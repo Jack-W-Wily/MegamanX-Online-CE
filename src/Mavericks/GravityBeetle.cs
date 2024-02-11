@@ -38,7 +38,7 @@ public class GravityBeetle : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new GBeetleShoot(false));
 				} else if (input.isPressed(Control.Special1, player) && well == null) {

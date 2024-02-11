@@ -38,7 +38,7 @@ public class Damager {
 			{ (int)ProjIds.MechChain, 1 },
 			{ (int)ProjIds.TunnelFangCharged, 1 },
 			{ (int)ProjIds.Headbutt, 1 },
-			{ (int)ProjIds.RocketPunch, 1 },
+			//{ (int)ProjIds.RocketPunch, 1 },
 			{ (int)ProjIds.InfinityGig, 1 },
 			{ (int)ProjIds.SpoiledBrat, 1 },
 			{ (int)ProjIds.SpinningBladeCharged, 1 },
@@ -314,7 +314,10 @@ public class Damager {
 			else if (projId == (int)ProjIds.FStagDash) character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
 			else if (projId == (int)ProjIds.DrDopplerDash) character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
 			else if (projId == (int)ProjIds.Sigma3Fire) character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
-
+			// Onhit cancel
+			if (owner?.character != null){
+			owner.character.CanOnHitCancel = true;
+			}
 			// Other effects
 			if (projId == (int)ProjIds.IceGattling) {
 				character.addIgFreezeProgress(1, 2);
@@ -346,12 +349,14 @@ public class Damager {
 				character.addIgFreezeProgress(4, 2);
 			} else if (projId == (int)ProjIds.SeaDragonRage) {
 				character.addIgFreezeProgress(1, 2);
+			} else if (projId == (int)ProjIds.DistanceNeedler) {
+				character.addIgFreezeProgress(1, 2);
 			} else if (projId == (int)ProjIds.SplashLaser) {
 				if (damagingActor != null) {
 					character.splashLaserKnockback(damagingActor.deltaPos);
 				}
 			} else if (projId == (int)ProjIds.MechFrogStompShockwave || projId == (int)ProjIds.FlameMStompShockwave || projId == (int)ProjIds.TBreakerProj) {
-				if (character.grounded && character.ownedByLocalPlayer) {
+				if (character.ownedByLocalPlayer) {
 					character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 				}
 			} else if (projId == (int)ProjIds.MechFrogGroundPound) {
@@ -412,7 +417,7 @@ public class Damager {
 					character.flinchCooldown[flinchKey] = flinchCooldown;
 				}
 			}
-
+			//Backshield code
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner)) {
 					damage--;
@@ -422,6 +427,20 @@ public class Damager {
 						character.playSound("ding");
 					}
 				}
+			}
+			//Block Code
+			if (character.sprite.name.Contains("block") &&
+			 damage > 0 && !isArmorPiercing(projId)) {
+					if (damage < 1) {
+						damage = 0;
+						character.playSound("ding");
+					}
+				}
+			
+			// imunity to small flinches while falling or frozen
+			if ((character.sprite.name.Contains("frozen") 
+			||(character.sprite.name.Contains("knocked")))&& flinch < 10) {
+			flinch = 0;
 			}
 
 			if (damage > 0) {
@@ -493,7 +512,7 @@ public class Damager {
 				damage *= 2;
 			}
 
-			if (maverick.player.isTagTeam() && !maverick.state.superArmor) {
+			if (!maverick.state.superArmor) {
 				if (flinch < Global.halfFlinch) flinch = 0;
 				// Large mavericks
 				if (maverick.isHeavy) {
@@ -577,6 +596,7 @@ public class Damager {
 						) {
 							maverick.changeState(new ArmoredAGuardChargeState(damage * 2));
 						}
+
 						flinch = 0;
 						damage = 0;
 						maverick.playSound("ding");
@@ -584,7 +604,7 @@ public class Damager {
 							owner.character is Zero zero &&
 							!zero.isHyperZero()
 						) {
-							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 ||
+							if (victim.sprite.name.Contains("block")|| projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 ||
 								projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3
 							) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
@@ -595,7 +615,7 @@ public class Damager {
 			}
 
 			if (damage > 0) {
-				if (flinch > 0 && !isOnFlinchCooldown) {
+				if (flinch > 3 && !isOnFlinchCooldown) {
 					if (weakness) {
 						victim.playSound("weakness");
 					} else {
@@ -647,7 +667,7 @@ public class Damager {
 			projId == (int)ProjIds.TriadThunderBall ||
 			projId == (int)ProjIds.TriadThunderBeam ||
 			projId == (int)ProjIds.TriadThunder ||
-			projId == (int)ProjIds.PeaceOutRoller ||
+			projId == (int)ProjIds.DistanceNeedler ||
 			projId == (int)ProjIds.RayGun ||
 			projId == (int)ProjIds.RayGun2 ||
 			projId == (int)ProjIds.PlasmaGun2 ||

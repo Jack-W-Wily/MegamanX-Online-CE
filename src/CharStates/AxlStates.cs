@@ -53,7 +53,6 @@ public class HyperAxlStart : CharState {
 }
 
 public class Hover : CharState {
-	public SoundWrapper sound;
 	float hoverTime;
 	Anim hoverExhaust;
 	Axl axl;
@@ -109,20 +108,12 @@ public class Hover : CharState {
 			exhaustPos(), "hover_exhaust", axl.getAxlXDir(), player.getNextActorNetId(), false, sendRpc: true
 		);
 		hoverExhaust.setzIndex(ZIndex.Character - 1);
-		if (character.ownedByLocalPlayer) {
-			sound = character.playSound("Axlhover", forcePlay: false, sendRpc: true);
-		}
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		hoverExhaust.destroySelf();
-		if (sound != null && !sound.deleted)
-		{
-			sound.sound?.Stop();
-		}
-		RPC.stopSound.sendRpc("Axlhover", character.netId);
 	}
 }
 

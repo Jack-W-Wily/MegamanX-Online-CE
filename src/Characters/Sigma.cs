@@ -198,7 +198,7 @@ public class Sigma : Character {
 			if (player.weapon is MaverickWeapon mw && (!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
-						if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+						if (!(charState is Idle || charState is Run || charState is Crouch || charState is Jump || charState is Fall   )) return;
 						if (isStriker && player.mavericks.Count > 0) return;
 						buyMaverick(mw);
 						var maverick = player.maverickWeapon.summon(player, pos.addxy(0, -112), pos, xDir);
@@ -524,8 +524,8 @@ public class Sigma : Character {
 					return;
 				}
 
-				changeSprite(getSprite(attackSprite), true);
-				if (player.isSigma1()) playSound("SigmaSaber", sendRpc: true);
+//				changeSprite(getSprite(attackSprite), true);
+				if (player.isSigma1()) playSound("saberShot", sendRpc: true);
 				if (player.isSigma2()) playSound("sigma2slash", sendRpc: true);
 			}
 		} else if (!isAttacking() && !isInvulnerableAttack() && (charState is Idle || charState is Run)) {
@@ -604,7 +604,7 @@ public class Sigma : Character {
 			return true;
 		}
 		if (player.isCrouchHeld() && canCrouch() &&
-			!isAttacking() && noBlockTime == 0 &&
+			!isAttacking() && noBlockTime == 0 && grounded &&
 			charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());
@@ -644,7 +644,7 @@ public class Sigma : Character {
 		} else if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
 			proj = new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true
+				0, 0, 0, isShield: true
 			);
 		} else if (sprite.name == "sigma2_attack") {
 			proj = new GenericMeleeProj(
@@ -919,9 +919,9 @@ public class Sigma : Character {
 	}
 
 	public override bool isAttacking() {
-		if (isSigmaShooting()) {
-			return true;
-		}
+		//if (isSigmaShooting()) {
+		//	return true;
+		//}
 		return base.isAttacking();
 	}
 

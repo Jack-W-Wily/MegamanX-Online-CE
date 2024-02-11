@@ -96,7 +96,7 @@ public class VileMissileProj : Projectile {
 	bool split;
 	int type;
 	public VileMissileProj(VileMissile weapon, Point pos, int xDir, int type, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 3, player, weapon.projSprite, 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 200, 3, player, weapon.projSprite, 3, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		projId = (int)ProjIds.VileMissile;
@@ -275,7 +275,7 @@ public class MissileAttack : CharState {
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
 		if (headPosNullable == null) return;
 
-		vile.playSound("MK2Stunshot", sendRpc: true);
+		vile.playSound("mk2rocket", sendRpc: true);
 		new Anim(headPosNullable.Value, "dust", 1, vile.player.getNextActorNetId(), true, true);
 
 		if (isStunShot) {

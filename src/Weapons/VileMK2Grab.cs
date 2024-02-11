@@ -17,6 +17,9 @@ public class VileMK2Grab : Weapon {
 public class VileMK2GrabState : CharState {
 	public Character victim;
 	float leechTime = 1;
+
+	float hitcd = 1;
+
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
 	public VileMK2GrabState(Character victim) : base("grab", "", "", "") {
@@ -24,12 +27,14 @@ public class VileMK2GrabState : CharState {
 		grabTime = VileMK2Grabbed.maxGrabTime;
 	}
 
+	bool SpawnShockwave;
+
 	public override void update() {
 		base.update();
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
-
-		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
+		hitcd += Global.spf;
+		if (victimWasGrabbedSpriteOnce && victim == null) {
 			character.changeState(new Idle(), true);
 			return;
 		}
@@ -50,14 +55,25 @@ public class VileMK2GrabState : CharState {
 				return;
 			}
 		}
-
+		var damager = new Damager(player, 0.25f, 0, 0);
 		if (leechTime > 0.5f) {
 			leechTime = 0;
 			character.addHealth(1);
-			var damager = new Damager(player, 1, 0, 0);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+			
 		}
-
+		if (character.sprite.name.Contains("raging") && character.frameIndex > 5 && hitcd > 0.2f){
+			hitcd =0;
+			character.playSound("armoredaCrash", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+		damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);	
+		}
+		if (player.input.isPressed(Control.Dash, player)) {
+			character.changeSpriteFromName("ragingdemon_grab", true);
+			sprite = "ragingdemon_grab";
+			sprite = "knocked_down";
+			SpawnShockwave = true;
+			victim.changeSpriteFromName("knocked_down", true);
+		}
 		if (player.input.isPressed(Control.Special1, player)) {
 			character.changeState(new Idle(), true);
 			return;
@@ -75,6 +91,12 @@ public class VileMK2GrabState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		if (SpawnShockwave){
+		new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+		character.pos.addxy(6 * character.xDir, 0), character.xDir, 
+		player, player.getNextActorNetId(), rpc: true);
+		character.playSound("crash", sendRpc: true);
+		}
 		character.grabCooldown = 1;
 		victim.grabInvulnTime = 2;
 		victim?.releaseGrab(character);
@@ -83,6 +105,9 @@ public class VileMK2GrabState : CharState {
 
 public class VileMK2Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
-	public VileMK2Grabbed(Character grabber) : base(grabber, maxGrabTime, "vilemk2_grab") {
+
+	
+
+	public VileMK2Grabbed(Character grabber) : base(grabber, maxGrabTime, "_grab") {
 	}
 }

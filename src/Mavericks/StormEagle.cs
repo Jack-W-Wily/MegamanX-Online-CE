@@ -17,7 +17,7 @@ public class StormEagle : Maverick {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
 		stateCooldowns.Add(typeof(StormEEggState), new MaverickStateCooldown(false, true, 1.5f));
 		stateCooldowns.Add(typeof(StormEGustState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 1f));
+		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 

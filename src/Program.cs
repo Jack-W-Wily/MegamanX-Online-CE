@@ -153,26 +153,27 @@ class Program {
 		Fonts.loadFontSprites();
 
 		List<string> loadText = new();
-		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
-		loadText.Add("Copyrigth ©2114, NOM Corporation");
-		loadText.Add("");
-		loadText.Add("MMXOD " + Global.shortForkName + " Revision " + Global.version + " " + Global.versionName);
+		loadText.Add("NOM BIOS v" + Global.version + ", Interesting...");
+		//loadText.Add("Copyrigth ©2114, NOM Corporation");
+		//loadText.Add("");
+		loadText.Add("MMXOD " + "Wily Cut" + " Special Edition " + "0.0" + " " + Global.versionName);
 		loadText.Add("");
 		if (String.IsNullOrEmpty(Options.main.playerName)) {
-			loadText.Add("User: Dr. Cain");
+			loadText.Add("User: Dr. Wily");
 		} else {
 			loadText.Add("User: " + Options.main.playerName);
 		}
 		loadText.Add("CPU: " + System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER").Split(",")[0]);
 		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
 		loadText.Add("");
-
 		// Input
 		Global.input = new Input(false);
 		setupControllers(window);
 
 		if (Options.main.areShadersDisabled() == false) {
-			loadText.Add("Shaders OK.");
+			loadText.Add("Shaders Systems ONLINE.");
+			loadText.Add(">G:I suppose it was a matter of time before you went loose");
+			
 			loadShaders();
 		} else {
 			loadText.Add("Shaders disabled, skipping.");
@@ -184,12 +185,14 @@ class Program {
 		if (MasterServerData.serverIp == "127.0.0.1") {
 			loadText[loadText.Count - 1] = "Using local conection.";
 		} else {
-			loadText[loadText.Count - 1] = "Masterserver OK.";
+			loadText[loadText.Count - 1] = "Conected to Master server.";
 		}
 
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
 		loadText[loadText.Count - 1] = "Loaded Sprites.";
+		loadText.Add(">W:HIHEHAHAHA, OUT OF MY WAY, I have a lot of shit to do");
+
 
 		loadText.Add("Loading Sprite JSONS...");
 		loadMultiThread(loadText, window, loadSprites);
@@ -198,15 +201,19 @@ class Program {
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
 		loadText[loadText.Count - 1] = "Maps Loaded.";
+		loadText.Add(">G:This is not quite stable yet,I recomend waiting for now");
+			
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
 		loadText[loadText.Count - 1] = "SFX Loaded.";
+		loadText.Add(">W:HA! No need I'll do all the testing myself");
+			
 
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
 		loadText[loadText.Count - 1] = "Music Loaded.";
-
+		loadText.Add("let the chaos roll for a little while we're at it shall we?");
 		loadText.Add("Calculating checksum...");
 		loadMultiThread(loadText, window, Global.computeChecksum);
 		loadText[loadText.Count - 1] = "Checksum OK.";

@@ -63,7 +63,7 @@ public class DrDoppler : Maverick {
 				}
 			}
 
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player) && ammo >= 8) {

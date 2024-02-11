@@ -420,7 +420,7 @@ public class UpgradeArmorMenu : IMainMenu {
 					mainPlayer.character.boughtUltimateArmorOnce = true;
 				}
 				mainPlayer.setUltimateArmor(true);
-				Global.playSound("chingX4");
+				Global.playSound("ching");
 				return true;
 			} else if (mainPlayer.canUpgradeGoldenX()) {
 				if (!mainPlayer.character.boughtGoldenArmorOnce) {

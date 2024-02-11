@@ -29,12 +29,12 @@ public class AssassinBullet : AxlWeapon {
 			// URGENT TODO
 			// player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
 		}
-		var bullet = new AssassinBulletProj(weapon, bulletPos, player.assassinHitPos.hitPos, xDir, player, target, headshotTarget, netId);
-		bullet.applyDamage(player.assassinHitPos.hitGos.ElementAtOrDefault(0), player.assassinHitPos.isHeadshot);
+		//var bullet = new AssassinBulletProj(weapon, bulletPos, player.assassinHitPos.hitPos, xDir, player, target, headshotTarget, netId);
+		//bullet.applyDamage(player.assassinHitPos.hitGos.ElementAtOrDefault(0), player.assassinHitPos.isHeadshot);
 
 		if (player.ownedByLocalPlayer) {
-			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(bulletPos, bullet);
-			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		//	AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(bulletPos, bullet);
+		//	RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
 	}
 }

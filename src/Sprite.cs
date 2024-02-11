@@ -142,7 +142,7 @@ public class Sprite {
 					float poiX = (float)Convert.ToDouble(poisJson[j]["x"]);
 					float poiY = (float)Convert.ToDouble(poisJson[j]["y"]);
 					string tags = Convert.ToString(poisJson[j]["tags"]);
-					if (tags == "h" || (name.Contains("zero_") && string.IsNullOrEmpty(tags))) {
+					if (tags == "h" || (name.Contains("superzero_") && string.IsNullOrEmpty(tags))) {
 						frame.headPos = new Point(poiX, poiY);
 					} else {
 						frame.POIs.Add(new Point(poiX, poiY));

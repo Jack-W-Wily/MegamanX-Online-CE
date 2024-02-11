@@ -124,7 +124,7 @@ public class VileCannon : Weapon {
 
 public class VileCannonProj : Projectile {
 	public VileCannonProj(VileCannon weapon, Point pos, int xDir, int gizmoNum, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 300, 3, player, weapon.projSprite, 4, 0f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)ProjIds.MK2Cannon;
 		maxTime = 0.5f;

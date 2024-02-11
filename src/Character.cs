@@ -42,6 +42,8 @@ public partial class Character : Actor, IDamagable {
 	public bool boughtUltimateArmorOnce;
 	public bool boughtGoldenArmorOnce;
 
+	public bool CanOnhitCancel;
+
 	public float headbuttAirTime = 0;
 	public int dashedInAir = 0;
 	public bool lastAirDashWasSide;
@@ -61,6 +63,8 @@ public partial class Character : Actor, IDamagable {
 	public float invulnTime = 0;
 	public float parryCooldown;
 	public float maxParryCooldown = 0.5f;
+
+
 
 	public bool stockedCharge;
 	public void stockCharge(bool stockOrUnstock) {
@@ -494,7 +498,7 @@ public partial class Character : Actor, IDamagable {
 	// Stuck in place and can't do any action but still can activate controls, etc.
 	public virtual bool isSoftLocked() {
 		if (charState is WarpOut) return true;
-		if (player.currentMaverick != null) return true;
+		if (player.currentMaverick != null) return false;
 		//if (player.weapon is MaverickWeapon mw && mw.isMenuOpened) return true;
 		return false;
 	}
@@ -735,6 +739,9 @@ public partial class Character : Actor, IDamagable {
 		if (sprite.name.Contains("_ra_")) {
 			rect.y2 = 20;
 		}
+		if (sprite.name.Contains("_grabbed")){
+			rect.y2 = 1;
+		}
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
@@ -828,7 +835,12 @@ public partial class Character : Actor, IDamagable {
 	long originalZIndex;
 	bool viralOnce;
 
+
 	public override void update() {
+
+		if (charState is Idle) {
+		CanOnhitCancel = false;
+		}
 		if (charState is not InRideChaser) {
 			camOffsetX = Helpers.lerp(camOffsetX, 0, Global.spf * 10);
 			camOffsetX = MathF.Round(camOffsetX);
@@ -1545,7 +1557,7 @@ public partial class Character : Actor, IDamagable {
 	public bool isCCImmuneHyperMode() {
 		// The former two hyper modes rely on a float time value sync.
 		// The latter two hyper modes are boolean states so use the BoolState ("BS") system.
-		return isAwakenedGenmuZeroBS.getValue() || (isInvisibleBS.getValue() && player.isAxl) || isHyperSigmaBS.getValue() || isHyperXBS.getValue();
+		return isHyperSigmaBS.getValue();//isAwakenedGenmuZeroBS.getValue() || (isInvisibleBS.getValue() && player.isAxl) || isHyperSigmaBS.getValue() || isHyperXBS.getValue();
 	}
 
 	public virtual bool isToughGuyHyperMode() {
@@ -1589,8 +1601,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool isSpriteInvulnerable() {
-		return sprite.name == "mmx_gigacrush" || sprite.name == "zero_hyper_start" || sprite.name == "axl_hyper_start" || sprite.name == "zero_rakuhouha" ||
-			sprite.name == "zero_rekkoha" || sprite.name == "zero_cflasher" || sprite.name.Contains("vile_revive") || sprite.name.Contains("warp_out") || sprite.name.Contains("nova_strike");
+		return sprite.name == "mmx_gigacrush" || sprite.name == "superzero_hyper_start" || sprite.name == "axl_hyper_start" || sprite.name == "superzero_rakuhouha" ||
+			sprite.name == "superzero_rekkoha" || sprite.name == "superzero_cflasher" || sprite.name.Contains("vile_revive") || sprite.name.Contains("warp_out") || sprite.name.Contains("nova_strike");
 	}
 
 	public bool isCStingVulnerable(int projId) {
@@ -1609,7 +1621,7 @@ public partial class Character : Actor, IDamagable {
 			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
 			if (!isAxlSelfDamage) return false;
 		}
-
+		
 		// Bommerang can go thru invisibility check
 		if (player.alliance != damagerAlliance && projId != null && isCStingVulnerable(projId.Value)) {
 			return true;
@@ -2779,7 +2791,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (player.isSigma || isToughGuyHyperMode()) {
+		if (sprite.name.Contains("vile") && sprite.name.Contains("grab") || player.isSigma && player.currentMaverick != null || isToughGuyHyperMode()) {
 			if (miniFlinchTime > 0) return;
 			else {
 				flinchFrames = 0;
@@ -2844,7 +2856,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalizeEnd() {
 		isCrystalized = false;
-		playSound("CrystalizeDashingX2");
+		playSound("freezebreak2");
 		for (int i = 0; i < 8; i++) {
 			var anim = new Anim(getCenterPos().addxy(Helpers.randomRange(-20, 20), Helpers.randomRange(-20, 20)), "crystalhunter_piece", Helpers.randomRange(0, 1) == 0 ? -1 : 1, null, false);
 			anim.frameIndex = Helpers.randomRange(0, 1);

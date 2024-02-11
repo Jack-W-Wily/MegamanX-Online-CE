@@ -42,9 +42,9 @@ public class Vile : Character {
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
 		if (isWarpIn) {
-			if (mk5VileOverride) {
+			if (player.vileCannonWeapon.type == 2) {
 				vileForm = 2;
-			} else if (mk2VileOverride) {
+			} else if (player.vileCannonWeapon.type == 1) {
 				vileForm = 1;
 			}
 			if (player.vileFormToRespawnAs == 2 || Global.quickStartVileMK5 == true) {
@@ -315,7 +315,7 @@ public class Vile : Character {
 			charState is DarkHoldState || charState is HexaInvoluteState || charState is CallDownMech || charState is NapalmAttack) return;
 
 		if (charState is Dash || charState is AirDash) {
-			if (isVileMK2 && (player.input.isPressed(Control.Special1, player))) {
+			if ((player.input.isPressed(Control.Special1, player))) {
 				charState.isGrabbing = true;
 				charState.superArmor = true;
 				changeSpriteFromName("dash_grab", true);
@@ -351,12 +351,13 @@ public class Vile : Character {
 						player.vileFlamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 					}
 				}
-			} else if (charState is Idle || charState is Dash || charState is Run || charState is RocketPunchAttack) {
+			} else if (charState is Idle ||  charState is AirDash || charState is Dash || charState is Run ||  charState is RocketPunchAttack) {
 				if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && !player.input.isHeld(Control.Up, player)) {
 					if (player.vileRocketPunchWeapon.type > -1) {
 						player.vileRocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
 					}
-				} else if (charState is not RocketPunchAttack) {
+				//ara ara~~ sugoooooi rokketo pantsu canceru
+				} else if (charState is not Crouch) {
 					if (!player.input.isHeld(Control.Up, player) || player.vileCutterWeapon.type == -1) {
 						if (player.vileMissileWeapon.type > -1) {
 							player.vileMissileWeapon.vileShoot(WeaponIds.ElectricShock, this);
@@ -366,7 +367,8 @@ public class Vile : Character {
 					}
 				}
 			}
-		} else if (player.input.isHeld(Control.Shoot, player)) {
+		} else if (player.input.isHeld(
+			Control.Shoot, player)) {
 			if (player.vileCutterWeapon.shootTime < player.vileCutterWeapon.rateOfFire * 0.75f) {
 				player.weapon.vileShoot(0, this);
 			}
@@ -377,9 +379,17 @@ public class Vile : Character {
 		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
 			changeSpriteFromName("fall", true);
 		}
+		if (player.input.isHeld(Control.Up, player) &&
+			!isAttacking() && grounded &&
+			charState is not SwordBlock
+		) {
+			changeState(new SwordBlock());
+			return true;
+		}
 		if (canVileHover() &&
+			sprite.name.Contains("fall") &&
 			player.input.isPressed(Control.Jump, player) &&
-			charState is not VileHover
+			charState is not VileHover && charState is not Jump
 		) {
 			changeState(new VileHover(), true);
 			return true;
@@ -545,6 +555,11 @@ public class Vile : Character {
 		Projectile proj = null;
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0);
+		}
+		if (sprite.name.Contains("_block") && !collider.isHurtBox()) {
+			return new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isShield: true
+			);
 		}
 		return proj;
 	}

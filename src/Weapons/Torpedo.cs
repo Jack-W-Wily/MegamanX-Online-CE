@@ -15,7 +15,7 @@ public class Torpedo : Weapon {
 		weaponSlotIndex = 1;
 		weaknessIndex = 3;
 		shootSounds = new List<string>() { "torpedo", "torpedo", "torpedo", "buster3" };
-		rateOfFire = 0.625f;
+		rateOfFire = 0.25f;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -43,7 +43,7 @@ public class TorpedoProj : Projectile, IDamagable {
 	public float maxSpeed = 150;
 	int type;
 	public TorpedoProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, float? angle = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 2, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 2, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 1, 0f, netProjId, player.ownedByLocalPlayer) {
 		if (type == 0) projId = (int)ProjIds.Torpedo;
 		else if (type == 1) projId = (int)ProjIds.TorpedoCharged;
 		else if (type == 2) projId = (int)ProjIds.MechTorpedo;

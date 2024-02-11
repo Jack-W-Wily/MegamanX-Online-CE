@@ -71,7 +71,7 @@ public class MagnaCentipede : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
 				if (shootHeldTime > 0.2f && magnetMineParent == null && !noTail) {
 					shootHeldTime = 0;
 					changeState(new MagnaCMagnetMineState());

@@ -261,8 +261,8 @@ public class SpiralMagnumProj : Projectile {
 		if (victim != null) {
 			var hitChar = victim as Character;
 
-			bool canBlock = reflectable && !weakness && hitChar != null && hitChar.player.isZero && (hitChar.sprite.name == "zero_block" || (hitChar.sprite.name.Contains("zero_attack") && hitChar.sprite.getCurrentFrame().hitboxes.Count > 0));
-			if (canBlock && hitChar.sprite.name != "zero_attack_air2") {
+			bool canBlock = reflectable && !weakness && hitChar != null && hitChar.player.isZero && (hitChar.sprite.name == "superzero_block" || (hitChar.sprite.name.Contains("superzero_attack") && hitChar.sprite.getCurrentFrame().hitboxes.Count > 0));
+			if (canBlock && hitChar.sprite.name != "superzero_attack_air2") {
 				canBlock = canBlock && hitChar.xDir == -MathF.Sign(vel.x);
 				if (player.character.pos.distanceTo(hitChar.pos) < 50) {
 					canBlock = false;

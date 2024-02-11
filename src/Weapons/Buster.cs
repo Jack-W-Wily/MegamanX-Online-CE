@@ -55,7 +55,6 @@ public class Buster : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		string shootSound = "buster";
-		if (player.hasArmArmor(ArmorId.Light) || player.hasArmArmor(ArmorId.None) || player.hasUltimateArmor())
 		shootSound = chargeLevel switch {
 			_ when (
 					player.character.stockedCharge
@@ -63,17 +62,16 @@ public class Buster : Weapon {
 			0 => "buster",
 			1 => "buster2",
 			2 => "buster3",
-			3 => "buster4"
+			_ => "buster4"
 		};
 		if (player.hasArmArmor(ArmorId.Giga)) {
 			shootSound = chargeLevel switch {
 				_ when (
 					player.character.stockedCharge
 				) => "",
-				0 => "buster", //i have to rip the sound of this one
 				1 => "buster2X2",
 				2 => "buster3X2",
-				3 => "", //haha this causes bugs
+				3 => "",
 				_ => shootSound
 			};
 		} else if (player.hasArmArmor(ArmorId.Max)) {
@@ -84,10 +82,8 @@ public class Buster : Weapon {
 				_ when (
 					player.character.stockedX3Buster
 				) => "",
-				0 => "busterX3",
 				1 => "buster2X3",
-				2 => "buster3X3",
-				3 => "buster3X3",
+				3 => "",
 				_ => shootSound
 			};
 		}
@@ -232,14 +228,14 @@ public class Buster3Proj : Projectile {
 		}
 		// Double buster part 1
 		if (type == 1) {
-			damager.damage = 4;
+			damager.damage = 2;
 			changeSprite("buster3_x2", true);
 			projId = (int)ProjIds.Buster4;
 			reflectable = false;
 		}
 		// Double buster part 2
 		if (type == 2) {
-			damager.damage = 4;
+			damager.damage = 2;
 			changeSprite("buster4_x2", true);
 			fadeSprite = "buster4_x2_fade";
 			for (int i = 0; i < 6; i++) {
@@ -327,8 +323,8 @@ public class Buster4Proj : Projectile {
 		int type, float offsetTime, ushort netProjId,
 		bool smoothStart = false
 	) : base(
-		weapon, pos, xDir, 396, 4, player, "buster4",
-		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 396, 1, player, "buster4",
+		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster4_fade";
 		this.type = type;
@@ -497,7 +493,7 @@ public class X3ChargeShot : CharState {
 					player.weapon, character.getShootPos(), character.getShootXDir(),
 					3, player, player.getNextActorNetId(), rpc: true
 				);
-				//character.playSound("buster3X3", sendRpc: true);
+				character.playSound("buster3X3", sendRpc: true);
 			} else {
 				if (hyperBusterWeapon != null) {
 					hyperBusterWeapon.ammo -= hyperBusterWeapon.getChipFactoredAmmoUsage(player);

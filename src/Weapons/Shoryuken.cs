@@ -41,8 +41,9 @@ public class Shoryuken : CharState {
 			jumpedYet = true;
 			character.dashedInAir++;
 			character.vel.y = -character.getJumpPower() * 1.5f;
-			character.playSound("shoryukenV", sendRpc: true);		
-
+			if (!isUnderwater) {
+				character.playSound("shoryuken", sendRpc: true);
+			}
 		}
 		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Count > 0) {
 			character.move(new Point(character.xDir * 150, 0));

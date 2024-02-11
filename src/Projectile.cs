@@ -103,7 +103,7 @@ public class Projectile : Actor {
 				return;
 			}
 		} else {
-			if (time > maxTime + 0.2 ||
+			if (time > maxTime * 1.5 ||
 				moveDistance > maxDistance ||
 				pos.x > Global.level.width + leeway ||
 				pos.x < -leeway ||
@@ -414,7 +414,7 @@ public class Projectile : Actor {
 			if (otherProj != null && otherProj.isDeflectShield && reflectable && damager.owner.alliance != otherProj.damager.owner.alliance) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					deflect(otherProj.owner, playDingSound: false);
-					playSound("SigmaSaberBlock", forcePlay: false, sendRpc: true);
+					playSound("ding", sendRpc: true);
 				}
 			}
 

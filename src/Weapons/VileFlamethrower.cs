@@ -72,20 +72,22 @@ public class VileFlamethrower : Weapon {
 		if (shootTime == 0) {
 			if (weaponInput == WeaponIds.VileFlamethrower) {
 				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
-				if (ground == null) {
+			
+			//	if (ground == null) {
 					if (vile.player.vileAmmo > 0) {
 						vile.setVileShootTime(this);
 						vile.changeState(new FlamethrowerState(), true);
 					}
-				}
+			//	}
+			
 			} else if (weaponInput == WeaponIds.VileBomb) {
 				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
-				if (ground == null) {
+				//if (ground == null) {
 					if (vile.player.vileAmmo > 0) {
 						vile.setVileShootTime(this);
 						vile.changeState(new FlamethrowerState(), true);
 					}
-				}
+				//}
 			} else if (weaponInput == WeaponIds.Napalm) {
 				if (vile.player.vileAmmo > 0) {
 					vile.changeState(new NapalmAttack(NapalmAttackType.Flamethrower), true);
@@ -109,10 +111,10 @@ public class FlamethrowerState : CharState {
 
 		shootTime += Global.spf;
 		if (shootTime > 0.06f) {
-			if (!vile.tryUseVileAmmo(2)) {
-				character.changeToIdleOrFall();
-				return;
-			}
+			//if (!vile.tryUseVileAmmo(2)) {
+			//	character.changeToIdleOrFall();
+			//	return;
+			//}
 			shootTime = 0;
 			character.playSound("flamethrower");
 			new FlamethrowerProj(player.vileFlamethrowerWeapon, character.getPOIPos(shootPOI), character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
@@ -139,7 +141,7 @@ public class FlamethrowerProj : Projectile {
 	bool napalmInput;
 	float destroyTime;
 	public FlamethrowerProj(VileFlamethrower weapon, Point pos, int xDir, bool napalmInput, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, weapon.projSprite, 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, weapon.projSprite, 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = weapon.projId;
 		fadeSprite = weapon.projFadeSprite;
 		destroyOnHit = true;

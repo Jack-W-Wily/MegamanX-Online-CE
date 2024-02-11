@@ -774,7 +774,7 @@ public partial class Actor : GameObject {
 			// Prioritize certain colliders over others, running them first
 			triggerList = triggerList.OrderBy(trigger => {
 				if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None &&
-					(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zero_block")) {
+					(trigger.otherCollider.originalSprite.Contains("block"))) {
 					return 0;
 				} else if (trigger.otherCollider.originalSprite?.StartsWith("sigma3_kaiser") == true && trigger.otherCollider.name == "head") {
 					return 0;

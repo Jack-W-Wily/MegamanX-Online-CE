@@ -665,11 +665,13 @@ public class SwordBlock : CharState {
 		base.update();
 
 		bool isHoldingGuard;
-		if (!player.isSigma) {
+		if (player.isZero) {
 			isHoldingGuard = player.input.isHeld(Control.WeaponLeft, player) || player.input.isHeld(Control.WeaponRight, player);
-		} else {
+		}if (player.isSigma) {
 			isHoldingGuard = player.isCrouchHeld();
-		}
+		} else {
+			isHoldingGuard = player.input.isHeld(Control.Up, player);
+			}
 
 		if (!player.isControllingPuppet()) {
 			bool leftGuard = player.input.isHeld(Control.Left, player);
@@ -684,7 +686,7 @@ public class SwordBlock : CharState {
 			return;
 		}
 
-		if (player.input.isPressed(Control.Shoot, player) && character.saberCooldown == 0 && !player.isControllingPuppet()) {
+		if ((player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.Shoot, player) )&& !player.isControllingPuppet()) {
 			if (sigma != null) {
 				sigma.noBlockTime = 0.25f;
 			}
@@ -944,7 +946,7 @@ public class AirDash : CharState {
 	public bool stop;
 
 	public AirDash(string initialDashButton) : base("dash", "dash_shoot") {
-		enterSound = "DashX2";
+		enterSound = "dash";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
 		attackCtrl = true;
@@ -1077,7 +1079,7 @@ public class WallSlide : CharState {
 	) : base(
 		"wall_slide", "wall_slide_shoot", "wall_slide_attack"
 	) {
-		enterSound = "land";
+		enterSound = "wallslide";
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
 		accuracy = 2;
@@ -1172,7 +1174,7 @@ public class WallSlide : CharState {
 
 public class WallKick : CharState {
 	public WallKick() : base("wall_kick", "wall_kick_shoot") {
-		enterSound = "jump";
+		enterSound = "wallkick";
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
@@ -1539,8 +1541,9 @@ public class Stunned : CharState {
 	public Stunned() : base("lose") {
 	}
 
+/*
 	public override bool canEnter(Character character) {
-		if (!base.canEnter(character) ||
+		if (
 			character.stunInvulnTime > 0 ||
 			character.isInvulnerable() ||
 			character.charState is SwordBlock ||
@@ -1555,7 +1558,7 @@ public class Stunned : CharState {
 		}
 		return true;
 	}
-
+*/
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.ownedByLocalPlayer) return;

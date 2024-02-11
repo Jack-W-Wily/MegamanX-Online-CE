@@ -32,7 +32,7 @@ public class FlameMammoth : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {

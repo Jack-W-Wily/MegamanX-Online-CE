@@ -741,9 +741,26 @@ public class Axl : Character {
 			changeState(new Hover(), true);
 			return true;
 		}
+		if (player.input.isHeld(Control.Up, player) && 
+			!isAttacking() && grounded &&
+			charState is not SwordBlock
+		) {
+			changeState(new SwordBlock());
+			return true;
+		}
 		return base.normalCtrl();
 	}
 
+	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile proj = null;
+		if (sprite.name.Contains("_block") && !collider.isHurtBox()) {
+			return new GenericMeleeProj(
+				new ZSaber(player), centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
+			);
+		}
+		return proj;
+	}
+	
 	public float getAimBackwardsAmount() {
 		Point bulletDir = getAxlBulletDir();
 

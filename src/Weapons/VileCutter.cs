@@ -128,7 +128,7 @@ public class VileCutterProj : Projectile {
 	public float soundCooldown;
 
 	public VileCutterProj(VileCutter weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 2, player, weapon.projSprite, 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 2, player, weapon.projSprite, 1, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)weapon.projId;
 		destroyOnHit = true;

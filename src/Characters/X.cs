@@ -493,6 +493,13 @@ public partial class MegamanX : Character {
 	}
 
 	public override bool normalCtrl() {
+		if (player.input.isHeld(Control.Up, player) &&
+			!isAttacking() && grounded && charState is Idle && 
+			charState is not SwordBlock
+		) {
+			changeState(new SwordBlock());
+			return true;
+		}
 		if (!grounded) {
 			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
 				CharState dashState;
@@ -788,7 +795,7 @@ public partial class MegamanX : Character {
 				player.character.boughtUltimateArmorOnce = true;
 			}
 			player.setUltimateArmor(true);
-			Global.playSound("chingX4");
+			Global.playSound("ching");
 			return;
 		}
 	}
@@ -946,7 +953,11 @@ public partial class MegamanX : Character {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
-
+		if (sprite.name.Contains("_block") && !collider.isHurtBox()) {
+			return new GenericMeleeProj(
+				new ZSaber(player), centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
+			);
+		}
 		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
 			float overrideDamage = 3;
 			if (!grounded) overrideDamage = 2;
@@ -1041,7 +1052,7 @@ public partial class MegamanX : Character {
 	}
 
 	public void drawHyperCharge(float x, float y) {
-		addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
+		addRenderEffect(RenderEffectType.Flash, 0.05f, 0.1f);
 		hyperChargeAnimTime += Global.spf;
 		if (hyperChargeAnimTime >= maxHyperChargeAnimTime) hyperChargeAnimTime = 0;
 		float sx = pos.x + x;

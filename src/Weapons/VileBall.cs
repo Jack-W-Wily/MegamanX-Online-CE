@@ -88,7 +88,7 @@ public class VileBombProj : Projectile {
 	int type;
 	bool split;
 	public VileBombProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 2, player, type == 0 ? "vile_bomb_air" : "vile_bomb_ground", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 100, 2, player, type == 0 ? "vile_bomb_air" : "vile_bomb_ground", 4, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.VileBomb;
 		if (type == 0) maxTime = 0.45f;
 		if (type == 1) maxTime = 0.3f;
@@ -140,7 +140,7 @@ public class PeaceOutRollerProj : Projectile {
 	int type;
 	bool split;
 	public PeaceOutRollerProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 3, player, "ball_por_proj", 1, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 75, 3, player, "ball_por_proj", 15, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.PeaceOutRoller;
 		maxTime = 0.5f;
 		if (type == 1) maxTime = 0.4f;

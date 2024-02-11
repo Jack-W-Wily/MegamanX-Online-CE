@@ -107,6 +107,9 @@ public partial class Character {
 	public NetCharBoolState isNightmareZeroBS;
 	public NetCharBoolState isDarkHoldBS;
 
+	public bool CanOnHitCancel { get; internal set; }
+
+
 	public void initNetCharState2() {
 		isHyperChargeActiveBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Two, (character) => { return character.player.showHyperBusterCharge(); });
 		isSpeedDevilActiveBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.Two, (character) => { return character.player.speedDevil; });

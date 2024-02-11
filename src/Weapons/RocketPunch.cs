@@ -89,7 +89,7 @@ public class RocketPunchProj : Projectile {
 	}
 
 	public RocketPunchProj(RocketPunch weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, getSpeed(weapon.type), 3, player, weapon.projSprite, Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, getSpeed(weapon.type), 3, player, weapon.projSprite, 20, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.RocketPunch;
 		this.player = player;
 		shooter = player.character;

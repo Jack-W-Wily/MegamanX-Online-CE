@@ -623,7 +623,7 @@ public partial class Player {
 		}
 		int bonus = 0;
 		if (isSigma && isPuppeteer()) bonus = 4;
-		return (16 + bonus + (heartTanks * getHeartTankModifier())) * getHealthModifier();
+		return (28 + bonus + (heartTanks * getHeartTankModifier())) * getHealthModifier();
 	}
 
 	public void creditHealing(float healAmount) {
@@ -1372,10 +1372,10 @@ public partial class Player {
 	}
 
 	public bool canUpgradeUltimateX() {
-		return character != null &&
-			isX && !isDisguisedAxl &&
-			character.charState is not Die && !Global.level.is1v1() &&
-			!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= ultimateArmorCost;
+		return false;//character != null &&
+			//isX && !isDisguisedAxl &&
+			//character.charState is not Die && !Global.level.is1v1() &&
+			//!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= ultimateArmorCost;
 	}
 
 	public void destroy() {

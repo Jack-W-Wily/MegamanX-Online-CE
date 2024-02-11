@@ -56,7 +56,7 @@ public class BoomerKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun || state is BoomerKDashState) {
+			if (state is MIdle || state is MJump || state is MFall || state is MRun || state is BoomerKDashState) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;
@@ -84,7 +84,7 @@ public class BoomerKuwanger : Maverick {
 				}
 			}
 		} else {
-			if (!bald && (state is MIdle || state is MRun || state is BoomerKDashState)) {
+			if (!bald && (state is MIdle || state is MJump || state is MFall || state is MRun|| state is BoomerKDashState)) {
 				foreach (var enemyPlayer in Global.level.players) {
 					if (enemyPlayer.character == null || enemyPlayer == player) continue;
 					var chr = enemyPlayer.character;
