@@ -314,9 +314,16 @@ public class Damager {
 			else if (projId == (int)ProjIds.FStagDash) character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
 			else if (projId == (int)ProjIds.DrDopplerDash) character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
 			else if (projId == (int)ProjIds.Sigma3Fire) character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
-			// Onhit cancel
+			
+			//>>>>>>>>>>>>>>>>>>>
+			// Jump Cancel System
 			if (owner?.character != null){
-			owner.character.CanOnHitCancel = true;
+			owner.character.JumpCancelTime = 0.25f;
+			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+			//Grab fix test FUCK YOU GM HOLY MOTHER OF GOD
+			if (projId == (int)ProjIds.VileMK2Grab && !(character.charState is VileMK2Grabbed)) {	
+				character.changeState(new VileMK2Grabbed(owner.character), true);			
 			}
 			// Other effects
 			if (projId == (int)ProjIds.IceGattling) {

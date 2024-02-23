@@ -448,6 +448,7 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public bool launched;
 	float launchTime;
+
 	public DeadLiftGrabbed(BoomerKuwanger grabber) : base(grabber, 1, "") {
 		customUpdate = true;
 	}
@@ -461,8 +462,14 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-			if (character.stopCeiling()) {
-				new BoomerKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerKDeadLift);
+			for (int i = 1; i <= 4; i++) {
+			CollideData collideData = Global.level.checkCollisionActor(character, 0, -10 * i * character.getYMod(), autoVel: true);							
+				if (collideData != null&& collideData.gameObject is Wall wall
+				&& collideData.isCeilingHit()) {
+				character.addHealth(-3f);
+				character.changeState(new KnockedDown(1), true);
+				//	new BoomerKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerKDeadLift);
+				}
 			}
 			return;
 		}

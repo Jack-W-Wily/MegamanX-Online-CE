@@ -353,10 +353,18 @@ public class Axl : Character {
 		updateAxlAim();
 
 		if (dodgeRollCooldown == 0 && player.canControl) {
+			
+
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
 				changeState(new DodgeRoll());
 			}
-			else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+			if (player.input.isHeld(Control.AxlCrouch, player) && player.input.isPressed(Control.Dash, player) && canDash()) {
+				changeState(new DodgeRoll());
+			}
+			if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Dash, player) && canDash()) {
+				changeState(new DodgeRoll());
+			}
+			 if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new DodgeRoll(), true);
 			}
 		}
@@ -753,7 +761,7 @@ public class Axl : Character {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
-		if (sprite.name.Contains("_block") && !collider.isHurtBox()) {
+		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				new ZSaber(player), centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
 			);

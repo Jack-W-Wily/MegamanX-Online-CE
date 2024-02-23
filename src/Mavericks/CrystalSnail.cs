@@ -88,6 +88,9 @@ public class CrystalSnail : Maverick {
 	}
 
 	public override string getMaverickPrefix() {
+		if (Options.main.smallBarsEx){
+		return "tt_csnail";
+		}
 		return "csnail";
 	}
 

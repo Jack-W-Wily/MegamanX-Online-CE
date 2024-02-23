@@ -11,7 +11,7 @@ public class Velguarder : Maverick {
 
 	public Velguarder(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 1.75f));
 		meleeWeapon = new VelGMeleeWeapon(player);
 		canClimbWall = true;
 
@@ -114,7 +114,7 @@ public class VelGMeleeWeapon : Weapon {
 #region projectiles
 public class VelGFireProj : Projectile {
 	public VelGFireProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 125, 1, player, "velg_proj_fire", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 125, 1, player, "velg_proj_fire", 1, 0.01f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.VelGFire;
 		maxTime = 1f;
 		vel.y = 200;
@@ -165,13 +165,42 @@ public class VelGShootFireState : MaverickState {
 		base.update();
 		if (player == null) return;
 
-		if (maverick.frameIndex == 1) {
+		if (maverick.frameIndex >= 1) {
 			var poi = maverick.getFirstPOIOrDefault();
 			shootTime += Global.spf;
 			if (shootTime > 0.05f) {
 				shootTime = 0;
 				maverick.playSound("fireWave", sendRpc: true);
+				// >>>>> FlameThrowers
+
+				//Classic
+				if (!player.input.isHeld(Control.Up, player)
+				&& !player.input.isHeld(Control.Down, player)
+				&& !(player.input.isHeld(Control.Left, player)
+				|| player.input.isHeld(Control.Right, player))){
 				new VelGFireProj(new VelGFireWeapon(), poi, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				}
+				//Dragon's Wrath
+				if (player.input.isHeld(Control.Up, player)
+				&& !player.input.isHeld(Control.Down, player)
+				&& !(player.input.isHeld(Control.Left, player)
+				|| player.input.isHeld(Control.Right, player))){
+					new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi, maverick.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				}
+				//SeaDragon Rage
+				if (!player.input.isHeld(Control.Up, player)
+				&& player.input.isHeld(Control.Down, player)
+				&& !(player.input.isHeld(Control.Left, player)
+				|| player.input.isHeld(Control.Right, player))){
+					new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi, maverick.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				}
+				//Wild Horse Kick
+				if (!player.input.isHeld(Control.Up, player)
+				&& !player.input.isHeld(Control.Down, player)
+				&& (player.input.isHeld(Control.Left, player)
+				|| player.input.isHeld(Control.Right, player))){
+					new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), poi, maverick.xDir,true, player, player.getNextActorNetId(), sendRpc: true);
+				}
 			}
 		}
 

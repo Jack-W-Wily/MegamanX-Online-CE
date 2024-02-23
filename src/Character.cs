@@ -62,6 +62,7 @@ public partial class Character : Actor, IDamagable {
 	public bool insideCharacter;
 	public float invulnTime = 0;
 	public float parryCooldown;
+	public float JumpCancelTime;
 	public float maxParryCooldown = 0.5f;
 
 
@@ -539,10 +540,23 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool canJump() {
 		if (mk5RideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// Jump Cancel System
+		if (isAttacking() && JumpCancelTime > 0){ 
+		return true;
+		}
+		if (isAttacking() && JumpCancelTime == 0){ 
+		return false;
+		}
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		return true;
 	}
 
 	public virtual bool canCrouch() {
+		if (player.isZero && (sprite.name.Contains("quakeblazer")|| sprite.name.Contains("hyouretsuzan") || sprite.name.Contains("rakukojin")) )
+		{
+		return false;	
+		}
 		if (isSoftLocked() || isDashing) {
 			return false;
 		}
@@ -849,6 +863,7 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
 		Helpers.decrementTime(ref parryCooldown);
+		Helpers.decrementTime(ref JumpCancelTime);
 
 		if (ownedByLocalPlayer && player.possessedTime > 0) {
 			player.possesseeUpdate();
@@ -1525,7 +1540,7 @@ public partial class Character : Actor, IDamagable {
 			int chargeType = 0;
 			if (player.isZBusterZero()) {
 				chargeType = 1;
-			} else if (player.isX && player.hasArmArmor(3)) {
+			} else if (player.isX && player.hasAllX3Armor()) {
 				if (player.hasGoldenArmor()) {
 					chargeType = 2;
 				}
@@ -1601,8 +1616,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool isSpriteInvulnerable() {
-		return sprite.name == "mmx_gigacrush" || sprite.name == "superzero_hyper_start" || sprite.name == "axl_hyper_start" || sprite.name == "superzero_rakuhouha" ||
-			sprite.name == "superzero_rekkoha" || sprite.name == "superzero_cflasher" || sprite.name.Contains("vile_revive") || sprite.name.Contains("warp_out") || sprite.name.Contains("nova_strike");
+		return sprite.name == "mmx_gigacrush" || sprite.name == "zero_hyper_start" || sprite.name == "axl_hyper_start" || sprite.name == "zero_rakuhouha" ||
+			sprite.name == "zero_rekkoha" || sprite.name == "zero_cflasher" || sprite.name.Contains("vile_revive") || sprite.name.Contains("warp_out") || sprite.name.Contains("nova_strike");
 	}
 
 	public bool isCStingVulnerable(int projId) {
@@ -2101,7 +2116,7 @@ public partial class Character : Actor, IDamagable {
 				shouldDrawHealthBar = true;
 			}
 			  // X with scan
-			  else if (!player.isMainPlayer && Global.level.mainPlayer.isX && Global.level.mainPlayer.hasHelmetArmor(2) && player.scanned && !isStealthy(Global.level.mainPlayer.alliance)) {
+			  else if (!player.isMainPlayer && Global.level.mainPlayer.isX && Global.level.mainPlayer.hasFullGiga() && player.scanned && !isStealthy(Global.level.mainPlayer.alliance)) {
 				overrideTextColor = Color.Red;
 				overrideColor = Helpers.DarkBlue;
 				shouldDrawName = true;
@@ -2531,10 +2546,10 @@ public partial class Character : Actor, IDamagable {
 				} else if (mmx.hasBarrier(true)) {
 					damageSavings += (originalDamage * 0.5f);
 				}
-				if (player.isX && player.hasBodyArmor(1)) {
+				if (player.isX && player.hasFullLight()) {
 					damageSavings += originalDamage / 8f;
 				}
-				if (player.isX && player.hasBodyArmor(2)) {
+				if (player.isX && player.hasFullGiga()) {
 					damageSavings += originalDamage / 8f;
 				}
 			}
@@ -2624,7 +2639,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			killPlayer(attacker, null, weaponIndex, projId);
 		} else {
-			if (mmx != null && player.hasBodyArmor(3) && damage > 0) {
+			if (mmx != null && player.hasAllX3Armor() && damage > 0) {
 				mmx.addBarrier(charState is Hurt);
 			}
 		}
@@ -2643,6 +2658,7 @@ public partial class Character : Actor, IDamagable {
 			}
 
 			if (killer != null && killer != player) {
+				if (killer.possessedTime == 0){
 				killer.addKill();
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
@@ -2651,7 +2667,17 @@ public partial class Character : Actor, IDamagable {
 						Global.level.gameMode.syncTeamScores();
 					}
 				}
-
+				}
+				if (killer.possessedTime > 0){
+				killer.possesser.addKill();
+				if (Global.level.gameMode is TeamDeathMatch) {
+					if (Global.isHost) {
+						if (player.alliance == GameMode.redAlliance) Global.level.gameMode.redPoints++;
+						if (player.alliance == GameMode.blueAlliance) Global.level.gameMode.bluePoints++;
+						Global.level.gameMode.syncTeamScores();
+					}
+				}
+				}
 				killer.awardScrap();
 			} else if (Global.level.gameMode.level.is1v1()) {
 				// In 1v1 the other player should always be considered a killer to prevent suicide
@@ -2751,7 +2777,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void increaseCharge() {
 		float factor = 1;
-		if (player.isX && player.hasArmArmor(1)) factor = 1.5f;
+		if (player.isX && player.hasFullLight()) factor = 1.5f;
 		//if (player.isX && isHyperX) factor = 1.5f;
 		//if (player.isZero && isAttacking()) factor = 0f;
 		chargeTime += Global.spf * factor;
@@ -3155,7 +3181,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			chargeLogic();
 		}
-
+	
 		/*
 		if (player.weapon is AssassinBullet && chargeTime > 7)
 		{

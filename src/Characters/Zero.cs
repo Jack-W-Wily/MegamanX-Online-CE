@@ -106,21 +106,21 @@ public class Zero : Character {
 	public override bool isAttacking() {
 		return (
 			sprite.name.Contains("attack") ||
-			sprite.name.Contains("superzero_hyouretsuzan") ||
-			sprite.name.Contains("superzero_raijingeki") ||
-			sprite.name.Contains("superzero_ryuenjin") ||
-			sprite.name.Contains("superzero_rakukojin") ||
-			sprite.name.Contains("superzero_raijingeki2") ||
-			sprite.name.Contains("superzero_eblade") ||
-			sprite.name.Contains("superzero_rising") ||
-			sprite.name.Contains("superzero_quakeblazer") ||
-			sprite.name.Contains("superzero_genmu") ||
-			sprite.name.Contains("superzero_projswing") ||
-			sprite.name.Contains("superzero_tbreaker") ||
-			sprite.name.Contains("superzero_spear") ||
+			sprite.name.Contains("zero_hyouretsuzan") ||
+			sprite.name.Contains("zero_raijingeki") ||
+			sprite.name.Contains("zero_ryuenjin") ||
+			sprite.name.Contains("zero_rakukojin") ||
+			sprite.name.Contains("zero_raijingeki2") ||
+			sprite.name.Contains("zero_eblade") ||
+			sprite.name.Contains("zero_rising") ||
+			sprite.name.Contains("zero_quakeblazer") ||
+			sprite.name.Contains("zero_genmu") ||
+			sprite.name.Contains("zero_projswing") ||
+			sprite.name.Contains("zero_tbreaker") ||
+			sprite.name.Contains("zero_spear") ||
 			sprite.name.Contains("punch") ||
-			sprite.name.Contains("superzero_kick_air") ||
-			sprite.name.Contains("superzero_dropkick")
+			sprite.name.Contains("zero_kick_air") ||
+			sprite.name.Contains("zero_dropkick")
 		);
 	}
 
@@ -346,7 +346,34 @@ public class Zero : Character {
 			canAirDash() &&
 			flag == null
 		);
-
+		// >>>>>>>>>>>>>>>>>>>>>>>
+		// new DP system for zero
+		if (grounded) {
+				if (player.input.checkShoryuken(player, xDir, Control.Shoot)) {
+					spcActivated = true;
+					if (ryuenjinCooldown <= 0) {
+						changeState(
+							new ZeroUppercut(
+								new EBladeWeapon(player),
+								isUnderwater()
+							),
+							true
+						);
+					}
+				} 
+				if (player.input.checkShoryuken(player, xDir, Control.Special1)) {
+					spcActivated = true;
+					if (ryuenjinCooldown <= 0) {
+						changeState(
+							new ZeroUppercut(
+								new RyuenjinWeapon(player),
+								isUnderwater()
+							),
+							true
+						);
+					}
+				}
+		}
 		bool notUpLogic = !player.input.isHeld(Control.Up, player) || !isMidairRising;
 		if (zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenzan && spcPressed && !player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
 			(charState is Jump || charState is Fall || charState is WallKick) && !isInvulnerableAttack() &&
@@ -378,31 +405,34 @@ public class Zero : Character {
 
 		if (charState.canAttack() &&
 			charState is Idle && !player.hasKnuckle() &&
-			((sprite.name == "superzero_attack" && frameIndex > 3f) ||
-			(sprite.name == "superzero_attack2" && frameIndex > 3f)) &&
+			((sprite.name == "zero_attack" && frameIndex > 3f) ||
+			(sprite.name == "zero_attack2" && frameIndex > 3f)) &&
 			spcPressed &&
 			!player.input.isHeld(Control.Up, player) &&
 			!player.input.isHeld(Control.Down, player)
 		) {
 			raijingekiWeapon.attack2(this);
 		}
-		else if (charState.canAttack() && charState is Idle && player.hasKnuckle() && ((sprite.name == "superzero_punch" && frameIndex > 3f) || (sprite.name == "superzero_punch2" && frameIndex > 3f)) && spcPressed &&
+
+		
+		// >>>>>>>>>>>>>>>>>>>>>>>
+		else if (charState.canAttack() && charState is Idle && player.hasKnuckle() && ((sprite.name == "zero_punch" && frameIndex > 3f) || (sprite.name == "zero_punch2" && frameIndex > 3f)) && spcPressed &&
 			  !player.input.isHeld(Control.Up, player) && !player.input.isHeld(Control.Down, player)) {
 			raijingekiWeapon.attack2(this);
 		} else if (charState.canAttack() && (spcPressed || lenientAttackPressed) && !isAttacking()) {
 			if (charState is Idle || charState is Run || charState is Crouch) {
 				if (player.input.isHeld(Control.Up, player)) {
 					spcActivated = true;
-					if (ryuenjinCooldown <= 0) {
+					if (spcPressed && ryuenjinCooldown <= 0) {
 						changeState(
 							new ZeroUppercut(
-								lenientAttackPressed ? zeroUppercutWeaponA : zeroUppercutWeaponS,
+								new RisingWeapon(player),
 								isUnderwater()
 							),
 							true
 						);
 					}
-				} else if (player.input.isHeld(Control.Down, player)) {
+				}	else if (player.input.isHeld(Control.Down, player)) {
 					if (spcPressed && rakuhouhaCooldown == 0 && flag == null) {
 						spcActivated = true;
 
@@ -425,7 +455,7 @@ public class Zero : Character {
 				if (player.input.isHeld(Control.Up, player) && isMidairRising) {
 					spcActivated = true;
 					if (ryuenjinCooldown <= 0) {
-						changeState(new ZeroUppercut(zeroUppercutWeaponA is RisingWeapon ? zeroUppercutWeaponA : zeroUppercutWeaponS, isUnderwater()), true);
+						changeState(new ZeroUppercut(new RisingWeapon(player), isUnderwater()), true);
 					}
 				} else if (player.input.isHeld(Control.Down, player)) {
 					spcActivated = true;
@@ -449,7 +479,7 @@ public class Zero : Character {
 					slideVel = xDir * getDashSpeed();
 					changeState(new Idle(), true);
 					playSound("saber1", sendRpc: true);
-					changeSprite("superzero_attack_dash2", true);
+					changeSprite("zero_attack_dash2", true);
 				} else {
 					if (dashAttackCooldown > 0) return;
 					changeState(new ZeroSpinKickState(), true);
@@ -517,16 +547,16 @@ public class Zero : Character {
 						playSound("saber1", sendRpc: true);
 					}
 				}
-			} else if (charState is Idle && sprite.name == "superzero_attack" && frameIndex > 5f) {
+			} else if (charState is Idle && sprite.name == "zero_attack" && frameIndex > 5f) {
 				playSound("saber2", sendRpc: true);
-				changeSprite("superzero_attack2", true);
+				changeSprite("zero_attack2", true);
 				turnToInput(player.input, player);
-			} else if (charState is Idle && sprite.name == "superzero_attack2" && frameIndex > 5f) {
+			} else if (charState is Idle && sprite.name == "zero_attack2" && frameIndex > 5f) {
 				playSound("saber3", sendRpc: true);
-				changeSprite("superzero_attack3", true);
+				changeSprite("zero_attack3", true);
 				turnToInput(player.input, player);
-			} else if (charState is Idle && sprite.name == "superzero_punch" && frameIndex > 5f) {
-				changeSprite("superzero_punch2", true);
+			} else if (charState is Idle && sprite.name == "zero_punch" && frameIndex > 5f) {
+				changeSprite("zero_punch2", true);
 				playSound("punch2");
 				turnToInput(player.input, player);
 			}
@@ -585,7 +615,7 @@ public class Zero : Character {
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name == "superzero_attack3") {
+		if (sprite.name == "zero_attack3") {
 			float timeSinceStart = zero3SwingComboEndTime - zero3SwingComboStartTime;
 			float overrideDamage = 4;
 			int overrideFlinch = Global.defFlinch;
@@ -598,12 +628,12 @@ public class Zero : Character {
 			}
 			return new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaber3, player,
-				overrideDamage, overrideFlinch, 0.25f, isReflectShield: true
+				overrideDamage, overrideFlinch, 0.25f, isReflectShield: false
 			);
 		} 
 		else if (sprite.name.Contains("hyouretsuzan")) {
 			return new GenericMeleeProj(
-				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan2, player, 4, 12, 0.5f
+				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan2, player, 1, 12, 0.5f
 			);
 		}
 		else if (sprite.name.Contains("rakukojin")) {
@@ -617,43 +647,43 @@ public class Zero : Character {
 				new QuakeBlazerWeapon(player), centerPoint, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
 			);
 		}
-		else if (sprite.name.Contains("superzero_projswing")) {
+		else if (sprite.name.Contains("zero_projswing")) {
 			return new GenericMeleeProj(
 				zSaberProjSwingWeapon, centerPoint, ProjIds.ZSaberProjSwing, player,
-				isBlackZero2() ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true
+				isBlackZero2() ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: false
 			);
-		} else if (sprite.name.Contains("superzero_block") && !collider.isHurtBox()) {
+		} else if (sprite.name.Contains("zero_block") && !collider.isHurtBox()) {
 			return new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
 			);
 		}
 		Projectile proj = null;
 		proj = sprite.name switch {
-			"superzero_punch" => new GenericMeleeProj(
+			"zero_punch" => new GenericMeleeProj(
 				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle, player, 1, 1, 0.25f
 			),
-			"superzero_punch2" => new GenericMeleeProj(
+			"zero_punch2" => new GenericMeleeProj(
 				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle2, player, 1, Global.halfFlinch, 0.25f
 			),
-			"superzero_spinkick" => new GenericMeleeProj(
+			"zero_spinkick" => new GenericMeleeProj(
 				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle2, player, 1, Global.halfFlinch, 0.5f
 			),
-			"superzero_kick_air" => new GenericMeleeProj(
+			"zero_kick_air" => new GenericMeleeProj(
 				kKnuckleWeapon, centerPoint, ProjIds.KKnuckleAirKick, player, 1, 1, 0.25f
 			),
-			"superzero_parry_start" => new GenericMeleeProj(
+			"zero_parry_start" => new GenericMeleeProj(
 				new KKnuckleParry(), centerPoint, ProjIds.KKnuckleParryStart, player, 0, Global.defFlinch, 0.25f
 			),
-			"superzero_parry" =>  new GenericMeleeProj(
+			"zero_parry" =>  new GenericMeleeProj(
 				new KKnuckleParry(), centerPoint, ProjIds.KKnuckleParry, player, 1, Global.defFlinch, 0.25f
 			),
-			"superzero_shoryuken" => new GenericMeleeProj(
+			"zero_shoryuken" => new GenericMeleeProj(
 				zeroUppercutWeaponA, centerPoint, ProjIds.KKnuckleShoryuken, player, 3, Global.defFlinch, 0.25f
 			),
-			"superzero_megapunch" => new GenericMeleeProj(
+			"zero_megapunch" => new GenericMeleeProj(
 				raijingekiWeapon, centerPoint, ProjIds.KKnuckleMegaPunch, player, 2, Global.defFlinch, 0.25f
 			),
-			"superzero_dropkick" => new GenericMeleeProj(
+			"zero_dropkick" => new GenericMeleeProj(
 				zeroDownThrustWeaponA, centerPoint, ProjIds.KKnuckleDropKick, player, 4, Global.halfFlinch, 0.25f
 			),
 			_ => null
@@ -663,55 +693,55 @@ public class Zero : Character {
 		}
 		
 		proj = sprite.name switch {
-			"superzero_attack" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_attack" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_attack2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_attack2" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_attack3" => new GenericMeleeProj(
-					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 3, 1, 0.25f, isReflectShield: true
+			"zero_attack3" => new GenericMeleeProj(
+					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 3, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_hyoroga_attack" =>  new GenericMeleeProj(
+			"zero_hyoroga_attack" =>  new GenericMeleeProj(
 				zeroAirSpecialWeapon, centerPoint, ProjIds.HyorogaSwing, player, 4, 1, 0.25f
 			),
-			"superzero_attack_dash" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberdash, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_attack_dash" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaberdash, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_attack_dash2" => new GenericMeleeProj(
+			"zero_attack_dash2" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.Shippuuga, player, 1, Global.halfFlinch, 0.25f
 			),
-			"superzero_attack_air" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_attack_air" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_attack_air2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.125f, isDeflectShield: true
+			"zero_attack_air2" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.125f, isDeflectShield: false
 			),
-			"superzero_ladder_attack" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberladder, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_ladder_attack" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaberladder, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_wall_slide_attack" => proj = new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberslide, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_wall_slide_attack" => proj = new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSaberslide, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_attack_crouch" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSabercrouch, player, 1, 1, 0.25f, isReflectShield: true
+			"zero_attack_crouch" => new GenericMeleeProj(
+				zSaberWeapon, centerPoint, ProjIds.ZSabercrouch, player, 1, 1, 0.25f, isReflectShield: false
 			),
-			"superzero_raijingeki" => new GenericMeleeProj(
+			"zero_raijingeki" => new GenericMeleeProj(
 				raijingekiWeapon, centerPoint, ProjIds.Raijingeki, player, 1, Global.defFlinch, 0.06f
 			),
-			"superzero_raijingeki2" => new GenericMeleeProj(
+			"zero_raijingeki2" => new GenericMeleeProj(
 				raijingeki2Weapon, centerPoint, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 0.06f
 			),
-			"superzero_tbreaker" => new GenericMeleeProj(
+			"zero_tbreaker" => new GenericMeleeProj(
 				raijingekiWeapon, centerPoint, ProjIds.TBreaker, player, 1, Global.defFlinch, 0.5f
 			),
-			"superzero_ryuenjin" => new GenericMeleeProj(
+			"zero_ryuenjin" => new GenericMeleeProj(
 				new RyuenjinWeapon(player), centerPoint, ProjIds.Ryuenjin, player, 1, 3, 0.2f
 			),
-			"superzero_eblade" => new GenericMeleeProj(
+			"zero_eblade" => new GenericMeleeProj(
 				new EBladeWeapon(player), centerPoint, ProjIds.EBlade, player, 1, Global.defFlinch, 0.1f
 			),
-			"superzero_rising" => new GenericMeleeProj(
+			"zero_rising" => new GenericMeleeProj(
 				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 1, 0.15f
 			),
 			_ => null
@@ -736,8 +766,8 @@ public class Zero : Character {
 
 		string zeroShootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(zeroShootSprite)) {
-			if (grounded) zeroShootSprite = "superzero_shoot";
-			else zeroShootSprite = "superzero_fall_shoot";
+			if (grounded) zeroShootSprite = "zero_shoot";
+			else zeroShootSprite = "zero_fall_shoot";
 		}
 		bool hasShootSprite = !string.IsNullOrEmpty(charState.shootSprite);
 		if (shootAnimTime == 0) {
@@ -917,17 +947,17 @@ public class Zero : Character {
 	}
 
 	public override void changeSprite(string spriteName, bool resetFrame) {
-		if (sprite != null && sprite.name != "superzero_attack" && spriteName == "superzero_attack") {
+		if (sprite != null && sprite.name != "zero_attack" && spriteName == "zero_attack") {
 			zero3SwingComboStartTime = Global.time;
 		}
-		if (sprite != null && sprite.name != "superzero_attack3" && spriteName == "superzero_attack3") {
+		if (sprite != null && sprite.name != "zero_attack3" && spriteName == "zero_attack3") {
 			zero3SwingComboEndTime = Global.time;
 		}
 		base.changeSprite(spriteName, resetFrame);
 	}
 
 	public override string getSprite(string spriteName) {
-		return "superzero_" + spriteName;
+		return "zero_" + spriteName;
 	}
 
 	public override void render(float x, float y) {
@@ -940,9 +970,9 @@ public class Zero : Character {
 			float xOff = 0;
 			int auraXDir = 1;
 			float yOff = 5;
-			string auraSprite = "superzero_awakened_aura";
+			string auraSprite = "zero_awakened_aura";
 			if (sprite.name.Contains("dash")) {
-				auraSprite = "superzero_awakened_aura2";
+				auraSprite = "zero_awakened_aura2";
 				auraXDir = xDir;
 				yOff = 8;
 			}

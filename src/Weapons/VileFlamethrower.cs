@@ -221,5 +221,13 @@ public class FlamethrowerProj : Projectile {
 			var character = damagable as Character;
 			character?.unfreezeIfFrozen();
 		}
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+		}
 	}
+	
 }

@@ -338,9 +338,9 @@ public partial class Player {
 			if (isX) {
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
-					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
-					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
-					if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
+					if (hasAllX3Armor()) weapons.Add(new HyperBuster());
+					if (hasFullGiga()) weapons.Add(new GigaCrush());
+					if (HasFullForce()) weapons.Add(new NovaStrike(this));
 				} else if (Global.level.is1v1()) {
 					if (xArmor1v1 == 1) {
 						weapons.Add(new Buster());

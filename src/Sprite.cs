@@ -142,7 +142,7 @@ public class Sprite {
 					float poiX = (float)Convert.ToDouble(poisJson[j]["x"]);
 					float poiY = (float)Convert.ToDouble(poisJson[j]["y"]);
 					string tags = Convert.ToString(poisJson[j]["tags"]);
-					if (tags == "h" || (name.Contains("superzero_") && string.IsNullOrEmpty(tags))) {
+					if (tags == "h" || (name.Contains("zero_") && string.IsNullOrEmpty(tags))) {
 						frame.headPos = new Point(poiX, poiY);
 					} else {
 						frame.POIs.Add(new Point(poiX, poiY));
@@ -277,6 +277,10 @@ public class Sprite {
 		bool drawAxlArms = true;
 		bool hyperBusterReady = false;
 		bool isUPX = false;
+		bool isLightX = false;
+		bool isGigaX = false;
+		bool isMaxX = false;
+		bool isForceX = false;
 		bool isUltX = false;
 		Character character = actor as Character;
 		if (character != null) {
@@ -292,6 +296,10 @@ public class Sprite {
 			if (character.player.isAxl && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
+			isLightX = character.player.isX && character.player.hasFullLight();
+			isGigaX = character.player.isX && character.player.hasFullGiga();
+			isMaxX = character.player.isX && character.player.hasAllX3Armor();
+			isForceX = character.player.isX && character.player.HasFullForce();
 			isUPX = character.player.isX && (character.isHyperXBS.getValue() || (character.sprite.name == "mmx_revive" && character.frameIndex > 3));
 			isUltX = character.player.isX && character.hasUltimateArmorBS.getValue();
 		}
@@ -539,6 +547,22 @@ public class Sprite {
 		if (isUPX) {
 			bitmap = Global.textures["XUP"];
 		}
+
+		if (isLightX) {
+		bitmap = Global.textures["XLight"];
+		}
+		if (isGigaX) {
+		bitmap = Global.textures["XGIGA"];
+		}
+		if (isMaxX) {
+		bitmap = Global.textures["XMAX"];
+		}
+		if (isForceX) {
+		bitmap = Global.textures["XFORCE"];
+		}
+
+
+		
 
 		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 

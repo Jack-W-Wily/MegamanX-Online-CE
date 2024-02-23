@@ -40,9 +40,10 @@ public class XLoadout {
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);
-		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperBuster);
-		if (player.hasBodyArmor(2)) indices.Add((int)WeaponIds.GigaCrush);
-		if (player.hasUltimateArmor()) indices.Add((int)WeaponIds.NovaStrike);
+	//	if (player.hasAllX3Armor()) indices.Add((int)WeaponIds.HyperBuster);
+		//if (player.hasFullGiga()) 
+		indices.Add((int)WeaponIds.GigaCrush);
+	//	if (player.HasFullForce()) indices.Add((int)WeaponIds.NovaStrike);
 
 		return indices.Select(index => {
 			return Weapon.getAllSwitchableWeapons(new AxlLoadout()).Find(w => w.index == index).clone();
@@ -127,13 +128,16 @@ public class VileLoadout {
 
 	public List<Weapon> getWeaponsFromLoadout(bool includeMech) {
 		var weapons = new List<Weapon>();
-		if (cannon > -1) weapons.Add(new VileCannon((VileCannonType)cannon));
-		if (vulcan > -1) weapons.Add(new Vulcan((VulcanType)vulcan));
-
-		if (includeMech) {
-			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
-			weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
+		if (cannon > 0) {
+			weapons.Add(new VileCannon((VileCannonType)cannon));
 		}
+		if (cannon == 0){
+		 weapons.Add(new Vulcan((VulcanType)vulcan));
+		}	 
+		//if (includeMech) {
+		//	weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
+		//	weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
+		//}
 
 		return weapons;
 	}

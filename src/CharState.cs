@@ -665,13 +665,18 @@ public class SwordBlock : CharState {
 		base.update();
 
 		bool isHoldingGuard;
-		if (player.isZero) {
-			isHoldingGuard = player.input.isHeld(Control.WeaponLeft, player) || player.input.isHeld(Control.WeaponRight, player);
-		}if (player.isSigma) {
-			isHoldingGuard = player.isCrouchHeld();
-		} else {
-			isHoldingGuard = player.input.isHeld(Control.Up, player);
-			}
+		if (player.isZero && !(player.input.isHeld(Control.WeaponLeft, player) 
+		|| player.input.isHeld(Control.WeaponRight, player))) {
+		character.changeState(new Idle());
+		}
+		if (player.isSigma && !player.isCrouchHeld()) {
+		character.changeState(new Idle());
+		}  	
+		if (!player.isZero && !player.isSigma && ! player.input.isHeld(Control.Up, player)) {
+		character.changeState(new Idle());	
+		}
+			
+	
 
 		if (!player.isControllingPuppet()) {
 			bool leftGuard = player.input.isHeld(Control.Left, player);
@@ -681,10 +686,7 @@ public class SwordBlock : CharState {
 			else if (rightGuard) character.xDir = 1;
 		}
 
-		if (!isHoldingGuard) {
-			character.changeState(new Idle());
-			return;
-		}
+		
 
 		if ((player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.Shoot, player) )&& !player.isControllingPuppet()) {
 			if (sigma != null) {
@@ -883,7 +885,7 @@ public class Dash : CharState {
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
-		if (player.isX && player.hasBootsArmor(1)) {
+		if (player.isX && player.hasFullLight()) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
 		}
@@ -962,7 +964,7 @@ public class AirDash : CharState {
 		}
 		float speedModifier = 1;
 		float distanceModifier = 1;
-		if (player.isX && player.hasBootsArmor(2)) {
+		if (player.isX && player.hasFullGiga()) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
 		}
@@ -1426,7 +1428,7 @@ public class Hurt : CharState {
 		if (miniFlinchTime == 0) {
 			if (!spiked) character.vel.y = -100;
 		}
-		if (player.isX && player.hasBodyArmor(1)) {
+		if (player.isX && player.hasFullLight()) {
 			flinchTime *= 0.75f;
 			sprite = "hurt2";
 			character.changeSpriteFromName("hurt2", true);
@@ -1829,8 +1831,11 @@ public class GenericGrabbedState : CharState {
 
 	public override void update() {
 		base.update();
+		//Testing to see if his is the issue with grabs real qucik
+		/*
 		if (customUpdate) return;
 
+		
 		if (grabber.sprite?.name.EndsWith(grabSpriteSuffix) == true ||
 			(!string.IsNullOrEmpty(additionalGrabSprite) && grabber.sprite?.name.EndsWith(additionalGrabSprite) == true)) {
 			if (!trySnapToGrabPoint(lerp) && freeOnHitWall) {
@@ -1839,11 +1844,12 @@ public class GenericGrabbedState : CharState {
 			}
 		} else {
 			notGrabbedTime += Global.spf;
+		*/
 			if (notGrabbedTime > maxNotGrabbedTime) {
 				character.changeToIdleOrFall();
 				return;
 			}
-		}
+	//	}
 
 		grabTime -= player.mashValue();
 		if (grabTime <= 0) {

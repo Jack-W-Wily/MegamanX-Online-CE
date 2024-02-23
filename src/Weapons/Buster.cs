@@ -93,10 +93,22 @@ public class Buster : Weapon {
 		}
 		bool hasUltArmor = player.character.hasUltimateArmorBS.getValue();
 		bool isHyperX = ((player.character as MegamanX)?.isHyperX == true);
-
-		if (isHyperX && chargeLevel > 0) {
+		if ((player.character as MegamanX).CurrentArmor == 0 && chargeLevel >=3){
+		new Buster3Proj(
+					player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 3,
+					player, player.getNextActorNetId(), rpc: true
+				);
+			shootSound = "buster2";
+		}
+		if (player.HasFullForce() && chargeLevel >= 3) {
 			new BusterUnpoProj(this, pos, xDir, player, netProjId);
 			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
+			shootSound = "buster2";
+		}
+		if (player.HasFullForce() && (player.character as MegamanX).unpoShotCount > 0) {
+			new BusterUnpoProj(this, pos, xDir, player, netProjId);
+			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
+			(player.character as MegamanX).unpoShotCount -= 1;
 			shootSound = "buster2";
 		} else if (player.character.stockedCharge) {
 			player.character.changeState(new X2ChargeShot(1), true);
@@ -108,14 +120,14 @@ public class Buster : Weapon {
 			new Buster3Proj(this, pos, xDir, 0, player, netProjId);
 		} else if (chargeLevel >= 3) {
 			if (hasUltArmor) {
-				if (player.hasArmArmor(2)) {
+				if (player.hasFullGiga()) {
 					player.character.changeState(new X2ChargeShot(2), true);
 				} else {
 					new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 					new BusterPlasmaProj(this, pos, xDir, player, netProjId);
 					shootSound = "plasmaShot";
 				}
-			} else if (player.hasArmArmor(0) || player.hasArmArmor(1)) {
+			} else if (player.hasFullLight()) {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 				//Create the buster effect
 				int xOff = xDir * -5;
@@ -130,14 +142,14 @@ public class Buster : Weapon {
 				Global.level.delayedActions.Add(new DelayedAction(delegate{
 					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 5f / 60f, true);
 				}, 5.8f/60f));
-			} else if (player.hasArmArmor(2)) {
+			} else if (player.hasFullGiga()) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
 						shootTime = 0;
 					}
 					player.character.changeState(new X2ChargeShot(0), true);
 				}
-			} else if (player.hasArmArmor(3)) {
+			} else if (player.hasAllX3Armor()) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
 						shootTime = 0;
@@ -198,7 +210,7 @@ public class Buster2Proj : Projectile {
 
 public class BusterUnpoProj : Projectile {
 	public BusterUnpoProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) :
-		base(weapon, pos, xDir, 350, 3, player, "buster_unpo", Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 2, player, "buster_unpo", Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "buster3_fade";
 		reflectable = true;
 		maxTime = 0.5f;
@@ -212,7 +224,7 @@ public class Buster3Proj : Projectile {
 	float partTime;
 
 	public Buster3Proj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		this.type = type;
 		maxTime = 0.5f;
 		fadeSprite = "buster3_fade";

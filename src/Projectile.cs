@@ -287,7 +287,8 @@ public class Projectile : Actor {
 	public static bool charsCanClang(Character attacker, Character defender) {
 		if (attacker == null || defender == null) return false;
 		if (attacker.player.alliance == defender.player.alliance) return false;
-		if (!defender.sprite.name.Contains("attack") && !defender.sprite.name.Contains("block")) return false;
+		if (!defender.sprite.name.Contains("attack") 
+		&& !defender.sprite.name.Contains("block")) return false;
 		if (defender.sprite.name.Contains("sigma2")) return false;
 		if ((attacker as Zero)?.isHyperZero() == true) return false;
 

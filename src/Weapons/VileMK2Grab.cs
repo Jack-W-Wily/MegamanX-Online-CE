@@ -87,6 +87,9 @@ public class VileMK2GrabState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		var damager = new Damager(player, 1f, 0, 0);
+		character.addHealth(1);		
+		damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);	
 	}
 
 	public override void onExit(CharState newState) {
@@ -109,5 +112,11 @@ public class VileMK2Grabbed : GenericGrabbedState {
 	
 
 	public VileMK2Grabbed(Character grabber) : base(grabber, maxGrabTime, "_grab") {
+	}
+
+
+	public override void update() {
+		base.update();
+		trySnapToGrabPoint(true);
 	}
 }

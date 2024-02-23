@@ -306,8 +306,38 @@ public class Sigma : Character {
 		}
 	}
 
+	public override bool chargeButtonHeld() {
+	
+		return player.input.isHeld(Control.Shoot, player);
+	}
+
+	public void chargeControls() {
+		if (chargeButtonHeld() && canCharge()) {
+			increaseCharge();
+		} else {
+			if (isCharging()) {
+				changeState(new SigmaSlashState(charState), true);
+					stopCharge();
+				//}
+			} else if (!(charState is Hurt)) {
+				stopCharge();
+			}
+		}
+	}
+
 	public override void update() {
 		base.update();
+		// Charge System
+		 chargeControls();
+			chargeLogic();
+		//>>>>
+		//Microdashing
+		if (charState is Dash && (player.input.isPressed(Control.Special1, player)
+			|| player.input.isPressed(Control.Shoot, player)
+			) ){
+			slideVel = xDir * getDashSpeed();			
+			}
+		//>>>
 		if (!ownedByLocalPlayer) {
 			return;
 		}

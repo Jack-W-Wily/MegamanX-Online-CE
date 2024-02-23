@@ -314,6 +314,118 @@ public class NapalmAttack : CharState {
 	}
 }
 
+
+public class DragonsWrath : CharState {
+	bool shot;
+	bool isGrounded = false;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+	
+	public DragonsWrath(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		//if (isGrounded){
+		return "crouch_flamethrower";
+		//}
+		//return "flamethrower";
+	}
+
+	public override void update() {
+		base.update();
+			if (character.grounded){
+			isGrounded = true;
+			}
+			shootTime += Global.spf;
+			var poi = character.getFirstPOI();
+			if (shootTime > 0.06f && poi != null) {
+				if (!vile.tryUseVileAmmo(2)) {
+					character.changeState(new Crouch(""), true);
+					return;
+				}
+				shootTime = 0;
+				character.playSound("flamethrower");
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+			}
+
+			if (character.loopCount > 4) {
+				character.changeState(new Crouch(""), true);
+				return;
+			}
+
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class WildHorseKick : CharState {
+	bool shot;
+	bool isGrounded = false;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+	
+	public WildHorseKick(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		//if (isGrounded){
+		return "idle_flamethrower";
+		//}
+		//return "flamethrower";
+	}
+
+	public override void update() {
+		base.update();
+			if (character.grounded){
+			isGrounded = true;
+			}
+			shootTime += Global.spf;
+			var poi = character.getFirstPOI();
+			if (shootTime > 0.06f && poi != null) {
+				if (!vile.tryUseVileAmmo(2)) {
+					character.changeState(new Crouch(""), true);
+					return;
+				}
+				shootTime = 0;
+				character.playSound("flamethrower");
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+			}
+
+			if (character.loopCount > 4) {
+				character.changeState(new Crouch(""), true);
+				return;
+			}
+
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
 public class MK2NapalmGrenadeProj : Projectile {
 	public MK2NapalmGrenadeProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
 		base(weapon, pos, xDir, 150, 1, player, "napalm_grenade2", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
@@ -519,7 +631,7 @@ public class SplashHitProj : Projectile {
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, 0));
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
 		}
 	}
 }

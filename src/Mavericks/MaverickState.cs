@@ -494,7 +494,7 @@ public class MEnter : MaverickState {
 		maverick.alpha = Helpers.clamp01(stateTime * 2);
 		maverick.incPos(new Point(0, maverick.vel.y * Global.spf));
 		maverick.vel.y += Global.speedMul * Physics.Gravity;
-		if (maverick.pos.y >= destY) {
+		if (maverick.pos.y >= destY || stateTime > 2f) {
 			maverick.changePos(new Point(maverick.pos.x, destY));
 			if (maverick is DrDoppler) {
 				maverick.changeState(new DrDopplerUncoatState(), true);
@@ -536,7 +536,7 @@ public class MExit : MaverickState {
 		maverick.alpha = Helpers.clamp01(1 - stateTime * 2);
 		maverick.incPos(new Point(0, maverick.vel.y * Global.spf));
 		maverick.vel.y += Physics.Gravity * Global.speedMul * maverick.getYMod();
-		if ((maverick.getYMod() == 1 && maverick.pos.y < destY) || (maverick.getYMod() == -1 && maverick.pos.y > destY)) {
+		if ((maverick.getYMod() == 1 && maverick.pos.y < destY) || (maverick.getYMod() == -1 && maverick.pos.y > destY) || stateTime > 2f) {
 			maverick.changePos(destPos.addxy(0, -yPos * maverick.getYMod()));
 			if (!isRecall) {
 				maverick.changeState(new MEnter(destPos));

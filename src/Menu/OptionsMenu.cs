@@ -1238,7 +1238,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "Pup small energy bars:",
+							optionFontText, "I Like Magical Girls:",
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(

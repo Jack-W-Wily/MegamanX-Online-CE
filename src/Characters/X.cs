@@ -14,11 +14,17 @@ public partial class MegamanX : Character {
 	public bool fgMotion;
 	public bool isHyperX;
 
-	public const int headArmorCost = 2;
-	public const int bodyArmorCost = 3;
-	public const int armArmorCost = 3;
-	public const int bootsArmorCost = 2;
 
+	// >>>>>>>>>>>>>>>>>>>>>>>
+	// New Armor System
+	public float CurrentArmor = 0;
+
+
+	public const int headArmorCost = 4;
+	public const int bodyArmorCost = 4;
+	public const int armArmorCost = 4;
+	public const int bootsArmorCost = 4;
+	// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	public RollingShieldProjCharged chargedRollingShieldProj;
 	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
 	public StrikeChainProj strikeChainProj;
@@ -88,9 +94,34 @@ public partial class MegamanX : Character {
 	public override void update() {
 		fgMotion = false;
 		base.update();
-
+		player.armorFlag = 0;
 		Helpers.decrementTime(ref barrierCooldown);
-
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		//Armor Switching
+        if (player.input.isHeld(Control.Taunt, player)) {
+		if (player.input.isPressed(Control.Right, player) 
+		&& Global.level.mainPlayer.isHeadArmorPurchased(1)){
+		CurrentArmor = 1;
+		Global.level.gameMode.setHUDErrorMessage(player, "LIGHT", playSound: false);
+		}
+		if (player.input.isPressed(Control.Down, player)
+		&& Global.level.mainPlayer.isBodyArmorPurchased(1)){
+		CurrentArmor = 2;
+		Global.level.gameMode.setHUDErrorMessage(player, "GIGA", playSound: false);
+		}
+		if (player.input.isPressed(Control.Up, player)
+		&& Global.level.mainPlayer.isArmArmorPurchased(1)){
+		CurrentArmor = 3;
+		Global.level.gameMode.setHUDErrorMessage(player, "MAX", playSound: false);
+		}
+		if (player.input.isPressed(Control.Left, player)
+		&& Global.level.mainPlayer.isBootsArmorPurchased(1)){
+		CurrentArmor = 4;
+		Global.level.gameMode.setHUDErrorMessage(player, "FORCE", playSound: false);
+		}
+		}
+	
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (cStingPaletteTime > 5) {
 			cStingPaletteTime = 0;
 			cStingPaletteIndex++;
@@ -183,8 +214,7 @@ public partial class MegamanX : Character {
 				}
 			}
 
-			if (Options.main.gigaCrushSpecial &&
-				player.input.isPressed(Control.Special1, player) &&
+			if (player.input.isPressed(Control.Special1, player) &&
 				player.input.isHeld(Control.Down, player) &&
 				player.weapons.Any(w => w is GigaCrush)
 			) {
@@ -305,7 +335,7 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		if (charState.attackCtrl && player.hasHelmetArmor(2) && scannerCooldown == 0 && canScan()) {
+		if (charState.attackCtrl && player.hasFullGiga() && scannerCooldown == 0 && canScan()) {
 			Point scanPos;
 			Point? headPos = getHeadPos();
 			if (headPos != null) {
@@ -397,17 +427,22 @@ public partial class MegamanX : Character {
 				shoot(false);
 			}
 
-			if (!isHyperX) {
-				chargeControls();
-			} else {
+			if (player.HasFullForce()) {
+				if (player.weapon is Buster){
 				unpoChargeControls();
+				}
+				else{
+				chargeControls();
+				}
+			} if (!player.HasFullForce()) {
+				chargeControls();
 			}
 		} else if (
 			charState is Dash || charState is AirDash ||
 			charState is XUPParryMeleeState || charState is XUPParryProjState ||
 			charState is XUPParryStartState || charState is XUPGrabState
 		) {
-			if (isHyperX) {
+			if (player.HasFullForce()) {
 				unpoChargeControls();
 			}
 		}
@@ -418,9 +453,10 @@ public partial class MegamanX : Character {
 			changeSprite("mmx_" + charState.shootSprite, true);
 		}
 
-		if (!isHyperX) {
-			player.changeWeaponControls();
-		}
+//Bye Bye
+//		if (!isHyperX) {
+		player.changeWeaponControls();
+//		}
 
 		chargeLogic();
 
@@ -503,7 +539,7 @@ public partial class MegamanX : Character {
 		if (!grounded) {
 			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
 				CharState dashState;
-				if (player.input.isHeld(Control.Up, player) && player.hasBootsArmor(3)) {
+				if (player.input.isHeld(Control.Up, player) && player.hasAllX3Armor()) {
 					dashState = new UpDash(Control.Dash);
 				} else {
 					dashState = new AirDash(dashControl);
@@ -524,7 +560,7 @@ public partial class MegamanX : Character {
 				changeState(new Jump());
 				return true;
 			}
-			if (!player.isAI && player.hasUltimateArmor() &&
+			if (!player.isAI && player.HasFullForce() &&
 				player.input.isPressed(Control.Jump, player) &&
 				canJump() && !isDashing && canAirDash() && flag == null
 			) {
@@ -548,17 +584,20 @@ public partial class MegamanX : Character {
 			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
 		if (player.isX && hadokenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) player.scrap -= 3;
-			player.fgMoveAmmo = 0;
+			if (!player.hasAllItems()) //player.scrap -= 1;
+			//player.fgMoveAmmo = 0;
 			changeState(new Hadouken(), true);
 			return true;
 		}
 		if (player.isX && shoryukenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) player.scrap -= 3;
-			player.fgMoveAmmo = 0;
+			if (!player.hasAllItems()) //player.scrap -= 1;
+			//layer.fgMoveAmmo = 0;
 			changeState(new Shoryuken(isUnderwater()), true);
 			return true;
 		}
+
+
+		
 		return false;
 	}
 
@@ -589,11 +628,19 @@ public partial class MegamanX : Character {
 	public void unpoChargeControls() {
 		if (chargeButtonHeld() && canCharge()) {
 			increaseCharge();
-			if (getChargeLevel() == 1) unpoShotCount = Math.Max(unpoShotCount, 1);
-			if (getChargeLevel() == 2) unpoShotCount = Math.Max(unpoShotCount, 2);
-			if (getChargeLevel() == 3) unpoShotCount = Math.Max(unpoShotCount, 3);
-			if (getChargeLevel() == 4) unpoShotCount = Math.Max(unpoShotCount, 4);
-		} else {
+			if (getChargeLevel() == 1){
+			 unpoShotCount = Math.Max(unpoShotCount, 1);
+			}
+			if (getChargeLevel() == 2) 	{
+			unpoShotCount = Math.Max(unpoShotCount, 2);
+			}
+			if (getChargeLevel() == 3) {
+			unpoShotCount = Math.Max(unpoShotCount, 3);
+			}
+			if (getChargeLevel() >= 4) {
+			unpoShotCount = Math.Max(unpoShotCount, 4);
+			}
+			} else {
 			if (isCharging()) {
 				stopCharge();
 			} else if (!(charState is Hurt)) {
@@ -690,13 +737,14 @@ public partial class MegamanX : Character {
 			xSaberCooldown = 0.66f;
 		}
 
-		if (chargeLevel >= 3 && player.hasArmArmor(2)) {
+		if (chargeLevel >= 3 && player.hasFullGiga()) {
 			stockedCharge = true;
 			if (player.weapon is Buster) {
 				shootTime = hasUltimateArmorBS.getValue() ? 0.5f : 0.25f;
 			} else shootTime = 0.5f;
+			if (charState is not ) {
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.StockCharge);
-		} else if (stockedCharge) {
+		}} else if (stockedCharge) {
 			stockedCharge = false;
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
 		}
@@ -953,7 +1001,7 @@ public partial class MegamanX : Character {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
-		if (sprite.name.Contains("_block") && !collider.isHurtBox()) {
+		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				new ZSaber(player), centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
 			);
@@ -1032,8 +1080,15 @@ public partial class MegamanX : Character {
 
 	public override float getJumpModifier() {
 		float jumpModifier = 1;
-		jumpModifier += (chargedBubbles.Count / 6.0f) * 50;
+		jumpModifier += (chargedBubbles.Count / 6.0f) * 5;
 
+		// Bubble Teleport
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>
+		if (player.input.isHeld(Control.Special2, player) && player.scrap > 0){
+		jumpModifier += (chargedBubbles.Count / 6.0f) * 50;
+		player.scrap -= 1;
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>
 		return jumpModifier * base.getJumpModifier();
 	}
 
@@ -1129,7 +1184,7 @@ public partial class MegamanX : Character {
 	
 	public bool canHeadbutt() {
 		if (!player.isX) return false;
-		if (!player.hasHelmetArmor(1)) return false;
+		if (!player.hasFullLight()) return false;
 		if (isInvisibleBS.getValue()) return false;
 		if (isInvulnerableAttack()) return false;
 		if (headbuttAirTime < 0.04f) return false;
@@ -1140,11 +1195,11 @@ public partial class MegamanX : Character {
 	}
 
 	public bool hasHadoukenEquipped() {
-		return !Global.level.is1v1() && player.hasArmArmor(1) && player.hasBootsArmor(1) && player.hasHelmetArmor(1) && player.hasBodyArmor(1) && player.weapons.Any(w => w is Buster);
+		return  player.hasFullLight();
 	}
 
 	public bool hasShoryukenEquipped() {
-		return !Global.level.is1v1() && player.hasArmArmor(2) && player.hasBootsArmor(2) && player.hasHelmetArmor(2) && player.hasBodyArmor(2) && player.weapons.Any(w => w is Buster);
+		return  player.hasFullGiga();
 	}
 
 	public bool hasFgMoveEquipped() {
@@ -1156,7 +1211,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool canUseFgMove() {
-		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0 && player.weapon is Buster && player.fgMoveAmmo >= 32;
+		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0 && player.fgMoveAmmo >= 32;
 	}
 
 	public bool shouldDrawFgCooldown() {

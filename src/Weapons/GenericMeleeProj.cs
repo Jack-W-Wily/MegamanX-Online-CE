@@ -81,7 +81,17 @@ public class GenericMeleeProj : Projectile {
 				hyouretsuzanState.quakeBlazerExplode(false);
 			}
 		}
+		//>>> Zero Uppercut Bullshit
 
+		if (projId == (int)ProjIds.Ryuenjin || projId == (int)ProjIds.EBlade || projId == (int)ProjIds.Rising){
+			if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+			}
+		}
 		// Command grab section
 		Character grabberChar = owner.character;
 		Character grabbedChar = damagable as Character;

@@ -126,7 +126,7 @@ public class Anim : Actor {
 		string[] maverickDieSprites = new string[]
 		{
 				"chillp_die", "sparkm_die", "armoreda_die", "armoreda_na_die", "launcho_die", "boomerk_die", "boomerk_bald_die", "stingc_die", "storme_die", "flamem_die",
-				"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die", "morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die", "csnail_die", "overdriveo_die", "fakezero_die",
+				"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die", "morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die", "csnail_die", "tt_csnail_die",  "overdriveo_die", "fakezero_die",
 				"bbuffalo_die", "tseahorse_die", "tunnelr_die", "voltc_die", "crushc_die", "neont_die", "gbeetle_die", "bhornet_die", "drdoppler_die",
 		};
 		return maverickDieSprites.Any(s => s == spriteName);

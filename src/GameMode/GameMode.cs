@@ -683,7 +683,7 @@ public class GameMode {
 			//Global.sprites["axl_cursor"].drawImmediate(0, Global.level.mainPlayer.character.axlCursorPos.x, Global.level.mainPlayer.character.axlCursorPos.y);
 		}
 
-		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(2)) {
+		if (level.mainPlayer.isX && level.mainPlayer.hasFullGiga()) {
 			Player mostRecentlyScanned = null;
 			foreach (var player in level.players) {
 				if (player.tagged && player.character != null) {
@@ -752,7 +752,7 @@ public class GameMode {
 		if (Global.level.isRace()) return true;
 		if (level.is1v1()) return false;
 		if (level.mainPlayer == null) return false;
-		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(3)) {
+		if (level.mainPlayer.isX && level.mainPlayer.hasAllX3Armor()) {
 			return true;
 		}
 		if (level.mainPlayer.isAxl && level.boundBlasterAltProjs.Any(b => b.state == 1)) {
@@ -1164,7 +1164,7 @@ public class GameMode {
 		// Puppeteer small energy bars.
 		bool forceSmallBarsOff = false;
 		if (!Options.main.smallBarsEx || !allowSmall && maxAmmo > 16) {
-			forceSmallBarsOff = true;
+			forceSmallBarsOff = false;
 		}
 
 		// Small Bars option.

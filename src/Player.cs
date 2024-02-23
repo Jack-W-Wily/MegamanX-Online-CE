@@ -1063,6 +1063,8 @@ public partial class Player {
 		input.possessedControlHeld[Control.Jump] = Global.input.isHeld(Control.Jump, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Dash] = Global.input.isHeld(Control.Dash, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Taunt] = Global.input.isHeld(Control.Taunt, Global.level.mainPlayer);
+	    input.possessedControlHeld[Control.Shoot] = Global.input.isHeld(Control.Shoot, Global.level.mainPlayer);
+		input.possessedControlHeld[Control.Special1] = Global.input.isHeld(Control.Special1, Global.level.mainPlayer);
 
 		byte inputHeldByte = Helpers.boolArrayToByte(new bool[]
 		{
@@ -1073,6 +1075,8 @@ public partial class Player {
 				input.possessedControlHeld[Control.Jump],
 				input.possessedControlHeld[Control.Dash],
 				input.possessedControlHeld[Control.Taunt],
+				input.possessedControlHeld[Control.Shoot],
+				input.possessedControlHeld[Control.Special1],
 				false,
 		});
 
@@ -1084,6 +1088,8 @@ public partial class Player {
 		input.possessedControlPressed[Control.Jump] = Global.input.isPressed(Control.Jump, Global.level.mainPlayer);
 		input.possessedControlPressed[Control.Dash] = Global.input.isPressed(Control.Dash, Global.level.mainPlayer);
 		input.possessedControlPressed[Control.Taunt] = Global.input.isPressed(Control.Taunt, Global.level.mainPlayer);
+		input.possessedControlPressed[Control.Shoot] = Global.input.isPressed(Control.Shoot, Global.level.mainPlayer);
+		input.possessedControlPressed[Control.Special1] = Global.input.isPressed(Control.Special1, Global.level.mainPlayer);
 
 		byte inputPressedByte = Helpers.boolArrayToByte(new bool[]
 		{
@@ -1094,6 +1100,8 @@ public partial class Player {
 				input.possessedControlPressed[Control.Jump],
 				input.possessedControlPressed[Control.Dash],
 				input.possessedControlPressed[Control.Taunt],
+				input.possessedControlPressed[Control.Shoot],
+				input.possessedControlPressed[Control.Special1],
 				false,
 		});
 
@@ -1103,7 +1111,6 @@ public partial class Player {
 	public void unpossess(bool sendRpc = false) {
 		possessedTime = 0;
 		possesser = null;
-		input.possessedControlHeld.Clear();
 		input.possessedControlPressed.Clear();
 		if (sendRpc) {
 			RPC.possess.sendRpc(0, id, true);
@@ -1359,8 +1366,20 @@ public partial class Player {
 		return bodyArmorNum > 0 && bootsArmorNum > 0 && armArmorNum > 0 && helmetArmorNum > 0;
 	}
 
+	public bool hasFullLight() {
+		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 1;
+	}
+
+	public bool hasFullGiga() {
+		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 2;
+	}
+
 	public bool hasAllX3Armor() {
-		return bodyArmorNum >= 3 && bootsArmorNum >= 3 && armArmorNum >= 3 && helmetArmorNum >= 3;
+		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 3;
+	}
+
+	public bool HasFullForce() {
+		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 4;
 	}
 
 	public bool canUpgradeGoldenX() {
@@ -1484,9 +1503,9 @@ public partial class Player {
 					return false;
 				}
 			}
-			if (character is Sigma sigma && sigma.tagTeamSwapProgress > 0) {
-				return false;
-			}
+		//	if (character is Sigma sigma && sigma.tagTeamSwapProgress > 0) {
+		//		return false;
+		//	}
 			if (isPossessed()) {
 				return false;
 			}
@@ -1630,9 +1649,9 @@ public partial class Player {
 			explodeDieEffect = null;
 		}
 		limboChar = null;
-		if (!weapons.Any(w => w is MechMenuWeapon)) {
-			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
-		}
+		//if (!weapons.Any(w => w is MechMenuWeapon)) {
+		//	weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
+		//}
 		character.changeState(new VileRevive(vileFormToRespawnAs == 2), true);
 		RPC.playerToggle.sendRpc(id, vileFormToRespawnAs == 2 ? RPCToggleType.ReviveVileTo5 : RPCToggleType.ReviveVileTo2);
 	}
@@ -2251,7 +2270,7 @@ public partial class Player {
 		if (character.isCStingInvisible()) return false;
 		if (character.isHyperSigmaBS.getValue()) return false;
 
-		return true;
+		return false;
 	}
 
 	public void fillSubtank(float amount) {

@@ -9,7 +9,6 @@ namespace MMXOnline;
 
 public class GigaCrush : Weapon {
 	public GigaCrush() : base() {
-		shootSounds = new List<string>() { "gigaCrush", "gigaCrush", "gigaCrush", "gigaCrush" };
 		rateOfFire = 1;
 		ammo = 0;
 		index = (int)WeaponIds.GigaCrush;
@@ -21,17 +20,44 @@ public class GigaCrush : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (player.character.ownedByLocalPlayer) {
-			player.character.changeState(new GigaCrushCharState(), true);
-		}
+		if (player.hasFullGiga()) {
+		player.character.changeState(new GigaCrushCharState(), true);
 		new GigaCrushEffect(player.character);
+		}
+		if (player.hasAllX3Armor()) {
+		player.character.changeState(new X3ChargeShot(null), true);
+		}
+		if (player.HasFullForce()){
+		player.character.changeState(new NovaStrikeState(), true);
+		}
+		}
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return 32;
+		if (Global.level.mainPlayer.hasFullGiga()) {
+			return 32;
+		}
+		if (Global.level.mainPlayer.hasAllX3Armor()) {
+			return 10;
+		}
+		if (Global.level.mainPlayer.HasFullForce()) {
+		return 16;
+		}
+		return 0;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 16 : 32);
+		if (Global.level.mainPlayer.hasFullGiga()) {
+		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 16 : 32);	
+		}
+		if (Global.level.mainPlayer.hasAllX3Armor()) {
+		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 5 : 10);	
+		}
+		if (Global.level.mainPlayer.HasFullForce()) {
+		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 8 : 16);	
+		}
+		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 33 : 33);	
+		
 	}
 }
 

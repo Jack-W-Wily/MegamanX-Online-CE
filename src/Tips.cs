@@ -384,18 +384,18 @@ public class Tips {
 			},
 			new string[]
 			{
-				"As Vile, you can revive yourself as Vile MK-II",
-				"after death with SPECIAL btn."
+				"Vile's leg weapons reset his Airdash when used once",
+				"Can be used to avoid pits."
 			},
 			new string[]
 			{
-				"As Vile, the Kangaroo (K-type) Ride Armor deals",
-				"more damage but punches slower."
+				"Most of Vile's weapons will juggle the oponent",
+				"Can be used for Aerial combos."
 			},
 			new string[]
 			{
-				"As Vile, the Frog (F-type) Ride Armor can swim",
-				"underwater by holding the JUMP btn."
+				"As Vile, Finishing or starting up combos with a grab",
+				"allows you to lifesteal constantly."
 			},
 			new string[]
 			{

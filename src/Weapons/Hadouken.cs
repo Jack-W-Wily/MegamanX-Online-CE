@@ -8,7 +8,7 @@ namespace MMXOnline;
 
 public class HadoukenWeapon : Weapon {
 	public HadoukenWeapon(Player player) : base() {
-		damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
+		damager = new Damager(player, 10, Global.defFlinch, 0.5f);
 		ammo = 0;
 		index = (int)WeaponIds.Hadouken;
 		weaponBarBaseIndex = 19;

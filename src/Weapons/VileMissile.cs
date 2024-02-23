@@ -72,12 +72,12 @@ public class VileMissile : Weapon {
 		} else if (vile.charState is InRideArmor) {
 			if (!vile.isVileMK2) {
 				vile.setVileShootTime(this);
-				if (player.vileMissileWeapon.type == 2 || player.vileMissileWeapon.type == 1) {
-					vile.playSound("vileMissile", sendRpc: true);
-					new VileMissileProj(player.vileMissileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
-				} else {
+				//if (player.vileMissileWeapon.type == 2 || player.vileMissileWeapon.type == 1) {
+				//	vile.playSound("vileMissile", sendRpc: true);
+				//	new VileMissileProj(player.vileMissileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
+				//} else {
 					new StunShotProj(this, vile.pos.addxy(15 * vile.xDir, -10), vile.getShootXDir(), 0, player, player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
-				}
+				//}
 			} else {
 				vile.setVileShootTime(this);
 				if (player.vileMissileWeapon.type == 2 || player.vileMissileWeapon.type == 1) {
@@ -96,7 +96,7 @@ public class VileMissileProj : Projectile {
 	bool split;
 	int type;
 	public VileMissileProj(VileMissile weapon, Point pos, int xDir, int type, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 3, player, weapon.projSprite, 3, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 200, 1, player, weapon.projSprite, 4, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		projId = (int)ProjIds.VileMissile;
@@ -109,7 +109,7 @@ public class VileMissileProj : Projectile {
 		canBeLocal = false; // TODO: Remove the need for this.
 
 		if (weapon.type == (int)VileMissileType.HumerusCrush) {
-			damager.damage = 3;
+			damager.damage = 1;
 			// damager.flinch = Global.halfFlinch;
 			this.vel.x = xDir * 350;
 			maxTime = 0.35f;
@@ -123,7 +123,7 @@ public class VileMissileProj : Projectile {
 			this.xDir = 1;
 			this.vel = vel.Value.times(speed);
 			angle = this.vel.angle;
-			damager.damage = 2;
+			damager.damage = 1;
 			damager.hitCooldown = 0;
 		}
 
@@ -264,12 +264,12 @@ public class MissileAttack : CharState {
 
 		Point shootPos = vile.setCannonAim(shootVel);
 
-		if (isStunShot) {
+	//	if (isStunShot) {
 			new StunShotProj(player.vileMissileWeapon, shootPos, vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), shootVel, rpc: true);
-		} else {
-			vile.playSound("vileMissile", sendRpc: true);
-			new VileMissileProj(player.vileMissileWeapon, shootPos, vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), shootVel, rpc: true);
-		}
+	//	} else {
+	//		vile.playSound("vileMissile", sendRpc: true);
+	//		new VileMissileProj(player.vileMissileWeapon, shootPos, vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), shootVel, rpc: true);
+	//	}
 	}
 
 	public static void mk2ShootLogic(Vile vile, bool isStunShot) {

@@ -159,7 +159,7 @@ public class Options {
 	}
 
 	public string getSpecialAirAttack() {
-		return !swapAirAttacks ? "superzero_attack_air2" : "superzero_attack_air";
+		return !swapAirAttacks ? "zero_attack_air2" : "zero_attack_air";
 	}
 
 	public string getAirAttack() {

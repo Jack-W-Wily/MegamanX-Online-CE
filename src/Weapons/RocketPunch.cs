@@ -89,7 +89,7 @@ public class RocketPunchProj : Projectile {
 	}
 
 	public RocketPunchProj(RocketPunch weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, getSpeed(weapon.type), 3, player, weapon.projSprite, 20, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, getSpeed(weapon.type), 2, player, weapon.projSprite, 20, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.RocketPunch;
 		this.player = player;
 		shooter = player.character;
@@ -101,13 +101,11 @@ public class RocketPunchProj : Projectile {
 		if (weapon.type == (int)RocketPunchType.GoGetterRight) {
 			maxReverseTime = 0.3f;
 		}
-
 		rocketPunchWeapon = weapon;
-		damager.flinch = Global.halfFlinch;
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
-			damager.damage = 2;
+			damager.damage = 1;
 			damager.hitCooldown = 0.1f;
-			maxTime = 0.25f;
+			maxTime = 0.15f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBrat;
 		} else if (weapon.type == (int)RocketPunchType.InfinityGig) {
@@ -265,6 +263,130 @@ public class RocketPunchAttack : CharState {
 		var poi = character.sprite.getCurrentFrame().POIs[0];
 		poi.x *= character.xDir;
 		proj = new RocketPunchProj(player.vileRocketPunchWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+	}
+
+	public void reset() {
+		character.frameIndex = 0;
+		stateTime = 0;
+		shot = false;
+	}
+}
+
+
+
+public class GoGetterRightPunch : CharState {
+	bool shot = false;
+	RocketPunchProj proj;
+	float specialPressTime;
+	public GoGetterRightPunch(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+			proj.reversed = true;
+		}
+
+		if (!shot && character.sprite.frameIndex == 1) {
+			shoot();
+		}
+		if (proj != null) {
+			if (player.vileRocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
+				if (player.input.isPressed(Control.Special1, player)) {
+					specialPressTime = 0.25f;
+				}
+
+				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+					character.frameIndex = 1;
+					character.frameTime = 0;
+				} else if (character.isAnimOver()) {
+					character.changeState(new Idle(), true);
+					return;
+				}
+			} else {
+				if (proj.returned || proj.destroyed) {
+					character.changeState(new Idle(), true);
+					return;
+				}
+			}
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("rocketPunch", sendRpc: true);
+		character.frameIndex = 1;
+		character.frameTime = 0;
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.GoGetterRight), 
+		character.pos.add(poi), character.xDir, character.player, 
+		character.player.getNextActorNetId(), rpc: true);
+	}
+
+	public void reset() {
+		character.frameIndex = 0;
+		stateTime = 0;
+		shot = false;
+	}
+}
+
+
+
+public class SpoiledBratPunch : CharState {
+	bool shot = false;
+	RocketPunchProj proj;
+	float specialPressTime;
+	public SpoiledBratPunch(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+			proj.reversed = true;
+		}
+
+		if (!shot && character.sprite.frameIndex == 1) {
+			shoot();
+		}
+		if (proj != null) {
+			if (player.vileRocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
+				if (player.input.isPressed(Control.Special1, player)) {
+					specialPressTime = 0.25f;
+				}
+
+				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+					character.frameIndex = 1;
+					character.frameTime = 0;
+				} else if (character.isAnimOver()) {
+					character.changeState(new Idle(), true);
+					return;
+				}
+			} else {
+				if (proj.returned || proj.destroyed) {
+					character.changeState(new Idle(), true);
+					return;
+				}
+			}
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("rocketPunch", sendRpc: true);
+		character.frameIndex = 1;
+		character.frameTime = 0;
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.SpoiledBrat), 
+		character.pos.add(poi), character.xDir, character.player, 
+		character.player.getNextActorNetId(), rpc: true);
 	}
 
 	public void reset() {

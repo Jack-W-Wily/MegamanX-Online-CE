@@ -51,19 +51,24 @@ public class NovaStrikeState : CharState {
 
 		if (sprite == "nova_strike_start") {
 			if (character.isAnimOver()) {
-				if (player.input.isHeld(Control.Up, player)) {
+				if (player.hasUltimateArmor()){
+					if (player.input.isHeld(Control.Up, player)) {
 					upOrDown = -1;
 					sprite = "nova_strike_up";
-				} else if (player.input.isHeld(Control.Down, player)) {
+					} else if (player.input.isHeld(Control.Down, player)) {
 					upOrDown = 1;
 					sprite = "nova_strike_down";
-				} else {
+					} else {
 					leftOrRight = 1;
 					sprite = "nova_strike";
+					}
 				}
-				character.playSound("speedBurnerCharged", sendRpc: true);
-				character.changeSpriteFromName(sprite, true);
+			} else {
+			leftOrRight = 1;
+			sprite = "nova_strike";
 			}
+			character.playSound("speedBurnerCharged", sendRpc: true);
+			character.changeSpriteFromName(sprite, true);
 			return;
 		}
 

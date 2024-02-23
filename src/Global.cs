@@ -385,6 +385,9 @@ public partial class Global {
 			{ "csnail_fall", "csnail_enter" },
 			{ "csnail_jump", "csnail_exit" },
 
+			{ "tt_csnail_fall", "tt_csnail_enter" },
+			{ "tt_csnail_jump", "tt_csnail_exit" },
+
 			{ "overdriveo_fall", "overdriveo_enter" },
 			{ "overdriveo_jump", "overdriveo_exit" },
 			{ "overdriveo_die", "overdriveo_hurt" },

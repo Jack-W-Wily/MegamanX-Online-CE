@@ -56,7 +56,7 @@ public class SonicSlicerProj : Projectile {
 	public Sprite twin;
 	int type;
 	public SonicSlicerProj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 2, player, "sonicslicer_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 200, 2, player, "sonicslicer_proj", 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.75f;
 		this.type = type;
 		collider.wallOnly = true;
