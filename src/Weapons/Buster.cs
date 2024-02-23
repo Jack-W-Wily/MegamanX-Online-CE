@@ -62,7 +62,8 @@ public class Buster : Weapon {
 			0 => "buster",
 			1 => "buster2",
 			2 => "buster3",
-			_ => "buster4"
+			3 => "buster4",
+			_ => ""
 		};
 		if (player.hasArmArmor(ArmorId.Giga)) {
 			shootSound = chargeLevel switch {

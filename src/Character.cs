@@ -536,7 +536,7 @@ public partial class Character : Actor, IDamagable {
 		return flag == null;
 	}
 
-	public bool canJump() {
+	public virtual bool canJump() {
 		if (mk5RideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		return true;
@@ -656,7 +656,7 @@ public partial class Character : Actor, IDamagable {
 		float runSpeed = Physics.WalkSpeed;
 		if (player.isX) {
 			if (charState is XHover) {
-				runSpeed = 129;
+				runSpeed = Physics.WalkSpeed;
 			}
 		}
 		else if (player.isVile && player.speedDevil) {
@@ -678,7 +678,7 @@ public partial class Character : Actor, IDamagable {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		float dashSpeed = 210;
+		float dashSpeed = 3.45f * 60f;
 
 		if (charState is XHover) {
 			dashSpeed *= 1.25f;
@@ -1631,8 +1631,8 @@ public partial class Character : Actor, IDamagable {
 
 		// Self damaging projIds can go thru alliance check
 		bool isSelfDamaging =
-			projId == (int)ProjIds.GLauncherSplash ||
-			projId == (int)ProjIds.ExplosionSplash ||
+			projId == (int)ProjIds.BlastLauncherSplash ||
+			projId == (int)ProjIds.GreenSpinnerSplash ||
 			projId == (int)ProjIds.NecroBurst ||
 			projId == (int)ProjIds.SniperMissileBlast ||
 			projId == (int)ProjIds.SpeedBurnerRecoil;
