@@ -416,7 +416,7 @@ public class Projectile : Actor {
 				damager.owner.alliance != otherProj.damager.owner.alliance
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
-					deflect(otherProj.owner, playDingSound: false);
+					deflect(otherProj.owner,sendRpc: true);
 					playSound("ding", sendRpc: true);
 				}
 			}

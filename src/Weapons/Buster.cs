@@ -94,19 +94,16 @@ public class Buster : Weapon {
 		bool hasUltArmor = player.character.hasUltimateArmorBS.getValue();
 		bool isHyperX = ((player.character as MegamanX)?.isHyperX == true);
 		if ((player.character as MegamanX).CurrentArmor == 0 && chargeLevel >=3){
-		new Buster3Proj(
-					player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 3,
-					player, player.getNextActorNetId(), rpc: true
-				);
-			shootSound = "buster2";
+		if (player.ownedByLocalPlayer) new Buster3Proj(player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 3,	player, player.getNextActorNetId(), rpc: true);
+		if (player.ownedByLocalPlayer)	shootSound = "buster3";
 		}
 		if (player.HasFullForce() && chargeLevel >= 3) {
-			new BusterUnpoProj(this, pos, xDir, player, netProjId);
-			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
-			shootSound = "buster2";
+			if (player.ownedByLocalPlayer) new BusterUnpoProj(this, pos, xDir, player, netProjId);
+			if (player.ownedByLocalPlayer) new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
+			if (player.ownedByLocalPlayer) shootSound = "buster2";
 		}
 		if (player.HasFullForce() && (player.character as MegamanX).unpoShotCount > 0) {
-			new BusterUnpoProj(this, pos, xDir, player, netProjId);
+			if (player.ownedByLocalPlayer) new BusterUnpoProj(this, pos, xDir, player, netProjId);
 			new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 			(player.character as MegamanX).unpoShotCount -= 1;
 			shootSound = "buster2";

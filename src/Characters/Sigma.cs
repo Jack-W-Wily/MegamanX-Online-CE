@@ -314,19 +314,20 @@ public class Sigma : Character {
 	public void chargeControls() {
 		if (chargeButtonHeld() && canCharge()) {
 			increaseCharge();
-		} else {
+		} 
+		if (!chargeButtonHeld()){
 			if (isCharging()) {
-				changeState(new SigmaSlashState(charState), true);
-					stopCharge();
-				//}
-			} else if (!(charState is Hurt)) {
-				stopCharge();
-			}
+			changeState(new SigmaSlashState(charState), true);
+			stopCharge();
+		}
 		}
 	}
 
 	public override void update() {
 		base.update();
+		if (charState is SigmaSlashState){
+			stopCharge();
+		}
 		// Charge System
 		 chargeControls();
 			chargeLogic();

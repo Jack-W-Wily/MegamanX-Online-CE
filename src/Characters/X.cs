@@ -742,7 +742,7 @@ public partial class MegamanX : Character {
 			if (player.weapon is Buster) {
 				shootTime = hasUltimateArmorBS.getValue() ? 0.5f : 0.25f;
 			} else shootTime = 0.5f;
-			if (charState is not ) {
+			if (!sprite.name.Contains("x2_shot")) {
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.StockCharge);
 		}} else if (stockedCharge) {
 			stockedCharge = false;

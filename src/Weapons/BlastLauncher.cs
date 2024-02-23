@@ -18,7 +18,7 @@ public class BlastLauncher : AxlWeapon {
 		switchCooldown = 0.1f;
 		rateOfFire = 0.75f;
 
-		sprite = "axl_arm_blastlauncher";
+		sprite = "axl_arm_glauncher";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 1.5f;
