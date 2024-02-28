@@ -27,9 +27,10 @@ public class CmdSigma : BaseSigma {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		// Cooldowns.
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementTime(ref sigmaAmmoRechargeCooldown);
-
+		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementTime(ref sigmaAmmoRechargeTime);
 			if (sigmaAmmoRechargeTime == 0) {
@@ -37,8 +38,8 @@ public class CmdSigma : BaseSigma {
 				sigmaAmmoRechargeTime = sigmaHeadBeamRechargePeriod;
 			}
 		}
-
-		if (isAttacking() && charState.normalCtrl && !isSigmaShooting()) {
+		// For ladder and slide attacks.
+		if (isAttacking() && charState is WallSlide or LadderClimb && !isSigmaShooting()) {
 			if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
@@ -70,7 +71,7 @@ public class CmdSigma : BaseSigma {
 		if (lenientAttackPressed && saberCooldown == 0) {
 			saberCooldown = sigmaSaberMaxCooldown;
 
-			if (charState is WallSlide || charState is LadderClimb) {
+			if (charState is WallSlide or LadderClimb) {
 				if (charState is LadderClimb) {
 					int inputXDir = player.input.getXDir(player);
 					if (inputXDir != 0) {
