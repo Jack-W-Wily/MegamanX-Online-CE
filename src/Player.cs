@@ -393,7 +393,7 @@ public partial class Player {
 	public ShaderWrapper catfishChargeShader = Helpers.cloneGenericPaletteShader("paletteVoltCatfishCharge");
 	public ShaderWrapper gatorArmorShader = Helpers.cloneShaderSafe("wheelgEaten");
 	public ShaderWrapper spongeChargeShader = Helpers.cloneShaderSafe("wspongeCharge");
-	
+
 	// Projectile shaders.
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
@@ -541,7 +541,7 @@ public partial class Player {
 		}
 		foreach (var key in charHeartTanks.Keys) {
 			int htCount = getStartHeartTanksForChar();
-			int altHtCount =  getStartHeartTanks();
+			int altHtCount = getStartHeartTanks();
 			if (altHtCount > htCount) {
 				htCount = altHtCount;
 			}
@@ -956,8 +956,7 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			}
-			else if (charNum == 2) {
+			} else if (charNum == 2) {
 				character = new Vile(
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
@@ -968,10 +967,22 @@ public partial class Player {
 					false, charNetId, ownedByLocalPlayer
 				);
 			} else if (charNum == 4) {
-				character = new Sigma(
-					this, pos.x, pos.y, xDir,
-					false, charNetId, ownedByLocalPlayer
-				);
+				if (isSigma3()) {
+					character = new Doppma(
+						this, pos.x, pos.y, xDir,
+						false, charNetId, ownedByLocalPlayer
+					);
+				} else if (isSigma2()) {
+					character = new NeoSigma(
+						this, pos.x, pos.y, xDir,
+						false, charNetId, ownedByLocalPlayer
+					);
+				} else {
+					character = new CmdSigma(
+						this, pos.x, pos.y, xDir,
+						false, charNetId, ownedByLocalPlayer
+					);
+				}
 			} else if (charNum == 5) {
 				character = new Rock(
 					this, pos.x, pos.y, xDir,
@@ -1066,8 +1077,7 @@ public partial class Player {
 	    input.possessedControlHeld[Control.Shoot] = Global.input.isHeld(Control.Shoot, Global.level.mainPlayer);
 		input.possessedControlHeld[Control.Special1] = Global.input.isHeld(Control.Special1, Global.level.mainPlayer);
 
-		byte inputHeldByte = Helpers.boolArrayToByte(new bool[]
-		{
+		byte inputHeldByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlHeld[Control.Left],
 				input.possessedControlHeld[Control.Right],
 				input.possessedControlHeld[Control.Up],
@@ -1091,8 +1101,7 @@ public partial class Player {
 		input.possessedControlPressed[Control.Shoot] = Global.input.isPressed(Control.Shoot, Global.level.mainPlayer);
 		input.possessedControlPressed[Control.Special1] = Global.input.isPressed(Control.Special1, Global.level.mainPlayer);
 
-		byte inputPressedByte = Helpers.boolArrayToByte(new bool[]
-		{
+		byte inputPressedByte = Helpers.boolArrayToByte(new bool[] {
 				input.possessedControlPressed[Control.Left],
 				input.possessedControlPressed[Control.Right],
 				input.possessedControlPressed[Control.Up],
@@ -1204,10 +1213,23 @@ public partial class Player {
 				true, character.netId, true, isWarpIn: false
 			);
 		} else if (charNum == 4) {
-			retChar = new Sigma(
-				this, character.pos.x, character.pos.y, character.xDir,
-				true, character.netId, true, isWarpIn: false
-			);
+			if (dnaCore.loadout.sigmaLoadout.sigmaForm == 2) {
+				retChar = new Doppma(
+					this, character.pos.x, character.pos.y, character.xDir,
+					true, character.netId, true, isWarpIn: false
+				);
+			} else if (dnaCore.loadout.sigmaLoadout.sigmaForm == 1) {
+				retChar = new NeoSigma(
+					this, character.pos.x, character.pos.y, character.xDir,
+					true, character.netId, true, isWarpIn: false
+				);
+			} else {
+				retChar = new CmdSigma(
+					this, character.pos.x, character.pos.y, character.xDir,
+					true, character.netId, true, isWarpIn: false
+				);
+			}
+
 		} else if (charNum == 5) {
 			retChar = new Rock(
 				this, character.pos.x, character.pos.y, character.xDir,
@@ -1249,8 +1271,7 @@ public partial class Player {
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				zero.isNightmareZero = true;
 			}
-		}
-		else if (charNum == 3 && character is Axl axl) {
+		} else if (charNum == 3 && character is Axl axl) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 				RPC.playerToggle.sendRpc(id, RPCToggleType.SetWhiteAxl);
@@ -1276,8 +1297,7 @@ public partial class Player {
 				} else {
 					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
 				}
-			}
-			else if (isSigma) {
+			} else if (isSigma) {
 				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
 			}
 		}
@@ -1323,8 +1343,7 @@ public partial class Player {
 				} else {
 					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
 				}
-			}
-			else if (isSigma) {
+			} else if (isSigma) {
 				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
 			}
 		}
@@ -1383,10 +1402,10 @@ public partial class Player {
 	}
 
 	public bool canUpgradeGoldenX() {
-		return character != null && 
-			isX && !isDisguisedAxl && 
-			character.charState is not Die && !Global.level.is1v1() && 
-			hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() && 
+		return character != null &&
+			isX && !isDisguisedAxl &&
+			character.charState is not Die && !Global.level.is1v1() &&
+			hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() &&
 			!hasGoldenArmor() && scrap >= goldenArmorCost && !usedChipOnce;
 	}
 

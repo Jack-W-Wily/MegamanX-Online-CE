@@ -1184,14 +1184,18 @@ public class RPCAxlShoot : RPC {
 			player.character.playSound("axlBulletCharged");
 		} else if (projId == (int)ProjIds.BlastLauncher) {
 			var pos = new Point(x, y);
-			var bullet = new GrenadeProj(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, new Point(), 0, netId);
+			var bullet = new GrenadeProj(
+				new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, new Point(), 0, netId
+			);
 			var flash = new Anim(pos, "axl_pistol_flash", 1, null, true);
 			flash.angle = angle;
 			flash.frameSpeed = 1;
 			player.character.playSound("grenadeShoot");
 		} else if (projId == (int)ProjIds.GreenSpinner) {
 			var pos = new Point(x, y);
-			var bullet = new GreenSpinnerProj(new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, netId);
+			var bullet = new GreenSpinnerProj(
+				new BlastLauncher(0), pos, xDir, player, Point.createFromAngle(angle), null, netId
+			);
 			var flash = new Anim(pos, "axl_pistol_flash_charged", 1, null, true);
 			flash.angle = angle;
 			flash.frameSpeed = 3;
@@ -1217,7 +1221,9 @@ public class RPCAxlShoot : RPC {
 			flash.frameSpeed = 1;
 		} else if (projId == (int)ProjIds.SpiralMagnum || projId == (int)ProjIds.SpiralMagnumScoped) {
 			var pos = new Point(x, y);
-			var bullet = new SpiralMagnumProj(new SpiralMagnum(0), pos, 0, 0, player, Point.createFromAngle(angle), null, null, netId);
+			var bullet = new SpiralMagnumProj(
+				new SpiralMagnum(0), pos, 0, 0, player, Point.createFromAngle(angle), null, null, netId
+			);
 			if (projId == (int)ProjIds.SpiralMagnumScoped) {
 				AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(pos, bullet);
 			}
@@ -1248,7 +1254,12 @@ public class RPCAxlShoot : RPC {
 		var yBytes = BitConverter.GetBytes(pos.y);
 		var netIdBytes = BitConverter.GetBytes(netId);
 		var projIdBytes = BitConverter.GetBytes((ushort)projId);
-		Global.serverClient?.rpc(this, (byte)playerId, projIdBytes[0], projIdBytes[1], netIdBytes[0], netIdBytes[1], xBytes[0], xBytes[1], xBytes[2], xBytes[3], yBytes[0], yBytes[1], yBytes[2], yBytes[3], Helpers.dirToByte(xDir), Helpers.angleToByte(angle));
+		Global.serverClient?.rpc(
+			this, (byte)playerId, projIdBytes[0], projIdBytes[1], netIdBytes[0], netIdBytes[1],
+			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
+			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
+			Helpers.dirToByte(xDir), Helpers.angleToByte(angle)
+		);
 	}
 }
 
@@ -1670,7 +1681,7 @@ public class RPCCommandGrabPlayer : RPC {
 		} else if (hookScenario == CommandGrabScenario.WhirlpoolGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new WhirlpoolGrabbed(grabber as LaunchOctopus), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.DeadLiftGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerKuwanger), isDefenderFavored);
+			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerangKuwanger), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.WheelGGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new WheelGGrabbed(grabber as WheelGator), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.FStagGrab) {
@@ -2247,8 +2258,9 @@ public class RPCSyncPossessInput : RPC {
 		int playerId = arguments[0];
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
-		if (!player.isPossessed()) return;
-
+		if (!player.isPossessed()) {
+			return;
+		}
 		bool[] inputHeldArray = Helpers.byteToBoolArray(arguments[1]);
 		bool[] inputPressedArray = Helpers.byteToBoolArray(arguments[2]);
 

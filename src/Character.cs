@@ -112,7 +112,6 @@ public partial class Character : Actor, IDamagable {
 	public bool stopCamUpdate = false;
 	public Anim warpBeam;
 	public float flattenedTime;
-	public float wallKickCooldown;
 	public float saberCooldown;
 
 	public const float maxLastAttackerTime = 5;
@@ -132,13 +131,9 @@ public partial class Character : Actor, IDamagable {
 	// Some things previously in other char files used by multiple characters.
 	public int lastShootPressed;
 	public int lastShootReleased;
+	public int lastAttackFrame = -100;
 	public int framesSinceLastAttack = 1000;
 	public float grabCooldown;
-
-	public float dashAttackCooldown;
-	public float maxDashAttackCooldown = 0.75f;
-	public float airAttackCooldown;
-	public float maxAirAttackCooldown = 0.5f;
 
 	public RideArmor vileStartRideArmor;
 	public RideArmor mk5RideArmorPlatform;
@@ -184,6 +179,7 @@ public partial class Character : Actor, IDamagable {
 			else initialCharState = new Idle();
 		} else {
 			initialCharState = new NetLimbo(); 
+			useGravity = false;
 		}
 
 		spriteToCollider["roll"] = getDashingCollider();
@@ -1518,7 +1514,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void freeze(int timeToFreeze = 5) {
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
-		if (charState is SwordBlock) return;
+		if (charState.stunResistant) return;
 		if (charState is Frozen) return;
 
 		changeState(new Frozen(timeToFreeze), true);
@@ -1526,7 +1522,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canCrystalize() {
 		if ((this as MegamanX)?.chargedRollingShieldProj != null) return false;
-		if (charState is SwordBlock) return false;
+		if (charState.stunResistant) return false;
 		if (isCrystalized) return false;
 		return true;
 	}
@@ -1596,7 +1592,11 @@ public partial class Character : Actor, IDamagable {
 		if (factorHyperMode && isInvulnBS.getValue() && !isCCImmuneHyperMode()) return true;
 		if (!ignoreRideArmorHide && charState is InRideArmor && (charState as InRideArmor).isHiding) return true;
 		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) return true;
-		if (specialState == (int)SpecialStateIds.AxlRoll) return true;
+		if (specialState == (int)SpecialStateIds.AxlRoll ||
+			specialState == (int)SpecialStateIds.XTeleport
+		) {
+			return true;
+		}
 		if (sprite.name.Contains("viral_exit")) return true;
 		if (charState is WarpOut) return true;
 		if (charState is WolfSigmaRevive || charState is ViralSigmaRevive || charState is KaiserSigmaRevive) return true;
@@ -3020,7 +3020,7 @@ public partial class Character : Actor, IDamagable {
 		return base.getProjFromHitbox(hitbox, centerPoint);
 	}
 
-	public void releaseGrab(Actor grabber) {
+	public void releaseGrab(Actor grabber, bool sendRpc = false) {
 		charState?.releaseGrab();
 		if (!ownedByLocalPlayer) {
 			RPC.commandGrabPlayer.sendRpc(

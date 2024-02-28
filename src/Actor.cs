@@ -1139,11 +1139,14 @@ public partial class Actor : GameObject {
 				yOff -= 8;
 			}
 		}
-		string text = "-" + damage.ToString();
+		string text = damage.ToString();
 		bool isHeal = false;
 		if (damage < 0) {
-			text = "+" + (damage * -1).ToString();
+			text = (damage * -1).ToString();
 			isHeal = true;
+		}
+		if (damage != 0 && damage < 1 && damage > -1) {
+			text = text[1..];
 		}
 		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
 	}
@@ -1152,8 +1155,8 @@ public partial class Actor : GameObject {
 		int xOff = 0;
 		int yOff = 0;
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
-			if (damageTexts[i].time < 0.1f) {
-				yOff -= 8;
+			if (damageTexts[i].time < 6) {
+				yOff -= (6 - (int)damageTexts[i].time);
 			}
 		}
 		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), isHeal));
@@ -1162,20 +1165,28 @@ public partial class Actor : GameObject {
 	public void renderDamageText(float yOff) {
 		for (int i = damageTexts.Count - 1; i >= 0; i--) {
 			var dt = damageTexts[i];
-			dt.time += Global.spf;
-			if (dt.time > 0.75f) {
+			dt.time += 1;
+			if (dt.time >= 46) {
 				damageTexts.RemoveAt(i);
 			}
-			float textPosX = dt.pos.x;
-			float textPosY = dt.pos.y - yOff - (dt.time * 60);
-			Color col = new Color(255, 32, 32, (byte)(255f - (dt.time * 0.00f * 255f)));
-			Color outlineCol = new Color(Helpers.DarkBlue.R, Helpers.DarkBlue.G, Helpers.DarkBlue.B, (byte)(255f - (dt.time * 0.00f * 255f)));
-			if (dt.isHeal) {
-				col = new Color(32, 255, 32, (byte)(255f - (dt.time * 0.00f * 255f)));
-				outlineCol = new Color(Helpers.DarkBlue.R, Helpers.DarkBlue.G, Helpers.DarkBlue.B, (byte)(255f - (dt.time * 0.00f * 255f)));
-			}
+			dt.offset.x += (Helpers.randomRange(-4, 4) / 4f);
+			dt.offset.y -= 1;
 
-			DrawWrappers.DrawText(dt.text, dt.offset.x + textPosX, dt.offset.y + textPosY, Alignment.Center, true, fontSize: 0.75f, color: col, outlineColor: outlineCol, Text.Styles.Regular, 1, true, ZIndex.HUD);
+			float textPosX = dt.pos.x;
+			if (dt.offset.x >= 0) {
+				textPosX += MathInt.Ceiling(dt.offset.x);
+			} else {
+				textPosX += MathInt.Floor(dt.offset.x);
+			}
+			float textPosY = dt.pos.y - yOff + dt.offset.y;
+			FontType color = FontType.Red;
+			if (dt.isHeal) {
+				color = FontType.Green;
+			}
+			Fonts.drawText(
+				color, dt.text, textPosX, textPosY,
+				Alignment.Center, isWorldPos: true, depth: ZIndex.HUD
+			);
 		}
 	}
 

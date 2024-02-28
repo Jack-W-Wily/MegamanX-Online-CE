@@ -190,7 +190,7 @@ public class AI {
 			}
 			if (trainingBehavior == AITrainingBehavior.Crouch) {
 				if (player.isSigma) {
-					character?.changeState(new SwordBlock(), true);
+					character?.changeState(new SigmaBlock(), true);
 					player.press(Control.Down);
 				} else {
 					player.press(Control.Down);
@@ -236,7 +236,7 @@ public class AI {
 
 		target = Global.level.getClosestTarget(character.pos, player.alliance, true, isRequesterAI: true);
 
-		if (character is KaiserSigma || character is Sigma sigma && sigma.isHyperSigma) {
+		if (character is KaiserSigma || character is BaseSigma sigma && sigma.isHyperSigma) {
 			int attack = Helpers.randomRange(0, 1);
 			if (attack == 0) {
 				player.release(Control.Special1);

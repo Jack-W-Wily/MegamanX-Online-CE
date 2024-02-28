@@ -29,6 +29,7 @@ public class CharState {
 	public bool useGravity = true;
 
 	public bool invincible;
+	public bool stunResistant;
 	public bool superArmor;
 	public bool immuneToWind;
 	public int accuracy;
@@ -651,8 +652,6 @@ public class Crouch : CharState {
 }
 
 public class SwordBlock : CharState {
-	public Sigma sigma;
-
 	public SwordBlock() : base("block") {
 		immuneToWind = true;
 		superArmor = true;
@@ -1548,10 +1547,10 @@ public class Stunned : CharState {
 		if (
 			character.stunInvulnTime > 0 ||
 			character.isInvulnerable() ||
-			character.charState is SwordBlock ||
+			character.charState.stunResistant ||
 			character.grabInvulnTime > 0 ||
 			character.isVaccinated() ||
-			character.charState is Frozen ||
+			//character.charState is Frozen ||
 			character.charState is VileMK2Grabbed ||
 			(character as MegamanX).chargedRollingShieldProj == null ||
 			character.charState.invincible
@@ -1636,7 +1635,7 @@ public class Crystalized : CharState {
 
 public class Die : CharState {
 	bool sigmaHasMavericks;
-	Sigma sigma;
+	BaseSigma sigma;
 	MegamanX mmx;
 
 	public Die() : base("die") {
@@ -1644,7 +1643,7 @@ public class Die : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		sigma = character as Sigma;
+		sigma = character as BaseSigma;
 		mmx = character as MegamanX;
 		character.useGravity = false;
 		character.stopMoving();
@@ -1816,14 +1815,20 @@ public class GenericGrabbedState : CharState {
 	public float notGrabbedTime;
 	public float maxNotGrabbedTime;
 	public bool customUpdate;
-	public GenericGrabbedState(Actor grabber, float maxGrabTime, string grabSpriteSuffix,
-		bool reverseZIndex = false, bool freeOnHitWall = true, bool lerp = true, string additionalGrabSprite = null, float maxNotGrabbedTime = 0.5f) : base("grabbed") {
+	public GenericGrabbedState(
+		Actor grabber, float maxGrabTime, string grabSpriteSuffix,
+		bool reverseZIndex = false, bool freeOnHitWall = true,
+		bool lerp = true, string additionalGrabSprite = null, float maxNotGrabbedTime = 0.5f
+	) : base(
+		"grabbed"
+	) {
 		this.isGrabbedState = true;
 		this.grabber = grabber;
 		grabTime = maxGrabTime;
 		this.grabSpriteSuffix = grabSpriteSuffix;
 		this.reverseZIndex = reverseZIndex;
-		//this.freeOnHitWall = freeOnHitWall;   //Don't use this unless absolutely needed, it causes issues with octopus grab in FTD
+		//Don't use this unless absolutely needed, it causes issues with octopus grab in FTD
+		//this.freeOnHitWall = freeOnHitWall;
 		this.lerp = lerp;
 		this.additionalGrabSprite = additionalGrabSprite;
 		this.maxNotGrabbedTime = maxNotGrabbedTime;
@@ -1835,10 +1840,13 @@ public class GenericGrabbedState : CharState {
 		/*
 		if (customUpdate) return;
 
-		
-		if (grabber.sprite?.name.EndsWith(grabSpriteSuffix) == true ||
-			(!string.IsNullOrEmpty(additionalGrabSprite) && grabber.sprite?.name.EndsWith(additionalGrabSprite) == true)) {
-			if (!trySnapToGrabPoint(lerp) && freeOnHitWall) {
+		if (grabber.sprite?.name.EndsWith(grabSpriteSuffix) == true || (
+				!string.IsNullOrEmpty(additionalGrabSprite) &&
+				grabber.sprite?.name.EndsWith(additionalGrabSprite) == true
+			)
+		) {
+			bool didNotHitWall = trySnapToGrabPoint(lerp);
+			if (!didNotHitWall && freeOnHitWall) {
 				character.changeToIdleOrFall();
 				return;
 			}
@@ -1875,14 +1883,16 @@ public class GenericGrabbedState : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (!base.canEnter(character)) return false;
+		if (!base.canEnter(character)) {
+			return false;
+		}
 		return !character.isInvulnerable() && !character.charState.invincible;
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMoving();
-		character.stopCharge();
+		//character.stopCharge();
 		character.useGravity = false;
 		character.grounded = false;
 		savedZIndex = character.zIndex;

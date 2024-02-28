@@ -74,7 +74,7 @@ public class VileMK2GrabState : CharState {
 			SpawnShockwave = true;
 			victim.changeSpriteFromName("knocked_down", true);
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (frameTime >= 2 && player.input.isPressed(Control.Special1, player)) {
 			character.changeState(new Idle(), true);
 			return;
 		}
@@ -101,8 +101,10 @@ public class VileMK2GrabState : CharState {
 		character.playSound("crash", sendRpc: true);
 		}
 		character.grabCooldown = 1;
-		victim.grabInvulnTime = 2;
-		victim?.releaseGrab(character);
+		if (newState is not VileMK2GrabState && victim != null) {
+			victim.grabInvulnTime = 2;
+			victim?.releaseGrab(character, true);
+		}
 	}
 }
 
