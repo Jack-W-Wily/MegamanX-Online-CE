@@ -14,7 +14,7 @@ public partial class Player {
 	public Character character;
 	public Character lastCharacter;
 	public bool ownedByLocalPlayer;
-	public int? awakenedScrapEnd;
+	public int? awakenedCurrencyEnd;
 	public float fgMoveAmmo = 32;
 	public bool isDefenderFavored {
 		get {
@@ -128,9 +128,9 @@ public partial class Player {
 	public const int zeroHyperCost = 10;
 	public const int zBusterZeroHyperCost = 10;
 	public const int AxlHyperCost = 10;
-	public const int reviveVileScrapCost = 5;
-	public const int reviveSigmaScrapCost = 10;
-	public const int reviveXScrapCost = 10;
+	public const int reviveVileCost = 5;
+	public const int reviveSigmaCost = 10;
+	public const int reviveXCost = 10;
 	public const int goldenArmorCost = 5;
 	public const int ultimateArmorCost = 10;
 	public bool lastDeathCanRevive;
@@ -244,14 +244,15 @@ public partial class Player {
 		}
 	}
 
-	// Scrap
-	public Dictionary<int, int> charScrap = new Dictionary<int, int>();
-	public int scrap {
+	// Currency
+	public const int maxCharCurrencyId = 5;
+	public int[] charCurrency = new int[maxCharCurrencyId];
+	public int currency {
 		get {
-			return charScrap[isDisguisedAxl ? 3 : charNum];
+			return charCurrency[isDisguisedAxl ? 3 : charNum];
 		}
 		set {
-			charScrap[isDisguisedAxl ? 3 : charNum] = value;
+			charCurrency[isDisguisedAxl ? 3 : charNum] = value;
 		}
 	}
 
@@ -363,7 +364,7 @@ public partial class Player {
 		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null && newAlliance != serverPlayer.autobalanceAlliance.Value) {
 			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(name + " was autobalanced to " + GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true), true);
 			forceKill();
-			scrap += 5;
+			currency += 5;
 			Global.serverClient?.rpc(RPC.switchTeam, RPCSwitchTeam.getSendMessage(id, serverPlayer.autobalanceAlliance.Value));
 			newAlliance = serverPlayer.autobalanceAlliance.Value;
 		}
@@ -536,8 +537,8 @@ public partial class Player {
 			armArmorNum = xArmor1v1;
 		}
 
-		for (int i = 0; i <= 5; i++) {
-			charScrap[i] = getStartScrap();
+		for (int i = 0; i < charCurrency.Length; i++) {
+			charCurrency[i] = getStartCurrency();
 		}
 		foreach (var key in charHeartTanks.Keys) {
 			int htCount = getStartHeartTanksForChar();
@@ -630,7 +631,7 @@ public partial class Player {
 		teamHealAmount += healAmount;
 		if (teamHealAmount >= 16) {
 			teamHealAmount = 0;
-			scrap++;
+			currency++;
 		}
 	}
 
@@ -942,7 +943,7 @@ public partial class Player {
 			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
 				if (isVile) {
 					mk2VileOverride = true;
-					scrap = 9999;
+					currency = 9999;
 				}
 			}
 
@@ -1006,7 +1007,7 @@ public partial class Player {
 					} else {
 						zero.awakenedZeroTime = Global.spf;
 						zero.hyperZeroUsed = true;
-						scrap = 9999;
+						currency = 9999;
 					}
 				}
 				if (character is Axl axl) {
@@ -1018,7 +1019,7 @@ public partial class Player {
 					} else {
 						axl.stingChargeTime = 8;
 						axl.hyperAxlUsed = true;
-						scrap = 9999;
+						currency = 9999;
 					}
 				}
 			}
@@ -1406,14 +1407,21 @@ public partial class Player {
 			isX && !isDisguisedAxl &&
 			character.charState is not Die && !Global.level.is1v1() &&
 			hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() &&
-			!hasGoldenArmor() && scrap >= goldenArmorCost && !usedChipOnce;
+			!hasGoldenArmor() && currency >= goldenArmorCost && !usedChipOnce;
 	}
 
 	public bool canUpgradeUltimateX() {
+<<<<<<< HEAD
 		return false;//character != null &&
 			//isX && !isDisguisedAxl &&
 			//character.charState is not Die && !Global.level.is1v1() &&
 			//!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= ultimateArmorCost;
+=======
+		return character != null &&
+			isX && !isDisguisedAxl &&
+			character.charState is not Die && !Global.level.is1v1() &&
+			!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && currency >= ultimateArmorCost;
+>>>>>>> bfeea2da3ced4a479effaeb59464f274af33d979
 	}
 
 	public void destroy() {
@@ -1538,7 +1546,7 @@ public partial class Player {
 		}
 	}
 
-	public void awardScrap() {
+	public void awardCurrency() {
 		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
 		if (character?.isCCImmuneHyperMode() == true) return;
 		if (character is Zero zero && (zero.isNightmareZero)) return;
@@ -1553,12 +1561,16 @@ public partial class Player {
 		if (isAxl) fillSubtank(3);
 		if (isX || isSigma) fillSubtank(4);
 
-		scrap++;
+		currency++;
 	}
 
-	public int getStartScrap() {
-		if (Global.level.levelData.isTraining() || Global.anyQuickStart) return 9999;
-		if (Global.level?.server?.customMatchSettings != null) return Global.level.server.customMatchSettings.startScrap;
+	public int getStartCurrency() {
+		if (Global.level.levelData.isTraining() || Global.anyQuickStart) {
+			return 999;
+		}
+		if (Global.level?.server?.customMatchSettings != null) {
+			return Global.level.server.customMatchSettings.startCurrency;
+		}
 		return 3;
 	}
 
@@ -1582,7 +1594,7 @@ public partial class Player {
 		if (Global.level.isElimination() ||
 			!lastDeathCanRevive ||
 			newCharNum != 2 ||
-			scrap < reviveVileScrapCost ||
+			currency < reviveVileCost ||
 			lastDeathWasVileMK5
 		) {
 			return false;
@@ -1599,7 +1611,7 @@ public partial class Player {
 			return true;
 		}
 
-		bool basicCheck = !Global.level.isElimination() && limboChar != null && lastDeathCanRevive && isSigma && newCharNum == 4 && scrap >= reviveSigmaScrapCost && !lastDeathWasSigmaHyper;
+		bool basicCheck = !Global.level.isElimination() && limboChar != null && lastDeathCanRevive && isSigma && newCharNum == 4 && currency >= reviveSigmaCost && !lastDeathWasSigmaHyper;
 		if (!basicCheck) return false;
 
 		if (isSigma1()) {
@@ -1644,11 +1656,11 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return !Global.level.isElimination() && armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && scrap >= reviveXScrapCost && !lastDeathWasXHyper;
+		return !Global.level.isElimination() && armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
 	}
 
 	public void reviveVile(bool toMK5) {
-		scrap -= reviveVileScrapCost;
+		currency -= reviveVileCost;
 		Vile vile = (limboChar as Vile);
 
 		if (toMK5) {
@@ -1695,7 +1707,7 @@ public partial class Player {
 	}
 
 	public void reviveSigma(Point spawnPoint) {
-		scrap -= reviveSigmaScrapCost;
+		currency -= reviveSigmaCost;
 		hyperSigmaRespawn = true;
 		respawnTime = 0;
 		character = limboChar;
@@ -1710,18 +1722,43 @@ public partial class Player {
 		} else if (isSigma2()) {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
-		} else if (isSigma3()) {
+		}
+		else if (character is Doppma) {
+			character.destroySelf();
+			KaiserSigma kaiserSigma = new KaiserSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				character.netId, character.ownedByLocalPlayer
+			);
+			character = kaiserSigma;
+			character.changeSprite("sigma3_kaiser_enter", true);
 			explodeDieEffect.changeSprite("sigma3_revive");
 			if (Global.level.is1v1() && spawnPoint.isZero()) {
-				var closestSpawn = Global.level.spawnPoints.OrderBy(s => s.pos.distanceTo(character.pos)).FirstOrDefault();
+				var closestSpawn = Global.level.spawnPoints.OrderBy(
+					s => s.pos.distanceTo(character.pos)
+				).FirstOrDefault();
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
 			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
 		}
+		RPC.playerToggle.sendRpc(id, RPCToggleType.ReviveSigma);
+	}
+
+	public void reviveSigmaNonOwner(Point spawnPoint) {
+		clearSigmaWeapons();
+		maxHealth = 32 * getHealthModifier();
+		if (character is Doppma) {
+			character.destroySelf();
+			KaiserSigma kaiserSigma = new KaiserSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				character.netId, character.ownedByLocalPlayer
+			);
+			character = kaiserSigma;
+		}
+		character.changeSprite("sigma3_kaiser_enter", true);
 	}
 
 	public void reviveX() {
-		scrap -= reviveXScrapCost;
+		currency -= reviveXCost;
 		hyperXRespawn = true;
 		respawnTime = 0;
 		character.changeState(new XReviveStart(), true);
@@ -1781,9 +1818,9 @@ public partial class Player {
 			//if (axlBulletType == (int)AxlBulletWeaponType.AncientGun) axlBulletType = 0;
 		}
 
-		if (isZero && awakenedScrapEnd != null && scrap >= awakenedScrapEnd) {
-			scrap = awakenedScrapEnd.Value;
-			awakenedScrapEnd = null;
+		if (isZero && awakenedCurrencyEnd != null && currency >= awakenedCurrencyEnd) {
+			currency = awakenedCurrencyEnd.Value;
+			awakenedCurrencyEnd = null;
 		}
 
 		if (!character.player.isVile && !character.player.isSigma) {
@@ -1925,7 +1962,9 @@ public partial class Player {
 	}
 
 	public void setChipNum(int armorIndex, bool remove) {
-		if (!remove) usedChipOnce = true;
+		if (!remove) {
+			usedChipOnce = true;
+		}
 		setArmorNum(0, 3);
 		setArmorNum(1, 3);
 		setArmorNum(2, 3);
@@ -2133,13 +2172,13 @@ public partial class Player {
 			deaths++;
 			if (isSuicide) {
 				kills = Helpers.clamp(kills - 1, 0, int.MaxValue);
-				scrap = Helpers.clamp(scrap - 1, 0, int.MaxValue);
+				currency = Helpers.clamp(currency - 1, 0, int.MaxValue);
 			}
 		} else if (ownedByLocalPlayer) {
 			deaths++;
 			if (isSuicide) {
 				kills = Helpers.clamp(kills - 1, 0, int.MaxValue);
-				scrap = Helpers.clamp(scrap - 1, 0, int.MaxValue);
+				currency = Helpers.clamp(currency - 1, 0, int.MaxValue);
 			}
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}

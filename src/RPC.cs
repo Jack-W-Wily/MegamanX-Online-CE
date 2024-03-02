@@ -502,6 +502,7 @@ public enum RPCToggleType {
 	ReviveX,
 	StartRev,
 	StopRev,
+	ReviveSigma
 }
 
 public class RPCPlayerToggle : RPC {
@@ -566,6 +567,10 @@ public class RPCPlayerToggle : RPC {
 			if (player.character is Axl axl) {
 				axl.isNonOwnerRev = false;
 			}
+		} else if (toggleId == RPCToggleType.ReviveSigma) {
+			if (player.character is BaseSigma) {
+				player.reviveSigma(player.character.pos);
+			}
 		}
 	}
 
@@ -587,7 +592,7 @@ public enum RPCActorToggleType {
 	ShakeCamera,
 	ReverseRocketPunch,
 	DropFlagManual,
-	AwardScrap,
+	AwardCurrency,
 	AddViralSigmaMusicSource,
 	MorphMothCocoonSelfDestruct,
 	AddKaiserSigmaMusicSource,
@@ -664,9 +669,9 @@ public class RPCActorToggle : RPC {
 				chr.dropFlag();
 				chr.dropFlagCooldown = 1;
 			}
-		} else if (toggleId == RPCActorToggleType.AwardScrap) {
+		} else if (toggleId == RPCActorToggleType.AwardCurrency) {
 			if (actor is Character chr) {
-				chr.player.scrap += 5;
+				chr.player.currency += 5;
 			}
 		} else if (toggleId == RPCActorToggleType.MorphMothCocoonSelfDestruct) {
 			if (actor is MorphMothCocoon mmc) {

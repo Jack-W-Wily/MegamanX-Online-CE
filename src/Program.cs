@@ -17,26 +17,26 @@ using System.Runtime.InteropServices;
 namespace MMXOnline;
 
 class Program {
-	#if WINDOWS
+#if WINDOWS
 	[STAThread]
-	#endif
+#endif
 	static void Main(string[] args) {
 		if (args.Length > 0 && args[0] == "-relay") {
-			#if WINDOWS
-				AllocConsole();
-			#endif
+#if WINDOWS
+			AllocConsole();
+#endif
 			RelayServer.ServerMain(args);
 		} else {
 			int mode = 0;
 			if (args.Length > 0 && args[0] == "-server") {
 				mode = 1;
-				args = new string[] {};
+				args = new string[] { };
 			}
 			if (args.Length >= 2 && args[0] == "-connect") {
 				mode = 2;
 				args = args[1..];
 			} else {
-				args = new string[] {};
+				args = new string[] { };
 			}
 			GameMain(args, mode);
 		}
@@ -49,11 +49,11 @@ class Program {
 		Environment.Exit(0);
 	}
 
-	#if WINDOWS
-		[DllImport("kernel32.dll", SetLastError = true)]
-		[return: MarshalAs(UnmanagedType.Bool)]
-		static extern bool AllocConsole();
-	#endif
+#if WINDOWS
+	[DllImport("kernel32.dll", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	static extern bool AllocConsole();
+#endif
 
 	static void GameMain(string[] args, int mode) {
 		if (Debugger.IsAttached) {
@@ -71,18 +71,18 @@ class Program {
 				throw;
 				*/
 				Logger.LogFatalException(e);
-                Logger.logException(e, false, "Fatal exception", true);
-                Thread.Sleep(1000);
+				Logger.logException(e, false, "Fatal exception", true);
+				Thread.Sleep(1000);
 				throw;
 			}
 		}
 	}
 
 	static void Run(string[] args, int mode) {
-		#if MAC
+#if MAC
 		Global.assetPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName) + "/";
 		Global.writePath = Global.assetPath;
-		#endif
+#endif
 		Global.Init();
 		if (Global.debug) {
 			if (Enum.GetNames(typeof(WeaponIds)).Length > 256) {
@@ -163,7 +163,8 @@ class Program {
 		} else {
 			loadText.Add("User: " + Options.main.playerName);
 		}
-		loadText.Add("CPU: " + System.Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER").Split(",")[0]);
+		// Get CPU name here.
+		loadText.Add("CPU: " + getCpuName());
 		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
 		loadText.Add("");
 		// Input
@@ -235,7 +236,7 @@ class Program {
 		Menu.change(new MainMenu());
 		Global.changeMusic("menu");
 		if (mode == 1) {
-			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true); 
+			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);
 			menu.completeAction();
 		} else if (mode == 2) {
@@ -509,11 +510,9 @@ class Program {
 					} else {
 						if (AI.trainingBehavior == AITrainingBehavior.Attack) {
 							AI.trainingBehavior = AITrainingBehavior.Jump;
-						}
-						else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
+						} else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
 							AI.trainingBehavior = AITrainingBehavior.Default;
-						}
-						else if (AI.trainingBehavior == AITrainingBehavior.Default) {
+						} else if (AI.trainingBehavior == AITrainingBehavior.Default) {
 							AI.trainingBehavior = AITrainingBehavior.Idle;
 							Global.level.mainPlayer.aiTakeover = false;
 							Global.level.mainPlayer.isAI = false;
@@ -974,7 +973,7 @@ class Program {
 		return true;
 	}
 
-	
+
 	// Main loop.
 	// GM19 used some deltatime system.
 	// This leads to massive inconsistencies on high lag.
@@ -1052,10 +1051,10 @@ class Program {
 					framesUpdatesThisSecond++;
 				}
 			}
-			if (deltaTime < 0.001m) {
+			if (deltaTime < 0.01m) {
 				deltaTime = 0;
 			}
-			//deltaTimeSavings = deltaTime;
+			deltaTimeSavings = deltaTime;
 			videoUpdatesThisSecond++;
 			Global.isSkippingFrames = false;
 			Global.input.clearInput();
@@ -1095,6 +1094,31 @@ class Program {
 			*/
 		}
 	}
+
+	public static string getCpuName() {
+		string cpuName = "Unknown";
+#if WINDOWS
+		// For Windows OS.
+		cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+			@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
+		).GetValue(
+			"ProcessorNameString"
+		) as String;
+#endif
+#if LINUX
+	cpuName = "Linux CPU";
+
+#endif
+#if MACOS
+	cpuName = "MAC CPU";
+#endif
+		// Fix simbols.
+		cpuName.Replace("(R)", "®");
+		cpuName.Replace("(C)", "©");
+		cpuName.Replace("(TM)", "ª"); //Todo, implement proper trademark simbol.
+		return cpuName;
+	}
+
 	public static void loadMultiThread(List<String> loadText, RenderWindow window, ThreadStart loadFunct) {
 		Thread loadTread = new Thread(loadFunct);
 		loadTread.Start();

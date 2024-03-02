@@ -1272,7 +1272,7 @@ public partial class Character : Actor, IDamagable {
 			(charState.airMove && vel.y > 0 || charState is WallSlide) &&
 			wallKickTimer <= 0 &&
 			player.input.isPressed(Control.Jump, player) &&
-			(charState.wallKickLeftWall != null || charState.wallKickRigthWall != null)
+			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide)
@@ -1284,7 +1284,7 @@ public partial class Character : Actor, IDamagable {
 			if (charState.wallKickLeftWall != null) {
 				wallKickDir += 1;
 			}
-			if (charState.wallKickRigthWall != null) {
+			if (charState.wallKickRightWall != null) {
 				wallKickDir -= 1;
 			}
 			if (wallKickDir == 0) {
@@ -2667,18 +2667,8 @@ public partial class Character : Actor, IDamagable {
 						Global.level.gameMode.syncTeamScores();
 					}
 				}
-				}
-				if (killer.possessedTime > 0){
-				killer.possesser.addKill();
-				if (Global.level.gameMode is TeamDeathMatch) {
-					if (Global.isHost) {
-						if (player.alliance == GameMode.redAlliance) Global.level.gameMode.redPoints++;
-						if (player.alliance == GameMode.blueAlliance) Global.level.gameMode.bluePoints++;
-						Global.level.gameMode.syncTeamScores();
-					}
-				}
-				}
-				killer.awardScrap();
+
+				killer.awardCurrency();
 			} else if (Global.level.gameMode.level.is1v1()) {
 				// In 1v1 the other player should always be considered a killer to prevent suicide
 				var otherPlayer = Global.level.nonSpecPlayers().Find(p => p.id != player.id);
@@ -2691,7 +2681,7 @@ public partial class Character : Actor, IDamagable {
 				assister.addAssist();
 				assister.addKill();
 
-				assister.awardScrap();
+				assister.awardCurrency();
 			}
 			//bool isSuicide = killer == null || killer == player;
 			player.addDeath(false);
@@ -3069,12 +3059,12 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canAffordRideArmor() {
 		if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
-		return player.scrap >= Vile.callNewMechScrapCost;
+		return player.currency >= Vile.callNewMechCost;
 	}
 
 	public void buyRideArmor() {
 		if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
-		else player.scrap -= Vile.callNewMechScrapCost * (player.selectedRAIndex >= 4 ? 2 : 1);
+		else player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);
 	}
 
 	public virtual void onMechSlotSelect(MechMenuWeapon mmw) {
@@ -3138,8 +3128,8 @@ public partial class Character : Actor, IDamagable {
 				player.revertToAxl();
 				player.character.undisguiseTime = 0.33f;
 				// To keep DNA.
-				if (altShootPressed && player.scrap >= 1) {
-					player.scrap -= 1;
+				if (altShootPressed && player.currency >= 1) {
+					player.currency -= 1;
 					lastDNA.hyperMode = DNACoreHyperMode.None;
 					// Turn ultimate and golden armor into naked X
 					if (lastDNA.armorFlag >= byte.MaxValue - 1) {
@@ -3160,12 +3150,14 @@ public partial class Character : Actor, IDamagable {
 
 		if (player.weapon is AssassinBullet) {
 			if (player.input.isPressed(Control.Special1, player) && !isCharging()) {
-				if (player.scrap >= 2) {
-					player.scrap -= 2;
+				if (player.currency >= 2) {
+					player.currency -= 2;
 					shootAssassinShot(isAltFire: true);
 					return;
 				} else {
-					Global.level.gameMode.setHUDErrorMessage(player, "Quick assassinate requires 2 scrap");
+					Global.level.gameMode.setHUDErrorMessage(
+						player, $"Quick assassinate requires 2 {Global.nameCoins}"
+					);
 				}
 			}
 		}

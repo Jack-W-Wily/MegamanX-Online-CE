@@ -137,16 +137,19 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		return true;
 	}
 
-	public void recipeManager(string recipe, bool buyIfCanAfford, out bool canAfford, out int missingScrap, out int[] missingCores) {
+	public void recipeManager(
+		string recipe, bool buyIfCanAfford, out bool canAfford,
+		out int missingCurrency, out int[] missingCores
+	) {
 		canAfford = true;
-		missingScrap = 0;
+		missingCurrency = 0;
 		int missingXCores = 0;
 		int missingZeroCores = 0;
 		int missingVileCores = 0;
 		int missingAxlCores = 0;
 		int missingSigmaCores = 0;
 
-		int scrapRequired = 0;
+		int currencyRequired = 0;
 		int xCoresRequired = 0;
 		int zeroCoresRequired = 0;
 		int vileCoresRequired = 0;
@@ -154,7 +157,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		int sigmaCoresRequired = 0;
 
 		for (int i = 0; i < recipe.Length - 1; i += 2) {
-			if (recipe[i] == 'S') scrapRequired = recipe[i + 1] - '0';
+			if (recipe[i] == 'S') currencyRequired = recipe[i + 1] - '0';
 			if (recipe[i] == '0') xCoresRequired = recipe[i + 1] - '0';
 			if (recipe[i] == '1') zeroCoresRequired = recipe[i + 1] - '0';
 			if (recipe[i] == '2') vileCoresRequired = recipe[i + 1] - '0';
@@ -162,9 +165,9 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			if (recipe[i] == '4') sigmaCoresRequired = recipe[i + 1] - '0';
 		}
 
-		if (mainPlayer.scrap < scrapRequired) {
+		if (mainPlayer.currency < currencyRequired) {
 			canAfford = false;
-			missingScrap = scrapRequired - mainPlayer.scrap;
+			missingCurrency = currencyRequired - mainPlayer.currency;
 		}
 
 		int xDnaCount = mainPlayer.weapons.Count(w => w is DNACore dnaCore && dnaCore.charNum == 0);
@@ -198,7 +201,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 		}
 
 		if (buyIfCanAfford && canAfford) {
-			mainPlayer.scrap -= scrapRequired;
+			mainPlayer.currency -= currencyRequired;
 			for (int i = 0; i < xCoresRequired; i++) {
 				mainPlayer.weapons.RemoveAt(mainPlayer.weapons.FindIndex(w => w is DNACore dnaCore && dnaCore.charNum == 0));
 				int removeIndex = mainPlayer.savedDNACoreWeapons.FindIndex(w => w is DNACore dnaCore && dnaCore.charNum == 0);
@@ -594,7 +597,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				);
 			}
 			Fonts.drawText(
-				FontType.Blue, "Cost: 10 metal",
+				FontType.Blue, "Cost: 10 Metal",
 				Global.halfScreenW, row2Y, Alignment.Center
 			);
 		}
@@ -614,8 +617,8 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Change Slot", Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
 		}
 
-		string helpText = "[Z]: Back, [X]: Confirm";
-		if (!inGame) helpText = "[Z]: Save and back";
+		string helpText = "[BACK]: Back, [OK]: Confirm";
+		if (!inGame) helpText = "[BACK]: Save and back";
 		Helpers.drawTextStd(TCat.BotHelp, helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
 		*/
 		if (!string.IsNullOrEmpty(error)) {
@@ -627,7 +630,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
 			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
 			Fonts.drawTextEX(
-				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
 		}
@@ -667,7 +670,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				rx += 35;
 			}
 			float ry = rects[i].y1 + 3;
-			recipeManager(recipe, false, out bool canAfford, out int missingScrap, out int[] missingCores);
+			recipeManager(recipe, false, out bool canAfford, out int missingCurrency, out int[] missingCores);
 			for (int j = 0; j < recipe.Length - 1; j += 2) {
 				char curChar = recipe[j];
 				char nextChar = recipe[j + 1];

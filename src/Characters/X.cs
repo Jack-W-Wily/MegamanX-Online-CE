@@ -830,7 +830,7 @@ public partial class MegamanX : Character {
 		hyperProgress = 0;
 		if (player.canUpgradeGoldenX()) {
 			if (!player.character.boughtGoldenArmorOnce) {
-				player.scrap -= Player.goldenArmorCost;
+				player.currency -= Player.goldenArmorCost;
 				player.character.boughtGoldenArmorOnce = true;
 			}
 			player.setGoldenArmor(true);
@@ -839,7 +839,7 @@ public partial class MegamanX : Character {
 		}
 		if (player.canUpgradeUltimateX()) {
 			if (!player.character.boughtUltimateArmorOnce) {
-				player.scrap -= Player.ultimateArmorCost;
+				player.currency -= Player.ultimateArmorCost;
 				player.character.boughtUltimateArmorOnce = true;
 			}
 			player.setUltimateArmor(true);
@@ -1173,6 +1173,8 @@ public partial class MegamanX : Character {
 		player.removeOwnedMines();
 		player.removeOwnedTurrets();
 
+		player.usedChipOnce = false;
+
 		if (player.hasUltimateArmor()) {
 			player.setUltimateArmor(false);
 		}
@@ -1207,7 +1209,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool canAffordFgMove() {
-		return player.scrap >= 3 || player.hasAllItems();
+		return player.currency >= 3 || player.hasAllItems();
 	}
 
 	public bool canUseFgMove() {

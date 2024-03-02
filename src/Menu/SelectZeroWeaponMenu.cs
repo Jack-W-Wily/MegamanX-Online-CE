@@ -191,18 +191,18 @@ public class SelectZeroWeaponMenu : IMainMenu {
 
 		float hyperModeYPos = startY - 6 + (wepH * 8);
 		Fonts.drawText(
-			FontType.BlueMenu, "Hyper Mode:", 40, hyperModeYPos,
+			FontType.Blue, "Hyper Mode:", 40, hyperModeYPos,
 			selected: selCursorIndex == 8
 		);
 		if (cursors[8].index == 0) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Black Zero", wepTextX, hyperModeYPos,
+				FontType.Grey, "Black Zero", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 8
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(122, wepPosX, hyperModeYPos + 3, alpha);
 		} else if (cursors[8].index == 1) {
 			Fonts.drawText(
-				FontType.DarkPurple, "Awakened Zero", wepTextX, hyperModeYPos,
+				FontType.Red, "Awakened Zero", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 8
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(87, wepPosX, hyperModeYPos + 3, alpha);
@@ -235,7 +235,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				Fonts.drawText(FontType.Green, "Lasts 12 seconds.", 40, wsy + 15);
 			} else if (cursors[8].index == 1) {
 				Fonts.drawText(FontType.Green, "This hyper form grants powerful ranged attacks.", 40, wsy + 6);
-				Fonts.drawText(FontType.Green, "Lasts until scrap is depleted.", 40, wsy + 15);
+				Fonts.drawText(FontType.Green, $"Lasts until {Global.nameCoins} are depleted.", 40, wsy + 15);
 			} else if (cursors[8].index == 2) {
 				Fonts.drawText(FontType.Green, "This hyper form infects and disrupts foes on each hit.", 40, wsy + 6);
 				Fonts.drawText(FontType.Green, "Lasts until death.", 40, wsy + 15);
@@ -244,8 +244,8 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		/*
 		Helpers.drawTextStd(TCat.BotHelp, "Left/Right: Change Technique", Global.screenW * 0.5f, 200 + botOffY, Alignment.Center, fontSize: 18);
 		Helpers.drawTextStd(TCat.BotHelp, "Up/Down: Change Category", Global.screenW * 0.5f, 205 + botOffY, Alignment.Center, fontSize: 18);
-		string helpText = "[Z]: Back, [X]: Confirm";
-		if (!inGame) helpText = "[Z]: Save and back";
+		string helpText = "[BACK]: Back, [OK]: Confirm";
+		if (!inGame) helpText = "[BACK]: Save and back";
 		Helpers.drawTextStd(TCat.BotHelp, helpText, Global.screenW * 0.5f, 210 + botOffY, Alignment.Center, fontSize: 18);
 		*/
 		if (!string.IsNullOrEmpty(error)) {
@@ -257,7 +257,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
 			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
 			Fonts.drawTextEX(
-				FontType.Grey, Helpers.controlText("Press [X] to continue"),
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
 		}

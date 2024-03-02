@@ -354,11 +354,7 @@ public abstract class BaseSigma : Character {
 				becomeMaverick(mw.maverick);
 			}
 		}
-		if (isHyperSigmaBS.getValue() && player.isSigma3() && charState is not Die) {
-			lastHyperSigmaSprite = sprite?.name;
-			lastHyperSigmaFrameIndex = frameIndex;
-			lastHyperSigmaXDir = xDir;
-		}
+
 		if (isHyperSigmaBS.getValue() && player.isSigma2() && charState is not Die) {
 			lastHyperSigmaSprite = sprite?.name;
 			lastHyperSigmaFrameIndex = frameIndex;
@@ -444,17 +440,7 @@ public abstract class BaseSigma : Character {
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name.Contains("sigma3_kaiser_fall") && collider.isAttack()) {
-			return new GenericMeleeProj(
-				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
-				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
-			);
-		} else if (sprite.name.StartsWith("sigma3_kaiser_") && collider.name == "body") {
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
-			);
-		} else if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
+		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
 			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true
@@ -518,12 +504,14 @@ public abstract class BaseSigma : Character {
 		//if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
 		if (player.isStriker()) return;
 		if (player.isRefundableMode() && mw.summonedOnce) return;
-		else player.scrap -= getMaverickCost();
+		else player.currency -= getMaverickCost();
 	}
 
 	private void cantAffordMaverickMessage() {
 		//if (Global.level.is1v1()) Global.level.gameMode.setHUDErrorMessage(player, "Maverick requires 16 HP");
-		Global.level.gameMode.setHUDErrorMessage(player, "Maverick requires " + getMaverickCost() + " scrap");
+		Global.level.gameMode.setHUDErrorMessage(
+			player, "Maverick requires " + getMaverickCost() + " " + Global.nameCoins
+		);
 	}
 
 	private bool canAffordMaverick(MaverickWeapon mw) {
@@ -531,7 +519,7 @@ public abstract class BaseSigma : Character {
 		if (player.isStriker()) return true;
 		if (player.isRefundableMode() && mw.summonedOnce) return true;
 
-		return player.scrap >= getMaverickCost();
+		return player.currency >= getMaverickCost();
 	}
 
 	public int getMaverickCost() {
