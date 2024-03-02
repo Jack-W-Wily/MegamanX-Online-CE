@@ -2747,8 +2747,9 @@ public partial class Character : Actor, IDamagable {
 					}
 
 					Global.serverClient?.rpc(RPC.killPlayer, bytes.ToArray());
-				} else {
+					} else {
 					Global.serverClient?.rpc(RPC.killPlayer, (byte)0, (byte)0, (byte)0, victimPlayerIdBytes[0], victimPlayerIdBytes[1]);
+					}
 				}
 			}
 		}

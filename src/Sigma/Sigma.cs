@@ -169,7 +169,7 @@ public abstract class BaseSigma : Character {
 			}
 		} else if (player.weapon is SigmaMenuWeapon &&
 			player.currentMaverick == null && player.mavericks.Count > 0 &&
-			grounded && player.input.isHeld(Control.Up, player) &&
+			 player.input.isHeld(Control.Up, player) &&
 			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand
 		) {
 			if (player.input.isCommandButtonPressed(player)) {
