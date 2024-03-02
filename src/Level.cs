@@ -266,8 +266,9 @@ public partial class Level {
 			gameMode = new KingOfTheHill(this, server.timeLimit);
 		} else if (server.gameMode == GameMode.Race) {
 			gameMode = new Race(this);
+		} else if (server.gameMode == GameMode.Nightmare) {
+			gameMode = new Nightmare(this, server.playTo, server.timeLimit);
 		}
-
 		// Radar dimensions
 		float maxDim = 50f;
 		bool reallyWide = levelData.width > levelData.height * 3;
@@ -769,7 +770,7 @@ public partial class Level {
 						}
 					}
 				} else {
-					charNum = Helpers.randomRange(0, 4);
+					charNum = Helpers.randomRange(0, 5);
 				}
 
 				PlayerCharData playerData = null;
@@ -1541,6 +1542,11 @@ public partial class Level {
 			drawPowerplant2();
 		}
 
+		if ( gameMode is Nightmare) {
+			drawNightmaremode();
+		}
+
+
 		if (isNon1v1Elimination() && gameMode.virusStarted > 0) {
 			drawSigmaVirus();
 		}
@@ -1777,6 +1783,12 @@ public partial class Level {
 			}
 		}
 
+		DrawWrappers.DrawRect(0, 0, width, height, true, new Color(0, 0, 0, alpha), 1, Global.level.mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
+	}
+
+	private void drawNightmaremode() {
+		byte alpha = 0;
+			alpha = 200;
 		DrawWrappers.DrawRect(0, 0, width, height, true, new Color(0, 0, 0, alpha), 1, Global.level.mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
 	}
 
@@ -2072,7 +2084,7 @@ public partial class Level {
 	}
 
 	public bool isElimination() {
-		return gameMode is Elimination || gameMode is TeamElimination;
+		return gameMode is Elimination || gameMode is TeamElimination || gameMode is Nightmare;
 	}
 
 	public bool isNon1v1Elimination() {

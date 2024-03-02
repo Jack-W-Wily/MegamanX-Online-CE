@@ -117,6 +117,77 @@ public class Hover : CharState {
 	}
 }
 
+
+public class RainStorm : CharState {
+	bool jumpedYet;
+	float timeInWall;
+	bool isUnderwater;
+	Anim anim;
+	float projTime;
+	Axl axl;
+
+	public RainStorm(bool isUnderwater) : base("rainstorm", "", "") {
+		this.isUnderwater = isUnderwater;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isUnderwater() && anim != null) {
+			anim.visible = false;
+		}
+
+		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
+			jumpedYet = true;
+			character.dashedInAir++;
+			character.vel.y = -character.getJumpPower() * 1.5f;
+		}
+		
+		if (character.sprite.frameIndex >= 2 && character.currentFrame.POIs.Count > 0) {
+			character.move(new Point(character.xDir * 150, -120f));
+			Point poi = character.currentFrame.POIs[0];
+			projTime += Global.spf;
+			if (projTime > 0.06f) {
+				projTime = 0;
+				var anim = new Anim(character.getCenterPos(), "shoryuken_fade", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+				anim.vel = new Point(-character.xDir * 50, 25);	
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), character.pos, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
+				character.playSound("axlBullet", sendRpc: true);
+			}
+		} 
+
+		var wallAbove = Global.level.checkCollisionActor(character, 0, -10);
+		if (wallAbove != null && wallAbove.gameObject is Wall) {
+			timeInWall += Global.spf;
+			if (timeInWall > 0.1f) {
+				character.changeState(new Fall());
+				return;
+			}
+		}
+
+		if (character.isAnimOver()) {
+			character.changeState(new Fall());
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		axl = character as Axl;
+	}
+
+	public override void onExit(CharState newState) {
+		if (anim != null) {
+			anim.destroySelf();
+			anim = null;
+		}
+		base.onExit(newState);
+	//mmx.shoryukenCooldownTime = mmx.maxShoryukenCooldownTime;
+	}
+}
+
+
+
 public class DodgeRoll : CharState {
 	public float dashTime = 0;
 	public int initialDashDir;

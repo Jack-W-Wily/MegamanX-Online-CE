@@ -352,20 +352,28 @@ public class Axl : Character {
 
 		updateAxlAim();
 
+	
 		if (dodgeRollCooldown == 0 && player.canControl) {
 			
+			if (player.input.isPressed(Control.Special1, player)) {
+				changeState(new RainStorm(isUnderwater()), true);
+			}
 
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
 				changeState(new DodgeRoll());
+				slideVel = xDir * getDashSpeed();
 			}
 			if (player.input.isHeld(Control.AxlCrouch, player) && player.input.isPressed(Control.Dash, player) && canDash()) {
 				changeState(new DodgeRoll());
+				slideVel = xDir * getDashSpeed();
 			}
 			if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Dash, player) && canDash()) {
 				changeState(new DodgeRoll());
+				slideVel = xDir * getDashSpeed();
 			}
 			 if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new DodgeRoll(), true);
+				slideVel = xDir * getDashSpeed();
 			}
 		}
 
@@ -1416,8 +1424,18 @@ public class Axl : Character {
 			}
 		} else if (charState is LadderEnd) ladderClimb = true;
 
-		return !(charState is HyperAxlStart || isWarpIn() || charState is Hurt || charState is Die || charState is Frozen || charState is InRideArmor || charState is DodgeRoll || charState is Crystalized || charState is VileMK2Grabbed || charState is KnockedDown
-			|| sprite.name.Contains("win") || sprite.name.Contains("lose") || ladderClimb || charState is DeadLiftGrabbed || charState is UPGrabbed || charState is WhirlpoolGrabbed || charState is InRideChaser);
+		return !(charState is HyperAxlStart ||
+		isWarpIn() ||
+		charState is Hurt ||
+		charState is Die || 
+		charState is Frozen ||
+		charState is InRideArmor || 
+		charState is DodgeRoll || 
+		charState is Crystalized || 
+		charState is VileMK2Grabbed ||
+		charState is SwordBlock ||  
+		charState is RainStorm || 
+		charState is KnockedDown || sprite.name.Contains("win") || sprite.name.Contains("lose") || ladderClimb || charState is DeadLiftGrabbed || charState is UPGrabbed || charState is WhirlpoolGrabbed || charState is InRideChaser);
 	}
 
 	public Point getAxlBulletDir() {

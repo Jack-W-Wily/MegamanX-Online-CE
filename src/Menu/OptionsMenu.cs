@@ -956,7 +956,7 @@ public class OptionsMenu : IMainMenu {
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
 							Options.main.axlAimMode = 0;
 						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							Options.main.axlAimMode = 2;
+							Options.main.axlAimMode = 0; //hehehe fuck you axl cursor
 						}
 					},
 					(Point pos, int index) => {

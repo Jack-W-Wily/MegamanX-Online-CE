@@ -125,16 +125,18 @@ public class VileCannon : Weapon {
 	}
 }
 
+
+
 public class VileCannonProj : Projectile {
 	public VileCannonProj(
 		VileCannon weapon, Point pos, float byteAngle, Player player,
 		ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 300, 3, player, weapon.projSprite, 4, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)ProjIds.FrontRunner;
-		maxTime = 0.5f;
+		maxTime = 0.18f;
 		destroyOnHit = true;
 
 		if (weapon.type == (int)VileCannonType.FrontRunner) {
@@ -259,9 +261,11 @@ public class CannonAttack : CharState {
 
 public class FrontRunnerAttack : CharState {
 	bool isGizmo;
-	
+	bool grounded;
 	public FrontRunnerAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
 		this.isGizmo = isGizmo;
+		this.grounded = grounded;
+	airMove = true;
 	}
 
 	public static string getSprite(bool isGizmo, bool grounded) {
@@ -310,8 +314,12 @@ public class FrontRunnerAttack : CharState {
 		var muzzle = new Anim(shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile);
 		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
 
-		new VileCannonProj(new VileCannon(VileCannonType.FrontRunner), shootPos, vile.getShootXDir(), vile.longshotGizmoCount, player, player.getNextActorNetId(), shootVel, rpc: true);
-		
+
+		new VileCannonProj(
+			new VileCannon(VileCannonType.FrontRunner),
+			shootPos, MathF.Round(shootVel.byteAngle) *  vile.getShootXDir(), //vile.longshotGizmoCount,
+			player, player.getNextActorNetId(), rpc: true
+		);
 	}
 
 

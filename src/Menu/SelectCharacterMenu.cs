@@ -50,7 +50,8 @@ public class CharSelection {
 					new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 					new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
 					new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-					//new CharSelection("Rockman", 5, 1, 0, "rock_idle", 0),
+					new CharSelection("dynamo", 5, 1, 0, "dynamo_idle", 0),
+					new CharSelection("gbd", 6, 1, 0, "tgbd_idle", 0),
 				};
 		}
 	}
@@ -298,14 +299,29 @@ public class SelectCharacterMenu : IMainMenu {
 			alignment: Alignment.Center
 		);
 
-		string[] description = playerData.charNum switch {
-		 	0 => ["A versatile marksman whose arsenal can", "accommodate a variety of different play styles."],
-			1 => ["Powerful melee warrior", "with high damage combos."],
-			2 => ["Unpredictable threat that can self-revive", "and call down Ride Armors."],
-			3 => ["Precise and deadly close range assassin", "with aiming and rapid fire capabilities."],
-			4 => ["A fearsome military commander that can", "summon Mavericks on the battlefield."],
-			_ => ["ERROR"]
-		};
+		string[] description = { };
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		
+		if (playerData.charNum == 0) {
+			description = new string[] {"All-around ranged shooter.", "Can equip a variety of weapons and armor." };
+		} else if (playerData.charNum == 1) {
+			description = new string[] { "Powerful melee warrior", "with high damage combos." };
+		} else if (playerData.charNum == 2) {
+			description = new string[] { "Unpredictable threat that can self-revive", "and call down Ride Armors." };
+		} else if (playerData.charNum == 3) {
+			description = new string[] { 
+				"Precise and deadly ranged assassin", "with aiming and rapid fire capabilities."
+			};
+		} else if (playerData.charNum == 4) {
+			description = new string[] {
+				"A fearsome military commander that can", "summon Mavericks on the battlefield."
+			};
+		} else if (playerData.charNum == 5) {
+			description = new string[] {
+				"Skilled Bounty hunter", "Gets rewards for hunting down high scorers."
+			};
+		}
+		
 		if (description.Length > 0) {
 			DrawWrappers.DrawRect(
 				25, startY + 98, Global.screenW - 25, startY + 127,

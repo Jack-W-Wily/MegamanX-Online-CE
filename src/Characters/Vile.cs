@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class Vile : Character {
 	public float vulcanLingerTime;
-	public const int callNewMechCost = 5;
+	public const int callNewMechScrapCost = 0;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public float vileLadderShootCooldown;
@@ -42,18 +42,21 @@ public class Vile : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		if (isWarpIn) {
+
+		
+
 			if (player.vileCannonWeapon.type == 2) {
 				vileForm = 2;
-			} else if (player.vileCannonWeapon.type == 1) {
+			} 
+			if (player.vileCannonWeapon.type == 1) {
 				vileForm = 1;
 			}
 			if (player.vileFormToRespawnAs == 2 || Global.quickStartVileMK5 == true) {
-				vileForm = 2;
+				vileForm = 2;	
 			} else if (player.vileFormToRespawnAs == 1 || Global.quickStartVileMK2 == true) {
 				vileForm = 1;
 			}
-		}
+		
 	}
 
 	public Sprite getCannonSprite(out Point poiPos, out int zIndexDir) {
@@ -259,7 +262,8 @@ public class Vile : Character {
 				onMechSlotSelect(mmw);
 				return;
 			}
-		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
+		}  		
+		if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
 			onMechSlotSelect(mmw);
 			return;
 		}
@@ -318,7 +322,7 @@ public class Vile : Character {
 			charState is DarkHoldState || charState is HexaInvoluteState || charState is CallDownMech || charState is NapalmAttack) return;
 
 		if (charState is Dash || charState is AirDash) {
-			if ((player.input.isHeld(Control.Special1, player))) {
+			if ((player.input.isHeld(Control.Shoot, player))) {
 				charState.isGrabbing = true;
 				charState.superArmor = true;
 				changeSpriteFromName("dash_grab", true);
@@ -535,7 +539,7 @@ public class Vile : Character {
 					buyRideArmor();
 					mmw.isMenuOpened = false;
 					int raIndex = player.selectedRAIndex;
-					if (isVileMK5 && raIndex == 4) raIndex++;
+					if (isVileMK5 && raIndex >= 0) raIndex = 5;
 					vileStartRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
 					if (vileStartRideArmor.raNum == 4) summonedGoliath = true;
 					if (isVileMK5) {
@@ -669,10 +673,10 @@ public class Vile : Character {
 
 	public override bool isSoftLocked() {
 		if (isShootingLongshotGizmo) {
-			return true;
+			return false;
 		}
 		if (isVileMK5 && player.weapon is MechMenuWeapon && vileStartRideArmor != null) {
-			return true;
+			return false;
 		}
 		if (sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 0.1f) {
 			return true;

@@ -25,10 +25,26 @@ public class Tornado : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel < 3) {
-			new TornadoProj(this, pos, xDir, false, player, netProjId);
-		} else {
-			new TornadoProjCharged(this, pos, xDir, player, netProjId);
+		if (player.ownedByLocalPlayer) {
+		
+			if (player.character is MegamanX mmx && mmx.VileCounters == 0){
+				if (chargeLevel < 3) {
+				new TornadoProj(this, pos, xDir, false, player, netProjId);
+				} else {
+				new TornadoProjCharged(this, pos, xDir, player, netProjId);
+				}
+			} else {
+				if (chargeLevel == 0) {
+				new TornadoProj(this, pos, xDir, false, player, netProjId);
+				}
+				if (chargeLevel >= 3) {
+				new TornadoProjCharged(this, pos, xDir, player, netProjId);
+				}
+				if (chargeLevel != 0 && chargeLevel < 3 ) {
+		 		new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare),
+				pos, xDir, player, player.getNextActorNetId(), sendRpc: true);
+				}
+			}
 		}
 	}
 }

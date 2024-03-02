@@ -1359,6 +1359,7 @@ public partial class Actor : GameObject {
 			else if (charNum.Value == 1) charName = "zero";
 			else if (charNum.Value == 2) charName = "vile";
 			else if (charNum.Value == 3) charName = "axl";
+			else if (charNum.Value == 5) charName = "dynamo";
 			else charName = "sigma";
 
 			var overrideSoundBuffer = Global.charSoundBuffers.GetValueOrDefault(soundBuffer.soundKey + "." + charName);

@@ -53,7 +53,7 @@ public class XHover : CharState {
 		}
 
 		hoverTime += Global.spf;
-		if (hoverTime > 2 || character.player.input.isPressed(Control.Jump, character.player)) {
+		if (hoverTime > 2 || stateTime > 0.2f && character.player.input.isPressed(Control.Jump, character.player)) {
 			character.changeState(new Fall(), true);
 		}
 	}

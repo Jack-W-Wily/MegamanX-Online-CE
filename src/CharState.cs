@@ -140,7 +140,7 @@ public class CharState {
 
 	public virtual bool canEnter(Character character) {
 		if (character.charState is InRideArmor &&
-			!(this is Die || this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
+			!(this is Die || this is SwordBlock ||this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
 			  this is NecroBurstAttack || this is UPGrabbed || this is WhirlpoolGrabbed || this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))) {
 			return false;
 		}
@@ -708,9 +708,9 @@ public class SwordBlock : CharState {
 		
 
 		if ((player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.Shoot, player) )&& !player.isControllingPuppet()) {
-			if (sigma != null) {
-				sigma.noBlockTime = 0.25f;
-			}
+			//if (character != null) {
+			//	character.noBlockTime = 0.25f;
+			//}
 			character.changeState(new Idle());
 			return;
 		}

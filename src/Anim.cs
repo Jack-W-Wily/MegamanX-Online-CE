@@ -134,8 +134,8 @@ public class Anim : Actor {
 
 	public override void update() {
 		base.update();
-
-		if (sprite.name == "risingspecter_muzzle") {
+		
+		if (Global.level.mainPlayer.charNum != 5 && sprite.name == "risingspecter_muzzle") {
 			float sin = MathF.Sin(Global.time * 100);
 			float sinDamp = Helpers.clamp01(1 - (time / 0.5f));
 			xScale = (0.75f + sin * 0.25f) * sinDamp;
@@ -181,7 +181,7 @@ public class Anim : Actor {
 			yScale = 1 + 2 * Helpers.clamp01(time / sprite.getAnimLength());
 		}
 
-		if (sprite.name == "sigma3_kaiser_virus_return") {
+		if (Global.level.mainPlayer.charNum != 5 &&  sprite.name == "sigma3_kaiser_virus_return") {
 			xScale -= Global.spf * 2.5f;
 			yScale = xScale;
 			if (xScale < 0) {

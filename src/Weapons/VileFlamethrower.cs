@@ -140,6 +140,8 @@ public class FlamethrowerState : CharState {
 public class FlamethrowerProj : Projectile {
 	bool napalmInput;
 	float destroyTime;
+	float AxlDMG;
+	int AxlFlinch;
 	public FlamethrowerProj(VileFlamethrower weapon, Point pos, int xDir, bool napalmInput, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, weapon.projSprite, 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = weapon.projId;
@@ -148,6 +150,7 @@ public class FlamethrowerProj : Projectile {
 		this.napalmInput = napalmInput;
 
 		destroyTime = 0.3f;
+		if (!player.isAxl){
 		if (weapon.type == (int)VileFlamethrowerType.SeaDragonRage) {
 			destroyTime = 0.2f;
 		}
@@ -167,7 +170,7 @@ public class FlamethrowerProj : Projectile {
 				this.vel.y = -250;
 				destroyTime = 0.4f;
 			}
-
+		}
 		}
 
 		angle = vel.angle;
@@ -176,6 +179,17 @@ public class FlamethrowerProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+
+		if (player.isAxl){
+		changeSprite("axl_bullet", true);
+		destroyTime = 1f;
+		AxlDMG = Helpers.randomRange(1, 2);
+		AxlFlinch = Helpers.randomRange(1, 30);
+		damager.damage = AxlDMG;
+		damager.flinch = AxlFlinch;
+		vel = new Point(xDir, 2f);
+		vel = vel.normalize().times(350);
+		}
 	}
 
 	public override void update() {

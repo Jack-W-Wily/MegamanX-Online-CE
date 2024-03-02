@@ -88,7 +88,7 @@ public class MechGoliathPunchWeapon : Weapon {
 
 public class MechDevilBearPunchWeapon : Weapon {
 	public MechDevilBearPunchWeapon(Player player) : base() {
-		damager = new Damager(player, 2, Global.defFlinch, 0.25f);
+		damager = new Damager(player, 1, Global.defFlinch, 0.3f);
 		ammo = 0;
 		index = (int)WeaponIds.MechDevilBearPunch;
 		killFeedIndex = 176;

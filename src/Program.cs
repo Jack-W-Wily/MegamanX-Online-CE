@@ -234,7 +234,19 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
-		Global.changeMusic("menu");
+
+		//>>>>>>>>>>>>>>>>>>>>>>>
+		// Menu music
+		if (Options.main.preferredCharacter == 0){
+		Global.changeMusic("menu");	
+		}
+		if (Options.main.preferredCharacter == 1){
+		Global.changeMusic("menuZero");	
+		}
+		if (Options.main.preferredCharacter == 2){
+		Global.changeMusic("menuVile");	
+		}
+		// >>>>>>>>>>>>>>>>>>
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);

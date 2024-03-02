@@ -278,7 +278,11 @@ public class GoGetterRightPunch : CharState {
 	bool shot = false;
 	RocketPunchProj proj;
 	float specialPressTime;
+
+	bool grounded;
 	public GoGetterRightPunch(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	this.grounded = grounded;
+	airMove = true;
 	}
 
 	public override void update() {
@@ -340,7 +344,10 @@ public class SpoiledBratPunch : CharState {
 	bool shot = false;
 	RocketPunchProj proj;
 	float specialPressTime;
+	bool grounded;
 	public SpoiledBratPunch(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	this.grounded = grounded;
+	airMove = true;
 	}
 
 	public override void update() {

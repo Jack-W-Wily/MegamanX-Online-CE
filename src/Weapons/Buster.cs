@@ -166,14 +166,16 @@ public class BusterProj : Projectile {
 	public BusterProj(
 		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 240, 1, player, "buster1", 0, 0, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 240, 1, player, "buster1", 0, 0.05f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster1_fade";
 		reflectable = true;
 		maxTime = 0.5175f;
 		if (type == 0) projId = (int)ProjIds.Buster;
 		else if (type == 1) projId = (int)ProjIds.ZBuster;
-
+		if (Helpers.randomRange(0, 10) == 10){
+		damager.flinch = 10;
+		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

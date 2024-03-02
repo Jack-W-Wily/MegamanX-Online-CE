@@ -16,6 +16,7 @@ public class GameMode {
 	public const string TeamElimination = "team elimination";
 	public const string KingOfTheHill = "king of the hill";
 	public const string Race = "race";
+	public const string Nightmare = "Nightmare";
 	public static List<string> allGameModes = new List<string>() {
 		Deathmatch, TeamDeathmatch, CTF, KingOfTheHill,
 		ControlPoint, Elimination, TeamElimination
@@ -134,7 +135,7 @@ public class GameMode {
 	}
 
 	public static bool isStringTeamMode(string selectedGameMode) {
-		if (selectedGameMode == CTF || selectedGameMode == TeamDeathmatch || selectedGameMode == ControlPoint || selectedGameMode == TeamElimination || selectedGameMode == KingOfTheHill) {
+		if (selectedGameMode == CTF || selectedGameMode == TeamDeathmatch || selectedGameMode == ControlPoint || selectedGameMode == Nightmare || selectedGameMode == TeamElimination || selectedGameMode == KingOfTheHill) {
 			return true;
 		}
 		return false;
@@ -148,6 +149,7 @@ public class GameMode {
 		else if (mode == TeamElimination) return "t.elim";
 		else if (mode == KingOfTheHill) return "koth";
 		else if (mode == Race) return "race";
+		else if (mode == Nightmare) return "Nightmare";
 		else return "dm";
 	}
 
@@ -1068,6 +1070,9 @@ public class GameMode {
 
 		int frameIndex = player.charNum;
 		if (player.charNum == 5) {
+			frameIndex = 0;
+		}
+		if (player.charNum == 6) {
 			frameIndex = 0;
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
@@ -2195,6 +2200,9 @@ public class GameMode {
 			Helpers.drawTextStd(TCat.HUD, string.Format("Mode: Team Deathmatch(to {0})", playingTo.ToString()), padding + 5, top, Alignment.Left, fontSize: fontSize);
 		} else if (this is TeamElimination) {
 			Helpers.drawTextStd(TCat.HUD, string.Format("Mode: Team Elimination", playingTo.ToString()), padding + 5, top, Alignment.Left, fontSize: fontSize);
+		}
+		else if (this is Nightmare) {
+			Helpers.drawTextStd(TCat.HUD, string.Format("Mode: Nightmare", playingTo.ToString()), padding + 5, top, Alignment.Left, fontSize: fontSize);
 		} else {
 			Helpers.drawTextStd(TCat.HUD, string.Format("Mode: {0}", Global.level.server.gameMode), padding + 5, top, Alignment.Left, fontSize: fontSize);
 		}
@@ -2208,7 +2216,7 @@ public class GameMode {
 
 		int redPlayersStillAlive = 0;
 		int bluePlayersStillAlive = 0;
-		if (this is TeamElimination) {
+		if (this is TeamElimination || this is Nightmare) {
 			redPlayersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo && p.alliance == redAlliance).Count();
 			bluePlayersStillAlive = level.players.Where(p => !p.isSpectator && p.deaths < playingTo && p.alliance == blueAlliance).Count();
 		}
@@ -2611,6 +2619,8 @@ public class GameMode {
 			}
 		} else if (charNum == 1) charName = "Zero";
 		else if (charNum == 2) charName = "Vile";
+		else if (charNum == 5) charName = "Dynamo";
+		else if (charNum == 6) charName = "GBD";
 		else if (charNum == 3) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";
 			else if (Options.main.axlAimMode == 1) charName = "AxlAngular";

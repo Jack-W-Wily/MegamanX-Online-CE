@@ -39,8 +39,8 @@ public class Damager {
 			{ (int)ProjIds.TunnelFangCharged, 1 },
 			{ (int)ProjIds.Headbutt, 1 },
 			//{ (int)ProjIds.RocketPunch, 1 },
-			{ (int)ProjIds.InfinityGig, 1 },
-			{ (int)ProjIds.SpoiledBrat, 1 },
+			//{ (int)ProjIds.InfinityGig, 1 },
+			//{ (int)ProjIds.SpoiledBrat, 1 },
 			{ (int)ProjIds.SpinningBladeCharged, 1 },
 			{ (int)ProjIds.Shingetsurin, 1 },
 			{ (int)ProjIds.MagnetMineCharged, 1 },
@@ -90,7 +90,7 @@ public class Damager {
 				weakness = false;
 			}
 
-			if (chr.player.isAxl && newFlinch > 0) {
+			if (chr.isAttacking() && newFlinch > 0) {
 				if (newFlinch < 4) {
 					newFlinch = 4;
 				} else if (newFlinch < 12) {
@@ -287,7 +287,8 @@ public class Damager {
 				playHurtSound = true;
 			}
 
-			if (character.ownedByLocalPlayer && character.charState.superArmor && projId != (int)ProjIds.PlasmaGun) {
+			if (character.ownedByLocalPlayer 
+			&& character.charState.superArmor ){ //&& projId != (int)ProjIds.PlasmaGun) { Kill yourself gm19
 				flinch = 0;
 			}
 
@@ -317,9 +318,9 @@ public class Damager {
 			
 			//>>>>>>>>>>>>>>>>>>>
 			// Jump Cancel System
-			if (owner?.character != null){
-			owner.character.JumpCancelTime = 0.25f;
-			}
+			//if (owner?.character != null){
+			//owner.character.JumpCancelTime = 0.25f;
+			//}
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			//Grab fix test FUCK YOU GM HOLY MOTHER OF GOD
 			if (projId == (int)ProjIds.VileMK2Grab && !(character.charState is VileMK2Grabbed)) {	
@@ -347,7 +348,7 @@ public class Damager {
 					mmx.barrierTime = 0;
 				}
 			} else if (projId == (int)ProjIds.ShotgunIceCharged) {
-				character.addIgFreezeProgress(4, 5);
+				character.addIgFreezeProgress(1, 2);
 			} else if (projId == (int)ProjIds.ChillPIceBlow) {
 				character.addIgFreezeProgress(4, 2);
 			} else if (projId == (int)ProjIds.HyorogaProj) {
@@ -425,6 +426,7 @@ public class Damager {
 				}
 			}
 			//Backshield code
+			/*
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner)) {
 					damage--;
@@ -435,6 +437,7 @@ public class Damager {
 					}
 				}
 			}
+			*/
 			//Block Code
 			if (character.sprite.name.Contains("block") &&
 			 damage > 0 && !isArmorPiercing(projId)) {

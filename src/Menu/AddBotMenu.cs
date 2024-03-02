@@ -100,6 +100,8 @@ public class AddBotMenu : IMainMenu {
 		else if (botCharNum == 2) botCharStr = "Vile";
 		else if (botCharNum == 3) botCharStr = "Axl";
 		else if (botCharNum == 4) botCharStr = "Sigma";
+		else if (botCharNum == 5) botCharStr = "Dynamo";
+		else if (botCharNum == 6) botCharStr = "GBD";
 
 		Fonts.drawText(
 			FontType.Blue, "Character: " + botCharStr,

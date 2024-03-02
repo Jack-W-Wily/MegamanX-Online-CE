@@ -443,9 +443,13 @@ public class RideArmor : Actor, IDamagable {
 				playSound("frogShoot", sendRpc: true);
 			}
 		}
+		if (raNum == 5 &&   (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
+		&& player.input.isPressed(Control.WeaponRight, player)) {
+		changeState(new RADash());
+		}
 
 		bool attackConditionMet = canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;
-		if (raNum == 5) attackConditionMet = canAttack() && character.player.input.isHeld(Control.Shoot, character.player);
+		if (raNum == 5) attackConditionMet = canAttack() && character.player.input.isHeld(Control.WeaponRight, character.player);
 		if (attackConditionMet) {
 			if (rideArmorState is RARun) changeState(new RAIdle(), true);
 			if (rideArmorState is RAJump) changeState(new RAFall(), true);
@@ -774,6 +778,7 @@ public class RideArmor : Actor, IDamagable {
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (Global.level.isRace()) return false;
 		if (character == null) return false;
+		if (raNum == 5) return false;
 		return !character.isInvulnerable(true) && character.player.alliance != damagerAlliance;
 	}
 
@@ -1303,7 +1308,7 @@ public class RAIdle : RideArmorState {
 			rideArmor.changeState(new RAJump(isDash: dashHeld));
 			return;
 		}
-
+		
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			if (!rideArmor.isAttacking()) {
 				if (player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
@@ -1322,6 +1327,7 @@ public class RAIdle : RideArmorState {
 			}
 		}
 		groundCode();
+
 		if (player.input.isPressed(Control.Dash, player)) {
 			if (rideArmor.canDash()) rideArmor.changeState(new RADash());
 		}
@@ -1673,6 +1679,7 @@ public class RADash : RideArmorState {
 		var move = getDashVel();
 		rideArmor.move(move);
 		bool isHeldDashAttack = rideArmor.raNum == 4 && player.input.isHeld(Control.Shoot, player);
+		if (rideArmor.raNum == 5) isHeldDashAttack = player.input.isHeld(Control.WeaponLeft, player);
 		if (isHeldDashAttack) {
 			dashTime = 0;
 			dashAttackTime += Global.spf;
@@ -1694,7 +1701,7 @@ public class RADash : RideArmorState {
 				}
 				return;
 			}
-		} else if (!player.input.isHeld(Control.Dash, player)) {
+		} else if (rideArmor.raNum != 5 && !player.input.isHeld(Control.Dash, player)) {
 			rideArmor.changeState(new RAIdle());
 			return;
 		}

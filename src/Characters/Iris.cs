@@ -1,0 +1,27 @@
+namespace MMXOnline;
+
+public class Iris : Character {
+	public Iris(
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true
+	) : base(
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
+	) {
+
+	}
+
+	public override bool canDash() {
+		return false;
+	}
+
+	public override bool canWallClimb() {
+		return false;
+	}
+
+	public override string getSprite(string spriteName) {
+		return "rock_" + spriteName;
+	}
+}
+
+

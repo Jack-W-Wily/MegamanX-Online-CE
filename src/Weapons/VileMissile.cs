@@ -37,7 +37,7 @@ public class VileMissile : Weapon {
 			description = new string[] { "Stops enemies in their tracks,", "but deals no damage." };
 			vileWeight = 3;
 		} else if (vileMissileType == VileMissileType.HumerusCrush) {
-			rateOfFire = 0.75f;
+			rateOfFire = 1.75f;
 			displayName = "Humerus Crush";
 			projSprite = "missile_hc_proj";
 			vileAmmo = 8;
@@ -45,7 +45,7 @@ public class VileMissile : Weapon {
 			killFeedIndex = 74;
 			vileWeight = 3;
 		} else if (vileMissileType == VileMissileType.PopcornDemon) {
-			rateOfFire = 0.75f;
+			rateOfFire = 2.75f;
 			displayName = "Popcorn Demon";
 			projSprite = "missile_pd_proj";
 			vileAmmo = 12;

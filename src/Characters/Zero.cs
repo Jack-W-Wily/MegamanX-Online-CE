@@ -378,6 +378,29 @@ public class Zero : Character {
 					}
 				}
 		}
+		//>>>>>>>>>>>>>>>>>
+		//Giga Canceling everything
+		if (grounded && player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Special1, player)) {
+				if (spcPressed && rakuhouhaCooldown == 0 && flag == null) {
+				spcActivated = true;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= gigaAmmoUsage) {
+					zeroGigaAttackWeapon.addAmmo(-gigaAmmoUsage, player);		
+					changeState(new Rakuhouha(zeroGigaAttackWeapon), true);				
+				}
+			}
+		}
+		if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.WeaponLeft, player) && player.input.isPressed(Control.WeaponRight, player)) {
+				if (spcPressed && rakuhouhaCooldown == 0 && flag == null) {
+				spcActivated = true;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= gigaAmmoUsage) {
+					zeroGigaAttackWeapon.addAmmo(-gigaAmmoUsage, player);		
+					changeState(new Rekkoha(zeroGigaAttackWeapon), true);					
+				}
+			}
+		}
+		//>>>>>>>>>>>>>>>>>>
 		bool notUpLogic = !player.input.isHeld(Control.Up, player) || !isMidairRising;
 		if (zeroAirSpecialWeapon.type != (int)AirSpecialType.Kuuenzan && spcPressed && !player.input.isHeld(Control.Down, player) && !isAttacking() && !player.hasKnuckle() &&
 			(charState is Jump || charState is Fall || charState is WallKick) && !isInvulnerableAttack() &&
@@ -435,20 +458,6 @@ public class Zero : Character {
 							),
 							true
 						);
-					}
-				}	else if (player.input.isHeld(Control.Down, player)) {
-					if (spcPressed && rakuhouhaCooldown == 0 && flag == null) {
-						spcActivated = true;
-
-						float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
-						if (gigaWeapon.ammo >= gigaAmmoUsage) {
-							zeroGigaAttackWeapon.addAmmo(-gigaAmmoUsage, player);
-							if (zeroGigaAttackWeapon is RekkohaWeapon) {
-								changeState(new Rekkoha(zeroGigaAttackWeapon), true);
-							} else {
-								changeState(new Rakuhouha(zeroGigaAttackWeapon), true);
-							}
-						}
 					}
 				} else {
 					if (!lenientAttackPressed) {
@@ -842,7 +851,16 @@ public class Zero : Character {
 				player.currency = 0;
 			}
 		} else {
-			int type = player.isZBusterZero() ? 1 : 0;
+			// >>>>>>>>>>>>>>>
+			// New buster type changes
+			int type = 0;
+			if (player.isZBusterZero()) {
+			type = 1;
+			}
+			if (!player.isZBusterZero() && !isBlackZero()){
+			type = 2;
+			}
+			//>>>>>>>>>>>>>>>>>>>>>>>>
 
 			if (stockedCharge) {
 				changeState(new ZeroDoubleBuster(true, true), true);
@@ -855,13 +873,15 @@ public class Zero : Character {
 				zeroLemonsOnField.Add(lemon);
 			} else if (chargeLevel == 1) {
 				if (type == 0) player.scrap -= 1;
-				playSound("zbuster2", sendRpc: true);
+				if (type != 2) playSound("zbuster2", sendRpc: true);
 				zeroLemonCooldown = 0.375f;
-				new ZBuster2Proj(
+				if (type == 2) changeState(new ZBusterX6(grounded, true), true);
+				if (type != 2) {new ZBuster2Proj(
 					zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
-				);
+				);}
 			} else if (chargeLevel == 2) {
-				if (type == 0) player.currency -= 1;
+				if (type != 2){
+				if (type == 0) player.scrap -= 1;
 				zeroLemonCooldown = 0.375f;
 				if (!player.isZBusterZero()) {
 					playSound("zbuster3", sendRpc: true);
@@ -874,8 +894,10 @@ public class Zero : Character {
 						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
 					);
 				}
+				} else {changeState(new ZBusterX6(grounded, true), true);}
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
-				if (type == 0) player.currency -= 1;
+				if (type != 2){
+				if (type == 0) player.scrap -= 1;
 				if (chargeLevel == 3 && player.isZBusterZero()) {
 					changeState(new ZeroDoubleBuster(false, true), true);
 					//playSound("zbuster2", sendRpc: true);
@@ -891,6 +913,7 @@ public class Zero : Character {
 						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
 					);
 				}
+				} else {changeState(new ZBusterX6(grounded, true), true);}
 			}
 		}
 
@@ -899,7 +922,7 @@ public class Zero : Character {
 	}
 
 	public bool canUseDoubleBusterCombo() {
-		//if (isBlackZero()) return true;
+		if (isBlackZero()) return true;
 		if (player.isZBusterZero()) return true;
 		return false;
 	}
@@ -1156,6 +1179,6 @@ public class Zero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isHeld(Control.Special1, player) || player.input.isHeld(Control.Shoot, player);
 	}
 }

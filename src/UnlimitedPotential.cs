@@ -361,6 +361,7 @@ public class XUPGrabState : CharState {
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
+	MegamanX mmx;
 	public XUPGrabState(Character victim) : base("unpo_grab", "", "", "") {
 		this.victim = victim;
 		grabTime = UPGrabbed.maxGrabTime;
@@ -368,6 +369,7 @@ public class XUPGrabState : CharState {
 
 	public override void update() {
 		base.update();
+		mmx = character as MegamanX;
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 
@@ -388,7 +390,9 @@ public class XUPGrabState : CharState {
 			if (character.isDefenderFavored()) {
 				if (leechTime > 0.33f) {
 					leechTime = 0;
+					if (mmx.VileCounters > 1 || character.sprite.name.Contains("nghost") ){
 					character.addHealth(1);
+					}
 				}
 				return;
 			}
@@ -405,18 +409,47 @@ public class XUPGrabState : CharState {
 			if (!character.grounded && !character.sprite.name.EndsWith("2")) {
 				character.changeSpriteFromName("unpo_grab2", true);
 			}
+			if (character.sprite.name.Contains("nghost") && !character.sprite.name.EndsWith("2")) {
+				character.changeSpriteFromName("unpo_grab2", true);
+			}
 		}
 
 		if (leechTime > 0.33f) {
 			leechTime = 0;
+			if (character.sprite.name.Contains("nghost")){
+					character.addHealth(1);
+			var damager = new Damager(player, 1, 0, 0);
+			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
+		}
+			if (player.isX && mmx.VileCounters > 1){
 			character.addHealth(1);
 			var damager = new Damager(player, 1, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}
+		}
 
 		if (player.input.isPressed(Control.Special1, player)) {
+			if (victim.sprite.name.Contains("vile")){
+			mmx.VileCounters += 1;
 			character.changeState(new Idle(), true);
-			return;
+			}
+			if (victim.sprite.name.Contains("zero")){
+			mmx.ZeroCounters += 1;
+			character.changeState(new Idle(), true);
+			}
+			if (victim.sprite.name.Contains("mmx")){
+			mmx.XCounters += 1;
+			character.changeState(new Idle(), true);
+			}
+			if (victim.sprite.name.Contains("sigma")){
+			mmx.SigmaCounters += 1;
+			character.changeState(new Idle(), true);
+			}
+			if (victim.sprite.name.Contains("axl")){
+			mmx.AxlCounters += 1;
+			character.changeState(new Idle(), true);
+			}
+			
 		}
 
 		if (grabTime <= 0) {
@@ -695,6 +728,57 @@ public class XRevive : CharState {
 		if (character != null) {
 			character.invulnTime = character.maxParryCooldown;
 		}
+	}
+}
+
+public class IXGrow : CharState {
+	public float radius = 200;
+	XReviveAnim reviveAnim;
+	MegamanX mmx;
+
+	public IXGrow() : base("revive_shake") {
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.ownedByLocalPlayer) return;
+
+		if (!once && character.frameIndex >= 1 && sprite == "revive") {
+			character.playSound("ching", sendRpc: true);
+			player.health = 1;
+			character.addHealth(player.maxHealth);
+			player.addHyperCharge();
+			once = true;
+			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			flash.grow = true;
+		}
+
+		if (character.isAnimOver()) {
+			mmx.isReturnIX = true;
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		}
+
+		if (sprite == "revive_shake" && character.loopCount > 6) {
+			sprite = "revive_shake2";
+			character.changeSpriteFromName(sprite, true);
+		} else if (sprite == "revive_shake2" && character.loopCount > 6) {
+			sprite = "revive";
+			character.changeSpriteFromName(sprite, true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
+		character.playSound("xRevive", sendRpc: true);
+		mmx = character as MegamanX;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 

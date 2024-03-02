@@ -225,6 +225,7 @@ public class LevelData {
 			maxPlayers = 22;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
+			supportedGameModesSet.Add(GameMode.Nightmare);
 		}
 
 		if (levelJson.supportsCTF == true) {
@@ -511,14 +512,14 @@ public class LevelData {
 	}
 
 	public string getMusicKey(List<Player> players) {
+
+		if (Global.level.gameMode is Nightmare) {
+			return "theplace";
+		}
+
 		if (name == "japetribute_1v1") {
 			return "japetribute_1v1";
 		}
-
-		if (isCustomMap) {
-			return name;
-		}
-
 		if (name == "dopplerlab_1v1") {
 			return "goliath";
 		}
@@ -547,6 +548,9 @@ public class LevelData {
 			if (name == "giantdam2") return "giantdam";
 			if (name.Contains("sigma4")) return "bossroom";
 			return Helpers.removeMapSuffix(name);
+		}
+		if (isCustomMap) {
+			return name;
 		}
 	}
 

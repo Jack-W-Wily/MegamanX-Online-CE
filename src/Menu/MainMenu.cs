@@ -171,6 +171,7 @@ public class MainMenu : IMainMenu {
 		float startX = 75;
 
 		string selectionImage = "";
+		
 		if (selectY == 0) selectionImage = "joinserver";
 		else if (selectY == 1) selectionImage = "hostserver";
 		else if (selectY == 2) selectionImage = "vscpu";
@@ -178,13 +179,56 @@ public class MainMenu : IMainMenu {
 		else if (selectY == 4) selectionImage = "controls";
 		else if (selectY == 5) selectionImage = "options";
 		else if (selectY == 6) selectionImage = "quit";
+		
 
+		if (Options.main.preferredCharacter == 0){
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		}
+		if (Options.main.preferredCharacter == 1){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundZero"], 0, 0);
+		}
+		if (Options.main.preferredCharacter == 2){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundVile"], 0, 0);
+		}
+		if (Options.main.preferredCharacter >= 3){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		}
 		DrawWrappers.DrawTitleTexture(Global.textures["mainmenutitle"]);
 		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX - 10, startPos - 2 + (selectY * yDistance));
 		DrawWrappers.DrawTextureHUD(Global.textures[selectionImage], 208, 107);
 		DrawWrappers.DrawTextureHUD(Global.textures["mainmenubox"], 199, 98);
 
+		if (Options.main.preferredCharacter == 0
+		|| Options.main.preferredCharacter == 1
+		|| Options.main.preferredCharacter == 3){
+		Fonts.drawText(FontType.BlueMenu, "Join Mission", startX, optionPos[0].y, selected: selectY == 0);
+		Fonts.drawText(FontType.BlueMenu, "Start Mission", startX, optionPos[1].y, selected: selectY == 1);
+		Fonts.drawText(FontType.BlueMenu, "Simulation Battle", startX, optionPos[2].y, selected: selectY == 2);
+		Fonts.drawText(FontType.BlueMenu, "Weaponry", startX, optionPos[3].y, selected: selectY == 3);
+		Fonts.drawText(FontType.BlueMenu, "Controls", startX, optionPos[4].y, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "Settings", startX, optionPos[5].y, selected: selectY == 5);
+		Fonts.drawText(FontType.BlueMenu, "Quit", startX, optionPos[6].y, selected: selectY == 6);
+		}
+		
+		if (Options.main.preferredCharacter == 2){
+		Fonts.drawText(FontType.BlueMenu, "Network Invasion", startX, optionPos[0].y, selected: selectY == 0);
+		Fonts.drawText(FontType.BlueMenu, "Network Set", startX, optionPos[1].y, selected: selectY == 1);
+		Fonts.drawText(FontType.BlueMenu, "Single Player", startX, optionPos[2].y, selected: selectY == 2);
+		Fonts.drawText(FontType.BlueMenu, "Arsenal", startX, optionPos[3].y, selected: selectY == 3);
+		Fonts.drawText(FontType.BlueMenu, "Set Controls", startX, optionPos[4].y, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "Options", startX, optionPos[5].y, selected: selectY == 5);
+		Fonts.drawText(FontType.BlueMenu, "Leave", startX, optionPos[6].y, selected: selectY == 6);
+		}
+		if (Options.main.preferredCharacter == 4){
+		Fonts.drawText(FontType.BlueMenu, "Conquest", startX, optionPos[0].y, selected: selectY == 0);
+		Fonts.drawText(FontType.BlueMenu, "Invitation", startX, optionPos[1].y, selected: selectY == 1);
+		Fonts.drawText(FontType.BlueMenu, "Simulate", startX, optionPos[2].y, selected: selectY == 2);
+		Fonts.drawText(FontType.BlueMenu, "Ordenation", startX, optionPos[3].y, selected: selectY == 3);
+		Fonts.drawText(FontType.BlueMenu, "Formation", startX, optionPos[4].y, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "Ajustments", startX, optionPos[5].y, selected: selectY == 5);
+		Fonts.drawText(FontType.BlueMenu, "Retreat", startX, optionPos[6].y, selected: selectY == 6);
+		}
+		if (Options.main.preferredCharacter >= 5){
 		Fonts.drawText(FontType.BlueMenu, "Join Match", startX, optionPos[0].y, selected: selectY == 0);
 		Fonts.drawText(FontType.BlueMenu, "Create Match", startX, optionPos[1].y, selected: selectY == 1);
 		Fonts.drawText(FontType.BlueMenu, "VS. CPU", startX, optionPos[2].y, selected: selectY == 2);
@@ -192,7 +236,7 @@ public class MainMenu : IMainMenu {
 		Fonts.drawText(FontType.BlueMenu, "Controls", startX, optionPos[4].y, selected: selectY == 4);
 		Fonts.drawText(FontType.BlueMenu, "Settings", startX, optionPos[5].y, selected: selectY == 5);
 		Fonts.drawText(FontType.BlueMenu, "Quit", startX, optionPos[6].y, selected: selectY == 6);
-
+		}
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Change selection, [OK]: Choose",
 			Global.screenW / 2, Global.screenH - 12, Alignment.Center

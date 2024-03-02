@@ -181,7 +181,7 @@ public abstract class BaseSigma : Character {
 		}
 
 		if (player.weapon is SigmaMenuWeapon && player.currentMaverick == null &&
-			player.mavericks.Count > 0 && grounded &&
+			player.mavericks.Count > 0 &&
 			(player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player))
 			&& isSummoner && charState is not IssueGlobalCommand && charState is not Dash
 		) {
@@ -206,7 +206,7 @@ public abstract class BaseSigma : Character {
 		) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
-						if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+						//if (!(charState is Idle || charState is Run || charState is Crouch || charState is Jump || charState is Fall   )) return;
 						if (isStriker && player.mavericks.Count > 0) return;
 						buyMaverick(mw);
 						var maverick = player.maverickWeapon.summon(player, pos.addxy(0, -112), pos, xDir);

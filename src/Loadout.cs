@@ -32,7 +32,7 @@ public class XLoadout {
 			weapon3 = 2;
 		}
 
-		if (melee < 0 || melee > 1) melee = 0;
+		if (melee < 0 || melee > 2) melee = 0;
 	}
 
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
@@ -134,10 +134,10 @@ public class VileLoadout {
 		if (cannon == 0){
 		 weapons.Add(new Vulcan((VulcanType)vulcan));
 		}	 
-		//if (includeMech) {
-		//	weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
-		//	weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
-		//}
+		if (includeMech) {
+			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
+			weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
+		}
 
 		return weapons;
 	}

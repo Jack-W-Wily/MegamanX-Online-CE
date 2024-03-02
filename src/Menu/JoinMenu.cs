@@ -356,7 +356,7 @@ public class JoinMenu : IMainMenu {
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
 		// DrawWrappers.DrawTextureHUD(Global.textures[joinMenuImage], 0, 0);
 		DrawWrappers.DrawTextureHUD(Global.textures["joinborder"], 0, 30);
-
+		
 		Helpers.drawTextStd(TCat.Title, "Join Match", Global.halfScreenW, 10, alignment: Alignment.Center, vAlignment: VAlignment.Center, fontSize: 48);
 
 		Helpers.drawTextStd("Name", col1Pos, headerPos, outline: false, fontSize: 24);

@@ -15,10 +15,24 @@ public partial class MegamanX : Character {
 	public bool isHyperX;
 
 
+	//X kai Stuff
+	public bool isXKai;
+	public float XCounters = 0;
+	public float ZeroCounters = 0;
+	public float VileCounters = 0;
+	public float AxlCounters = 0;
+	public float SigmaCounters = 0;
+
 	// >>>>>>>>>>>>>>>>>>>>>>>
 	// New Armor System
 	public float CurrentArmor = 0;
 
+	//IX Stuff
+	public float IXTimer = 0;
+	public bool isIX;
+	public bool isReturnIX;
+	public float EvolutionTrigger = 0;
+	// >>>>>>>>>>>>>>>>>>>>>>>
 
 	public const int headArmorCost = 4;
 	public const int bodyArmorCost = 4;
@@ -95,33 +109,55 @@ public partial class MegamanX : Character {
 		fgMotion = false;
 		base.update();
 		player.armorFlag = 0;
-		Helpers.decrementTime(ref barrierCooldown);
+		if (player.loadout.xLoadout.melee == 1){
+		isXKai = true;
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		if (player.loadout.xLoadout.melee == 2){
+		isIX = true;
+
+		if (!isReturnIX && IXTimer > 20 && charState is not IXGrow){
+		changeState(new IXGrow(), true);
+		
+		}
+		}
+		
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		//Armor Switching
-        if (player.input.isHeld(Control.Taunt, player)) {
+        if (player.input.isHeld(Control.Taunt, player) && player.loadout.xLoadout.melee == 0) {
 		if (player.input.isPressed(Control.Right, player) 
 		&& Global.level.mainPlayer.isHeadArmorPurchased(1)){
 		CurrentArmor = 1;
+		stockedCharge = false;
+		stockedX3Buster = false;
 		Global.level.gameMode.setHUDErrorMessage(player, "LIGHT", playSound: false);
 		}
 		if (player.input.isPressed(Control.Down, player)
 		&& Global.level.mainPlayer.isBodyArmorPurchased(1)){
 		CurrentArmor = 2;
+		stockedCharge = false;
+		stockedX3Buster = false;
 		Global.level.gameMode.setHUDErrorMessage(player, "GIGA", playSound: false);
 		}
 		if (player.input.isPressed(Control.Up, player)
 		&& Global.level.mainPlayer.isArmArmorPurchased(1)){
 		CurrentArmor = 3;
+		stockedCharge = false;
+		stockedX3Buster = false;
 		Global.level.gameMode.setHUDErrorMessage(player, "MAX", playSound: false);
 		}
 		if (player.input.isPressed(Control.Left, player)
 		&& Global.level.mainPlayer.isBootsArmorPurchased(1)){
 		CurrentArmor = 4;
+		stockedCharge = false;
+		stockedX3Buster = false;
 		Global.level.gameMode.setHUDErrorMessage(player, "FORCE", playSound: false);
 		}
-		}
-	
+		}	
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+		if (IXTimer > 19f) EvolutionTrigger = 1;
+
 		if (cStingPaletteTime > 5) {
 			cStingPaletteTime = 0;
 			cStingPaletteIndex++;
@@ -147,12 +183,13 @@ public partial class MegamanX : Character {
 			hadoukenCooldownTime = maxHadoukenCooldownTime;
 			shoryukenCooldownTime = maxShoryukenCooldownTime;
 		}
-
+		Helpers.decrementTime(ref barrierCooldown);
 		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref scannerCooldown);
 		Helpers.decrementTime(ref hadoukenCooldownTime);
 		Helpers.decrementTime(ref shoryukenCooldownTime);
 		Helpers.decrementTime(ref streamCooldown);
+		IXTimer += Global.spf;
 
 		if (player.weapon.ammo >= player.weapon.maxAmmo) {
 			weaponHealAmount = 0;
@@ -274,8 +311,8 @@ public partial class MegamanX : Character {
 
 		Helpers.decrementTime(ref upPunchCooldown);
 
-		if (isHyperX && !isInvulnerableAttack()) {
-			if (charState.attackCtrl && player.input.isPressed(Control.Shoot, player)) {
+		if (isXKai && !isInvulnerableAttack()) {
+			if (isHyperX && charState.attackCtrl && player.input.isPressed(Control.Shoot, player)) {
 				if (unpoShotCount <= 0) {
 					upPunchCooldown = 0.5f;
 					changeState(new XUPPunchState(grounded), true);
@@ -285,14 +322,14 @@ public partial class MegamanX : Character {
 				  (charState is Dash || charState is AirDash)) {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
-			} else if (player.input.isPressed(Control.Special1, player) &&
+			} else if (isHyperX && player.input.isPressed(Control.Special1, player) &&
 				  (charState is Idle || charState is Run || charState is Fall || charState is Jump)) {
 				upPunchCooldown = 0.5f;
 				changeState(new XUPPunchState(grounded), true);
 				return;
 			} else if
 			  (
-				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 &&
+				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 && SigmaCounters > 2 &&
 				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
 			  ) {
 				if (unpoAbsorbedProj != null) {
@@ -306,8 +343,10 @@ public partial class MegamanX : Character {
 		}
 
 		if (charState.attackCtrl &&
-			isSpecialSaber() && canShoot() &&
-			canChangeWeapons() && player.armorFlag == 0 &&
+			 canShoot() &&
+			canChangeWeapons()
+			// Allows X to use Saber
+			&& ( CurrentArmor > 6 || ZeroCounters > 0) &&
 			player.input.isPressed(Control.Special1, player) &&
 			!isAttacking() && !isInvisible() &&
 			!charState.isGrabbing && !isHyperX
@@ -537,20 +576,25 @@ public partial class MegamanX : Character {
 			return true;
 		}
 		if (!grounded) {
-			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
+			if (player.dashPressed(out string dashControl) && canDash()) {
 				CharState dashState;
-				if (player.input.isHeld(Control.Up, player) && player.hasAllX3Armor()) {
+				if (player.input.isHeld(Control.Up, player) && canAirDash() && player.hasAllX3Armor() || isIX && IXTimer > 6 ) {
 					dashState = new UpDash(Control.Dash);
-				} else {
+				} 
+				else{
+					if (canAirDash()) {
 					dashState = new AirDash(dashControl);
-				}
-				if (!isDashing) {
+					}
+					dashState = new AirDash(dashControl);
+					if (!isDashing) {
 					changeState(dashState);
 					return true;
-				} else if (player.hasChip(0)) {
+					} else if (player.hasChip(0)) {
 					changeState(dashState);
 					return true;
+					}
 				}
+
 			}
 			if (player.input.isPressed(Control.Jump, player) &&
 				canJump() && isUnderwater() &&
@@ -560,9 +604,9 @@ public partial class MegamanX : Character {
 				changeState(new Jump());
 				return true;
 			}
-			if (!player.isAI && player.HasFullForce() &&
+			if (!player.isAI && (player.HasFullForce() || AxlCounters > 0)&&
 				player.input.isPressed(Control.Jump, player) &&
-				canJump() && !isDashing && canAirDash() && flag == null
+				 !isDashing && canAirDash() && flag == null
 			) {
 				dashedInAir++;
 				changeState(new XHover(), true);
@@ -858,7 +902,7 @@ public partial class MegamanX : Character {
 
 	public bool isHyperXOrReviving() {
 		if (sprite.name.Contains("revive")) return true;
-		if (isHyperXBS.getValue()) return true;
+		if (isReturnIXBS.getValue()) return true;
 		return false;
 	}
 
@@ -1009,7 +1053,7 @@ public partial class MegamanX : Character {
 		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
 			float overrideDamage = 3;
 			if (!grounded) overrideDamage = 2;
-			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.X6Saber, player, damage: overrideDamage, flinch: 0);
+			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.X6Saber, player, damage: overrideDamage, flinch: 12);
 		} else if (sprite.name.Contains("beam_saber")) {
 			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.XSaber, player);
 		} else if (sprite.name.Contains("nova_strike")) {
@@ -1141,6 +1185,9 @@ public partial class MegamanX : Character {
 	public override void render(float x, float y) {
 		if (!shouldRender(x, y)) {
 			return;
+		}
+		if (VileCounters > 2){
+		addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
 		if (isShootingRaySplasher) {
 			var shootPos = getShootPos();

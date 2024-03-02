@@ -8,7 +8,8 @@ namespace MMXOnline;
 
 public enum NetCharBoolStateNum {
 	One,
-	Two
+	Two,
+	Three
 }
 
 public class NetCharBoolState {
@@ -30,16 +31,25 @@ public class NetCharBoolState {
 		}
 		if (netCharStateNum == NetCharBoolStateNum.One) {
 			return Helpers.getByteValue(character.netCharState1, byteIndex);
-		} else {
+		} 
+		if (netCharStateNum == NetCharBoolStateNum.Two) {
 			return Helpers.getByteValue(character.netCharState2, byteIndex);
-		}
+		} 
+		if (netCharStateNum == NetCharBoolStateNum.Three) {
+			return Helpers.getByteValue(character.netCharState3, byteIndex);
+		} 
+		return false;
 	}
 
 	public void updateValue() {
 		if (netCharStateNum == NetCharBoolStateNum.One) {
 			Helpers.setByteValue(ref character.netCharState1, byteIndex, getValue());
-		} else {
+		} 
+		if (netCharStateNum == NetCharBoolStateNum.Two) {
 			Helpers.setByteValue(ref character.netCharState2, byteIndex, getValue());
+		}
+		if (netCharStateNum == NetCharBoolStateNum.Three) {
+			Helpers.setByteValue(ref character.netCharState3, byteIndex, getValue());
 		}
 	}
 }
@@ -54,7 +64,7 @@ public partial class Character {
 	public NetCharBoolState isAwakenedZeroBS;
 	public NetCharBoolState isAwakenedGenmuZeroBS;
 	public NetCharBoolState isInvisibleBS;
-	public NetCharBoolState isHyperXBS;
+	public NetCharBoolState isReturnIXBS;
 	public NetCharBoolState isHyperSigmaBS;
 
 	public void initNetCharState1() {
@@ -75,8 +85,8 @@ public partial class Character {
 			return (character as Zero)?.isAwakenedGenmuZero() == true;
 		});
 		isInvisibleBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.One, (character) => { return character.isInvisible(); });
-		isHyperXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => {
-			return (character as MegamanX)?.isHyperX == true;
+		isReturnIXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => {
+			return (character as MegamanX)?.isReturnIX == true;
 		});
 		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
 			if (character is KaiserSigma) {
@@ -93,7 +103,7 @@ public partial class Character {
 		isAwakenedZeroBS.updateValue();
 		isAwakenedGenmuZeroBS.updateValue();
 		isInvisibleBS.updateValue();
-		isHyperXBS.updateValue();
+		isReturnIXBS.updateValue();
 		isHyperSigmaBS.updateValue();
 		return netCharState1;
 	}
@@ -136,5 +146,43 @@ public partial class Character {
 		isNightmareZeroBS.updateValue();
 		isDarkHoldBS.updateValue();
 		return netCharState2;
+	}
+
+	
+	// NET CHAR STATE 3 SECTION
+	public byte netCharState3;
+
+	public NetCharBoolState isLightArmorXBS;
+	public NetCharBoolState isGigaArmorXBS;
+	public NetCharBoolState isMaxArmorXBS;
+	public NetCharBoolState isForceArmorXBS;
+	public NetCharBoolState isFalconArmorXBS;
+	public NetCharBoolState isGaeaArmorXBS;
+	public NetCharBoolState isBladeArmorXBS;
+	public NetCharBoolState isShadowArmorXBS;
+
+	
+
+	public void initNetCharState3() {
+		isLightArmorXBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Three, (character) => {	return character.player.hasFullLight(); });
+		isGigaArmorXBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.Three, (character) => { return character.player.hasFullGiga(); });
+		isMaxArmorXBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.Three, (character) => {return character.player.hasAllX3Armor(); });
+		isForceArmorXBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.Three, (character) => { return character.player.HasFullForce(); });
+		isFalconArmorXBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.Three, (character) => { return character.player.HasFullFalcon(); });
+		isGaeaArmorXBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.Three, (character) => { return character.player.HasFullGaea(); });
+		isBladeArmorXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.Three, (character) => {return character.player.HasFullBlade(); });
+		isShadowArmorXBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.Three, (character) => {return character.player.HasFullShadow(); });
+	}
+
+	public byte updateAndGetNetCharState3() {
+		isLightArmorXBS.updateValue();
+		isGigaArmorXBS.updateValue();
+		isMaxArmorXBS.updateValue();
+		isForceArmorXBS.updateValue();
+		isFalconArmorXBS.updateValue();
+		isGaeaArmorXBS.updateValue();
+		isBladeArmorXBS.updateValue();
+		isShadowArmorXBS.updateValue();
+		return netCharState3;
 	}
 }

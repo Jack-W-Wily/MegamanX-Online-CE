@@ -168,6 +168,7 @@ public partial class Character : Actor, IDamagable {
 		this.xDir = xDir;
 		initNetCharState1();
 		initNetCharState2();
+		initNetCharState3();
 
 		isDashing = false;
 		splashable = true;
@@ -525,6 +526,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canDash() {
+		if (this is MegamanX mmx && mmx.isIX && mmx.IXTimer < 6f) return false;
 		if (player.isAI && charState is Dash) return false;
 		if (mk5RideArmorPlatform != null) return false;
 		if (charState is WallKick wallKick && wallKick.stateTime < 0.25f) return false;
@@ -556,18 +558,37 @@ public partial class Character : Actor, IDamagable {
 		if (isSoftLocked() || isDashing) {
 			return false;
 		}
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// Jump Cancel System
+		if (isAttacking() && JumpCancelTime > 0){ 
+		return true;
+		}
+		if (isAttacking() && JumpCancelTime == 0){ 
+		return false;
+		}
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		return true;
 	}
 
 	public bool canAirDash() {
+		if (this is MegamanX mmx){ 
+		if (mmx.isIX && mmx.IXTimer < 10f) return false;
+		if (!mmx.isIX && player.isX && player.loadout.xLoadout.melee != 1 && mmx.CurrentArmor < 2){
+		return false;
+		}
+		return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasChip(0));
+		}
 		return dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasChip(0));
 	}
 
 	public bool canAirJump() {
-		if (this is not Zero zero) {
-			return false;
+		if (this is Zero zero) {
+			return dashedInAir == 0 || (dashedInAir == 1 && zero.isBlackZero2());
 		}
-		return dashedInAir == 0 || (dashedInAir == 1 && zero.isBlackZero2());
+		if (this is MegamanX mmx) {
+			return dashedInAir == 0 && mmx.ZeroCounters > 0;
+		}
+		return false;
 	}
 
 	public virtual bool canWallClimb() {
@@ -609,6 +630,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canCharge() {
+		if (this is MegamanX mmx && mmx.isIX && mmx.IXTimer < 10f) return false;
 		return true;
 	}
 
@@ -669,7 +691,7 @@ public partial class Character : Actor, IDamagable {
 				runSpeed = Physics.WalkSpeed;
 			}
 		}
-		else if (player.isVile && player.speedDevil) {
+		else if ((player.isVile || player.isX && this is MegamanX mmx && mmx.VileCounters > 2) && player.speedDevil) {
 			runSpeed *= 1.1f;
 		}
 		return runSpeed * getRunDebuffs();
@@ -693,7 +715,7 @@ public partial class Character : Actor, IDamagable {
 		if (charState is XHover) {
 			dashSpeed *= 1.25f;
 		}
-		else if (player.isVile && player.speedDevil) {
+		else if ((player.isVile || player.isX && this is MegamanX mmx && mmx.VileCounters > 2)&& player.speedDevil) {
 			dashSpeed *= 1.1f;
 		}
 		return dashSpeed * getRunDebuffs();
@@ -707,7 +729,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual float getJumpModifier() {
 		float jp = 1;
-
+		if (this is MegamanX mmx && mmx.isIX && mmx.IXTimer > 6f) jp *= 1.75f;
 		if (slowdownTime > 0) jp *= 0.75f;
 		if (igFreezeProgress == 1) jp *= 0.75f;
 		if (igFreezeProgress == 2) jp *= 0.5f;
@@ -1032,7 +1054,7 @@ public partial class Character : Actor, IDamagable {
 			if (flattenedTime < 0) flattenedTime = 0;
 		}
 
-		if (isHyperSigmaBS.getValue() || isHyperXBS.getValue()) {
+		if (isHyperSigmaBS.getValue()) {
 			flattenedTime = 0;
 		}
 		Helpers.decrementTime(ref slowdownTime);
@@ -1568,7 +1590,7 @@ public partial class Character : Actor, IDamagable {
 	public bool isCCImmuneHyperMode() {
 		// The former two hyper modes rely on a float time value sync.
 		// The latter two hyper modes are boolean states so use the BoolState ("BS") system.
-		return isHyperSigmaBS.getValue();//isAwakenedGenmuZeroBS.getValue() || (isInvisibleBS.getValue() && player.isAxl) || isHyperSigmaBS.getValue() || isHyperXBS.getValue();
+		return isHyperSigmaBS.getValue();//isAwakenedGenmuZeroBS.getValue() || (isInvisibleBS.getValue() && player.isAxl) || isHyperSigmaBS.getValue() || isReturnIXBS.getValue();
 	}
 
 	public virtual bool isToughGuyHyperMode() {
@@ -2522,19 +2544,11 @@ public partial class Character : Actor, IDamagable {
 			damageSavings -= 1;
 			damage -= 1;
 		}
-
+		
 		// Damage increase/reduction section
 		if (!isArmorPiercing) {
-			if (charState is SwordBlock) {
-				if (player.isSigma) {
-					if (player.isPuppeteer()) {
-						damageSavings += (originalDamage * 0.25f);
-					} else {
-						damageSavings += (originalDamage * 0.5f);
-					}
-				} else {
-					damageSavings += (originalDamage * 0.25f);
-				}
+			if (charState is SwordBlock) {				
+						damageSavings += (originalDamage * 0.5f);		
 			}
 			if (acidTime > 0) {
 				float extraDamage = 0.25f + (0.25f * (acidTime / 8.0f));
@@ -2639,7 +2653,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			killPlayer(attacker, null, weaponIndex, projId);
 		} else {
-			if (mmx != null && player.hasAllX3Armor() && damage > 0) {
+			if (mmx != null && (player.hasAllX3Armor() || mmx.SigmaCounters > 0) && damage > 0) {
 				mmx.addBarrier(charState is Hurt);
 			}
 		}
@@ -2768,7 +2782,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual void increaseCharge() {
 		float factor = 1;
 		if (player.isX && player.hasFullLight()) factor = 1.5f;
-		//if (player.isX && isHyperX) factor = 1.5f;
+		if (player.isX && this is MegamanX mmx && mmx.isIX && mmx.IXTimer > 14f) factor = 1.5f;
 		//if (player.isZero && isAttacking()) factor = 0f;
 		chargeTime += Global.spf * factor;
 	}
@@ -2970,7 +2984,7 @@ public partial class Character : Actor, IDamagable {
 		var retProjs = new Dictionary<int, Func<Projectile>>();
 
 		// TODO: Move this to viral Sigma class.
-		if (sprite.name.Contains("viral_tackle") && sprite.time > 0.15f) {
+		if (player.isSigma2AndSigma() && sprite.name.Contains("viral_tackle") && sprite.time > 0.15f) {
 			retProjs[(int)ProjIds.Sigma2ViralTackle] = () => {
 				var damageCollider = getAllColliders().FirstOrDefault(c => c.isAttack());
 				Point centerPoint = damageCollider.shape.getRect().center();
@@ -3114,7 +3128,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		*/
 
-		if (this is Zero || this is Rock) {
+		if (this is Zero || this is Rock || this is Reploid  ) {
 			player.changeWeaponControls();
 		}
 

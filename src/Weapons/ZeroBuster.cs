@@ -251,6 +251,7 @@ public class ZeroDoubleBuster : CharState {
 			}
 		}
 	}
+	
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -331,6 +332,69 @@ public class ZSaberProjSwingState : CharState {
 				}
 				character.vel.y = -character.getJumpPower();
 				sprite = "projswing_air";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+}
+
+
+public class ZBusterX6 : CharState {
+	bool fired;
+	bool grounded;
+	bool shootProj;
+
+	Zero zero;
+	public ZBusterX6(
+		bool grounded, bool shootProj
+	) : base(
+		grounded ? "x6buster_air" : "x6buster", "", "", ""
+	) {
+		this.grounded = grounded;
+		landSprite = "x6buster";
+		this.shootProj = shootProj;
+		if (shootProj) {
+			superArmor = true;
+		}
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.grounded) {
+			if (player.input.isHeld(Control.Dash, player)) {
+				character.isDashing = true;
+			}
+			sprite = "x6buster_air";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+		}
+	
+			Point shootPos = character.getShootPos();
+		if (character.frameIndex >= 4 && !fired) {
+			fired = true;
+			character.playSound("buster2", sendRpc: true);
+			if (shootProj) {
+				if (player.weapon.ammo > 5){
+				player.weapon.ammo -= 5;
+				new ZBuster2Proj(player.weapon, shootPos, character.xDir, 0, character.player, player.getNextActorNetId(), rpc: true);
+				}
+			}
+		}
+
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "x6buster_air";
 				defaultSprite = sprite;
 				character.changeSpriteFromName(sprite, false);
 			}

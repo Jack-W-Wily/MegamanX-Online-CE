@@ -146,7 +146,7 @@ public class SelectWeaponMenu : IMainMenu {
 				cursors[selCursorIndex].cycleRight();
 			}
 		} else {
-			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, 1, playSound: true);
+			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, 2, playSound: true);
 		}
 
 		Helpers.menuUpDown(ref selCursorIndex, 0, 3);
@@ -168,7 +168,8 @@ public class SelectWeaponMenu : IMainMenu {
 				Options.main.xLoadout.melee = cursors[3].index;
 				if (Global.level?.mainPlayer != null) {
 					Global.level.mainPlayer.loadout.xLoadout.melee = cursors[3].index;
-					Global.level.mainPlayer.syncLoadout();
+					//Global.level.mainPlayer.syncLoadout();
+					Global.level.mainPlayer.forceKill();
 				}
 				shouldSave = true;
 			}
@@ -225,7 +226,7 @@ public class SelectWeaponMenu : IMainMenu {
 			if (i == 3) {
 				Fonts.drawText(FontType.Blue, "Special ", 40, yPos + 2, selected: selCursorIndex == i);
 
-				for (int j = 0; j < 2; j++) {
+				for (int j = 0; j < 3; j++) {
 					if (j == 0) {
 						Global.sprites["hud_weapon_icon"].drawToHUD(0, startX2 + (j * wepW), startY + (i * wepH));
 					} else if (j == 1) {
@@ -300,16 +301,23 @@ public class SelectWeaponMenu : IMainMenu {
 				Global.halfScreenW, 126, Alignment.Center
 			);
 			if (cursors[3].index == 0) {
-				Fonts.drawText(FontType.Blue, "X-Buster", Global.halfScreenW, 146, Alignment.Center);
+				Fonts.drawText(FontType.Blue, "Classic X", Global.halfScreenW, 146, Alignment.Center);
 				Fonts.drawText(
-					FontType.Green, "If no armor is equipped,\nSPECIAL will fire the X-Buster.",
+					FontType.Green, "Gets Stronger by Buying armorrs and can switch them midfight.",
 					Global.halfScreenW, wsy, Alignment.Center
 				);
 			}
 			if (cursors[3].index == 1) {
-				Fonts.drawText(FontType.Green, "Z-Saber", Global.halfScreenW, 146, Alignment.Center);
+				Fonts.drawText(FontType.Green, "X Kai", Global.halfScreenW, 146, Alignment.Center);
 				Fonts.drawText(
-					FontType.Blue,"If no armor is equipped,\nSPECIAL will swing the Z-Saber.",
+					FontType.Blue,"Gets Stronger by Stealinng powers from others.",
+					Global.halfScreenW, wsy, Alignment.Center
+				);
+			}
+				if (cursors[3].index == 2) {
+				Fonts.drawText(FontType.Green, "IX", Global.halfScreenW, 146, Alignment.Center);
+				Fonts.drawText(
+					FontType.Blue,"Gets Stronger overtime by stacking buffs.",
 					Global.halfScreenW, wsy, Alignment.Center
 				);
 			}

@@ -277,6 +277,8 @@ public class Sprite {
 		bool drawAxlArms = true;
 		bool hyperBusterReady = false;
 		bool isUPX = false;
+		bool isIX = false;
+		bool isRIX = false;
 		bool isLightX = false;
 		bool isGigaX = false;
 		bool isMaxX = false;
@@ -300,8 +302,10 @@ public class Sprite {
 			isGigaX = character.player.isX && character.player.hasFullGiga();
 			isMaxX = character.player.isX && character.player.hasAllX3Armor();
 			isForceX = character.player.isX && character.player.HasFullForce();
-			isUPX = character.player.isX && (character.isHyperXBS.getValue() || (character.sprite.name == "mmx_revive" && character.frameIndex > 3));
+			isUPX = character.player.isX && character.player.loadout.xLoadout.melee == 1;
+			isIX = character.player.isX && character.player.loadout.xLoadout.melee == 2;
 			isUltX = character.player.isX && character.hasUltimateArmorBS.getValue();
+			isRIX = character.player.isX && character.isReturnIXBS.getValue();
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;
@@ -548,6 +552,12 @@ public class Sprite {
 			bitmap = Global.textures["XUP"];
 		}
 
+		if (isIX) {
+			if (!isRIX){
+			bitmap = Global.textures["XIX"];
+			} else {bitmap = Global.textures["XRIX"];}
+		}
+
 		if (isLightX) {
 		bitmap = Global.textures["XLight"];
 		}
@@ -566,7 +576,7 @@ public class Sprite {
 
 		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 
-		if (isUPX) {
+		if (isUPX && isUltX ) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 			if (Global.isOnFrameCycle(5)) {
 				if (Global.shaderWrappers.ContainsKey("hit")) {

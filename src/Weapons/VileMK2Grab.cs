@@ -63,7 +63,7 @@ public class VileMK2GrabState : CharState {
 		}
 		if (character.sprite.name.Contains("raging") && character.frameIndex > 5 && hitcd > 0.2f){
 			hitcd =0;
-			character.playSound("armoredaCrash", sendRpc: true);
+			character.playSound("vilestomp", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 		damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);	
 		}

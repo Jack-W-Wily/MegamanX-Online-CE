@@ -222,7 +222,7 @@ public class HostMenu : IMainMenu {
 		foreach (var kvp in Global.levelDatas) {
 			var levelData = kvp.Value;
 			if (levelData.isMirrored || levelData.name.EndsWith("_inverted")) continue;
-			if (levelData.name == "nodetest") continue;
+			//if (levelData.name == "nodetest") continue;
 
 			if (!levelData.isCustomMap) {
 				if (levelData.is1v1() || levelData.isTraining()) smallMaps.Add(levelData);
@@ -461,7 +461,9 @@ public class HostMenu : IMainMenu {
 					(Point pos, int index) => {
 						string playToStr = "Play to: ";
 						if (selectedGameMode == GameMode.Elimination ||
-							selectedGameMode == GameMode.TeamElimination
+							selectedGameMode == GameMode.TeamElimination ||
+							selectedGameMode == GameMode.Nightmare
+							
 						) {
 							playToStr = "Lives: ";
 						}
@@ -516,7 +518,7 @@ public class HostMenu : IMainMenu {
 							timeLimitDirty = true;
 							timeLimit--;
 							int minimumTimeLimit = 0;
-							if (selectedGameMode == GameMode.ControlPoint || selectedGameMode == GameMode.KingOfTheHill || selectedGameMode == GameMode.Elimination || selectedGameMode == GameMode.TeamElimination) {
+							if (selectedGameMode == GameMode.ControlPoint || selectedGameMode == GameMode.KingOfTheHill || selectedGameMode == GameMode.Elimination || selectedGameMode == GameMode.TeamElimination || selectedGameMode == GameMode.Nightmare) {
 								if (!is1v1) {
 									minimumTimeLimit = 1;
 								}
@@ -727,17 +729,7 @@ public class HostMenu : IMainMenu {
 	}
 
 	public string[] mapSortOrder = new string[] {
-		"factory_md", "airport_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
-		"centralcomputer_1v1", "zerovirus_1v1", "sigma4_1v1", "dopplerlab_1v1", "sigma1_1v1",
-		"airport_1v1", "factory_1v1", "hunterbase_1v1", "forest_1v1", "highway", "highway2",
-		"bossroom", "powerplant", "factory", "gallery", "tower", "mountain", "ocean", "forest",
-		"forest2", "airport", "sigma", "sigma2", "japetribute_1v1", "training",
-		"maverickfactory", "weathercontrol", "dinosaurtank", "deepseabase", "volcaniczone",
-		"robotjunkyard", "desertbase", "desertbase2", "crystalmine", "centralcomputer",
-		"xhunter1", "xhunter2", "hunterbase", "highway2", "giantdam", "giantdam2",
-		"weaponsfactory", "frozentown", "aircraftcarrier", "powercenter", "shipyard",
-		"quarry", "safaripark", "dopplerlab", "hunterbase2",
-	};
+	"training","nodetest_md","nodetest",};
 	public int mapSortFunc(LevelData a, LevelData b) {
 		int aIndex = -1;
 		int bIndex = -1;
