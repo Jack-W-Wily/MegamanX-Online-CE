@@ -23,7 +23,7 @@ public class VoltCatfish : Maverick {
 		awardWeaponId = WeaponIds.TriadThunder;
 		weakWeaponId = WeaponIds.TunnelFang;
 		weakMaverickWeaponId = WeaponIds.TunnelRhino;
-
+		canClimbWall = true;
 		netActorCreateId = NetActorCreateId.VoltCatfish;
 		bouncedOnce = true;
 

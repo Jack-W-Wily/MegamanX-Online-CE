@@ -19,7 +19,7 @@ public class CrystalSnail : Maverick {
 		spriteToCollider.Add("shell_dash", getShellCollider());
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.CrystalHunter;
 		weakWeaponId = WeaponIds.MagnetMine;
 		weakMaverickWeaponId = WeaponIds.MagnetMine;

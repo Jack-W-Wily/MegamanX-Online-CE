@@ -20,7 +20,7 @@ public class TunnelRhino : Maverick {
 		spriteFrameToSounds["tunnelr_run/11"] = "walkStomp";
 
 		isHeavy = true;
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.TunnelFang;
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;

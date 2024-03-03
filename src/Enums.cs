@@ -283,10 +283,14 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
+	//New wcut weapons
+	DynamoBoomerang,
+	//>>>>>>>>
 	DNACore = 250
 }
 
 public enum ProjIds {
+	DynamoBoomerang,
 	Buster,
 	Buster2,
 	Buster3,

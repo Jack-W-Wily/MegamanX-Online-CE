@@ -15,7 +15,7 @@ public class FlameMammoth : Maverick {
 		stompWeapon = new FlameMStompWeapon(player);
 		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
 		isHeavy = true;
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.Tornado;
 		weakMaverickWeaponId = WeaponIds.StormEagle;

@@ -461,7 +461,11 @@ public partial class Player {
 						weapons = Weapon.getAllSigmaWeapons(this, sigmaForm).Select(w => w.clone()).ToList();
 					}
 				} else {
+					if (maverick1v1 != null) {
+					weapons = new List<Weapon>() {Weapon.getAllSigmaWeapons(this).Select(w => w.clone()).ToList()[maverick1v1.Value + 1] };
+					} else{	
 					weapons = loadout.sigmaLoadout.getWeaponsFromLoadout(this, Options.main.sigmaWeaponSlot);
+					}	
 				}
 
 				// Preserve HP on death so can summon for free until they die

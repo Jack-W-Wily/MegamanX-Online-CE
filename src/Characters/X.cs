@@ -628,13 +628,13 @@ public partial class MegamanX : Character {
 			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
 		if (player.isX && hadokenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) //player.scrap -= 1;
+			if (!player.hasAllItems()) //player.currency -= 1;
 			//player.fgMoveAmmo = 0;
 			changeState(new Hadouken(), true);
 			return true;
 		}
 		if (player.isX && shoryukenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) //player.scrap -= 1;
+			if (!player.hasAllItems()) //player.currency -= 1;
 			//layer.fgMoveAmmo = 0;
 			changeState(new Shoryuken(isUnderwater()), true);
 			return true;
@@ -1047,7 +1047,7 @@ public partial class MegamanX : Character {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new ZSaber(player), centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
 		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
@@ -1128,9 +1128,9 @@ public partial class MegamanX : Character {
 
 		// Bubble Teleport
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>
-		if (player.input.isHeld(Control.Special2, player) && player.scrap > 0){
+		if (player.input.isHeld(Control.Special2, player) && player.currency > 0){
 		jumpModifier += (chargedBubbles.Count / 6.0f) * 50;
-		player.scrap -= 1;
+		player.currency -= 1;
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>
 		return jumpModifier * base.getJumpModifier();

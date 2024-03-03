@@ -19,7 +19,7 @@ public class GravityBeetle : Maverick {
 		meleeWeapon = getMeleeWeapon(player);
 
 		isHeavy = true;
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.GravityWell;
 		weakWeaponId = WeaponIds.RaySplasher;
 		weakMaverickWeaponId = WeaponIds.NeonTGeneric;

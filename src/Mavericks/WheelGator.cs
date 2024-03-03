@@ -20,7 +20,7 @@ public class WheelGator : Maverick {
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
 		isHeavy = true;
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.SpinWheel;
 		weakWeaponId = WeaponIds.StrikeChain;
 		weakMaverickWeaponId = WeaponIds.WireSponge;

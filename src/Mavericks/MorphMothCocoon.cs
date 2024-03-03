@@ -10,7 +10,7 @@ public class MorphMothCocoon : Maverick {
 	public float currencyRegenTime;
 	public Point latchPos;
 	public float latchLen;
-	public int scrapAbsorbed;
+	public int currencyAbsorbed;
 	public bool isBurned { get { return sprite.name.Contains("_burn"); } }
 	public float smokeTime;
 
@@ -21,7 +21,7 @@ public class MorphMothCocoon : Maverick {
 
 		weapon = getWeapon();
 		angle = 0;
-
+		canClimbWall = true;
 		spriteToCollider["*_hang"] = getDashCollider();
 
 		awardWeaponId = WeaponIds.SilkShot;
@@ -53,8 +53,8 @@ public class MorphMothCocoon : Maverick {
 			addRenderEffect(RenderEffectType.Hit);
 		}
 
-		xScale = 1 + (scrapAbsorbed / 64f);
-		yScale = 1 + (scrapAbsorbed / 64f);
+		xScale = 1 + (currencyAbsorbed / 64f);
+		yScale = 1 + (currencyAbsorbed / 64f);
 
 		if (!ownedByLocalPlayer) return;
 
@@ -82,7 +82,7 @@ public class MorphMothCocoon : Maverick {
 			angle = 0;
 		}
 
-		if ((health < maxHealth * 0.5f && health > 0) || scrapAbsorbed >= 32) {
+		if ((health < maxHealth * 0.5f && health > 0) || currencyAbsorbed >= 32) {
 			if (selfDestructTime == 0) {
 				selfDestructTime = 0.1f;
 				playSound("morphmMorph", sendRpc: true);
@@ -178,10 +178,10 @@ public class MorphMothCocoon : Maverick {
 		if (proj.projId == (int)ProjIds.MorphMCSpin) {
 			float damage = 1;
 			int flinch = 0;
-			if (deltaPos.magnitude > 300 * Global.spf * Helpers.progress(scrapAbsorbed, 32f)) {
+			if (deltaPos.magnitude > 300 * Global.spf * Helpers.progress(currencyAbsorbed, 32f)) {
 				damage = 4;
 				flinch = Global.defFlinch;
-			} else if (deltaPos.magnitude > 200 * Global.spf * Helpers.progress(scrapAbsorbed, 32f)) {
+			} else if (deltaPos.magnitude > 200 * Global.spf * Helpers.progress(currencyAbsorbed, 32f)) {
 				damage = 2;
 				flinch = Global.halfFlinch;
 			}
@@ -227,9 +227,9 @@ public class MorphMothCocoon : Maverick {
 	}
 
 	public void absorbScrap() {
-		scrapAbsorbed++;
-		if (scrapAbsorbed > 32) {
-			scrapAbsorbed = 32;
+		currencyAbsorbed++;
+		if (currencyAbsorbed > 32) {
+			currencyAbsorbed = 32;
 		}
 	}
 

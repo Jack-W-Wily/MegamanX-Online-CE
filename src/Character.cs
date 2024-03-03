@@ -86,6 +86,7 @@ public partial class Character : Actor, IDamagable {
 	public bool stockedX3Buster;
 
 	public float xSaberCooldown;
+	public float useGrabCooldown;
 	public float stockedChargeFlashTime;
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
@@ -497,7 +498,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isSoftLocked() {
 		if (charState is WarpOut) return true;
 		if (player.currentMaverick != null) return false;
-		//if (player.weapon is MaverickWeapon mw && mw.isMenuOpened) return true;
+		if (!Options.main.maverickStartFollow && player.weapon is MaverickWeapon mw && mw.isMenuOpened) return true;
 		return false;
 	}
 
@@ -877,12 +878,14 @@ public partial class Character : Actor, IDamagable {
 			camOffsetX = Helpers.lerp(camOffsetX, 0, Global.spf * 10);
 			camOffsetX = MathF.Round(camOffsetX);
 		}
-
+		Helpers.decrementTime(ref useGrabCooldown);
+		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
 		Helpers.decrementTime(ref parryCooldown);
 		Helpers.decrementTime(ref JumpCancelTime);
 
+		if (sprite.name.Contains("_grab")) useGrabCooldown = 1.5f;
 		if (ownedByLocalPlayer && player.possessedTime > 0) {
 			player.possesseeUpdate();
 		}
@@ -1492,7 +1495,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool isSpawning() {
-		return sprite.name.Contains("warp_in") || !visible || (player.isVile && isInvulnBS.getValue());
+		return	 charState is WarpIn;// sprite.name.Contains("warp_in") || !visible || (player.isVile && isInvulnBS.getValue());
 	}
 
 	public Point getCharRideArmorPos() {

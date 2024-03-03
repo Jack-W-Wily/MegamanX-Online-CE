@@ -21,7 +21,7 @@ public class ChillPenguin : Maverick {
 		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		spriteToCollider.Add("slide", getDashCollider());
-
+		canClimbWall = true;
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);
 
 		awardWeaponId = WeaponIds.ShotgunIce;

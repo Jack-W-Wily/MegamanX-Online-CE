@@ -447,7 +447,7 @@ public class Axl : Character {
 			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
-				/* if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
+				/* if (isCharging() && getChargeLevel() >= 3 && player.currency >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
 					if (player.axlHyperMode == 0) {
 						changeState(new HyperAxlStart(grounded), true);
 					} else {
@@ -771,7 +771,7 @@ public class Axl : Character {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new ZSaber(player), centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
 		return proj;

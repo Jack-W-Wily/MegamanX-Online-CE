@@ -393,7 +393,7 @@ public abstract class BaseSigma : Character {
 		if (player.currentMaverick != null) {
 			return;
 		}
-		if (player.weapon is MaverickWeapon && (
+		if (!Options.main.maverickStartFollow && player.weapon is MaverickWeapon && (
 			player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))
 		) {
 			return;
@@ -440,7 +440,14 @@ public abstract class BaseSigma : Character {
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+		
 		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
+			if (frameIndex == 2){
+			return new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
+				1, 10, 1, isDeflectShield: true
+			);
+		}
 			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true

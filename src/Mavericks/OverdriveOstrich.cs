@@ -18,7 +18,7 @@ public class OverdriveOstrich : Maverick {
 		stateCooldowns.Add(typeof(OverdriveOJumpKickState), new MaverickStateCooldown(true, true, 1f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.SonicSlicer;
 		weakWeaponId = WeaponIds.CrystalHunter;
 		weakMaverickWeaponId = WeaponIds.CrystalSnail;

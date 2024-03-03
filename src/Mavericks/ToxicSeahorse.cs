@@ -21,7 +21,7 @@ public class ToxicSeahorse : Maverick {
 		weakMaverickWeaponId = WeaponIds.BlizzardBuffalo;
 
 		spriteToCollider["teleport"] = getDashCollider(1, 0.25f);
-
+		canClimbWall = true;
 		netActorCreateId = NetActorCreateId.ToxicSeahorse;
 		netOwner = player;
 		if (sendRpc) {

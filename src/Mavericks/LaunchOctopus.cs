@@ -22,7 +22,7 @@ public class LaunchOctopus : Maverick {
 		stateCooldowns.Add(typeof(LaunchOWhirlpoolState), new MaverickStateCooldown(false, false, 2));
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.Torpedo;
 		weakWeaponId = WeaponIds.RollingShield;
 		weakMaverickWeaponId = WeaponIds.ArmoredArmadillo;

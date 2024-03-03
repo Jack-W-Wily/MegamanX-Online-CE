@@ -16,7 +16,7 @@ public class NeonTiger : Maverick {
 		weapon = getWeapon();
 
 		canClimbWall = true;
-
+		
 		awardWeaponId = WeaponIds.RaySplasher;
 		weakWeaponId = WeaponIds.SpinningBlade;
 		weakMaverickWeaponId = WeaponIds.CrushCrawfish;

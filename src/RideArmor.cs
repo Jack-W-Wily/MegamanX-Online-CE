@@ -336,8 +336,9 @@ public class RideArmor : Actor, IDamagable {
 		*/
 
 		if (pos.y > Global.level.killY) {
-			incPos(new Point(0, 50));
-			applyDamage(null, null, Damager.envKillDamage, null);
+		//	incPos(new Point(0, 50));
+		destroySelf();
+		//	applyDamage(null, null, Damager.envKillDamage, null);
 		}
 
 		if (grabbedCharacter != null && !string.IsNullOrEmpty(rideArmorState.carrySprite) && !isAttacking()) {

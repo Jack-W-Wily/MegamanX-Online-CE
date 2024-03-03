@@ -20,10 +20,10 @@ public class BoomerangKuwanger : Maverick {
 		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
 
-		gravityModifier = 1.25f;
+		gravityModifier = 2.25f;
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.Boomerang;
 		weakWeaponId = WeaponIds.Torpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;

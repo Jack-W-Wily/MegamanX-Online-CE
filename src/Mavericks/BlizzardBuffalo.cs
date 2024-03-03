@@ -18,7 +18,7 @@ public class BlizzardBuffalo : Maverick {
 		isHeavy = true;
 		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
 		spriteFrameToSounds["bbuffalo_run/6"] = "walkStomp";
-
+		canClimbWall = true;
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
 

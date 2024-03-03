@@ -22,7 +22,7 @@ public class MagnaCentipede : Maverick {
 		stateCooldowns.Add(typeof(MagnaCDrainState), new MaverickStateCooldown(true, false, 2f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.MagnetMine;
 		weakWeaponId = WeaponIds.SilkShot;
 		weakMaverickWeaponId = WeaponIds.MorphMoth;
@@ -272,7 +272,6 @@ public class MagnaCMagnetMineParent : Actor {
 		this.maverick = maverick;
 		useGravity = false;
 		originOffset = pos.subtract(maverick.pos);
-
 		var player = maverick.player;
 		pieces.Add(new MagnaCMagnetMineProj(maverick.weapon, pos, new Point(-5 * maverick.xDir, -5), 0, player, player.getNextActorNetId(), rpc: true));
 		pieces.Add(new MagnaCMagnetMineProj(maverick.weapon, pos, new Point(0, 0), 90, player, player.getNextActorNetId(), rpc: true));

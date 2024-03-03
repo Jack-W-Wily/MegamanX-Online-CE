@@ -403,7 +403,8 @@ public class Damager {
 			if (projectileFlinchCooldowns.ContainsKey(projId)) {
 				flinchCooldown = projectileFlinchCooldowns[projId];
 			}
-
+	//I took off BZ dmg buffs from wcut for obvious reaons
+/* 
 			if (owner.character is Zero zero && zero.isBlackZero() && projId != (int)ProjIds.Burn) {
 				if (flinch >= Global.halfFlinch) {
 					flinch = Global.defFlinch;
@@ -413,7 +414,7 @@ public class Damager {
 				}
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
-
+*/
 			if (flinchCooldown > 0) {
 				int flinchKey = getFlinchKeyFromProjId(projId);
 				if (!character.flinchCooldown.ContainsKey(flinchKey)) {

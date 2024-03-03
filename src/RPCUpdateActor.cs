@@ -180,7 +180,7 @@ public partial class Actor {
 			} else if (this is WheelGator wg) {
 				args.Add((byte)(int)(wg.damageEaten * 10));
 			} else if (this is MorphMothCocoon mmc) {
-				args.Add((byte)mmc.scrapAbsorbed);
+				args.Add((byte)mmc.currencyAbsorbed);
 				byte[] xBytes = BitConverter.GetBytes(mmc.latchPos.x);
 				args.AddRange(xBytes);
 				byte[] yBytes = BitConverter.GetBytes(mmc.latchPos.y);
@@ -496,8 +496,8 @@ public class RPCUpdateActor : RPC {
 						int damageEaten = arguments[i++];
 						wg.damageEaten = damageEaten / 10f;
 					} else if (actor is MorphMothCocoon mmc) {
-						int scrapAbsorbed = arguments[i++];
-						mmc.scrapAbsorbed = scrapAbsorbed;
+						int currencyAbsorbed = arguments[i++];
+						mmc.currencyAbsorbed = currencyAbsorbed;
 
 						float latchPosX = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
 						i += 4;

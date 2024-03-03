@@ -13,7 +13,7 @@ public class CrushCrawfish : Maverick {
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.SpinningBlade;
 		weakWeaponId = WeaponIds.TriadThunder;
 		weakMaverickWeaponId = WeaponIds.VoltCatfish;

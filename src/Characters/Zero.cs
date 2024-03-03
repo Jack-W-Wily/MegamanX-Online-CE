@@ -814,8 +814,8 @@ public class Zero : Character {
 		if (isAwakenedZero()) {
 			var proj = new ShingetsurinProj(new Shingetsurin(player), shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true);
 			playSound("saber3", sendRpc: true);
-			player.scrap -= 1;
-			if (player.scrap < 0) player.scrap = 0;
+			player.currency -= 1;
+			if (player.currency < 0) player.currency = 0;
 			if (chargeLevel >= 2) {
 				Global.level.delayedActions.Add(new DelayedAction(() => {
 					var proj = new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.15f, player, player.getNextActorNetId(), rpc: true);
@@ -872,7 +872,7 @@ public class Zero : Character {
 				);
 				zeroLemonsOnField.Add(lemon);
 			} else if (chargeLevel == 1) {
-				if (type == 0) player.scrap -= 1;
+				if (type == 0) player.currency -= 1;
 				if (type != 2) playSound("zbuster2", sendRpc: true);
 				zeroLemonCooldown = 0.375f;
 				if (type == 2) changeState(new ZBusterX6(grounded, true), true);
@@ -881,7 +881,7 @@ public class Zero : Character {
 				);}
 			} else if (chargeLevel == 2) {
 				if (type != 2){
-				if (type == 0) player.scrap -= 1;
+				if (type == 0) player.currency -= 1;
 				zeroLemonCooldown = 0.375f;
 				if (!player.isZBusterZero()) {
 					playSound("zbuster3", sendRpc: true);
@@ -897,7 +897,7 @@ public class Zero : Character {
 				} else {changeState(new ZBusterX6(grounded, true), true);}
 			} else if (chargeLevel == 3 || chargeLevel >= 4) {
 				if (type != 2){
-				if (type == 0) player.scrap -= 1;
+				if (type == 0) player.currency -= 1;
 				if (chargeLevel == 3 && player.isZBusterZero()) {
 					changeState(new ZeroDoubleBuster(false, true), true);
 					//playSound("zbuster2", sendRpc: true);

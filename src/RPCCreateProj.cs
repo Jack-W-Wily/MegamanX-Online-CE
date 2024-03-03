@@ -156,7 +156,9 @@ public partial class RPCCreateProj : RPC {
 			proj = new MK2NapalmWallProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.Napalm2Flame) {
 			proj = new MK2NapalmFlame(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
-		} else if (projId == (int)ProjIds.RocketPunch) {
+		} else if (projId == (int)ProjIds.DynamoBoomerang) {
+			proj = new DynamoBoomerangProj(new DynamoBoomerang(), pos, xDir, player, netProjByte);
+		}else if (projId == (int)ProjIds.RocketPunch) {
 			proj = new RocketPunchProj(new RocketPunch(RocketPunchType.GoGetterRight), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.SpoiledBrat) {
 			proj = new RocketPunchProj(new RocketPunch(RocketPunchType.SpoiledBrat), pos, xDir, player, netProjByte);

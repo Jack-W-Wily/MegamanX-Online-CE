@@ -19,7 +19,7 @@ public class WireSponge : Maverick {
 		stateCooldowns.Add(typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(WSpongeLightningState), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(WSpongeChainSpinState), new MaverickStateCooldown(false, true, 0.75f));
-
+		canClimbWall = true;
 		weapon = getWeapon();
 		chainWeapon = getChainWeapon(player);
 

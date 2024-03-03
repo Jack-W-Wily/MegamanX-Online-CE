@@ -20,7 +20,7 @@ public class StormEagle : Maverick {
 		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.Tornado;
 		weakWeaponId = WeaponIds.Sting;
 		weakMaverickWeaponId = WeaponIds.StingChameleon;

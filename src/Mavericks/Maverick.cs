@@ -220,6 +220,22 @@ public class Maverick : Actor, IDamagable {
 				flyBar += 1 * Global.speedMul;
 				if (flyBar > maxFlyBar) { flyBar = maxFlyBar; }
 			}
+
+		 if (player.input.isPressed(Control.Down,player) && !canClimb)
+			{
+				checkLadderDown = true;
+				List<CollideData> ladders2 = Global.level.getTriggerList(this, 0f, 1f, null, typeof(Ladder));
+				if (ladders2.Count > 0)
+				{
+				Rect rect2 = ladders2[0].otherCollider.shape.getRect();
+				float xDist2 = (rect2.x1 + rect2.x2) / 2f - pos.x;
+					if (MathF.Abs(xDist2) < 10f && Global.level.checkCollisionActor(this, xDist2, 30f) == null)
+					{
+						move(new Point(xDist2, 1f), useDeltaTime: false);
+					}
+				}
+				checkLadderDown = false;
+			}
 		}
 
 		if (ammo >= maxAmmo) {
@@ -273,8 +289,13 @@ public class Maverick : Actor, IDamagable {
 		if (!ownedByLocalPlayer) return;
 
 		if (pos.y > Global.level.killY && state is not MEnter && state is not MExit) {
+			if (player.isPuppeteer()){
+
+			destroySelf();
+			} else {
 			incPos(new Point(0, 50));
 			applyDamage(null, null, Damager.envKillDamage, null);
+			}
 		}
 
 		if (autoExit) {
@@ -544,11 +565,11 @@ public class Maverick : Actor, IDamagable {
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		var retProjs = new Dictionary<int, Func<Projectile>>();
 
-		if (globalCollider != null && Global.level.is1v1() && player.maverick1v1 != null && (sprite.name.Contains("_jump") || sprite.name.Contains("_fall"))) {
+		if (globalCollider != null && player.maverick1v1 != null && (sprite.name.Contains("_jump") || sprite.name.Contains("_fall"))) {
 			retProjs[(int)ProjIds.MaverickContactDamage] = () => {
 				Point centerPoint = globalCollider.shape.getRect().center();
-				float damage = 3;
-				int flinch = 0;
+				float damage = 1;
+				int flinch = 4;
 				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch, 0.5f);
 				proj.globalCollider = globalCollider.clone();
 				return proj;

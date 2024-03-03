@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class Vile : Character {
 	public float vulcanLingerTime;
-	public const int callNewMechScrapCost = 0;
+	public const int callNewMechCost = 0;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public float vileLadderShootCooldown;
@@ -322,7 +322,7 @@ public class Vile : Character {
 			charState is DarkHoldState || charState is HexaInvoluteState || charState is CallDownMech || charState is NapalmAttack) return;
 
 		if (charState is Dash || charState is AirDash) {
-			if ((player.input.isHeld(Control.Shoot, player))) {
+			if (useGrabCooldown == 0 && (player.input.isHeld(Control.Shoot, player))) {
 				charState.isGrabbing = true;
 				charState.superArmor = true;
 				changeSpriteFromName("dash_grab", true);

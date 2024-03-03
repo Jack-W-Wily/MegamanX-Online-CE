@@ -20,7 +20,7 @@ public class Velguarder : Maverick {
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
 
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
-
+		canClimbWall = true;
 		netActorCreateId = NetActorCreateId.Velguarder;
 		netOwner = player;
 		if (sendRpc) {

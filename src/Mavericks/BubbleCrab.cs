@@ -20,7 +20,7 @@ public class BubbleCrab : Maverick {
 		//stateCooldowns.Add(typeof(BCrabShieldStartState), new MaverickStateCooldown(false, true, 0.75f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.BubbleSplash;
 		weakWeaponId = WeaponIds.SpinWheel;
 		weakMaverickWeaponId = WeaponIds.WheelGator;

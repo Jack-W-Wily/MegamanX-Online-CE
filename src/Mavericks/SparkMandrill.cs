@@ -34,7 +34,7 @@ public class SparkMandrill : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
-
+		canClimbWall = true;
 		usesAmmo = false;
 		canHealAmmo = false;
 		ammo = 32;
