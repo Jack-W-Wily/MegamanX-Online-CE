@@ -61,6 +61,7 @@ public class Server {
 	[ProtoMember(30)] public bool disableHtSt;
 	[ProtoMember(31)] public bool disableVehicles;
 	[ProtoMember(32)] public bool isP2P;
+	[ProtoMember(33)] public byte teamNum = 2;
 
 	[JsonIgnore]
 	public int redScore;
@@ -82,7 +83,7 @@ public class Server {
 	public Dictionary<string, int> weaponKillStats = new Dictionary<string, int>();
 	[JsonIgnore]
 	public long uniqueID = 0;
-	
+
 	private bool shutdownVar;
 	private long iterations = 0;
 	private long lastUpdateTime = 0L;
@@ -229,24 +230,7 @@ public class Server {
 			if (serverPlayer.preferredAlliance != null) {
 				serverPlayer.alliance = serverPlayer.preferredAlliance.Value;
 			} else {
-				GameMode.getAllianceCounts(players, out int redCount, out int blueCount);
-				if (redCount < blueCount) serverPlayer.alliance = GameMode.redAlliance;
-				else if (blueCount < redCount) serverPlayer.alliance = GameMode.blueAlliance;
-				else {
-					if (Global.debug) {
-						serverPlayer.alliance = GameMode.blueAlliance;
-					} else {
-						if (redScore > blueScore) {
-							serverPlayer.alliance = GameMode.blueAlliance;
-						} else if (redScore < blueScore) {
-							serverPlayer.alliance = GameMode.redAlliance;
-						} else {
-							serverPlayer.alliance = (
-								Helpers.randomRange(0, 1) == 0 ? GameMode.blueAlliance : GameMode.redAlliance
-							);
-						}
-					}
-				}
+				serverPlayer.alliance = getMatchInitAutobalanceTeam(players);;
 			}
 		} else {
 			serverPlayer.alliance = serverPlayer.id;
@@ -272,9 +256,11 @@ public class Server {
 		if (!hidden && GameMode.isStringTeamMode(gameMode) &&
 			gameMode != GameMode.TeamElimination && level != "training"
 		) {
-			GameMode.getAllianceCounts(players, out int redCount, out int blueCount);
-			bool tooManyReds = redCount > blueCount + 1;
-			bool tooManyBlues = blueCount > redCount + 1;
+			int[] teamSizes = GameMode.getAllianceCounts(players);
+			int biggerTeam = teamSizes.Max();
+			int smallerTeam = teamSizes.Min();
+			// Check if a team has +2 characters than other team to move 1.
+			bool areTeamsUnbalanced = (biggerTeam - 1 > smallerTeam);
 
 			if (playerToAutobalance != null) {
 				// Player left match
@@ -287,23 +273,20 @@ public class Server {
 					playerToAutobalance = null;
 				}
 				// Teams no longer unbalanced
-				else if (!tooManyReds && !tooManyBlues) {
+				else if (!areTeamsUnbalanced) {
 					playerToAutobalance.autobalanceAlliance = null;
 					playerToAutobalance = null;
 				}
-			} else {
-				if (tooManyReds) {
+			} else if (areTeamsUnbalanced) {
+				int lowerCharTeam = getAutobalanceTeam(teamSizes);
+				if (lowerCharTeam >= 0) {
 					playerToAutobalance = (
-						selectPlayerToAutobalance(GameMode.redAlliance, prioritizedAutobalancePlayer)
+						selectPlayerToAutobalance(lowerCharTeam, prioritizedAutobalancePlayer)
 					);
-					if (!playerToAutobalance.isBot) playerToAutobalance.alreadyAutobalanced = true;
-					playerToAutobalance.autobalanceAlliance = GameMode.blueAlliance;
-				} else if (tooManyBlues) {
-					playerToAutobalance = (
-						selectPlayerToAutobalance(GameMode.blueAlliance, prioritizedAutobalancePlayer)
-					);
-					if (!playerToAutobalance.isBot) playerToAutobalance.alreadyAutobalanced = true;
-					playerToAutobalance.autobalanceAlliance = GameMode.redAlliance;
+					if (!playerToAutobalance.isBot) {
+						playerToAutobalance.alreadyAutobalanced = true;
+					}
+					playerToAutobalance.autobalanceAlliance = lowerCharTeam;
 				}
 			}
 		}
@@ -311,6 +294,75 @@ public class Server {
 		var syncModel = new PeriodicServerSyncModel() { players = players };
 		byte[] bytes = Helpers.serialize(syncModel);
 		RPC.periodicServerSync.sendFromServer(s_server, bytes);
+	}
+
+	// Returns the lower player count team.
+	// Returns -1 if there is not posible to autobalance.
+	public static int getAutobalanceTeam(int[] teamSizes) {
+		int biggerTeam = teamSizes.Max();
+		int smallerTeam = teamSizes.Min();
+		int lowerCharTeam = Array.IndexOf(teamSizes, smallerTeam);
+		// Avoid putting people in 1 player teams if we have more than 3.
+		if (teamSizes.Length >= 3 && smallerTeam == 0) {
+			if (biggerTeam <= 2) {
+				lowerCharTeam = -1;
+			} else {
+				int teamsWithPeople = 0;
+				int ogLowerTeam = lowerCharTeam;
+				smallerTeam = biggerTeam;
+				lowerCharTeam = -1;
+				for (int i = 0; i < teamSizes.Length; i++) {
+					if (teamSizes[i] > 0) {
+						teamsWithPeople++;
+					}
+					if (teamSizes[i] < smallerTeam) {
+						smallerTeam = teamSizes[i];
+						lowerCharTeam = i;
+					}
+				}
+				if (teamsWithPeople < 2) {
+					lowerCharTeam = ogLowerTeam;
+				}
+			}
+		}
+		if (lowerCharTeam >= 0) {
+			return lowerCharTeam;
+		}
+		return -1;
+	}
+
+	public static int getMatchInitAutobalanceTeam(List<Player> players) {
+		int[] teamSizes = GameMode.getAllianceCounts(players);
+		int biggerTeam = teamSizes.Max();
+		int smallerTeam = teamSizes.Min();
+		if (biggerTeam == smallerTeam) {
+			return Helpers.randomRange(0, teamSizes.Length - 1);
+		}
+		// We try to use autobalance rules if posible.
+		int lowerCharTeam = getAutobalanceTeam(teamSizes);
+		if (lowerCharTeam >= 0) {
+			return lowerCharTeam;
+		}
+		// We search for the first lower char team
+		// if is not really posible to autobalance this out.
+		return Array.IndexOf(teamSizes, smallerTeam);
+	}
+
+	public static int getMatchInitAutobalanceTeam(List<ServerPlayer> players) {
+		int[] teamSizes = GameMode.getAllianceCounts(players);
+		int biggerTeam = teamSizes.Max();
+		int smallerTeam = teamSizes.Min();
+		if (biggerTeam == smallerTeam) {
+			return Helpers.randomRange(0, teamSizes.Length - 1);
+		}
+		// We try to use autobalance rules if posible.
+		int lowerCharTeam = getAutobalanceTeam(teamSizes);
+		if (lowerCharTeam >= 0) {
+			return lowerCharTeam;
+		}
+		// We search for the first lower char team
+		// if is not really posible to autobalance this out.
+		return Array.IndexOf(teamSizes, smallerTeam);
 	}
 
 	public ServerPlayer selectPlayerToAutobalance(
@@ -591,10 +643,16 @@ public class Server {
 			for (int i = 0; i < botCount; i++) {
 				var cpuData = extraCpuCharData.cpuDatas.ElementAtOrDefault(i);
 				int? overrideCharNum = null;
-				if (cpuData != null && !cpuData.isRandom) overrideCharNum = cpuData?.charNum;
-				int? overrideAlliance = (
-					GameMode.isStringTeamMode(gameMode) && cpuData?.alliance >= 0 ? cpuData?.alliance : null
-				);
+				if (cpuData != null && !cpuData.isRandom) {
+					overrideCharNum = cpuData?.charNum;
+				}
+				int? overrideAlliance = null;
+				if (GameMode.isStringTeamMode(gameMode) &&
+					cpuData != null &&
+					cpuData?.alliance >= 0
+				) {
+					overrideAlliance = cpuData?.alliance;
+				};
 				addPlayer("BOT", playerContract, im.SenderConnection, true, overrideCharNum, overrideAlliance);
 			}
 		}
@@ -762,7 +820,9 @@ public class Server {
 				if (charNum == 255) charNum = Helpers.randomRange(0, 3);
 				int? preferredAlliance = null;
 
-				if (team == 0 || team == 1) preferredAlliance = team;
+				if (team >= 0 && team <= teamNum) {
+					preferredAlliance = team;
+				}
 				var serverPlayer = new ServerPlayer(
 					"BOT", 0, false, charNum, preferredAlliance, "", im.SenderConnection, host?.startPing
 				);
@@ -836,8 +896,7 @@ public class Server {
 			if ((gameMode == GameMode.CTF || gameMode == GameMode.TeamDeathmatch) &&
 				rpcIndexByte == RPC.templates.IndexOf(RPC.syncTeamScores)
 			) {
-				redScore = bytes[0];
-				blueScore = bytes[1];
+				Global.level.gameMode.teamPoints = bytes;
 			}
 		} else {
 			var message = im.ReadString();

@@ -523,7 +523,12 @@ public partial class Level {
 						netId = cp1NetId;
 						int captureTime = 30;
 						float offsetY = 0;
-						hill = new ControlPoint(GameMode.neutralAlliance, pos, 1, true, captureTime, 0, netId, isHost) { yOff = offsetY };
+						hill = new ControlPoint(
+							GameMode.neutralAlliance, pos, 1, true,
+							captureTime, 0, netId, isHost
+						) {
+							yOff = offsetY
+						};
 					}
 				}
 			} else if (objectName == "Node") {
@@ -753,7 +758,7 @@ public partial class Level {
 				if (!gameMode.isTeamMode) {
 					alliance = id;
 				} else {
-					alliance = (i + mainPlayer.serverPlayer.alliance + 1) % 2;
+					alliance = Server.getMatchInitAutobalanceTeam(players);;
 				}
 
 				if (equalCharDistribution) {
@@ -778,7 +783,9 @@ public partial class Level {
 				// Overrides from 1v1 select character menu
 				if (i < cpuDatas.Count) {
 					if (!cpuDatas[i].isRandom) charNum = cpuDatas[i].charNum;
-					if (gameMode.isTeamMode && cpuDatas[i].alliance >= 0) alliance = cpuDatas[i].alliance;
+					if (gameMode.isTeamMode && cpuDatas[i].alliance >= 0) {
+						alliance = cpuDatas[i].alliance;
+					}
 				}
 				playerData = cpuDatas.InRange(i) ? cpuDatas[i] : null;
 
@@ -794,7 +801,8 @@ public partial class Level {
 				}
 
 				var cpu = new Player(
-					"CPU" + (i + 1).ToString(), id, charNum, playerData, true, true, alliance, new Input(true), null
+					"CPU" + (i + 1).ToString(), id, charNum,
+					playerData, true, true, alliance, new Input(true), null
 				);
 				players.Add(cpu);
 			}

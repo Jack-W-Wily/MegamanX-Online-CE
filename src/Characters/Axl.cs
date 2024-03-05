@@ -1342,7 +1342,11 @@ public class Axl : Character {
 				}
 				DrawWrappers.DeferTextDraw(() =>
 				{
-					Helpers.drawTextStd("Reload:" + player.weapon.rechargeCooldown.ToString("0.0"), textPosX, textPosY, Alignment.Center, fontSize: 20, outlineColor: Helpers.getAllianceColor());
+					Helpers.drawTextStd(
+						"Reload:" + player.weapon.rechargeCooldown.ToString("0.0"),
+						textPosX, textPosY, Alignment.Center, fontSize: 20,
+						outlineColor: Helpers.getAllianceColor()
+					);
 				});
 			}
 		}
