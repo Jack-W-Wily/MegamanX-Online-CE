@@ -20,7 +20,7 @@ public class BoomerangKuwanger : Maverick {
 		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
 
-		gravityModifier = 2.25f;
+		//gravityModifier = 2.25f;
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
 		canClimbWall = true;
@@ -56,7 +56,7 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun || state is BoomerKDashState) {
+			if (state is MIdle || state is MRun ||state is MJump || state is MFall || state is BoomerKDashState) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;
@@ -71,7 +71,10 @@ public class BoomerangKuwanger : Maverick {
 				if (shootPressed() && !bald) {
 					changeState(getShootState());
 				} else if (specialPressed() && !bald) {
+					if (ammo >= 8) {
+						deductAmmo(8);
 					changeState(new BoomerKDeadLiftState());
+					}
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
 						deductAmmo(8);
@@ -460,6 +463,17 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 			if (launchTime > 0.33f) {
 				character.changeToIdleOrFall();
 				return;
+			}
+
+			for (int i = 1; i <= 4; i++) {
+						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
+						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+							player.health -= 3;
+							character.playSound("crash", sendRpc: true);
+							character.shakeCamera(sendRpc: true);
+							//return;
+						}
 			}
 			if (character.stopCeiling()) {
 				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);

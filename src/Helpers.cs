@@ -392,6 +392,86 @@ public class Helpers {
 		return genericPaletteShader;
 	}
 
+	public static ShaderWrapper clonethundergodrageShader(string textureName)
+	{
+		Texture texture = Global.textures[textureName];
+		ShaderWrapper shaderWrapper = cloneShaderSafe("thundergodrage");
+		shaderWrapper?.SetUniform("paletteTexture", texture);
+		shaderWrapper?.SetUniform("palette", 1);
+		shaderWrapper?.SetUniform("rows", texture.Size.Y);
+		if (shaderWrapper != null)
+		{
+			shaderWrapper.SetUniform("cols", texture.Size.X);
+			return shaderWrapper;
+		}
+		return shaderWrapper;
+	}
+
+
+	
+public static ShaderWrapper exvileShader(string textureName)
+	{
+		Texture texture = Global.textures[textureName];
+		ShaderWrapper shaderWrapper = cloneShaderSafe("exvile");
+		shaderWrapper?.SetUniform("paletteTexture", texture);
+		shaderWrapper?.SetUniform("palette", 1);
+		shaderWrapper?.SetUniform("rows", texture.Size.Y);
+		if (shaderWrapper != null)
+		{
+			shaderWrapper.SetUniform("cols", texture.Size.X);
+			return shaderWrapper;
+		}
+		return shaderWrapper;
+	}
+
+
+	
+public static ShaderWrapper cloneexvileShader(string textureName)
+	{
+		Texture texture = Global.textures[textureName];
+		ShaderWrapper shaderWrapper = cloneShaderSafe("exvile");
+		shaderWrapper?.SetUniform("paletteTexture", texture);
+		shaderWrapper?.SetUniform("palette", 1);
+		shaderWrapper?.SetUniform("rows", texture.Size.Y);
+		if (shaderWrapper != null)
+		{
+			shaderWrapper.SetUniform("cols", texture.Size.X);
+			return shaderWrapper;
+		}
+		return shaderWrapper;
+	}
+
+public static ShaderWrapper clonePhoenixflameShader(string textureName)
+	{
+		Texture texture = Global.textures[textureName];
+		ShaderWrapper shaderWrapper = cloneShaderSafe("phoenixflame");
+		shaderWrapper?.SetUniform("paletteTexture", texture);
+		shaderWrapper?.SetUniform("palette", 1);
+		shaderWrapper?.SetUniform("rows", texture.Size.Y);
+		if (shaderWrapper != null)
+		{
+			shaderWrapper.SetUniform("cols", texture.Size.X);
+			return shaderWrapper;
+		}
+		return shaderWrapper;
+	}
+
+
+public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
+	{
+		Texture texture = Global.textures[textureName];
+		ShaderWrapper shaderWrapper = cloneShaderSafe("infernalcapacity");
+		shaderWrapper?.SetUniform("paletteTexture", texture);
+		shaderWrapper?.SetUniform("palette", 1);
+		shaderWrapper?.SetUniform("rows", texture.Size.Y);
+		if (shaderWrapper != null)
+		{
+			shaderWrapper.SetUniform("cols", texture.Size.X);
+			return shaderWrapper;
+		}
+		return shaderWrapper;
+	}
+	
 	public static float toZero(float num, float inc, int dir) {
 		if (dir == 1) {
 			num -= inc;

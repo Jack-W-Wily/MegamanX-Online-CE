@@ -266,7 +266,7 @@ public class TriadThunderProjCharged : Projectile {
 
 	public override void update() {
 		base.update();
-		updateWallCrawl();
+		//updateWallCrawl();
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {

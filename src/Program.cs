@@ -237,7 +237,7 @@ class Program {
 
 		//>>>>>>>>>>>>>>>>>>>>>>>
 		// Menu music
-		if (Options.main.preferredCharacter == 0){
+		if (Options.main.preferredCharacter >= 3 || Options.main.preferredCharacter == 0 ){
 		Global.changeMusic("menu");	
 		}
 		if (Options.main.preferredCharacter == 1){

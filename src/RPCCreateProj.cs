@@ -246,6 +246,8 @@ public partial class RPCCreateProj : RPC {
 			proj = new SplashHitGrenadeProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.NapalmSplashHit) {
 			proj = new SplashHitProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
+		} else if (projId == (int)ProjIds.DynamoBeam) {
+			proj = new DynamoBeam(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.ShinMessenkou) {
 			proj = new ShinMessenkouProj(new ShinMessenkou(null), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.Shingetsurin) {
@@ -260,7 +262,10 @@ public partial class RPCCreateProj : RPC {
 			proj = new GenmuProj(new Genmu(), pos, xDir, 0, player, netProjByte);
 		} else if (projId == (int)ProjIds.PeaceOutRoller) {
 			proj = new PeaceOutRollerProj(new VileBall(VileBallType.PeaceOutRoller), pos, xDir, player, 0, netProjByte);
-		} else if (projId == (int)ProjIds.NecroBurst) {
+		}
+		else if (projId == (int)ProjIds.DynamoDownShoot) {
+			proj = new DynamoDownShoot(new VileBall(VileBallType.PeaceOutRoller), pos, xDir, player, 0, netProjByte);
+		}  else if (projId == (int)ProjIds.NecroBurst) {
 			proj = new NecroBurstProj(new VileLaser(VileLaserType.NecroBurst), pos, xDir, player, netProjByte);
 		} else if (projId == (int)ProjIds.NecroBurstShrapnel) {
 			ushort spriteIndex = BitConverter.ToUInt16(new byte[] { arguments[extraDataIndex], arguments[extraDataIndex + 1] }, 0);

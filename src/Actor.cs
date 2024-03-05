@@ -12,6 +12,8 @@ namespace MMXOnline;
 public partial class Actor : GameObject {
 	public Sprite sprite; //Current sprite
 
+	public AfterImageRenderer afterImageRenderer;
+
 	public int frameIndex { get { return sprite.frameIndex; } set { if (sprite == null) { return; } sprite.frameIndex = value; } }
 	public float frameSpeed { get { return sprite.frameSpeed; } set { if (sprite == null) { return; } sprite.frameSpeed = value; } }
 	public float frameTime { get { return sprite.frameTime; } set { if (sprite == null) { return; } sprite.frameTime = value; } }
@@ -110,6 +112,10 @@ public partial class Actor : GameObject {
 	private int lastYDir;
 	private float? lastAngle;
 	public float lastNetUpdate;
+
+
+
+	public float reversedGravityOffset = 40;
 
 	public NetActorCreateId netActorCreateId;
 	public Player netOwner;
@@ -1360,6 +1366,8 @@ public partial class Actor : GameObject {
 			else if (charNum.Value == 2) charName = "vile";
 			else if (charNum.Value == 3) charName = "axl";
 			else if (charNum.Value == 5) charName = "dynamo";
+			else if (charNum.Value == 6) charName = "gbd";
+			else if (charNum.Value == 7) charName = "iris";
 			else charName = "sigma";
 
 			var overrideSoundBuffer = Global.charSoundBuffers.GetValueOrDefault(soundBuffer.soundKey + "." + charName);

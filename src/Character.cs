@@ -89,6 +89,14 @@ public partial class Character : Actor, IDamagable {
 	public float useGrabCooldown;
 	public float stockedChargeFlashTime;
 
+	private float UPDamageCooldown;
+
+	public float unpoDamageMaxCooldown = 2f;
+
+	private float unpoTime;
+
+	public Projectile unpoAbsorbedProj;
+
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;
 
@@ -694,6 +702,17 @@ public partial class Character : Actor, IDamagable {
 		}
 		else if ((player.isVile || player.isX && this is MegamanX mmx && mmx.VileCounters > 2) && player.speedDevil) {
 			runSpeed *= 1.1f;
+		}
+		else if (player.isGBD && this is GBD gbd){
+			if (gbd.shiningSparkStacks > 30){
+			runSpeed *= 1.5f;
+			}
+			if (gbd.shiningSparkStacks > 15 && gbd.shiningSparkStacks < 31){
+			runSpeed *= 1.3f;
+			}
+			if (gbd.shiningSparkStacks > 5 && gbd.shiningSparkStacks < 16 ){
+			runSpeed *= 1.1f;
+			}
 		}
 		return runSpeed * getRunDebuffs();
 	}
@@ -2074,7 +2093,7 @@ public partial class Character : Actor, IDamagable {
 			chargeEffect.render(getParasitePos().add(new Point(x, y)));
 		}
 
-		if (player.isX && sprite.name.Contains("frozen")) {
+		if ((player.isX || player.isIris || player.isDynamo ||player.isGBD) && sprite.name.Contains("frozen")) {
 			Global.sprites["frozen_block"].draw(0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1);
 		}
 
@@ -3077,12 +3096,12 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canAffordRideArmor() {
 		if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
-		return player.currency >= Vile.callNewMechCost;
+		return  this is Vile vile && vile.isVileMK5 || player.currency >= Vile.callNewMechCost;
 	}
 
 	public void buyRideArmor() {
 		if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
-		else player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);
+		else if (this is Vile vile && !vile.isVileMK5) player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);
 	}
 
 	public virtual void onMechSlotSelect(MechMenuWeapon mmw) {

@@ -481,4 +481,12 @@ public class BBuffaloDragged : GenericGrabbedState {
 	public BBuffaloDragged(BlizzardBuffalo grabber) :
 		base(grabber, maxGrabTime, "_dash", reverseZIndex: true, freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab") {
 	}
+
+	public override void update() {
+		base.update();
+		trySnapToGrabPoint(true);
+
+		if (!grabber.sprite.name.Contains("_dash")) character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+				
+	}
 }

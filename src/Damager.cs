@@ -326,6 +326,18 @@ public class Damager {
 			if (projId == (int)ProjIds.VileMK2Grab && !(character.charState is VileMK2Grabbed)) {	
 				character.changeState(new VileMK2Grabbed(owner.character), true);			
 			}
+			if (projId == (int)ProjIds.UPGrab && !(character.charState is UPGrabbed)) {	
+				character.changeState(new UPGrabbed(owner.character), true);			
+			}
+			
+			//GBD's Mighty Kick
+			if (projId == (int)ProjIds.GBDKick && !(character.charState is KnockedDown)) {	
+				character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
+				owner.character.isDashing = true;
+				owner.character.dashedInAir += 1;
+				owner.character.vel.y = 0f - owner.character.getJumpPower();
+				owner.character.changeState(new WallKick(), true);
+			}
 			// Other effects
 			if (projId == (int)ProjIds.IceGattling) {
 				character.addIgFreezeProgress(1, 2);
@@ -703,6 +715,7 @@ public class Damager {
 			projId == (int)ProjIds.AssassinBulletQuick ||
 			projId == (int)ProjIds.VileMK2Grab ||
 			projId == (int)ProjIds.UPGrab ||
+			projId == (int)ProjIds.GBDKick ||
 			projId == (int)ProjIds.LaunchODrain ||
 			projId == (int)ProjIds.DistanceNeedler ||
 			projId == (int)ProjIds.Raijingeki ||

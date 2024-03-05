@@ -228,9 +228,13 @@ public class SelectWeaponMenu : IMainMenu {
 
 				for (int j = 0; j < 3; j++) {
 					if (j == 0) {
-						Global.sprites["hud_weapon_icon"].drawToHUD(0, startX2 + (j * wepW), startY + (i * wepH));
-					} else if (j == 1) {
-						Global.sprites["hud_weapon_icon"].drawToHUD(102, startX2 + (j * wepW), startY + (i * wepH));
+						Global.sprites["hud_weapon_icon"].drawToHUD(30, startX2 + (j * wepW), startY + (i * wepH));
+					} 
+					if (j == 1) {
+						Global.sprites["hud_weapon_icon"].drawToHUD(65, startX2 + (j * wepW), startY + (i * wepH));
+					}
+					if (j == 2) {
+						Global.sprites["hud_weapon_icon"].drawToHUD(26, startX2 + (j * wepW), startY + (i * wepH));
 					}
 
 					if (cursors[3].index != j) {

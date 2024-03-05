@@ -91,6 +91,8 @@ public enum WeaponIds {
 	NovaStrike,
 	X6Saber,
 
+	//Gbd
+	GBDKick,
 	// DO NOT CHANGE THE ORDER OF THESE SIGMA WEAPONS
 	Sigma,
 	ChillPenguin,
@@ -285,12 +287,19 @@ public enum WeaponIds {
 	RideChaserHit,
 	//New wcut weapons
 	DynamoBoomerang,
+	DynamoTrick,
+	DynamoRoyal,
+	DynamoSword,
 	//>>>>>>>>
 	DNACore = 250
 }
 
 public enum ProjIds {
 	DynamoBoomerang,
+	DynamoBeam,
+	DynamoDownShoot,
+
+
 	Buster,
 	Buster2,
 	Buster3,
@@ -376,6 +385,7 @@ public enum ProjIds {
 	XSaberProj,
 	Headbutt,
 	UPGrab,
+	GBDKick,
 	UPPunch,
 	UPParryBlock,
 	UPParryMelee,

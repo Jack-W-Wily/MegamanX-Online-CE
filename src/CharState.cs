@@ -483,6 +483,15 @@ public class WarpIn : CharState {
 		character.visible = true;
 		character.useGravity = true;
 		character.splashable = true;
+		if (player.isDynamo){
+		player.weapons.Add(new DynamoTrick());
+		player.weapons.Add(new DynamoSword());
+		player.weapons.Add(new DynamoRoyal(null));
+		}
+		if (player.isGBD){
+		player.weapons.Add(new SpinningBlade());
+		new RideChaser(Global.level.mainPlayer, character.pos, 0, Global.level.mainPlayer.getNextActorNetId(), ownedByLocalPlayer: true, sendRpc: true);
+		}
 		if (warpAnim != null) {
 			warpAnim.destroySelf();
 		}
@@ -1382,6 +1391,7 @@ public class KnockedDown : CharState {
 	public KnockedDown(int dir) : base("knocked_down") {
 		hurtDir = dir;
 		hurtSpeed = dir * 100;
+		superArmor = true;
 		flinchTime = 0.5f;
 	}
 
@@ -1675,10 +1685,16 @@ public class Die : CharState {
 		if (mmx != null) {
 			mmx.removeBarrier();
 		}
-		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
-			character.player.revertToAxlDeath();
-			character.changeSpriteFromName("die", true);
-		}
+		//if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
+		//	player.revertToAxl();
+		//}
+		//	character.player.revertToAxlDeath();
+		//	character.changeSpriteFromName("die", true);
+		//	player.weapons.RemoveAt(player.weaponSlot);
+		//	player.character.cleanupBeforeTransform();
+		//	player.preTransformedAxl = player.character;
+		//	Global.level.gameObjects.Remove(player.preTransformedAxl);		
+		//}
 		player.lastDeathWasVileMK2 = vile?.isVileMK2 == true;
 		player.lastDeathWasVileMK5 = vile?.isVileMK5 == true;
 		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true || character is KaiserSigma;
@@ -1894,7 +1910,7 @@ public class GenericGrabbedState : CharState {
 			}
 	//	}
 
-		grabTime -= player.mashValue();
+	//	grabTime -= player.mashValue();
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
 		}
@@ -1937,7 +1953,7 @@ public class GenericGrabbedState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabInvulnTime = 2;
+		character.grabInvulnTime = 0;
 		character.useGravity = true;
 		character.setzIndex(savedZIndex);
 	}

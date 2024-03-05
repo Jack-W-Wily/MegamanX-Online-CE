@@ -44,7 +44,7 @@ public class SigmaSlashState : CharState {
 				off = new Point(20, -30);
 			}
 
-			float damage = character.grounded ? 4 : 3;
+			float damage = character.grounded ? 3 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new SigmaSlashProj(
 				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
@@ -99,8 +99,8 @@ public class SigmaBallProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player,
 		ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 2, player, "sigma_proj_ball",
-		0, 0.2f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 400, 1, player, "sigma_proj_ball",
+		3, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.SigmaBall;
 		maxTime = 0.5f;

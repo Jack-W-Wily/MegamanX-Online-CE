@@ -119,7 +119,7 @@ public class RisingSpecterProj : Projectile {
 	public float sinDampTime = 1;
 	public Anim muzzle;
 	public RisingSpecterProj(Weapon weapon, Point poi, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, poi, xDir, 0, 6, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, poi, xDir, 0, 3, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;

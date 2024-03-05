@@ -127,6 +127,7 @@ public partial class Actor {
 
 			if (charMask[2]) {
 				Axl axl = character as Axl;
+				if(character != null){
 				byte axlArmAngle = Helpers.angleToByte(axl.netArmAngle);
 				args.Add(axlArmAngle);
 				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes(
@@ -134,6 +135,7 @@ public partial class Actor {
 				);
 				args.AddRange(netAxlArmSpriteIndexBytes);
 				args.Add((byte)character.player.axlBulletType);
+				}
 			}
 
 			if (charMask[3]) {

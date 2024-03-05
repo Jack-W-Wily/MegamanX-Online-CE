@@ -36,31 +36,31 @@ public class VileCannon : Weapon {
 		} else if (vileCannonType == VileCannonType.FrontRunner) {
 			rateOfFire = 0.75f;
 			vileAmmoUsage = 8;
-			displayName = "Front Runner";
+			displayName = "VAVA";
 			projSprite = "vile_mk2_proj";
 			fadeSprite = "vile_mk2_proj_fade";
-			description = new string[] { "This cannon not only offers power,", "but can be aimed up and down." };
+			description = new string[] { "Vile's Original Body ,", "Created by Dr.Cain." };
 			vileWeight = 2;
 		} else if (vileCannonType == VileCannonType.FatBoy) {
 			rateOfFire = 0.75f;
 			vileAmmoUsage = 24;
-			displayName = "Fat Boy";
+			displayName = "VAVA MK2";
 			projSprite = "vile_mk2_fb_proj";
 			fadeSprite = "vile_mk2_fb_proj_fade";
 			killFeedIndex = 90;
 			weaponSlotIndex = 61;
-			description = new string[] { "The most powerful cannon around,", "it consumes a lot of energy." };
+			description = new string[] { "Used in the Doppletown Incident,", "Created by Dr.Doppler." };
 			vileWeight = 3;
 		}
 		if (vileCannonType == VileCannonType.LongshotGizmo) {
 			rateOfFire = 0.1f;
 			vileAmmoUsage = 4;
-			displayName = "Longshot Gizmo";
+			displayName = "VAVA V";
 			projSprite = "vile_mk2_lg_proj";
 			fadeSprite = "vile_mk2_lg_proj_fade";
 			killFeedIndex = 91;
 			weaponSlotIndex = 62;
-			description = new string[] { "This cannon fires 5 shots at once,", "but leaves you open to attack." };
+			description = new string[] { "Vile's NewGEN body used in the Orbital Elevator Incident,", "Unknown Creator." };
 			vileWeight = 4;
 		}
 	}
@@ -132,7 +132,7 @@ public class VileCannonProj : Projectile {
 		VileCannon weapon, Point pos, float byteAngle, Player player,
 		ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 300, 3, player, weapon.projSprite, 4, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 300, 1, player, weapon.projSprite, 4, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)ProjIds.FrontRunner;
@@ -317,7 +317,7 @@ public class FrontRunnerAttack : CharState {
 
 		new VileCannonProj(
 			new VileCannon(VileCannonType.FrontRunner),
-			shootPos, MathF.Round(shootVel.byteAngle) *  vile.getShootXDir(), //vile.longshotGizmoCount,
+			shootPos, MathF.Round(shootVel.byteAngle) *  vile.xDir, //vile.longshotGizmoCount,
 			player, player.getNextActorNetId(), rpc: true
 		);
 	}

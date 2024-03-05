@@ -183,8 +183,8 @@ public class RakuhouhaProj : Projectile {
 		Weapon weapon, Point pos, bool isCFlasher, float xVel,
 		float yVel, Player player, ushort netProjId, int angle, bool rpc = false
 	) : base(
-		weapon, pos, xVel >= 0 ? 1 : -1, 300, 4, player, isCFlasher ? "cflasher" : "rakuhouha",
-		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xVel >= 0 ? 1 : -1, 300, 1, player, isCFlasher ? "cflasher" : "rakuhouha",
+		Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		this.isCFlasher = isCFlasher;
 

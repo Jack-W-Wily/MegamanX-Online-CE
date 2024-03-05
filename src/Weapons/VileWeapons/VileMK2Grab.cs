@@ -102,7 +102,7 @@ public class VileMK2GrabState : CharState {
 		}
 		character.grabCooldown = 1;
 		if (newState is not VileMK2GrabState && victim != null) {
-			victim.grabInvulnTime = 2;
+			victim.grabInvulnTime = 0;
 			victim?.releaseGrab(character, true);
 		}
 	}

@@ -1308,7 +1308,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool isSpecialBuster() {
-		return player.loadout.xLoadout.melee == 0 && !isHyperX;
+		return player.loadout.xLoadout.melee == 0;// && !isHyperX;
 	}
 
 	public bool isSpecialSaber() {

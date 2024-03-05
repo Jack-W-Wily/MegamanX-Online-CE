@@ -137,12 +137,12 @@ public class ShotgunIceProj : Projectile {
 		base.onHitDamagable(damagable);
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
-		return new ShotgunIceProj(
-			ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
-			arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
-		); 
-	}
+	//public static Projectile rpcInvoke(ProjParameters arg) {
+	//	return new ShotgunIceProj(
+	//		ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
+	//		arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
+	//	); 
+	//}
 }
 
 public class ShotgunIceProjCharged : Projectile {

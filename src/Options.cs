@@ -22,7 +22,7 @@ public class Options {
 	public bool showSysReqPrompt = true;
 	public bool enableDeveloperConsole;
 	public bool disableChat;
-	public int maxFPS = 600;
+	public int maxFPS = 60;
 	public bool cheatWarningShown;
 	public bool disableDoubleDash;
 	public int preferredCharacter;

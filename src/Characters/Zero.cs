@@ -713,7 +713,7 @@ public class Zero : Character {
 				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 1, 0.25f, isReflectShield: false
 			),
 			"zero_attack3" => new GenericMeleeProj(
-					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 3, 1, 0.25f, isReflectShield: false
+					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 20, 0.25f, isReflectShield: false
 			),
 			"zero_hyoroga_attack" =>  new GenericMeleeProj(
 				zeroAirSpecialWeapon, centerPoint, ProjIds.HyorogaSwing, player, 4, 1, 0.25f

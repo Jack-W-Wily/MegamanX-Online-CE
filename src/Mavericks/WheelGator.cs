@@ -132,67 +132,113 @@ public class WheelGator : Maverick {
 }
 
 public class WheelGSpinWheelProj : Projectile {
-	float lastHitTime;
-	const float hitCooldown = 0.2f;
+	private float lastHitTime;
+
+	private const float hitCooldown = 0.2f;
+
+	private int bounces;
+
+	private bool isDynamoBlade;
+
+
 	public WheelGSpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 250, 1, player, "wheelg_proj_wheel", Global.defFlinch, hitCooldown, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.WheelGSpinWheel;
+			if (player.isSigma && player.currency > 0 && player.input.isHeld("special2", player)){
+			destroySelf();
+			player.currency -= 1;
+			new SpinWheelProjChargedStart(new SpinWheel(), pos, xDir, damager.owner, player.getNextActorNetId());
+		}
+		if (player?.character != null && player.isGBD){
+			changeSprite("meudisco2_proj", resetFrame: true);
+			damager.hitCooldown = 0.3f;
+			}
 		maxTime = 2f;
-
 		destroyOnHit = false;
-		vel = new Point(xDir * 200, -200);
+		if (!isDynamoBlade){
 		useGravity = true;
-		collider.wallOnly = true;
-
-		if (rpc) {
+		vel = new Point(xDir * 200, -200f);
+		base.collider.wallOnly = true;
+		}
+		if (player?.character != null && player.isDynamo){
+			changeSprite("dynamo_verticalbladeproj", resetFrame: true);
+			isDynamoBlade = true;
+			useGravity = false;
+			damager.hitCooldown = 0.3f;
+			}
+		if (isDynamoBlade) {
+		vel = new Point(xDir * 300, 0f);
+		useGravity = false;
+		}
+		if (rpc)
+		{
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
-	public override void update() {
+	public override void update()
+	{
 		base.update();
-
+		if (!isDynamoBlade) {
 		vel.x = xDir * 250;
-		if (lastHitTime > 0) vel.x = xDir * 4;
+		if (lastHitTime > 0f)
+		{
+			vel.x = xDir * 4;
+		}
 		Helpers.decrementTime(ref lastHitTime);
-	}
-
-	int bounces;
-	public override void onHitWall(CollideData other) {
-		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
-
-		bounces++;
-
-		var normal = other.hitData.normal ?? new Point(0, -1);
-		if (normal.isSideways()) {
-			vel.x *= -1f;
-			xDir *= -1;
-			incPos(new Point(5 * MathF.Sign(vel.x), 0));
-		} else if (bounces < 2) {
-			vel.y *= -0.5f;
-			if (vel.y < -300) vel.y = -300;
-			incPos(new Point(0, 5 * MathF.Sign(vel.y)));
+		}
+		if (isDynamoBlade){
+		if (ownedByLocalPlayer && MathF.Abs(vel.x) < 400f)
+		{
+			vel.x -= Global.spf * 450f * (float)xDir;
+		}
 		}
 	}
 
-	public override void onHitDamagable(IDamagable damagable) {
-		if (damagable is CrackedWall) {
-			damager.hitCooldown = hitCooldown;
+	public override void onHitWall(CollideData other)
+	{
+		base.onHitWall(other);
+		if (!ownedByLocalPlayer)
+		{
 			return;
 		}
+		if (!isDynamoBlade){
+		bounces++;
+		if ((other.hitData.normal ?? new Point(0f, -1f)).isSideways())
+		{
+			vel.x *= -1f;
+			xDir *= -1;
+			incPos(new Point(5 * MathF.Sign(vel.x), 0f));
+		}
+		else if (bounces < 2)
+		{
+			vel.y *= -0.5f;
+			if (vel.y < -300f)
+			{
+				vel.y = -300f;
+			}
+			incPos(new Point(0f, 5 * MathF.Sign(vel.y)));
+		}
+		}
+	}
 
-		lastHitTime = hitCooldown;
-
-		var chr = damagable as Character;
-		if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
-			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10);
+	public override void onHitDamagable(IDamagable damagable)
+	{
+		if (damagable is CrackedWall)
+		{
+			damager.hitCooldown = 0.2f;
+			return;
+		}
+		lastHitTime = 0.2f;
+		if (damagable is Character chr && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback())
+		{
+			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10f);
 			chr.slowdownTime = 0.25f;
 		}
-
 		base.onHitDamagable(damagable);
 	}
 }
+
 
 public class WheelGShootState : MaverickState {
 	int state;

@@ -20,17 +20,32 @@ public class SpinningBlade : Weapon {
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 	}
 
+private bool GBDdisk;
+
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (chargeLevel < 3) {
+		
+		if (player?.character is MegamanX mmx){
+			if (chargeLevel < 3) {
 			player.setNextActorNetId(netProjId);
 			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true));
 			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true));
-		} else if (player?.character is MegamanX mmx) {
-			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, netProjId);
-			if (mmx.ownedByLocalPlayer) {
+			} else  {
+				var csb = new SpinningBladeProjCharged(this, pos, xDir, player, netProjId);
+				if (mmx.ownedByLocalPlayer) {
 				mmx.chargedSpinningBlade = csb;
+				}
 			}
 		}
+		if (player?.character != null && player.isGBD){
+	
+		player.setNextActorNetId(netProjId);
+			
+		if (!player.input.isHeld(Control.Down, player))	new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true));
+		if (player.input.isHeld(Control.Down, player))new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true));
+		
+		}
+
+
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -69,44 +84,59 @@ public class SpinningBladeProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		if (player?.character != null && player.isGBD){
+			changeSprite("meudisco_proj", resetFrame: true);
+			
+		}
 	}
 
-	public override void update() {
+	public override void update()
+	{
 		base.update();
-		if (!once && time > 0.1f && spinSound != null) {
+		if (!once && time > 0.1f && spinSound != null)
+		{
 			spinSound.Play();
 			once = true;
+			
 		}
-		if (spinSound != null) {
+		if (spinSound != null)
+		{
 			spinSound.Volume = getSoundVolume() * 0.5f;
-			if (spinSound.Volume < 0.1) {
-				spinSound.Stop();
-				spinSound.Dispose();
-				spinSound = null;
-			}
 		}
-		if (MathF.Abs(vel.x) < 400) {
-			vel.x -= Global.spf * 450 * xDir;
+		if (ownedByLocalPlayer && MathF.Abs(vel.x) < 400f)
+		{
+			vel.x -= Global.spf * 450f * (float)xDir;
+		}
+		if (time >= 1) damager.damage = 3;
+		if (time >= 1) damager.flinch = 4;
+		if (owner?.character != null && owner.isGBD){
+			changeSprite("meudisco_proj", resetFrame: true);
+			damager.flinch = 1;
 		}
 	}
 
-	public override void onDestroy() {
+	public override void onDestroy()
+	{
 		base.onDestroy();
 		spinSound?.Stop();
 		spinSound?.Dispose();
 		spinSound = null;
-		//int randFlipX = Helpers.randomRange(0, 1) == 0 ? -1 : 1;
 		float randFlipX = Helpers.randomRange(0.75f, 1.5f);
-		new Anim(pos, "spinningblade_piece1", xDir, null, false) { useGravity = true, vel = new Point(-100 * xDir * randFlipX, Helpers.randomRange(-100, -50)), ttl = 2 };
-		new Anim(pos, "spinningblade_piece2", xDir, null, false) { useGravity = true, vel = new Point(100 * xDir * randFlipX, Helpers.randomRange(-100, -50)), ttl = 2 };
-	}
-
-	public override void onStart() {
-		base.onStart();
-		spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
-		spinSound.Volume = 50f;
+		new Anim(pos, "spinningblade_piece1", xDir, null, destroyOnEnd: false)
+		{
+			useGravity = true,
+			vel = new Point((float)(-100 * xDir) * randFlipX, Helpers.randomRange(-100, -50)),
+			ttl = 2f
+		};
+		new Anim(pos, "spinningblade_piece2", xDir, null, destroyOnEnd: false)
+		{
+			useGravity = true,
+			vel = new Point((float)(100 * xDir) * randFlipX, Helpers.randomRange(-100, -50)),
+			ttl = 2f
+		};
 	}
 }
+  
 
 public class SpinningBladeProjCharged : Projectile {
 	public MegamanX character;

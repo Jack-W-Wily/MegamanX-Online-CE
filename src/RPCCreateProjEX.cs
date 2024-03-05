@@ -8,7 +8,7 @@ public partial class RPCCreateProj : RPC {
 	public static Dictionary<int, ProjCreate> functs = new Dictionary<int, ProjCreate> {
 		// X Stuff.
 		{ (int)ProjIds.Boomerang, BoomerangProj.rpcInvoke },
-		{ (int)ProjIds.ShotgunIce, ShotgunIceProj.rpcInvoke },
+		//{ (int)ProjIds.ShotgunIce, ShotgunIceProj.rpcInvoke },
 		{ (int)ProjIds.TriadThunder, TriadThunderProj.rpcInvoke },
 		{ (int)ProjIds.TriadThunderQuake, TriadThunderQuake.rpcInvoke },
 		{ (int)ProjIds.TriadThunderCharged, TriadThunderProjCharged.rpcInvoke },

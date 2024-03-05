@@ -45,6 +45,8 @@ public class RaySplasherProj : Projectile {
 	) {
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasher;
+
+		if (player.isIris) damager.flinch = 4;
 		if (isTurret) {
 			projId = (int)ProjIds.RaySplasherChargedProj;
 			damager.hitCooldown = 0;
@@ -62,7 +64,9 @@ public class RaySplasherProj : Projectile {
 		if (dirType == 2) {
 			vel = new Point(600 * xDir, 0);
 		}
-
+		if (player?.character != null && player.isIris){
+		changeSprite("iris_crystal_fireball", true);
+		}
 		if (rpc) {
 			rpcCreate(
 				pos, player, netProjId, xDir,
@@ -95,6 +99,8 @@ public class RaySplasherTurret : Actor, IDamagable
 
 	private bool isIgnis;
 
+	private bool irisCrystal;
+
 	private Actor target;
 
 	private float health;
@@ -104,6 +110,8 @@ public class RaySplasherTurret : Actor, IDamagable
 	private const float range = 130f;
 
 	private float drainTime;
+
+	private float LaserCD = 0;
 
 	private float raySplasherShootTime;
 
@@ -115,6 +123,10 @@ public class RaySplasherTurret : Actor, IDamagable
 
 	private Player playerOwner;
 
+	public Anim anim;
+
+	
+
 	public RaySplasherTurret(Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false)
 		: base("raysplasher_turret_start", pos, netId, ownedByLocalPlayer, dontAddToLevel: false)
 	{
@@ -124,6 +136,10 @@ public class RaySplasherTurret : Actor, IDamagable
 		if (player.character != null && player.isVile) {
 			isIgnis = true; 
 		} else {isIgnis = false;}
+		if (player.character != null && player.isIris) {
+			irisCrystal = true; 
+			
+		} else {irisCrystal = false;}
 		if (!isIgnis){
 		health = 2;
 		maxHealth = 2;
@@ -174,6 +190,10 @@ public class RaySplasherTurret : Actor, IDamagable
 	{
 		base.update();
 		updateProjectileCooldown();
+
+		if (playerOwner?.character == null) {
+				destroySelf();
+		}
 		if (!ownedByLocalPlayer)
 		{
 			return;
@@ -212,7 +232,7 @@ public class RaySplasherTurret : Actor, IDamagable
 				}
 			}
 		}
-		if (isIgnis){
+		if (isIgnis && !irisCrystal){
 		if (state == 0)
 		{
 			if (Global.level.getTriggerList(this, 0f, velY * Global.spf, null, typeof(Wall)).Count == 0)
@@ -244,8 +264,103 @@ public class RaySplasherTurret : Actor, IDamagable
 				state = 1;
 				}
 		}
+		
 		}
-		if (!isIgnis){
+
+		Helpers.decrementTime(ref LaserCD);
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		if (!isIgnis && irisCrystal){
+		//if (anim == null)  anim =
+		 new Anim(pos, "iris_crystal_fade", xDir,playerOwner.getNextActorNetId(), true, sendRpc: true);
+	
+		if (state == 0)
+		{
+			if (Global.level.getTriggerList(this, 0f, velY * Global.spf, null, typeof(Wall)).Count == 0)
+			{
+				move(new Point(0f, velY));
+			}
+			velY += Global.spf * 75f;
+			if (velY >= 0f)
+			{
+				velY = 0f;
+				if (playerOwner.character != null && playerOwner.input.isPressed("weaponright", playerOwner)){
+				new TriadThunderQuake(playerOwner.weapon, pos.addxy(-10 * xDir, 0f), 1, playerOwner, playerOwner.getNextActorNetId(), rpc: true);	
+				state = 1;
+				}
+				changeSprite("iris_crystal_idle", resetFrame: true);
+			}
+		}else if (state == 1)
+		{
+
+			if (playerOwner.character.xDir == 1)move(new Point(100f, velY));
+			if (playerOwner.character.xDir == -1)move(new Point(-100f, velY));
+			if (playerOwner.character != null && !playerOwner.input.isHeld("weaponright", playerOwner)){
+				state = 2;
+			}
+			changeSprite("iris_crystal_bash", resetFrame: true);	
+		}else if (state == 2)
+		{
+		changeSprite("iris_crystal_idle", resetFrame: true);
+		if (playerOwner.character != null && playerOwner.input.isPressed("weaponright", playerOwner)){
+				new TriadThunderQuake(playerOwner.weapon, pos.addxy(-10 * xDir, 0f), 1, playerOwner, playerOwner.getNextActorNetId(), rpc: true);	
+				state = 1;
+				}
+		}
+
+		if (playerOwner.character != null && playerOwner.input.isPressed("shoot", playerOwner)){
+				state = 3;
+		}
+		
+		
+		if (LaserCD == 0 && playerOwner.character != null && playerOwner.input.isPressed("special1", playerOwner)){
+				new RisingSpecterProj(new VileLaser(VileLaserType.RisingSpecter), pos, xDir, playerOwner, playerOwner.getNextActorNetId(), rpc: true);
+				LaserCD = 4;
+				playSound("risingSpecter", sendRpc: true);
+			}
+		else if (state == 3)
+		{
+			//isStatic = true;
+			Actor closestTarget = Global.level.getClosestTarget(pos, netOwner.alliance, checkWalls: true, 130f);
+			if (closestTarget != null)
+			{
+				target = closestTarget;
+				state = 1;
+				changeSprite("iris_crystal_shoot", resetFrame: true);
+			}
+		}
+		else
+		{
+			if (state == 0)
+			{
+				return;
+			}
+			_ = target;
+			target = Global.level.getClosestTarget(pos, netOwner.alliance, checkWalls: true);
+			if (target == null || pos.distanceTo(target.getCenterPos()) >= 130f)
+			{
+				state = 1;
+				target = null;
+				changeSprite("iris_crystal_idle", resetFrame: true);
+				return;
+			}
+			raySplasherShootTime += Global.spf;
+			if (raySplasherShootTime > 0.4f &&  playerOwner.input.isHeld("shoot", playerOwner))
+			{
+				playSound("buster2");
+				RaySplasherProj raySplasherProj = new RaySplasherProj(new RaySplasher(), pos, (!(pos.x > target.getCenterPos().x)) ? 1 : (-1), raySplasherMod % 3, 0, isTurret: true, netOwner, netOwner.getNextActorNetId(), rpc: true);
+				float ang = pos.directionToNorm(target.getCenterPos()).angle;
+				ang += Helpers.randomRange(-22.5f/2, 22.5f/2);
+				raySplasherProj.vel = Point.createFromAngle(ang).times(600f);
+				raySplasherShootTime = 0f;
+				raySplasherMod++;
+			}
+		}
+		}
+		
+
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>
+		if (!isIgnis && !irisCrystal){
+	
 		if (state == 0)
 		{
 			if (Global.level.getTriggerList(this, 0f, velY * Global.spf, null, typeof(Wall)).Count == 0)
@@ -299,6 +414,7 @@ public class RaySplasherTurret : Actor, IDamagable
 			}
 		}
 		}
+			
 	}
 
 	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId)
@@ -363,6 +479,8 @@ public class RaySplasherTurret : Actor, IDamagable
 	{
 		base.onDestroy();
 		playSound("freezebreak2");
+
+		if (!irisCrystal && !isIgnis){
 		new Anim(pos, "raysplasher_turret_pieces", 1, null, destroyOnEnd: false)
 		{
 			ttl = 2f,
@@ -395,6 +513,8 @@ public class RaySplasherTurret : Actor, IDamagable
 			frameIndex = 1,
 			frameSpeed = 0f
 		};
+		}
+		if (anim != null) anim.destroySelf();
 		netOwner.turrets.Remove(this);
 	}
 

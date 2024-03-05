@@ -291,7 +291,7 @@ public abstract class BaseSigma : Character {
 
 		if (tagTeamSwapProgress > 0) {
 			tagTeamSwapProgress += Global.spf * 2;
-			if (tagTeamSwapProgress > 1) {
+			if (tagTeamSwapProgress > 0) {
 				tagTeamSwapProgress = 0;
 				if (tagTeamSwapCase == 0) {
 					var sw = player.weapons.FirstOrDefault(w => w is SigmaMenuWeapon);
@@ -453,6 +453,13 @@ public abstract class BaseSigma : Character {
 				0, 0, 0, isDeflectShield: true
 			);
 		}
+		if (sprite.name.Contains("wall_dash") && !collider.isHurtBox()) {
+	
+			return new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
+				1, 10, 1, isDeflectShield: true
+			);
+		}
 		return null;
 	}
 
@@ -533,7 +540,7 @@ public abstract class BaseSigma : Character {
 		if (player.isSummoner()) return 3;
 		if (player.isPuppeteer()) return 3;
 		if (player.isStriker()) return 0;
-		if (player.isTagTeam()) return 5;
+		if (player.isTagTeam()) return 1;
 		return 3;
 	}
 

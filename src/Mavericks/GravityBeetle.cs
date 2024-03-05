@@ -345,12 +345,21 @@ public class BeetleGrabbedState : GenericGrabbedState {
 
 public class GBeetleGravityWellProj : Projectile {
 	public int state;
+
 	public float drawRadius;
-	const float riseSpeed = 150;
+
+	private const float riseSpeed = 150f;
+
 	public float radiusFactor;
-	float randPartTime;
-	public float maxRadius = 50;
-	float ttl = 4;
+
+	private float randPartTime;
+
+	public float maxRadius = 50f;
+
+	public float timer;
+
+	private float ttl = 4f;
+
 	public GBeetleGravityWellProj(Weapon weapon, Point pos, int xDir, float chargeTime, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.GBeetleGravityWell;
@@ -364,67 +373,86 @@ public class GBeetleGravityWellProj : Projectile {
 		}
 	}
 
-	public override void update() {
+	public override void update()
+	{
 		base.update();
-
+		timer += Global.spf;
+		if (timer > 4) destroySelf();
 		drawRadius = radiusFactor * maxRadius;
-		if (radiusFactor > 0) {
-			globalCollider = new Collider(new Rect(0, 0, 24 + (radiusFactor * maxRadius), 24 + (radiusFactor * maxRadius)).getPoints(), true, this, false, false, 0, Point.zero);
+		if (radiusFactor > 0f)
+		{
+			base.globalCollider = new Collider(new Rect(0f, 0f, 24f + radiusFactor * maxRadius, 24f + radiusFactor * maxRadius).getPoints(), isTrigger: true, this, isClimbable: false, isStatic: false, HitboxFlag.Hitbox, Point.zero);
 		}
-
-		if (!ownedByLocalPlayer) return;
-
-		if (state == 0) {
-			move(new Point(0, -riseSpeed));
-			moveDistance += riseSpeed * Global.spf;
-			var hit = checkCollision(0, -1);
-			if (moveDistance > 175 || hit?.isCeilingHit() == true) {
+		if (!ownedByLocalPlayer)
+		{
+			return;
+		}
+		if (state == 0)
+		{
+			move(new Point(0f, -150f));
+			moveDistance += 150f * Global.spf;
+			CollideData hit = checkCollision(0f, -1f);
+			if (moveDistance > 175f || (hit != null && hit.isCeilingHit()))
+			{
 				state = 1;
-				playSound("gbeetleWell", sendRpc: true);
+				playSound("gbeetleWell", forcePlay: false, sendRpc: true);
 			}
-		} else if (state == 1) {
+		}
+		else if (state == 1)
+		{
 			radiusFactor += Global.spf * 1.5f;
-			if (radiusFactor >= 1) {
+			if (radiusFactor >= 1f)
+			{
 				state = 2;
 				maxTime = ttl;
-				time = 0;
+				time = 0f;
 			}
-		} else if (state == 2) {
+		}
+		else if (state == 2)
+		{
 			randPartTime += Global.spf;
-			if (randPartTime > 0.025f) {
-				randPartTime = 0;
-				var partSpawnAngle = Helpers.randomRange(0, 360);
+			if (randPartTime > 0.025f)
+			{
+				randPartTime = 0f;
+				int partSpawnAngle = Helpers.randomRange(0, 360);
 				float spawnRadius = maxRadius;
-				float spawnSpeed = 300;
-				var partSpawnPos = pos.addxy(Helpers.cosd(partSpawnAngle) * spawnRadius, Helpers.sind(partSpawnAngle) * spawnRadius);
-				var partVel = partSpawnPos.directionToNorm(pos).times(spawnSpeed);
-				var partSprite = "gbeetle_proj_flare" + (Helpers.randomRange(0, 1) == 0 ? "2" : "");
-				new Anim(partSpawnPos, partSprite, 1, owner.getNextActorNetId(), false, sendRpc: true) {
+				float spawnSpeed = 300f;
+				Point partSpawnPos = pos.addxy(Helpers.cosd(partSpawnAngle) * spawnRadius, Helpers.sind(partSpawnAngle) * spawnRadius);
+				Point partVel = partSpawnPos.directionToNorm(pos).times(spawnSpeed);
+				string partSprite = "gbeetle_proj_flare" + ((Helpers.randomRange(0, 1) == 0) ? "2" : "");
+				new Anim(partSpawnPos, partSprite, 1, base.owner.getNextActorNetId(), destroyOnEnd: false, sendRpc: true)
+				{
 					vel = partVel,
-					ttl = ((spawnRadius - 10) / spawnSpeed),
+					ttl = (spawnRadius - 10f) / spawnSpeed
 				};
 			}
 		}
+       
 	}
 
-	public override void onHitDamagable(IDamagable damagable) {
+	public override void onHitDamagable(IDamagable damagable)
+	{
 		base.onHitDamagable(damagable);
-		var actor = damagable.actor();
+		Actor actor = damagable.actor();
 		Character chr = actor as Character;
-		if (chr != null && chr.isCCImmune()) return;
-		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
-		if (chr != null && (chr.charState is DeadLiftGrabbed || chr.charState is BeetleGrabbedState)) return;
-
-		float mag = 100;
-		if (!actor.grounded) actor.vel.y = 0;
-		Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
-		actor.move(velVector, true);
+		if ((chr == null || !chr.isCCImmune()) && (actor is Character || actor is RideArmor || actor is Maverick) && (chr == null || (!(chr.charState is DeadLiftGrabbed) && !(chr.charState is BeetleGrabbedState))))
+		{
+			float mag = 100f;
+			if (!actor.grounded)
+			{
+				actor.vel.y = 0f;
+			}
+			Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
+			actor.move(velVector);
+		}
 	}
 
-	public override void render(float x, float y) {
+	public override void render(float x, float y)
+	{
 		base.render(x, y);
-		if (state >= 1) {
-			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, drawRadius, true, Color.Black, 1, ZIndex.Background + 10);
+		if (state >= 1)
+		{
+			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, drawRadius, filled: true, Color.Black, 1f, -2999990L);
 		}
 	}
 }

@@ -537,9 +537,9 @@ public class RPCPlayerToggle : RPC {
 			if (player.character is MegamanX mmx) {
 				mmx.isShootingRaySplasher = false;
 			}
-		} else if (toggleId == RPCToggleType.StartBarrier) {
+		} else if (player?.character != null && toggleId == RPCToggleType.StartBarrier) {
 			(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
-		} else if (toggleId == RPCToggleType.StopBarrier) {
+		} else if (player?.character != null && toggleId == RPCToggleType.StopBarrier) {
 			(player?.character as MegamanX).barrierTime = 0;
 		} else if (toggleId == RPCToggleType.StockSaber) {
 			player.character.stockedXSaber = true;
@@ -1700,9 +1700,9 @@ public class RPCCommandGrabPlayer : RPC {
 		} else if (hookScenario == CommandGrabScenario.BBuffaloGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new BBuffaloDragged(grabber as BlizzardBuffalo), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.Release) {
-			if (victimChar != null) {
-				victimChar.charState?.releaseGrab();
-			}
+			//if (victimChar != null) {
+			//	victimChar.charState?.releaseGrab();
+			//}
 		}
 	}
 

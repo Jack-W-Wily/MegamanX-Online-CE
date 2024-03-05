@@ -121,9 +121,9 @@ public partial class Player {
 
 	public bool shouldBlockMechSlotScroll() {
 		if (character != null && character.vileStartRideArmor != null && (character as Vile).isVileMK5 == true) {
-			return false;
+			return true;
 		}
-		return Options.main.blockMechSlotScroll;
+		return true;// Options.main.blockMechSlotScroll;
 	}
 
 	public bool gridModeHeld;

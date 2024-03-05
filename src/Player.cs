@@ -151,6 +151,7 @@ public partial class Player {
 	public bool isSigma { get { return charNum == 4; } }
 	public bool isDynamo { get { return charNum == 5; } }
 	public bool isGBD { get { return charNum == 6; } }
+	public bool isIris { get { return charNum == 7; } }
 
 
 
@@ -219,6 +220,8 @@ public partial class Player {
 			{ 3, new List<SubTank>() },
 			{ 4, new List<SubTank>() },
 			{ 5, new List<SubTank>() },
+			{ 6, new List<SubTank>() },
+			{ 7, new List<SubTank>() },
 		};
 	public List<SubTank> subtanks {
 		get {
@@ -239,6 +242,7 @@ public partial class Player {
 			{ 4, 0 },
 			{ 5, 0 },
 			{ 6, 0 },
+			{ 7, 0 },
 		};
 	public int heartTanks {
 		get {
@@ -250,7 +254,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 6;
+	public const int maxCharCurrencyId = 10;
 	public int[] charCurrency = new int[maxCharCurrencyId];
 	public int currency {
 		get {
@@ -404,6 +408,24 @@ public partial class Player {
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
 
+	// Shader code for optimization.
+
+	public ShaderWrapper[] xPaletteShaderSub;
+	public ShaderWrapper mysteriousmaverickShader;
+	public ShaderWrapper thundergodrageShader;
+	public ShaderWrapper twinPhantasmShader;
+	public ShaderWrapper exvileShader;
+	public ShaderWrapper PhoenixflameShader;
+	public ShaderWrapper InfernalCapacityShader;
+	// Other shaders outside character classs
+	public ShaderWrapper predatorcloakShader;
+	public ShaderWrapper gatorEatenShader;
+	public ShaderWrapper shiningStanceShader;
+	public ShaderWrapper spnongeChargeShader;
+	// New Shaders
+	public List<ShaderWrapper> omegaAuraShader;
+	public List<ShaderWrapper> lastStandShader;
+
 
 	// Character specific data populated on RPC request
 	public ushort? charNetId;
@@ -417,7 +439,11 @@ public partial class Player {
 			{ 1, 0 },
 			{ 2, 0 },
 			{ 3, 0 },
-			{ 4, 0 }
+			{ 4, 0 },
+			{ 5, 0 },
+			{ 6, 0 },
+			{ 7, 0 },
+			{ 8, 0 }
 		};
 
 	public int hyperChargeSlot;
@@ -507,10 +533,39 @@ public partial class Player {
 		return -1;
 	}
 
+	public void intitalizeShaders() {
+		// For Chips and Xtreme Armor
+		xPaletteShaderSub = new ShaderWrapper[]{
+			Helpers.cloneShaderSafe("palette"),
+			Helpers.cloneShaderSafe("palette"),
+			Helpers.cloneShaderSafe("palette"),
+			Helpers.cloneShaderSafe("palette")
+		};
+		// Other shaders.
+		twinPhantasmShader = Helpers.cloneShaderSafe("twinPhantasm");
+		thundergodrageShader = Helpers.clonethundergodrageShader("paletteThunderGodRage");
+		exvileShader = Helpers.cloneexvileShader("palleteEXvile");
+		PhoenixflameShader = Helpers.clonePhoenixflameShader("palettephoenixflame");
+        InfernalCapacityShader = Helpers.cloneInfernalCapacityShader("paletteInfernalCapacity");
+		frozenCastleShader = Helpers.cloneShaderSafe("frozenCastle");
+		mysteriousmaverickShader = Helpers.cloneShaderSafe("mysteryousmaverick");
+	
+		// Shaders outside character classs
+		speedDevilShader = Helpers.cloneShaderSafe("speedDevilTrail");
+		speedDevilShader?.SetUniform("alpha", 0.5f);
+		predatorcloakShader = Helpers.cloneShaderSafe("predatorcloak");
+		predatorcloakShader?.SetUniform("alpha", 0.2f);
+		// HDM Shaders
+		omegaAuraShader = new(){Helpers.cloneShaderSafe("omega")};
+		lastStandShader = new(){Helpers.cloneShaderSafe("trail")};
+	}
+
+
 	public Player(
 		string name, int id, int charNum, PlayerCharData playerData,
 		bool isAI, bool ownedByLocalPlayer, int alliance, Input input, ServerPlayer serverPlayer
 	) {
+	//	intitalizeShaders();
 		this.name = name;
 		this.id = id;
 		curMaxNetId = getFirstAvailableNetId();
@@ -628,7 +683,11 @@ public partial class Player {
 			return 32 * getHealthModifier();
 		}
 		int bonus = 0;
-		if (isSigma && isPuppeteer()) bonus = 4;
+		if (isSigma) bonus = 4;
+		if (isDynamo) bonus = 2;
+		if (isVile) bonus = -8;
+		if (isIris) bonus = -4;
+		if (isAxl) bonus = -4;
 		return (28 + bonus + (heartTanks * getHeartTankModifier())) * getHealthModifier();
 	}
 
@@ -642,7 +701,7 @@ public partial class Player {
 
 	public void applyLoadoutChange() {
 		loadout = LoadoutData.createFromOptions(id);
-		if (isSigma) {
+		if (isSigma && Global.level.is1v1()) {
 			if (maverick1v1 != null) loadout.sigmaLoadout.commandMode = 3;
 			else loadout.sigmaLoadout.commandMode = 1;
 		}
@@ -1000,7 +1059,12 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else {
+			}else if (charNum == 7) {
+				character = new Iris(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			}  else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false
