@@ -76,7 +76,7 @@ public class CharState {
 	}
 
 	public bool canAttack() {
-		return !string.IsNullOrEmpty(attackSprite) && !character.isInvulnerableAttack() && character.saberCooldown == 0;
+		return this is SwordBlock || !string.IsNullOrEmpty(attackSprite) && character.saberCooldown == 0;
 	}
 
 	public Player player {

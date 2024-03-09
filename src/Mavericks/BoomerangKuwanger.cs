@@ -475,10 +475,10 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 							//return;
 						}
 			}
-			if (character.stopCeiling()) {
-				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
-			}
-			return;
+			//if (character.stopCeiling()) {
+			//	new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
+			//}
+			//return;
 		}
 
 		if (grabber.sprite?.name.EndsWith("_deadlift") == true) {

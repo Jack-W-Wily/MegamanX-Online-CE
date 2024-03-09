@@ -111,6 +111,9 @@ public partial class MegamanX : Character {
 		player.armorFlag = 0;
 		if (player.loadout.xLoadout.melee == 1){
 		isXKai = true;
+
+
+		if (charState.canAttack()) player.weapon.addAmmo(0.15f, player);
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (player.loadout.xLoadout.melee == 2){
@@ -640,6 +643,30 @@ public partial class MegamanX : Character {
 			return true;
 		}
 
+		
+	bool chaingrabcheck = player.input.checkShoryuken(player, xDir, Control.Special1);
+		
+		if (player.isX && chaingrabcheck && isXKai && player.weapon is StrikeChain && charState is not VileMK2GrabState) {
+			changeState(new ChainGrab(), true);
+			return true;
+		}
+
+		if (player.isX && player.input.isHeld(Control.Up, player) &&
+		player.input.isPressed(Control.Special1, player) &&
+		isXKai && player.weapon is GravityWell && useGrabCooldown == 0) {
+			changeState(new GravityBallShoot(), true);
+			useGrabCooldown = 1;
+			return true;
+		}
+
+		if (player.isX && player.input.isHeld(Control.Down, player) &&
+		player.input.isPressed(Control.Special1, player) &&
+		isXKai && player.weapon is StrikeChain && useGrabCooldown == 0) {
+			changeState(new ChainSliderState(), true);
+			useGrabCooldown = 1;
+			return true;
+		}
+
 
 		
 		return false;
@@ -1064,7 +1091,15 @@ public partial class MegamanX : Character {
 			proj = new GenericMeleeProj(new ShoryukenWeapon(player), centerPoint, ProjIds.Shoryuken, player);
 		} else if (sprite.name.Contains("unpo_grab_dash")) {
 			proj = new GenericMeleeProj(new XUPGrab(), centerPoint, ProjIds.UPGrab, player, 0, 0, 0);
-		} else if (sprite.name.Contains("unpo_punch")) {
+		} 
+		else if (sprite.name.Contains("ex_chainslider")) {
+		proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player);
+		} 
+		else if (sprite.name.Contains("ex_chain") && !sprite.name.Contains("ex_chainslider")) {
+		proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0f);
+		} 
+		
+		else if (sprite.name.Contains("unpo_punch")) {
 			proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player);
 		} else if (sprite.name.Contains("unpo_air_punch")) {
 			proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, damage: 3, flinch: Global.halfFlinch);

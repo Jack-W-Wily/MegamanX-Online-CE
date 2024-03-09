@@ -19,7 +19,7 @@ public class HadoukenWeapon : Weapon {
 
 public class HadoukenProj : Projectile {
 	public HadoukenProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, Damager.ohkoDamage, player, "hadouken", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 250, 4, player, "hadouken", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "hadouken_fade";
 		reflectable = true;
 		destroyOnHit = true;

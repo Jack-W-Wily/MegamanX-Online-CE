@@ -353,7 +353,7 @@ public class Axl : Character {
 		updateAxlAim();
 
 	
-		if (dodgeRollCooldown == 0 && player.canControl) {
+		if (dodgeRollCooldown == 0 && player.canControl && player.weapon is AxlBullet) {
 			
 			if (player.input.isPressed(Control.Special1, player)) {
 				changeState(new RainStorm(isUnderwater()), true);

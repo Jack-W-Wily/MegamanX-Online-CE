@@ -24,10 +24,12 @@ public class SpinWheel : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+		if (player.character.ownedByLocalPlayer){
 		if (chargeLevel < 3) {
 			new SpinWheelProj(this, pos, xDir, player, netProjId);
 		} else {
 			new SpinWheelProjChargedStart(this, pos, xDir, player, netProjId);
+		}
 		}
 	}
 }
@@ -49,7 +51,14 @@ public class SpinWheelProj : Projectile {
 	}
 
 	public override void update() {
+
+
 		base.update();
+
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+
 		projId = (int)ProjIds.SpinWheel;
 		if (collider != null) {
 			collider.isTrigger = false;

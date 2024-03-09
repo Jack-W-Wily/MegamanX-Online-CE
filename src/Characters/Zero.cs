@@ -59,7 +59,7 @@ public class Zero : Character {
 	public Weapon zeroGigaAttackWeapon {
 		get {
 			if (isAwakenedZero() == true) { return zeroShinMessenkouWeapon; }
-			if (isNightmareZeroBS.getValue() == true) { return zeroDarkHoldWeapon; }
+			if (isNightmareZeroBS.getValue() == true) { return zeroShinMessenkouWeapon; }
 			return _zeroGigaAttackWeapon;
 		}
 		set {
@@ -87,7 +87,7 @@ public class Zero : Character {
 		awakenedAuraWeapon = new AwakenedAura(player);
 
 		var zeroLoadout = player.loadout.zeroLoadout;
-
+		if (zeroHyperMode == 2 )isNightmareZero = true;
 		if (!player.hasKnuckle()) {
 			raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(player, zeroLoadout.groundSpecial);
 			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(player, zeroLoadout.airSpecial);
@@ -131,7 +131,9 @@ public class Zero : Character {
 
 	public override void update() {
 		base.update();
-
+	if (player.loadout.zeroLoadout.hyperMode == 2){
+	isNightmareZero = true;
+	}
 		if (awakenedZeroTime > 0) {
 			updateAwakenedZero();
 		}

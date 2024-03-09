@@ -331,7 +331,7 @@ public class LaunchOHomingTorpedoState : MaverickState {
 		base.update();
 		if (player == null) return;
 
-		if (maverick.frameIndex == 3 && !shootOnce) {
+		if (maverick.frameIndex == 9 && !shootOnce) {
 			shootOnce = true;
 			maverick.playSound("torpedo", sendRpc: true);
 			var pois = maverick.currentFrame.POIs;

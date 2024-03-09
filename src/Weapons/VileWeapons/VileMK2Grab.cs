@@ -18,7 +18,11 @@ public class VileMK2GrabState : CharState {
 	public Character victim;
 	float leechTime = 1;
 
+	public Vile vile;
+
 	float hitcd = 1;
+
+	private bool usechaingrab;
 
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
@@ -34,6 +38,8 @@ public class VileMK2GrabState : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 		hitcd += Global.spf;
+
+
 		if (victimWasGrabbedSpriteOnce && victim == null) {
 			character.changeState(new Idle(), true);
 			return;
@@ -55,19 +61,62 @@ public class VileMK2GrabState : CharState {
 				return;
 			}
 		}
-		var damager = new Damager(player, 0.25f, 0, 0);
+		
+		if (player.weapon is StrikeChain && player.isX){
+			var damager = new Damager(player, 3f, 0, 0);
+
+			sprite = "ex_chain_grab";
+		if (stateTime < 1)character.changeSpriteFromName("ex_chain_grab", true);
+			
+		if (leechTime > 0.5f) {
+			leechTime = 0;
+			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);			
+		}
+
+		if (character.isAnimOver()){
+			SpawnShockwave = true;
+			character.changeState(new Idle(), true);
+			victim?.releaseGrab(character, true);
+		}
+
+		}
+		if (player.isVile){
+
+		if ((character as Vile).isVileMK4 && player.input.isHeld(Control.Up, player)){
+			var damager = new Damager(player, 3f, 0, 0);
+
+			sprite = "ex_chain_grab";
+		if (stateTime < 1)character.changeSpriteFromName("ex_chain_grab", true);
+			
+		if (leechTime > 0.5f) {
+			leechTime = 0;
+			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);			
+		}
+
+		if (character.isAnimOver()){
+			SpawnShockwave = true;
+			character.changeState(new Idle(), true);
+			victim?.releaseGrab(character, true);
+		}
+
+		}
+
+		
+		
 		if (leechTime > 0.5f) {
 			leechTime = 0;
 			character.addHealth(1);
 			
 		}
+		
 		if (character.sprite.name.Contains("raging") && character.frameIndex > 5 && hitcd > 0.2f){
 			hitcd =0;
 			character.playSound("vilestomp", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
+		var damager = new Damager(player, 0.25f, 0, 0);
 		damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);	
 		}
-		if (player.input.isPressed(Control.Dash, player)) {
+		if (player.input.isPressed(Control.Dash, player) && !character.sprite.name.Contains("raging")) {
 			character.changeSpriteFromName("ragingdemon_grab", true);
 			sprite = "ragingdemon_grab";
 			sprite = "knocked_down";
@@ -83,10 +132,14 @@ public class VileMK2GrabState : CharState {
 			character.changeState(new Idle(), true);
 			return;
 		}
+		}
+		
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+
+		//if ((character as Vile).isVileMK4 && player.input.isHeld(Control.Up, player)) usechaingrab = true;
 		var damager = new Damager(player, 1f, 0, 0);
 		character.addHealth(1);		
 		damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);	
@@ -96,7 +149,7 @@ public class VileMK2GrabState : CharState {
 		base.onExit(newState);
 		if (SpawnShockwave){
 		new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
-		character.pos.addxy(6 * character.xDir, 0), character.xDir, 
+		victim.pos.addxy(6 * character.xDir, 0), character.xDir, 
 		player, player.getNextActorNetId(), rpc: true);
 		character.playSound("crash", sendRpc: true);
 		}

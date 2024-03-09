@@ -259,7 +259,7 @@ public class DynamoString1 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.playSound("dynamosaber", sendRpc: true);
+		character.playSound("dynamoslash", sendRpc: true);
 		if (!character.grounded) {
 			character.stopMovingWeak();
 			pushBackSpeed = 100;
@@ -319,7 +319,7 @@ public class DynamoString2 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.playSound("dynamosaber", sendRpc: true);
+		character.playSound("dynamoslash", sendRpc: true);
 		if (!character.grounded) {
 			character.stopMovingWeak();
 			pushBackSpeed = 100;
@@ -374,7 +374,7 @@ public class DynamoString3 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.playSound("dynamosaber", sendRpc: true);
+		character.playSound("dynamoslash", sendRpc: true);
 		if (!character.grounded) {
 			character.stopMovingWeak();
 			pushBackSpeed = 100;
@@ -822,5 +822,171 @@ public class DynamoBeam : Projectile
 }
 
 
+public class DynamoParryStartState : CharState {
 
 
+
+
+
+	public DynamoParryStartState() : base("parry_start", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
+		Actor counterAttackTarget = null;
+		if (damagingActor is GenericMeleeProj gmp) {
+			counterAttackTarget = gmp.owningActor;
+		}
+
+		if (counterAttackTarget == null) {
+			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
+		}
+
+		var proj = damagingActor as Projectile;
+		bool stunnableParry = proj != null && proj.canBeParried();
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 && counterAttackTarget is Character chr && stunnableParry) {
+			if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new ParriedState(), true);
+			}
+		}
+
+		character.playSound("zeroParry", sendRpc: true);
+		(player.character as Dynamo).NightmareBullets = 6;	
+		character.changeState(new Idle(), true);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.parryCooldown = character.maxParryCooldown;
+	}
+
+	public bool canParry(Actor damagingActor) {
+		var proj = damagingActor as Projectile;
+		if (proj == null) {
+			return false;
+		}
+		return character.frameIndex == 0;
+	}
+}
+
+
+
+public class DynamoShoot : CharState {
+	bool fired;
+	bool grounded;
+	bool shootProj;
+	public DynamoShoot(
+		bool grounded, bool shootProj
+	) : base(
+		grounded ? "idle_shoot" : "idle_shoot", "", "", ""
+	) {
+		this.grounded = grounded;
+		landSprite = "idle_shoot";
+		this.shootProj = shootProj;
+		if (shootProj) {
+			superArmor = true;
+		}
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.grounded) {
+			if (player.input.isHeld(Control.Dash, player)) {
+				character.isDashing = true;
+			}
+		}
+
+		if (character.frameIndex >= 0 && !fired) {
+			fired = true;
+			character.playSound("buster3", sendRpc: true);
+			new ZBuster2Proj(
+					new ZeroBuster(), character.getShootPos(), character.xDir, 0, player, player.getNextActorNetId(), rpc: true
+				);
+		}
+
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "fall_shoot";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+}
+
+
+public class DynamoNightmareBullet : CharState {
+	bool fired;
+	bool grounded;
+	bool shootProj;
+	public DynamoNightmareBullet(
+		bool grounded, bool shootProj
+	) : base(
+		grounded ? "unpo_parry_attack" : "unpo_parry_attack", "", "", ""
+	) {
+		this.grounded = grounded;
+		landSprite = "unpo_parry_attack";
+		this.shootProj = shootProj;
+		if (shootProj) {
+			superArmor = true;
+		}
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.grounded) {
+			if (player.input.isHeld(Control.Dash, player)) {
+				character.isDashing = true;
+			}
+		}
+
+		if (character.frameIndex >= 4 && !fired) {
+			fired = true;
+			character.playSound("buster3", sendRpc: true);
+		new TorpedoProj(new Torpedo(), character.getShootPos(), character.xDir, player, 3, player.getNextActorNetId(), 0, rpc: true);
+			
+		}
+
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "unpo_parry_attack";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+}

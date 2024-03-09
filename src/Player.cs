@@ -128,7 +128,7 @@ public partial class Player {
 	public const int zeroHyperCost = 10;
 	public const int zBusterZeroHyperCost = 10;
 	public const int AxlHyperCost = 10;
-	public const int reviveVileCost = 5;
+	public const int reviveVileCost = 1;
 	public const int reviveSigmaCost = 10;
 	public const int reviveXCost = 10;
 	public const int goldenArmorCost = 5;
@@ -1663,12 +1663,12 @@ public partial class Player {
 			return 2;
 		}
 		if (Global.level.gameMode is ControlPoints && alliance == GameMode.redAlliance) {
-			return 8;
+			return 5;
 		}
 		if (Global.level.gameMode is KingOfTheHill) {
-			return 7;
+			return 5;
 		}
-		return 5;
+		return 3;
 	}
 
 	ExplodeDieEffect explodeDieEffect;
@@ -1690,7 +1690,8 @@ public partial class Player {
 	}
 
 	public bool canReviveSigma(out Point spawnPoint) {
-		spawnPoint = Point.zero;
+		
+		spawnPoint = Point.zero;/*
 		if (Global.level.isHyper1v1() && !lastDeathWasSigmaHyper && limboChar != null && isSigma && newCharNum == 4) {
 			return true;
 		}
@@ -1735,8 +1736,8 @@ public partial class Player {
 		} else if (isSigma3()) {
 			return limboChar != null && KaiserSigma.canKaiserSpawn(limboChar, out spawnPoint);
 		}
-
-		return true;
+*/
+		return false;
 	}
 
 	public bool canReviveX() {
@@ -1774,6 +1775,7 @@ public partial class Player {
 	public void reviveVileNonOwner(bool toMK5) {
 		Vile vile = (character as Vile);
 
+		if (Options.main.swapGoliathInputs) vileFormToRespawnAs = 2;
 		if (toMK5) {
 			vileFormToRespawnAs = 2;
 		} else {

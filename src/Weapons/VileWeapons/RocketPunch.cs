@@ -402,3 +402,67 @@ public class SpoiledBratPunch : CharState {
 		shot = false;
 	}
 }
+
+
+public class Ouroboros : CharState {
+
+	private float partTime;
+
+	private float chargeTime;
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	private bool fired;
+
+	public Ouroboros(string transitionSprite = "")
+		: base("super_shoot", "", "", transitionSprite)
+	{
+
+	}
+
+	public override void update()
+	{
+		
+		if (!fired && character.frameIndex > 2){
+			new StrikeChain().getProjectile(character.getShootPos(), character.getShootXDir(), player, 0, player.getNextActorNetId());
+		fired = true;
+		}	
+		
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+

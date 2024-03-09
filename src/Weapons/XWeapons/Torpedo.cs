@@ -49,7 +49,16 @@ public class TorpedoProj : Projectile, IDamagable {
 		else if (type == 2) projId = (int)ProjIds.MechTorpedo;
 		else if (type == 3) {
 			projId = (int)ProjIds.LaunchOTorpedo;
+
+			if (!player.isDynamo){
 			changeSprite("launcho_proj_ht", true);
+			}
+			if (player.character != null && player.isDynamo){
+		changeSprite("dynamonbulletproj", true);
+		damager.flinch = Global.defFlinch;
+		damager.damage = 4;
+		maxSpeed = 300;
+		}
 		}
 
 		maxTime = 2f;
@@ -101,7 +110,7 @@ public class TorpedoProj : Projectile, IDamagable {
 
 		updateProjectileCooldown();
 		checkLandFrogTorpedo();
-
+			
 		if (ownedByLocalPlayer && homing) {
 			if (!Global.level.gameObjects.Contains(target)) {
 				target = null;

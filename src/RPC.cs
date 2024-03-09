@@ -537,10 +537,10 @@ public class RPCPlayerToggle : RPC {
 			if (player.character is MegamanX mmx) {
 				mmx.isShootingRaySplasher = false;
 			}
-		} else if (player?.character != null && toggleId == RPCToggleType.StartBarrier) {
-			(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
-		} else if (player?.character != null && toggleId == RPCToggleType.StopBarrier) {
-			(player?.character as MegamanX).barrierTime = 0;
+	//	} else if (player?.character != null && toggleId == RPCToggleType.StartBarrier) {
+	//		(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
+	//	} else if (player?.character != null && toggleId == RPCToggleType.StopBarrier) {
+	//		(player?.character as MegamanX).barrierTime = 0;
 		} else if (toggleId == RPCToggleType.StockSaber) {
 			player.character.stockedXSaber = true;
 		} else if (toggleId == RPCToggleType.UnstockSaber) {
@@ -1698,6 +1698,7 @@ public class RPCCommandGrabPlayer : RPC {
 			//if (victimChar != null) {
 			//	victimChar.charState?.releaseGrab();
 			//}
+			
 		}
 	}
 

@@ -158,7 +158,7 @@ public class SelectWeaponMenu : IMainMenu {
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
 		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
-			if (duplicateWeapons()) {
+			if (duplicateWeapons() && Options.main.xLoadout.melee != 3) {
 				error = "Cannot select same weapon more than once!";
 				return;
 			}

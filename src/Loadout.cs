@@ -37,9 +37,20 @@ public class XLoadout {
 
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
 		var indices = new List<byte>();
+		if (melee == 1){
+		indices.Add((byte)weapon1);
+		indices.Add((int)WeaponIds.Buster);
+		}
+		if (melee == 0){
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);
+		}
+		if (melee == 2){
+		indices.Add((byte)weapon1);
+		indices.Add((byte)weapon2);
+		indices.Add((byte)weapon3);
+		}
 	//	if (player.hasAllX3Armor()) indices.Add((int)WeaponIds.HyperBuster);
 		//if (player.hasFullGiga()) 
 		indices.Add((int)WeaponIds.GigaCrush);
@@ -142,7 +153,7 @@ public class VileLoadout {
 
 	public static VileLoadout createRandom() {
 		return new VileLoadout() {
-			cannon = Helpers.randomRange(0, 2),
+			cannon = Helpers.randomRange(0, 3),
 			vulcan = Helpers.randomRange(0, 2),
 			missile = Helpers.randomRange(0, 2),
 			rocketPunch = Helpers.randomRange(0, 2),
@@ -155,7 +166,7 @@ public class VileLoadout {
 	}
 
 	public void validate() {
-		if (!inRange(cannon, 0, 2)) cannon = 0;
+		if (!inRange(cannon, 0, 3)) cannon = 0;
 		if (!inRange(vulcan, 0, 2)) vulcan = 0;
 		if (!inRange(missile, 0, 2)) missile = 0;
 		if (!inRange(rocketPunch, 0, 2)) rocketPunch = 0;

@@ -1939,32 +1939,6 @@ public class GameMode {
 			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
-			if (weapon is DynamoRoyal rw) {
-			Global.sprites["hud_weapon_icon"].draw(
-				weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y,
-				1, 1, null, 1f, 1f, 1f, 1000000L
-			);
-			if (Global.level.mainPlayer?.character?.unpoAbsorbedProj != null) {
-				Projectile absorbedProj = Global.level.mainPlayer.character.unpoAbsorbedProj;
-				Sprite sprite = Global.sprites[absorbedProj.sprite.name];
-
-				float w = sprite.getCurrentFrame().rect.w();
-				float h = sprite.getCurrentFrame().rect.h();
-				float scaleX = Helpers.clampMax(10f / w, 1f);
-				float scaleY = Helpers.clampMax(10f / h, 1f);
-				Global.sprites[sprite.name].draw(
-					0, Global.level.camX + x,
-					Global.level.camY + y,
-					1, 1, null, 1f,
-					scaleX, scaleY, 1000000L
-				);
-			} else {
-				Global.sprites["hud_weapon_icon"].draw(
-				weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y,
-				1, 1, null, 1f, 1f, 1f, 1000000L
-			);
-			}
-		}
 	}
 
 	private void drawWeaponText(float x, float y, string text) {

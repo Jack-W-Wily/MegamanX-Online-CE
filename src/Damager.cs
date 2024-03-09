@@ -323,15 +323,16 @@ public class Damager {
 			//}
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 			//Grab fix test FUCK YOU GM HOLY MOTHER OF GOD
+			/*
 			if (projId == (int)ProjIds.VileMK2Grab && !(character.charState is VileMK2Grabbed)) {	
 				character.changeState(new VileMK2Grabbed(owner.character), true);			
 			}
 			if (projId == (int)ProjIds.UPGrab && !(character.charState is UPGrabbed)) {	
 				character.changeState(new UPGrabbed(owner.character), true);			
 			}
-			
+			*/
 			//GBD's Mighty Kick
-			if (projId == (int)ProjIds.GBDKick && !(character.charState is KnockedDown)) {	
+			if (projId == (int)ProjIds.GBDKick && !(character.charState is KnockedDown) && !(character.charState is SwordBlock)) {	
 				character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 				owner.character.isDashing = true;
 				owner.character.dashedInAir += 1;
@@ -396,7 +397,7 @@ public class Damager {
 			}
 
 			if (owner?.character?.isNightmareZeroBS.getValue() == true) {
-				character.addInfectedTime(owner, damage);
+				//character.addInfectedTime(owner, damage);
 			}
 
 			#endregion
@@ -676,6 +677,9 @@ public class Damager {
 			return true;
 		} else if (finalDamage > 0 && character != null && character.ownedByLocalPlayer && character.charState is KKnuckleParryStartState parryState2 && parryState2.canParry(damagingActor) && !isDot(projId)) {
 			parryState2.counterAttack(owner, damagingActor, 4);
+			return true;
+		}	else if (finalDamage > 0 && character != null && character.ownedByLocalPlayer && character.charState is DynamoParryStartState parryState3 && parryState3.canParry(damagingActor) && !isDot(projId)) {
+			parryState3.counterAttack(owner, damagingActor, 4);
 			return true;
 		}
 

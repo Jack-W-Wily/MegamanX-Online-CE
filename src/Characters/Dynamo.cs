@@ -13,10 +13,12 @@ public class Dynamo : Character {
 
 	}
 
-	
-	public int DynamoCounters;
+	public int NightmareBullets = 0;
 
-	public int DynamoStance;
+
+	public int DynamoCounters = 0;
+
+	public int DynamoStance = 0;
 
 	public float DynamoSlashCD;
 	public float DynamoStringCD;
@@ -106,15 +108,15 @@ public class Dynamo : Character {
 		}
 		// Dynamo STance 3
 		if (DynamoStance == 2){
-		if (grounded && charState.canAttack() && player.input.isHeld("shoot", player))
+		if (grounded && charState.canAttack() && player.input.isPressed("shoot", player))
 					{
-				if (unpoAbsorbedProj != null)
+				if (NightmareBullets > 0)
 					{
-						changeState(new XUPParryProjState(unpoAbsorbedProj, shootProj: true, absorbThenShoot: false), forceChange: true);
-						unpoAbsorbedProj = null;
-						return;
+			if (NightmareBullets != 2)changeState(new DynamoShoot(grounded, shootProj: false), forceChange: true);
+			if (NightmareBullets == 2)changeState(new DynamoNightmareBullet(grounded, shootProj: false), forceChange: true);			
+				NightmareBullets -= 1;				
 					}
-                 changeState(new XUPParryStartState());
+                 changeState(new DynamoParryStartState());
 					}
 		if (DynamoBoomerangCD == 0 && 
 		charState.canAttack() && player.input.isPressed("special1", player))

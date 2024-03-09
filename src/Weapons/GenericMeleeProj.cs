@@ -99,7 +99,10 @@ public class GenericMeleeProj : Projectile {
 			charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new XUPGrabState(grabbedChar), new UPGrabbed(grabberChar));
 		} else if (projId == (int)ProjIds.VileMK2Grab) {
 			charGrabCode(CommandGrabScenario.MK2Grab, grabberChar, damagable, new VileMK2GrabState(grabbedChar), new VileMK2Grabbed(grabberChar));
-		} else if (projId == (int)ProjIds.LaunchODrain && owningActor is LaunchOctopus lo) {
+		}
+	
+		
+		 else if (projId == (int)ProjIds.LaunchODrain && owningActor is LaunchOctopus lo) {
 			maverickGrabCode(CommandGrabScenario.WhirlpoolGrab, lo, damagable, new WhirlpoolGrabbed(lo));
 		} else if (projId == (int)ProjIds.FStagUppercut && owningActor is FlameStag fs) {
 			maverickGrabCode(CommandGrabScenario.FStagGrab, fs, damagable, new FStagGrabbed(fs));

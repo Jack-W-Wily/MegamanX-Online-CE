@@ -372,6 +372,10 @@ public partial class Character : Actor, IDamagable {
 		var shaders = new List<ShaderWrapper>();
 		ShaderWrapper palette = null;
 
+
+		if (isNightmareZeroBS.getValue()) {
+				palette = player.nightmareZeroShader;
+			}
 		// TODO: Send this to the respective classes.
 		if (player.isX) {
 			int index = player.weapon.index;
@@ -404,9 +408,7 @@ public partial class Character : Actor, IDamagable {
 			} else {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
 			}
-			if (isNightmareZeroBS.getValue()) {
-				palette = player.nightmareZeroShader;
-			}
+			
 		} else if (player.isAxl) {
 			
 		} else if (player.isViralSigma()) {
@@ -1963,7 +1965,7 @@ public partial class Character : Actor, IDamagable {
 	public int getChargeLevel() {
 		bool clampTo3 = true;
 		if (this is Zero zero) clampTo3 = !zero.canUseDoubleBusterCombo();
-		if (this is Vile vile) clampTo3 = !vile.isVileMK5;
+		if (this is Vile vile) clampTo3 = vile.vileForm == 0;
 		if (this is MegamanX mmx) clampTo3 = !mmx.isHyperX;
 
 		if (chargeTime < charge1Time) {

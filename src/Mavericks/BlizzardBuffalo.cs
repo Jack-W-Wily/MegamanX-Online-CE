@@ -486,7 +486,8 @@ public class BBuffaloDragged : GenericGrabbedState {
 		base.update();
 		trySnapToGrabPoint(true);
 
-		if (!grabber.sprite.name.Contains("_dash")) character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+		if (!grabber.sprite.name.Contains("_dash")) character.changeState(
+			new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
 				
 	}
 }

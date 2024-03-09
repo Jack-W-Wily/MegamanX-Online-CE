@@ -313,6 +313,10 @@ public partial class Actor : GameObject {
 			spriteName = spriteName.Replace("vilemk2_", "vile_").Replace("vilemk5_", "vile_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
+		if (matchingVoice == null && (spriteName.StartsWith("vilemk4_"))) {
+			spriteName = spriteName.Replace("vilemk4", "vilemk5_").Replace("vilemk4_", "vilemk5_");
+			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
+		}
 
 		if (matchingVoice != null) {
 			playSound(matchingVoice);

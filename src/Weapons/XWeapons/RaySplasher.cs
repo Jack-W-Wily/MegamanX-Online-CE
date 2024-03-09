@@ -292,9 +292,9 @@ public class RaySplasherTurret : Actor, IDamagable
 		}else if (state == 1)
 		{
 
-			if (playerOwner.character.xDir == 1)move(new Point(100f, velY));
-			if (playerOwner.character.xDir == -1)move(new Point(-100f, velY));
-			if (playerOwner.character != null && !playerOwner.input.isHeld("weaponright", playerOwner)){
+			if (playerOwner.character != null &&playerOwner.character.xDir == 1)move(new Point(100f, velY));
+			if (playerOwner.character != null &&playerOwner.character.xDir == -1)move(new Point(-100f, velY));
+			if (playerOwner.character != null &&playerOwner.character != null && !playerOwner.input.isHeld("weaponright", playerOwner)){
 				state = 2;
 			}
 			changeSprite("iris_crystal_bash", resetFrame: true);	
@@ -330,8 +330,9 @@ public class RaySplasherTurret : Actor, IDamagable
 		}
 		else
 		{
-			if (state == 0)
+			if (state == 3)
 			{
+				state = 1;
 				return;
 			}
 			_ = target;

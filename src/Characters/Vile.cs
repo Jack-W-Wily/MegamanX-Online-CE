@@ -23,6 +23,7 @@ public class Vile : Character {
 	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
 	public bool isVileMK5 { get { return vileForm == 2; } }
+	public bool isVileMK4 { get { return vileForm == 3; } }
 	public float vileHoverTime;
 	public float vileMaxHoverTime = 6;
 
@@ -34,6 +35,8 @@ public class Vile : Character {
 	public bool lastFrameWeaponRightHeld;
 	public int cannonAimNum;
 
+	public int ChainTrigger = 0;
+
 	public Vile(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -44,7 +47,9 @@ public class Vile : Character {
 	) {
 
 		
-
+			if (Options.main.swapGoliathInputs){
+			vileForm = 3;
+			}
 			if (player.vileCannonWeapon.type == 2) {
 				vileForm = 2;
 			} 
@@ -66,6 +71,7 @@ public class Vile : Character {
 		string vilePrefix = "vile_";
 		if (isVileMK2) vilePrefix = "vilemk2_";
 		if (isVileMK5) vilePrefix = "vilemk5_";
+		if (isVileMK4) vilePrefix = "vilemk4_";
 		string cannonSprite = vilePrefix + "cannon";
 		for (int i = 0; i < currentFrame.POIs.Count; i++) {
 			var poi = currentFrame.POIs[i];
@@ -172,15 +178,19 @@ public class Vile : Character {
 		Helpers.decrementTime(ref mk2missleCooldown);
 		
 
-		if (player.weapon is not AssassinBullet && (player.vileLaserWeapon.type > -1 || isVileMK5)) {
+		if (player.weapon is not AssassinBullet && (player.vileLaserWeapon.type > -1 || (isVileMK5 || isVileMK4))) {
 			if (player.input.isHeld(Control.Special1, player) && charState is not Die && invulnTime == 0 && flag == null && player.vileAmmo >= player.vileLaserWeapon.getAmmoUsage(0)) {
 				increaseCharge();
 			} else {
 				if (isCharging() && getChargeLevel() >= 3) {
-					if (getChargeLevel() >= 4 && isVileMK5) {
-						changeState(new HexaInvoluteState(), true);
+					if (getChargeLevel() >= 4 && (isVileMK5 || isVileMK4)) {
+						if (isVileMK5)changeState(new HexaInvoluteState(), true);
+						if (isVileMK4)changeState(new Rakuhouha(new ShinMessenkou(player)), true);				
+			
 					} else {
-						player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, this);
+						if (isVileMK4)changeState(new Rakuhouha(new ShinMessenkou(player)), true);				
+			
+						if (!isVileMK4)player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, this);
 					}
 				}
 				stopCharge();
@@ -394,6 +404,23 @@ public class Vile : Character {
 		//mk1 Vulcan
 		if (isVileMK1 && player.input.isHeld(Control.WeaponRight, player)){
 			player.weapon.vileShoot(WeaponIds.Vulcan, this);
+		}
+
+		//Ouroboros Bitch
+		if (Options.main.swapGoliathInputs && mk2missleCooldown == 0){
+		if (player.input.isPressed(Control.WeaponRight, player)) {
+			mk2missleCooldown = 0.5f;
+			changeState(new Ouroboros(), true);
+		}
+		if ((charState.canAttack() || charState is SwordBlock) && player.input.isPressed(Control.Shoot, player)&& player.input.isHeld(Control.Up, player) && charState is not VileMK2GrabState) {
+		
+			changeState(new ChainGrab(), true);
+			
+		}
+		if (charState.canAttack() && player.input.isPressed(Control.Shoot, player)&& player.input.isHeld(Control.Down, player) && charState is not Dash) {
+		
+			changeState(new DynamoString1(), true);
+		}
 		}
 		//Mk2 Missle Thinggy
 		if (isVileMK2 && player.input.isPressed(Control.WeaponRight, player) && mk2missleCooldown == 0){
@@ -660,6 +687,10 @@ public class Vile : Character {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
+		
+		if (sprite.name.Contains("ex_chain")) {
+		proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0f);
+		} 
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0f);
 		}
@@ -668,6 +699,19 @@ public class Vile : Character {
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
+		 if ( sprite.name.Contains("_projswing"))
+		{
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
+		}
+		 if ( sprite.name.Contains("_string"))
+		{
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+		}
+		if ( sprite.name.Contains("_flamethrower"))
+		{
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 1f, 25, 0.4f, null, isShield: true, isDeflectShield: true);
+		}
+	
 		return proj;
 	}
 
@@ -711,6 +755,10 @@ public class Vile : Character {
 	}
 
 	public override string getSprite(string spriteName) {
+		
+		if (isVileMK4){
+		return "vilemk4_" + spriteName;	
+		}
 		if (isVileMK5) {
 			return "vilemk5_" + spriteName;
 		}

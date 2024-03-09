@@ -27,10 +27,13 @@ public class StrikeChain : Weapon {
 		else if (player.input.isHeld(Control.Down, player)) {
 			if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && player.character.grounded) { } else upOrDown = 1;
 		}
+		if (player.isVile)new StrikeChainProj(this, pos, xDir, 1, upOrDown, player, netProjId, rpc: true);
+		if (player.isX){
 		if (chargeLevel < 3) {
 			new StrikeChainProj(this, pos, xDir, 0, upOrDown, player, netProjId, rpc: true);
 		} else {
 			new StrikeChainProj(this, pos, xDir, 1, upOrDown, player, netProjId, rpc: true);
+		}
 		}
 	}
 }
@@ -72,9 +75,13 @@ public class StrikeChainProj : Projectile {
 		projId = (int)ProjIds.StrikeChain;
 
 		if (type == 1) {
-			changeSprite(xDir == 1 ? "strikechain_charged" : "strikechain_charged_left", true);
+
+			if (player.isVile)changeSprite(xDir == 1 ? "strikechain_kuzari" : "strikechain_kuzari_left", true);
+	
+			if (!player.isVile)changeSprite(xDir == 1 ? "strikechain_charged" : "strikechain_charged_left", true);
 			maxDist = 180;
-			damager.damage = 4;
+			if (player.isVile)damager.damage = 2;
+			if (!player.isVile)damager.damage = 4;
 			speed *= 1.5f;
 		}
 
@@ -104,8 +111,10 @@ public class StrikeChainProj : Projectile {
 			string sprite = "";
 			if (type == 0 && xDir == 1) sprite = "strikechain_chain";
 			if (type == 0 && xDir == -1) sprite = "strikechain_chain_left";
-			if (type == 1 && xDir == 1) sprite = "strikechain_charged_chain";
-			if (type == 1 && xDir == -1) sprite = "strikechain_charged_chain_left";
+			if (!player.isVile && type == 1 && xDir == 1) sprite = "strikechain_charged_chain";
+			if (!player.isVile && type == 1 && xDir == -1)  sprite = "strikechain_charged_chain_left";
+			if (player.isVile && type == 1 && xDir == 1) sprite = "strikechain_kuzari_part";
+			if (player.isVile && type == 1 && xDir == -1)  sprite = "strikechain_kuzari_part_left";
 
 			var midSprite = Global.sprites[sprite].clone();
 			spriteMids.Add(midSprite);
@@ -445,4 +454,108 @@ public class StrikeChainHooked : CharState {
 			}
 		}
 	}
+}
+
+
+
+
+public class ChainSliderState : CharState
+{
+	public float dashTime;
+
+	public Projectile fSplasherProj;
+
+	private bool once;
+	
+
+	public ChainSliderState()
+		: base("ex_chainslider", "")
+	{
+
+	}
+
+	public override void onEnter(CharState oldState)
+	{
+		base.onEnter(oldState);
+		character.playSound("strikeChain", sendRpc: true);
+		
+	}
+
+	public override void onExit(CharState newState)
+	{
+		base.onExit(newState);
+	}
+
+	public override void update()
+	{
+		base.update();
+
+		if (character.frameIndex == 3 && !once){
+			once = true;
+     character.playSound("crashX3", forcePlay: false, sendRpc: true);
+
+		}
+		if (character.isAnimOver())
+		{
+		character.changeState(new Idle(), forceChange: true);
+		}
+	}
+}
+
+
+
+public class ChainGrab : CharState {
+
+	private float partTime;
+
+	private float chargeTime;
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	private bool fired;
+
+	public ChainGrab(string transitionSprite = "")
+		: base("ex_chain", "", "", transitionSprite)
+	{
+
+	}
+
+	public override void update()
+	{
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+		character.playSound("strikeChainCharged", sendRpc: true);
+			
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
 }
