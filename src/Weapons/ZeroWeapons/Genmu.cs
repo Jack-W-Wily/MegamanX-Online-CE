@@ -22,6 +22,7 @@ public class GenmuProj : Projectile {
 		xScale = 0.75f;
 		yScale = 0.75f;
 		projId = (int)ProjIds.Gemnu;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

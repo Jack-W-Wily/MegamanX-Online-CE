@@ -432,7 +432,6 @@ public class MK2NapalmGrenadeProj : Projectile {
 		collider.wallOnly = true;
 		fadeSound = "explosion";
 		fadeSprite = "explosion";
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -533,7 +532,6 @@ public class MK2NapalmWallProj : Projectile {
 		vel = new Point(0, -200);
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
