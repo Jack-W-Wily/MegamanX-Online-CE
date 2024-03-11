@@ -1,5 +1,4 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -66,10 +65,10 @@ public class TextExportMenu : IMainMenu {
 		} else if (Global.input.isPressedMenu(Control.MenuConfirm) &&
 			canCopyToClipboard && clipboardTime == 0
 		) {
-		#if WINDOWS
+#if WINDOWS
 			SetClipboard(text);
 			clipboardTime = 2;
-		#endif
+#endif
 		} else if (Global.input.isPressedMenu(Control.MenuAlt) && fileTime == 0) {
 			fileError = Helpers.WriteToFile(textFileName + ".txt", text);
 			fileTime = 2;
@@ -113,7 +112,7 @@ public class TextExportMenu : IMainMenu {
 			Global.screenW / 2, bot - 10, alignment: Alignment.Center
 		);
 		Fonts.drawTextEX(
-			FontType.Grey, "[BACK]: back", Global.screenW / 2,
+			FontType.Grey, "[BACK]: Back", Global.screenW / 2,
 			bot, alignment: Alignment.Center
 		);
 	}

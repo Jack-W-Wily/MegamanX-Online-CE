@@ -1,9 +1,9 @@
-﻿using Lidgren.Network;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Lidgren.Network;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -196,7 +196,7 @@ public class RPC {
 		if (bytes.Length > 0) {
 			om.Write(bytes);
 		}
-		s_server.SendMessage(om, s_server.Connections, netDeliveryMethod, 0);
+		s_server.SendToAll(om, netDeliveryMethod, 0);
 	}
 }
 
@@ -312,9 +312,9 @@ public class RPCApplyDamage : RPC {
 		int ownerId = arguments[0];
 		float damage = BitConverter.ToSingle(new byte[] { arguments[1], arguments[2], arguments[3], arguments[4] }, 0);
 		float hitCooldown = BitConverter.ToSingle(new byte[] { arguments[5], arguments[6], arguments[7], arguments[8] }, 0);
-		int flinch = (int)arguments[9];
+		int flinch = arguments[9];
 		ushort victimId = BitConverter.ToUInt16(new byte[] { arguments[10], arguments[11] }, 0);
-		bool weakness = (int)arguments[12] == 1;
+		bool weakness = arguments[12] == 1;
 		int weaponIndex = arguments[13];
 		int weaponKillFeedIndex = arguments[14];
 		ushort actorId = BitConverter.ToUInt16(new byte[] { arguments[15], arguments[16] }, 0);
@@ -381,10 +381,10 @@ public class RPCShoot : RPC {
 		int playerId = arguments[0];
 		int xPos = BitConverter.ToInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		int yPos = BitConverter.ToInt16(new byte[] { arguments[3], arguments[4] }, 0);
-		int xDir = (int)arguments[5] - 128;
-		int chargeLevel = (int)arguments[6];
+		int xDir = arguments[5] - 128;
+		int chargeLevel = arguments[6];
 		ushort projNetId = BitConverter.ToUInt16(new byte[] { arguments[7], arguments[8] }, 0);
-		int weaponIndex = (int)arguments[9];
+		int weaponIndex = arguments[9];
 
 		var player = Global.level.getPlayerById(playerId);
 		(player?.character as MegamanX)?.shootRpc(
@@ -532,15 +532,21 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.UnstockCharge) {
 			player.character.stockedCharge = false;
 		} else if (toggleId == RPCToggleType.StartRaySplasher) {
-			(player?.character as MegamanX).isShootingRaySplasher = true;
+			if (player.character is MegamanX mmx) {
+				mmx.isShootingRaySplasher = true;
+			}
 		} else if (toggleId == RPCToggleType.StopRaySplasher) {
 			if (player.character is MegamanX mmx) {
 				mmx.isShootingRaySplasher = false;
 			}
-	//	} else if (player?.character != null && toggleId == RPCToggleType.StartBarrier) {
-	//		(player?.character as MegamanX).barrierTime = (player?.character as MegamanX).barrierDuration;
-	//	} else if (player?.character != null && toggleId == RPCToggleType.StopBarrier) {
-	//		(player?.character as MegamanX).barrierTime = 0;
+		} else if (toggleId == RPCToggleType.StartBarrier) {
+			if (player.character is MegamanX mmx) {
+				mmx.barrierTime = mmx.barrierDuration;
+			}
+		} else if (toggleId == RPCToggleType.StopBarrier) {
+			if (player.character is MegamanX mmx) {
+				mmx.barrierTime = 0;
+			}
 		} else if (toggleId == RPCToggleType.StockSaber) {
 			player.character.stockedXSaber = true;
 		} else if (toggleId == RPCToggleType.UnstockSaber) {
@@ -746,7 +752,7 @@ public class RPCCreateAnim : RPC {
 		int spriteIndex = BitConverter.ToUInt16(new byte[] { arguments[2], arguments[3] }, 0);
 		float xPos = BitConverter.ToSingle(new byte[] { arguments[4], arguments[5], arguments[6], arguments[7] }, 0);
 		float yPos = BitConverter.ToSingle(new byte[] { arguments[8], arguments[9], arguments[10], arguments[11] }, 0);
-		int xDir = (int)arguments[12] - 128;
+		int xDir = arguments[12] - 128;
 
 		if (!Global.spriteNames.InRange(spriteIndex)) return;
 
@@ -1774,8 +1780,12 @@ public class RPCStopSound : RPC {
 		if (actor == null) return;
 
 		if (actor.netSounds.ContainsKey(soundIndex)) {
-			var soundWrapper = actor.netSounds[soundIndex];
-			if (!soundWrapper.deleted) soundWrapper.sound?.Stop();
+			SoundWrapper soundWrapper = actor.netSounds[soundIndex];
+			if (soundWrapper == null) {
+				actor.netSounds.Remove(soundIndex);
+			} else if (soundWrapper.deleted == false) {
+				soundWrapper.sound?.Stop();
+			}
 		}
 	}
 
@@ -2040,7 +2050,7 @@ public class RPCChangeDamage : RPC {
 	public override void invoke(params byte[] arguments) {
 		ushort netId = BitConverter.ToUInt16(new byte[] { arguments[0], arguments[1] }, 0);
 		float damage = BitConverter.ToSingle(new byte[] { arguments[2], arguments[3], arguments[4], arguments[5] }, 0);
-		int flinch = (int)arguments[6];
+		int flinch = arguments[6];
 
 		var proj = Global.level.getActorByNetId(netId) as Projectile;
 		if (proj?.damager != null) {

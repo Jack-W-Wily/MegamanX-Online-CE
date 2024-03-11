@@ -1,8 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -17,6 +16,7 @@ public class Anim : Actor {
 	public bool blink;
 	public bool maverickFade;
 	public bool grow;
+	public string animJsonName;
 
 	public Anim(Point pos, string spriteName, int xDir, ushort? netId, bool destroyOnEnd, bool sendRpc = false, bool ownedByLocalPlayer = true, Actor host = null,
 		long? zIndex = null, Actor zIndexRelActor = null, bool fadeIn = false, bool hasRaColorShader = false) :
@@ -26,6 +26,7 @@ public class Anim : Actor {
 		this.xDir = xDir;
 		this.destroyOnEnd = destroyOnEnd;
 		Global.level.gameObjects.Add(this);
+		animJsonName = spriteName;
 
 		if (isMaverickDeathAnim(spriteName)) {
 			maverickFade = true;

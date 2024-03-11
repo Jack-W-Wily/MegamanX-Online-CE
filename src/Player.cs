@@ -1,10 +1,8 @@
-﻿using Newtonsoft.Json;
-using ProtoBuf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
+using Newtonsoft.Json;
+using ProtoBuf;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -88,11 +86,12 @@ public partial class Player {
 
 	public bool canUpgradeXArmor() {
 		return (
-			character is MegamanX mmx &&
-			!isDisguisedAxl &&
-			mmx.isHyperX != true &&
-			mmx.charState is not XRevive &&
-			mmx.charState is not XReviveStart
+			realCharNum == 0 && (
+				character is not MegamanX mmx ||
+				mmx.isHyperX != true &&
+				mmx.charState is not XRevive &&
+				mmx.charState is not XReviveStart
+			)
 		);
 	}
 
@@ -370,8 +369,14 @@ public partial class Player {
 			deaths = serverPlayer.deaths;
 		}
 
-		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null && newAlliance != serverPlayer.autobalanceAlliance.Value) {
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(name + " was autobalanced to " + GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true), true);
+		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null &&
+			newAlliance != serverPlayer.autobalanceAlliance.Value
+		) {
+			Global.level.gameMode.chatMenu.addChatEntry(
+				new ChatEntry(
+					name + " was autobalanced to " +
+					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true
+				), true);
 			forceKill();
 			currency += 5;
 			Global.serverClient?.rpc(RPC.switchTeam, RPCSwitchTeam.getSendMessage(id, serverPlayer.autobalanceAlliance.Value));
@@ -985,12 +990,16 @@ public partial class Player {
 			previousLoadout = loadout;
 			applyLoadoutChange();
 			hyperChargeSlot = Global.level.is1v1() ? 0 : Options.main.hyperChargeSlot;
-			currentMaverickCommand = Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend;
+			currentMaverickCommand = (
+				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
+			);
 		} else if (isAI && Global.level.isTraining()) {
 			previousLoadout = loadout;
 			applyLoadoutChange();
 			hyperChargeSlot = Global.level.is1v1() ? 0 : Options.main.hyperChargeSlot;
-			currentMaverickCommand = Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend;
+			currentMaverickCommand = (
+				Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
+			);
 		}
 
 		configureWeapons();
@@ -1808,8 +1817,7 @@ public partial class Player {
 		} else if (isSigma2()) {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
-		}
-		else if (character is Doppma) {
+		} else if (character is Doppma) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
@@ -2442,7 +2450,9 @@ public partial class Player {
 		var nonSpecPlayers = Global.level.nonSpecPlayers();
 		nonSpecPlayers = nonSpecPlayers.OrderBy(p => p.id).ToList();
 		int index = nonSpecPlayers.IndexOf(this) % spawnPointCount;
-		if (index < 0) index = 0;
+		if (index < 0) {
+			index = 0;
+		}
 		return index;
 	}
 

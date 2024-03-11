@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -168,7 +165,7 @@ public class RayGunAltProj : Projectile {
 	float chargeTime;
 	float chargeDecreaseCooldown;
 	Axl axl;
-	
+
 	public RayGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId) :
 		base(weapon, pos, xDir, 0, 1, player, "axl_raygun_laser", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.RayGun2;
@@ -338,8 +335,11 @@ public class RayGunAltProj : Projectile {
 
 public class SplashLaserProj : Projectile {
 	public float maxSpeed = 400;
-	public SplashLaserProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 400, 1, player, "splashlaser_proj", 0, 0.3f, netProjId, player.ownedByLocalPlayer) {
+	public SplashLaserProj(
+		Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, 1, 400, 1, player, "splashlaser_proj", 0, 0.3f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "splashlaser_fade";
 		projId = (int)ProjIds.SplashLaser;
 		maxTime = 0.4f;
@@ -351,7 +351,7 @@ public class SplashLaserProj : Projectile {
 		shouldShieldBlock = false;
 		updateAngle();
 		if (sendRpc) {
-			rpcCreateAngle(pos, player, netProjId, getRpcAngle());
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
 		destroyOnHitWall = true;
 	}

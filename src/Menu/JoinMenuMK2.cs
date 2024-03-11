@@ -1,11 +1,9 @@
 using System;
-using System.Net;
 using System.Collections.Generic;
-using Lidgren.Network;
-using ProtoBuf;
-using Newtonsoft.Json;
-using System.Linq;
+using System.Net;
 using System.Threading;
+using Lidgren.Network;
+using Newtonsoft.Json;
 
 namespace MMXOnline;
 
@@ -25,6 +23,7 @@ public class JoinMenuP2P : IMainMenu {
 		config.EnableMessageType(NetIncomingMessageType.UnconnectedData);
 		config.AutoFlushSendQueue = false;
 		config.ConnectionTimeout = Server.connectionTimeoutSeconds;
+		//config.Port = Global.clientPort;
 		// Create client.
 		var netClient = new NetClient(config);
 		this.netClient = netClient;
@@ -57,9 +56,9 @@ public class JoinMenuP2P : IMainMenu {
 						break;
 					// Recieve server details to connect.
 					case 101:
-						(long, SimpleServerData) serverData = receiveServerDetails(msg);
+						(long, SimpleServerData, IPEndPoint) serverData = receiveServerDetails(msg);
 						if (serverData.Item2 != null) {
-							joinServer(serverData.Item1, serverData.Item2);
+							joinServer(serverData.Item1, serverData.Item2, serverData.Item3);
 							return;
 						}
 						break;
@@ -79,7 +78,7 @@ public class JoinMenuP2P : IMainMenu {
 		Helpers.menuUpDown(ref selServerIndex, 0, serverCount - 1);
 		// We pick a server with this.
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-			Action exitAction = () =>  {
+			Action exitAction = () => {
 				Menu.change(new ConnectionWaitMenuP2P(this, serverIndexes[selServerIndex]));
 			};
 			Menu.change(
@@ -119,7 +118,7 @@ public class JoinMenuP2P : IMainMenu {
 		foreach (long serverId in serverIndexes) {
 			Fonts.drawText(FontType.Blue, serverInfo[serverId].name, 30, 32 + offset);
 			Fonts.drawText(FontType.Blue, serverInfo[serverId].map, 102, 32 + offset);
-			Fonts.drawText(FontType.Blue, 
+			Fonts.drawText(FontType.Blue,
 				serverInfo[serverId].playerCount + "/" + serverInfo[serverId].maxPlayer,
 				190, 32
 			);
@@ -161,11 +160,12 @@ public class JoinMenuP2P : IMainMenu {
 		serverIndexes = serverKeys.ToArray();
 	}
 
-	public (long, SimpleServerData) receiveServerDetails(NetIncomingMessage msg) {
+	public (long, SimpleServerData, IPEndPoint) receiveServerDetails(NetIncomingMessage msg) {
 		long severId = msg.ReadInt64();
 		string jsonString = msg.ReadString();
+		IPEndPoint ipEndPoint = msg.ReadIPEndPoint();
 		SimpleServerData serverDetails = JsonConvert.DeserializeObject<SimpleServerData>(jsonString);
-		return (severId, serverDetails);
+		return (severId, serverDetails, ipEndPoint);
 	}
 
 	public void requestServerDetails(long serverId) {
@@ -178,7 +178,7 @@ public class JoinMenuP2P : IMainMenu {
 		netClient.SendUnconnectedMessage(regMsg, masterServerLocation);
 	}
 
-	public void joinServer(long serverId, SimpleServerData serverdata) {
+	public void joinServer(long serverId, SimpleServerData serverdata, IPEndPoint ipEndPoint) {
 		if (Helpers.compareVersions(Global.version, serverdata.gameVersion) == -1) {
 			exit(
 				new ErrorMenu(
@@ -251,12 +251,16 @@ public class JoinMenuP2P : IMainMenu {
 			playerName, -1, false, SelectCharacterMenu.playerData.charNum,
 			null, Global.deviceId, null, 0
 		);
-		Global.serverClient = ServerClient.CreateHolePunchAlt(
-			netClient, serverId, inputServerPlayer, out JoinServerResponse joinServerResponse,
-			out string error
+		Global.serverClient = ServerClient.CreateHolePunch(
+			netClient, serverId, ipEndPoint, inputServerPlayer,
+			out JoinServerResponse joinServerResponse, out string error
 		);
 		if (Global.serverClient == null) {
-			exit(new ErrorMenu(new string[] { error, "Please try rejoining." }, new MainMenu()));
+			exit(new ErrorMenu(
+				new string[] { "Connection error, log bellow.", error },
+				new MainMenu()
+			));
+			//Logger.LogNonFatalError(error);
 			return;
 		}
 		var players = joinServerResponse.server.players;
@@ -266,6 +270,7 @@ public class JoinMenuP2P : IMainMenu {
 			Global.level = new Level(
 				server.getLevelData(), SelectCharacterMenu.playerData, server.extraCpuCharData, true
 			);
+			Global.level.teamNum = server.teamNum;
 			Global.level.startLevel(joinServerResponse.server, true);
 		} else {
 			Menu.change(new WaitMenu(new MainMenu(), server, false));
@@ -274,12 +279,12 @@ public class JoinMenuP2P : IMainMenu {
 }
 
 public class SimpleServerData {
-	[ProtoMember(1)] public string name;
-	[ProtoMember(2)] public string level;
-	[ProtoMember(3)] public decimal gameVersion;
-	[ProtoMember(4)] public string gameChecksum;
-	[ProtoMember(5)] public string customMapChecksum;
-	[ProtoMember(6)] public string customMapUrl;
+	public string name;
+	public string level;
+	public decimal gameVersion;
+	public string gameChecksum;
+	public string customMapChecksum;
+	public string customMapUrl;
 
 	public SimpleServerData() {
 
@@ -316,46 +321,62 @@ public class SimpleServerInfo {
 	}
 }
 
+#pragma warning disable SYSLIB0014
 public static class MasterServerData {
 	public static int serverPort = 17788;
 	public static string serverIp = "127.0.0.1";
 
-	#pragma warning disable SYSLIB0014
 	public static void updateMasterServerURL() {
+		string[] portUrl = new string[0];
 		if (Helpers.FileExists("./serverurl.txt")) {
 			string contents = Helpers.ReadFromFile("./serverurl.txt");
-			string[] portUrl = contents.Split(":");
-			serverIp = System.Net.Dns.GetHostAddresses(portUrl[0])[0].ToString();
-			serverPort = Int32.Parse(portUrl[1]);
-			return;
-		}
-		try {
-			string contents;
-			using (var wc = new System.Net.WebClient()) {
-				contents = wc.DownloadString(
-					"http://mmx-online-hdm.github.io/serverinfo/serverurl.txt"
-				);
+			portUrl = contents.Split(":");
+		} else {
+			try {
+				string contents;
+				using (var wc = new System.Net.WebClient()) {
+					contents = wc.DownloadString(
+						"http://mmx-online-hdm.github.io/serverinfo/serverurl.txt"
+					);
+				}
+				portUrl = contents.Split(":");
+			} catch {
+				return;
 			}
-			string[] portUrl = contents.Split(":");
-			serverIp = System.Net.Dns.GetHostAddresses(portUrl[0])[0].ToString();
-			serverPort = Int32.Parse(portUrl[1]);
-		} catch {
+		}
+		if (portUrl.Length != 2) {
 			return;
 		}
+		bool foundAdress = false;
+		IPAddress[] addresses = System.Net.Dns.GetHostAddresses(
+			portUrl[0], System.Net.Sockets.AddressFamily.InterNetwork
+		);
+		foreach (IPAddress address in addresses) {
+			serverIp = address.ToString();
+			foundAdress = true;
+			break;
+		}
+		if (foundAdress) {
+			serverPort = Int32.Parse(portUrl[1]);
+		}
+		serverIp = System.Net.Dns.GetHostAddresses(portUrl[0])[0].ToString();
+		serverPort = Int32.Parse(portUrl[1]);
 	}
-	#pragma warning restore  SYSLIB0014
 }
+#pragma warning restore SYSLIB0014
 
 public enum MasterServerMsg {
 	HostList,
-	ConnectPeers,
+	ConnectPeersLong,
 	RequestDetails,
 	RegisterHost,
 	RegisterDetails,
 	RegisterInfo,
 	UpdatePlayerNum,
-	DeleteHost
+	DeleteHost,
+	ConnectPeersShort,
 }
+
 
 public class ConnectionWaitMenuP2P : IMainMenu {
 	public JoinMenuP2P joinMenu;
@@ -390,9 +411,9 @@ public class ConnectionWaitMenuP2P : IMainMenu {
 				if (msg.MessageType == NetIncomingMessageType.UnconnectedData &&
 					msg.ReadByte() == 101
 				) {
-					(long, SimpleServerData) serverData = joinMenu.receiveServerDetails(msg);
+					(long, SimpleServerData, IPEndPoint) serverData = joinMenu.receiveServerDetails(msg);
 					if (serverData.Item2 != null) {
-						joinMenu.joinServer(serverData.Item1, serverData.Item2);
+						joinMenu.joinServer(serverData.Item1, serverData.Item2, serverData.Item3);
 						return;
 					}
 				}

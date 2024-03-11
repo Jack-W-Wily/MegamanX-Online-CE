@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -69,7 +66,7 @@ public class ShotgunIceProj : Projectile {
 		fadeSprite = "buster1_fade";
 		this.type = type;
 		if (velOverride != null) {
-			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y / 0.5f));
+			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y * 0.5f));
 		}
 		reflectable = true;
 		//this.fadeSound = "explosion";
@@ -77,11 +74,12 @@ public class ShotgunIceProj : Projectile {
 			byte[] extraArgs;
 			if (velOverride != null) {
 				extraArgs = new byte[] {
+					(byte)type,
 					(byte)(velOverride.Value.x + 128),
 					(byte)(velOverride.Value.y + 128)
 				};
 			} else {
-				extraArgs = new byte[] { (byte)129, (byte)0 };
+				extraArgs = new byte[] { (byte)type, (byte)(128 + xDir), 128 };
 			}
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
 		}
@@ -106,23 +104,23 @@ public class ShotgunIceProj : Projectile {
 			Character chr = null;
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, -2), chr, rpc: true
+				((-1 * xDir), -2), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, -1), chr, rpc: true
+				((-1 * xDir), -1), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, 0), chr, rpc: true
+				((-1 * xDir), 0), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, 1), chr, rpc: true
+				((-1 * xDir), 1), chr, rpc: true
 			);
 			new ShotgunIceProj(
 				weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(),
-				(-1, 2), chr, rpc: true
+				((-1 * xDir), 2), chr, rpc: true
 			);
 		}
 	}
@@ -137,12 +135,12 @@ public class ShotgunIceProj : Projectile {
 		base.onHitDamagable(damagable);
 	}
 
-	//public static Projectile rpcInvoke(ProjParameters arg) {
-	//	return new ShotgunIceProj(
-	//		ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
-	//		arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
-	//	); 
-	//}
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ShotgunIceProj(
+			ShotgunIce.netWeapon, arg.pos, arg.xDir, arg.player,
+			arg.extraData[0], arg.netId, (arg.extraData[1] - 128, arg.extraData[2] - 128)
+		);
+	}
 }
 
 public class ShotgunIceProjCharged : Projectile {

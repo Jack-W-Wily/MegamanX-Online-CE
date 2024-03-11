@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using SFML.Graphics;
-using SFML.System;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
+using SFML.Graphics;
+using SFML.System;
 
 namespace MMXOnline;
 
@@ -38,6 +38,7 @@ public class GameMode {
 	public bool noContest;
 
 	public byte[] teamPoints = new byte[6];
+	public byte[] teamAltPoints = new byte[6];
 	public string[] teamNames = {
 		"Blue",
 		"Red",
@@ -51,7 +52,6 @@ public class GameMode {
 		FontType.Red,
 		FontType.Green,
 		FontType.Purple,
-		FontType.Yellow,
 		FontType.Yellow,
 		FontType.Orange
 	};
@@ -191,8 +191,7 @@ public class GameMode {
 		return 1;
 	}
 
-	public static int[] getAllianceCounts(List<Player> players) {
-		int teamNum = Global.level.server.teamNum;
+	public static int[] getAllianceCounts(List<Player> players, int teamNum) {
 		int[] teamSizes = new int[teamNum];
 		foreach (Player player in players) {
 			if (!player.isSpectator && player.alliance >= 0 && player.alliance < teamNum) {
@@ -202,8 +201,7 @@ public class GameMode {
 		return teamSizes;
 	}
 
-	public static int[] getAllianceCounts(List<ServerPlayer> players) {
-		int teamNum = Global.level.server.teamNum;
+	public static int[] getAllianceCounts(List<ServerPlayer> players, int teamNum) {
 		int[] teamSizes = new int[teamNum];
 		foreach (ServerPlayer serverPlayer in players) {
 			if (!serverPlayer.isSpectator && serverPlayer.alliance >= 0 && serverPlayer.alliance < teamNum) {
@@ -213,7 +211,7 @@ public class GameMode {
 		return teamSizes;
 	}
 
-	public GameMode(Level level, int? timeLimit) {
+	public GameMode(Level level, int? timeLimit, int? teamNum) {
 		this.level = level;
 		if (timeLimit != null) {
 			remainingTime = timeLimit.Value * 60;
@@ -483,7 +481,7 @@ public class GameMode {
 
 	public void checkIfWinLogicTeams() {
 		int winningAlliance = -1;
-		for (int i = 0; i < Global.level.server.teamNum; i++) {
+		for (int i = 0; i < Global.level.teamNum; i++) {
 			if (Global.level.gameMode.teamPoints[i] >= playingTo) {
 				if (winningAlliance == -1) {
 					winningAlliance = i;
@@ -495,11 +493,11 @@ public class GameMode {
 		if (winningAlliance == -1 && remainingTime <= 0) {
 			int lastScore = 0;
 			bool closeMatch = false;
-			for (int i = 0; i < Global.level.server.teamNum; i++) {
+			for (int i = 0; i < Global.level.teamNum; i++) {
 				if (Global.level.gameMode.teamPoints[i] > lastScore) {
 					winningAlliance = i;
 					closeMatch = false;
-					if (Global.level.gameMode.teamPoints[i] -1 == lastScore) {
+					if (Global.level.gameMode.teamPoints[i] - 1 == lastScore) {
 						closeMatch = true;
 					}
 				} else if (Global.level.gameMode.teamPoints[i] == lastScore) {
@@ -582,7 +580,11 @@ public class GameMode {
 
 				if (!axl.isZoomingIn && !axl.isZoomingOut) {
 					int zoomChargePercent = MathInt.Round(axl.zoomCharge * 100);
-					DrawWrappers.DrawText(zoomChargePercent.ToString() + "%", cursorPos.x + 5, cursorPos.y + 5, Alignment.Left, true, 0.75f, Color.White, Color.Black, Text.Styles.Regular, 1, false, ZIndex.HUD);
+					Fonts.drawText(
+						FontType.Orange, zoomChargePercent.ToString() + "%",
+						cursorPos.x + 5, cursorPos.y + 5, Alignment.Left,
+						true, depth: ZIndex.HUD
+					);
 				}
 
 				Helpers.decrementTime(ref flashCooldown);
@@ -1278,7 +1280,7 @@ public class GameMode {
 			ammoDisplayMultiplier = 0.5f;
 		}
 		for (var i = 0; i < MathF.Ceiling(maxAmmo * ammoDisplayMultiplier); i++) {
-			if ((double)i < Math.Ceiling(ammo * ammoDisplayMultiplier)) {
+			if (i < Math.Ceiling(ammo * ammoDisplayMultiplier)) {
 				if (ammo < grayAmmo) Global.sprites["hud_weapon_full"].drawToHUD(grayAmmoIndex, baseX, baseY);
 				else Global.sprites["hud_weapon_full"].drawToHUD(barIndex, baseX, baseY);
 			} else {
@@ -1487,9 +1489,14 @@ public class GameMode {
 			}
 
 			if (killFeed.killer == level.mainPlayer || killFeed.victim == level.mainPlayer || killFeed.assister == level.mainPlayer) {
-				var msgLen = Helpers.measureTextStd(TCat.HUD, msg, fontSize: 24).x;
-				var msgHeight = 10;
-				DrawWrappers.DrawRect(fromRight - msgLen - 2, fromTop - 2 + (i * yDist) - msgHeight / 2, fromRight + 2, fromTop - 1 + msgHeight / 2 + (i * yDist), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, isWorldPos: false, outlineColor: Color.White);
+				int msgLen = Fonts.measureText(FontType.FBlue, msg);
+				int msgHeight = 10;
+				DrawWrappers.DrawRect(
+					fromRight - msgLen - 2, fromTop - 2 + (i * yDist) - msgHeight / 2,
+					fromRight + 2, fromTop - 1 + msgHeight / 2 + (i * yDist),
+					true, new Color(0, 0, 0, 128), 1, ZIndex.HUD,
+					isWorldPos: false, outlineColor: Color.White
+				);
 			}
 
 			FontType killerColor = FontType.Blue;
@@ -2400,13 +2407,13 @@ public class GameMode {
 			(padding, top + 32),
 			(padding + 236, top + 32),
 			(padding + 118, top + 32),
-			(padding, top + 100),
+			(padding, top + 116),
 			(padding + 236, top + 116),
 			(padding + 118, top + 116),
 		};
 		drawTeamMiniScore(positions[0], 0, FontType.Blue, blueText);
 		drawTeamMiniScore(positions[1], 1, FontType.Red, redText);
-		for (int i = 2; i < Global.level.server.teamNum; i++) {
+		for (int i = 2; i < Global.level.teamNum; i++) {
 			drawTeamMiniScore(
 				positions[i], i,
 				teamFonts[i], $"{teamNames[i]}: {Global.level.gameMode.teamPoints[i]}"
@@ -2859,7 +2866,7 @@ public class GameMode {
 			drawAllTeamsHUD();
 			return;
 		}
-		int maxTeams = Global.level.server.teamNum;
+		int maxTeams = Global.level.teamNum;
 
 		string teamText = $"{teamNames[teamSide]}: {teamPoints[teamSide]}";
 		Fonts.drawText(teamFonts[teamSide], teamText, 5, 5);
@@ -2867,7 +2874,7 @@ public class GameMode {
 		int leaderTeam = 0;
 		int leaderScore = -1;
 		bool moreThanOneLeader = false;
-		for (int i = 0; i < Global.level.server.teamNum; i++) {
+		for (int i = 0; i < Global.level.teamNum; i++) {
 			if (teamPoints[0] >= leaderScore) {
 				leaderTeam = i;
 				if (leaderScore == teamPoints[i]) {
@@ -2876,19 +2883,19 @@ public class GameMode {
 				leaderScore = teamPoints[i];
 			}
 		}
-		if (moreThanOneLeader) {
-			Fonts.drawText(teamFonts[teamSide], $"Leader: {leaderScore}", 5, 5);
+		if (!moreThanOneLeader) {
+			Fonts.drawText(teamFonts[leaderTeam], $"Leader: {leaderScore}", 5, 15);
 		} else {
-			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 5);
+			Fonts.drawText(FontType.Grey, $"Leader: {leaderScore}", 5, 15);
 		}
 		drawTimeIfSet(25);
 	}
-	
+
 	public void drawAllTeamsHUD() {
-		for (int i = 0; i < Global.level.server.teamNum; i++) {
-			Fonts.drawText(teamFonts[i],  $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i* 10);
+		for (int i = 0; i < Global.level.teamNum; i++) {
+			Fonts.drawText(teamFonts[i], $"{teamNames[i]}: {teamPoints[i]}", 5, 5 + i * 10);
 		}
-		drawTimeIfSet(5 + 10 * (Global.level.server.teamNum + 1));
+		drawTimeIfSet(5 + 10 * (Global.level.teamNum + 1));
 	}
 
 	public void drawObjectiveNavpoint(string label, Point objPos) {

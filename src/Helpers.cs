@@ -1,18 +1,12 @@
-﻿using ProtoBuf;
-using SFML.Graphics;
-using SFML.System;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
-using static SFML.Graphics.Text;
+using ProtoBuf;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -25,8 +19,13 @@ public class Helpers {
 	public static Color LoadoutBorderColor = new Color(138, 192, 255);
 	public static Color DarkGreen {
 		get {
-			if (Global.level == null) return new Color(64, 255, 64);
-			//return new Color(0, (byte)(200 + (MathF.Sin(Global.time * 4) * 55)), (byte)(63 + (MathF.Sin(Global.time * 4) * 63)));
+			if (Global.level == null) {
+				return new Color(64, 255, 64);
+			}
+			/*return new Color(
+				0, (byte)(200 + (MathF.Sin(Global.time * 4) * 55)),
+				(byte)(63 + (MathF.Sin(Global.time * 4) * 63)));
+			*/
 			return new Color(0, 209, 63);
 		}
 	}
@@ -102,163 +101,12 @@ public class Helpers {
 		return getAllianceColor(Global.level?.mainPlayer);
 	}
 
-	public static bool shouldUseVectorFont(TCat textCategory) {
-		if ((textCategory == TCat.HUD || textCategory == TCat.Chat || textCategory == TCat.HUDColored) && Options.main.fontType != 0) return true;
-		if (Options.main.fontType == 2) return true;
-		return false;
-	}
-
-	public static bool shouldUseOutlineFont(TCat textCategory) {
-		if (textCategory == TCat.HUD || textCategory == TCat.Chat) return true;
-		return false;
-	}
-
-	public static float getWorldTextFontSize() {
-		return 0.75f;
-	}
-
-	public static void drawTextStd(string textStr, float x, float y, Alignment alignment = Alignment.Left, bool outline = true, uint fontSize = 36, Color? color = null,
-		Color? outlineColor = null, Styles style = Styles.Regular, float? outlineThickness = null, float alpha = 1,
-		float lineMargin = DrawWrappers.defaultLineMargin, VAlignment vAlignment = VAlignment.Top, bool selected = false, bool useVectorFont = false, bool isWorldPos = false) {
-		drawTextStd(TCat.Default, textStr, x, y, alignment, outline, fontSize, color, outlineColor, style, outlineThickness, alpha, lineMargin, vAlignment, useVectorFont, isWorldPos);
-	}
-
-	public static void drawTextStd(
-		TCat textCategory, string textStr, float x, float y,
-		Alignment alignment = Alignment.Left, bool outline = true, uint fontSize = 32, Color? color = null,
-		Color? outlineColor = null, Styles style = Styles.Regular, float? outlineThickness = null, float alpha = 1,
-		float lineMargin = DrawWrappers.defaultLineMargin, VAlignment vAlignment = VAlignment.Top,
-		bool selected = false, bool isWorldPos = false, int optionPadding = 0
-	) {
-		if (shouldUseVectorFont(textCategory)) {
-			if (color == null) {
-				color = new Color(255, 255, 255, Helpers.toColorByte(alpha));
-			} else if (alpha != 1) {
-				color = new Color(color.Value.R, color.Value.G, color.Value.B, Helpers.toColorByte(alpha));
-			}
-			drawTextStdFont(textStr, x, y, alignment, outline, fontSize, color, outlineColor, style, outlineThickness, textCategory == TCat.HUD, null, isWorldPos);
-			return;
-		}
-
-		// Pipeline step 1: auto-generate outlines if none passed in
-		if (outlineThickness == null) {
-			if (fontSize >= 36) outlineThickness = 4;
-			else if (fontSize >= 24) outlineThickness = 3;
-			else outlineThickness = 2;
-		}
-
-		// Pipeline step 2: sizes are "normalized" at 4x what they are supposed to be.
-		// This is a mistake but to avoid massive refactor, will "shim" it for now
-		fontSize = normalizeFontSize(fontSize);
-		outlineThickness = outlineThickness / 4f;
-
-		// Pipeline step 3: misc
-		if (textCategory == TCat.HUD) {
-			if (Global.level?.gameMode != null && Global.level.gameMode.isTeamMode) {
-				outlineColor = getAllianceColor();
-			} else {
-				outlineColor = Helpers.DarkBlue;
-			}
-		}
-
-		MMXFont font = MMXFont.Gray;
-		if (textCategory == TCat.Option) {
-			font = MMXFont.Menu;
-			var pieces = textStr.Split(": ");
-			if (pieces.Length > 1) {
-				string padding = "";
-				if (optionPadding > 0) {
-					padding = new string(' ', optionPadding - pieces[0].Length);
-				}
-				textStr = pieces[0] + ": " + padding + pieces[1];
-			}/* else {
-				textStr = textStr;
-			}*/
-		}
-		if (textCategory == TCat.OptionNoSplit) {
-			font = MMXFont.Menu;
-			//textStr = textStr;
-		}
-		if (textCategory == TCat.BotHelp) {
-			textStr = Helpers.menuControlText(textStr);
-			font = MMXFont.Gray;
-		}
-		if (textCategory == TCat.Title) {
-			font = MMXFont.Title;
-			//textStr = textStr.ToUpperInvariant();
-		}
-		if (textCategory == TCat.Default) {
-			font = MMXFont.Gray;
-		}
-		if (textCategory == TCat.BotHelp) {
-			font = MMXFont.Gray;
-		}
-		if (selected) {
-			font = MMXFont.Select;
-		}
-		if (textCategory == TCat.Chat) {
-			font = MMXFont.Gray;
-		}
-
-		if (outlineColor == Helpers.DarkBlue) font = MMXFont.Blue;
-		if (outlineColor == Helpers.DarkRed) font = MMXFont.Red;
-
-		DrawWrappers.DrawText(textStr, x, y, alignment, outline, fontSize / 8f, color, outlineColor, style, outlineThickness.Value, isWorldPos, 0, font, vAlignment: vAlignment, lineMargin: lineMargin, alpha: alpha);
-	}
-
 	public static string addPrefix(dynamic dStr, string prefix) {
 		string str = dStr ?? "";
 		if (!string.IsNullOrEmpty(str)) {
 			return prefix + str;
 		}
 		return str;
-	}
-
-	public static Point measureTextStd(TCat textCategory, string textStr, bool outline = true, uint fontSize = 36, float outlineThickness = 0) {
-		/*
-		if (shouldUseVectorFont(textCategory))
-		{
-			fontSize = normalizeFontSizeFont(fontSize);
-			return DrawWrappers.measureTextStdFont(textStr, outlineThickness, fontSize);
-		}
-		*/
-
-		fontSize = normalizeFontSize(fontSize);
-		return DrawWrappers.measureTextStd(textStr, outline, fontSize);
-	}
-
-	public static uint normalizeFontSize(uint fontSize) {
-		fontSize = (uint)(fontSize / 4f);
-
-		return fontSize;
-	}
-
-	public static void drawTextStdFont(string textStr, float x, float y, Alignment alignment = Alignment.Left,
-		bool outline = true, uint fontSize = 36, Color? color = null, Color? outlineColor = null, Styles style = Styles.Regular,
-		float? outlineThickness = null, bool matchAlliance = false, uint? lowQualityFontSize = null, bool isWorldPos = false) {
-		// Pipeline step 1: auto-generate outlines if none passed in
-		if (outlineThickness == null) {
-			if (fontSize >= 36) outlineThickness = 4;
-			else if (fontSize >= 24) outlineThickness = 3;
-			else outlineThickness = 2;
-		}
-
-		// Pipeline step 2: sizes are "normalized" at 4x what they are supposed to be. This is a mistake but to avoid massive refactor, will "shim" it for now
-		fontSize = normalizeFontSizeFont(fontSize);
-		outlineThickness = outlineThickness / 4f;
-
-		// Pipeline step 3: misc
-		if (matchAlliance && Global.level?.gameMode != null && Global.level.gameMode.isTeamMode) {
-			outlineColor = getAllianceColor();
-		}
-
-		DrawWrappers.DrawTextFont(textStr, x, y, alignment, outline, fontSize, color, outlineColor, style, outlineThickness.Value, isWorldPos, 0);
-	}
-
-	public static uint normalizeFontSizeFont(uint fontSize) {
-		fontSize = (uint)(fontSize / 4f);
-
-		return fontSize;
 	}
 
 	public static void drawWeaponSlotSymbol(float topLeftSlotX, float topLeftSlotY, string symbol) {
@@ -364,7 +212,8 @@ public class Helpers {
 		}
 	}
 
-	// Fast way to get a new shader wrapper that remembers SetUniform state while reusing the same base underlying shader
+	// Fast way to get a new shader wrapper that remembers SetUniform state
+	// while reusing the same base underlying shader
 	public static ShaderWrapper cloneShaderSafe(string shaderName) {
 		if (!Global.shaders.ContainsKey(shaderName)) {
 			return null;
@@ -377,8 +226,8 @@ public class Helpers {
 		var genericPaletteShader = cloneShaderSafe("genericPalette");
 		genericPaletteShader?.SetUniform("paletteTexture", texture);
 		genericPaletteShader?.SetUniform("palette", 1);
-		genericPaletteShader?.SetUniform("rows", (float)texture.Size.Y);
-		genericPaletteShader?.SetUniform("cols", (float)texture.Size.X);
+		genericPaletteShader?.SetUniform("rows", texture.Size.Y);
+		genericPaletteShader?.SetUniform("cols", texture.Size.X);
 		return genericPaletteShader;
 	}
 
@@ -387,8 +236,8 @@ public class Helpers {
 		var genericPaletteShader = cloneShaderSafe("nightmareZero");
 		genericPaletteShader?.SetUniform("paletteTexture", texture);
 		genericPaletteShader?.SetUniform("palette", 1);
-		genericPaletteShader?.SetUniform("rows", (float)texture.Size.Y);
-		genericPaletteShader?.SetUniform("cols", (float)texture.Size.X);
+		genericPaletteShader?.SetUniform("rows", texture.Size.Y);
+		genericPaletteShader?.SetUniform("cols", texture.Size.X);
 		return genericPaletteShader;
 	}
 
@@ -496,6 +345,16 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 		return MathF.Cos(radians);
 	}
 
+	public static float sinb(float degrees) {
+		var radians = degrees * MathF.PI / 128f;
+		return MathF.Sin(radians);
+	}
+
+	public static float cosb(float degrees) {
+		var radians = degrees * MathF.PI / 128f;
+		return MathF.Cos(radians);
+	}
+
 	public static float moveTo(float num, float dest, float inc, bool snap = false) {
 		float diff = dest - num;
 		inc *= MathF.Sign(diff);
@@ -556,7 +415,8 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 	}
 
 	// Given 2 angles, get the smallest difference between their values.
-	// Math.Abs(angle1 - angle2) won't work in such cases as angle1 = 359 and angle2 = 0, the closest angle difference should be 1
+	// Math.Abs(angle1 - angle2) won't work in such cases as angle1 = 359 and angle2 = 0,
+	// the closest angle difference should be 1
 	public static float getClosestAngleDiff(float angle1, float angle2) {
 		angle1 = to360(angle1);
 		angle2 = to360(angle2);
@@ -612,7 +472,7 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 	}
 
 	public static int byteToDir(byte dirByte) {
-		return (int)(dirByte - 128);
+		return dirByte - 128;
 	}
 
 	public static string menuControlText(string text, bool isController = false) {
@@ -650,44 +510,44 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 	public static int getGridCoordKey(ushort x, ushort y) {
 		return x << 16 | y;
 	}
-	
-	# if WINDOWS
-		[DllImport("user32.dll", SetLastError = true, CharSet= CharSet.Auto)]
-		public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
-	#endif
+
+#if WINDOWS
+	[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+	public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+#endif
 
 	public static void showMessageBox(string message, string caption) {
-		#if WINDOWS
-			if (Global.window != null) {
-				Global.window.SetMouseCursorVisible(true);
-			}
-			MessageBox(IntPtr.Zero, message, caption, 0);
-			if (Global.window != null && Options.main != null) {
-				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-			}
-		#else
+#if WINDOWS
+		if (Global.window != null) {
+			Global.window.SetMouseCursorVisible(true);
+		}
+		MessageBox(IntPtr.Zero, message, caption, 0);
+		if (Global.window != null && Options.main != null) {
+			Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+		}
+#else
 			Console.WriteLine(caption + Environment.NewLine + message);
-		#endif
+#endif
 	}
 
 	public static bool showMessageBoxYesNo(string message, string caption) {
-		#if WINDOWS
-			if (Global.window != null) {
-				Global.window.SetMouseCursorVisible(true);
-			}
-			int dialogResult = MessageBox(IntPtr.Zero, message, caption, 4);
-			if (Global.window != null && Options.main != null) {
-				Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
-			}
-			if (dialogResult == 6) {
-				return true;
-			} else {
-				return false;
-			}
-		#else
+#if WINDOWS
+		if (Global.window != null) {
+			Global.window.SetMouseCursorVisible(true);
+		}
+		int dialogResult = MessageBox(IntPtr.Zero, message, caption, 4);
+		if (Global.window != null && Options.main != null) {
+			Global.window.SetMouseCursorVisible(!Options.main.fullScreen);
+		}
+		if (dialogResult == 6) {
+			return true;
+		} else {
+			return false;
+		}
+#else
        		Console.WriteLine(caption + Environment.NewLine + message);
     		return true;
-		#endif
+#endif
 	}
 
 	public static void menuUpDown(ref int val, int minVal, int maxVal, bool wrap = true, bool playSound = true) {
@@ -787,7 +647,9 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 	public static List<string> getFiles(string path, bool recursive, params string[] filters) {
 		var files = new List<string>();
 		if (Directory.Exists(path)) {
-			files = Directory.GetFiles(path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly).ToList();
+			files = Directory.GetFiles(
+				path, "*", recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly
+			).ToList();
 		}
 
 		return files.Where(f => {
@@ -903,16 +765,16 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 		byte byteVal = 0;
 		for (int i = 0; i < boolArray.Length; i++) {
 			if (boolArray[i]) {
-				byteVal += (byte)(1 << 7-i);
+				byteVal += (byte)(1 << 7 - i);
 			}
 		}
 		return byteVal;
 	}
 
 	public static bool[] byteToBoolArray(byte byteValue) {
-		bool[] boolArray = new bool[8]; 
+		bool[] boolArray = new bool[8];
 		for (int i = 0; i < 8; i++) {
-			boolArray[i] = (byteValue & (1 << 7-i)) != 0;
+			boolArray[i] = (byteValue & (1 << 7 - i)) != 0;
 		}
 		return boolArray;
 	}
@@ -992,8 +854,12 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 		return placeStr;
 	}
 
-	public static SoundBufferWrapper getRandomMatchingVoice(Dictionary<string, SoundBufferWrapper> buffers, string soundKey, int charNum) {
-		var voices = buffers.Values.ToList().FindAll(v => v.soundKey.Split('.')[0] == soundKey && (v.charNum == null || v.charNum.Value == charNum));
+	public static SoundBufferWrapper getRandomMatchingVoice(
+		Dictionary<string, SoundBufferWrapper> buffers, string soundKey, int charNum
+	) {
+		var voices = buffers.Values.ToList().FindAll(
+			v => v.soundKey.Split('.')[0] == soundKey && (v.charNum == null || v.charNum.Value == charNum)
+		);
 		return voices.GetRandomItem();
 	}
 
@@ -1046,7 +912,9 @@ public static ShaderWrapper cloneInfernalCapacityShader(string textureName)
 	}
 
 	public static float twave(float time, float amplitude = 1, float period = 1) {
-		return 4 * amplitude / period * MathF.Abs((((time - period / 4) % period) + period) % period - period / 2) - amplitude;
+		return 4 * amplitude / period * MathF.Abs(
+			(((time - period / 4) % period) + period) % period - period / 2
+		) - amplitude;
 	}
 
 	public static int SignOr1(float val) {

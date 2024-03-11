@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -161,7 +159,7 @@ public class BoomerangKBoomerangWeapon : Weapon {
 
 public class BoomerangKDeadLiftWeapon : Weapon {
 	public BoomerangKDeadLiftWeapon(Player player) {
-		damager = new Damager(player, 6, Global.defFlinch, 0.5f);
+		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		index = (int)WeaponIds.BoomerangKDeadLift;
 		killFeedIndex = 97;
 	}

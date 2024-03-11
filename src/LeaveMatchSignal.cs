@@ -1,10 +1,7 @@
-﻿using Lidgren.Network;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Threading;
+using Lidgren.Network;
 
 namespace MMXOnline;
 
@@ -101,9 +98,9 @@ public class LeaveMatchSignal {
 				if (msg.MessageType == NetIncomingMessageType.UnconnectedData &&
 					msg.ReadByte() == 101
 				) {
-					(long, SimpleServerData) serverData = joinMenu.receiveServerDetails(msg);
+					(long, SimpleServerData, IPEndPoint) serverData = joinMenu.receiveServerDetails(msg);
 					if (serverData.Item2 != null) {
-						joinMenu.joinServer(serverData.Item1, serverData.Item2);
+						joinMenu.joinServer(serverData.Item1, serverData.Item2, serverData.Item3);
 						return;
 					}
 				}

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -656,12 +653,10 @@ public class InRideChaser : CharState {
 
 		if (Global.level.isRace()) {
 			if (player.input.isHeld(Control.WeaponLeft, player)) {
-				character.camOffsetX -= Global.spf * 150;
-				character.camOffsetX = MathF.Round(character.camOffsetX);
+				character.camOffsetX -= MathInt.Round(Global.spf * 150);
 				if (character.camOffsetX < -100) character.camOffsetX = -100;
 			} else if (player.input.isHeld(Control.WeaponRight, player)) {
-				character.camOffsetX += Global.spf * 150;
-				character.camOffsetX = MathF.Round(character.camOffsetX);
+				character.camOffsetX += MathInt.Round(Global.spf * 150);
 				if (character.camOffsetX > 100) character.camOffsetX = 100;
 			}
 		}

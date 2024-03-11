@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace MMXOnline;
 
@@ -47,10 +46,17 @@ public class Projectile : Actor {
 		damager = new Damager(player, damage, flinch, hitCooldown);
 		this.xDir = xDir;
 		if (Global.level.gameMode.isTeamMode && !(this is NapalmPartProj) && !(this is FlameBurnerProj)) {
-			if (player.alliance == GameMode.blueAlliance) {
-				addRenderEffect(RenderEffectType.BlueShadow);
-			} else {
-				addRenderEffect(RenderEffectType.RedShadow);
+			if (Global.level.teamNum == 2) {
+				if (player.alliance == GameMode.blueAlliance) {
+					addRenderEffect(RenderEffectType.BlueShadow);
+				} else {
+					addRenderEffect(RenderEffectType.RedShadow);
+				}
+			} else if (damager != null &&
+				!damager.owner.isMainPlayer &&
+				damager.owner.alliance == Global.level.mainPlayer.alliance
+			) {
+				addRenderEffect(RenderEffectType.GreenShadow);
 			}
 		}
 		this.ownerPlayer = player;
@@ -593,18 +599,22 @@ public class Projectile : Actor {
 		byte[] yBytes = BitConverter.GetBytes(pos.y);
 		byte[] netProjIdByte = BitConverter.GetBytes(netProjId);
 		// Create bools of data.
-		byte dataInf = 0;
-		if (isAngle) { dataInf += (byte)(1 << 7); }
-		if (extraData != null && extraData.Length > 0) { dataInf += (byte)(1 << 6); }
+		byte dataInf = Helpers.boolArrayToByte(new bool[] {
+			isAngle,
+			extraData != null && extraData.Length > 0
+		});
+		if (!isAngle) {
+			xDirOrAngle = Math.Sign(xDirOrAngle);
+			xDirOrAngle += 1;
+		}
 		// Create byte list.
-		var bytes = new List<byte>() {
-			dataInf,
+		List<byte> bytes = new List<byte>() {
+			dataInf, (byte)player.id,
 			projIdBytes[0], projIdBytes[1],
 			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
 			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
-			(byte)player.id,
 			netProjIdByte[0], netProjIdByte[1],
-			isAngle ? (byte)angle : (byte)(xDir + 128)
+			(byte)xDirOrAngle
 		};
 		if (extraData != null && extraData.Length > 0) {
 			bytes.AddRange(extraData);
@@ -612,7 +622,10 @@ public class Projectile : Actor {
 		Global.serverClient?.rpc(RPC.createProj, bytes.ToArray());
 	}
 
-	public virtual void rpcCreate(Point pos, Player player, ushort netProjId, int xDir, params byte[] extraData) {
+	public virtual void rpcCreate(
+		Point pos, Player player, ushort netProjId,
+		int xDir, params byte[] extraData
+	) {
 		rpcCreateHelper(pos, player, netProjId, xDir, false, extraData);
 	}
 

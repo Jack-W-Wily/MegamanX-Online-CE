@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -62,19 +60,23 @@ public class UpgradeMenu : IMainMenu {
 	}
 
 	public void update() {
-		if (UpgradeArmorMenu.updateHyperArmorUpgrades(mainPlayer)) return;
+		//if (UpgradeArmorMenu.updateHyperArmorUpgrades(mainPlayer)) return;
 
 		subtankTargets.Clear();
 		if (mainPlayer.isSigma) {
 			if (mainPlayer.isTagTeam()) {
 				if (mainPlayer.currentMaverick != null) {
-					var currentMaverickWeapon = mainPlayer.weapons.FirstOrDefault(w => w is MaverickWeapon mw && mw.maverick == mainPlayer.currentMaverick);
+					var currentMaverickWeapon = mainPlayer.weapons.FirstOrDefault(
+						w => w is MaverickWeapon mw && mw.maverick == mainPlayer.currentMaverick
+					);
 					if (currentMaverickWeapon != null) {
 						subtankTargets.Add(currentMaverickWeapon);
 					}
 				}
 			} else if (!mainPlayer.isStriker()) {
-				subtankTargets = mainPlayer.weapons.FindAll(w => (w is MaverickWeapon mw && mw.maverick != null) || w is SigmaMenuWeapon).ToList();
+				subtankTargets = mainPlayer.weapons.FindAll(
+					w => (w is MaverickWeapon mw && mw.maverick != null) || w is SigmaMenuWeapon
+				).ToList();
 			}
 		}
 
@@ -141,13 +143,17 @@ public class UpgradeMenu : IMainMenu {
 					bool maverickUsed = false;
 					if (subtankTargets.Count > 0) {
 						var currentTarget = subtankTargets[subtankTargetIndex];
-						if (currentTarget is MaverickWeapon mw && canUseSubtankInMenu(mw.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))) {
+						if (currentTarget is MaverickWeapon mw &&
+							canUseSubtankInMenu(mw.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))
+						) {
 							mainPlayer.subtanks[selectArrowPosY - 1].use(mw.maverick);
 							maverickUsed = true;
 						}
 					}
 
-					if (!maverickUsed && canUseSubtankInMenu(mainPlayer.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))) {
+					if (!maverickUsed && canUseSubtankInMenu(
+						mainPlayer.canUseSubtank(mainPlayer.subtanks[selectArrowPosY - 1]))
+					) {
 						mainPlayer.subtanks[selectArrowPosY - 1].use(mainPlayer.character);
 					}
 				}
@@ -182,14 +188,14 @@ public class UpgradeMenu : IMainMenu {
 		}
 
 		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
-			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 25, Global.halfScreenH, Alignment.Center);
-			Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
 		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
-			Fonts.drawText(FontType.DarkPurple, "<", 12, Global.halfScreenH, Alignment.Center);
-			Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, "<", 14, Global.halfScreenH, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
-			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 19, Global.halfScreenH, Alignment.Center);
-			Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
+			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
+			//Fonts.drawText(FontType.DarkPurple, "X1", Global.screenW - 19, Global.halfScreenH + 15, Alignment.Center);
 		}
 
 		bool soldOut = false;
@@ -286,7 +292,7 @@ public class UpgradeMenu : IMainMenu {
 			);
 		}
 
-		UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
+		//UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Select Item",

@@ -1,8 +1,8 @@
-﻿using SFML.Graphics;
-using SFML.Window;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFML.Graphics;
+using SFML.Window;
 
 namespace MMXOnline;
 
@@ -1105,7 +1105,7 @@ public class Axl : Character {
 		foreach (var enemy in Global.level.players) {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.getHeadPos() != null) {
 				if (player.axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
-					axlCursorTarget = enemy.character as IDamagable;
+					axlCursorTarget = enemy.character;
 					axlHeadshotTarget = enemy.character;
 				}
 			}
@@ -1263,13 +1263,13 @@ public class Axl : Character {
 
 		if (player.isMainPlayer && !player.isDead && !drawStatusProgress() && !drawSubtankHealing()) {
 			if (Options.main.aimKeyToggle) {
-			if (player.input.isAimingBackwards(player)) {
-				Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelAxlAimModeIconOffY);
-			} else if (player.input.isPositionLocked(player)) {
-				Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-				deductLabelY(labelAxlAimModeIconOffY);
-			}
+				if (player.input.isAimingBackwards(player)) {
+					Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
+					deductLabelY(labelAxlAimModeIconOffY);
+				} else if (player.input.isPositionLocked(player)) {
+					Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+					deductLabelY(labelAxlAimModeIconOffY);
+				}
 			} else if (Options.main.showRollCooldown && dodgeRollCooldown > 0) {
 				drawSpinner(Helpers.progress(dodgeRollCooldown, maxDodgeRollCooldown));
 			}

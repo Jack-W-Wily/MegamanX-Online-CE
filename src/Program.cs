@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SFML.Graphics;
-using SFML.System;
-using SFML.Audio;
-using SFML.Window;
-using static SFML.Window.Keyboard;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Globalization;
-using Lidgren.Network;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using Lidgren.Network;
+using SFML.Audio;
+using SFML.Graphics;
+using SFML.System;
+using SFML.Window;
+using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
 
@@ -466,8 +466,8 @@ class Program {
 	private static void onWindowResized(object sender, SizeEventArgs e) {
 		// Compares the aspect ratio of the window to the aspect ratio of the view,
 		// and sets the view's viewport accordingly in order to archieve a letterbox effect.
-		float windowRatio = (float)Global.window.Size.X / (float)Global.window.Size.Y;
-		float viewRatio = (float)Global.view.Size.X / (float)Global.view.Size.Y;
+		float windowRatio = Global.window.Size.X / (float)Global.window.Size.Y;
+		float viewRatio = Global.view.Size.X / Global.view.Size.Y;
 		float sizeX = 1;
 		float sizeY = 1;
 		float posX = 0;
@@ -713,6 +713,24 @@ class Program {
 		}
 	}
 
+	static string getFileBlobMD5(Dictionary<string, string> fileNamesToContents) {
+		string entireBlob = "";
+		var keys = fileNamesToContents.Keys.ToList();
+		keys.Sort(Helpers.invariantStringCompare);
+
+		foreach (var key in keys) {
+			entireBlob += key.ToLowerInvariant() + " " + fileNamesToContents[key];
+		}
+		var md5 = System.Security.Cryptography.MD5.Create();
+		return BitConverter.ToString(
+			md5.ComputeHash(
+				System.Text.Encoding.UTF8.GetBytes(entireBlob)
+			)
+		).Replace(
+			"-", String.Empty
+		);
+	}
+
 	static void addToFileChecksumBlob(Dictionary<string, string> fileNamesToContents) {
 		string entireBlob = "";
 		var keys = fileNamesToContents.Keys.ToList();
@@ -750,7 +768,7 @@ class Program {
 				Global.levelDatas.Add(levelData.name, levelData);
 			}
 		}
-		addToFileChecksumBlob(fileChecksumDict);
+		Global.fileChecksumBlob += "-" + getFileBlobMD5(fileChecksumDict);
 
 		var customLevelPaths = Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "json");
 		foreach (string levelPath in customLevelPaths) {
@@ -779,23 +797,48 @@ class Program {
 	static void loadSprites() {
 		string spritePath = "assets/sprites";
 
-		List<string> spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, false, "json");
-		if (spriteFilePaths.Count > 65536) {
-			throw new Exception("Exceeded max sprite limit of 65536. Fix actor.cs netUpdate() to support more sprites.");
+		string[] spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, false, "json").ToArray();
+		if (spriteFilePaths.Length > 65536) {
+			throw new Exception(
+				"Exceeded max sprite limit of 65536. Fix actor.cs netUpdate() to support more sprites."
+			);
 		}
 
-		var fileChecksumDict = new Dictionary<string, string>();
-		foreach (string spriteFilePath in spriteFilePaths) {
-			string name = Path.GetFileNameWithoutExtension(spriteFilePath);
-			string json = File.ReadAllText(spriteFilePath);
-
-			fileChecksumDict[name] = json;
-
-			Sprite sprite = new Sprite(json, name, null);
-			Global.sprites[sprite.name] = sprite;
+		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 6);
+		string[][] treadedFilePaths;
+		// Use multitread if loading 20 or more sprites.
+		if (spriteFilePaths.Length >= 20) {
+			treadedFilePaths = new string[][] {
+				spriteFilePaths[..fileSplit],
+				spriteFilePaths[(fileSplit)..(fileSplit*2)],
+				spriteFilePaths[(fileSplit*2)..(fileSplit*3)],
+				spriteFilePaths[(fileSplit*3)..(fileSplit*4)],
+				spriteFilePaths[(fileSplit*4)..(fileSplit*5)],
+				spriteFilePaths[(fileSplit*5)..],
+			};
+			string[] fileChecksums = new string[6];
+			List<Thread> threads = new();
+			for (int i = 0; i < treadedFilePaths.Length; i++) {
+				int j = i;
+				Thread tempThread = new Thread(() => { fileChecksums[j] = loadSpritesSub(treadedFilePaths[j]); });
+				threads.Add(tempThread);
+				tempThread.Start();
+			}
+			while (threads.Count > 0) {
+				for (int i = 0; i < threads.Count; i++) {
+					if (threads[i].ThreadState == System.Threading.ThreadState.Stopped) {
+						threads.Remove(threads[i]);
+						i = 0;
+					}
+				}
+			}
+			foreach (string fileChecksum in fileChecksums) {
+				Global.fileChecksumBlob += "-" + fileChecksum;
+			}
+		} else {
+			string fileChecksum = loadSpritesSub(spriteFilePaths);
+			Global.fileChecksumBlob += "-" + fileChecksum;
 		}
-		addToFileChecksumBlob(fileChecksumDict);
-
 		// Override sprite mods
 		string overrideSpriteSource = "assets/sprites_visualmods";
 		if (Options.main.shouldUseOptimizedAssets()) overrideSpriteSource = "assets/sprites_optimized";
@@ -824,6 +867,23 @@ class Program {
 		}
 	}
 
+	static string loadSpritesSub(string[] spriteFilePaths) {
+		Dictionary<string, string> fileChecksumDict = new();
+		foreach (string spriteFilePath in spriteFilePaths) {
+			string name = Path.GetFileNameWithoutExtension(spriteFilePath);
+			string json = File.ReadAllText(spriteFilePath);
+			if (String.IsNullOrEmpty(name)) {
+				continue;
+			}
+			fileChecksumDict[name] = json;
+			Sprite sprite = new Sprite(json, name, null);
+			lock (Global.sprites) {
+				Global.sprites[sprite.name] = sprite;
+			}
+		}
+		return getFileBlobMD5(fileChecksumDict);
+	}
+
 	static void loadSounds() {
 		var soundNames = Helpers.getFiles(Global.assetPath + "assets/sounds", true, "ogg", "wav");
 		if (soundNames.Count > 65535) {
@@ -837,7 +897,7 @@ class Program {
 			fileChecksumDict[name] = "";
 			Global.soundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Regular));
 		}
-		addToFileChecksumBlob(fileChecksumDict);
+		//addToFileChecksumBlob(fileChecksumDict);
 
 		// Voices
 		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav");

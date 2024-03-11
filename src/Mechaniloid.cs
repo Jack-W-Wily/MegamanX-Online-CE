@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -166,10 +163,14 @@ public class Mechaniloid : Actor, IDamagable {
 		if (player == Global.level.mainPlayer) {
 			addRenderEffect(RenderEffectType.GreenShadow);
 		} else if (Global.level.gameMode.isTeamMode) {
-			if (player.alliance == GameMode.blueAlliance) {
-				addRenderEffect(RenderEffectType.BlueShadow);
-			} else {
-				addRenderEffect(RenderEffectType.RedShadow);
+			if (Global.level.teamNum == 2) {
+				if (player.alliance == GameMode.blueAlliance) {
+					addRenderEffect(RenderEffectType.BlueShadow);
+				} else {
+					addRenderEffect(RenderEffectType.RedShadow);
+				}
+			} else if (player.alliance == Global.level.mainPlayer.alliance) {
+				addRenderEffect(RenderEffectType.GreenShadow);
 			}
 		}
 

@@ -1,9 +1,6 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -136,8 +133,7 @@ public class GigaCrushCharState : CharState {
 		if (stateTime <= 1.6) {
 			character.vel.x = moveDir.x * (1f - stateTime / 1.6f);
 			character.vel.y = moveDir.y * (1f - stateTime / 1.6f);
-		}
-		else {
+		} else {
 			character.vel.x = 0;
 			character.vel.y = 0;
 		}
@@ -154,8 +150,7 @@ public class GigaCrushCharState : CharState {
 		if (player.input.isHeld("left", base.player)) {
 			moveDir.x = -40f;
 			moveDir.y = 0;
-		}
-		else if (player.input.isHeld("right", base.player)) {
+		} else if (player.input.isHeld("right", base.player)) {
 			moveDir.x = 40f;
 			moveDir.y = 0;
 		}
@@ -225,9 +220,9 @@ public class GigaCrushEffect : Effect {
 			if (radius <= 0) {
 				return;
 			}
-			byte colour2 = (byte)(255.0 - 255.0 * ((radius-75) / 75.0));
-				byte colour1 = 255;
-				if (radius <= 75) {
+			byte colour2 = (byte)(255.0 - 255.0 * ((radius - 75) / 75.0));
+			byte colour1 = 255;
+			if (radius <= 75) {
 				colour2 = 0;
 				colour1 = (byte)(255.0 - 255.0 * (radius / 75.0));
 			}
@@ -259,10 +254,10 @@ public class GigaCrushBackwall : Effect {
 		if (effectTime > 2.6) {
 			transparecy = 100f - ((effectTime - 2.6f) * 500f);
 		}
-		
+
 		DrawWrappers.DrawRect(
-			Global.level.camX,  Global.level.camY,
-			Global.level.camX + 1000,  Global.level.camY + 1000,
+			Global.level.camX, Global.level.camY,
+			Global.level.camX + 1000, Global.level.camY + 1000,
 			true, new Color(0, 0, 0, (byte)System.MathF.Round(transparecy)), 1, ZIndex.Backwall
 		);
 	}

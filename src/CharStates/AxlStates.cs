@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 
 namespace MMXOnline;
@@ -69,7 +68,7 @@ public class Hover : CharState {
 
 		accuracy = 0;
 		Point prevPos = character.pos;
-		
+
 		if (character.pos.x != prevPos.x) {
 			accuracy = 5;
 		}

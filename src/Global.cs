@@ -1,16 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.IO.Hashing;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using DeviceId;
 using DeviceId.Encoders;
 using DeviceId.Formatters;
 using Newtonsoft.Json;
 using SFML.Graphics;
-using System;
-using System.Collections.Generic;
-using System.IO.Hashing;
-using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -18,19 +17,20 @@ namespace MMXOnline;
 public partial class Global {
 	public static decimal version = 20m;
 	public static string versionName = "Revision 20";
-	public static string subVersionName = "Alpha 8";
+	public static string subVersionName = "Alpha 10";
+	public static string subVersionShortName = "a10";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
 	// This step could be automated as future improvement in build scripts.
-	private const string assetChecksum = "712C30F769442BAF01DF6977C712DC84";
+	private const string assetChecksum = "5194A183DCB03AA7A7D12D61ABE837E0";
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = checksumPrefix + " DEVTEST-01-03-2024";
+	public const string checksumKey = checksumPrefix + " DEVTEST-07-03-2024";
 	// For displaying the name of the mod in the version string.
 	public static string shortForkName = "CE";
 
@@ -130,7 +130,7 @@ public partial class Global {
 	public static bool maverickWallClimb = false;
 
 	public static bool debug = false;
-	
+
 	public static bool consoleDebugLogging = false;
 
 	public static bool showHitboxes = false;
@@ -236,7 +236,7 @@ public partial class Global {
 		}
 
 		//if (Global.input.isPressed(Key.F8)) {
-			//DevConsole.changeTeam();
+		//DevConsole.changeTeam();
 		//}
 
 		if (Global.input.isPressed(Key.F9)) {
@@ -445,7 +445,7 @@ public partial class Global {
 		}
 	}
 
-	public static string fileChecksumBlob = checksumKey + "|";
+	public static string fileChecksumBlob = checksumKey;
 	private static string _checksum;
 	public static string checksum {
 		get {
@@ -456,7 +456,7 @@ public partial class Global {
 		}
 	}
 	public static string MD5Checksum => (_checksum);
-	
+
 	public static string CRC32Checksum;
 
 	public static string getShortChecksum() {
@@ -550,6 +550,7 @@ public partial class Global {
 	public static bool isHost { get { return level != null && level.isHost; } }
 	public static LeaveMatchSignal leaveMatchSignal;
 	public const int basePort = 14242;
+	public const int clientPort = 14240;
 	public static bool firstTimeVersionCheck = false;
 
 	public static string encryptionKey;
@@ -561,9 +562,9 @@ public partial class Global {
 	private static string _deviceId;
 	public static string deviceId {
 		get {
-			#if RELAYSERVER
+#if RELAYSERVER
 			return "";
-			#endif
+#endif
 			if (_deviceId == null) {
 				try {
 					_deviceId = new DeviceIdBuilder()
@@ -678,12 +679,10 @@ public partial class Global {
 								region.ip = null;
 							}
 						}
-						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip))
-						{
+						if (string.IsNullOrEmpty(region.name) || string.IsNullOrEmpty(region.ip)) {
 							//throw new Exception("region.json has missing fields.");
 							region = new Region();
-						}
-						else {
+						} else {
 							if (!region.ip.IsValidIpAddress()) {
 								throw new Exception("region.json has an invalid IP.");
 							}

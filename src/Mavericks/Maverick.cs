@@ -1,9 +1,7 @@
-﻿using SFML.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -155,11 +153,15 @@ public class Maverick : Actor, IDamagable {
 		_input = new Input(true);
 
 		if (Global.level.gameMode.isTeamMode) {
-			if (player.alliance == GameMode.blueAlliance) {
-				addRenderEffect(RenderEffectType.BlueShadow);
-			} else {
-				addRenderEffect(RenderEffectType.RedShadow);
+			if (Global.level.teamNum == 2) {
+				if (player.alliance == GameMode.blueAlliance) {
+					addRenderEffect(RenderEffectType.BlueShadow);
+				} else {
+					addRenderEffect(RenderEffectType.RedShadow);
+				}
 			}
+		} else if (player.alliance == Global.level.mainPlayer.alliance) {
+			addRenderEffect(RenderEffectType.GreenShadow);
 		}
 
 		Global.level.addGameObject(this);
@@ -967,11 +969,11 @@ public class Maverick : Actor, IDamagable {
 		deductLabelY(labelHealthOffY);
 	}
 
-	public void drawName(string overrideName = "", Color? overrideColor = null, Color? overrideTextColor = null) {
+	public void drawName(string overrideName = "", FontType? overrideColor = null) {
 		string playerName = player.name;
-		Color playerColor = Helpers.DarkBlue;
-		if (Global.level.gameMode.isTeamMode) {
-			playerColor = player.alliance == GameMode.blueAlliance ? Helpers.DarkBlue : Helpers.DarkRed;
+		FontType playerColor = FontType.Grey;
+		if (Global.level.gameMode.isTeamMode && player.alliance < Global.level.teamNum) {
+			playerColor = Global.level.gameMode.teamFonts[player.alliance];
 		}
 
 		if (!string.IsNullOrEmpty(overrideName)) playerName = overrideName;
@@ -980,8 +982,10 @@ public class Maverick : Actor, IDamagable {
 		float textPosX = pos.x;
 		float textPosY = pos.y + currentLabelY - 8;
 
-		DrawWrappers.DrawText(playerName, textPosX, textPosY, Alignment.Center, true, 0.75f,
-			overrideTextColor ?? Color.White, playerColor, style: overrideTextColor == null ? Text.Styles.Regular : Text.Styles.Italic, 1, true, ZIndex.HUD);
+		Fonts.drawText(
+			playerColor, playerName, textPosX, textPosY,
+			Alignment.Center, true, depth: ZIndex.HUD
+		);
 
 		deductLabelY(labelNameOffY);
 	}

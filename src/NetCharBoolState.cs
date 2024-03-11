@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MMXOnline;
 
@@ -72,11 +68,11 @@ public partial class Character {
 			if (character is not Vile vile) {
 				return false;
 			}
-			return vile.hasFrozenCastleBarrier(); 
+			return vile.hasFrozenCastleBarrier();
 		});
 		isStrikeChainHookedBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.One, (character) => { return character.charState is StrikeChainHooked; });
 		shouldDrawArmBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.One, (character) => {
-			return (character as Axl)?.shouldDrawArm() == true; 
+			return (character as Axl)?.shouldDrawArm() == true;
 		});
 		isAwakenedZeroBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.One, (character) => {
 			return (character as Zero)?.isAwakenedZero() == true;
@@ -88,7 +84,7 @@ public partial class Character {
 		isReturnIXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => {
 			return (character as MegamanX)?.isReturnIX == true;
 		});
-		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => { 
+		isHyperSigmaBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.One, (character) => {
 			if (character is KaiserSigma) {
 				return true;
 			}
