@@ -187,6 +187,8 @@ public class BoomerangKBoomerangProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 
 	public override void onCollision(CollideData other) {

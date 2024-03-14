@@ -356,6 +356,8 @@ public class WheelGSpitProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		// ToDo: Make local.
+		canBeLocal = false;
 	}
 }
 

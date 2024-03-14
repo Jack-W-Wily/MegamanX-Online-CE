@@ -687,6 +687,9 @@ public  void isGaeaproj() {
 	}
 
 	public void acidSplashEffect(CollideData other, ProjIds projId) {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		Point hitPoint = other.hitData.hitPoint ?? pos;
 		int yDir = 1;
 		int downY = 1;
@@ -778,7 +781,7 @@ public  void isGaeaproj() {
 
 	public void setupWallCrawl(Point initialMoveDir) {
 		useLegacyWallCrawl = Global.level.levelData.wallPathNodes.Count == 0;
-		if (ownedByLocalPlayer) {
+		if (ownedByLocalPlayer || canBeLocal) {
 			if (useLegacyWallCrawl) {
 				setupLegacyWallCrawl();
 			} else {
@@ -860,6 +863,9 @@ public  void isGaeaproj() {
 	}
 
 	public void updateModernWallCrawl() {
+		if (currentNode == null) {
+			return;
+		}
 		var nextNode = currentNode.next;
 		Point destPoint = nextNode.point;
 		Point dirToDest = pos.directionToNorm(destPoint);
@@ -1006,7 +1012,7 @@ public  void isGaeaproj() {
 	#endregion
 
 	public void checkBigAcidUnderwater() {
-		if (isUnderwater()) {
+		if (isUnderwater() && ownedByLocalPlayer) {
 			new BubbleAnim(pos, "bigbubble1", null, false) { vel = new Point(0, -75) };
 			Global.level.delayedActions.Add(new DelayedAction(() => { new BubbleAnim(pos, "bigbubble2", null, false) { vel = new Point(0, -75) }; }, 0.1f));
 

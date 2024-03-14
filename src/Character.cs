@@ -881,8 +881,15 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		var character = other.gameObject as Character;
-		if ((charState is Dash || charState is AirDash) && character != null && character.isCrystalized && character.player.alliance != player.alliance) {
-			Damager.applyDamage(player, 3, 1f, Global.defFlinch, character, false, (int)WeaponIds.CrystalHunter, 20, player.character, (int)ProjIds.CrystalHunterDash);
+		if ((charState is Dash || charState is AirDash) &&
+			character != null && character.isCrystalized &&
+			character.player.alliance != player.alliance
+		) {
+			Damager.applyDamage(
+				player, 3, 1f, Global.defFlinch, character, false,
+				(int)WeaponIds.CrystalHunter, 20, this,
+				(int)ProjIds.CrystalHunterDash
+			);
 		}
 
 		// Move zone movement.
@@ -1486,11 +1493,11 @@ public partial class Character : Actor, IDamagable {
 				int dpadXDir = player.input.getXDir(player);
 
 				if (dpadXDir == -1 && velYRequirementMet && charState.lastLeftWall != null) {
-					player.character.changeState(new WallSlide(-1, charState.lastLeftWallCollider));
+					changeState(new WallSlide(-1, charState.lastLeftWallCollider));
 					return true;
 				}
 				if (dpadXDir == 1 && velYRequirementMet && charState.lastRightWall != null) {
-					player.character.changeState(new WallSlide(1, charState.lastRightWallCollider));
+					changeState(new WallSlide(1, charState.lastRightWallCollider));
 					return true;
 				}
 			}
@@ -1518,8 +1525,8 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (!wallKickMove && xDpadDir != 0) {
 			Point moveSpeed = new Point();
-			if (player.character.canMove()) { moveSpeed.x = getDashSpeed() * xDpadDir; }
-			if (player.character.canTurn()) { xDir = xDpadDir; }
+			if (canMove()) { moveSpeed.x = getDashSpeed() * xDpadDir; }
+			if (canTurn()) { xDir = xDpadDir; }
 			if (moveSpeed.magnitude > 0) { move(moveSpeed); }
 		}
 	}
@@ -2542,9 +2549,9 @@ public partial class Character : Actor, IDamagable {
 
 	public void getHealthNameOffsets(out bool shieldDrawn, ref float healthPct) {
 		shieldDrawn = false;
-		if (player.character != null && player.character.rideArmor != null) {
+		if (rideArmor != null) {
 			shieldDrawn = true;
-			healthPct = player.character.rideArmor.health / player.character.rideArmor.maxHealth;
+			healthPct = rideArmor.health / rideArmor.maxHealth;
 		} else if ((this as MegamanX)?.chargedRollingShieldProj != null) {
 			shieldDrawn = true;
 			healthPct = player.weapon.ammo / player.weapon.maxAmmo;
