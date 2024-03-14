@@ -12,7 +12,10 @@ public partial class Character : Actor, IDamagable {
 		"Zero",
 		"Vile",
 		"Axl",
-		"Sigma"
+		"Sigma",
+		"Dynamo",
+		"GBD",
+		"Iris"
 	};
 	public CharState charState;
 	public Player player;
@@ -40,6 +43,13 @@ public partial class Character : Actor, IDamagable {
 	public bool boughtGoldenArmorOnce;
 
 	public bool CanOnhitCancel;
+
+
+
+	public float KillingSpree = 0;
+
+
+
 
 	public float headbuttAirTime = 0;
 	public int dashedInAir = 0;
@@ -82,8 +92,12 @@ public partial class Character : Actor, IDamagable {
 
 	public bool stockedX3Buster;
 
+
+
+	
 	public float xSaberCooldown;
 	public float useGrabCooldown;
+	public float grabtimeout;
 	public float stockedChargeFlashTime;
 
 	private float UPDamageCooldown;
@@ -156,6 +170,12 @@ public partial class Character : Actor, IDamagable {
 	public int specialState = 0;
 	// For doublejump.
 	public float lastJumpPressedTime;
+
+
+	// Input Shit
+	public float inputdecreasedCD;
+	public int downpressedtimes = 0;
+
 
 	// For wallkick.
 	public float wallKickTimer;
@@ -370,9 +390,6 @@ public partial class Character : Actor, IDamagable {
 		ShaderWrapper palette = null;
 
 
-		if (isNightmareZeroBS.getValue()) {
-				palette = player.nightmareZeroShader;
-			}
 		// TODO: Send this to the respective classes.
 		if (player.isX) {
 			int index = player.weapon.index;
@@ -380,8 +397,8 @@ public partial class Character : Actor, IDamagable {
 			if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
 				index = player.weapons[player.hyperChargeSlot].index;
 			}
-			if (player.hasGoldenArmor()) index = 25;
-			if (hasUltimateArmorBS.getValue()) index = 0;
+			if (player.hasGoldenArmor() && player.weapon is Buster) index = 25;
+			if (hasUltimateArmorBS.getValue() && player.weapon is Buster) index = 31;
 			palette = player.xPaletteShader;
 
 			if (!isCStingInvisibleGraphics()) {
@@ -393,6 +410,10 @@ public partial class Character : Actor, IDamagable {
 			}
 		} else if (this is Zero zero) {
 			int paletteNum = 0;
+			if (isNightmareZeroBS.getValue()) {
+				palette = player.nightmareZeroShader;
+				paletteNum = 1;
+			}
 			if (zero.blackZeroTime > 3) paletteNum = 1;
 			else if (zero.blackZeroTime > 0) {
 				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
@@ -400,9 +421,13 @@ public partial class Character : Actor, IDamagable {
 			}
 			palette = player.zeroPaletteShader;
 			palette?.SetUniform("palette", paletteNum);
-			if (!player.isZBusterZero()) {
+			if (player.loadout.zeroLoadout.hyperMode == 2) {
+				palette?.SetUniform("paletteTexture", Global.textures["paletteNightmareZero"]);
+			}
+			if (!player.isZBusterZero() && player.loadout.zeroLoadout.hyperMode != 2) {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
-			} else {
+			} 
+			if (player.isZBusterZero()) {
 				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
 			}
 			
@@ -540,6 +565,7 @@ public partial class Character : Actor, IDamagable {
 		if (charState is WallKick wallKick && wallKick.stateTime < 0.25f) return false;
 		if (isSoftLocked()) return false;
 		if (isAttacking()) return false;
+		if (infectedTime > 2f) return false;
 		return flag == null;
 	}
 
@@ -579,7 +605,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canAirDash() {
+		if (infectedTime > 2f) return false;
 		if (this is MegamanX mmx){ 
+
 		if (mmx.isIX && mmx.IXTimer < 10f) return false;
 		if (!mmx.isIX && player.isX && player.loadout.xLoadout.melee != 1 && mmx.CurrentArmor < 2){
 		return false;
@@ -638,6 +666,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canCharge() {
+		if (infectedTime > 0f) return false;
 		if (this is MegamanX mmx && mmx.isIX && mmx.IXTimer < 10f) return false;
 		return true;
 	}
@@ -703,14 +732,9 @@ public partial class Character : Actor, IDamagable {
 			runSpeed *= 1.1f;
 		}
 		else if (player.isGBD && this is GBD gbd){
-			if (gbd.shiningSparkStacks > 30){
+			if (gbd.shiningSparkStacks > 10){
 			runSpeed *= 1.5f;
-			}
-			if (gbd.shiningSparkStacks > 15 && gbd.shiningSparkStacks < 31){
-			runSpeed *= 1.3f;
-			}
-			if (gbd.shiningSparkStacks > 5 && gbd.shiningSparkStacks < 16 ){
-			runSpeed *= 1.1f;
+
 			}
 		}
 		return runSpeed * getRunDebuffs();
@@ -722,6 +746,10 @@ public partial class Character : Actor, IDamagable {
 		if (igFreezeProgress >= 3) runSpeed *= 0.25f;
 		else if (igFreezeProgress >= 2) runSpeed *= 0.75f;
 		else if (igFreezeProgress >= 1) runSpeed *= 0.5f;
+		 if ( player.isX && this is MegamanX mmx ){
+		if (mmx.CurrentArmor == 6) runSpeed *= 0.75f;
+		if (mmx.CurrentArmor == 8) runSpeed *= 1.35f;
+		}
 		return runSpeed;
 	}
 
@@ -889,6 +917,16 @@ public partial class Character : Actor, IDamagable {
 
 	public override void update() {
 
+
+		Helpers.decrementTime(ref inputdecreasedCD);
+		if (player.input.isPressed(Control.Down, player)){
+		downpressedtimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+
+		if (inputdecreasedCD == 0){
+		downpressedtimes = 0;
+		}
 		if (charState is Idle) {
 		CanOnhitCancel = false;
 		}
@@ -896,6 +934,7 @@ public partial class Character : Actor, IDamagable {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
 		Helpers.decrementTime(ref useGrabCooldown);
+		Helpers.decrementTime(ref grabtimeout);
 		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
@@ -1680,11 +1719,14 @@ public partial class Character : Actor, IDamagable {
 			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
 			if (!isAxlSelfDamage) return false;
 		}
-		
+		if (sprite.name.Contains("houtenjin")) return false;
 		// Bommerang can go thru invisibility check
 		if (player.alliance != damagerAlliance && projId != null && isCStingVulnerable(projId.Value)) {
 			return true;
 		}
+		if (player.isX 
+		&& this is MegamanX mmx 
+		&& mmx.CurrentArmor == 5 && charState is AirDash) return false;
 
 		if (isInvisibleBS.getValue()) return false;
 
@@ -1964,7 +2006,7 @@ public partial class Character : Actor, IDamagable {
 		bool clampTo3 = true;
 		if (this is Zero zero) clampTo3 = !zero.canUseDoubleBusterCombo();
 		if (this is Vile vile) clampTo3 = vile.vileForm == 0;
-		if (this is MegamanX mmx) clampTo3 = !mmx.isHyperX;
+		if (this is MegamanX mmx) clampTo3 = mmx.CurrentArmor == 0;
 
 		if (chargeTime < charge1Time) {
 			return 0;
@@ -2173,8 +2215,8 @@ public partial class Character : Actor, IDamagable {
 			}
 			  // X with scan
 			  else if (!player.isMainPlayer && Global.level.mainPlayer.isX && Global.level.mainPlayer.hasFullGiga() && player.scanned && !isStealthy(Global.level.mainPlayer.alliance)) {
-				overrideTextColor = Color.Red;
-				overrideColor = Helpers.DarkBlue;
+				//overrideTextColor = Color.Red;
+				//overrideColor = Helpers.DarkBlue;
 				shouldDrawName = true;
 				shouldDrawHealthBar = true;
 			}
@@ -2892,7 +2934,10 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (sprite.name.Contains("vile") && sprite.name.Contains("grab") || player.isSigma && player.currentMaverick != null || isToughGuyHyperMode()) {
+		if (sprite.name.Contains("vile") && sprite.name.Contains("grab") 
+		|| player.isSigma && player.currentMaverick != null 
+		|| isToughGuyHyperMode()
+		|| player.isX && player.HasFullGaea()) {
 			if (miniFlinchTime > 0) return;
 			else {
 				flinchFrames = 0;
@@ -3102,6 +3147,8 @@ public partial class Character : Actor, IDamagable {
 				grabber.netId, netId, CommandGrabScenario.Release, grabber.isDefenderFavored()
 			);
 		}
+		changeState(new Idle(), true);
+
 	}
 
 	public bool isAlwaysHeadshot() {

@@ -237,14 +237,19 @@ class Program {
 
 		//>>>>>>>>>>>>>>>>>>>>>>>
 		// Menu music
-		if (Options.main.preferredCharacter >= 3 || Options.main.preferredCharacter == 0 ){
-		Global.changeMusic("menu");	
+		if (Options.main.preferredCharacter == 0 ){
+		Global.changeMusic("menuX");	
 		}
-		if (Options.main.preferredCharacter == 1){
+		if (Options.main.preferredCharacter == 1 
+		|| Options.main.preferredCharacter == 3
+		|| Options.main.preferredCharacter >= 5){
 		Global.changeMusic("menuZero");	
 		}
 		if (Options.main.preferredCharacter == 2){
 		Global.changeMusic("menuVile");	
+		}
+		if (Options.main.preferredCharacter == 4){
+		Global.changeMusic("menuSIgma");	
 		}
 		// >>>>>>>>>>>>>>>>>>
 		if (mode == 1) {

@@ -183,7 +183,7 @@ public class MagnaCShurikenProj : Projectile {
 	public Pickup pickup;
 	public float maxSpeed = 250;
 	public MagnaCShurikenProj(Weapon weapon, Point pos, int xDir, Point velDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "magnac_shuriken", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "magnac_shuriken", 4, 0, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MagnaCShuriken;
 		maxTime = 1f;
 		vel = velDir.times(maxSpeed);
@@ -722,14 +722,25 @@ public class MagnaCDrainState : MaverickState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		victim?.releaseGrab(maverick);
+
+		
+				
+	
+		
 	}
 }
 
 public class MagnaCDrainGrabbed : GenericGrabbedState {
-	public const float maxGrabTime = 4;
+	public const float maxGrabTime = 2;
 	public MagnaCDrainGrabbed(MagnaCentipede grabber) : base(grabber, maxGrabTime, "_drain") {
 		this.grabber = grabber;
 		grabTime = maxGrabTime;
+	}
+
+			public override void update() {
+			base.update();
+		if (!grabber.sprite.name.Contains("drain")) character.changeState(
+			new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
 	}
 }
 

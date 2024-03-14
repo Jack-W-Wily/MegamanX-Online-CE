@@ -33,6 +33,16 @@ public override bool normalCtrl() {
 
 	public override void update(){
 		base.update();
+
+
+		//KillingSpreeThemes
+		if (KillingSpree == 5){
+				if (musicSource == null) {
+					addMusicSource("boss2", getCenterPos(), true);
+				}
+		} 
+
+
 		if (charState.canAttack() && shiningSparkStacks > 10){
 			if ((charState is Dash || charState is AirDash) && (player.input.isPressed(Control.Special1, player)
 			|| player.input.isPressed(Control.Shoot, player)

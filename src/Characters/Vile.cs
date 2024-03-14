@@ -15,6 +15,7 @@ public class Vile : Character {
 	public int longshotGizmoCount;
 	public float gizmoCooldown;
 	public float mk2missleCooldown;
+	public float ParasiteSwordcooldown;
 	public bool hasFrozenCastleBarrier() {
 		return player.frozenCastle;
 	}
@@ -112,6 +113,16 @@ public class Vile : Character {
 
 	public override void update() {
 		base.update();
+
+		//KillingSpreeThemes
+		if (KillingSpree == 5){
+				if (musicSource == null) {
+					addMusicSource("vilemk2", getCenterPos(), true);
+				}
+		} 
+		
+
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -177,7 +188,7 @@ public class Vile : Character {
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 		Helpers.decrementTime(ref mk2missleCooldown);
-		
+		Helpers.decrementTime(ref ParasiteSwordcooldown);
 
 		if (player.weapon is not AssassinBullet && (player.vileLaserWeapon.type > -1 || (isVileMK5 || isVileMK4))) {
 			if (player.input.isHeld(Control.Special1, player) && charState is not Die && invulnTime == 0 && flag == null && player.vileAmmo >= player.vileLaserWeapon.getAmmoUsage(0)) {
@@ -268,13 +279,13 @@ public class Vile : Character {
 
 		// Vile V Ride control.
 
-		if (!isVileMK5 || vileStartRideArmor == null) {
+		if (!isVileMK5 || vileStartRideArmor != null) {
 			if (player.input.isPressed(Control.Shoot, player) && mmw != null && calldownMechCooldown == 0) {
 				onMechSlotSelect(mmw);
 				return;
 			}
 		}  		
-		if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
+		if (vileStartRideArmor != null && player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
 			onMechSlotSelect(mmw);
 			return;
 		}
@@ -343,7 +354,19 @@ public class Vile : Character {
 
 		// Vile Moves
 
-	
+		// Houtenjin
+		if (isVileMK5 && player.currency > 0 &&
+		downpressedtimes >= 2 && 
+		mk2missleCooldown == 0 &&
+		player.input.isPressed(Control.WeaponLeft, player)){
+		downpressedtimes = 0;
+		changeState(new HoutenjinStartState(), true);
+		mk2missleCooldown = 2f;
+		player.currency -= 1;
+		}
+
+
+
 		if (charState.canAttack()){
 			if (charState is Dash && (player.input.isPressed(Control.Special1, player)
 			|| player.input.isPressed(Control.Shoot, player)
@@ -353,27 +376,65 @@ public class Vile : Character {
 			slideVel = xDir * getDashSpeed();			
 			}
 		
-		// Marrowed Tomahhawk
-		if (player.input.isPressed(Control.Down, player) && player.input.checkDoubleTap(Control.Down) &&
+		// Marrowed Tomahawk
+		if (downpressedtimes >= 2 &&
 		player.input.isPressed(Control.Special1, player)){
-		player.vileCutterWeapon.type = (int)VileCutterType.MaroonedTomahawk;
-		player.weapon.vileShoot(WeaponIds.VileCutter, this);
+		downpressedtimes = 0;
+		changeState(new MaroonedTomahawkAttackState(), true);
+		}
+
+
+		// Parasite Sword
+		if (ParasiteSwordcooldown == 0 && grounded &&
+		 charState is not ParasiteSwordAttackState && 
+		 charState is not StunBallsAttack && 
+		 player.input.checkShoryuken(player, xDir, Control.Special1)){
+		changeState(new ParasiteSwordAttackState(), true);
+		ParasiteSwordcooldown = 0.5f;
+		}
+
+
+		// Mk2 Firenade
+		if (isVileMK2 && ParasiteSwordcooldown == 0 && 
+		 charState is not ParasiteSwordAttackState && 
+		 charState is not StunBallsAttack && 
+		 player.input.checkShoryuken(player, xDir, Control.Jump)){
+		changeState(new FireNadeAttack(NapalmAttackType.Napalm), true);
+		ParasiteSwordcooldown = 0.5f;
 		}
 
 
 		// mk1 stunshot
-		if (isVileMK1 &&  player.input.checkHadoken(player, xDir, Control.Special1)){
+		if (isVileMK1 && mk2missleCooldown == 0 &&
+		 charState is not ParasiteSwordAttackState && 
+		player.input.checkHadoken(player, xDir, Control.Special1)){
 		changeState(new MissileAttack(), true);
+		mk2missleCooldown = 0.5f;
 		}
 
 
+		// Stunballs
+		if (!grounded && isVileMK2 && mk2missleCooldown == 0 &&
+		 charState is not StunBallsAttack && 
+		player.input.checkHadoken(player, xDir, Control.Special1)){
+		changeState(new StunBallsAttack(false), true);
+		mk2missleCooldown = 0.5f;
+		}
+
+		
+
+		
+
 		//Spoiled Brat
-		if (player.input.isPressed(Control.Shoot, player) 
+		if (player.vileAmmo > 5 &&
+		player.input.isPressed(Control.Shoot, player) 
 		&& !(player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
 		&& !player.input.isHeld(Control.Up, player)
 		&& !player.input.isHeld(Control.Down, player)
 		&& charState is not SpoiledBratPunch) {
 		changeState(new SpoiledBratPunch(), true);
+		player.vileAmmo -= 5;
+		vileAmmoRechargeCooldown = 0.15f;
 		}
 
 		//GoGetter Right
@@ -386,9 +447,16 @@ public class Vile : Character {
 		}
 
 		//Front Runner
-		if (player.input.isPressed(Control.Special1, player) 
-		&& charState is not FrontRunnerAttack && charState is not MissileAttack) {
+		if (player.vileAmmo > 8 &&
+		player.input.isPressed(Control.Special1, player) 
+		&& charState is not FrontRunnerAttack 
+		&& charState is not MissileAttack 
+		&& charState is not StunBallsAttack 
+		&& charState is not ParasiteSwordAttackState 
+		&& charState is not MaroonedTomahawkAttackState) {
 		changeState(new FrontRunnerAttack(false, false), true);
+		vileAmmoRechargeCooldown = 0.15f;
+
 		}
 
 
@@ -402,6 +470,11 @@ public class Vile : Character {
 		changeState(new DragonsWrath(NapalmAttackType.Napalm), true);
 		}
 		}
+		//SplashHit
+		
+
+
+
 		//mk1 Vulcan
 		if (isVileMK1 && player.input.isHeld(Control.WeaponRight, player)){
 			player.weapon.vileShoot(WeaponIds.Vulcan, this);
@@ -711,6 +784,10 @@ public class Vile : Character {
 		if ( sprite.name.Contains("_flamethrower"))
 		{
 			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 1f, 25, 0.4f, null, isShield: true, isDeflectShield: true);
+		}
+		if ( sprite.name.Contains("houtenjin"))
+		{
+			return new GenericMeleeProj(new HoutenjinWeapon(player), centerPoint, ProjIds.Houtenjin, player, 1f, 0, 1f, null, isShield: true, isDeflectShield: true);
 		}
 	
 		return proj;

@@ -318,6 +318,15 @@ public abstract class BaseSigma : Character {
 
 	public override void update() {
 		base.update();
+
+
+		//KillingSpreeThemes
+		if (KillingSpree == 5){
+				if (musicSource == null) {
+					addMusicSource("sigmabattle", getCenterPos(), true);
+				}
+		} 
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}

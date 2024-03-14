@@ -16,7 +16,7 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "Revision 20";
+	public static string versionName = "WCut v2.5";
 	public static string subVersionName = "Alpha 10";
 	public static string subVersionShortName = "a10";
 
@@ -32,7 +32,7 @@ public partial class Global {
 	// Better to use together with "checksumPrefix" and be diferent from it.
 	public const string checksumKey = checksumPrefix + " DEVTEST-07-03-2024";
 	// For displaying the name of the mod in the version string.
-	public static string shortForkName = "CE";
+	public static string shortForkName = "W.Cut";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 

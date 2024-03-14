@@ -468,6 +468,7 @@ public class XUPGrabState : CharState {
 		character.grabCooldown = 1;
 		victim.grabInvulnTime = 2;
 		victim?.releaseGrab(character);
+		
 	}
 }
 
@@ -682,7 +683,7 @@ public class XRevive : CharState {
 			player.health = 1;
 			character.addHealth(player.maxHealth);
 
-			player.weapons.RemoveAll(w => w is not Buster);
+			/*player.weapons.RemoveAll(w => w is not Buster);
 			if (player.weapons.Count == 0) {
 				player.weapons.Add(new Buster());
 			}
@@ -691,7 +692,7 @@ public class XRevive : CharState {
 				busterWeapon.setUnpoBuster();
 			}
 			player.weaponSlot = 0;
-
+			*/
 			once = true;
 			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
 			flash.grow = true;
@@ -699,6 +700,8 @@ public class XRevive : CharState {
 
 		if (character.isAnimOver()) {
 			mmx.isHyperX = true;
+			if (player.HasFullForce())player.setUltimateArmor(true);
+			if (player.hasAllX3Armor())player.setGoldenArmor(true);
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 		}

@@ -133,8 +133,8 @@ public class DynamoBoomerangProj : Projectile {
 		}
 		if (reversed) {
 			vel = new Point(0, 0);
-			if (pos.x > shooter.pos.x) xDir = -1;
-			else xDir = 1;
+			if (owner.character.xDir == 1) xDir = -1;
+			if (owner.character.xDir == -1) xDir = 1;
 		
 			Point returnPos = shooter.getCenterPos();
 			if (shooter.sprite.name == "vile_rocket_punch") {

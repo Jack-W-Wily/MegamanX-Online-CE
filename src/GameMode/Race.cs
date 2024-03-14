@@ -4,7 +4,7 @@ using System.Linq;
 namespace MMXOnline;
 
 public class Race : GameMode {
-	public Race(Level level) : base(level, null) {
+	public Race(Level level) : base(level,  null) {
 		isTeamMode = false;
 		playingTo = 100;
 		setupTime = Global.quickStart ? 2 : 12;

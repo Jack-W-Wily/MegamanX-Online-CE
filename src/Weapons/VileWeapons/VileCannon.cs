@@ -156,9 +156,9 @@ public class VileCannonProj : Projectile {
 		}
 		// Speed and angle.
 		Point norm = Point.createFromByteAngle(byteAngle);
-		this.vel.x = norm.x * speed * xDir;
-		this.vel.y = norm.y * speed;
-		this.byteAngle = byteAngle;
+		this.vel.x = norm.x * speed * player.character.xDir;
+		this.vel.y = norm.y * speed * player.character.xDir;
+		this.byteAngle = byteAngle * player.character.xDir;
 
 		if (rpc) {
 			rpcCreateByteAngle(pos, player, netProjId, byteAngle);

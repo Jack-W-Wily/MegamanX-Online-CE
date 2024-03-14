@@ -229,6 +229,8 @@ public class Input {
 		return completed;
 	}
 
+	
+
 	public Dictionary<Key, char> capsLockMapping = new Dictionary<Key, char>() {
 		{ Key.A, 'A' },
 		{ Key.B, 'B' },

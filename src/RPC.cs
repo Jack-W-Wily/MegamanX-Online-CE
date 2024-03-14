@@ -1617,7 +1617,7 @@ public class RPCCommandGrabPlayer : RPC {
 		if (grabber == null || victimChar == null) return;
 		if (!victimChar.canBeGrabbed()) return;
 
-		if (!isDefenderFavored) {
+		/*if (!isDefenderFavored) {
 			if (victimChar.ownedByLocalPlayer && !Helpers.isOfClass(victimChar.charState, grabbedState.GetType())) {
 				victimChar.changeState(grabbedState, true);
 			}
@@ -1628,7 +1628,9 @@ public class RPCCommandGrabPlayer : RPC {
 				}
 				grabber.state.trySetGrabVictim(victimChar);
 			}
-		}
+		}*/
+		grabber.state.trySetGrabVictim(victimChar);
+		victimChar.changeState(grabbedState, true);
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -1657,7 +1659,11 @@ public class RPCCommandGrabPlayer : RPC {
 			} else if (grabber is StrikeChainProj scp) {
 				scp.hookActor(victimChar);
 			}
-	/*	} else if (hookScenario == CommandGrabScenario.MK2Grab) {
+
+		} 
+		//This shit right here ain't working and I'm tried of trying to fix it so I made
+		//a new and better System in Damager.CS
+	/* else if (hookScenario == CommandGrabScenario.MK2Grab) {
 			//if (grabberChar == null || victimChar == null) return;
 			//if (!victimChar.canBeGrabbed()) return;
 
@@ -1671,7 +1677,7 @@ public class RPCCommandGrabPlayer : RPC {
 				}
 			}
 	
-	*/	} else if (hookScenario == CommandGrabScenario.UPGrab) {
+	} else if (hookScenario == CommandGrabScenario.UPGrab) {
 			if (grabberChar == null || victimChar == null) return;
 			if (!victimChar.canBeGrabbed()) return;
 
@@ -1684,7 +1690,7 @@ public class RPCCommandGrabPlayer : RPC {
 					grabberChar.changeState(new XUPGrabState(victimChar));
 				}
 			}
-		} else if (hookScenario == CommandGrabScenario.WhirlpoolGrab) {
+		} else*/ if (hookScenario == CommandGrabScenario.WhirlpoolGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new WhirlpoolGrabbed(grabber as LaunchOctopus), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.DeadLiftGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerangKuwanger), isDefenderFavored);
@@ -1701,9 +1707,9 @@ public class RPCCommandGrabPlayer : RPC {
 		} else if (hookScenario == CommandGrabScenario.BBuffaloGrab) {
 			maverickGrabCode(grabberMaverick, victimChar, new BBuffaloDragged(grabber as BlizzardBuffalo), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.Release) {
-			//if (victimChar != null) {
-			//	victimChar.charState?.releaseGrab();
-			//}
+			if (victimChar != null) {
+				victimChar.charState?.releaseGrab();
+			}
 			
 		}
 	}

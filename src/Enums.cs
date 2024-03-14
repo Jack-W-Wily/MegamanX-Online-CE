@@ -149,6 +149,8 @@ public enum WeaponIds {
 	DropKick,
 	DarkHold,
 
+	//Vile Weapons
+	Houtenjin,
 	MechMenuWeapon,
 	MechBuster,
 	MechPunch,
@@ -182,6 +184,7 @@ public enum WeaponIds {
 	StraightNightmare,
 	HexaInvolute,
 
+	//Axl WEeapons
 	AxlBullet,
 	BlastLauncher,
 	RayGun,
@@ -443,6 +446,9 @@ public enum ProjIds {
 	KKnuckleParryStart,
 	KKnuckleParry,
 
+
+	//VilePRojIDS
+	Houtenjin,
 	ElectricShock,
 	MK2StunShot,
 	VileMissile,

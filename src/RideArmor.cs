@@ -442,9 +442,17 @@ public class RideArmor : Actor, IDamagable {
 				playSound("frogShoot", sendRpc: true);
 			}
 		}
-		if (raNum == 5 &&   (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
+
+
+		// Devilbear special pup control
+		if (raNum == 5 &&  (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
 		&& player.input.isPressed(Control.WeaponRight, player)) {
 		changeState(new RADash());
+		}
+		if (raNum == 5 &&  (player.input.isHeld(Control.Up, player))
+		&& player.input.isPressed(Control.WeaponRight, player)) {
+		changeState(new RADash());
+		vel.y = -getJumpPower();
 		}
 
 		bool attackConditionMet = canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;

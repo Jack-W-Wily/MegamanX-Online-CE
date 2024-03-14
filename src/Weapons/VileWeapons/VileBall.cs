@@ -346,3 +346,101 @@ public class VileElectricBomb : Weapon {
 		killFeedIndex = 55;
 	}
 }
+
+
+
+
+public class StunBallsAttack : CharState {
+	int bombNum;
+	bool isNapalm;
+
+	public StunBallsAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		this.isNapalm = isNapalm;
+	}
+
+	public override void update() {
+		base.update();
+
+			var ebw = new VileElectricBomb();
+			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+			if (stateTime > 0f && bombNum == 0) {
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(150 * character.xDir, 0), rpc: true);
+			}
+			if (stateTime > 0.1f && bombNum == 1) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(133 * character.xDir, 75), rpc: true);
+			}
+			if (stateTime > 0.2f && bombNum == 2) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(75 * character.xDir, 133), rpc: true);
+			}
+			if (stateTime > 0.3f && bombNum == 3) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(0, 150), rpc: true);
+			}
+			if (stateTime > 0.4f && bombNum == 4) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-75 * character.xDir, 133), rpc: true);
+			}
+			if (stateTime > 0.5f && bombNum == 5) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-133 * character.xDir, 75), rpc: true);
+			}
+			if (stateTime > 0.6f && bombNum == 6) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-150 * character.xDir, 0), rpc: true);
+			}
+
+			if (stateTime > 0.66f) {
+				character.changeToIdleOrFall();
+			}
+		}
+	
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+
+
+

@@ -312,6 +312,267 @@ public class NapalmAttack : CharState {
 }
 
 
+
+public class RunblingBangAttack : CharState {
+	bool shot;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+
+	public RunblingBangAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		return napalmAttackType == NapalmAttackType.Flamethrower ? "crouch_flamethrower" : "crouch_nade";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (napalmAttackType == NapalmAttackType.Napalm) {
+			if (!shot && character.sprite.frameIndex == 2) {
+				shot = true;
+				vile.setVileShootTime(player.vileNapalmWeapon);
+				var poi = character.sprite.getCurrentFrame().POIs[0];
+				poi.x *= character.xDir;
+
+				Projectile proj;
+				proj = new NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				
+			}
+			
+		} 
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class FireNadeAttack : CharState {
+	bool shot;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+	bool jumpedYet;
+	float timeInWall;
+	bool isUnderwater;
+	Anim anim;
+	float projTime;
+
+	public FireNadeAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		return napalmAttackType == NapalmAttackType.Flamethrower ? "air_bomb_attack" : "air_bomb_attack";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
+			jumpedYet = true;
+			character.dashedInAir++;
+			character.vel.y = -character.getJumpPower() * 1.5f;
+			if (!isUnderwater) {
+				character.playSound("FireNappalmMK2", sendRpc: true);
+			}
+		}
+		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Count > 0) {
+			character.move(new Point(character.xDir * 150, 0));
+		}
+		if (napalmAttackType == NapalmAttackType.Napalm) {
+			if (!shot && character.sprite.frameIndex == 2) {
+				shot = true;
+				vile.setVileShootTime(player.vileNapalmWeapon);
+				var poi = character.sprite.getCurrentFrame().POIs[0];
+				poi.x *= character.xDir;
+
+				Projectile proj;
+				proj = new MK2NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				
+			}
+		} 
+		if (character.sprite.frameIndex == 6) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class SplashHitAttack : CharState {
+	bool shot;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+
+	public SplashHitAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		return napalmAttackType == NapalmAttackType.Flamethrower ? "crouch_flamethrower" : "crouch_nade";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (napalmAttackType == NapalmAttackType.Napalm) {
+			if (!shot && character.sprite.frameIndex == 2) {
+				shot = true;
+				vile.setVileShootTime(player.vileNapalmWeapon);
+				var poi = character.sprite.getCurrentFrame().POIs[0];
+				poi.x *= character.xDir;
+
+				Projectile proj;
+					proj = new SplashHitGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			
+				
+			}
+		} 
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+public class HoutenjinWeapon : Weapon {
+	public HoutenjinWeapon(Player player) : base() {
+		
+		index = (int)WeaponIds.Houtenjin;
+		killFeedIndex = 113;
+	}
+}
+
+
+public class HoutenjinStartState : CharState {
+	public HoutenjinStartState() : base("houtenjin_prepare", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (stateTime > 1) {
+		Actor counterAttackTarget = null;
+		counterAttackTarget =  Global.level.getClosestTarget(character.pos, player.alliance, true, aMaxDist: 250);;
+		character.playSound("zeroParry", sendRpc: true);
+		character.changeState(new HoutenjinState(counterAttackTarget), true);
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.parryCooldown = character.maxParryCooldown;
+	}
+
+	public bool canParry(Actor damagingActor) {
+		var proj = damagingActor as Projectile;
+		if (proj == null) {
+			return false;
+		}
+		return character.frameIndex == 0;
+	}
+}
+
+public class HoutenjinState : CharState {
+	bool shot;
+	
+	float shootTime;
+	int shootCount;
+
+	Actor counterAttackTarget;
+	Point counterAttackPos;
+	NapalmAttackType napalmAttackType;
+
+	public HoutenjinState(Actor counterAttackTarget, string transitionSprite = "") :
+		base(getSprite(), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite() {
+		return"houtenjin";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (counterAttackTarget != null) {
+			character.turnToPos(counterAttackPos);
+			float dist = character.pos.distanceTo(counterAttackPos);
+			if (dist < 350) {
+				if (character.frameIndex >= 1 && !once) {
+					if (dist > 5) {
+						var destPos = Point.lerp(character.pos, counterAttackPos, Global.spf * 5);
+						character.changePos(destPos);
+					}
+				}
+			}
+		}
+		else{
+		character.slideVel = character.xDir * character.getDashSpeed();	
+		}
+		if (napalmAttackType == NapalmAttackType.Napalm) {
+			if (!shot && character.sprite.frameIndex == 12) {
+				shot = true;
+				vile.setVileShootTime(player.vileNapalmWeapon);
+				var poi = character.sprite.getCurrentFrame().POIs[0];
+				poi.x *= character.xDir;
+
+				Projectile proj;
+					proj = new SplashHitProj(new Napalm(NapalmType.SplashHit)
+				, character.pos, character.xDir,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
+				
+			}
+		} 
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
 public class DragonsWrath : CharState {
 	bool shot;
 	bool isGrounded = false;
@@ -473,6 +734,20 @@ public class MK2NapalmProj : Projectile {
 		}
 	}
 
+
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -30));
+		}
+	}
+
+
 	public override void update() {
 		base.update();
 		if (ownedByLocalPlayer) {
@@ -543,6 +818,18 @@ public class MK2NapalmWallProj : Projectile {
 			destroySelf(disableRpc: true);
 		}
 	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+		}
+	}
+
 }
 
 
@@ -626,7 +913,7 @@ public class SplashHitProj : Projectile {
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
 		}
 	}
 }

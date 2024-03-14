@@ -154,9 +154,11 @@ public class VileMK2GrabState : CharState {
 		character.playSound("crash", sendRpc: true);
 		}
 		character.grabCooldown = 1;
+		character.grabtimeout = 0.15f;
 		if (newState is not VileMK2GrabState && victim != null) {
 			victim.grabInvulnTime = 0;
 			victim?.releaseGrab(character, true);
+			
 		}
 	}
 }

@@ -146,13 +146,22 @@ public class Zero : Character {
 				if (musicSource == null) {
 					addMusicSource("blackzero", getCenterPos(), true);
 				}
-			} else {
-				destroyMusicSource();
-			}
+			}// else {
+				//destroyMusicSource();
+		//	}
 		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+
+
+		//KillingSpreeThemes
+		if (KillingSpree == 5){
+				if (musicSource == null) {
+					addMusicSource("awakeroadagain", getCenterPos(), true);
+				}
+		} 
+
 
 		// All code here bellow is only executed by local players.
 		raijingekiWeapon.update();
@@ -850,7 +859,7 @@ public class Zero : Character {
 			if (player.isZBusterZero()) {
 			type = 1;
 			}
-			if (!player.isZBusterZero() && !isBlackZero()){
+			if (!player.isZBusterZero() && !isBlackZero() && !isNightmareZero){
 			type = 2;
 			}
 			//>>>>>>>>>>>>>>>>>>>>>>>>

@@ -171,8 +171,7 @@ public class RaySplasherTurret : Actor, IDamagable
 		}
 		netOwner = player;
 		netActorCreateId = NetActorCreateId.RaySplasherTurret;
-		if (rpc)
-		{
+		if (rpc) {
 			createActorRpc(player.id);
 		}
 	}

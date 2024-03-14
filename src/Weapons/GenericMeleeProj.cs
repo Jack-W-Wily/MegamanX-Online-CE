@@ -26,44 +26,53 @@ public class GenericMeleeProj : Projectile {
 
 	public void charGrabCode(CommandGrabScenario scenario, Character grabber, IDamagable damagable, CharState grabState, CharState grabbedState) {
 		if (grabber != null && damagable is Character grabbedChar && grabbedChar.canBeGrabbed()) {
-			if (!owner.isDefenderFavored) {
+			/*if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && !Helpers.isOfClass(grabber.charState, grabState.GetType())) {
 					owner.character.changeState(grabState, true);
 					if (Global.isOffline) {
 						grabbedChar.changeState(grabbedState, true);
 					} else {
-						RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, false);
+						grabbedChar.changeState(grabbedState, true);
+						//RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, false);
 					}
 				}
 			} else {
 				if (grabbedChar.ownedByLocalPlayer && !Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())) {
 					grabbedChar.changeState(grabbedState);
 					if (Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())) {
-						RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, true);
+						grabbedChar.changeState(grabbedState, true);
+						//RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, true);
 					}
 				}
-			}
+			}*/
+			owner.character.changeState(grabState, true);	
+			grabbedChar.changeState(grabbedState, true);
 		}
 	}
 
 	public void maverickGrabCode(CommandGrabScenario scenario, Maverick grabber, IDamagable damagable, CharState grabbedState) {
 		if (damagable is Character chr && chr.canBeGrabbed()) {
-			if (!owner.isDefenderFavored) {
+		/*	if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && grabber.state.trySetGrabVictim(chr)) {
 					if (Global.isOffline) {
 						chr.changeState(grabbedState, true);
 					} else {
-						RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, false);
+						chr.changeState(grabbedState, true);
+						//RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, false);
 					}
 				}
 			} else {
 				if (chr.ownedByLocalPlayer && !Helpers.isOfClass(chr.charState, grabbedState.GetType())) {
 					chr.changeState(grabbedState);
 					if (Helpers.isOfClass(chr.charState, grabbedState.GetType())) {
-						RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, true);
+						chr.changeState(grabbedState, true);
+						//RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, true);
 					}
 				}
 			}
+		}*/
+		chr.changeState(grabbedState, true);
+		
 		}
 	}
 
@@ -76,16 +85,16 @@ public class GenericMeleeProj : Projectile {
 			}
 		}
 		//>>> Zero Uppercut Bullshit
-
+		/*
 		if (projId == (int)ProjIds.Ryuenjin || projId == (int)ProjIds.EBlade || projId == (int)ProjIds.Rising){
 			if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+			float xMoveVel = proj.MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 0 * modifier, -300));
 			}
-		}
+		}*/
 		// Command grab section
 		Character grabberChar = owner.character;
 		Character grabbedChar = damagable as Character;

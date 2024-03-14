@@ -166,13 +166,14 @@ public class HyorogaStartState : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.sprite.name == "zero_hyoroga_rise") {
+		if (character.sprite.name.Contains("hyoroga_rise")) {
 			if (character.deltaPos.isCloseToZero()) {
-				character.changeSprite("zero_hyoroga_start", true);
+				sprite =  "hyoroga_start";
+				character.changeSpriteFromName("hyoroga_start", true);
 				character.gravityModifier = -1;
 				character.useGravity = true;
 			}
-		} else if (character.sprite.name == "zero_hyoroga_start") {
+		} else if (character.sprite.name.Contains("hyoroga_start")) {
 			if (character.isAnimOver()) {
 				character.changeState(new HyorogaState(), true);
 			}
@@ -225,7 +226,7 @@ public class HyorogaState : CharState {
 		Helpers.decrementTime(ref shootCooldown);
 
 		var pois = character.sprite.getCurrentFrame().POIs;
-		if (character.sprite.name == "zero_hyoroga_attack") {
+		if (character.sprite.name.Contains("hyoroga_attack")) {
 			if (pois != null && pois.Count > 0 && shootCooldown == 0) {
 				var poi = character.getFirstPOIOrDefault();
 				new HyorogaProj(

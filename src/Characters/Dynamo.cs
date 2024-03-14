@@ -40,6 +40,16 @@ public class Dynamo : Character {
 
 	public override void update() {
 		base.update();
+
+
+		//KillingSpreeThemes
+		if (KillingSpree == 5){
+				if (musicSource == null) {
+					addMusicSource("bossroom", getCenterPos(), true);
+				}
+		} 
+
+
 		player.changeWeaponControls();
 			Helpers.decrementTime(ref DynamoSlashCD);
 			Helpers.decrementTime(ref DynamoStringCD);

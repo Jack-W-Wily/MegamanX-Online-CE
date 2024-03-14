@@ -814,7 +814,7 @@ public class MFly : MaverickState {
 			}
 		}
 
-		maverick.flyBar = -1 * Global.speedMul;
+		maverick.flyBar -= 1;// * Global.speedMul;
 		if (maverick.flyBar <= 0 || maverick.gravityWellModifier > 1) {
 			flyVel.y = 100;
 		}

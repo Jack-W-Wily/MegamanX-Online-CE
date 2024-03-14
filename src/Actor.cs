@@ -912,7 +912,7 @@ public partial class Actor : GameObject {
 		}
 		if (netcodeOverride != null) {
 			if (netcodeOverride == NetcodeModel.FavorDefender) {
-				return true;
+				return false; // remember to change if this doens't works
 			} else {
 				return false;
 			}

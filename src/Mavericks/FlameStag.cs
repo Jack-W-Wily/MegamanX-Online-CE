@@ -410,6 +410,7 @@ public class FStagGrabState : MaverickState {
 	float xVel = 400;
 	public Character victim;
 	float endLagTime;
+	bool grabbedOnce;
 	public FStagGrabState(bool fromDash) : base("dash_grab", "") {
 		if (!fromDash) xVel = 0;
 	}
@@ -428,14 +429,19 @@ public class FStagGrabState : MaverickState {
 			return;
 		}
 
+		if (victim != null && victim.sprite.name.EndsWith("_grabbed")) {
+			grabbedOnce = true;
+		}
+
 		if (maverick.isAnimOver()) {
-			if (victim != null) {
+			if (grabbedOnce) {
 				endLagTime += Global.spf;
 				if (endLagTime > 0.25f) {
 					maverick.changeState(new FStagUppercutState(victim));
 				}
 			} else {
-				maverick.changeToIdleOrFall();
+				maverick.changeState(new FStagUppercutState(victim));
+				//maverick.changeToIdleOrFall();
 			}
 		}
 	}

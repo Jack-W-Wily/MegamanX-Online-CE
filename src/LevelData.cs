@@ -511,6 +511,10 @@ public class LevelData {
 		return name.EndsWith("_md");
 	}
 
+	public bool isRaceMap() {
+		return raceOnly;
+	}
+
 	public string getMusicKey(List<Player> players) {
 
 		if (Global.level.gameMode is Nightmare) {
@@ -552,6 +556,25 @@ public class LevelData {
 		if (isCustomMap) {
 			return name;
 		}
+	}
+
+
+	public string getMusicKey2(List<Player> players) {
+
+		if (Helpers.randomRange(0,3) == 0) {
+			return "awakeroadagain";
+		}
+		if (Helpers.randomRange(0,3) == 1) {
+			return "bossroom";
+		}
+		if (Helpers.randomRange(0,3) == 2) {
+			return "claudio";
+		}
+		if (Helpers.randomRange(0,3) == 3) {
+			return "vilemk2";
+		}
+		return "bossroom";
+		
 	}
 
 	public string getWinTheme() {

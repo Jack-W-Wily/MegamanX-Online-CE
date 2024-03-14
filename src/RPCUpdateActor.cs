@@ -112,6 +112,7 @@ public partial class Actor {
 			args.Add((byte)alliance);
 			args.Add(character.updateAndGetNetCharState1());  // Packs bool states (BS's) into one byte
 			args.Add(character.updateAndGetNetCharState2());
+			args.Add(character.updateAndGetNetCharState3());
 
 			if (charMask[0]) {
 				byte[] armorBytes = BitConverter.GetBytes(character.player.armorFlag);
@@ -360,6 +361,7 @@ public class RPCUpdateActor : RPC {
 					int alliance = arguments[i++];
 					int netCharState1 = arguments[i++];
 					int netCharState2 = arguments[i++];
+					int netCharState3 = arguments[i++];
 
 					character.player.changeWeaponFromWi(weaponIndex);
 					character.player.health = health;
@@ -377,6 +379,7 @@ public class RPCUpdateActor : RPC {
 					character.player.alliance = alliance;
 					character.netCharState1 = (byte)netCharState1;
 					character.netCharState2 = (byte)netCharState2;
+					character.netCharState3 = (byte)netCharState3;
 
 					// X section
 					if (charMaskBools[0]) {

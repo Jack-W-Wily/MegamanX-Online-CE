@@ -44,6 +44,7 @@ public class CharState {
 	// This should be inside the character object to sync while online.
 	public virtual void releaseGrab() {
 		grabTime = 0;
+		
 	}
 
 	// For character specific code.
@@ -967,6 +968,14 @@ public class AirDash : CharState {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
 		}
+		if (player.isX && player.HasFullBlade()) {
+			character.changeState(new BladeDash());
+		}
+		if (player.isX && player.HasFullFalcon()) {
+			distanceModifier = 0.5f;;
+		}
+
+	
 		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
@@ -1152,7 +1161,13 @@ public class WallSlide : CharState {
 					}
 				}
 			}
+
+			if (!(player.HasFullShadow())
+			&& !(player.isAxl 
+			&& player.input.isHeld(Control.Shoot,player))
+			){
 			character.move(new Point(0, 100));
+			}
 		}
 
 		dustTime += Global.spf;
@@ -1427,7 +1442,7 @@ public class Hurt : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (miniFlinchTime == 0) {
+		if (miniFlinchTime == 0 && !character.grounded) {
 			if (!spiked) character.vel.y = -100;
 		}
 		if (player.isX && player.hasFullLight()) {
@@ -1439,7 +1454,7 @@ public class Hurt : CharState {
 
 	public override void update() {
 		base.update();
-		if (hurtSpeed != 0) {
+		if (hurtSpeed != 0 && !character.grounded) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
 			character.move(new Point(hurtSpeed, 0));
 		}
@@ -1824,6 +1839,47 @@ public class Die : CharState {
 		}
 	}
 }
+public class LaunchedState : GenericGrabbedState {
+	public Character grabbedChar;
+	private bool once;
+	public bool launched;
+	float launchTime;
+	public LaunchedState(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+			for (int i = 1; i <= 4; i++) {
+						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
+						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+							if(!once){
+							player.health -= 3;
+							once = true;
+							}
+							character.playSound("crash", sendRpc: true);
+							character.shakeCamera(sendRpc: true);
+							//return;
+						}
+			}
+		
+		}
+		if (!launched) {
+				launched = true;
+				character.unstickFromGround();
+				character.vel.y = -600;
+			}
+	}
+}
 
 public class GenericGrabbedState : CharState {
 	public Actor grabber;
@@ -1917,16 +1973,16 @@ public class GenericGrabbedState : CharState {
 		//character.stopCharge();
 		character.useGravity = false;
 		character.grounded = false;
-		savedZIndex = character.zIndex;
-		if (!reverseZIndex) character.setzIndex(grabber.zIndex - 100);
-		else character.setzIndex(grabber.zIndex + 100);
+		//savedZIndex = character.zIndex;
+		//if (!reverseZIndex) character.setzIndex(grabber.zIndex - 100);
+		//else character.setzIndex(grabber.zIndex + 100);
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.grabInvulnTime = 0;
 		character.useGravity = true;
-		character.setzIndex(savedZIndex);
+		//character.setzIndex(savedZIndex);
 	}
 }
 

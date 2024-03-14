@@ -180,7 +180,7 @@ public class MainMenu : IMainMenu {
 		
 
 		if (Options.main.preferredCharacter == 0){
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundX"], 0, 0);
 		}
 		if (Options.main.preferredCharacter == 1){
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundZero"], 0, 0);
@@ -188,10 +188,22 @@ public class MainMenu : IMainMenu {
 		if (Options.main.preferredCharacter == 2){
 		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundVile"], 0, 0);
 		}
-		if (Options.main.preferredCharacter >= 3){
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		if (Options.main.preferredCharacter == 3){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundAxl"], 0, 0);
 		}
-		DrawWrappers.DrawTitleTexture(Global.textures["mainmenutitle"]);
+		if (Options.main.preferredCharacter == 4){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundSigma"], 0, 0);
+		}
+		if (Options.main.preferredCharacter == 5){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundDynamo"], 0, 0);
+		}
+		if (Options.main.preferredCharacter == 6){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundGBD"], 0, 0);
+		}
+		if (Options.main.preferredCharacter == 7){
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackgroundIris"], 0, 0);
+		}
+		DrawWrappers.DrawTextureHUD(Global.textures["mainmenutitle"], 0, 0);
 		DrawWrappers.DrawTextureHUD(Global.textures["cursor"], startX - 10, startPos - 2 + (selectY * yDistance));
 		DrawWrappers.DrawTextureHUD(Global.textures[selectionImage], 208, 107);
 		DrawWrappers.DrawTextureHUD(Global.textures["mainmenubox"], 199, 98);

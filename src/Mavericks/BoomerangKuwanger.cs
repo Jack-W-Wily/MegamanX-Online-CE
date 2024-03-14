@@ -479,10 +479,11 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 			//return;
 		}
 
-		if (grabber.sprite?.name.EndsWith("_deadlift") == true) {
+	if (grabber.sprite.name.Contains("deadlift")) {
 			if (grabber.frameIndex < 4) {
 				trySnapToGrabPoint(true);
-			} else if (!launched) {
+			} else 
+			if (!launched) {
 				launched = true;
 				character.unstickFromGround();
 				character.vel.y = -600;

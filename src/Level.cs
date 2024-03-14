@@ -680,6 +680,8 @@ public partial class Level {
 			} else if (objectName.StartsWith("Music Source")) {
 				string musicName = instance.properties.musicName ?? "";
 				if (!Global.musics.ContainsKey(musicName)) {
+					
+					
 					//throw new Exception("Music Source with music name " + musicName + " not found.\nIf music is in custom map folder, format as CUSTOM_MAP_NAME:MUSIC_NAME");
 				} else {
 					var actor = new Actor("empty", pos, null, true, false);
@@ -808,6 +810,10 @@ public partial class Level {
 		string musicKey = levelData.getMusicKey(players);
 		Global.changeMusic(musicKey);
 
+		if (Global.music == null){
+		string musicKey2 = levelData.getMusicKey2(players);
+		Global.changeMusic(musicKey2);
+		}
 		if (isHost) {
 			Global.serverClient?.rpc(RPC.updateStarted);
 		}
@@ -1448,12 +1454,12 @@ public partial class Level {
 
 		bool isSlown = false;
 
-		if (actor is Character chr2) {
-			if (chr2.infectedTime > 0) {
-				slowAmount = 1 - (0.25f * (chr2.infectedTime / 8));
-				isSlown = true;
-			}
-		}
+		//if (actor is Character chr2) {
+		//	if (chr2.infectedTime > 0) {
+		//		slowAmount = 1 - (0.25f * (chr2.infectedTime / 8));
+		//		isSlown = true;
+		//	}
+		//}
 
 		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is OverdriveOstrich) {
 			foreach (var cch in chargedCrystalHunters) {

@@ -204,6 +204,7 @@ public class GBeetleDashState : MaverickState {
 	float soundTime;
 	float dustTime;
 	float partTime;
+	public Character grabbedChar;
 	public GBeetleDashState() : base("dash", "dash_start") {
 	}
 
@@ -265,7 +266,8 @@ public class GBeetleDashState : MaverickState {
 				return;
 			}
 		}
-		maverick.changeState(new MIdle("dash_end"));
+		maverick.changeState(new GBeetleLiftState(grabbedChar), true);
+		//maverick.changeState(new MIdle("dash_end"));
 	}
 
 	public override bool trySetGrabVictim(Character grabbed) {

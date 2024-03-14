@@ -170,8 +170,8 @@ public class RocketPunchProj : Projectile {
 		}
 		if (reversed) {
 			vel = new Point(0, 0);
-			if (pos.x > shooter.pos.x) xDir = -1;
-			else xDir = 1;
+			if (shooter.xDir == 1) xDir = -1;
+			if (shooter.xDir == -1) xDir = 1;
 
 			Point returnPos = shooter.getCenterPos();
 			if (shooter.sprite.name == "vile_rocket_punch") {

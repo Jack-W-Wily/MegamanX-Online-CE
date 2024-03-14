@@ -325,7 +325,7 @@ public class Weapon {
 
 		if (soundTime == 0) {
 			if (shootSounds != null && shootSounds.Count > 0) {
-				player.character.playSound(shootSounds[chargeLevel]);
+		//		player.character.playSound(shootSounds[chargeLevel]);
 			}
 			if (this is FireWave) {
 				soundTime = 0.25f;

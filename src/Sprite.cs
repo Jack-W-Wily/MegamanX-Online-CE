@@ -283,6 +283,10 @@ public class Sprite {
 		bool isMaxX = false;
 		bool isForceX = false;
 		bool isUltX = false;
+		bool isShadowX = false;
+		bool isBladeX = false;
+		bool isFalconX = false;
+		bool isGaeaX = false;
 		Character character = actor as Character;
 		if (character != null) {
 			if (character.isInvisibleBS.getValue() && !Global.shaderWrappers.ContainsKey("invisible")) {
@@ -297,10 +301,14 @@ public class Sprite {
 			if (character.player.isAxl && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
-			isLightX = character.player.isX && character.player.hasFullLight();
-			isGigaX = character.player.isX && character.player.hasFullGiga();
-			isMaxX = character.player.isX && character.player.hasAllX3Armor();
-			isForceX = character.player.isX && character.player.HasFullForce();
+			isLightX = character.player.isX && character.isLightArmorXBS.getValue();
+			isGigaX = character.player.isX && character.isGigaArmorXBS.getValue();
+			isMaxX = character.player.isX && character.isMaxArmorXBS.getValue();
+			isForceX = character.player.isX && character.isForceArmorXBS.getValue();
+			isFalconX = character.player.isX && character.isFalconArmorXBS.getValue();
+			isGaeaX = character.player.isX && character.isGaeaArmorXBS.getValue();
+			isBladeX = character.player.isX && character.isBladeArmorXBS.getValue();
+			isShadowX = character.player.isX && character.isShadowArmorXBS.getValue();
 			isUPX = character.player.isX && character.player.loadout.xLoadout.melee == 1;
 			isIX = character.player.isX && character.player.loadout.xLoadout.melee == 2;
 			isUltX = character.player.isX && character.hasUltimateArmorBS.getValue();
@@ -557,8 +565,20 @@ public class Sprite {
 		if (isMaxX) {
 		bitmap = Global.textures["XMAX"];
 		}
-		if (isForceX) {
+		if (isForceX && !isUltX) {
 		bitmap = Global.textures["XFORCE"];
+		}
+		if (isShadowX) {
+		bitmap = Global.textures["XShadow"];
+		}
+		if (isGaeaX) {
+		bitmap = Global.textures["XGAEA"];
+		}
+		if (isFalconX) {
+		bitmap = Global.textures["XFALCON"];
+		}
+		if (isBladeX) {
+		bitmap = Global.textures["XBLADE"];
 		}
 
 

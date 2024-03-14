@@ -30,6 +30,7 @@ public class Projectile : Actor {
 	public float speed;
 	public int healAmount;
 	public bool isShield;
+	
 	public bool isReflectShield;
 	public bool isDeflectShield;
 	public bool shouldVortexSuck = true;
@@ -61,12 +62,41 @@ public class Projectile : Actor {
 		}
 		this.ownerPlayer = player;
 		canBeLocal = true;
+		ishyorogaproj();
+		isGaeaproj();
 	}
 
 	public void setIndestructableProperties() {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
+	}
+
+
+	public  void ishyorogaproj() {
+		if (ownerPlayer.character != null && ownerPlayer.character.sprite.name.Contains("hyoroga") == true) {
+			xDir = 1;
+			angle = 90;
+			incPos(new Point(0, 10));
+			vel.y = Math.Abs(vel.x);
+			vel.x = 0;
+		}
+		if (ownerPlayer.character != null && ownerPlayer.character.sprite.name.Contains("ex_bladesword") == true) {
+		
+			vel.y = -10;
+			vel.x = 10 + ownerPlayer.character.xDir;
+			maxTime = 0.20f;
+			damager.hitCooldown = 0.5f;
+			damager.flinch = 12;
+			damager.damage = 3;
+		}
+	}
+
+
+public  void isGaeaproj() {
+		if (ownerPlayer.character != null && ownerPlayer.character.isGaeaArmorXBS.getValue()) {
+			maxTime /= 2f;
+		}
 	}
 
 	public float getSpeed() {

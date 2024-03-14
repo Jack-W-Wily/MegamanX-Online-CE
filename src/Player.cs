@@ -10,6 +10,7 @@ namespace MMXOnline;
 public partial class Player {
 	public Input input;
 	public Character character;
+	public Maverick maverick;
 	public Character lastCharacter;
 	public bool ownedByLocalPlayer;
 	public int? awakenedCurrencyEnd;
@@ -17,7 +18,7 @@ public partial class Player {
 	public bool isDefenderFavored {
 		get {
 			if (character != null && !character.ownedByLocalPlayer) {
-				return character.isDefenderFavoredBS.getValue();
+				return false;//character.isDefenderFavoredBS.getValue();
 			}
 			if (Global.level?.server == null) {
 				return false;
@@ -27,11 +28,11 @@ public partial class Player {
 			}
 			if (Global.level.server.netcodeModel == NetcodeModel.FavorAttacker) {
 				if (Global.serverClient?.isLagging() == true) {
-					return true;
+					return false;//true;
 				}
-				return (getPingOrStartPing() >= Global.level.server.netcodeModelPing);
+				return false;//(getPingOrStartPing() >= Global.level.server.netcodeModelPing);
 			}
-			return true;
+			return false;//true;
 		}
 	}
 
@@ -2077,7 +2078,7 @@ public partial class Player {
 	}
 
 	public bool hasGoldenArmor() {
-		return armorFlag == ushort.MaxValue;
+		return hasAllX3Armor() && (character as MegamanX).isHyperX;
 	}
 
 	public void setUltimateArmor(bool addOrRemove) {
@@ -2250,6 +2251,7 @@ public partial class Player {
 			charNumToKills[realCharNum]++;
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}
+		character.KillingSpree += 1;
 	}
 
 	public void addAssist() {
