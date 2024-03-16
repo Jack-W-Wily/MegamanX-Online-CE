@@ -399,7 +399,7 @@ public abstract class BaseSigma : Character {
 		if (player.currentMaverick != null) {
 			return;
 		}
-		if (!Options.main.maverickStartFollow && player.weapon is MaverickWeapon && (
+		if ((player.currentMaverickCommand == MaverickAIBehavior.Defend && player.currentMaverick != null) &&  player.weapon is MaverickWeapon && (
 			player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))
 		) {
 			return;
@@ -434,7 +434,7 @@ public abstract class BaseSigma : Character {
 	}
 
 	public virtual bool canGuard() {
-		if (isSoftLocked() || isDashing) {
+		if ( isDashing) {
 			return false;
 		}
 		return true;

@@ -52,7 +52,7 @@ public class GravityBeetle : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 80;
+		return 95;
 	}
 
 	public override string getMaverickPrefix() {
@@ -87,7 +87,7 @@ public class GravityBeetle : Maverick {
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleStomp, player, damage: 2 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
 			}
 		}
 		return null;

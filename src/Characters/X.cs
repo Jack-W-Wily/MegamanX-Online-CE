@@ -98,6 +98,14 @@ public partial class MegamanX : Character {
 			streamCooldown == 0;
 	}
 
+	public bool hasExpandedMoveset() {
+		  if (player.loadout.xLoadout.melee == 1
+			|| player.hasUltimateArmor()) {
+		return true;
+		  }
+		return false;
+	}
+
 
 	public bool canArmorSwap() {
 		  if (player.loadout.xLoadout.melee == 0
@@ -141,6 +149,11 @@ public partial class MegamanX : Character {
 			if (player.hasGoldenArmor()) {
 				if (musicSource == null) {
 					addMusicSource("goldenX", getCenterPos(), true);
+				}
+			}
+			if (hasUltimateArmorBS.getValue()) {
+				if (musicSource == null) {
+					addMusicSource("fake", getCenterPos(), true);
 				}
 			}
 		
@@ -294,7 +307,7 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		if (player.hasChip(2) && !isInvisible() && totalChipHealAmount < maxTotalChipHealAmount) {
+		if (player.hasGoldenArmor() && !isInvisible() && totalChipHealAmount < maxTotalChipHealAmount) {
 			noDamageTime += Global.spf;
 			if ((player.health < player.maxHealth || player.hasSubtankCapacity()) && noDamageTime > 4) {
 				rechargeHealthTime -= Global.spf;
@@ -514,6 +527,9 @@ public partial class MegamanX : Character {
 				}
 			} if (!player.HasFullForce()) {
 				chargeControls();
+			
+			} if (player.hasUltimateArmor()) {
+				chargeControls();
 			}
 		}
 		if (charState.canShoot()) {
@@ -564,13 +580,16 @@ public partial class MegamanX : Character {
 			}
 
 			if (player.HasFullForce() && !player.hasUltimateArmor()) {
-				if (player.weapon is Buster){
+					if (player.weapon is Buster){
 				unpoChargeControls();
 				}
 				else{
 				chargeControls();
 				}
 			} if (!player.HasFullForce()) {
+				chargeControls();
+			
+			} if (player.hasUltimateArmor()) {
 				chargeControls();
 			}
 		} else if (
@@ -689,18 +708,16 @@ public partial class MegamanX : Character {
 		if (!grounded) {
 			if (player.dashPressed(out string dashControl) && canDash()) {
 				CharState dashState;
-				if (player.input.isHeld(Control.Up, player) && canAirDash() && player.hasAllX3Armor() || isIX && IXTimer > 6 ) {
+				if (player.input.isHeld(Control.Up, player) && canAirDash() &&(player.hasAllX3Armor() || isIX && IXTimer > 6)) {
 					dashState = new UpDash(Control.Dash);
 				} 
 				else{
-					if (canAirDash()) {
-					dashState = new AirDash(dashControl);
-					}
+					
 					dashState = new AirDash(dashControl);
 					if (!isDashing) {
 					changeState(dashState);
 					return true;
-					} else if (player.hasChip(0)) {
+					} else if (player.hasGoldenArmor()) {
 					changeState(dashState);
 					return true;
 					}
@@ -744,6 +761,7 @@ public partial class MegamanX : Character {
 			changeState(new Hadouken(), true);
 			return true;
 		}
+		
 		if (player.isX && shoryukenCheck && canUseFgMove()) {
 			if (!player.hasAllItems()) //player.currency -= 1;
 			//layer.fgMoveAmmo = 0;
@@ -759,9 +777,16 @@ public partial class MegamanX : Character {
 			return true;
 		}
 
+	bool xteleportcheck = player.input.checkShoryuken(player, xDir, Control.Dash);
+
+		if (player.isX && xteleportcheck && (player.HasFullShadow()|| isReturnIX)) {
+			changeState(new XTeleportState(), true);
+			return true;
+		}
+
 		if (player.isX && player.input.isHeld(Control.Up, player) &&
 		player.input.isPressed(Control.Special1, player) &&
-		isXKai && player.weapon is GravityWell && useGrabCooldown == 0) {
+		hasExpandedMoveset() && player.weapon is GravityWell && useGrabCooldown == 0) {
 			changeState(new GravityBallShoot(), true);
 			useGrabCooldown = 1;
 			return true;
@@ -769,7 +794,7 @@ public partial class MegamanX : Character {
 
 		if (player.isX && player.input.isHeld(Control.Down, player) &&
 		player.input.isPressed(Control.Special1, player) &&
-		isXKai && player.weapon is StrikeChain && useGrabCooldown == 0) {
+		hasExpandedMoveset() && player.weapon is StrikeChain && useGrabCooldown == 0) {
 			changeState(new ChainSliderState(), true);
 			useGrabCooldown = 1;
 			return true;
@@ -1051,15 +1076,15 @@ public partial class MegamanX : Character {
 	public float maxBarrierCooldown { get { return 0; } }
 	public bool hasBarrier(bool isOrange) {
 		bool hasBarrier = barrierTime > 0 && barrierTime < barrierDuration - 0.12f;
-		if (!isOrange) return hasBarrier && !player.hasChip(1);
-		else return hasBarrier && player.hasChip(1);
+		if (!isOrange) return hasBarrier && !player.hasGoldenArmor();
+		else return hasBarrier && player.hasGoldenArmor();
 	}
 	public void updateBarrier() {
 		if (barrierTime <= 0) return;
 
 		if (barrierAnim != null) {
 			if (barrierAnim.sprite.name == "barrier_start" && barrierAnim.isAnimOver()) {
-				string spriteName = player.hasChip(1) ? "barrier2" : "barrier";
+				string spriteName = player.hasGoldenArmor() ? "barrier2" : "barrier";
 				barrierAnim.changeSprite(spriteName, true);
 			}
 			barrierAnim.changePos(getCenterPos());

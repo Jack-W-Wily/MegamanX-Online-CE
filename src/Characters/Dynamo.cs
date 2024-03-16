@@ -45,7 +45,7 @@ public class Dynamo : Character {
 		//KillingSpreeThemes
 		if (KillingSpree == 5){
 				if (musicSource == null) {
-					addMusicSource("bossroom", getCenterPos(), true);
+					addMusicSource("dynamo", getCenterPos(), true);
 				}
 		} 
 

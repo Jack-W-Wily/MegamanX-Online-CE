@@ -48,7 +48,7 @@ public class TunnelRhino : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 75;
+		return 85;
 	}
 
 	public override string getMaverickPrefix() {
@@ -78,12 +78,12 @@ public class TunnelRhino : Maverick {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRDash, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRDash, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		}
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRStomp, player, damage: 2 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
 			}
 		}
 		return null;

@@ -420,7 +420,11 @@ public class Ouroboros : CharState {
 
 	public override void update()
 	{
-		
+		if (!fired && (character as Vile).isVileMK2 && character.frameIndex >= 0){
+			new StrikeChain().getProjectile(character.getShootPos(), character.getShootXDir(), player, 0, player.getNextActorNetId());
+		fired = true;
+		}	
+
 		if (!fired && character.frameIndex > 2){
 			new StrikeChain().getProjectile(character.getShootPos(), character.getShootXDir(), player, 0, player.getNextActorNetId());
 		fired = true;

@@ -27,7 +27,7 @@ public class HyperBuster : Weapon {
 	}
 
 	public float getChipFactoredAmmoUsage(Player player) {
-		return player.hasChip(3) ? ammoUsage / 2 : ammoUsage;
+		return player.hasGoldenArmor() ? ammoUsage / 2 : ammoUsage;
 	}
 
 	public static float getRateofFireMod(Player player) {

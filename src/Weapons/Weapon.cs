@@ -367,7 +367,7 @@ public class Weapon {
 	}
 
 	public void addAmmo(float amount, Player player) {
-		if (player.isX && player.hasChip(3) && amount < 0) amount *= 0.5f;
+		if (player.isX && player.hasGoldenArmor() && amount < 0) amount *= 0.5f;
 		ammo += amount;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 	}

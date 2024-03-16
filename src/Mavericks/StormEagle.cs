@@ -13,7 +13,7 @@ public class StormEagle : Maverick {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
 		stateCooldowns.Add(typeof(StormEEggState), new MaverickStateCooldown(false, true, 1.5f));
 		stateCooldowns.Add(typeof(StormEGustState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 0.5f));
+		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 0.2f));
 
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 		canClimbWall = true;
@@ -126,7 +126,7 @@ public class StormETornadoWeapon : Weapon {
 
 public class StormEDiveWeapon : Weapon {
 	public StormEDiveWeapon(Player player) {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+		damager = new Damager(player, 2, Global.defFlinch, 0.5f);
 		index = (int)WeaponIds.StormEDive;
 		killFeedIndex = 99;
 	}
@@ -157,7 +157,7 @@ public class StormEGustWeapon : Weapon {
 #region projectiles
 public class StormEEggProj : Projectile {
 	public StormEEggProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 2, player, "storme_proj_egg", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 100, 2, player, "storme_proj_egg", 4, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.StormEEgg;
 		maxTime = 0.675f;
 		useGravity = true;

@@ -391,6 +391,12 @@ public partial class Character : Actor, IDamagable {
 
 
 		// TODO: Send this to the respective classes.
+
+		if (this is Vile vile) {
+			if (!vile.isVileMK4 && Options.main.swapGoliathInputs){
+				palette = player.nightmareZeroShader;
+			}
+		}
 		if (player.isX) {
 			int index = player.weapon.index;
 			if (index == (int)WeaponIds.GigaCrush || index == (int)WeaponIds.ItemTracer || index == (int)WeaponIds.AssassinBullet || index == (int)WeaponIds.Undisguise || index == (int)WeaponIds.UPParry) index = 0;
@@ -410,10 +416,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		} else if (this is Zero zero) {
 			int paletteNum = 0;
-			if (isNightmareZeroBS.getValue()) {
-				palette = player.nightmareZeroShader;
-				paletteNum = 1;
-			}
+			
 			if (zero.blackZeroTime > 3) paletteNum = 1;
 			else if (zero.blackZeroTime > 0) {
 				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
@@ -529,7 +532,7 @@ public partial class Character : Actor, IDamagable {
 	// Stuck in place and can't do any action but still can activate controls, etc.
 	public virtual bool isSoftLocked() {
 		if (charState is WarpOut) return true;
-		if (player.currentMaverick != null) return false;
+		if (player.currentMaverickCommand == MaverickAIBehavior.Defend && player.currentMaverick != null &&  player.weapon is MaverickWeapon) return true;
 		if (!Options.main.maverickStartFollow && player.weapon is MaverickWeapon mw && mw.isMenuOpened) return true;
 		return false;
 	}
@@ -612,9 +615,9 @@ public partial class Character : Actor, IDamagable {
 		if (!mmx.isIX && player.isX && player.loadout.xLoadout.melee != 1 && mmx.CurrentArmor < 2){
 		return false;
 		}
-		return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasChip(0));
+		return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
 		}
-		return dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasChip(0));
+		return dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
 	}
 
 	public bool canAirJump() {
@@ -731,12 +734,7 @@ public partial class Character : Actor, IDamagable {
 		else if ((player.isVile || player.isX && this is MegamanX mmx && mmx.VileCounters > 2) && player.speedDevil) {
 			runSpeed *= 1.1f;
 		}
-		else if (player.isGBD && this is GBD gbd){
-			if (gbd.shiningSparkStacks > 10){
-			runSpeed *= 1.5f;
-
-			}
-		}
+		
 		return runSpeed * getRunDebuffs();
 	}
 
@@ -749,6 +747,11 @@ public partial class Character : Actor, IDamagable {
 		 if ( player.isX && this is MegamanX mmx ){
 		if (mmx.CurrentArmor == 6) runSpeed *= 0.75f;
 		if (mmx.CurrentArmor == 8) runSpeed *= 1.35f;
+		}
+		if (player.isGBD && this is GBD gbd){
+		if (gbd.shiningSparkStacks > 10){
+			runSpeed *= 1.5f;
+		}
 		}
 		return runSpeed;
 	}
@@ -798,10 +801,10 @@ public partial class Character : Actor, IDamagable {
 		}
 		float hSize = 30;
 		if (sprite.name.Contains("crouch")) {
-			hSize = 22;
+			hSize = 10;
 		}
 		if (sprite.name.Contains("dash")) {
-			hSize = 22;
+			hSize = 15;
 		}
 		if (sprite.name.Contains("_ra_")) {
 			hSize = 20;
@@ -1245,7 +1248,7 @@ public partial class Character : Actor, IDamagable {
 			if (player.isX) {
 				stingChargeTime -= Global.spf;
 
-				player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
+				player.weapon.ammo -= (Global.spf * 3 * (player.hasGoldenArmor() ? 0.5f : 1));
 				if (player.weapon.ammo < 0) player.weapon.ammo = 0;
 				stingChargeTime = player.weapon.ammo;
 			} else {

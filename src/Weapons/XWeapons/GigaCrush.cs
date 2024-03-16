@@ -45,15 +45,15 @@ public class GigaCrush : Weapon {
 
 	public override bool canShoot(int chargeLevel, Player player) {
 		if (Global.level.mainPlayer.hasFullGiga()) {
-		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 16 : 32);	
+		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 16 : 32);	
 		}
 		if (Global.level.mainPlayer.hasAllX3Armor()) {
-		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 5 : 10);	
+		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 5 : 10);	
 		}
 		if (Global.level.mainPlayer.HasFullForce()) {
-		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 8 : 16);	
+		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 8 : 16);	
 		}
-		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 33 : 33);	
+		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 33 : 33);	
 		
 	}
 }

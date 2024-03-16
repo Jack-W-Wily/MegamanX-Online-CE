@@ -122,15 +122,19 @@ public class Rakuhouha : CharState {
 
 		float x = character.pos.x;
 		float y = character.pos.y;
-		if (character.frameIndex > 7 && !fired) {
+		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
 			fired = true;
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+		character.pos.addxy(6 * character.xDir, 0), character.xDir, 
+		player, player.getNextActorNetId(), rpc: true);
 
-			if (isShinMessenkou) {
+
+			if (isShinMessenkou && (player.isVile || player.isAI || player.isZero && player.input.isPressed(Control.Shoot,player))) {
 				new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 				new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
-			} else if (isDarkHold) {
+			}  if (isDarkHold) {
 				darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
-			} else {
+			} if (isRakuhouha || isCFlasher) {
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.7f, -0.7f, player, player.getNextActorNetId(), 135, rpc: true);
@@ -150,13 +154,17 @@ public class Rakuhouha : CharState {
 			}
 		}
 
-		if (!fired2 && isShinMessenkou && character.frameIndex > 11) {
+		if (!fired2 && isShinMessenkou &&
+		 character.frameIndex > 11 && 
+		 character.frameIndex < 15 && 
+		 (player.isVile || player.isAI || 
+		 player.isZero &&player.input.isPressed(Control.Special1,player))) {
 			fired2 = true;
 			new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth * 2, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 			new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth * 2, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 		}
 
-		if (!fired3 && isShinMessenkou && character.frameIndex > 14) {
+		if (!fired3 && isShinMessenkou && character.frameIndex > 14 && player.input.isPressed(Control.Shoot,player)) {
 			fired3 = true;
 			new ShinMessenkouProj(weapon, new Point(x - shinMessenkouWidth * 3, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 			new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth * 3, y), character.xDir, player, player.getNextActorNetId(), rpc: true);

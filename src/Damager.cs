@@ -431,7 +431,7 @@ public class Damager {
 			}
 
 			if (owner?.character?.isNightmareZeroBS.getValue() == true) {
-				//character.addInfectedTime(owner, damage);
+				character.addInfectedTime(owner, 0.5f);
 			}
 
 			#endregion

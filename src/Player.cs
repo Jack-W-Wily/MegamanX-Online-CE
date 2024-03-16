@@ -18,7 +18,7 @@ public partial class Player {
 	public bool isDefenderFavored {
 		get {
 			if (character != null && !character.ownedByLocalPlayer) {
-				return false;//character.isDefenderFavoredBS.getValue();
+				return character.isDefenderFavoredBS.getValue();
 			}
 			if (Global.level?.server == null) {
 				return false;
@@ -28,11 +28,11 @@ public partial class Player {
 			}
 			if (Global.level.server.netcodeModel == NetcodeModel.FavorAttacker) {
 				if (Global.serverClient?.isLagging() == true) {
-					return false;//true;
+					return true;
 				}
-				return false;//(getPingOrStartPing() >= Global.level.server.netcodeModelPing);
+				return (getPingOrStartPing() >= Global.level.server.netcodeModelPing);
 			}
-			return false;//true;
+			return true;
 		}
 	}
 
@@ -132,14 +132,14 @@ public partial class Player {
 	public bool lastDeathWasVileMK5;
 	public bool lastDeathWasSigmaHyper;
 	public bool lastDeathWasXHyper;
-	public const int zeroHyperCost = 10;
-	public const int zBusterZeroHyperCost = 10;
-	public const int AxlHyperCost = 10;
+	public const int zeroHyperCost = 5;
+	public const int zBusterZeroHyperCost = 5;
+	public const int AxlHyperCost = 5;
 	public const int reviveVileCost = 1;
-	public const int reviveSigmaCost = 10;
-	public const int reviveXCost = 10;
+	public const int reviveSigmaCost = 1990;
+	public const int reviveXCost = 5;
 	public const int goldenArmorCost = 5;
-	public const int ultimateArmorCost = 10;
+	public const int ultimateArmorCost = 5;
 	public bool lastDeathCanRevive;
 	public int vileFormToRespawnAs;
 	public bool hyperSigmaRespawn;
@@ -2055,7 +2055,7 @@ public partial class Player {
 	}
 
 	public bool hasAnyChip() {
-		return hasChip(0) || hasChip(1) || hasChip(2) || hasChip(3);
+		return hasGoldenArmor() || hasGoldenArmor() || hasGoldenArmor() || hasGoldenArmor();
 	}
 
 	public bool hasChip(int armorIndex) {
@@ -2257,8 +2257,9 @@ public partial class Player {
 			kills++;
 			charNumToKills[realCharNum]++;
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
+			if (character != null) character.KillingSpree += 1;
 		}
-		character.KillingSpree += 1;
+		
 	}
 
 	public void addAssist() {
@@ -2326,7 +2327,7 @@ public partial class Player {
 	}
 
 	public bool hasKnuckle() {
-		return loadout?.zeroLoadout?.melee == 1;
+		return false;//loadout?.zeroLoadout?.melee == 1;
 	}
 
 	public bool isZBusterZero() {

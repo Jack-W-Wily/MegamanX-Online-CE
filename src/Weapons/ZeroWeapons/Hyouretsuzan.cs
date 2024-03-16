@@ -101,6 +101,12 @@ public class ZeroFallStab : CharState {
 				quakeBlazerExplode(true);
 			}
 		}
+
+
+
+		if (character.isCharging() && !character.chargeButtonHeld()){
+			character.changeToIdleOrFall();
+		}
 	}
 
 	public bool isUnderwaterQuakeBlazer() {
@@ -129,6 +135,8 @@ public class ZeroFallStab : CharState {
 		} else {
 			// weapon.shootTime = weapon.rateOfFire * 2;
 		}
+
+
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -157,6 +165,9 @@ public class ZeroFallStabLand : CharState {
 	public override void update() {
 		base.update();
 		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isCharging() && !character.chargeButtonHeld()){
 			character.changeToIdleOrFall();
 		}
 	}

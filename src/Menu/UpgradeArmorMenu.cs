@@ -73,7 +73,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeHelmetArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(2)) {
+				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(2, false);
 					Global.playSound("ching");
 				}
@@ -93,7 +93,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeBodyArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(1)) {
+				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(1, false);
 					Global.playSound("ching");
 				}
@@ -113,7 +113,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeArmArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(3)) {
+				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(3, false);
 					Global.playSound("ching");
 				}
@@ -133,7 +133,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeBootsArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasChip(0)) {
+				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(0, false);
 					Global.playSound("ching");
 				}
@@ -141,7 +141,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(2)) {
+					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(2, true);
 					} else {
 						upgradeHelmetArmor(mainPlayer, 0);
@@ -150,7 +150,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 			if (selectArrowPosY == 1) {
 				if (mainPlayer.bodyArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(1)) {
+					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(1, true);
 					} else {
 						upgradeBodyArmor(mainPlayer, 0);
@@ -159,7 +159,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 			if (selectArrowPosY == 2) {
 				if (mainPlayer.armArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(3)) {
+					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(2, true);
 					} else {
 						upgradeArmArmor(mainPlayer, 0);
@@ -168,7 +168,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 			if (selectArrowPosY == 3) {
 				if (mainPlayer.bootsArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasChip(0)) {
+					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(0, true);
 					} else {
 						upgradeBootsArmor(mainPlayer, 0);
@@ -413,10 +413,10 @@ public class UpgradeArmorMenu : IMainMenu {
 			//}
 		}
 
-		if (mainPlayer.hasChip(2)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 4, optionPos1.y);
-		if (mainPlayer.hasChip(1)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 4, optionPos2.y);
-		if (mainPlayer.hasChip(3)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 38, optionPos3.y);
-		if (mainPlayer.hasChip(0)) Global.sprites["menu_chip"].drawToHUD(0, 220 - 28, optionPos4.y);
+		if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_chip"].drawToHUD(0, 220 - 4, optionPos1.y);
+		if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_chip"].drawToHUD(0, 220 - 4, optionPos2.y);
+		if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_chip"].drawToHUD(0, 220 - 38, optionPos3.y);
+		if (mainPlayer.hasGoldenArmor()) Global.sprites["menu_chip"].drawToHUD(0, 220 - 28, optionPos4.y);
 
 		//drawHyperArmorUpgrades(mainPlayer, 0);
 

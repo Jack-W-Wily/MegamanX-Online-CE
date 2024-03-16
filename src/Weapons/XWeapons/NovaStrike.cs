@@ -33,7 +33,7 @@ public class NovaStrike : Weapon {
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		return player.character?.flag == null && ammo >= (player.hasChip(3) ? ammoUsage / 2 : ammoUsage);
+		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? ammoUsage / 2 : ammoUsage);
 	}
 }
 

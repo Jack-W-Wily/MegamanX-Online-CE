@@ -404,8 +404,8 @@ public class FireNadeAttack : CharState {
 				
 			}
 		} 
-		if (character.sprite.frameIndex == 6) {
-			character.changeState(new Crouch(""), true);
+		if (stateTime >1f) {
+			character.changeState(new Idle(), true);
 		}
 	}
 
@@ -607,6 +607,62 @@ public class DragonsWrath : CharState {
 				shootTime = 0;
 				character.playSound("flamethrower");
 				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+			}
+
+			if (character.loopCount > 4) {
+				character.changeState(new Crouch(""), true);
+				return;
+			}
+
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class SeaDragonRageAttack : CharState {
+	bool shot;
+	bool isGrounded = false;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+	
+	public SeaDragonRageAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		//if (isGrounded){
+		return "crouch_flamethrower";
+		//}
+		//return "flamethrower";
+	}
+
+	public override void update() {
+		base.update();
+			if (character.grounded){
+			isGrounded = true;
+			}
+			shootTime += Global.spf;
+			var poi = character.getFirstPOI();
+			if (shootTime > 0.06f && poi != null) {
+				if (!vile.tryUseVileAmmo(2)) {
+					character.changeState(new Crouch(""), true);
+					return;
+				}
+				shootTime = 0;
+				character.playSound("flamethrower");
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
 			}
 
 			if (character.loopCount > 4) {

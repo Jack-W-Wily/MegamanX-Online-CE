@@ -16,12 +16,11 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "Revision 20";
+	public static string versionName = "WCut v2.7";
 	public static string subVersionName = "Alpha 11";
 	public static string subVersionShortName = "a11";
-	public static string versionName = "WCut v2.5";
-	public static string subVersionName = "Alpha 10";
-	public static string subVersionShortName = "a10";
+
+
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.

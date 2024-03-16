@@ -260,9 +260,35 @@ public class TriadThunderProjCharged : Projectile {
 		}
 	}
 
+
+	bool startedWallCrawl;
+	int spriteXDir = 1;
+	string spriteName;
+
 	public override void update() {
 		base.update();
-		//updateWallCrawl();
+		if (startedWallCrawl) {
+			updateWallCrawl();
+			if (spriteXDir == -1) {
+				byteAngle -= 128;
+			}
+		} 		
+	}
+
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+		if (Global.level.levelData.wallPathNodes.Count == 0) return;
+		if (startedWallCrawl) return;
+		if (!ownedByLocalPlayer) return;
+		setupWallCrawl(deltaPos);
+		stopMoving();
+		startedWallCrawl = true;
+		changePos(other.getHitPointSafe());
+		if (deltaPos.x >= 0) {
+			spriteXDir = 1;
+		} else {
+			spriteXDir = -1;;
+		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {

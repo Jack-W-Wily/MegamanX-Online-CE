@@ -173,7 +173,7 @@ class Program {
 
 		if (Options.main.areShadersDisabled() == false) {
 			loadText.Add("Shaders Systems ONLINE.");
-			loadText.Add(">G:I suppose it was a matter of time before you went loose");
+		if (String.IsNullOrEmpty(Options.main.playerName))	loadText.Add(">G:I suppose it was a matter of time before you went loose");
 			
 			loadShaders();
 		} else {
@@ -192,7 +192,7 @@ class Program {
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
 		loadText[loadText.Count - 1] = "Loaded Sprites.";
-		loadText.Add(">W:HIHEHAHAHA, OUT OF MY WAY, I have a lot of shit to do");
+		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add(">W:HIHEHAHAHA, OUT OF MY WAY, I have a lot of shit to do");
 
 
 		loadText.Add("Loading Sprite JSONS...");
@@ -202,19 +202,19 @@ class Program {
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
 		loadText[loadText.Count - 1] = "Maps Loaded.";
-		loadText.Add(">G:This is not quite stable yet,I recomend waiting for now");
+		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add(">G:This is not quite stable yet,I recomend waiting for now");
 			
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
 		loadText[loadText.Count - 1] = "SFX Loaded.";
-		loadText.Add(">W:HA! No need I'll do all the testing myself");
+		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add(">W:HA! No need I'll do all the testing myself");
 			
 
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
 		loadText[loadText.Count - 1] = "Music Loaded.";
-		loadText.Add("let the chaos roll for a little while we're at it shall we?");
+		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add("let the chaos roll for a little while we're at it shall we?");
 		loadText.Add("Calculating checksum...");
 		loadMultiThread(loadText, window, Global.computeChecksum);
 		loadText[loadText.Count - 1] = "Checksum OK.";
@@ -242,14 +242,17 @@ class Program {
 		}
 		if (Options.main.preferredCharacter == 1 
 		|| Options.main.preferredCharacter == 3
-		|| Options.main.preferredCharacter >= 5){
+		|| Options.main.preferredCharacter >= 6){
 		Global.changeMusic("menuZero");	
 		}
 		if (Options.main.preferredCharacter == 2){
 		Global.changeMusic("menuVile");	
 		}
 		if (Options.main.preferredCharacter == 4){
-		Global.changeMusic("menuSIgma");	
+		Global.changeMusic("MenuSIgma");	
+		}
+		if (Options.main.preferredCharacter == 5){
+		Global.changeMusic("menudynamo");	
 		}
 		// >>>>>>>>>>>>>>>>>>
 		if (mode == 1) {

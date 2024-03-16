@@ -310,10 +310,12 @@ public partial class Actor : GameObject {
 			spriteName = spriteName.Replace("vilemk2_", "vile_").Replace("vilemk5_", "vile_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
-		if (matchingVoice == null && (spriteName.StartsWith("vilemk4_"))) {
-			spriteName = spriteName.Replace("vilemk4", "vilemk5_").Replace("vilemk4_", "vilemk5_");
+		if (matchingVoice == null && (spriteName.StartsWith("vilemk2ex_") || spriteName.StartsWith("vilemkv_"))) {
+			spriteName = spriteName.Replace("vilemk2ex_", "vilemk5_").Replace("vilemkv_", "vilemk5_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
+		
+		
 
 		if (matchingVoice != null) {
 			playSound(matchingVoice);
@@ -912,7 +914,7 @@ public partial class Actor : GameObject {
 		}
 		if (netcodeOverride != null) {
 			if (netcodeOverride == NetcodeModel.FavorDefender) {
-				return false; // remember to change if this doens't works
+				return true; // remember to change if this doens't works
 			} else {
 				return false;
 			}
@@ -1354,7 +1356,7 @@ public partial class Actor : GameObject {
 	}
 
 	public SoundWrapper playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
-		if (!Global.soundBuffers.ContainsKey(soundKey)) return null;
+		if (!Global.soundBuffers.ContainsKey(soundKey) && !ownedByLocalPlayer) return null;
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}
 
@@ -1395,6 +1397,8 @@ public partial class Actor : GameObject {
 		if (getSoundDist() > 600) {
 			return null;
 		}
+
+		if (!ownedByLocalPlayer) return null;
 
 		int? charNum = null;
 		if (this is Character || this is Maverick) {

@@ -86,7 +86,7 @@ public class BoomerangProj : Projectile {
 			}
 			destroySelf();
 			if (character.player.weapon is Boomerang) {
-				if (character.player.hasChip(3)) character.player.weapon.ammo += 0.5f;
+				if (character.player.hasGoldenArmor()) character.player.weapon.ammo += 0.5f;
 				else character.player.weapon.ammo++;
 			}
 		}

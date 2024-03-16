@@ -353,9 +353,9 @@ public class StraightNightmareProj : Projectile {
 	public float soundTime;
 
 	public StraightNightmareProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, "straightnightmare_proj", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "straightnightmare_proj", 4, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.StraightNightmare;
-		maxTime = 2;
+		maxTime = 1;
 		sprite.visible = false;
 		for (var i = 0; i < maxLen; i++) {
 			var midSprite = Global.sprites["straightnightmare_proj"].clone();

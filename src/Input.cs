@@ -502,11 +502,11 @@ public class Input {
 			return false;
 		}
 
-		if (player?.character != null && player.gridModeHeld) {
+	/*	if (player?.character != null && player.gridModeHeld) {
 			if (inputName == Control.Left || inputName == Control.Right || inputName == Control.Up || inputName == Control.Down) {
 				return false;
 			}
-		}
+		}*/
 
 		if (useAxlCursorControls(player)) {
 			if (inputName == Control.Shoot) {
@@ -568,11 +568,11 @@ public class Input {
 
 		int? keyboardKey = keyboardMapping.GetValueOrDefault(inputName);
 
-		if (player?.character != null && player.gridModeHeld) {
+	/*	if (player?.character != null && player.gridModeHeld) {
 			if (inputName == Control.Left || inputName == Control.Right || inputName == Control.Up || inputName == Control.Down) {
 				return false;
 			}
-		}
+		}*/
 
 		if (keyboardKey != null && isPressed((Key)keyboardKey)) {
 			return true;

@@ -23,8 +23,9 @@ public class Tornado : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (player.ownedByLocalPlayer) {
-		
-			if (player.character is MegamanX mmx && mmx.VileCounters == 0){
+			
+
+			if (player.character is MegamanX mmx && mmx.hasExpandedMoveset()){
 				if (chargeLevel < 3) {
 				new TornadoProj(this, pos, xDir, false, player, netProjId);
 				} else {
@@ -62,6 +63,11 @@ public class TornadoProj : Projectile {
 		if (isStormE) {
 			blowModifier = 1;
 			damager.hitCooldown = 0.5f;
+		}
+		if (isStormE && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) ){
+			destroySelf();
+			
+			new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare), pos, xDir, damager.owner, Global.level.mainPlayer.getNextActorNetId(), sendRpc: true);
 		}
 		maxTime = 2;
 		sprite.visible = false;

@@ -71,7 +71,8 @@ public class WheelGator : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 85;
+		if (damageEaten > 0) return 200;
+		return 95;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -91,7 +92,7 @@ public class WheelGator : Maverick {
 			if (hitbox.name == "eat") {
 				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGEat, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 			} else {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 6, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.3f, owningActor: this);
 			}
 		}
 		if (sprite.name.Contains("grab_start") && deltaPos.y <= 0) {

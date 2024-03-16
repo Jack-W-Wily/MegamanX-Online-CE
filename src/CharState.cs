@@ -444,7 +444,6 @@ public class WarpIn : CharState {
 		character.frameSpeed = 0;
 		destY = character.pos.y;
 		startY = character.pos.y;
-
 		if (player.warpedInOnce || Global.debug) {
 			sigmaRounds = 10;
 		}
@@ -455,6 +454,9 @@ public class WarpIn : CharState {
 		character.visible = true;
 		character.useGravity = true;
 		character.splashable = true;
+		if (player.isVile){
+			character.playSound("vileradio", sendRpc: true);	
+		}
 		if (player.isDynamo){
 		player.weapons.Add(new DynamoTrick());
 		player.weapons.Add(new DynamoSword());
@@ -649,6 +651,10 @@ public class Crouch : CharState {
 				}
 			}
 		}
+		if (player.isAxl && player.input.isPressed(Control.Dash, player)) {
+				character.changeState(new DodgeRoll());
+				character.slideVel = character.xDir * character.getDashSpeed();
+			}
 	}
 }
 
@@ -1578,6 +1584,47 @@ public class Stunned : CharState {
 		return true;
 	}
 */
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.ownedByLocalPlayer) return;
+		stunAnim = new Anim(character.getCenterPos(), "vile_stun_static", 1, character.player.getNextActorNetId(), false, sendRpc: true);
+		stunAnim.setzIndex(character.zIndex + 100);
+		if (character.vel.y < 0) character.vel.y = 0;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		if (!character.ownedByLocalPlayer) return;
+		stunAnim?.destroySelf();
+		character.stunInvulnTime = 2;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.isX && character.player.hasArmor(2)) character.changeSprite("mmx_lose_x2", true);
+		if (player.isX && character.player.hasArmor(3)) character.changeSprite("mmx_lose_x3", true);
+
+		if (!character.ownedByLocalPlayer) return;
+		if (stunAnim != null) stunAnim.pos = character.getCenterPos();
+
+		stunTime -= player.mashValue();
+		if (stunTime <= 0) {
+			stunTime = 0;
+			character.changeState(new Idle(), true);
+		}
+	}
+}
+
+
+
+public class SwordClash : CharState {
+	public float stunTime = 2;
+	public Anim stunAnim;
+	public SwordClash() : base("block") {
+	}
+
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.ownedByLocalPlayer) return;

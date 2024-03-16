@@ -127,6 +127,7 @@ public class MechFrogStompShockwave : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
+		genericShader = player.predatorcloakShader;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
