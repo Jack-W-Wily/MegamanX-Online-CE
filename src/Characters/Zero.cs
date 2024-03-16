@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
 
@@ -104,7 +105,7 @@ public class Zero : Character {
 			zeroDownThrustWeaponS = new DropKickWeapon(player);
 		}
 
-		zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(player, zeroLoadout.gigaAttack);
+		_zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(player, zeroLoadout.gigaAttack);
 		zeroHyperMode = zeroLoadout.hyperMode;
 	}
 
@@ -244,12 +245,12 @@ public class Zero : Character {
 		// Handles Standard Hypermode Activations.
 		if (player.currency >= Player.zeroHyperCost &&
 			player.input.isHeld(Control.Special2, player) &&
-			charState is not HyperZeroStart && (
+			charState is not HyperZeroStart and not WarpIn && (
 				!isNightmareZero &&
 				!isAwakenedZero() &&
 				!isBlackZero() &&
 				!isBlackZero2()
-			) && !(charState is WarpIn)
+			)
 		) {
 			if (!player.isZBusterZero()) {
 				hyperProgress += Global.spf;
@@ -637,7 +638,7 @@ public class Zero : Character {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name == "zero_attack3") {
 			float timeSinceStart = zero3SwingComboEndTime - zero3SwingComboStartTime;
 			float overrideDamage = 4;
@@ -676,8 +677,7 @@ public class Zero : Character {
 				zSaberWeapon, centerPoint, ProjIds.SwordBlock, player, 0, 0, 0, isShield: true
 			);
 		}
-		Projectile proj = null;
-		proj = sprite.name switch {
+		Projectile? proj = sprite.name switch {
 			"zero_punch" => new GenericMeleeProj(
 				kKnuckleWeapon, centerPoint, ProjIds.KKnuckle, player, 1, 1, 0.25f
 			),
@@ -790,9 +790,10 @@ public class Zero : Character {
 		}
 		bool hasShootSprite = !string.IsNullOrEmpty(charState.shootSprite);
 		if (shootAnimTime == 0) {
-			if (hasShootSprite) changeSprite(zeroShootSprite, false);
-			else {
-				if (!(charState is Crouch)) {
+			if (hasShootSprite) {
+				changeSprite(zeroShootSprite, false);
+			} else {
+				if (charState is not Crouch) {
 					return;
 				}
 			}
@@ -1045,7 +1046,7 @@ public class Zero : Character {
 
 		if (!hideNoShaderIcon()) {
 			float dummy = 0;
-			getHealthNameOffsets(out bool shieldDrawn, ref dummy);
+			getHealthNameOffsets(out _, ref dummy);
 			if (isBlackZero() && !Global.shaderWrappers.ContainsKey("hyperzero")) {
 				Global.sprites["hud_killfeed_weapon"].draw(
 					125, pos.x, pos.y - 6 + currentLabelY,
@@ -1078,8 +1079,9 @@ public class Zero : Character {
 
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
-			var retProjs = new Dictionary<int, Func<Projectile>>();
+			Dictionary<int, Func<Projectile>> retProjs = new();
 			retProjs[(int)ProjIds.AwakenedAura] = () => {
+				//playSound("Aura", forcePlay: true, sendRpc: true); 
 				Point centerPoint = globalCollider.shape.getRect().center();
 				float damage = 2;
 				int flinch = 0;
@@ -1126,7 +1128,7 @@ public class Zero : Character {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override Collider getTerrainCollider() {
+	public override Collider? getTerrainCollider() {
 		if (physicsCollider == null) {
 			return null;
 		}
