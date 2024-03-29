@@ -14,8 +14,8 @@ public class RaycastHitData {
 
 public class Axl : Character {
 	public bool aiming;
-	public IDamagable axlCursorTarget = null;
-	public Character axlHeadshotTarget = null;
+	public IDamagable? axlCursorTarget = null;
+	public Character? axlHeadshotTarget = null;
 	public Anim muzzleFlash;
 	public float recoilTime;
 	public float axlSwapTime;
@@ -52,10 +52,10 @@ public class Axl : Character {
 	public float revTime;
 	public float revIndex;
 	public bool aimingBackwards;
-	public LoopingSound iceGattlingLoop;
+	public LoopingSound? iceGattlingLoop;
 	public bool isRevving;
 	public bool isNonOwnerRev;
-	public SniperMissileProj sniperMissileProj;
+	public SniperMissileProj? sniperMissileProj;
 	public LoopingSound iceGattlingSound;
 	public float whiteAxlTime;
 	public float dodgeRollCooldown;
@@ -65,15 +65,15 @@ public class Axl : Character {
 	public float maxHyperAxlTime = 30;
 	public List<int> ammoUsages = new List<int>();
 
-	public RayGunAltProj rayGunAltProj;
-	public GaeaShieldProj gaeaShield;
+	public RayGunAltProj? rayGunAltProj;
+	public GaeaShieldProj? gaeaShield;
 
 	// Used to be 0.5, 100
 	public const float maxStealthRevealTime = 0.25f;
 	// The ping divided by this number indicates stealth reveal time in online
 	public const float stealthRevealPingDenom = 200;
 
-	public PlasmaGunAltProj plasmaGunAltProj;
+	public PlasmaGunAltProj? plasmaGunAltProj;
 
 	public Axl(
 		Player player, float x, float y, int xDir,
@@ -129,8 +129,10 @@ public class Axl : Character {
 		if (isZoomingOut || isZoomingIn) return false;
 		if (axlCursorTarget == null && axlHeadshotTarget == null) return false;
 		var hitData = getFirstHitPos(player.adjustedZoomRange, ignoreDamagables: true);
-		if (hitData.hitGos.Contains(axlCursorTarget) || hitData.hitGos.Contains(axlHeadshotTarget)) {
-			return true;
+		if (axlCursorTarget != null && axlHeadshotTarget != null){
+			if (hitData.hitGos.Contains(axlCursorTarget) || hitData.hitGos.Contains(axlHeadshotTarget)) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -469,10 +471,10 @@ public class Axl : Character {
 					if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
 						recoilTime = 0.2f;
 						if (!isWhiteAxl()) {
-							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+							player.axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
 						} else {
-							player.axlWeapon.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
-							player.axlWeapon.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
+							player.axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
+							player.axlWeapon?.axlShoot(player, AxlBulletType.WhiteAxlCopyShot2);
 						}
 					}
 				}
@@ -520,7 +522,7 @@ public class Axl : Character {
 		bool canShoot = (undisguiseTime == 0 && assassinTime == 0);
 		if (canShoot) {
 			// Axl bullet
-			if (!isCharging()) {
+			if (!isCharging() && player.axlWeapon != null) {
 				if (player.weapon is AxlBullet && charState.canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
 						recoilTime = 0.2f;
@@ -750,7 +752,7 @@ public class Axl : Character {
 	}
 
 	public override bool normalCtrl() {
-		if (!player.isAI && player.input.isPressed(Control.Jump, player) &&
+		if (player.input.isPressed(Control.Jump, player) &&
 			canJump() && !grounded && !isDashing && canAirDash() && flag == null
 		) {
 			dashedInAir++;
@@ -944,7 +946,7 @@ public class Axl : Character {
 		return !(charState is LadderClimb) && !(charState is LadderEnd) && canChangeDir();
 	}
 
-	public Character getLockOnTarget() {
+	public Character? getLockOnTarget() {
 		Character? newTarget = null;
 		foreach (var enemy in Global.level.players) {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.pos.distanceTo(pos) < 150 && !enemy.character.isStealthy(player.alliance)) {
@@ -1098,8 +1100,10 @@ public class Axl : Character {
 		var hit = Global.level.checkCollisionsShape(shape, new List<GameObject>() { this }).FirstOrDefault(c => c.gameObject is IDamagable);
 		if (hit != null) {
 			var target = hit.gameObject as IDamagable;
-			if (target.canBeDamaged(player.alliance, player.id, null)) {
-				axlCursorTarget = target;
+			if(target != null){
+				if (target.canBeDamaged(player.alliance, player.id, null)) {
+					axlCursorTarget = target;
+				}
 			}
 		}
 		foreach (var enemy in Global.level.players) {
@@ -1172,9 +1176,9 @@ public class Axl : Character {
 		}
 
 		// aimbot
-		if (!player.isAI) {
-			//var target = Global.level.getClosestTarget(pos, player.alliance, true);
-			//if (target != null) player.axlCursorPos = target.pos.addxy(-Global.level.camX, -Global.level.camY - (target.charState is InRideArmor ? 0 : 16));
+		if (player.isAI) {
+			var target = Global.level.getClosestTarget(pos, player.alliance, true);
+			if (target != null) player.axlCursorPos = target.pos.addxy(-Global.level.camX, -Global.level.camY - (target is InRideArmor ? 0 : 16));
 		}
 
 		getMouseTargets();
@@ -1261,23 +1265,28 @@ public class Axl : Character {
 			}
 		}
 
-		if (player.isMainPlayer && !player.isDead && !drawStatusProgress() && !drawSubtankHealing()) {
+		if (player.isMainPlayer && !player.isDead) {
 			if (Options.main.aimKeyToggle) {
 				if (player.input.isAimingBackwards(player)) {
-					Global.sprites["hud_axl_aim"].draw(0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD);
+					Global.sprites["hud_axl_aim"].draw(
+						0, pos.x, pos.y + currentLabelY, xDir, 1, null, 1, 1, 1, ZIndex.HUD
+					);
 					deductLabelY(labelAxlAimModeIconOffY);
 				} else if (player.input.isPositionLocked(player)) {
-					Global.sprites["hud_axl_aim"].draw(1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+					Global.sprites["hud_axl_aim"].draw(
+						1, pos.x, pos.y + currentLabelY, 1, 1, null, 1, 1, 1, ZIndex.HUD
+					);
 					deductLabelY(labelAxlAimModeIconOffY);
 				}
-			} else if (Options.main.showRollCooldown && dodgeRollCooldown > 0) {
-				drawSpinner(Helpers.progress(dodgeRollCooldown, maxDodgeRollCooldown));
 			}
 		}
 
 		if (Global.showHitboxes) {
 			Point bulletPos = getAxlBulletPos();
-			DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x, player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1);
+			DrawWrappers.DrawLine(
+				bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x,
+				player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1
+			);
 		}
 
 		drawAxlCursor();
@@ -1295,7 +1304,6 @@ public class Axl : Character {
 
 	float axlCursorAngle;
 	public void drawAxlCursor() {
-		if (player.isAI) return;
 		if (!ownedByLocalPlayer) return;
 		if (Global.level.gameMode.isOver) return;
 		if (isZooming() && !isZoomOutPhase1Done) return;

@@ -626,7 +626,11 @@ public class Zero : Character {
 		if (changedState) {
 			return true;
 		}
+<<<<<<< HEAD
 		if (player.isZSaber() && grounded && (
+=======
+		if (charState is not Dash && grounded && !isAttacking() && player.isZSaber() && (
+>>>>>>> 1667cae9c3207cb337307b148d55cc475f44839e
 				player.input.isHeld(Control.WeaponLeft, player) ||
 				player.input.isHeld(Control.WeaponRight, player)
 			) && (
@@ -634,6 +638,7 @@ public class Zero : Character {
 				player.input.isHeld(Control.Down, player)
 			)
 		) {
+			turnToInput(player.input, player);
 			changeState(new SwordBlock());
 			return true;
 		} 
@@ -644,8 +649,15 @@ public class Zero : Character {
 				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
 			  )
 		  ) {
+<<<<<<< HEAD
 			if (!player.input.isHeld(Control.Up, player)) {
 				changeState(new SwordBlock());
+=======
+			if (!player.hasKnuckle()) {
+				if (grounded && !isAttacking()){
+				turnToInput(player.input, player);
+				changeState(new SwordBlock());}
+>>>>>>> 1667cae9c3207cb337307b148d55cc475f44839e
 				return true;
 			}
 			 else if (parryCooldown == 0 && isNightmareZero) {
@@ -892,6 +904,12 @@ public class Zero : Character {
 		if (!Global.sprites.ContainsKey(zeroShootSprite)) {
 			if (grounded) zeroShootSprite = "zero_shoot";
 			else zeroShootSprite = "zero_fall_shoot";
+		}
+		// Zero MMXOD Vanilla intended balance: Z-Buster Cancel on Zerofallstabland
+		if (shootAnimTime == 0f && (		
+			charState is ZeroFallStabLand 
+		)) {
+			changeToIdleOrFall();
 		}
 		bool hasShootSprite = !string.IsNullOrEmpty(charState.shootSprite);
 		if (shootAnimTime == 0) {
@@ -1172,12 +1190,6 @@ public class Zero : Character {
 					1, 1, null, 1, 1, 1, ZIndex.HUD
 				);
 				deductLabelY(labelKillFeedIconOffY);
-			}
-		}
-
-		if (!drawStatusProgress() && !drawSubtankHealing()) {
-			if (Options.main.showGigaAttackCooldown && zeroGigaAttackWeapon.shootTime > 0) {
-				drawSpinner(Helpers.progress(zeroGigaAttackWeapon.shootTime, zeroGigaAttackWeapon.rateOfFire));
 			}
 		}
 		base.render(x, y);

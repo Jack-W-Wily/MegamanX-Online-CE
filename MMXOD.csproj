@@ -3,19 +3,18 @@
 		<!--LangVersion>12.0</LangVersion-->
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
+		<Nullable>enable</Nullable>
 		<Version>19.12</Version>
 		<AssemblyVersion>19.12</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net6.0-windows</TargetFramework>
 		<ImplicitUsings>false</ImplicitUsings>
 		<SelfContained>false</SelfContained>
-		<!--OutDir>./bin/test/<OutDir-->
-		<!--RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory-->
+		<!--OutDir>./bin/anycpu/</OutDir-->
+		<RunWorkingDirectory>./bin/win7-x64/</RunWorkingDirectory>
 		<OutputPath>./bin/</OutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<!--Nullable>enable</Nullable>
 		<DebugType>embedded</DebugType>
-		<WarningLevel>9999</WarningLevel-->
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,7 +27,7 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="DeviceId" Version="6.6.0" />
 		<PackageReference Include="Profanity.Detector" Version="0.1.8" />
-		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.2.7" />
+		<PackageReference Include="SpaceWizards.Lidgren.Network" Version="0.3.0" />
 		<PackageReference Include="System.IO.Hashing" Version="8.0.0" />
 	</ItemGroup>
 </Project>

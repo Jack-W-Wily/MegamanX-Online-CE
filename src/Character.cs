@@ -63,7 +63,7 @@ public partial class Character : Actor, IDamagable {
 	public float weaponHealTime = 0;
 	public float healthBarInnerWidth;
 	public float slideVel = 0;
-	public Flag flag;
+	public Flag? flag;
 	public float stingChargeTime;
 	public bool isCrystalized;
 	public bool insideCharacter;
@@ -126,8 +126,8 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public float damageSavings = 0;
-	public float damageDebt;
+	public decimal damageSavings = 0;
+	public decimal damageDebt = 0;
 
 	public bool stopCamUpdate = false;
 	public Anim warpBeam;
@@ -2622,10 +2622,12 @@ public partial class Character : Actor, IDamagable {
 		deductLabelY(labelNameOffY);
 	}
 
-	public void applyDamage(Player attacker, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(Player attacker, int? weaponIndex, float fDamage, int? projId) {
 		if (!ownedByLocalPlayer) return;
-		float originalDamage = damage;
-		float originalHP = player.health;
+		decimal damage = (decimal)fDamage;
+		decimal originalDamage = damage;
+		decimal originalHP = (decimal)player.health;
+		decimal decimalHP = (decimal)player.health;
 		Axl axl = this as Axl;
 		MegamanX mmx = this as MegamanX;
 
@@ -2633,8 +2635,8 @@ public partial class Character : Actor, IDamagable {
 			damage = 0;
 		}
 		if (Global.level.isRace() &&
-			damage != Damager.envKillDamage &&
-			damage != Damager.switchKillDamage &&
+			damage != (decimal)Damager.envKillDamage &&
+			damage != (decimal)Damager.switchKillDamage &&
 			attacker != player
 		) {
 			damage = 0;
@@ -2655,6 +2657,23 @@ public partial class Character : Actor, IDamagable {
 			inRideArmor.checkCrystalizeTime();
 		}
 
+		// For fractional damage shenanigans.
+		if (damage % 1 != 0) {
+			decimal decDamage = damage % 1;
+			damage = Math.Floor(decDamage);
+			// Fully nullyfy decimal using damage savings if posible.
+			if (damageSavings >= decDamage) {
+				damageSavings -= decDamage;
+			}
+			// If damage is over one we add it to damagedebt.
+			else if (damage >= 1) {
+				damageDebt += decDamage;
+			}
+			// If is under 1 we just apply it as is.
+			else {
+				damage += decDamage; 
+			}
+		}
 		// First we apply debt then savings.
 		// This is done before defense calculation to allow to defend from debt.
 		while (damageDebt >= 1) {
@@ -2672,14 +2691,14 @@ public partial class Character : Actor, IDamagable {
 						damageSavings += (originalDamage * 0.5f);		
 			}
 			if (acidTime > 0) {
-				float extraDamage = 0.25f + (0.25f * (acidTime / 8.0f));
+				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
 				damageDebt += (originalDamage * extraDamage);
 			}
 			if (mmx != null) {
 				if (mmx.hasBarrier(false)) {
-					damageSavings += (originalDamage * 0.25f);
+					damageSavings += (originalDamage * 0.25m);
 				} else if (mmx.hasBarrier(true)) {
-					damageSavings += (originalDamage * 0.5f);
+					damageSavings += (originalDamage * 0.5m);
 				}
 				if (player.isX && player.hasFullLight()) {
 					damageSavings += originalDamage / 8f;
@@ -2692,11 +2711,16 @@ public partial class Character : Actor, IDamagable {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
 		}
+		// Special conditions for decimal damage.
+		if (damage % 1 != 0) {
+			decimal damageDec = (decimal)damage % 1m;
+
+		}
 		// This is to defend from overkill damage.
 		// Or at least attempt to.
 		if (damageSavings > 0 &&
-			player.health - damage <= 0 &&
-			(player.health + damageSavings) - damage > 0
+			decimalHP - damage <= 0 &&
+			(decimalHP + damageSavings) - damage > 0
 		) {
 			while (damageSavings >= 1) {
 				damageSavings -= 1;
@@ -2708,14 +2732,15 @@ public partial class Character : Actor, IDamagable {
 		// Heals are not really applied here.
 		if (damage < 0) { damage = 0; }
 
-		player.health -= damage;
+		player.health -= (float)damage;
+		decimalHP = (decimal)player.health;
 
 		if (player.showTrainingDps && player.health > 0 && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
 				player.trainingDpsStartTime = Global.time;
 				Global.level.gameMode.dpsString = "";
 			}
-			player.trainingDpsTotalDamage += damage;
+			player.trainingDpsTotalDamage += (float)damage;
 		}
 
 		if (damage > 0 && mmx != null) {
@@ -2729,16 +2754,15 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
-			addDamageTextHelper(attacker, damage, player.maxHealth, true);
+			addDamageTextHelper(attacker, (float)damage, player.maxHealth, true);
 		}
-
-		if (player.health > 0 && damage > 0) {
-			float modifier = player.maxHealth > 0 ? (16 / player.maxHealth) : 1;
-			float gigaAmmoToAdd = 1 + (damage * 2 * modifier);
-			if (this is Zero zero && ownedByLocalPlayer) {
+		if (player.health > 0 && damage > 0 && ownedByLocalPlayer) {
+			decimal modifier = (decimal)player.maxHealth > 0 ? (16 / (decimal)player.maxHealth) : 1;
+			float gigaAmmoToAdd = (float)(1 + (damage * 2 * modifier));
+			if (this is Zero zero) {
 				zero.zeroGigaAttackWeapon.addAmmo(gigaAmmoToAdd, player);
 			}
-			if (player.isX && ownedByLocalPlayer) {
+			if (this is MegamanX) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
@@ -2754,7 +2778,7 @@ public partial class Character : Actor, IDamagable {
 				//fgMoveAmmo += gigaAmmoToAdd;
 				//if (fgMoveAmmo > 32) fgMoveAmmo = 32;
 			}
-			if (player.isSigma && player.isSigma2() && !player.isViralSigma() && ownedByLocalPlayer) {
+			if (this is NeoSigma) {
 				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + gigaAmmoToAdd, player.sigmaMaxAmmo);
 			}
 		}

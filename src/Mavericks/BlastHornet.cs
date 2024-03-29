@@ -4,7 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class BlastHornet : Maverick {
-	public static Weapon getWeapon() { return new Weapon(WeaponIds.BHornetGeneric, 158); }
+	public static Weapon netWeapon = new Weapon(WeaponIds.BHornetGeneric, 158);
+
 	public BHornetCursorProj cursor;
 	//public Actor lockOnTarget;
 	//public float lockOnTime;
@@ -17,7 +18,7 @@ public class BlastHornet : Maverick {
 		stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
 		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
 
-		weapon = getWeapon();
+		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 		wings = Global.sprites["bhornet_wings"].clone();
 		canFly = true;
 
@@ -121,7 +122,7 @@ public class BlastHornet : Maverick {
 		}
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_stinger_attack")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		}

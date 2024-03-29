@@ -864,9 +864,8 @@ public class HostMenu : IMainMenu {
 				isLAN, mirrored, useLoadout, Global.checksum,
 				selectedLevel.checksum, selectedLevel.customMapUrl,
 				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
-				disableHtSt, disableVehicles
+				disableHtSt, disableVehicles, teamNum
 			);
-			server.teamNum = teamNum;
 			server.uniqueID = oldServer.uniqueID;
 			server.isP2P = oldServer.isP2P;
 			if (server.isP2P) {
@@ -892,9 +891,8 @@ public class HostMenu : IMainMenu {
 				netcodeModelUnderPing, isLAN, mirrored, useLoadout,
 				Global.checksum, selectedLevel.checksum, selectedLevel.customMapUrl,
 				savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
-				disableHtSt, disableVehicles
+				disableHtSt, disableVehicles, teamNum
 			);
-			serverData.teamNum = teamNum;
 			createServer(
 				SelectCharacterMenu.playerData.charNum, serverData, team, false, previous, out errorMessage
 			);
@@ -963,9 +961,8 @@ public class HostMenu : IMainMenu {
 			false, (NetcodeModel)netcodeModel, netcodeModelUnderPing,
 			isLAN, mirrored, useLoadout, Global.checksum, selectedLevel.checksum,
 			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData, getCustomMatchSettings(),
-			disableHtSt, disableVehicles
+			disableHtSt, disableVehicles, teamNum
 		);
-		localServer.teamNum = teamNum;
 		localServer.players = new List<ServerPlayer>() { me };
 
 		Global.level = new Level(
@@ -1005,9 +1002,8 @@ public class HostMenu : IMainMenu {
 			false, mirrored, useLoadout,
 			Global.checksum, selectedLevel.checksum,
 			selectedLevel.customMapUrl, savedMatchSettings.extraCpuCharData,
-			getCustomMatchSettings(), disableHtSt, disableVehicles
+			getCustomMatchSettings(), disableHtSt, disableVehicles, teamNum
 		);
-		localServer.teamNum = teamNum;
 		localServer.isP2P = true;
 		Global.localServer = localServer;
 		localServer.start();

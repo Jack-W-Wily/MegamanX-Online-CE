@@ -19,4 +19,24 @@ public class MathInt {
 	public static int Floor(float num) {
 		return (int)MathF.Floor(num);
 	}
+
+	public static int Round(decimal num) {
+		return (int)Math.Round(num);
+	}
+
+	public static int Ceiling(decimal num) {
+		return (int)Math.Ceiling(num);
+	}
+
+	public static int Floor(decimal num) {
+		return (int)Math.Floor(num);
+	}
+	
+	public static int Ceiling(double num) {
+		return (int)Math.Ceiling(num);
+	}
+
+	public static int Floor(double num) {
+		return (int)Math.Floor(num);
+	}
 }

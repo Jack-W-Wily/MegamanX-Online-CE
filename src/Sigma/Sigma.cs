@@ -199,8 +199,8 @@ public abstract class BaseSigma : Character {
 
 		if (player.currentMaverick == null && !isTagTeam) {
 			if (player.weapon is MaverickWeapon mw &&
-			(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
-		) {
+				(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
+			) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
 						//if (!(charState is Idle || charState is Run || charState is Crouch || charState is Jump || charState is Fall   )) return;
@@ -242,7 +242,7 @@ public abstract class BaseSigma : Character {
 					} else {
 						cantAffordMaverickMessage();
 					}
-				} else if (isSummoner) {
+				} else if (isSummoner && !mw.isMenuOpened) {
 					if (shootPressed && mw.shootTime == 0) {
 						mw.shootTime = MaverickWeapon.summonerCooldown;
 						changeState(new CallDownMaverick(mw.maverick, false, false), true);
@@ -416,6 +416,9 @@ public abstract class BaseSigma : Character {
 			return;
 		}
 		*/
+		if (player.weapon is MaverickWeapon mw2 && player.input.isPressed(Control.Special2, player)) {
+			mw2.isMenuOpened = true;
+		}
 	}
 
 	public override bool normalCtrl() {
@@ -520,7 +523,7 @@ public abstract class BaseSigma : Character {
 		}
 	}
 
-	private void buyMaverick(MaverickWeapon mw) {
+	public void buyMaverick(MaverickWeapon mw) {
 		//if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
 		if (player.isStriker()) return;
 		if (player.isRefundableMode() && mw.summonedOnce) return;
@@ -534,7 +537,7 @@ public abstract class BaseSigma : Character {
 		);
 	}
 
-	private bool canAffordMaverick(MaverickWeapon mw) {
+	public bool canAffordMaverick(MaverickWeapon mw) {
 		//if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
 		if (player.isStriker()) return true;
 		if (player.isRefundableMode() && mw.summonedOnce) return true;

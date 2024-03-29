@@ -27,7 +27,7 @@ public class Server {
 	[ProtoMember(4)] public int playTo;
 	[ProtoMember(5)] public int botCount;
 	[ProtoMember(6)] public int maxPlayers;
-	[ProtoMember(7)] public Region region;
+	[ProtoMember(7)] public Region? region;
 	[ProtoMember(8)] public int? timeLimit;
 	[ProtoMember(9)] public bool fixedCamera;
 	[ProtoMember(10)] public bool hidden;
@@ -54,7 +54,7 @@ public class Server {
 	[ProtoMember(26)] public ExtraCpuCharData extraCpuCharData;
 	[ProtoMember(27)] public CustomMatchSettings customMatchSettings;
 	[ProtoMember(28)] public string shortLevelName;
-	[ProtoMember(29)] public string ip;
+	[ProtoMember(29)] public string ip = "";
 	[ProtoMember(30)] public bool disableHtSt;
 	[ProtoMember(31)] public bool disableVehicles;
 	[ProtoMember(32)] public bool isP2P;
@@ -70,11 +70,11 @@ public class Server {
 	[JsonIgnore]
 	public int nonSpecPlayerCountOnStart;
 	[JsonIgnore]
-	public ServerPlayer host { get; set; }
+	public ServerPlayer? host;
 	[JsonIgnore]
 	public int framesZeroPlayers;
 	[JsonIgnore]
-	public ServerPlayer playerToAutobalance;
+	public ServerPlayer? playerToAutobalance;
 	[JsonIgnore]
 	public NetServer s_server;
 	[JsonIgnore]
@@ -104,18 +104,16 @@ public class Server {
 
 	public const int maxPlayerCap = 22;
 
-	public Server() { }
-
 	public Server(
-		decimal gameVersion, Region region,
+		decimal gameVersion, Region? region,
 		string name, string level, string shortLevelName,
 		string gameMode, int playTo, int botCount, int maxPlayers,
-		int timeLimit, bool fixedCamera, bool hidden,
+		int? timeLimit, bool fixedCamera, bool hidden,
 		NetcodeModel netcodeModel, int netcodeModelPing, bool isLAN,
 		bool mirrored, bool useLoadout,
 		string gameChecksum, string customMapChecksum, string customMapUrl,
 		ExtraCpuCharData extra1v1CpuCharData, CustomMatchSettings customMatchSettings,
-		bool disableHtSt, bool disableVehicles
+		bool disableHtSt, bool disableVehicles, byte teamNum
 	) {
 		this.gameVersion = gameVersion;
 		this.region = region;
@@ -141,6 +139,8 @@ public class Server {
 		this.customMatchSettings = customMatchSettings;
 		this.disableHtSt = disableHtSt;
 		this.disableVehicles = disableVehicles;
+		this.teamNum = teamNum;
+		teamScore = new byte[teamNum];
 		players = new List<ServerPlayer>();
 		port = getNextAvailablePort();
 	}
@@ -246,11 +246,13 @@ public class Server {
 		thread.Start();
 	}
 
-	public void periodicPing(NetServer s_server, ServerPlayer prioritizedAutobalancePlayer = null) {
+	public void periodicPing(NetServer s_server, ServerPlayer? prioritizedAutobalancePlayer = null) {
 		NetOutgoingMessage om = s_server.CreateMessage();
 
 		foreach (var player in players) {
-			player.ping = (int)MathF.Round(player.connection.AverageRoundtripTime * 1000);
+			if (player.connection != null) {
+				player.ping = (int)MathF.Round(player.connection.AverageRoundtripTime * 1000);
+			}
 		}
 
 		if ((!hidden || isP2P) && GameMode.isStringTeamMode(gameMode) &&
@@ -364,7 +366,7 @@ public class Server {
 	}
 
 	public ServerPlayer selectPlayerToAutobalance(
-		int allianceToChooseFrom, ServerPlayer prioritizedAutobalancePlayer
+		int allianceToChooseFrom, ServerPlayer? prioritizedAutobalancePlayer
 	) {
 		var pool = players.FindAll(p => p.alliance == allianceToChooseFrom && !p.isSpectator);
 
@@ -412,7 +414,7 @@ public class Server {
 			*/
 			s_server = new NetServer(config);
 			s_server.Start();
-			s_server.UPnP.ForwardPort(config.Port, "XOD P2P", s_server.Port);
+			s_server.UPnP?.ForwardPort(config.Port, "XOD P2P", s_server.Port);
 			if (uniqueID == 0) {
 				uniqueID = s_server.UniqueIdentifier;
 			}
@@ -422,9 +424,9 @@ public class Server {
 			}
 			if (isP2P && uniqueID != 0) {
 				// If we are a P2P server we cannot use a public IP as the masterserver handles that.
-				ip = null;
+				ip = "";
 				// Send our info to masterserver to say that we are open now.
-				IPEndPoint masterServerLocation = NetUtility.Resolve(
+				IPEndPoint? masterServerLocation = NetUtility.Resolve(
 					MasterServerData.serverIp, MasterServerData.serverPort
 				);
 				// First. The basic info.
@@ -439,7 +441,7 @@ public class Server {
 				listInfoMsg.Write(uniqueID);
 				listInfoMsg.Write(name);
 				listInfoMsg.Write((byte)maxPlayers);
-				listInfoMsg.Write((byte)1); // Current players.
+				listInfoMsg.Write((byte)players.Count); // Current players.
 				listInfoMsg.Write(gameMode);
 				listInfoMsg.Write(level);
 				listInfoMsg.Write(Global.shortForkName);
@@ -490,7 +492,7 @@ public class Server {
 		s_server.FlushSendQueue();
 		s_server.Shutdown(reason);
 		s_server.FlushSendQueue();
-		s_server.UPnP.DeleteForwardingRule(s_server.Port);
+		s_server.UPnP?.DeleteForwardingRule(s_server.Port);
 		servers.Remove(this, out _);
 		shutdownVar = true;
 	}
@@ -528,28 +530,29 @@ public class Server {
 			}
 			if (iterations % 120 == 0) {
 				periodicPing(s_server);
-				s_server.FlushSendQueue();
 			}
 			if (iterations % 6 == 0) {
 				RPC.periodicServerPing.sendFromServer(s_server, new byte[] { });
 			}
 
 			framesZeroPlayers = 0;
+			s_server.FlushSendQueue();
 		}
 
 		//s_server.MessageReceivedEvent.WaitOne();
-		NetIncomingMessage im;
+		NetIncomingMessage? im;
 		while ((im = s_server.ReadMessage()) != null) {
 			List<NetConnection> all = s_server.Connections.ToList(); // get copy
-			all.Remove(im.SenderConnection);
-
+			if (im.SenderConnection != null) {
+				all.Remove(im.SenderConnection);
+			}
 			if (im.MessageType == NetIncomingMessageType.StatusChanged) {
 				NetConnectionStatus status = (NetConnectionStatus)im.ReadByte();
 				string reason = im.ReadString();
-				Helpers.debugLog(
+				/*Helpers.debugLog(
 					NetUtility.ToHexString(im.SenderConnection.RemoteUniqueIdentifier) +
 					" " + status + ": " + reason
-				);
+				);*/
 				if (status == NetConnectionStatus.Connected) {
 					onConnect(im);
 				} else if (status == NetConnectionStatus.Disconnected) {
@@ -572,12 +575,14 @@ public class Server {
 					processClientMessage(im, rpcTemplate, rpcIndexByte, all);
 				}
 			} else if (im.MessageType == NetIncomingMessageType.ConnectionApproval) {
-				string ipAddress = im.SenderConnection.RemoteEndPoint.Address.ToString();
-				BanEntry banEntry = Global.banList.FirstOrDefault(b => b.isBanned(ipAddress, "", 0));
-				if (banEntry == null) {
-					im.SenderConnection.Approve();
-				} else {
-					im.SenderConnection.Deny();
+				if (im.SenderConnection != null) {
+				string ipAddress = im.SenderConnection.RemoteEndPoint?.Address.ToString() ?? "";
+					BanEntry? banEntry = Global.banList.FirstOrDefault(b => b.isBanned(ipAddress, "", 0));
+					if (banEntry == null) {
+						im.SenderConnection.Approve();
+					} else {
+						im.SenderConnection.Deny();
+					}
 				}
 			} else {
 				string text = im.ReadString();
@@ -594,7 +599,10 @@ public class Server {
 	}
 
 	public void onConnect(NetIncomingMessage im) {
-		string connectMessage = im.SenderConnection.RemoteHailMessage.ReadString();
+		string connectMessage = im.SenderConnection?.RemoteHailMessage?.ReadString() ?? "";
+		if (im.SenderConnection == null || connectMessage == "") {
+			return;
+		}
 		var playerContract = JsonConvert.DeserializeObject<ServerPlayer>(connectMessage);
 
 		bool shouldSpec = false;
@@ -774,22 +782,24 @@ public class Server {
 			if (player != null) {
 				NetOutgoingMessage om = s_server.CreateMessage();
 				om.Write((byte)RPC.templates.IndexOf(RPC.reportPlayerResponse));
-				var reportedPlayer = new ReportedPlayer(
-					player.name, player.connection.RemoteEndPoint?.Address?.ToString(), player.deviceId
+				ReportedPlayer reportedPlayer = new ReportedPlayer(
+					player.name, player.connection?.RemoteEndPoint?.Address?.ToString() ?? "", player.deviceId
 				);
 				string reportedPlayerJson = JsonConvert.SerializeObject(reportedPlayer);
 				om.Write(reportedPlayerJson);
-				s_server.SendMessage(om, im.SenderConnection, rpcTemplate.netDeliveryMethod, 0);
+				if (im.SenderConnection != null) {
+					s_server.SendMessage(om, im.SenderConnection, rpcTemplate.netDeliveryMethod, 0);
+				}
 			}
 		} else if (rpcTemplate is RPCKickPlayerRequest) {
 			string kickPlayerJson = im.ReadString();
-			var kickPlayerObj = JsonConvert.DeserializeObject<RPCKickPlayerJson>(kickPlayerJson);
+			RPCKickPlayerJson? kickPlayerObj = JsonConvert.DeserializeObject<RPCKickPlayerJson>(kickPlayerJson);
 
-			if (kickPlayerObj.banTimeMinutes > 0) {
+			if (kickPlayerObj?.banTimeMinutes > 0) {
 				string deviceId = kickPlayerObj.deviceId;
 				string kickReason = kickPlayerObj.banReason;
 				DateTime bannedUntil = DateTime.UtcNow.AddMinutes(kickPlayerObj.banTimeMinutes);
-				kickedPlayers.Add(new BanEntry(null, deviceId, kickReason, bannedUntil, 0));
+				kickedPlayers.Add(new BanEntry("", deviceId, kickReason, bannedUntil, 0));
 			}
 
 			NetOutgoingMessage om = s_server.CreateMessage();
@@ -825,7 +835,9 @@ public class Server {
 				var serverPlayer = new ServerPlayer(
 					"BOT", 0, false, charNum, preferredAlliance, "", im.SenderConnection, host?.startPing
 				);
-				addPlayer("BOT", serverPlayer, im.SenderConnection, true, overrideCharNum: charNum);
+				if (im.SenderConnection != null) {
+					addPlayer("BOT", serverPlayer, im.SenderConnection, true, overrideCharNum: charNum);
+				}
 				periodicPing(s_server);
 			}
 		} else if (rpcTemplate is RPCRemoveBot) {
@@ -844,9 +856,11 @@ public class Server {
 				return;
 			}
 
-			var player = players.FirstOrDefault(p => p.id == playerId);
-			player.isSpectator = isSpectator;
-			periodicPing(s_server, player);
+			ServerPlayer? player = players.FirstOrDefault(p => p.id == playerId);
+			if (player != null) {
+				player.isSpectator = isSpectator;
+				periodicPing(s_server, player);
+			}
 		}
 	}
 
@@ -921,8 +935,13 @@ public class Server {
 			*/
 		}
 
-		if (rpcTemplate.toHostOnly) s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, 0);
-		else if (all.Count > 0) s_server.SendMessage(om, all, rpcTemplate.netDeliveryMethod, 0);
+		if (rpcTemplate.toHostOnly) {
+			if (host.connection != null) {
+				s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, 0);
+			}
+		} else if (all.Count > 0) {
+			s_server.SendMessage(om, all, rpcTemplate.netDeliveryMethod, 0);
+		}
 	}
 
 	public string getNetcodeString() {

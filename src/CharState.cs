@@ -787,7 +787,7 @@ public class Fall : CharState {
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		airMove = true;
-		canStopJump = true;
+		canStopJump = false;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
