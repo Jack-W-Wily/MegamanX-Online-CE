@@ -78,13 +78,13 @@ public class BoundBlasterProj : Projectile {
 	public BoundBlasterProj(
 		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 250, 1, player, "boundblaster_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 250, 1, player, "boundblaster_proj", 1, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = true;
 		Point anglePoint = Point.createFromAngle(angle);
 		vel.x = anglePoint.x * speed;
 		vel.y = anglePoint.y * speed;
-		maxTime = 1.5f;
+		maxTime = 0.5f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = 3f;
 			isWaProj = true;

@@ -17,7 +17,7 @@ public class ElectricSpark : Weapon {
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (player.ownedByLocalPlayer) {
 		
-		if (player.character is MegamanX mmx && mmx.hasExpandedMoveset()){
+		if (player.character is MegamanX mmx && !mmx.hasExpandedMoveset()){
 		if (chargeLevel < 3) {
 			new ElectricSparkProj(this, pos, xDir, player, 0, netProjId);
 		} else {

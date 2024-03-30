@@ -765,10 +765,7 @@ public class Damager {
 			parryState3.counterAttack(owner, damagingActor, 4);
 		
 			return true;
-		}	else if (finalDamage > 0 && character != null && character.ownedByLocalPlayer && character.charState is DynamoParryStartState parryState3 && parryState3.canParry(damagingActor) && !isDot(projId)) {
-			parryState3.counterAttack(owner, damagingActor, 4);
-			return true;
-		}
+		}	
 
 		damagable.applyDamage(owner, weaponKillFeedIndex, finalDamage, projId);
 

@@ -341,7 +341,7 @@ public partial class MegamanX : Character {
 					player.changeWeaponSlot(oldSlot);
 				}
 			}
-
+			//>>>>>>>>>> Use Super
 			if (player.input.isPressed(Control.Special1, player) &&
 				player.input.isHeld(Control.Down, player) &&
 				player.weapons.Any(w => w is GigaCrush)
@@ -352,7 +352,9 @@ public partial class MegamanX : Character {
 				shoot(false);
 				player.weaponSlot = oldSlot;
 				player.changeWeaponSlot(oldSlot);
-			} else if (
+			}
+			// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>	
+		 else if (
 				  Options.main.novaStrikeSpecial &&
 				  player.input.isPressed(Control.Special1, player) &&
 				  player.weapons.Any(w => w is NovaStrike) &&
@@ -436,7 +438,7 @@ public partial class MegamanX : Character {
 			 canShoot() &&
 			canChangeWeapons()
 			// Allows X to use Saber
-			&& ( CurrentArmor > 6 || ZeroCounters > 0) &&
+			&& (CurrentArmor == 5 && player.health < 6 || CurrentArmor > 6 || ZeroCounters > 0) &&
 			player.input.isPressed(Control.Special1, player) &&
 			!isAttacking() && !isInvisible() &&
 			!charState.isGrabbing

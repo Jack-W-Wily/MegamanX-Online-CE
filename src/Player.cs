@@ -667,10 +667,10 @@ public partial class Player {
 	public float getMaverickMaxHp() {
 		if (!Global.level.is1v1() && isTagTeam()) {
 			//return 16 + (heartTanks * getHeartTankModifier());
-			return 24 * getHealthModifier();
+			return 32 * getHealthModifier();
 		}
 
-		return 24 * getHealthModifier();
+		return 32 * getHealthModifier();
 	}
 
 	public bool hasAllItems() {
@@ -1666,9 +1666,9 @@ public partial class Player {
 	public void awardCurrency() {
 		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
 		if (character?.isCCImmuneHyperMode() == true) return;
-		if (character is Zero zero && (zero.isNightmareZero)) return;
+		//if (character is Zero zero && (zero.isNightmareZero)) return;
 		//if (character != null && character.isBlackZero2()) return;
-		if (character != null && character.rideArmor != null && character.charState is InRideArmor && character.rideArmor.raNum == 4) return;
+		if (character != null && character.rideArmor != null && character.charState is InRideArmor) return;
 		if (isX && hasUltimateArmor()) return;
 		//if (isX && hasAnyChip() && !hasGoldenArmor()) return;
 		//if (isX && hasGoldenArmor()) return;

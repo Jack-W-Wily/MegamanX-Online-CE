@@ -201,13 +201,13 @@ public class AxlBulletProj : Projectile {
 
 public class MettaurCrashProj : Projectile {
 	public MettaurCrashProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.MetteurCrash;
 		angle = bulletDir.angle;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		maxTime = 0.3f;
+		maxTime = 0.2f;
 		reflectable = true;
 		destroyOnHit = false;
 		if (Helpers.randomRange(0, 10) == 10){

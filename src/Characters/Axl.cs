@@ -267,6 +267,11 @@ public class Axl : Character {
 			}
 		}
 
+		if (charState.canAttack() && !player.input.isHeld(Control.Shoot,player)
+		&& !player.input.isHeld(Control.Special1,player)){ 
+			player.weapon.addAmmo(0.15f, player);
+		}
+
 		// Cutoff point for things not controlled by the local player.
 		if (!ownedByLocalPlayer) {
 			if (isNonOwnerRev) {
@@ -355,9 +360,9 @@ public class Axl : Character {
 		updateAxlAim();
 
 	
-		if (dodgeRollCooldown == 0 && player.canControl && player.weapon is AxlBullet) {
+		if (dodgeRollCooldown == 0 && player.canControl) {
 			
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (charState is SwordBlock && player.input.isPressed(Control.Special1, player)) {
 				changeState(new RainStorm(isUnderwater()), true);
 			}
 
@@ -1590,6 +1595,7 @@ public class Axl : Character {
 		if (!player.ownedByLocalPlayer) return;
 		if (!player.isAxl) return;
 		if (player.isAxl && player.isDisguisedAxl) return;
+		if (!Global.level.is1v1()) return;
 		if (Global.level.is1v1()) return;
 
 		if (player.weapons.Count < 8 || Global.level.isTraining()) {

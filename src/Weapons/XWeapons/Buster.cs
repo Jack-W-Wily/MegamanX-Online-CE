@@ -127,7 +127,7 @@ public class Buster : Weapon {
 					new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 					new BusterPlasmaProj(this, pos, xDir, player, netProjId);
 					shootSound = "plasmaShot";		
-			} else if (player.hasFullLight()) {
+			}  if (player.hasFullLight()) {
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 				//Create the buster effect
 				int xOff = xDir * -5;
@@ -142,14 +142,14 @@ public class Buster : Weapon {
 				Global.level.delayedActions.Add(new DelayedAction(delegate{
 					createBuster4Line(pos.x + (float)xOff, pos.y, xDir, player, 5f / 60f, true);
 				}, 5.8f/60f));
-			} else if (player.hasFullGiga()) {
+			}  if (player.hasFullGiga()) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
 						shootTime = 0;
 					}
 					player.character.changeState(new X2ChargeShot(0), true);
 				}
-			} else if (player.hasAllX3Armor()) {
+			} if (player.hasAllX3Armor()) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
 						shootTime = 0;
@@ -157,9 +157,19 @@ public class Buster : Weapon {
 					player.character.changeState(new X3ChargeShot(null), true);
 				}
 			}
+
+			if (player.HasFullFalcon()) {
+					new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+					new ZBuster3Proj(
+						new ZeroBuster(), player.character.getShootPos(), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
+					);
+					shootSound = "plasmaShot";		
+			}
+			
 		}
 
-		if (player?.character?.ownedByLocalPlayer == true) {
+		if (!player.hasAllX3Armor() && !player.hasFullGiga() &&
+			player?.character?.ownedByLocalPlayer == true) {
 			player.character.playSound(shootSound, sendRpc: true);
 		}
 	}

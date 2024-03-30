@@ -192,11 +192,11 @@ public class UpgradeArmorMenu : IMainMenu {
 	public static void upgradeBodyArmor(Player player, int type) {
 		player.bodyArmorNum = type;
 		if (type == 2) {
-			player.addGigaCrush();
+		//	player.addGigaCrush();
 		}
 
 		if (type == 0) {
-			player.removeGigaCrush();
+		//	player.removeGigaCrush();
 		}
 	}
 

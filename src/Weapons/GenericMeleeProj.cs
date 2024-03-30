@@ -26,53 +26,48 @@ public class GenericMeleeProj : Projectile {
 
 	public void charGrabCode(CommandGrabScenario scenario, Character grabber, IDamagable damagable, CharState grabState, CharState grabbedState) {
 		if (grabber != null && damagable is Character grabbedChar && grabbedChar.canBeGrabbed()) {
-			/*if (!owner.isDefenderFavored) {
+			if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && !Helpers.isOfClass(grabber.charState, grabState.GetType())) {
 					owner.character.changeState(grabState, true);
 					if (Global.isOffline) {
 						grabbedChar.changeState(grabbedState, true);
 					} else {
-						grabbedChar.changeState(grabbedState, true);
-						//RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, false);
+						//grabbedChar.changeState(grabbedState, true);
+						RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, false);
 					}
 				}
 			} else {
 				if (grabbedChar.ownedByLocalPlayer && !Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())) {
 					grabbedChar.changeState(grabbedState);
 					if (Helpers.isOfClass(grabbedChar.charState, grabbedState.GetType())) {
-						grabbedChar.changeState(grabbedState, true);
-						//RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, true);
+						//grabbedChar.changeState(grabbedState, true);
+						RPC.commandGrabPlayer.sendRpc(grabber.netId, grabbedChar.netId, scenario, true);
 					}
 				}
-			}*/
-			owner.character.changeState(grabState, true);	
-			grabbedChar.changeState(grabbedState, true);
+			}
 		}
 	}
 
 	public void maverickGrabCode(CommandGrabScenario scenario, Maverick grabber, IDamagable damagable, CharState grabbedState) {
 		if (damagable is Character chr && chr.canBeGrabbed()) {
-		/*	if (!owner.isDefenderFavored) {
+			if (!owner.isDefenderFavored) {
 				if (ownedByLocalPlayer && grabber.state.trySetGrabVictim(chr)) {
 					if (Global.isOffline) {
 						chr.changeState(grabbedState, true);
 					} else {
-						chr.changeState(grabbedState, true);
-						//RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, false);
+						//chr.changeState(grabbedState, true);
+						RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, false);
 					}
 				}
 			} else {
 				if (chr.ownedByLocalPlayer && !Helpers.isOfClass(chr.charState, grabbedState.GetType())) {
 					chr.changeState(grabbedState);
 					if (Helpers.isOfClass(chr.charState, grabbedState.GetType())) {
-						chr.changeState(grabbedState, true);
-						//RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, true);
+						//chr.changeState(grabbedState, true);
+						RPC.commandGrabPlayer.sendRpc(grabber.netId, chr.netId, scenario, true);
 					}
 				}
 			}
-		}*/
-		chr.changeState(grabbedState, true);
-		
 		}
 	}
 
@@ -100,26 +95,24 @@ public class GenericMeleeProj : Projectile {
 		Character grabbedChar = damagable as Character;
 		if (projId == (int)ProjIds.UPGrab) {
 			charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new XUPGrabState(grabbedChar), new UPGrabbed(grabberChar));
-		} else if (projId == (int)ProjIds.VileMK2Grab) {
+		}  if (projId == (int)ProjIds.VileMK2Grab) {
 			charGrabCode(CommandGrabScenario.MK2Grab, grabberChar, damagable, new VileMK2GrabState(grabbedChar), new VileMK2Grabbed(grabberChar));
-		}
-	
-		
-		 else if (projId == (int)ProjIds.LaunchODrain && owningActor is LaunchOctopus lo) {
+		}	
+		  if (projId == (int)ProjIds.LaunchODrain && owningActor is LaunchOctopus lo) {
 			maverickGrabCode(CommandGrabScenario.WhirlpoolGrab, lo, damagable, new WhirlpoolGrabbed(lo));
-		} else if (projId == (int)ProjIds.FStagUppercut && owningActor is FlameStag fs) {
+		}  if (projId == (int)ProjIds.FStagUppercut && owningActor is FlameStag fs) {
 			maverickGrabCode(CommandGrabScenario.FStagGrab, fs, damagable, new FStagGrabbed(fs));
-		} else if (projId == (int)ProjIds.WheelGGrab && owningActor is WheelGator wg) {
+		}  if (projId == (int)ProjIds.WheelGGrab && owningActor is WheelGator wg) {
 			maverickGrabCode(CommandGrabScenario.WheelGGrab, wg, damagable, new WheelGGrabbed(wg));
-		} else if (projId == (int)ProjIds.MagnaCTail && owningActor is MagnaCentipede ms) {
+		}  if (projId == (int)ProjIds.MagnaCTail && owningActor is MagnaCentipede ms) {
 			maverickGrabCode(CommandGrabScenario.MagnaCGrab, ms, damagable, new MagnaCDrainGrabbed(ms));
-		} else if (projId == (int)ProjIds.BoomerangKDeadLift && owningActor is BoomerangKuwanger bk) {
+		}  if (projId == (int)ProjIds.BoomerangKDeadLift && owningActor is BoomerangKuwanger bk) {
 			maverickGrabCode(CommandGrabScenario.DeadLiftGrab, bk, damagable, new DeadLiftGrabbed(bk));
-		} else if (projId == (int)ProjIds.GBeetleLift && owningActor is GravityBeetle gb) {
+		}  if (projId == (int)ProjIds.GBeetleLift && owningActor is GravityBeetle gb) {
 			maverickGrabCode(CommandGrabScenario.BeetleLiftGrab, gb, damagable, new BeetleGrabbedState(gb));
-		} else if (projId == (int)ProjIds.CrushCGrab && owningActor is CrushCrawfish cc) {
+		}  if (projId == (int)ProjIds.CrushCGrab && owningActor is CrushCrawfish cc) {
 			maverickGrabCode(CommandGrabScenario.CrushCGrab, cc, damagable, new CrushCGrabbed(cc));
-		} else if (projId == (int)ProjIds.BBuffaloDrag && owningActor is BlizzardBuffalo bb) {
+		}  if (projId == (int)ProjIds.BBuffaloDrag && owningActor is BlizzardBuffalo bb) {
 			maverickGrabCode(CommandGrabScenario.BBuffaloGrab, bb, damagable, new BBuffaloDragged(bb));
 		}
 	}

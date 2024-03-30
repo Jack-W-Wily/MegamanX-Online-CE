@@ -153,7 +153,7 @@ public class SpiralMagnumProj : Projectile {
 	bool playedSoundOnce;
 
 	public SpiralMagnumProj(Weapon weapon, Point pos, float jumpDist, int type, Player player, Point bulletDir, IDamagable target, Character headshotChar, ushort netProjId) :
-		base(weapon, pos, 1, 1000, 2, player, "spiralmagnum_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 1000, 2, player, "spiralmagnum_proj", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		this.target = target;
 		reflectable = false;

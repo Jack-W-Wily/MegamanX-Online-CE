@@ -104,7 +104,7 @@ public class VileMK2GrabState : CharState {
 			
 		}
 		// STab
-		if (character.sprite.name.Contains("gravity") && character.frameIndex > 5 && hitcd > 2f){
+		if (character.sprite.name.Contains("gravity") && character.frameIndex > 0 && hitcd > 2f){
 			hitcd =0;
 		
 		var damager = new Damager(player, 2f, 0, 0);
@@ -145,12 +145,6 @@ public class VileMK2GrabState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-
-		if (player.isVile && !firstHeal){
-		var damager = new Damager(player, 1f, 0, 0);
-		character.addHealth(1);		
-		damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);	
-			}
 		}
 
 

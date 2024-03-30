@@ -25,7 +25,7 @@ public class Tornado : Weapon {
 		if (player.ownedByLocalPlayer) {
 			
 
-			if (player.character is MegamanX mmx && mmx.hasExpandedMoveset()){
+			if (player.character is MegamanX mmx && !mmx.hasExpandedMoveset()){
 				if (chargeLevel < 3) {
 				new TornadoProj(this, pos, xDir, false, player, netProjId);
 				} else {

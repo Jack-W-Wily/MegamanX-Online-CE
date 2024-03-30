@@ -65,7 +65,7 @@ public class GrenadeProj : Projectile, IDamagable {
 		Weapon weapon, Point pos, int xDir, Player player, Point bulletDir,
 		IDamagable target, Point cursorPos, int chargeLevel, ushort netProjId
 	) : base(
-		weapon, pos, xDir, 300, 0, player, "axl_grenade", 0, 0, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 0, player, "axl_grenade", 10, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		this.target = target;
 

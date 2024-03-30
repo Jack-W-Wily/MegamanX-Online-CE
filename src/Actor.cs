@@ -1362,16 +1362,16 @@ public partial class Actor : GameObject {
 
 	public SoundWrapper createSoundWrapper(SoundBufferWrapper soundBuffer, int? charNum) {
 		if (charNum != null) {
-			string charName;
+			string charName = "sigma";
 			if (charNum.Value == 0) charName = "mmx";
-			else if (charNum.Value == 1) charName = "zero";
-			else if (charNum.Value == 2) charName = "vile";
-			else if (charNum.Value == 3) charName = "axl";
-			else if (charNum.Value == 5) charName = "dynamo";
-			else if (charNum.Value == 6) charName = "gbd";
-			else if (charNum.Value == 7) charName = "iris";
-			else charName = "sigma";
-
+			 if (charNum.Value == 1) charName = "zero";
+			 if (charNum.Value == 2) charName = "vile";
+			 if (charNum.Value == 3) charName = "axl";
+			 if (charNum.Value == 4) charName = "sigma";
+			 if (charNum.Value == 5) charName = "dynamo";
+			 if (charNum.Value == 6) charName = "gbd";
+			 if (charNum.Value == 7) charName = "iris";
+		
 			var overrideSoundBuffer = Global.charSoundBuffers.GetValueOrDefault(soundBuffer.soundKey + "." + charName);
 			if (overrideSoundBuffer != null) {
 				return new SoundWrapper(overrideSoundBuffer, this);
@@ -1398,13 +1398,14 @@ public partial class Actor : GameObject {
 			return null;
 		}
 
-		if (!ownedByLocalPlayer) return null;
+		
 
 		int? charNum = null;
 		if (this is Character || this is Maverick) {
 			charNum = this is Character chr ? chr.player.charNum : 4;
 		}
 
+		
 		SoundWrapper sound = createSoundWrapper(soundBuffer, charNum);
 		sound.play();
 

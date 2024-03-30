@@ -91,7 +91,27 @@ public class Projectile : Actor {
 			damager.flinch = 12;
 			damager.damage = 3;
 		}
+
+		if (ownerPlayer.HasFullFalcon() && ownerPlayer.character != null && ownerPlayer.character.sprite.name.Contains("giga") == true) {
+		
+			if (Helpers.randomRange(0,1) == 0){
+			xDir = 1;
+			angle = 90;
+			incPos(new Point(0, 10));
+			vel.y = 300;
+			vel.x = 0;
+			}
+			if (Helpers.randomRange(0,1) == 1){
+			xDir = -1;
+			angle = 90;
+			incPos(new Point(0, 10));
+			vel.y = -300;
+			vel.x = 0;
+			}
+		}
 	}
+		
+	
 
 
 public  void isGaeaproj() {
@@ -589,6 +609,18 @@ public  void isGaeaproj() {
 			damagedOnce = true;
 			destroySelf(fadeSprite, fadeSound, favorDefenderProjDestroy: isDefenderFavoredAndOwner());
 		}
+
+	
+		if (owner.isAxl){
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 0 * modifier, -300));
+		}
+		}
+	
 	}
 
 	// Can be used in lieu of the on<PROJ>Damage() method in damager method with caveat that this causes issues where the actor isn't created yet leading to point blank shots under lag not running this

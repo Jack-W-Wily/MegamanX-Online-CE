@@ -44,6 +44,17 @@ public class Iris : Character {
 	public override string getSprite(string spriteName) {
 		return "iris_" + spriteName;
 	}
+
+
+	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile proj = null;
+		if (sprite.name.Contains("_block")) {
+			return new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
+			);
+		}
+		return proj;
+	}
 }
 
 

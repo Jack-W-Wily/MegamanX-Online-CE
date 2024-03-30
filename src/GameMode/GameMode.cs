@@ -639,7 +639,7 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-			if (drawPlayer.isZero && !drawPlayer.isZBusterZero()) {
+			if (drawPlayer.isZero ) {
 				drawZeroGigaCooldown(drawPlayer);
 			}
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
@@ -1846,7 +1846,7 @@ public class GameMode {
 		Weapon weapon = player.lastHudWeapon;
 		if (player.character != null) {
 			weapon = player.weapon;
-			if (player.character is Zero zero && !player.isZBusterZero()) {
+			if (player.character is Zero zero) {
 				weapon = zero.zeroGigaAttackWeapon;
 			}
 			player.lastHudWeapon = weapon;

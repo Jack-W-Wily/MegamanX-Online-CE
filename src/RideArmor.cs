@@ -783,7 +783,7 @@ public class RideArmor : Actor, IDamagable {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		if (Global.level.isRace()) return false;
+	
 		if (character == null) return false;
 		if (raNum == 5) return false;
 		return !character.isInvulnerable(true) && character.player.alliance != damagerAlliance;

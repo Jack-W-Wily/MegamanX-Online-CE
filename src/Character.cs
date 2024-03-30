@@ -1725,10 +1725,7 @@ public partial class Character : Actor, IDamagable {
 		if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
-		if (Global.level.isRace()) {
-			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
-			if (!isAxlSelfDamage) return false;
-		}
+	
 		if (sprite.name.Contains("houtenjin")) return false;
 		// Bommerang can go thru invisibility check
 		if (player.alliance != damagerAlliance && projId != null && isCStingVulnerable(projId.Value)) {
@@ -2688,7 +2685,7 @@ public partial class Character : Actor, IDamagable {
 		// Damage increase/reduction section
 		if (!isArmorPiercing) {
 			if (charState is SwordBlock) {				
-						damageSavings += (originalDamage * 0.5f);		
+						damageSavings += (originalDamage * 0.5m);		
 			}
 			if (acidTime > 0) {
 				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
@@ -2701,10 +2698,10 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += (originalDamage * 0.5m);
 				}
 				if (player.isX && player.hasFullLight()) {
-					damageSavings += originalDamage / 8f;
+					damageSavings += originalDamage / 8m;
 				}
 				if (player.isX && player.hasFullGiga()) {
-					damageSavings += originalDamage / 8f;
+					damageSavings += originalDamage / 8m;
 				}
 			}
 			if (this is Vile vile && vile.hasFrozenCastleBarrier()) {

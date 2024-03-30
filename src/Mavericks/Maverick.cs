@@ -875,8 +875,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		if (Global.level.isRace()) return false;
-
+		
 		if (this is BoomerangKuwanger bk && bk.sprite.name.Contains("teleport")) {
 			return false;
 		}

@@ -85,16 +85,16 @@ public class RayGunProj : Projectile {
 	//float lastAngle;
 	const float maxLen = 50;
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 1, 0f, netProjId, player.ownedByLocalPlayer) {
 		reflectable = true;
 		if ((player?.character as Axl)?.isWhiteAxl() == true) {
 			speed = 525;
 			damager.hitCooldown = 0;
-			maxTime *= 1.5f;
+			maxTime *= 1f;
 		}
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		maxTime = 0.35f;
+		maxTime = 0.25f;
 		projId = (int)ProjIds.RayGun;
 		updateAngle();
 		destroyOnHitWall = true;

@@ -114,7 +114,7 @@ public class Rakuhouha : CharState {
 
 	public override void update() {
 		base.update();
-		bool isCFlasher = type == RakuhouhaType.CFlasher;
+		bool isCFlasher = false;
 		bool isRakuhouha = type == RakuhouhaType.Rakuhouha;
 		bool isShinMessenkou = type == RakuhouhaType.ShinMessenkou;
 		bool isDarkHold = type == RakuhouhaType.DarkHold;
@@ -170,6 +170,108 @@ public class Rakuhouha : CharState {
 			new ShinMessenkouProj(weapon, new Point(x + shinMessenkouWidth * 3, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 		}
 
+		if (character.isAnimOver()) {
+			character.changeState(new Idle());
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		weapon.shootTime = weapon.rateOfFire;
+		base.onExit(newState);
+	}
+}
+
+
+public class DarkHoldS : CharState {
+	public Weapon weapon;
+	RakuhouhaType type { get { return (RakuhouhaType)weapon.type; } }
+	bool fired = false;
+	bool fired2 = false;
+	bool fired3 = false;
+	const float shinMessenkouWidth = 40;
+	public DarkHoldProj darkHoldProj;
+	public DarkHoldS(Weapon weapon) : base(weapon.type == (int)RakuhouhaType.CFlasher || weapon.type == (int)RakuhouhaType.DarkHold ? "taunt" : "taunt", "", "", "") {
+		this.weapon = weapon;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		bool isDarkHold = true;
+		// isDarkHold = true;
+
+		float x = character.pos.x;
+		float y = character.pos.y;
+		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
+			fired = true;
+		
+
+		  if (isDarkHold) {
+				darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);	
+				character.playSound("cflasher", sendRpc: true);
+			}
+
+		
+
+		if (character.isAnimOver()) {
+			character.changeState(new Idle());
+		}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		weapon.shootTime = weapon.rateOfFire;
+		base.onExit(newState);
+	}
+}
+
+
+
+public class Massenkou : CharState {
+	public Weapon weapon;
+	RakuhouhaType type { get { return (RakuhouhaType)weapon.type; } }
+	bool fired = false;
+	bool fired2 = false;
+	bool fired3 = false;
+	const float shinMessenkouWidth = 40;
+	public DarkHoldProj darkHoldProj;
+	public Massenkou(Weapon weapon) : base(weapon.type == (int)RakuhouhaType.CFlasher || weapon.type == (int)RakuhouhaType.DarkHold ? "cflasher" : "rakuhouha", "", "", "") {
+		this.weapon = weapon;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		bool isCFlasher = true;
+		// isDarkHold = true;
+
+		float x = character.pos.x;
+		float y = character.pos.y;
+		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
+			fired = true;
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+		character.pos.addxy(6 * character.xDir, 0), character.xDir, 
+		player, player.getNextActorNetId(), rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.7f, -0.7f, player, player.getNextActorNetId(), 135, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.38f, -0.92f, player, player.getNextActorNetId(), 135, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0, -1, player, player.getNextActorNetId(), 90, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.92f, -0.38f, player, player.getNextActorNetId(), 45, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.71f, -0.71f, player, player.getNextActorNetId(), 45, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.38f, -0.92f, player, player.getNextActorNetId(), 45, rpc: true);
+				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 1, 0, player, player.getNextActorNetId(), 0, rpc: true);
+			}
+				character.playSound("cflasher", sendRpc: true);		
 		if (character.isAnimOver()) {
 			character.changeState(new Idle());
 		}

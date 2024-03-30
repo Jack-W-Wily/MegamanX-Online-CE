@@ -42,14 +42,16 @@ public class CharSelection {
 		get {
 			return new List<CharSelection>()
 			{
-					new CharSelection("X", 0, 1, 0, "smenu_x", 0),
+					new CharSelection("<X (X1)", 0, 1, 0, "smenu_x", 0),			
 					new CharSelection("Zero", 1, 1, 0, "smenu_zero", 0),
 					new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
 					new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
 					new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
 					new CharSelection("dynamo", 5, 1, 0, "smenu_dynamo", 0),
 					new CharSelection("Green Biker Dude", 6, 1, 0, "smenu_gbd", 0),
-					new CharSelection("Iris", 7, 1, 0, "smenu_iris", 0),
+					new CharSelection("Iris", 7, 1, 0, "smenu_iris", 0),	
+					new CharSelection(" X (X3)>", 0, 3, 0, "smenu_x", 0),
+					new CharSelection("<X (X2)>", 0, 2, 0, "smenu_x", 0),
 				};
 		}
 	}
@@ -162,11 +164,11 @@ public class SelectCharacterMenu : IMainMenu {
 		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selections;
 		playerData.charNum = isInGame ? Global.level.mainPlayer.newCharNum : Options.main.preferredCharacter;
 
-		if (is1v1) {
+	//	if (is1v1) {
 			playerData.uiSelectedCharIndex = charSelections.FindIndex(c => c.mappedCharNum == playerData.charNum && c.mappedCharArmor == playerData.armorSet);
-		} else {
-			playerData.uiSelectedCharIndex = charSelections.FindIndex(c => c.mappedCharNum == playerData.charNum);
-		}
+	//	} else {
+	//		playerData.uiSelectedCharIndex = charSelections.FindIndex(c => c.mappedCharNum == playerData.charNum);
+	//	}
 	}
 
 	public Player mainPlayer { get { return Global.level.mainPlayer; } }

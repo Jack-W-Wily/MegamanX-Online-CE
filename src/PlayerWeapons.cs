@@ -333,12 +333,14 @@ label:
 		weapons = new List<Weapon>();
 
 		if (ownedByLocalPlayer) {
+		
 			if (isX) {
+				
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
 					if (hasAllX3Armor()) weapons.Add(new HyperBuster());
-					if (hasFullGiga()) weapons.Add(new GigaCrush());
-					if (HasFullForce()) weapons.Add(new NovaStrike(this));
+				//	if (hasFullGiga()) weapons.Add(new GigaCrush());
+				//	if (HasFullForce()) weapons.Add(new NovaStrike(this));
 				}
 				else if (isAI) {
 						weapons.Add(new Buster());
@@ -366,10 +368,11 @@ label:
 						weapons.Add(new GravityWell());
 						weapons.Add(new FrostShield());
 						weapons.Add(new TunnelFang());
-					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
-					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
+					//if (hasArmArmor(3)) weapons.Add(new HyperBuster());
+					//if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 					}
-				 else if (Global.level.is1v1()) {
+				 else if (loadout.xLoadout.melee == 0) {
+					//weapons.Add(new GigaCrush());
 					if (xArmor1v1 == 1) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
@@ -380,6 +383,7 @@ label:
 						weapons.Add(new ElectricSpark());
 						weapons.Add(new Boomerang());
 						weapons.Add(new ShotgunIce());
+						
 					} else if (xArmor1v1 == 2) {
 						weapons.Add(new Buster());
 						weapons.Add(new CrystalHunter());
@@ -390,7 +394,7 @@ label:
 						weapons.Add(new StrikeChain());
 						weapons.Add(new MagnetMine());
 						weapons.Add(new SpeedBurner(this));
-						weapons.Add(new GigaCrush());
+						
 					} else if (xArmor1v1 == 3) {
 						weapons.Add(new Buster());
 						weapons.Add(new AcidBurst());
@@ -401,9 +405,12 @@ label:
 						weapons.Add(new GravityWell());
 						weapons.Add(new FrostShield());
 						weapons.Add(new TunnelFang());
-						weapons.Add(new HyperBuster());
+					//	weapons.Add(new HyperBuster());
+					
 					}
-
+				// So everyone has it
+				weapons.Add(new GigaCrush());
+				//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 					foreach (var enemyPlayer in Global.level.players) {
 						if (enemyPlayer.maverick1v1 != null && enemyPlayer.alliance != alliance) {
 							Weapon weaponToDeplete = null;
@@ -454,7 +461,7 @@ label:
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllAxlWeapons(axlLoadout).Select(w => w.clone()).ToList();
 					weapons[0] = getAxlBullet(axlBulletType);
-				} else if (Global.level.is1v1()) {
+				} else if (Global.level.is1v1() || !Global.level.is1v1()) {
 					weapons.Add(new AxlBullet());
 					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
 					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));

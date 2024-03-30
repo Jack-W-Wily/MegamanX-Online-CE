@@ -97,7 +97,7 @@ public class PlasmaGunAltProj : Projectile {
 	bool hasTarget;
 	SoundWrapper sound;
 	public PlasmaGunAltProj(Weapon weapon, Point pos, Point cursorPos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "plasmagun_alt_proj", 1, 0.25f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "plasmagun_alt_proj", 10, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.PlasmaGun2;
 
 		destroyOnHit = false;
@@ -256,7 +256,7 @@ public class PlasmaGunAltProj : Projectile {
 public class VoltTornadoProj : Projectile {
 	Player player;
 	public VoltTornadoProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "volt_tornado_proj", 1, 0.25f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 4, player, "volt_tornado_proj", 30, 1f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "volt_tornado_fade";
 		projId = (int)ProjIds.VoltTornado;
 		if ((player.character as Axl)?.isWhiteAxl() == true) {

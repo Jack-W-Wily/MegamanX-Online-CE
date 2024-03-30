@@ -159,8 +159,7 @@ public override bool normalCtrl() {
 		
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
 			else if (shiningSparkStacks > 30 && sprite.name.Contains("dash"))
