@@ -41,7 +41,7 @@ public class AcidBurst : Weapon {
 
 public class AcidBurstProj : Projectile {
 	public AcidBurstProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 0, player, "acidburst_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 300, 0, player, "acidburst_proj", 4, 0f, netProjId, player.ownedByLocalPlayer) {
 		useGravity = true;
 		maxTime = 1.5f;
 		projId = (int)ProjIds.AcidBurst;
@@ -82,7 +82,7 @@ public class AcidBurstProj : Projectile {
 
 public class AcidBurstProjSmall : Projectile {
 	public AcidBurstProjSmall(Weapon weapon, Point pos, int xDir, Point vel, ProjIds projId, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 0, player, "acidburst_proj_small", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 300, 1, player, "acidburst_proj_small", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		useGravity = true;
 		maxTime = 1.5f;
 		this.projId = (int)projId;
@@ -120,7 +120,7 @@ public class AcidBurstProjSmall : Projectile {
 public class AcidBurstProjCharged : Projectile {
 	int bounces = 0;
 	public AcidBurstProjCharged(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 0, player, "acidburst_charged_start", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 300, 2, player, "acidburst_charged_start", 30, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 4f;
 		projId = (int)ProjIds.AcidBurstCharged;
 		useGravity = true;

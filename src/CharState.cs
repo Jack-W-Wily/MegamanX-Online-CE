@@ -462,10 +462,10 @@ public class WarpIn : CharState {
 		player.weapons.Add(new DynamoSword());
 		player.weapons.Add(new DynamoRoyal(null));
 		}
-		if (player.isGBD){
-		player.weapons.Add(new SpinningBlade());
-		new RideChaser(Global.level.mainPlayer, character.pos, 0, Global.level.mainPlayer.getNextActorNetId(), ownedByLocalPlayer: true, sendRpc: true);
-		}
+		//if (player.isGBD){
+		//player.weapons.Add(new SpinningBlade());
+		//new RideChaser(Global.level.mainPlayer, character.pos, 0, Global.level.mainPlayer.getNextActorNetId(), ownedByLocalPlayer: true, sendRpc: true);
+		//}
 		if (warpAnim != null) {
 			warpAnim.destroySelf();
 		}
@@ -670,7 +670,7 @@ public class SwordBlock : CharState {
 	public override void update() {
 		base.update();
 
-		bool isHoldingGuard;
+		//bool isHoldingGuard;
 		if (player.isZero && !(player.input.isHeld(Control.WeaponLeft, player) 
 		|| player.input.isHeld(Control.WeaponRight, player))) {
 		character.changeState(new Idle());
@@ -767,6 +767,10 @@ public class Jump : CharState {
 			}
 			return;
 		}
+		// Hydra jump stuff
+		if (player.input.isHeld(Control.Down, player) && player.hasBurnerX()){
+			character.changeSpriteFromName("up_dash", true);
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -827,6 +831,7 @@ public class Fall : CharState {
 
 public class Dash : CharState {
 	public float dashTime = 0;
+	public float trailTime = 0;
 	public string initialDashButton;
 	public int initialDashDir;
 	public bool stop;
@@ -884,13 +889,49 @@ public class Dash : CharState {
 		dashBackwardsCode(character, initialDashDir);
 
 		base.update();
-
-		if (!player.input.isHeld(initialDashButton, player) && !stop) {
-			dashTime = 50;
-		}
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
+
+
+		if (player.isGBD) character.turnToInput(player.input, player);
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// Phoenix Dash
+		Helpers.decrementTime(ref trailTime);
+		if (trailTime <= 0 && player.isGBD && character is GBD gbd && gbd.shiningSparkStacks > 10) {
+			trailTime = 0.04f;
+			new FStagTrailProj(player.weapon, character.pos, character.xDir, player, player.getNextActorNetId(), rpc: true);
+		}
+
+		if (player.hasMizuX()) {
+			speedModifier = 1.15f;
+			distanceModifier = 1.15f;
+			if (trailTime <= 0){
+
+			trailTime = 0.04f;
+			new Anim(new Point(character.pos.x, character.pos.y), "splash", 1, null, true);
+			character.playSound("splash");
+			}
+		}
+
+		if (player.hasBurnerX()) {
+		
+			if (trailTime <= 0){
+			trailTime = 4f;
+			character.playSound("flamemShoot", sendRpc: true);
+			new FlameMFireballProj(new FlameMFireballWeapon(), character.pos, character.xDir, player.input.isHeld(Control.Down, player), player, player.getNextActorNetId(), rpc: true);
+
+			}
+		}
+
+
+		
+
+	
+		//>>>>>>>>>>>>>>>>>>>>>>>
+		if (!player.input.isHeld(initialDashButton, player) && !stop) {
+			dashTime = 50;
+		}
 		if (player.isX && player.hasFullLight()) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
@@ -926,7 +967,9 @@ public class Dash : CharState {
 			character.move(move);
 		} else {
 			var move = new Point(0, 0);
-			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier; ;
+	move.x = character.getDashSpeed() * initialDashDir * speedModifier;
+		
+			//move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier; ;
 			character.move(move);
 		}
 		if (dashTime <= Global.spf * 3 || stop) {
@@ -1005,7 +1048,9 @@ public class AirDash : CharState {
 			character.move(move);
 		} else {
 			var move = new Point(0, 0);
-			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier;
+			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
+			//Die gay gacel dash I fixed you
+			//move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier;
 			character.move(move);
 		}
 		dashTime += Global.spf;
@@ -1460,7 +1505,7 @@ public class Hurt : CharState {
 
 	public override void update() {
 		base.update();
-		if (hurtSpeed != 0 && !character.grounded) {
+		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
 			character.move(new Point(hurtSpeed, 0));
 		}
@@ -1888,7 +1933,7 @@ public class Die : CharState {
 }
 public class LaunchedState : GenericGrabbedState {
 	public Character grabbedChar;
-	private bool once;
+	//private bool once;
 	public bool launched;
 	float launchTime;
 	public LaunchedState(Character grabber) : base(grabber, 1, "") {
@@ -1924,6 +1969,49 @@ public class LaunchedState : GenericGrabbedState {
 				launched = true;
 				character.unstickFromGround();
 				character.vel.y = -600;
+			}
+	}
+}
+
+
+public class LaunchedStateF : GenericGrabbedState {
+	public Character grabbedChar;
+	//private bool once;
+	public bool launched;
+	float launchTime;
+	public LaunchedStateF(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+				return;
+			}
+
+			var hitWall = Global.level.checkCollisionActor(character, character.xDir * 20, -5);
+			if (hitWall?.isSideWallHit() == true) {
+			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+				if(!once){
+				player.health -= 3;
+				once = true;
+				}
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(sendRpc: true);
+					//return;
+				}
+			}
+		
+	
+		if (!launched) {
+				launched = true;
+				character.unstickFromGround();
+				if (character.xDir == 1) character.vel.x = -600;
+				if (character.xDir == -1) character.vel.x = 600;
 			}
 	}
 }

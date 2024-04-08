@@ -158,7 +158,8 @@ public class KKnuckleParryStartState : CharState {
 		}
 
 		character.playSound("zeroParry", sendRpc: true);
-		character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
+	if (player.isZero)	character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
+	if (!player.isZero) character.changeToIdleOrFall();
 	}
 
 	public override void onExit(CharState newState) {

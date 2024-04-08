@@ -23,6 +23,7 @@ public partial class MegamanX : Character {
 	// >>>>>>>>>>>>>>>>>>>>>>>
 	// New Armor System
 	public float CurrentArmor = 0;
+	public float Geimini = 0;
 	public float LockFromArmorCooldown;
 
 	//IX Stuff
@@ -176,9 +177,31 @@ public partial class MegamanX : Character {
 		}
 		
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		//XKai swap
+		if (isXKai && player.input.isPressed(Control.Special2, player) 
+		&& Geimini == 0 && LockFromArmorCooldown == 0){
+		LockFromArmorCooldown = 0.2f;
+		Geimini = 1;
+		stockedCharge = false;
+		stockedX3Buster = false;
+		changeSpriteFromName("swap", true);
+		Global.level.gameMode.setHUDErrorMessage(player, "XISU", playSound: false);		
+		}
+		if (isXKai && player.input.isPressed(Control.Special2, player) 
+		&& Geimini == 1 && LockFromArmorCooldown == 0){
+		Geimini = 0;
+		stockedCharge = false;
+		changeSpriteFromName("swap", true);
+		LockFromArmorCooldown = 0.2f;
+		stockedX3Buster = false;
+		Global.level.gameMode.setHUDErrorMessage(player, "KAI", playSound: false);
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		//Armor Switching
 
-		if (charState is KnockedDown){
+		if (charState is KnockedDown && !isHyperX){
 		LockFromArmorCooldown = 3;
 		CurrentArmor = 0;
 		}
@@ -241,11 +264,9 @@ public partial class MegamanX : Character {
 		stockedCharge = false;
 		stockedX3Buster = false;
 		Global.level.gameMode.setHUDErrorMessage(player, "SHADOW", playSound: false);
-			}
+		}
 		}	
 		}
-		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 		if (IXTimer > 19f) EvolutionTrigger = 1;
 
 		if (cStingPaletteTime > 5) {
@@ -375,7 +396,7 @@ public partial class MegamanX : Character {
 
 		if (charState is not Die &&
 			player.input.isPressed(Control.Special1, player) &&
-			player.hasAllX3Armor() && !player.hasGoldenArmor()
+			player.HasFullMax() && !player.hasGoldenArmor()
 			&& player.hasUltimateArmor()
 		) {
 			if (player.input.isHeld(Control.Down, player)) {
@@ -403,7 +424,34 @@ public partial class MegamanX : Character {
 
 		Helpers.decrementTime(ref upPunchCooldown);
 
-		if (isXKai && !isInvulnerableAttack()) {
+
+		if (player.input.isPressed(Control.Special1, player) && isReturnIX &&
+				  (charState is Dash || charState is AirDash)) {
+				charState.isGrabbing = true;
+				changeSpriteFromName("ix_grab", true);
+			}
+
+
+		if (isXKai && player.isXisu()){
+			 if (player.input.isHeld(Control.Down, player) &&
+				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 &&
+				  (charState is Idle || charState is Run || charState is Fall || charState is Jump)
+			  )
+			if (unpoAbsorbedProj != null) {
+					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
+					unpoAbsorbedProj = null;
+					return;
+				} else {
+					changeState(new XUPParryStartState(), true);
+				}
+		}
+		if (isXKai && player.isKai()){
+			 	 if (player.input.isHeld(Control.Down, player) &&
+				  player.input.isWeaponLeftOrRightPressed(player)){
+					changeState(new KKnuckleParryStartState(), true);	
+				}}
+
+		if (player.hasUltimateArmor() || isXKai && !isInvulnerableAttack()) {
 			if (isHyperX && charState.attackCtrl && player.input.isPressed(Control.Shoot, player)) {
 				if (unpoShotCount <= 0) {
 					upPunchCooldown = 0.5f;
@@ -419,8 +467,7 @@ public partial class MegamanX : Character {
 				upPunchCooldown = 0.5f;
 				changeState(new XUPPunchState(grounded), true);
 				return;
-			} else if
-			  (
+			} else if (
 				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 && SigmaCounters > 2 &&
 				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
 			  ) {
@@ -459,7 +506,7 @@ public partial class MegamanX : Character {
 			if (unpoTime > 36) unpoDamageMaxCooldown = 0.5f;
 			if (unpoTime > 48) unpoDamageMaxCooldown = 0.25f;
 
-			if (!player.hasAllX3Armor() &&
+			if (!player.HasFullMax() &&
 			charState is not XUPGrabState && charState is not XUPParryMeleeState && charState is not XUPParryProjState) {
 				unpoTime += Global.spf;
 				UPDamageCooldown += Global.spf;
@@ -710,7 +757,7 @@ public partial class MegamanX : Character {
 		if (!grounded) {
 			if (player.dashPressed(out string dashControl) && canDash()) {
 				CharState dashState;
-				if (player.input.isHeld(Control.Up, player) && canAirDash() &&(player.hasAllX3Armor() || isIX && IXTimer > 6)) {
+				if (player.input.isHeld(Control.Up, player) && canAirDash() &&(player.HasFullMax() || isIX && IXTimer > 6)) {
 					dashState = new UpDash(Control.Dash);
 				} 
 				else{
@@ -774,14 +821,14 @@ public partial class MegamanX : Character {
 		
 	bool chaingrabcheck = player.input.checkShoryuken(player, xDir, Control.Special1);
 		
-		if (player.isX && chaingrabcheck && isXKai && player.weapon is StrikeChain && charState is not VileMK2GrabState) {
+		if (player.isX && chaingrabcheck && isXKai && player.isKai() && player.weapon is StrikeChain && charState is not VileMK2GrabState) {
 			changeState(new ChainGrab(), true);
 			return true;
 		}
 
 	bool xteleportcheck = player.input.checkShoryuken(player, xDir, Control.Dash);
 
-		if (player.isX && xteleportcheck && (player.HasFullShadow()|| isReturnIX)) {
+		if (player.isX && xteleportcheck && (player.HasFullShadow()|| isReturnIX || player.isXisu() && player.weapon is Boomerang)) {
 			changeState(new XTeleportState(), true);
 			return true;
 		}
@@ -796,7 +843,7 @@ public partial class MegamanX : Character {
 
 		if (player.isX && player.input.isHeld(Control.Down, player) &&
 		player.input.isPressed(Control.Special1, player) &&
-		hasExpandedMoveset() && player.weapon is StrikeChain && useGrabCooldown == 0) {
+		player.isKai() && player.weapon is StrikeChain && useGrabCooldown == 0) {
 			changeState(new ChainSliderState(), true);
 			useGrabCooldown = 1;
 			return true;
@@ -1243,6 +1290,14 @@ public partial class MegamanX : Character {
 		} else if (sprite.name.Contains("unpo_parry_start")) {
 			proj = new GenericMeleeProj(new XUPParry(), centerPoint, ProjIds.UPParryBlock, player, 0, 0, 1);
 		}
+		if ( sprite.name.Contains("deadlift"))
+		{
+			return new GenericMeleeProj(new HoutenjinWeapon(player), centerPoint, ProjIds.Houtenjin, player, 1f, 0, 1f, null, isShield: true, isDeflectShield: true);
+		}
+		if ( sprite.name.Contains("ix_grab"))
+		{
+			return new GenericMeleeProj(new HoutenjinWeaponF(player), centerPoint, ProjIds.HoutenjinF, player, 1f, 0, 3f, null, isShield: true, isDeflectShield: true);
+		}
 
 		return proj;
 	}
@@ -1298,6 +1353,13 @@ public partial class MegamanX : Character {
 	public override float getJumpModifier() {
 		float jumpModifier = 1;
 		jumpModifier += (chargedBubbles.Count / 6.0f) * 5;
+		
+		//>>>>>>>>>>>
+		//Hydra Jump
+		if (player.hasBurnerX() && player.input.isHeld(Control.Down, player)){
+		jumpModifier = 2;
+		}
+		//>>>>>>>>>>>>>
 
 		// Bubble Teleport
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>

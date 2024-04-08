@@ -36,7 +36,8 @@ public class XLoadout {
 		var indices = new List<byte>();
 		if (melee == 1){
 		indices.Add((byte)weapon1);
-		indices.Add((int)WeaponIds.Buster);
+		indices.Add((byte)weapon2);
+		indices.Add((byte)weapon3);
 		}
 		if (melee == 0){
 		indices.Add((byte)weapon1);
@@ -48,7 +49,7 @@ public class XLoadout {
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);
 		}
-	//	if (player.hasAllX3Armor()) indices.Add((int)WeaponIds.HyperBuster);
+	//	if (player.HasFullMax()) indices.Add((int)WeaponIds.HyperBuster);
 		//if (player.hasFullGiga()) 
 		indices.Add((int)WeaponIds.GigaCrush);
 	//	if (player.HasFullForce()) indices.Add((int)WeaponIds.NovaStrike);

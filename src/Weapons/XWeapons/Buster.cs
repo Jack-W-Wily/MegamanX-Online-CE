@@ -65,7 +65,7 @@ public class Buster : Weapon {
 			3 => "buster4",
 			_ => ""
 		};
-		if (player.hasArmArmor(ArmorId.Giga)) {
+		if (player.hasFullGiga()) {
 			shootSound = chargeLevel switch {
 				_ when (
 					player.character.stockedCharge
@@ -75,7 +75,7 @@ public class Buster : Weapon {
 				3 => "",
 				_ => shootSound
 			};
-		} else if (player.hasArmArmor(ArmorId.Max)) {
+		} else if (player.HasFullMax()) {
 			shootSound = chargeLevel switch {
 				_ when (
 					player.character.stockedCharge
@@ -128,6 +128,8 @@ public class Buster : Weapon {
 					new BusterPlasmaProj(this, pos, xDir, player, netProjId);
 					shootSound = "plasmaShot";		
 			}  if (player.hasFullLight()) {
+
+				shootSound = "plasmaShot";
 				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 				//Create the buster effect
 				int xOff = xDir * -5;
@@ -149,7 +151,7 @@ public class Buster : Weapon {
 					}
 					player.character.changeState(new X2ChargeShot(0), true);
 				}
-			} if (player.hasAllX3Armor()) {
+			} if (player.HasFullMax()) {
 				if (player.ownedByLocalPlayer) {
 					if (player.character.charState is not WallSlide) {
 						shootTime = 0;
@@ -165,10 +167,30 @@ public class Buster : Weapon {
 					);
 					shootSound = "plasmaShot";		
 			}
+			if (player.HasFullShadow()) {
+					new Buster3Proj(player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 4,	player, player.getNextActorNetId(), rpc: true);
+					shootSound = "plasmaShot";		
+			}
+			if (player.hasBurnerX()) {
+					new Buster3Proj(player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 5,	player, player.getNextActorNetId(), rpc: true);
+					shootSound = "plasmaShot";		
+			}
+			if ( player.hasMizuX()) {
+					new Buster3Proj(player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 6,	player, player.getNextActorNetId(), rpc: true);
+					shootSound = "plasmaShot";		
+			}
+			if ( player.HasFullBlade() && !player.hasMizuX()) {
+					new Buster3Proj(player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 7,	player, player.getNextActorNetId(), rpc: true);
+					shootSound = "plasmaShot";		
+			}
+			if ( player.HasFullGaea() && !player.hasBurnerX()) {
+					new Buster3Proj(player.weapon, player.character.getShootPos(), player.character.getShootXDir(), 8,	player, player.getNextActorNetId(), rpc: true);
+					shootSound = "plasmaShot";		
+			}
 			
 		}
 
-		if (!player.hasAllX3Armor() && !player.hasFullGiga() &&
+		if (!player.HasFullMax() && !player.hasFullGiga() && !player.hasFullLight() && 
 			player?.character?.ownedByLocalPlayer == true) {
 			player.character.playSound(shootSound, sendRpc: true);
 		}
@@ -266,6 +288,7 @@ public class Buster3Proj : Projectile {
 	public int type;
 	public List<Sprite> spriteMids = new List<Sprite>();
 	float partTime;
+	bool releaseExtra = false;
 
 	public Buster3Proj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 350, 3, player, "buster3", Global.defFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
@@ -312,6 +335,77 @@ public class Buster3Proj : Projectile {
 			projId = (int)ProjIds.Buster4;
 			reflectable = false;
 		}
+
+		// Shadow Shuriken buster
+		if (type == 4) {
+			damager.damage = 1;
+			changeSprite("buster4_xshadow", true);
+			fadeSprite = "buster4_xshadow_fade";
+			vel.x = 0;
+			maxTime = 1.75f;
+			projId = (int)ProjIds.Buster4;
+			reflectable = true;
+	
+		}
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+		// BurnerBuster
+		
+		if (type == 5) {
+			damager.damage = 1;
+			changeSprite("burnerbuster_proj", true);
+			fadeSprite = "buster4_x2_fade";
+			for (int i = 0; i < 6; i++) {
+				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
+				spriteMids.Add(midSprite);
+			}
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
+		}
+
+		// MizuBuster
+		
+		if (type == 6) {
+			damager.damage = 3;
+			changeSprite("mizubuster_proj", true);
+			fadeSprite = "buster4_x2_fade";
+			for (int i = 0; i < 6; i++) {
+				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
+				spriteMids.Add(midSprite);
+			}
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
+		}
+
+
+		// BladeBuster
+		if (type == 7) {
+			damager.damage = 3;
+			maxTime = 1.75f;
+			changeSprite("bladebuster_proj", true);
+			fadeSprite = "bladebuster_fade";
+			for (int i = 0; i < 6; i++) {
+				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
+				spriteMids.Add(midSprite);
+			}
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
+		}
+		// GaeaBuster
+		if (type == 8) {
+			damager.damage = 4;
+			changeSprite("gaeabuster_proj", true);
+			fadeSprite = "gaeabuster_fade";
+			for (int i = 0; i < 6; i++) {
+				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
+				spriteMids.Add(midSprite);
+			}
+			projId = (int)ProjIds.Buster4;
+			reflectable = false;
+		}
+
+
 		/*var busterWeapon = weapon as Buster;
 		if (busterWeapon != null) {
 			damager.damage = busterWeapon.getDamage(damager.damage);
@@ -320,13 +414,34 @@ public class Buster3Proj : Projectile {
 		if (player.HasFullFalcon()) isfalconproj = true;
 	}
 
+bool isfalconproj;
 
-	bool isfalconproj;
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!isfalconproj) destroySelf();
+		if (type == 4){
+			playSound("dingX2");
+			xDir *= -1;
+			vel.x *= -1;
+			vel.y = -30;
+			new Anim(pos, "sonicslicer_sparks", xDir, null, true);
+			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+		}
 	}
 
+
+	public override void onDestroy() {
+	base.onDestroy();
+
+	if (type == 5)
+	{
+	new TorpedoProj(new Torpedo(),pos.addxy(-40,15),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+	new TorpedoProj(new Torpedo(),pos.addxy(-40,10),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+	new TorpedoProj(new Torpedo(),pos.addxy(-40,5),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+	new TorpedoProj(new Torpedo(),pos.addxy(-40,-5),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+	new TorpedoProj(new Torpedo(),pos.addxy(-40,-10),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+	new TorpedoProj(new Torpedo(),pos.addxy(-40,-15),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);	
+	}
+	}
 
 	public override void update() {
 		base.update();
@@ -338,6 +453,38 @@ public class Buster3Proj : Projectile {
 				partTime = 0;
 				new Anim(pos.addRand(0, 16), "buster4_x3_part", 1, null, true) { acc = new Point(-vel.x * 3f, 0) };
 			}
+		}
+
+		if (type == 7){
+			vel.x -= Global.spf * xDir * 550;
+		}
+		if (type == 4){
+			vel.x += Global.spf * xDir * 550;
+			var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+		if (collideData != null && collideData.hitData != null) {
+			playSound("dingX2");
+			xDir *= -1;
+			vel.x *= -1;
+			new Anim(pos, "sonicslicer_sparks", xDir, null, true);
+			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+		}
+		int velYSign = MathF.Sign(vel.y);
+		if (velYSign != 0) {
+			collideData = Global.level.checkCollisionActor(this, 0, velYSign, vel);
+			if (collideData != null && collideData.hitData != null) {
+				playSound("dingX2");
+				vel.y *= -1;
+				new Anim(pos, "sonicslicer_sparks", xDir, null, true);
+				RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+			}
+		}
+		}
+
+		if (type == 6 && !releaseExtra){
+			releaseExtra = true;
+		new TorpedoProj(new Torpedo(),pos.addxy(-40,5),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+		new TorpedoProj(new Torpedo(),pos.addxy(-40,-5),owner.character.xDir, owner, 3, owner.getNextActorNetId(), 0, rpc: true);
+	
 		}
 	}
 

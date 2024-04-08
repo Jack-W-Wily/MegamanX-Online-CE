@@ -73,7 +73,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeHelmetArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
+				} else if (mainPlayer.HasFullMax() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(2, false);
 					Global.playSound("ching");
 				}
@@ -93,7 +93,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeBodyArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
+				} else if (mainPlayer.HasFullMax() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(1, false);
 					Global.playSound("ching");
 				}
@@ -113,7 +113,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeArmArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
+				} else if (mainPlayer.HasFullMax() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(3, false);
 					Global.playSound("ching");
 				}
@@ -133,7 +133,7 @@ public class UpgradeArmorMenu : IMainMenu {
 						upgradeBootsArmor(mainPlayer, xGame);
 						Global.playSound("ching");
 					}
-				} else if (mainPlayer.hasAllX3Armor() && !mainPlayer.hasGoldenArmor()) {
+				} else if (mainPlayer.HasFullMax() && !mainPlayer.hasGoldenArmor()) {
 					mainPlayer.setChipNum(0, false);
 					Global.playSound("ching");
 				}
@@ -141,7 +141,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
 			if (selectArrowPosY == 0) {
 				if (mainPlayer.helmetArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
+					if (mainPlayer.HasFullMax() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(2, true);
 					} else {
 						upgradeHelmetArmor(mainPlayer, 0);
@@ -150,7 +150,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 			if (selectArrowPosY == 1) {
 				if (mainPlayer.bodyArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
+					if (mainPlayer.HasFullMax() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(1, true);
 					} else {
 						upgradeBodyArmor(mainPlayer, 0);
@@ -159,7 +159,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 			if (selectArrowPosY == 2) {
 				if (mainPlayer.armArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
+					if (mainPlayer.HasFullMax() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(2, true);
 					} else {
 						upgradeArmArmor(mainPlayer, 0);
@@ -168,7 +168,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			}
 			if (selectArrowPosY == 3) {
 				if (mainPlayer.bootsArmorNum == xGame) {
-					if (mainPlayer.hasAllX3Armor() && mainPlayer.hasGoldenArmor()) {
+					if (mainPlayer.HasFullMax() && mainPlayer.hasGoldenArmor()) {
 						mainPlayer.setChipNum(0, true);
 					} else {
 						upgradeBootsArmor(mainPlayer, 0);
@@ -313,10 +313,10 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (selectArrowPosY == 2) optionPos = optionPos3;
 		if (selectArrowPosY == 3) optionPos = optionPos4;
 
-		float yOff = xGame == 3 && mainPlayer.hasAllX3Armor() ? 9 : -1;
+		float yOff = xGame == 3 && mainPlayer.HasFullMax() ? 9 : -1;
 		Global.sprites["cursor"].drawToHUD(0, optionPos1.x - 8, optionPos.y + 4 + yOff);
 
-		bool showChips = mainPlayer.hasAllX3Armor() && xGame == 3;
+		bool showChips = mainPlayer.HasFullMax() && xGame == 3;
 
 		// Head section
 		Fonts.drawText(FontType.Green, getHeadArmorMessage(), optionPos1.x + 60, optionPos1.y);
@@ -334,7 +334,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos1.x, optionPos1.y, selected: selectArrowPosY == 0 && !showChips);
 		
-			//if (mainPlayer.hasAllX3Armor()) {
+			//if (mainPlayer.HasFullMax()) {
 			//	Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos1.x + 5, optionPos1.y + 10, selected: selectArrowPosY == 0);
 			//	Fonts.drawText(FontType.Blue, "Slowly regenerate health.", optionPos1.x + 5, optionPos1.y + 20);
 			//} else {
@@ -358,7 +358,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos2.x, optionPos2.y, selected: selectArrowPosY == 1 && !showChips);
 		
-			//if (mainPlayer.hasAllX3Armor()) {
+			//if (mainPlayer.HasFullMax()) {
 			//	Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos2.x + 5, optionPos2.y + 10, selected: selectArrowPosY == 1);
 			//	Fonts.drawText(FontType.Blue, "Improves barrier defense.", optionPos2.x + 5, optionPos2.y + 20);
 			//} else {
@@ -381,7 +381,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos3.x, optionPos3.y, selected: selectArrowPosY == 2 && !showChips);
 		
-		//	if (mainPlayer.hasAllX3Armor()) {
+		//	if (mainPlayer.HasFullMax()) {
 		//		Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos3.x + 5, optionPos3.y + 10);
 		//		Fonts.drawText(FontType.Blue, "Reduce ammo usage by half.", optionPos3.x + 5, optionPos3.y + 20);
 		//	} else {
@@ -405,7 +405,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos4.x, optionPos4.y, selected: selectArrowPosY == 3 && !showChips);
 		
-			//if (mainPlayer.hasAllX3Armor()) {
+			//if (mainPlayer.HasFullMax()) {
 			//	Fonts.drawText(FontType.Golden, "ENHANCEMENT CHIP", optionPos4.x + 5, optionPos4.y + 10, selected: selectArrowPosY == 3);
 			//	Fonts.drawText(FontType.Blue, "Dash twice in the air.", optionPos4.x + 5, optionPos4.y + 20);
 			//} else {

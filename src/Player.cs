@@ -159,6 +159,7 @@ public partial class Player {
 	public bool isDynamo { get { return charNum == 5; } }
 	public bool isGBD { get { return charNum == 6; } }
 	public bool isIris { get { return charNum == 7; } }
+	public bool isLumine { get { return charNum == 8; } }
 
 
 
@@ -229,6 +230,7 @@ public partial class Player {
 			{ 5, new List<SubTank>() },
 			{ 6, new List<SubTank>() },
 			{ 7, new List<SubTank>() },
+			{ 8, new List<SubTank>() },
 		};
 	public List<SubTank> subtanks {
 		get {
@@ -250,6 +252,7 @@ public partial class Player {
 			{ 5, 0 },
 			{ 6, 0 },
 			{ 7, 0 },
+			{ 8, 0 },
 		};
 	public int heartTanks {
 		get {
@@ -261,7 +264,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 5;
+	public const int maxCharCurrencyId = 10;
 	public static int curMul = Helpers.randomRange(2, 8);
 	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
@@ -468,7 +471,7 @@ public partial class Player {
 			{ 5, 0 },
 			{ 6, 0 },
 			{ 7, 0 },
-			{ 8, 0 }
+			{ 8, 0 },
 		};
 
 	public int hyperChargeSlot;
@@ -1094,7 +1097,13 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			}  else {
+			}
+			else if (charNum == 8) {
+				character = new Lumine(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			}   else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false
@@ -1499,7 +1508,15 @@ public partial class Player {
 		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 2;
 	}
 
-	public bool hasAllX3Armor() {
+	public bool isXisu() {
+		return character != null && character is MegamanX mmx && mmx.Geimini == 1;
+	}
+
+	public bool isKai() {
+		return character != null && character is MegamanX mmx && mmx.Geimini == 0;
+	}
+
+	public bool HasFullMax() {
 		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 3;
 	}
 
@@ -1522,12 +1539,20 @@ public partial class Player {
      public bool HasFullShadow() {
 		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 8;
 	}
+	
+	public bool hasBurnerX() {
+		return HasFullGaea() && (character as MegamanX).isHyperX;
+	}
+
+	 public bool hasMizuX() {
+		return HasFullBlade() && (character as MegamanX).isHyperX;
+	}
 
 	public bool canUpgradeGoldenX() {
 		return character != null &&
 			isX && !isDisguisedAxl &&
 			character.charState is not Die && !Global.level.is1v1() &&
-			hasAllX3Armor() && !hasAnyChip() && !hasUltimateArmor() &&
+			HasFullMax() && !hasAnyChip() && !hasUltimateArmor() &&
 			!hasGoldenArmor() && currency >= goldenArmorCost && !usedChipOnce;
 	}
 
@@ -2075,7 +2100,7 @@ public partial class Player {
 	}
 
 	public bool hasChip(int armorIndex) {
-		if (!hasAllX3Armor()) return false;
+		if (!HasFullMax()) return false;
 		return getArmorNum(armorFlag, armorIndex, true) == 15;
 	}
 
@@ -2101,7 +2126,7 @@ public partial class Player {
 	}
 
 	public bool hasGoldenArmor() {
-		return hasAllX3Armor() && (character as MegamanX).isHyperX;
+		return HasFullMax() && (character as MegamanX).isHyperX;
 	}
 
 	public void setUltimateArmor(bool addOrRemove) {

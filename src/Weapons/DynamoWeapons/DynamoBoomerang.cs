@@ -105,6 +105,7 @@ public class DynamoBoomerangProj : Projectile {
 			destroySelf("explosion", "explosion", true);
 			return;
 		}
+		if (owner.character != null) destroySelf("explosion", "explosion", true);
 		
 		if (!locallyControlled) return;
 
@@ -120,7 +121,7 @@ public class DynamoBoomerangProj : Projectile {
 				reversed = true;
 			}
 		}
-		if (!reversed) {
+		if (!reversed && owner.character != null) {
 			if (player.input.isHeld(Control.Up, player)) {
 				incPos(new Point(0, -300 * Global.spf));
 			} else if (player.input.isHeld(Control.Down, player)) {
@@ -128,16 +129,16 @@ public class DynamoBoomerangProj : Projectile {
 			}
 		}
 
-		if (!reversed && time > maxReverseTime) {
+		if (!reversed && time > maxReverseTime && owner.character != null) {
 			reversed = true;
 		}
-		if (reversed) {
+		if (reversed && owner.character != null) {
 			vel = new Point(0, 0);
 			if (owner.character.xDir == 1) xDir = -1;
 			if (owner.character.xDir == -1) xDir = 1;
 		
 			Point returnPos = shooter.getCenterPos();
-			if (shooter.sprite.name == "vile_rocket_punch") {
+			if (shooter.sprite.name == "dynamo_rocket_punch") {
 				Point poi = shooter.pos;
 				var pois = shooter.sprite.getCurrentFrame()?.POIs;
 				if (pois != null && pois.Count > 0) {

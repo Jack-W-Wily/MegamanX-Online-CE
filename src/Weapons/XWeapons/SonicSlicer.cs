@@ -32,7 +32,7 @@ public class SonicSlicer : Weapon {
 
 public class SonicSlicerStart : Projectile {
 	public SonicSlicerStart(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "sonicslicer_start", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "sonicslicer_start", 4, 0, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.SonicSlicerChargedStart;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

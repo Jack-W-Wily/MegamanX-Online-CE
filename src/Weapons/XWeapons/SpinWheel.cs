@@ -40,7 +40,7 @@ public class SpinWheelProj : Projectile {
 	float lastHitTime;
 	const float hitCooldown = 0.2f;
 	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 0, hitCooldown, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 1, hitCooldown, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

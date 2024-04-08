@@ -21,7 +21,7 @@ public class GigaCrush : Weapon {
 		player.character.changeState(new GigaCrushCharState(), true);
 		new GigaCrushEffect(player.character);
 		}
-		if (player.hasAllX3Armor()) {
+		if (player.HasFullMax()) {
 		player.character.changeState(new X3ChargeShot(null), true);
 		}
 		if (player.HasFullForce()){
@@ -34,7 +34,7 @@ public class GigaCrush : Weapon {
 		if (Global.level.mainPlayer.hasFullGiga() || Global.level.mainPlayer.HasFullFalcon()) {
 			return 32;
 		}
-		if (Global.level.mainPlayer.hasAllX3Armor()) {
+		if (Global.level.mainPlayer.HasFullMax()) {
 			return 10;
 		}
 		if (Global.level.mainPlayer.HasFullForce()) {
@@ -53,7 +53,7 @@ public class GigaCrush : Weapon {
 		if (Global.level.mainPlayer.hasFullGiga() ||Global.level.mainPlayer.HasFullFalcon()) {
 		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 16 : 32);	
 		}
-		if (Global.level.mainPlayer.hasAllX3Armor()) {
+		if (Global.level.mainPlayer.HasFullMax()) {
 		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 5 : 10);	
 		}
 		if (Global.level.mainPlayer.HasFullForce()) {

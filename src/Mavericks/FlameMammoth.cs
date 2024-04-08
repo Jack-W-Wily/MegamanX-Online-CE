@@ -126,7 +126,7 @@ public class FlameMFireballProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 250, 2, player, "flamem_proj_fireball",
-		0, 0.01f, netProjId, player.ownedByLocalPlayer
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.FlameMFireball;
 		fadeSprite = "flamem_anim_fireball_fade";

@@ -26,7 +26,7 @@ public class SilkShot : Weapon {
 
 public class SilkShotProj : Projectile {
 	bool splitOnce;
-	public SilkShotProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) : base(weapon, pos, xDir, 200, 2, player, "silkshot_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public SilkShotProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) : base(weapon, pos, xDir, 200, 2, player, "silkshot_proj", 8, 0, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		useGravity = true;

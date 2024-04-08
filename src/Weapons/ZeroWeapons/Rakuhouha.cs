@@ -209,7 +209,7 @@ public class DarkHoldS : CharState {
 		float y = character.pos.y;
 		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
 			fired = true;
-		
+		}
 
 		  if (isDarkHold) {
 				darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);	
@@ -218,11 +218,11 @@ public class DarkHoldS : CharState {
 
 		
 
-		if (character.isAnimOver()) {
+		if (character.isAnimOver() || stateTime >= 1.5f ) {
 			character.changeState(new Idle());
 		}
 		}
-	}
+	
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -599,24 +599,25 @@ public class DarkHoldWeapon : Weapon {
 	}
 }
 
+
 public class DarkHoldProj : Projectile {
 	public float radius = 10;
-	public float attackRadius { get { return radius + 15; } }
-	public ShaderWrapper screenShader;
-	public DarkHoldProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 6, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		maxTime = 0.5f;
+	public float attackRadius => (radius + 15);
+	public ShaderWrapper? screenShader;
+	public DarkHoldProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "empty", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 1.25f;
 		vel = new Point();
 		projId = (int)ProjIds.DarkHold;
 		setIndestructableProperties();
-
 		Global.level.darkHoldProjs.Add(this);
-
 		if (Options.main.enablePostProcessing) {
 			screenShader = player.darkHoldScreenShader;
 			updateShader();
 		}
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -624,40 +625,56 @@ public class DarkHoldProj : Projectile {
 
 	public override void update() {
 		base.update();
-
 		updateShader();
 
-		if (isRunByLocalPlayer()) {
-			foreach (var go in Global.level.getGameObjectArray()) {
-				var actor = go as Actor;
-				var damagable = go as IDamagable;
-				if (actor == null) continue;
-				if (damagable == null) continue;
-				if (!damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
-				if (!inRange(actor)) continue;
-
-				damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: 0, overrideFlinch: 0);
+		if (time <= 0.5) {
+			foreach (var gameObject in Global.level.getGameObjectArray()) {
+				if (gameObject is Actor actor &&
+					actor.ownedByLocalPlayer &&
+					gameObject is IDamagable damagable &&
+					damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null) &&
+					inRange(actor)
+				) {
+					damager.applyDamage(damagable, false, weapon, this, projId);
+				}
 			}
 		}
-		radius += Global.spf * 400;
+		if (time <= 0.5) {
+			radius += Global.spf * 400;
+		}
+		if (time >= 1 && radius > 0) {
+			radius -= Global.spf * 800;
+			if (radius <= 0) {
+				radius = 0;
+			}
+		}
 	}
 
 	public bool inRange(Actor actor) {
-		float dist = actor.getCenterPos().distanceTo(pos);
-		if (dist > attackRadius) return false;
-		return true;
+		return (actor.getCenterPos().distanceTo(pos) <= attackRadius);
 	}
 
 	public void updateShader() {
 		if (screenShader != null) {
-			var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
-			var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
-			var normalizedRadius = radius / 261f;
-
+			var screenCoords = new Point(
+				pos.x - Global.level.camX,
+				pos.y - Global.level.camY
+			);
+			var normalizedCoords = new Point(
+				screenCoords.x / Global.viewScreenW,
+				1 - screenCoords.y / Global.viewScreenH
+			);
+			float ratio = (float)Global.screenW / (float)Global.screenH;
+			float normalizedRadius = (radius / (float)Global.screenH);
+	
+			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);
-			if (Global.viewSize == 2) screenShader.SetUniform("r", normalizedRadius * 0.5f);
-			else screenShader.SetUniform("r", normalizedRadius);
+			if (Global.viewSize == 2) {
+				screenShader.SetUniform("r", normalizedRadius * 0.5f);
+			} else {
+				screenShader.SetUniform("r", normalizedRadius);
+			}
 		}
 	}
 
@@ -669,6 +686,7 @@ public class DarkHoldProj : Projectile {
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, true, col, 1, zIndex + 1, true);
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, col2, 3, zIndex + 1, true, col2);
 		}
+
 	}
 
 	public override void onDestroy() {

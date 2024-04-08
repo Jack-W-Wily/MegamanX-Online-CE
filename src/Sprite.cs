@@ -275,7 +275,11 @@ public class Sprite {
 		int[] armors = null;
 		bool drawAxlArms = true;
 		bool hyperBusterReady = false;
-		bool isUPX = false;
+
+
+
+		bool isKAI = false;
+		bool isXISU = false;
 		bool isIX = false;
 		bool isRIX = false;
 		bool isLightX = false;
@@ -287,6 +291,11 @@ public class Sprite {
 		bool isBladeX = false;
 		bool isFalconX = false;
 		bool isGaeaX = false;
+		bool isBurnerX = false;
+		bool isMizuX = false;
+
+
+
 		Character character = actor as Character;
 		if (character != null) {
 			if (character.isInvisibleBS.getValue() && !Global.shaderWrappers.ContainsKey("invisible")) {
@@ -309,7 +318,11 @@ public class Sprite {
 			isGaeaX = character.player.isX && character.isGaeaArmorXBS.getValue();
 			isBladeX = character.player.isX && character.isBladeArmorXBS.getValue();
 			isShadowX = character.player.isX && character.isShadowArmorXBS.getValue();
-			isUPX = character.player.isX && character.player.loadout.xLoadout.melee == 1;
+			isBurnerX = character.player.isX && character.isBurnerXBS.getValue();
+			isMizuX = character.player.isX && character.isMizuXBS.getValue();
+
+			isKAI = character.player.isX && character.player.loadout.xLoadout.melee == 1 && !character.isNightmareZeroBS.getValue();
+			isXISU = character.player.isX && character.player.loadout.xLoadout.melee == 1 && character.isNightmareZeroBS.getValue();
 			isIX = character.player.isX && character.player.loadout.xLoadout.melee == 2;
 			isUltX = character.player.isX && character.hasUltimateArmorBS.getValue();
 			isRIX = character.player.isX && character.isReturnIXBS.getValue();
@@ -541,13 +554,16 @@ public class Sprite {
 
 		float extraYOff = 0;
 		if (isUltX) {
-			bitmap = Global.textures["XUltimate"];
+			bitmap = Global.textures["XCLEAR"];
 			extraYOff = 3;
 			armors = null;
 		}
 
-		if (isUPX) {
+		if (isKAI) {
 			bitmap = Global.textures["XUP"];
+		}
+		if (isXISU) {
+			bitmap = Global.textures["XISSU"];
 		}
 
 		if (isIX) {
@@ -577,8 +593,14 @@ public class Sprite {
 		if (isFalconX) {
 		bitmap = Global.textures["XFALCON"];
 		}
-		if (isBladeX) {
+		if (isBladeX && !isMizuX) {
 		bitmap = Global.textures["XBLADE"];
+		}
+		if (isBurnerX) {
+		bitmap = Global.textures["XBurn"];
+		}
+		if (isMizuX) {
+		bitmap = Global.textures["XWater"];
 		}
 
 
@@ -586,7 +608,7 @@ public class Sprite {
 
 		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 
-		if (isUPX && isUltX ) {
+		if (isKAI && isUltX ) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 			if (Global.isOnFrameCycle(5)) {
 				if (Global.shaderWrappers.ContainsKey("hit")) {

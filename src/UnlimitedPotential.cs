@@ -198,6 +198,56 @@ public class XUPParryMeleeState : CharState {
 	}
 }
 
+
+public class XDeadLift : CharState {
+	Actor counterAttackTarget;
+	float damage;
+	public XDeadLift(Actor counterAttackTarget, float damage) : base("deadlift", "", "", "") {
+		invincible = true;
+		this.counterAttackTarget = counterAttackTarget;
+		this.damage = damage;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (counterAttackTarget != null) {
+			character.turnToPos(counterAttackTarget.pos);
+
+			float dist = character.pos.distanceTo(counterAttackTarget.pos);
+			if (dist < 150) {
+				if (character.frameIndex >= 4 && !once) {
+					if (character.pos.distanceTo(counterAttackTarget.pos) > 10) {
+						character.moveToPos(counterAttackTarget.pos, 350);
+					}
+				}
+			}
+		}
+
+		Point? shootPos = character.getFirstPOI("melee");
+		if (!once && shootPos != null) {
+			once = true;
+			new UPParryMeleeProj(new XUPParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
+			character.playSound("upParryAttack", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		//character.frameIndex = 2;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.parryCooldown = character.maxParryCooldown;
+	}
+}
+
 public class AbsorbWeapon : Weapon {
 	public Projectile absorbedProj;
 	public AbsorbWeapon(Projectile otherProj) {
@@ -427,6 +477,14 @@ public class XUPGrabState : CharState {
 		}
 		}
 
+
+		if (player.isXisu() && player.input.isPressed(Control.Shoot, player)){
+		character.changeState(new XUPParryMeleeState(victim, 3), true);
+		}
+
+		if (player.isXisu() && player.input.isPressed(Control.Up, player) && player.weapon is Boomerang){
+		character.changeState(new XDeadLift(victim, 3), true);
+		}
 		if (player.input.isPressed(Control.Special1, player)) {
 			if (victim.sprite.name.Contains("vile")){
 			mmx.VileCounters += 1;
@@ -701,7 +759,7 @@ public class XRevive : CharState {
 		if (character.isAnimOver()) {
 			mmx.isHyperX = true;
 			if (player.HasFullForce())player.setUltimateArmor(true);
-			if (player.hasAllX3Armor())player.setGoldenArmor(true);
+			if (player.HasFullMax())player.setGoldenArmor(true);
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 		}
@@ -719,6 +777,7 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
+		character.useGravity = false;
 		mmx = character as MegamanX;
 	}
 
@@ -776,6 +835,7 @@ public class IXGrow : CharState {
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
 		mmx = character as MegamanX;
+		character.useGravity = false;
 	}
 
 	public override void onExit(CharState newState) {

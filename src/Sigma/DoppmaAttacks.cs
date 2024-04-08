@@ -200,6 +200,18 @@ public class Sigma3FireProj : Projectile {
 		}
 	}
 
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer && frameIndex >= 4) {
+			playSound("flamemOilBurn", sendRpc: true);
+			new FlameMBigFireProj(new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true);
+			// oilSpill.time = 0;
+			oilSpill.destroySelf();
+		}
+	}
+
 	public override void update() {
 		base.update();
 

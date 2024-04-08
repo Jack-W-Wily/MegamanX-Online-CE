@@ -131,7 +131,7 @@ public class BubbleSplashProjCharged : Projectile {
 	public float yPos;
 	public float initTime;
 	public BubbleSplashProjCharged(Weapon weapon, Point pos, int xDir, Player player, float time, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 4, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 20, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		useGravity = false;
 		fadeSprite = "bubblesplash_pop";
 

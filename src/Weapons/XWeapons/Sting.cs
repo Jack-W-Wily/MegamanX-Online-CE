@@ -28,7 +28,7 @@ public class StingProj : Projectile {
 	public StingProj(
 		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 2, player, "sting_start", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 2, player, "sting_start", 4, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Sting;
 		maxTime = 0.6f;

@@ -11,16 +11,33 @@ public class Lumine : Character {
 
 	}
 
+
+	public float shootcd = 0;
+
+
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref shootcd);
+		if (player.input.isHeld(Control.Shoot, player) && shootcd <= 0){
+		shootcd = 0.2f;
+		playSound("buster", sendRpc : true);
+		new BusterProj(new Buster(), getShootPos(), xDir, 0, player, player.getNextActorNetId());
+		}
+	}
+
+
+
+
 	public override bool canDash() {
-		return false;
+		return true;
 	}
 
 	public override bool canWallClimb() {
-		return false;
+		return true;
 	}
 
 	public override string getSprite(string spriteName) {
-		return "rock_" + spriteName;
+		return "pallete_" + spriteName;
 	}
 }
 

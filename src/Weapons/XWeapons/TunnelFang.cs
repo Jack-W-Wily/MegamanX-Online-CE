@@ -55,7 +55,7 @@ public class TunnelFangProj : Projectile {
 	public TunnelFangProj(
 		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 100, 1, player, "tunnelfang_proj", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 100, 1, player, "tunnelfang_proj", 1, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 1.5f;
 		projId = (int)ProjIds.TunnelFang;
@@ -136,8 +136,10 @@ public class TunnelFangProj : Projectile {
 public class TunnelFangProjCharged : Projectile {
 	public MegamanX character;
 	float sparksCooldown;
+
+	float timer = 5;
 	public TunnelFangProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 1, player, "tunnelfang_charged", Global.defFlinch, 0.125f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 300, 0.5f, player, "tunnelfang_charged", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TunnelFangCharged;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -147,6 +149,7 @@ public class TunnelFangProjCharged : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+		
 	}
 
 	public override void update() {
@@ -159,9 +162,9 @@ public class TunnelFangProjCharged : Projectile {
 			destroySelf();
 			return;
 		}
-
-		character.player.weapon.addAmmo(-Global.spf * 5, character.player);
-		if (character.player.weapon.ammo <= 0) {
+			Helpers.decrementTime(ref timer);
+		//character.player.weapon.addAmmo(-Global.spf * 5, character.player);
+		if (character.player.weapon.ammo <= 0 || timer <= 0f) {
 			destroySelf();
 			return;
 		}

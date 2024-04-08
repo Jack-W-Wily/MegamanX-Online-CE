@@ -55,23 +55,6 @@ public override bool normalCtrl() {
 		
 			flameCreateTime += Global.spf;
 			SuperGBDCreateTime += Global.spf;
-			if (shiningSparkStacks > 80) {
-			
-			if (SuperGBDCreateTime > 20f) {
-				SuperGBDCreateTime = 0;
-			
-			}
-			if (flameCreateTime > 0.075f) {
-
-				flameCreateTime = 0f;
-				new Anim(getCenterPos(), "firedash1", xDir, player.getNextActorNetId(), destroyOnEnd: true, sendRpc: true).vel = new Point(-xDir * 50, 0f);
-				new MK2NapalmFlame(
-					player.weapon, pos,
-					xDir, player, player.getNextActorNetId(),
-					rpc: true
-				);
-			}
-     	}
 			if (flag == null) {
 			if (charState is not Hurt &&
 				charState is not InRideArmor && (
@@ -144,8 +127,9 @@ public override bool normalCtrl() {
 		if (charState.canAttack() && xSaberCooldown == 0f &&
 		 player.input.isPressed(Control.WeaponRight, player))
 					{
-				xSaberCooldown = 1f;
-               	new MagnetMine().getProjectile(getShootPos(), getShootXDir(), player, 0, player.getNextActorNetId());
+				changeState(new XTeleportState(), true);
+				//xSaberCooldown = 1f;
+               //	new MagnetMine().getProjectile(getShootPos(), getShootXDir(), player, 0, player.getNextActorNetId());
 		
 					}
 
@@ -162,7 +146,7 @@ public override bool normalCtrl() {
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
-			else if (shiningSparkStacks > 30 && sprite.name.Contains("dash"))
+			else if (sprite.name.Contains("dash"))
 		{
 			return  new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 30, 0.5f, null, isShield: false, isDeflectShield: true);;
 		}

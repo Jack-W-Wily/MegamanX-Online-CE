@@ -94,7 +94,7 @@ public class Zero : Character {
 		var zeroLoadout = player.loadout.zeroLoadout;
 		if (zeroHyperMode == 2 )isNightmareZero = true;
 		if (!player.hasKnuckle()) {
-			raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(player, zeroLoadout.groundSpecial);
+			raijingekiWeapon = new RaijingekiWeapon(player);
 			zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(player, zeroLoadout.airSpecial);
 			zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(player, zeroLoadout.uppercutA);
 			zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(player, zeroLoadout.uppercutS);
@@ -841,7 +841,7 @@ public class Zero : Character {
 				raijingeki2Weapon, centerPoint, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 0.06f
 			),
 			"zero_tbreaker" => new GenericMeleeProj(
-				raijingekiWeapon, centerPoint, ProjIds.TBreaker, player, 1, Global.defFlinch, 0.5f
+				raijingekiWeapon, centerPoint, ProjIds.TBreaker, player, 4, Global.defFlinch, 0.5f
 			),
 			"zero_ryuenjin" => new GenericMeleeProj(
 				new RyuenjinWeapon(player), centerPoint, ProjIds.Ryuenjin, player, 1, 3, 0.2f
@@ -892,7 +892,7 @@ public class Zero : Character {
 				raijingeki2Weapon, centerPoint, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 0.06f
 			),
 			"superzero_tbreaker" => new GenericMeleeProj(
-				raijingekiWeapon, centerPoint, ProjIds.TBreaker, player, 1, Global.defFlinch, 0.5f
+				raijingekiWeapon, centerPoint, ProjIds.TBreaker, player, 4, Global.defFlinch, 0.5f
 			),
 			"superzero_ryuenjin" => new GenericMeleeProj(
 				new RyuenjinWeapon(player), centerPoint, ProjIds.Ryuenjin, player, 1, 3, 0.2f
@@ -1083,7 +1083,9 @@ public class Zero : Character {
 					
 					if (zeroGigaAttackWeapon.ammo >= 6) {
 					zeroGigaAttackWeapon.addAmmo(-6, player);	
-					changeState(new ZBusterX6(grounded, true), true);
+					if (!player.input.isHeld(Control.Down, player)){
+						changeState(new ZBusterX6(grounded, true), true);
+					} else {changeState(new TBreakerState(false), true);}
 					}
 					}
 			}

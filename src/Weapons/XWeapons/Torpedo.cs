@@ -47,23 +47,37 @@ public class TorpedoProj : Projectile, IDamagable {
 		else if (type == 3) {
 			projId = (int)ProjIds.LaunchOTorpedo;
 
-			if (!player.isDynamo){
+			if (!player.isDynamo && !owner.hasMizuX() && !owner.hasBurnerX()){
 			changeSprite("launcho_proj_ht", true);
+			damager.damage = 2;
 			}
-			if (player.character != null && player.isDynamo){
+			if (owner.character != null && owner.isDynamo){
 		changeSprite("dynamonbulletproj", true);
 		damager.flinch = Global.defFlinch;
 		damager.damage = 4;
 		maxSpeed = 300;
 		}
+		if (owner.character != null && owner.hasBurnerX()){
+		changeSprite("burnerbuster_proj2", true);
+		damager.flinch = 4;
+		damager.damage = 1;
+		maxSpeed = 200;
+		}
+		if (owner.character != null && owner.hasMizuX()){
+		changeSprite("mizubusterproj_2", true);
+		damager.flinch = 4;
+		damager.damage = 1;
+		maxSpeed = 200;
+		}
+
 		}
 
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;
 		reflectableFBurner = true;
 		customAngleRendering = true;
-		if (type == 1 || type == 3) {
-			damager.damage = (type == 1 ? 1 : 2);
+		if (type == 1) {
+			damager.damage = 2;
 			damager.flinch = Global.halfFlinch;
 		} else if (type == 2) {
 			vel.x = 1;

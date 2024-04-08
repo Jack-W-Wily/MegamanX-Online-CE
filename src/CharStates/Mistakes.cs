@@ -14,6 +14,7 @@ public class XTeleportState : CharState {
 	int width = 18;
 
 	public XTeleportState() : base("land") {
+		invincible = true;
 	}
 
 	public override void update() {
@@ -169,7 +170,12 @@ public class XTeleportState : CharState {
 		Collider col = new Collider(
 			teleportCollider.getPoints(), false, tempClone, false, false, 0, new Point(0, 0)
 		);
-		tempClone.changeSprite("mmx_land", false);
+		if (player.isX){
+		tempClone.changeSprite("mmx_warp_in_beam", false);
+		}
+		if (!player.isX){
+		tempClone.changeSprite("tgbd_land", false);
+		}
 		tempClone.globalCollider = col;
 		tempClone.alpha = 0.5f;
 		tempClone.xDir = character.xDir;

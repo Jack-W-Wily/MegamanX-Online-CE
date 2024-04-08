@@ -151,6 +151,7 @@ public enum WeaponIds {
 
 	//Vile Weapons
 	Houtenjin,
+	HoutenjinF,
 	MechMenuWeapon,
 	MechBuster,
 	MechPunch,
@@ -449,6 +450,7 @@ public enum ProjIds {
 
 	//VilePRojIDS
 	Houtenjin,
+	HoutenjinF,
 	ElectricShock,
 	MK2StunShot,
 	VileMissile,

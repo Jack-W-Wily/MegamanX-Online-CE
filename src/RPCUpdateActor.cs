@@ -105,8 +105,10 @@ public partial class Actor {
 			args.Add((byte)alliance);
 			args.Add(character.updateAndGetNetCharState1());  // Packs bool states (BS's) into one byte
 			args.Add(character.updateAndGetNetCharState2());
-			args.Add((byte)character.player.currency);
 			args.Add(character.updateAndGetNetCharState3());
+			args.Add(character.updateAndGetNetCharState4());
+			args.Add((byte)character.player.currency);
+			
 
 			if (character is MegamanX mmx) {
 				byte[] armorBytes = BitConverter.GetBytes(character.player.armorFlag);
@@ -358,6 +360,7 @@ public class RPCUpdateActor : RPC {
 					int netCharState1 = arguments[i++];
 					int netCharState2 = arguments[i++];
 					int netCharState3 = arguments[i++];
+					int netCharState4 = arguments[i++];
 					int currency = arguments[i++];
 
 					character.player.changeWeaponFromWi(weaponIndex);
@@ -368,6 +371,7 @@ public class RPCUpdateActor : RPC {
 					character.netCharState1 = (byte)netCharState1;
 					character.netCharState2 = (byte)netCharState2;
 					character.netCharState3 = (byte)netCharState3;
+					character.netCharState4 = (byte)netCharState4;
 					character.player.currency = currency;
 
 					// X section.

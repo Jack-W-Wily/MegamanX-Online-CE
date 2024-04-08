@@ -384,6 +384,9 @@ public class Damager {
 	if (projId == (int)ProjIds.Houtenjin) {	
 		character.changeState(new LaunchedState(owner.character), true);
 	}
+	if (projId == (int)ProjIds.HoutenjinF) {	
+		character.changeState(new LaunchedStateF(owner.character), true);
+	}
 	//GBD's Mighty Kick
 	if (projId == (int)ProjIds.GBDKick && !(character.charState is KnockedDown) && !(character.charState is SwordBlock)) {	
 			character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
@@ -450,8 +453,13 @@ public class Damager {
 			}
 
 			if (owner?.character?.isNightmareZeroBS.getValue() == true) {
-				character.addInfectedTime(owner, 0.5f);
+				character.addInfectedTime(owner, 0.8f);
 			}
+			if (owner.isZero) {
+				(owner.character as Zero).zeroGigaAttackWeapon.addAmmo(1, owner);
+			}
+
+			
 
 			#endregion
 

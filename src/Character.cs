@@ -195,7 +195,7 @@ public partial class Character : Actor, IDamagable {
 		initNetCharState1();
 		initNetCharState2();
 		initNetCharState3();
-
+		initNetCharState4();
 		isDashing = false;
 		splashable = true;
 
@@ -610,12 +610,11 @@ public partial class Character : Actor, IDamagable {
 	public bool canAirDash() {
 		if (infectedTime > 2f) return false;
 		if (this is MegamanX mmx){ 
-
 		if (mmx.isIX && mmx.IXTimer < 10f) return false;
-		if (!mmx.isIX && player.isX && player.loadout.xLoadout.melee != 1 && mmx.CurrentArmor < 2){
+		if (player.isX && player.loadout.xLoadout.melee == 0 && mmx.CurrentArmor < 2){
 		return false;
 		}
-		return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
+		//return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
 		}
 		return dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
 	}
@@ -1438,9 +1437,17 @@ public partial class Character : Actor, IDamagable {
 				isDashing = (
 					isDashing || player.dashPressed(out string dashControl) && canDash()
 				);
+				//// Hydra jump stuff
+				if (player.hasBurnerX() && player.input.isHeld(Control.Down, player)){
+				new FlameMOilProj(new FlameMOilWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+	
+			//	new Anim(new Point(pos.x, pos.y), "splash", 1, null, true);
+			//		playSound("splash");
+				}
+				//.................
 				changeState(new Jump());
 				return true;
-			} else if (player.dashPressed(out string dashControl) && canDash() && charState is not Dash) {
+			} else if (player.dashPressed(out string dashControl) && canDash()) { //&& charState is not Dash) {
 				changeState(new Dash(dashControl), true);
 				return true;
 			} else if (mk5RideArmorPlatform != null &&
@@ -1629,7 +1636,7 @@ public partial class Character : Actor, IDamagable {
 			int chargeType = 0;
 			if (player.isZBusterZero()) {
 				chargeType = 1;
-			} else if (player.isX && player.hasAllX3Armor()) {
+			} else if (player.isX && player.HasFullMax()) {
 				if (player.hasGoldenArmor()) {
 					chargeType = 2;
 				}
@@ -2795,8 +2802,11 @@ public partial class Character : Actor, IDamagable {
 			}
 			killPlayer(attacker, null, weaponIndex, projId);
 		} else {
-			if (mmx != null && (player.hasAllX3Armor() || mmx.SigmaCounters > 0) && damage > 0) {
+			if (mmx != null && (player.HasFullMax() || mmx.SigmaCounters > 0) && damage > 0) {
 				mmx.addBarrier(charState is Hurt);
+			}
+			if (mmx != null && (player.hasMizuX()) && damage > 0) {
+			new RollingShieldProjCharged(new RollingShield(), pos, xDir, player, player.getNextActorNetId());
 			}
 		}
 	}

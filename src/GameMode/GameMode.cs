@@ -869,7 +869,7 @@ public class GameMode {
 		if (Global.level.isRace()) return true;
 		if (level.is1v1()) return false;
 		if (level.mainPlayer == null) return false;
-		if (level.mainPlayer.isX && level.mainPlayer.hasAllX3Armor()) {
+		if (level.mainPlayer.isX && level.mainPlayer.HasFullMax()) {
 			return true;
 		}
 		if (level.mainPlayer.isAxl && level.boundBlasterAltProjs.Any(b => b.state == 1)) {

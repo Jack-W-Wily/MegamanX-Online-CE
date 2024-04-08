@@ -472,6 +472,14 @@ public class HoutenjinWeapon : Weapon {
 	}
 }
 
+public class HoutenjinWeaponF : Weapon {
+	public HoutenjinWeaponF(Player player) : base() {
+		
+		index = (int)WeaponIds.HoutenjinF;
+		killFeedIndex = 113;
+	}
+}
+
 
 public class HoutenjinStartState : CharState {
 	public HoutenjinStartState() : base("houtenjin_prepare", "", "", "") {

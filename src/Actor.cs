@@ -314,6 +314,11 @@ public partial class Actor : GameObject {
 			spriteName = spriteName.Replace("vilemk2ex_", "vilemk5_").Replace("vilemkv_", "vilemk5_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
+
+		if (this is Character charzin && charzin is MegamanX mmx && mmx.isXKai) {
+			spriteName = spriteName.Replace("mmx_", "xisu_").Replace("mmx_", "xisu_");
+			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
+		}
 		
 		
 
@@ -566,7 +571,7 @@ public partial class Actor : GameObject {
 			}
 
 			if (Math.Abs(xSwingVel) > 0) {
-				if (chr != null) {
+				/*if (chr != null) {
 					if (chr.player.isX) {
 						if (!chr.player.input.isHeld(Control.Dash, chr.player) || chr.flag != null) {
 							xSwingVel = Helpers.lerp(xSwingVel, 0, Global.spf * 5);
@@ -580,6 +585,33 @@ public partial class Actor : GameObject {
 					} else if (chr.player.input.isHeld(Control.Right, chr.player) && xSwingVel < 0) {
 						xSwingVel += Global.spf * 1000;
 						if (xSwingVel > 0) xSwingVel = 0;
+					}
+				}*/
+				if (chr != null)
+				{
+					if (chr.player.isX && (!chr.player.input.isHeld(Control.Dash, chr.player) || chr.flag != null))
+					{
+						xSwingVel = Helpers.lerp(xSwingVel, 0f, Global.spf * 5f);
+						if (MathF.Abs(xSwingVel) < 20f)
+						{
+							xSwingVel = 0f;
+						}
+					}
+					if (chr.player.input.isHeld(Control.Left, chr.player) && xSwingVel > 0f)
+					{
+						xSwingVel -= Global.spf * 1000f;
+						if (xSwingVel < 0f)
+						{
+							xSwingVel = 0f;
+						}
+					}
+					else if (chr.player.input.isHeld(Control.Right, chr.player) && xSwingVel < 0f)
+					{
+						xSwingVel += Global.spf * 1000f;
+						if (xSwingVel > 0f)
+						{
+							xSwingVel = 0f;
+						}
 					}
 				}
 
@@ -1371,6 +1403,7 @@ public partial class Actor : GameObject {
 			 if (charNum.Value == 5) charName = "dynamo";
 			 if (charNum.Value == 6) charName = "gbd";
 			 if (charNum.Value == 7) charName = "iris";
+			// if (charNum.Value == 8) charName = "lumine";
 		
 			var overrideSoundBuffer = Global.charSoundBuffers.GetValueOrDefault(soundBuffer.soundKey + "." + charName);
 			if (overrideSoundBuffer != null) {

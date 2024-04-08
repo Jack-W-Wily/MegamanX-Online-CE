@@ -338,7 +338,7 @@ label:
 				
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
-					if (hasAllX3Armor()) weapons.Add(new HyperBuster());
+					if (HasFullMax()) weapons.Add(new HyperBuster());
 				//	if (hasFullGiga()) weapons.Add(new GigaCrush());
 				//	if (HasFullForce()) weapons.Add(new NovaStrike(this));
 				}

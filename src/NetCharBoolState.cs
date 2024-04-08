@@ -5,7 +5,8 @@ namespace MMXOnline;
 public enum NetCharBoolStateNum {
 	One,
 	Two,
-	Three
+	Three,
+	Four
 }
 
 public class NetCharBoolState {
@@ -34,6 +35,9 @@ public class NetCharBoolState {
 		if (netCharStateNum == NetCharBoolStateNum.Three) {
 			return Helpers.getByteValue(character.netCharState3, byteIndex);
 		} 
+		if (netCharStateNum == NetCharBoolStateNum.Four) {
+			return Helpers.getByteValue(character.netCharState4, byteIndex);
+		} 
 		return false;
 	}
 
@@ -46,6 +50,9 @@ public class NetCharBoolState {
 		}
 		if (netCharStateNum == NetCharBoolStateNum.Three) {
 			Helpers.setByteValue(ref character.netCharState3, byteIndex, getValue());
+		}
+		if (netCharStateNum == NetCharBoolStateNum.Four) {
+			Helpers.setByteValue(ref character.netCharState4, byteIndex, getValue());
 		}
 	}
 }
@@ -127,7 +134,7 @@ public partial class Character {
 		isDefenderFavoredBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.Two, (character) => { return character.player.isDefenderFavored; });
 		hasSubtankCapacityBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.Two, (character) => { return character.player.hasSubtankCapacity(); });
 		isNightmareZeroBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.Two, (character) => {
-			return (character as Zero)?.isNightmareZero == true || Options.main.swapGoliathInputs;
+			return (character as Zero)?.isNightmareZero == true || character is Vile vile && Options.main.swapGoliathInputs || player.isXisu();
 		});
 		isDarkHoldBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.Two, (character) => { return character.charState is DarkHoldState; });
 	}
@@ -162,7 +169,7 @@ public partial class Character {
 	public void initNetCharState3() {
 		isLightArmorXBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Three, (character) => {	return character.player.hasFullLight(); });
 		isGigaArmorXBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.Three, (character) => { return character.player.hasFullGiga(); });
-		isMaxArmorXBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.Three, (character) => {return character.player.hasAllX3Armor(); });
+		isMaxArmorXBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.Three, (character) => {return character.player.HasFullMax(); });
 		isForceArmorXBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.Three, (character) => { return character.player.HasFullForce(); });
 		isFalconArmorXBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.Three, (character) => { return character.player.HasFullFalcon(); });
 		isGaeaArmorXBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.Three, (character) => { return character.player.HasFullGaea(); });
@@ -181,4 +188,27 @@ public partial class Character {
 		isShadowArmorXBS.updateValue();
 		return netCharState3;
 	}
+
+	// NET CHAR STATE 4 SECTION
+	public byte netCharState4;
+
+	public NetCharBoolState isBurnerXBS;
+	public NetCharBoolState isMizuXBS;
+
+
+
+	
+
+	public void initNetCharState4() {
+		isBurnerXBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Three, (character) => {	return character.player.hasBurnerX(); });
+		isMizuXBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.Three, (character) => { return character.player.hasMizuX(); });
+	}
+
+	public byte updateAndGetNetCharState4() {
+		isBurnerXBS.updateValue();
+		isMizuXBS.updateValue();
+	
+		return netCharState4;
+	}
+
 }

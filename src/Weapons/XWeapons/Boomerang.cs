@@ -53,7 +53,7 @@ public class BoomerangProj : Projectile {
 	public BoomerangProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, int turnDir, bool sendRpc = false
 	) : base(
-		weapon, pos, xDir, 250, 2, player, "boomerang", 0, 0, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 250, 2, player, "boomerang", 3, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Boomerang;
 		customAngleRendering = true;
