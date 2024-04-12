@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
 
@@ -259,7 +258,7 @@ public class Zero : Character {
 			}
 			stopCharge();
 		}
-		chargeLogic();
+		chargeGfx();
 
 		Helpers.decrementTime(ref zeroLemonCooldown);
 
@@ -930,8 +929,8 @@ public class Zero : Character {
 			else zeroShootSprite = "zero_fall_shoot";
 		}
 		// Zero MMXOD Vanilla intended balance: Z-Buster Cancel on Zerofallstabland
-		if (shootAnimTime == 0f && (		
-			charState is ZeroFallStabLand 
+		if (shootAnimTime == 0f && (
+			charState is ZeroFallStabLand
 		)) {
 			changeToIdleOrFall();
 		}
@@ -1352,5 +1351,39 @@ public class Zero : Character {
 
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Special1, player) || player.input.isHeld(Control.Shoot, player);
+	}
+
+	public override bool canAirJump() {
+		return dashedInAir == 0;
+	}
+
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+		int paletteNum = 0;
+		if (blackZeroTime > 3) {
+			paletteNum = 1;
+		} else if (blackZeroTime > 0) {
+			int mod = MathInt.Ceiling(blackZeroTime) * 2;
+			paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
+		}
+		if (paletteNum != 0) {
+			palette = player.zeroPaletteShader;
+			palette?.SetUniform("palette", paletteNum);
+			palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
+		}
+		if (isNightmareZeroBS.getValue()) {
+			palette = player.nightmareZeroShader;
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
 	}
 }

@@ -522,7 +522,7 @@ public class Axl : Character {
 				stopCharge();
 			}
 		}
-		chargeLogic();
+		chargeGfx();
 
 		bool canShoot = (undisguiseTime == 0 && assassinTime == 0);
 		if (canShoot) {

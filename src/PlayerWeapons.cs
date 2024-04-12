@@ -342,6 +342,11 @@ label:
 				//	if (hasFullGiga()) weapons.Add(new GigaCrush());
 				//	if (HasFullForce()) weapons.Add(new NovaStrike(this));
 				}
+				// Removed X AI having all weapons
+				// Well I'm putting it back you can't stop me gacel
+				// that AI sucks if you Disable
+				// The AI's ilegal moves that's the only
+				// Way to make it viable
 				else if (isAI) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
@@ -472,6 +477,7 @@ label:
 					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
 				}
+				/* Removed Axl AI having all weapons
 				else if (isAI) {
 					weapons.Add(new AxlBullet());
 					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
@@ -482,7 +488,7 @@ label:
 					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
 				//	weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));}
-
+				*/
 				 else {
 					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 					weapons.Insert(0, getAxlBullet(axlBulletType));

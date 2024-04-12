@@ -10,6 +10,8 @@ public class CharState {
 	public string shootSprite;
 	public string transitionSprite;
 	public string landSprite;
+	public string airSprite;
+	public bool wasGrounded = true;
 	public Point busterOffset;
 	public Character character;
 	public Collider lastLeftWallCollider;
@@ -53,6 +55,7 @@ public class CharState {
 	// Control system.
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
+	public bool[] altAttackCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
 	public bool canStopJump;
@@ -96,17 +99,13 @@ public class CharState {
 		if (newState is not Dash &&
 			newState is not Jump &&
 			newState is not Fall &&
-			!(newState.useDashJumpSpeed && (character.grounded || character.vel.y < 0))
+			!(newState.useDashJumpSpeed && (!character.grounded || character.vel.y < 0))
 		) {
-			if (character.isDashing && newState is AirDash) {
-				character.dashedInAir++;
-			}
-			if (character.isDashing && newState is UpDash) {
-				character.dashedInAir++;
-			}
 			character.isDashing = false;
 		}
-		if (newState is Hurt || newState is Die || newState is Frozen || newState is Crystalized || newState is Stunned) {
+		if (newState is Hurt || newState is Die ||
+			newState is Frozen || newState is Crystalized || newState is Stunned
+		) {
 			character.onFlinchOrStun(newState);
 		}
 		if (character.mk5RideArmorPlatform != null && (
@@ -134,6 +133,7 @@ public class CharState {
 			character.useGravity = false;
 			character.stopMoving();
 		}
+		wasGrounded = character.grounded;
 	}
 
 	public virtual bool canEnter(Character character) {
@@ -248,7 +248,19 @@ public class CharState {
 			lastRightWallCollider = rightActor.collider;
 		}
 
-		if (character.grounded && !string.IsNullOrEmpty(landSprite) && sprite != landSprite) {
+		airTrasition();
+		wasGrounded = character.grounded;
+	}
+
+	public virtual void airTrasition() {
+		if (airSprite != null && !character.grounded && wasGrounded && sprite != airSprite) {
+			sprite = airSprite;
+			int oldFrameIndex = character.sprite.frameIndex;
+			float oldFrameTime = character.sprite.frameTime;
+			character.changeSprite(sprite, false);
+			character.sprite.frameIndex = oldFrameIndex;
+			character.sprite.frameTime = oldFrameTime;
+		} else if (landSprite != null && character.grounded && !wasGrounded && sprite != landSprite) {
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
@@ -841,7 +853,7 @@ public class Dash : CharState {
 		enterSound = "dash";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
-		exitOnAirborne = true;
+		//exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
@@ -986,6 +998,10 @@ public class Dash : CharState {
 				"dust", initialDashDir, player.getNextActorNetId(), true,
 				sendRpc: true
 			);
+		}
+		if (!character.grounded) {
+			character.dashedInAir++;
+			character.changeState(new Fall());
 		}
 	}
 }

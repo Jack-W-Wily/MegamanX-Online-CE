@@ -313,7 +313,11 @@ public partial class MegamanX : Character {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				player.weapon.ammo = Helpers.clampMax(player.weapon.ammo + 1, player.weapon.maxAmmo);
+				if (!player.hasArmArmor(3)) {			
 				playSound("heal", forcePlay: true);
+				} else {
+				playSound("healX3", forcePlay: true);
+				}
 			}
 		}
 
@@ -662,7 +666,7 @@ public partial class MegamanX : Character {
 		player.changeWeaponControls();
 //		}
 
-		chargeLogic();
+		chargeGfx();
 
 		if (charState is Hurt || charState is Die) {
 			shotgunIceChargeTime = 0;
@@ -1066,7 +1070,7 @@ public partial class MegamanX : Character {
 
 	// Fast upgrading via command key.
 	public void quickArmorUpgrade() {
-		if (!player.input.isHeld(Control.Special2, player)) {
+		if (!player.input.isHeld(Control.Special1, player)) {
 			hyperProgress = 0;
 			return;
 		}
@@ -1117,7 +1121,7 @@ public partial class MegamanX : Character {
 
 	// BARRIER SECTION
 
-	public Anim barrierAnim;
+	public Anim? barrierAnim;
 	public float barrierTime;
 	public bool barrierFlinch;
 	public float barrierDuration { get { return barrierFlinch ? 1.5f : 0.75f; } }
@@ -1557,7 +1561,53 @@ public partial class MegamanX : Character {
 		return player.input.isHeld(Control.Shoot, player);
 	}
 
+	public override bool canAirDash() {
+		return dashedInAir == 0 || (dashedInAir == 1 && player.hasChip(0));
+	}
+
 	public override string getSprite(string spriteName) {
 		return "mmx_" + spriteName;
+	}
+
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+		int index = player.weapon.index;
+
+		if (index == (int)WeaponIds.GigaCrush ||
+			index == (int)WeaponIds.ItemTracer ||
+			index == (int)WeaponIds.AssassinBullet ||
+			index == (int)WeaponIds.Undisguise ||
+			index == (int)WeaponIds.UPParry
+		) { 
+			index = 0;
+		}
+		if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
+			index = player.weapons[player.hyperChargeSlot].index;
+		}
+		if (player.hasGoldenArmor()) {
+			index = 25;
+		}
+		if (hasUltimateArmorBS.getValue()) {
+			index = 0;
+		}
+		palette = player.xPaletteShader;
+
+		if (!isCStingInvisibleGraphics()) {
+			palette?.SetUniform("palette", index);
+			palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
+		} else {
+			palette?.SetUniform("palette", (this as MegamanX).cStingPaletteIndex % 9);
+			palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
 	}
 }

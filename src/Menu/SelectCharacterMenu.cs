@@ -24,6 +24,18 @@ public class PlayerCharData {
 	}
 }
 
+public enum CharIds {
+	X,
+	Zero,
+	Vile,
+	Axl,
+	Sigma,
+	PunchyZero,
+	BusterZero,
+	// Non vanilla chars start here.
+	Rock = 10,
+}
+
 public class CharSelection {
 	public string name;
 	public int mappedCharNum;
@@ -31,6 +43,7 @@ public class CharSelection {
 	public int mappedCharMaverick;
 	public string sprite;
 	public int frameIndex;
+	public Point offset = new Point(0, 0);
 
 	public static int sigmaIndex {
 		get {
@@ -98,7 +111,10 @@ public class CharSelection {
 		}
 	}
 
-	public CharSelection(string name, int mappedCharNum, int mappedCharArmor, int mappedCharMaverick, string sprite, int frameIndex) {
+	public CharSelection(
+		string name, int mappedCharNum, int mappedCharArmor,
+		int mappedCharMaverick, string sprite, int frameIndex
+	) {
 		this.name = name;
 		this.mappedCharNum = mappedCharNum;
 		this.mappedCharArmor = mappedCharArmor;
@@ -280,7 +296,11 @@ public class SelectCharacterMenu : IMainMenu {
 		string sprite = charSelection.sprite;
 		int frameIndex = charSelection.frameIndex;
 		float yOff = sprite.EndsWith("_idle") ? (Global.sprites[sprite].frames[0].rect.h() * 0.5f) : 0;
-		Global.sprites[sprite].drawToHUD(frameIndex, charPosX1, charPosY1 + yOff);
+		Global.sprites[sprite].drawToHUD(
+			frameIndex,
+			charPosX1 + charSelection.offset.x,
+			charPosY1 + yOff + charSelection.offset.y
+		);
 
 		// Draw text
 
@@ -300,14 +320,28 @@ public class SelectCharacterMenu : IMainMenu {
 		);
 
 		string[] description = playerData.charNum switch {
-			0 => new string[]{
+			(int)CharIds.X => new string[]{
 				"A versatile marksman whose arsenal can",
 				"accommodate a variety of different play styles."
 			},
-			1 => new string[] { "Powerful melee warrior", "with high damage combos." },
-			2 => new string[] { "Unpredictable threat that can self-revive", "and call down Ride Armors." },
-			3 => new string[] { "Precise and deadly close range assassin", "with aiming and rapid fire capabilities." },
-			4 => new string[] { "A fearsome military commander that can", "summon Mavericks on the battlefield." },
+			(int)CharIds.Zero => new string[] {
+				"Powerful melee warrior", "with high damage combos."
+			},
+			(int)CharIds.Vile => new string[] {
+				"Unpredictable threat that can self-revive", "and call down Ride Armors."
+			},
+			(int)CharIds.Axl => new string[] {
+				"Precise and deadly close range assassin", "with aiming and rapid fire capabilities."
+			},
+			(int)CharIds.Sigma => new string[] {
+				"A fearsome military commander that can", "summon Mavericks on the battlefield."
+			},
+			(int)CharIds.BusterZero => new string[] {
+				"Fast ranged marksman", "with a simple but strong buster combo."
+			},
+			(int)CharIds.PunchyZero => new string[] {
+				"Close range melee brawler", "that can counter the enemy attacks."
+			},
 			_ => new string[] { "ERROR" }
 		};
 		if (description.Length > 0) {

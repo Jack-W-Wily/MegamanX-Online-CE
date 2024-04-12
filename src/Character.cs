@@ -387,8 +387,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override List<ShaderWrapper> getShaders() {
 		var shaders = new List<ShaderWrapper>();
-		ShaderWrapper palette = null;
-
+		ShaderWrapper? palette = null;
 
 		// TODO: Send this to the respective classes.
 
@@ -442,10 +441,7 @@ public partial class Character : Actor, IDamagable {
 			palette = player.viralSigmaShader;
 			palette?.SetUniform("palette", paletteNum);
 			palette?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
-		} else if (player.isSigma3()) {
-			if (Global.isOnFrameCycle(8)) palette = player.sigmaShieldShader;
 		}
-
 		if (palette != null) shaders.Add(palette);
 
 		if (player.isPossessed()) {
@@ -865,6 +861,16 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void onCollision(CollideData other) {
+		if (charState is KKnuckleParryStartState punchParry &&
+			other.gameObject is Projectile proj &&
+			punchParry.canParry(proj) &&
+			proj.owner.alliance != player.alliance &&
+			proj.damager?.damage > 0 &&
+			!Damager.isDot(proj.projId)
+		) {
+			punchParry.counterAttack(proj.owner, proj, proj.damager.damage);
+			return;
+		}
 		base.onCollision(other);
 		if (other.myCollider?.flag == (int)HitboxFlag.Hitbox || other.myCollider?.flag == (int)HitboxFlag.None) return;
 
@@ -1133,7 +1139,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (!ownedByLocalPlayer) {
 			if (isCharging()) {
-				chargeLogic();
+				chargeGfx();
 			} else {
 				stopCharge();
 			}
@@ -1290,7 +1296,12 @@ public partial class Character : Actor, IDamagable {
 					if (acidTime < 0) removeAcid();
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
+					if (!player.hasChip(2)) {
 					playSound("heal", forcePlay: true, sendRpc: true);
+					}
+					else {
+					playSound("MMX3-GoldenHelmetHP" , forcePlay: true, sendRpc: true);
+					}
 				}
 			}
 		} else {
@@ -1368,10 +1379,12 @@ public partial class Character : Actor, IDamagable {
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
+			dashedInAir = 0;
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide)
 			) {
 				isDashing = true;
+				dashedInAir++;
 			}
 			vel.y = -getJumpPower();
 			wallKickDir = 0;
@@ -1417,6 +1430,9 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (charState.attackCtrl) {
 			return attackCtrl();
+		}
+		if (charState.altAttackCtrls.Any(b => b)) {
+			return altAttackCtrl(charState.altAttackCtrls);
 		}
 		return false;
 	}
@@ -1470,10 +1486,8 @@ public partial class Character : Actor, IDamagable {
 		// Air normal states.
 		else {
 			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
-				if (!isDashing) {
-					changeState(new AirDash(dashControl));
-					return true;
-				}
+				changeState(new AirDash(dashControl));
+				return true;
 			}
 			if (canAirJump()) {
 				if (player.input.isPressed(Control.Jump, player) && canJump()) {
@@ -1481,9 +1495,10 @@ public partial class Character : Actor, IDamagable {
 				}
 				if ((player.input.isPressed(Control.Jump, player) ||
 					Global.time - lastJumpPressedTime < 0.1f) &&
-					!isDashing && wallKickTimer <= 0 && flag == null &&
+					wallKickTimer <= 0 && flag == null &&
 					!sprite.name.Contains("kick_air")
 				) {
+					lastJumpPressedTime = 0;
 					dashedInAir++;
 					vel.y = -getJumpPower();
 					changeState(new Jump(), true);
@@ -1542,6 +1557,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool attackCtrl() {
+		return false;
+	}
+
+	public virtual bool altAttackCtrl(bool[] ctrls) {
 		return false;
 	}
 
@@ -1627,14 +1646,14 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public void chargeLogic() {
+	public virtual void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();
 		}
 		if (isCharging()) {
 			chargeSound.play();
 			int chargeType = 0;
-			if (player.isZBusterZero()) {
+			if (this is BusterZero) {
 				chargeType = 1;
 			} else if (player.isX && player.HasFullMax()) {
 				if (player.hasGoldenArmor()) {
@@ -2018,10 +2037,20 @@ public partial class Character : Actor, IDamagable {
 
 	public int getChargeLevel() {
 		bool clampTo3 = true;
-		if (this is Zero zero) clampTo3 = !zero.canUseDoubleBusterCombo();
-		if (this is Vile vile) clampTo3 = vile.vileForm == 0;
-		if (this is MegamanX mmx) clampTo3 = mmx.CurrentArmor == 0;
-
+		switch (this) {
+			case MegamanX mmx:
+				clampTo3 = !mmx.isHyperX;
+				break;
+			case Zero zero:
+				clampTo3 = !zero.canUseDoubleBusterCombo();
+				break;
+			case Vile vile:
+				clampTo3 = !vile.isVileMK5;
+				break;
+			case BusterZero:
+				clampTo3 = false;
+				break;
+		}
 		if (chargeTime < charge1Time) {
 			return 0;
 		} else if (chargeTime >= charge1Time && chargeTime < charge2Time) {
@@ -2675,7 +2704,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			// If is under 1 we just apply it as is.
 			else {
-				damage += decDamage; 
+				damage += decDamage;
 			}
 		}
 		// First we apply debt then savings.
@@ -2770,10 +2799,22 @@ public partial class Character : Actor, IDamagable {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
+					if (gigaCrush.ammo < 32) {
+						playSound("MMX2-GigaCrushRecharge");	
+					}
+					if (gigaCrush.ammo == 32 && player.health < 8 && player.health > 4) {
+						playSound("MMX2-GigaCrushFull");	
+					}
 				}
 				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
 				if (hyperBuster != null) {
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
+					if (hyperBuster.ammo < 32){
+						playSound("MMX3-HyperchargeRecharge");	
+					}
+					if (hyperBuster.ammo == 32 && player.health < 8 && player.health > 4) {
+						playSound("MMX3-HyperchargeFull");	
+					}
 				}
 				var novaStrike = player.weapons.FirstOrDefault(w => w is NovaStrike);
 				if (novaStrike != null) {
@@ -3344,7 +3385,7 @@ public partial class Character : Actor, IDamagable {
 				}
 				stopCharge();
 			}
-			chargeLogic();
+			chargeGfx();
 		}
 	
 		/*
@@ -3393,6 +3434,30 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool chargeButtonHeld() {
 		return false;
+	}
+
+
+	public virtual void chargeLogic(Action<int> shootFunct) {
+		// Charge shoot logic.
+		// We test if we are holding charge and not inside a vehicle.
+		if (chargeButtonHeld() && flag == null && rideChaser == null && rideArmor == null) {
+			// If we are holding but we cannot charge we do not release.
+			if (canCharge()) {
+				increaseCharge();
+			}
+		}
+		// Release charge only if not holding and we can attack.
+		// This to prevent from losing charge.
+		else if (charState.attackCtrl) {
+			int chargeLevel = getChargeLevel();
+			if (isCharging()) {
+				if (chargeLevel >= 1) {
+					shootFunct(chargeLevel);
+				}
+			}
+			stopCharge();
+		}
+		chargeGfx();
 	}
 }
 

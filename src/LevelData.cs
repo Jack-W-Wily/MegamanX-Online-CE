@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
+using SFML.Audio;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -522,35 +523,34 @@ public class LevelData {
 		}
 
 		if (name == "japetribute_1v1") {
-			return "japetribute_1v1";
+			return "MMX1-Demo";
 		}
 		if (name == "dopplerlab_1v1") {
 			return "goliath";
 		}
 		if (name == "zerovirus_1v1") {
-			return "x_vs_zero_x5";
+			return "MMX5-XvsZeroV2-megasfc";
 		} else if (players.Count == 2 && is1v1() && ((players[0].isZero && players[1].isX) || (players[0].isX && players[1].isZero))) {
-			return "x_vs_zero_x5";
+			return "MMX5-XvsZeroV2-megasfc";
 		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickFakeZero() || players[1].is1v1MaverickFakeZero())) {
-			return "x_vs_zero";
-		} else if (players.Count == 2 && is1v1() && (players[0].isNon1v1MaverickSigma() || players[1].isNon1v1MaverickSigma())) {
-			if (players[0].isSigma1AndSigma() || players[1].isSigma1AndSigma()) return "sigmabattle";
-			else if (players[0].isSigma2AndSigma() || players[1].isSigma2AndSigma()) return "sigmabattle2";
-			else return "sigmabattle3";
+			return "MMX2-ZerosRebirth";
+		} else if 
+		(players.Count == 2 && is1v1() && (players[0].isNon1v1MaverickSigma() || players[1].isNon1v1MaverickSigma())) 
+		{
+			if (players[0].isSigma1AndSigma() || players[1].isSigma1AndSigma()) return "MMX1-SigmaBattle";
+
+			else if (players[0].isSigma2AndSigma() || players[1].isSigma2AndSigma()) return "MMX2-GrimVigilante";
+
+			else return "MMX3-Sigma";
 		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX1() || players[1].is1v1MaverickX1())) {
-			return "bossroom";
+			return "MMX1-BossBattle";
 		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX2() || players[1].is1v1MaverickX2())) {
-			return "boss2";
+			return "MMX2-TheBattleEnsues";
 		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX3() || players[1].is1v1MaverickX3())) {
-			return "boss3";
+			return "MMX3-MaverickBattle";
 		} else if (players.Count == 2 && name == "highway_1v1" && (players[0].isVile || players[1].isVile)) {
-			return "vile";
+			return "MMX1-Vile";
 		} else {
-			if (name == "centralcomputer_1v1") return "boss2";
-			if (name == "forest2" || name == "forest3") return "forest";
-			if (name == "powerplant2") return "powerplant";
-			if (name == "giantdam2") return "giantdam";
-			if (name.Contains("sigma4")) return "bossroom";
 			return Helpers.removeMapSuffix(name);
 		}
 		if (isCustomMap) {
@@ -578,14 +578,18 @@ public class LevelData {
 	}
 
 	public string getWinTheme() {
-		if (name.Contains("xhunter1") || name.Contains("deepseabase") || name.Contains("maverickfactory") || name.Contains("robotjunkyard") || name.Contains("volcaniczone") || name.Contains("dinosaurtank") || name.Contains("centralcomputer")
+		if (name.Contains("xhunter1") || name.Contains("deepseabase") || name.Contains("maverickfactory") ||
+			 name.Contains("robotjunkyard") || name.Contains("volcaniczone") || name.Contains("dinosaurtank") || name.Contains("centralcomputer")
 			|| name.Contains("crystalmine") || name.Contains("desertbase") || name.Contains("weathercontrol")) {
-			return "win_x2";
+			return "MMX2-MissionAccomplished";
 		}
-		if (name.Contains("hunterbase") || name.Contains("giantdam") || name.Contains("weaponsfactory") || name.Contains("frozentown") || name.Contains("aircraftcarrier") || name.Contains("powercenter") || name.Contains("shipyard") || name.Contains("quarry") || name.Contains("safaripark") || name.Contains("dopplerlab")) {
-			return "win_x3";
+		if (name.Contains("hunterbase") || name.Contains("giantdam") || name.Contains("weaponsfactory") ||
+		 name.Contains("frozentown") || name.Contains("aircraftcarrier") || name.Contains("powercenter") || name.Contains("shipyard") || 
+		 name.Contains("quarry") || name.Contains("safaripark") || name.Contains("dopplerlab")) {
+
+			return "MMX3-Victory";
 		}
-		return "win";
+		return "MMX1-BossDefeated";
 	}
 
 	public Texture getMapThumbnail() {

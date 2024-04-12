@@ -425,9 +425,6 @@ public enum ProjIds {
 	ZBuster2,
 	ZBuster3,
 	ZBuster4,
-	ZBuster2b,
-	ZBuster3b,
-	ZBuster4b,
 	Shingetsurin,
 	AwakenedAura,
 	FSplasher,
@@ -437,15 +434,6 @@ public enum ProjIds {
 	SuiretsusanProj,
 	TBreaker,
 	TBreakerProj,
-	KKnuckle,
-	KKnuckle2,
-	KKnuckleAirKick,
-	KKnuckleSpinKick,
-	KKnuckleShoryuken,
-	KKnuckleDropKick,
-	KKnuckleMegaPunch,
-	KKnuckleParryStart,
-	KKnuckleParry,
 
 
 	//VilePRojIDS
@@ -709,9 +697,33 @@ public enum ProjIds {
 	RideChaserHit,
 	RideChaserCrash,
 	DarkHold,
-	KillZone,
+
+	// PunchyZeroStuff
+	PZeroPunch,
+	PZeroPunch2,
+	PZeroAirKick,
+	PZeroSenpuukyaku, // Spin kick
+	PZeroShoryuken, // Air Upercut
+	PZeroEnkoukyaku, // Drop Kick
+	PZeroYoudantotsu, // Strong Punch
+	PZeroParryStart,
+	PZeroParryAttack,
+
+	// Dark Zero buster.
+	DZBuster,
+	DZBuster2,
+	DZBuster3,
+	DZBuster4,
+	DZMelee,
+	DZHadangeki,
+
+	// Special damage types.
+	SelfDmg = 30000,
+
+	// Enviroment effect shenanigans.
+	KillZone = 32000,
 
 	// Close to the int16 max value.
 	// Do not add things bellow this.
-	SelfDmg = 32700,
+	SelfDestruct = 32700,
 }

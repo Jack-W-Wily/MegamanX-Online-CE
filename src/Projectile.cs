@@ -40,7 +40,16 @@ public class Projectile : Actor {
 	public Player ownerPlayer;
 	public Actor hitboxActor;
 
-	public Projectile(Weapon weapon, Point pos, int xDir, float speed, float damage, Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer) : base(sprite, pos, netId, ownedByLocalPlayer, false) {
+	public bool isMelee;
+	public int meleeId = -1;
+
+	public Projectile(
+		Weapon weapon, Point pos, int xDir, float speed, float damage,
+		Player player, string sprite, int flinch, float hitCooldown, ushort? netId, bool ownedByLocalPlayer,
+		bool addToLevel = true
+	) : base(
+		sprite, pos, netId, ownedByLocalPlayer, !addToLevel
+	) {
 		this.weapon = weapon;
 		this.speed = speed;
 		vel = new Point(speed * xDir, 0);
@@ -160,7 +169,7 @@ public  void isGaeaproj() {
 				return;
 			}
 		} else {
-			if (time > maxTime * 1.5 ||
+			if (time > maxTime + 0.1 ||
 				moveDistance > maxDistance ||
 				pos.x > Global.level.width + leeway ||
 				pos.x < -leeway ||
@@ -653,14 +662,17 @@ public  void isGaeaproj() {
 	}
 
 	private void rpcCreateHelper(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		int xDirOrAngle, bool isAngle,
 		params byte[] extraData
 	) {
+		if (netProjId == null) {
+			throw new Exception($"Attempt to create RPC of projectile type {this.GetType().ToString()} with null ID");
+		}
 		byte[] projIdBytes = BitConverter.GetBytes((ushort)projId);
 		byte[] xBytes = BitConverter.GetBytes(pos.x);
 		byte[] yBytes = BitConverter.GetBytes(pos.y);
-		byte[] netProjIdByte = BitConverter.GetBytes(netProjId);
+		byte[] netProjIdByte = BitConverter.GetBytes(netProjId.Value);
 		// Create bools of data.
 		byte dataInf = Helpers.boolArrayToByte(new bool[] {
 			isAngle,
@@ -686,14 +698,14 @@ public  void isGaeaproj() {
 	}
 
 	public virtual void rpcCreate(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		int xDir, params byte[] extraData
 	) {
 		rpcCreateHelper(pos, player, netProjId, xDir, false, extraData);
 	}
 
 	public virtual void rpcCreateAngle(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round((angle / 1.40625f) % 256f);
@@ -701,7 +713,7 @@ public  void isGaeaproj() {
 	}
 
 	public virtual void rpcCreateByteAngle(
-		Point pos, Player player, ushort netProjId,
+		Point pos, Player player, ushort? netProjId,
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round(angle % 256f);
