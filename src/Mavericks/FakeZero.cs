@@ -271,7 +271,7 @@ public class FakeZeroShoot2State : MaverickState {
 				maverick.playSound("zbuster3", sendRpc: true);
 				new FakeZeroBuster2Proj(maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 			} else if (shootNum == 2) {
-				maverick.playSound("beamsaber", sendRpc: true);
+				maverick.playSound("AzsaberX5", sendRpc: true);
 				new FakeZeroSwordBeamProj(maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 			shootNum++;

@@ -55,9 +55,9 @@ public class PunchyZero : Character {
 		return false;
 	}
 
-	public override bool canAirJump() {
-		return dashedInAir == 0;
-	}
+	//public override bool canAirJump() {
+	//	return dashedInAir == 0;
+	//}
 
 	public override string getSprite(string spriteName) {
 		return "zero_" + spriteName;

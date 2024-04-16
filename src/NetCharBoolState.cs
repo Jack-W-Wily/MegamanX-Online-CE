@@ -194,19 +194,25 @@ public partial class Character {
 
 	public NetCharBoolState isBurnerXBS;
 	public NetCharBoolState isMizuXBS;
+	public NetCharBoolState vileEXTriggerBS;
+	public NetCharBoolState vileSTriggerBS;
 
 
 
 	
 
 	public void initNetCharState4() {
-		isBurnerXBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Three, (character) => {	return character.player.hasBurnerX(); });
-		isMizuXBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.Three, (character) => { return character.player.hasMizuX(); });
+		isBurnerXBS = new NetCharBoolState(this, 0, NetCharBoolStateNum.Four, (character) => {	return character.player.hasBurnerX(); });
+		isMizuXBS = new NetCharBoolState(this, 1, NetCharBoolStateNum.Four, (character) => { return character.player.hasMizuX(); });
+		vileEXTriggerBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.Four, (character) => { return character.player.VavaEXTrigger(); });
+		vileSTriggerBS  = new NetCharBoolState(this, 3, NetCharBoolStateNum.Four, (character) => { return character.player.VavaSTrigger(); });
 	}
 
 	public byte updateAndGetNetCharState4() {
 		isBurnerXBS.updateValue();
 		isMizuXBS.updateValue();
+		vileEXTriggerBS.updateValue();
+		vileSTriggerBS.updateValue();
 	
 		return netCharState4;
 	}

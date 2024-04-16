@@ -81,7 +81,7 @@ public partial class Level {
 	public int height;
 	public bool equalCharDistribution;
 	public bool supportsRideChasers;
-	public bool rideArmorFlight;
+	public bool rideArmorFlight = true;
 	public bool hasMovingPlatforms { get { return movingPlatforms.Count > 0; } }
 
 	public float syncValue;

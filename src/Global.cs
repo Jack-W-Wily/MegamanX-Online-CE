@@ -16,7 +16,7 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "WC 3.0";
+	public static string versionName = "WC 3.1";
 	public static string subVersionName = "Alpha 11";
 	public static string subVersionShortName = "a11";
 
@@ -432,6 +432,8 @@ public partial class Global {
 			{ "bhornet_jump", "bhornet_exit" },
 
 			{ "drdoppler_jump", "drdoppler_exit" },
+
+			{ "vilemk5_revive", "vilemk5_revive_to5" },
 
 			{ "sigma3_kaiser_idle_body", "sigma3_kaiser_taunt_body" },
 			{ "sigma3_kaiser_empty", "sigma3_kaiser_empty_fadeout" }

@@ -258,6 +258,7 @@ public class Massenkou : CharState {
 		float y = character.pos.y;
 		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
 			fired = true;
+			character.playSound("cflasher", sendRpc: true);	
 			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
 		character.pos.addxy(6 * character.xDir, 0), character.xDir, 
 		player, player.getNextActorNetId(), rpc: true);
@@ -271,7 +272,7 @@ public class Massenkou : CharState {
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.38f, -0.92f, player, player.getNextActorNetId(), 45, rpc: true);
 				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 1, 0, player, player.getNextActorNetId(), 0, rpc: true);
 			}
-				character.playSound("cflasher", sendRpc: true);		
+					
 		if (character.isAnimOver()) {
 			character.changeState(new Idle());
 		}
@@ -294,7 +295,7 @@ public class RakuhouhaProj : Projectile {
 		float yVel, Player player, ushort netProjId, int angle, bool rpc = false
 	) : base(
 		weapon, pos, xVel >= 0 ? 1 : -1, 300, 1, player, isCFlasher ? "cflasher" : "rakuhouha",
-		Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer
+		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		this.isCFlasher = isCFlasher;
 

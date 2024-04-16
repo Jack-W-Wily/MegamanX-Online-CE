@@ -99,6 +99,7 @@ public partial class Character : Actor, IDamagable {
 	public float useGrabCooldown;
 	public float grabtimeout;
 	public float stockedChargeFlashTime;
+	public float BurstCooldown;
 
 	private float UPDamageCooldown;
 
@@ -220,10 +221,11 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["revive"] = null;
 		spriteToCollider["revive_to5"] = null;
 		spriteToCollider["die"] = null;
+		if (charState is VileMK2Grabbed) spriteToCollider["die"] = null;
 		spriteToCollider["block"] = getBlockCollider();
 
 		changeState(initialCharState);
-
+  
 		visible = isVisible;
 
 		chargeTime = 0;
@@ -605,14 +607,14 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canAirDash() {
 		if (infectedTime > 2f) return false;
-		if (this is MegamanX mmx){ 
-		if (mmx.isIX && mmx.IXTimer < 10f) return false;
+		if (player.isX && this is MegamanX mmx){ 
+		if (player.isX && mmx.isIX && mmx.IXTimer < 10f) return false;
 		if (player.isX && player.loadout.xLoadout.melee == 0 && mmx.CurrentArmor < 2){
 		return false;
 		}
-		//return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
+		return  dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
 		}
-		return dashedInAir == 0 || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
+		return !player.isX && dashedInAir == 0;// || (dashedInAir == 1 && player.isX && player.hasGoldenArmor());
 	}
 
 	public bool canAirJump() {
@@ -931,8 +933,24 @@ public partial class Character : Actor, IDamagable {
 
 
 	public override void update() {
-
-
+		//Burst System
+		Helpers.decrementTime(ref BurstCooldown);
+		if (player.input.isPressed(Control.WeaponLeft, player) &&
+			player.input.isPressed(Control.WeaponRight, player) &&
+			BurstCooldown == 0 && player.currency > 1 &&
+				(sprite.name.Contains("grabbed") || 
+				sprite.name.Contains("hurt") || 
+				sprite.name.Contains("knocked")
+				)
+			){
+		playSound("gigaCrushLate", forcePlay: false, sendRpc: true);
+		player.currency -= 2;
+		BurstCooldown = 10;
+		changeToIdleOrFall(); 
+		new MechFrogStompShockwave(new MechFrogStompWeapon(player), pos.addxy(-10 * xDir, 0f), xDir, player, player.getNextActorNetId(), rpc: true);
+			}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// New Presing system
 		Helpers.decrementTime(ref inputdecreasedCD);
 		if (player.input.isPressed(Control.Down, player)){
 		downpressedtimes += 1;
@@ -942,6 +960,7 @@ public partial class Character : Actor, IDamagable {
 		if (inputdecreasedCD == 0){
 		downpressedtimes = 0;
 		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (charState is Idle) {
 		CanOnhitCancel = false;
 		}
@@ -957,6 +976,7 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementTime(ref JumpCancelTime);
 
 		if (sprite.name.Contains("_grab")) useGrabCooldown = 1.5f;
+
 		if (ownedByLocalPlayer && player.possessedTime > 0) {
 			player.possesseeUpdate();
 		}

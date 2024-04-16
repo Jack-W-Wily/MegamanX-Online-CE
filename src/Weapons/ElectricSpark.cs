@@ -30,7 +30,7 @@ public class ElectricSpark : Weapon {
 				if (chargeLevel >= 3) {
 				new ElectricSparkProjChargedStart(this, pos, xDir, player, netProjId);
 				}
-				if (chargeLevel != 0 && chargeLevel < 3 ) {
+				if (chargeLevel >= 2 && chargeLevel < 3 ) {
 		 		new PeaceOutRollerProj(player.vileBallWeapon, 
 				pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
 				}

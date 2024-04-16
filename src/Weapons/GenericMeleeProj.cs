@@ -1,5 +1,8 @@
 ﻿namespace MMXOnline;
 
+using System;
+using System.Collections.Generic;
+
 public class GenericMeleeProj : Projectile {
 	public Actor owningActor;
 
@@ -80,6 +83,74 @@ public class GenericMeleeProj : Projectile {
 		}
 	}
 
+
+	public void charGrabMaverick(
+		CommandGrabScenario scenario, Character grabber,
+		IDamagable damagable, CharState grabState, MaverickState grabbedState,
+		int projId
+	) {
+		if (grabber == null || !(damagable is Maverick maverick) || !maverick.canBeGrabbed(grabber.player.id, projId)) {
+			return;
+		}
+		if (!owner.isDefenderFavored) {
+			if (ownedByLocalPlayer && !Helpers.isOfClass(grabber.charState, grabState.GetType())) {
+				base.owner.character.changeState(grabState);
+				if (Global.isOffline) {
+					maverick.changeState(grabbedState);
+				} else {
+					RPC.grabMaverick.sendRpc(
+						grabber.netId, maverick.netId,
+						scenario, isDefenderFavored: false,
+						projId
+					);
+				}
+			}
+		} else if (maverick.ownedByLocalPlayer && !Helpers.isOfClass(maverick.state, grabbedState.GetType())) {
+			maverick.changeState(grabbedState);
+			if (Helpers.isOfClass(maverick.state, grabbedState.GetType())) {
+				RPC.grabMaverick.sendRpc(
+						grabber.netId, maverick.netId,
+						scenario, isDefenderFavored: true,
+						projId
+				);
+			}
+		}
+	}
+
+	public void maverickGrabOther(
+		CommandGrabScenario scenario, Maverick grabber,
+		IDamagable damagable, MaverickState grabbedState, int projId
+	) {
+		
+		if (!(damagable is Maverick maverick) || !maverick.canBeGrabbed(grabber.player.id, projId)) {
+			return;
+		}
+		if (!owner.isDefenderFavored) {
+			if (ownedByLocalPlayer) {
+				if (Global.isOffline) {
+					maverick.changeState(grabbedState);
+				} else {
+					RPC.grabMaverick.sendRpc(
+						grabber.netId, maverick.netId,
+						scenario, isDefenderFavored: false,
+						projId
+					);
+				}
+			}
+		} else if (maverick.ownedByLocalPlayer &&
+			!Helpers.isOfClass(maverick.state, grabbedState.GetType())
+		) {
+			maverick.changeState(grabbedState);
+			if (Helpers.isOfClass(maverick.state, grabbedState.GetType())) {
+				RPC.grabMaverick.sendRpc(
+					grabber.netId, maverick.netId,
+					scenario, isDefenderFavored: true,
+					projId
+				);
+			}
+		}
+	}
+
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 
@@ -89,22 +160,26 @@ public class GenericMeleeProj : Projectile {
 			}
 		}
 		//>>> Zero Uppercut Bullshit
-		/*
+		
 		if (projId == (int)ProjIds.Ryuenjin || projId == (int)ProjIds.EBlade || projId == (int)ProjIds.Rising){
 			if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = proj.MathF.Sign(pos.x - chr.pos.x);
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 0 * modifier, -300));
 			}
-		}*/
+		}
 		// Command grab section
 		Character grabberChar = owner.character;
 		Character grabbedChar = damagable as Character;
 		if (projId == (int)ProjIds.UPGrab) {
 			charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new XUPGrabState(grabbedChar), new UPGrabbed(grabberChar));
-		}  if (projId == (int)ProjIds.VileMK2Grab) {
+		}
+		if (projId == (int)ProjIds.VileGrab) {
+			charGrabCode(CommandGrabScenario.UPGrab, grabberChar, damagable, new VileGrabState(grabbedChar), new UPGrabbed(grabberChar));
+		}
+		  if (projId == (int)ProjIds.VileMK2Grab) {
 			charGrabCode(CommandGrabScenario.MK2Grab, grabberChar, damagable, new VileMK2GrabState(grabbedChar), new VileMK2Grabbed(grabberChar));
 		}	
 		  if (projId == (int)ProjIds.LaunchODrain && owningActor is LaunchOctopus lo) {

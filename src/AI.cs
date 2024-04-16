@@ -1545,7 +1545,7 @@ public class AI {
 				return;
 			}
 
-			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= 16) {
+			if (player.HasFullMax() && player.canUpgradeGoldenX() && player.health >= 16) {
 				if (!player.character.boughtGoldenArmorOnce) {
 					player.currency -= Player.goldenArmorCost;
 					player.character.boughtGoldenArmorOnce = true;

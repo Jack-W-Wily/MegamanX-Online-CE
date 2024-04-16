@@ -122,8 +122,8 @@ public class Dynamo : Character {
 					{
 				if (NightmareBullets > 0)
 					{
-			if (NightmareBullets != 2)changeState(new DynamoShoot(grounded, shootProj: false), forceChange: true);
-			if (NightmareBullets == 2)changeState(new DynamoNightmareBullet(grounded, shootProj: false), forceChange: true);			
+			if (NightmareBullets != 3)changeState(new DynamoShoot(grounded, shootProj: false), forceChange: true);
+			if (NightmareBullets == 3)changeState(new DynamoNightmareBullet(grounded, shootProj: false), forceChange: true);			
 				NightmareBullets -= 1;				
 					}
                  changeState(new DynamoParryStartState());

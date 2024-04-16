@@ -381,7 +381,7 @@ public class FireNadeAttack : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
+		if (character.sprite.frameIndex >= 0 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
 			character.vel.y = -character.getJumpPower() * 1.5f;
@@ -486,9 +486,21 @@ public class HoutenjinStartState : CharState {
 		superArmor = true;
 	}
 
+	
+
 	public override void update() {
 		base.update();
-
+		CrystalHunterCharged proj;
+		CrystalHunterCharged proj2;
+		CrystalHunterCharged proj3;
+		CrystalHunterCharged proj4;
+		if (stateTime < 0.1f){
+		proj =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
+		proj2 =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
+		proj3 =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
+		proj4 =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
+				
+		}
 		if (stateTime < 0.1f) {
 			character.turnToInput(player.input, player);
 		}
@@ -505,6 +517,9 @@ public class HoutenjinStartState : CharState {
 		base.onExit(newState);
 		character.parryCooldown = character.maxParryCooldown;
 	}
+
+
+	
 
 	public bool canParry(Actor damagingActor) {
 		var proj = damagingActor as Projectile;
@@ -574,6 +589,7 @@ public class HoutenjinState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
@@ -605,6 +621,12 @@ public class DragonsWrath : CharState {
 			if (character.grounded){
 			isGrounded = true;
 			}
+
+
+			if (!character.grounded){
+			if (player.input.isHeld(Control.Jump, player)){
+			character.useGravity = false;} else {character.useGravity = true;}
+			}
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
 			if (shootTime > 0.06f && poi != null) {
@@ -614,7 +636,11 @@ public class DragonsWrath : CharState {
 				}
 				shootTime = 0;
 				character.playSound("flamethrower");
-				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				if (player.input.isHeld(Control.WeaponLeft, player) && !character.grounded){
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
+				} 
+				else {	new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				}
 			}
 
 			if (character.loopCount > 4) {
@@ -661,6 +687,12 @@ public class SeaDragonRageAttack : CharState {
 			if (character.grounded){
 			isGrounded = true;
 			}
+
+
+			if (!character.grounded){
+			if (player.input.isHeld(Control.Jump, player)){
+			character.useGravity = false;} else {character.useGravity = true;}
+			}
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
 			if (shootTime > 0.06f && poi != null) {
@@ -670,7 +702,11 @@ public class SeaDragonRageAttack : CharState {
 				}
 				shootTime = 0;
 				character.playSound("flamethrower");
-				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				if (player.input.isHeld(Control.WeaponLeft, player) && !character.grounded){
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi.Value, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
+				} 
+				else {	new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				}
 			}
 
 			if (character.loopCount > 4) {
@@ -685,6 +721,7 @@ public class SeaDragonRageAttack : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
@@ -717,6 +754,12 @@ public class WildHorseKick : CharState {
 			if (character.grounded){
 			isGrounded = true;
 			}
+
+
+			if (!character.grounded){
+			if (player.input.isHeld(Control.Jump, player)){
+			character.useGravity = false;} else {character.useGravity = true;}
+			}
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
 			if (shootTime > 0.06f && poi != null) {
@@ -726,7 +769,11 @@ public class WildHorseKick : CharState {
 				}
 				shootTime = 0;
 				character.playSound("flamethrower");
-				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				if (player.input.isHeld(Control.WeaponLeft, player) && !character.grounded){
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), poi.Value, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
+				} 
+				else {	new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				}
 			}
 
 			if (character.loopCount > 4) {
@@ -741,6 +788,7 @@ public class WildHorseKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
@@ -807,7 +855,7 @@ public class MK2NapalmProj : Projectile {
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -30));
+			chr.move(new Point(xMoveVel * 50 * modifier, -50));
 		}
 	}
 

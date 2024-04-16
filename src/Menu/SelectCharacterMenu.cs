@@ -25,15 +25,20 @@ public class PlayerCharData {
 }
 
 public enum CharIds {
-	X,
-	Zero,
-	Vile,
-	Axl,
-	Sigma,
-	PunchyZero,
-	BusterZero,
+	X = 0,
+	Zero = 1,
+	Vile = 2,
+	Axl = 3,
+	Sigma = 4,
+	Dynamo = 5,
+	Iris = 6,
+	GBD = 7,
+	Lumine = 8,
+	PunchyZero = 11,
+	BusterZero = 12,
 	// Non vanilla chars start here.
 	Rock = 10,
+
 }
 
 public class CharSelection {

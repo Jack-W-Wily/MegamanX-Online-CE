@@ -16,6 +16,21 @@ public class RPC {
 	// Need templates? Use these:
 	// -Sending a value to an actor: RPCChangeDamage
 
+
+	public static HdmCustomRPC hdmCustomRPC;
+
+	public static RPC_CreditKillOther creditKillOther = new RPC_CreditKillOther();
+
+	public static RPC_GiveMaverickAmmo giveMaverickAmmo = new RPC_GiveMaverickAmmo();
+
+	public static RPC_UpdateHdmPlayer updateHdmPlayer = new RPC_UpdateHdmPlayer();
+
+	//public static RPC_CreateEffect createEffect;
+
+	public static RPC_maverickGrabMaverick grabMaverick = new RPC_maverickGrabMaverick();
+
+	
+
 	public static RPCSendString sendString;
 	public static RPCStartLevel startLevel;
 	public static RPCSpawnCharacter spawnCharacter;
@@ -173,6 +188,9 @@ public class RPC {
 			(healDoppler = new RPCHealDoppler()),
 			(resetFlags = new RPCResetFlag()),
 			(custom = new RPCCustom()),
+			(grabMaverick = new RPC_maverickGrabMaverick()),
+			(hdmCustomRPC = new HdmCustomRPC()),
+			//(createEffect = new RPC_CreateEffect()),
 		};
 
 	public virtual void invoke(params byte[] arguments) {

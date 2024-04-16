@@ -354,6 +354,44 @@ public class Zero : Character {
 					playSound: false, resetCooldown: true
 				);
 			}
+
+			//>>>>>>>>>>>>>>>>>
+		//Giga Attacks
+
+		if (downpressedtimes >= 2 && player.input.isPressed(Control.Special1, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+				
+				downpressedtimes = 0;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= 10) {
+					zeroGigaAttackWeapon.addAmmo(-10, player);		
+					changeState(new Massenkou(zeroGigaAttackWeapon), true);					
+				}
+			}
+		}
+		if (downpressedtimes < 2 && grounded && player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Special1, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+			
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= 16) {
+					zeroGigaAttackWeapon.addAmmo(-16, player);		
+					changeState(new Rakuhouha(zeroGigaAttackWeapon), true);				
+				}
+			}
+		}
+		
+		if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.WeaponLeft, player) && player.input.isPressed(Control.WeaponRight, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+			
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= 32) {
+					zeroGigaAttackWeapon.addAmmo(-32, player);		
+					changeState(new Rekkoha(zeroGigaAttackWeapon), true);					
+				}
+			}
+		}
+		
+		//>>>>>>>>>>>>>>>>>>
 			return;
 		}
 
@@ -486,10 +524,10 @@ public class Zero : Character {
 			}
 		}
 
-		if (charState.canAttack() &&
-			charState is Idle && !player.hasKnuckle() &&
+		if (
 			((sprite.name.EndsWith("_attack") && frameIndex > 3f) ||
-			(sprite.name.EndsWith("_attack2")  && frameIndex > 3f)) &&
+			(sprite.name.EndsWith("_attack2")  && frameIndex > 3f)
+			|| sprite.name.EndsWith("_land")) &&
 			spcPressed &&
 			!player.input.isHeld(Control.Up, player) &&
 			!player.input.isHeld(Control.Down, player)
@@ -837,7 +875,7 @@ public class Zero : Character {
 				raijingekiWeapon, centerPoint, ProjIds.Raijingeki, player, 1, 0, 0.06f
 			),
 			"zero_raijingeki2" => new GenericMeleeProj(
-				raijingeki2Weapon, centerPoint, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 0.06f
+				raijingeki2Weapon, centerPoint, ProjIds.Raijingeki2, player, 1, 0, 0.06f
 			),
 			"zero_tbreaker" => new GenericMeleeProj(
 				raijingekiWeapon, centerPoint, ProjIds.TBreaker, player, 4, Global.defFlinch, 0.5f
@@ -849,7 +887,10 @@ public class Zero : Character {
 				new EBladeWeapon(player), centerPoint, ProjIds.EBlade, player, 1, Global.defFlinch, 0.1f
 			),
 			"zero_rising" => new GenericMeleeProj(
-				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 1, 0.15f
+				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1, 1, 0.15f
+			),
+			"zero_rising2" => new GenericMeleeProj(
+				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 1, 0.25f
 			),
 			"superzero_attack" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 1, 0.25f, isReflectShield: false
@@ -1036,7 +1077,7 @@ public class Zero : Character {
 					}
 				}
 				if (type != 2) {new ZBuster2Proj(
-					zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+					zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 				);}
 			} else if (chargeLevel == 2) {
 				if (type != 2){
@@ -1353,9 +1394,9 @@ public class Zero : Character {
 		return player.input.isHeld(Control.Special1, player) || player.input.isHeld(Control.Shoot, player);
 	}
 
-	public override bool canAirJump() {
-		return dashedInAir == 0;
-	}
+//	public override bool canAirJump() {
+//		return dashedInAir == 0;
+//	}
 
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();

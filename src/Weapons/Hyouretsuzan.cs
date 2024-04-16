@@ -64,10 +64,13 @@ public class ZeroFallStab : CharState {
 	public bool canFreeze;
 	public Zero zero;
 
+
+
 	public ZeroFallStab(Weapon weapon) : base(
 		getSpriteName(weapon.type) + "_fall", "", "", getSpriteName(weapon.type) + "_start"
 	) {
 		this.weapon = weapon;
+		airMove = true; 
 	}
 
 	public static string getSpriteName(int type) {
@@ -78,6 +81,47 @@ public class ZeroFallStab : CharState {
 
 	public override void update() {
 		base.update();
+			if (character.canAirJump() && player.input.isPressed("jump", player) && character.dashedInAir == 0) {
+			string dashButton = "dash";
+			if (player.input.isHeld(dashButton, base.player)) {
+				character.isDashing = true;
+			}
+			character.vel.y = 0f - character.getJumpPower();
+			character.changeState(new Jump());
+			character.dashedInAir += 1;
+			return;
+		}
+		if (!character.ownedByLocalPlayer)
+		{
+			return;
+		}
+		if (isUnderwaterQuakeBlazer() && !sprite.EndsWith("_water"))
+		{
+			transitionSprite = transitionSprite ?? "";
+			sprite += "_water";
+			defaultSprite += "_water";
+			character.changeSpriteFromName(sprite, resetFrame: false);
+		}
+
+		float moveSpeed = character.getRunSpeed();
+		if (type == ZeroFallStabType.Rakukojin) {
+			moveSpeed *= 0.3f;
+		}
+
+		if (type != ZeroFallStabType.DropKick)
+		{
+			if (base.player.input.isHeld("left", base.player))
+			{
+				character.xDir = -1;
+				character.move(new Point(-moveSpeed, 0f));
+			}
+			else if (base.player.input.isHeld("right", base.player))
+			{
+				character.xDir = 1;
+				character.move(new Point(moveSpeed, 0f));
+			}
+		}
+
 		if (isUnderwaterQuakeBlazer()) {
 			if (!sprite.EndsWith("_water")) {
 				transitionSprite += "";

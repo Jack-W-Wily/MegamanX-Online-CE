@@ -229,6 +229,10 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.Dynamo, new List<SubTank>() },
+		{ (int)CharIds.GBD, new List<SubTank>() },
+		{ (int)CharIds.Iris, new List<SubTank>() },
+		{ (int)CharIds.Lumine, new List<SubTank>() },
 	};
 	// Heart tanks
 	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
@@ -240,6 +244,10 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, 0 },
 		{ (int)CharIds.BusterZero, 0 },
 		{ (int)CharIds.Rock, 0 },
+		{ (int)CharIds.Dynamo, 0 },
+		{ (int)CharIds.GBD, 0 },
+		{ (int)CharIds.Lumine, 0 },
+		{ (int)CharIds.Iris, 0 },
 	};
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -440,6 +448,7 @@ public partial class Player {
 	public ShaderWrapper spnongeChargeShader;
 	// New Shaders
 	public List<ShaderWrapper> omegaAuraShader;
+	public List<ShaderWrapper> darknessmodeShader;
 	public List<ShaderWrapper> lastStandShader;
 
 
@@ -573,6 +582,7 @@ public partial class Player {
 		predatorcloakShader?.SetUniform("alpha", 0.2f);
 		// HDM Shaders
 		omegaAuraShader = new(){Helpers.cloneShaderSafe("omega")};
+		darknessmodeShader = new(){Helpers.cloneShaderSafe("darknessmode")};
 		lastStandShader = new(){Helpers.cloneShaderSafe("trail")};
 	}
 
@@ -718,10 +728,10 @@ public partial class Player {
 
 	public void applyLoadoutChange() {
 		loadout = LoadoutData.createFromOptions(id);
-		if (isSigma && Global.level.is1v1()) {
-			if (maverick1v1 != null) loadout.sigmaLoadout.commandMode = 3;
-			else loadout.sigmaLoadout.commandMode = 1;
-		}
+		if (isSigma) loadout.sigmaLoadout.commandMode = 1;// && Global.level.is1v1()) {
+	//		if (maverick1v1 != null) loadout.sigmaLoadout.commandMode = 3;
+	//		else loadout.sigmaLoadout.commandMode = 1;
+	//	}
 
 		syncLoadout();
 	}
@@ -1072,23 +1082,27 @@ public partial class Player {
 				}
 			} else if (charNum == (int)CharIds.Rock) {
 				character = new Rock(
-			} else if (charNum == 5) {
+					
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			} else if (charNum == (int)CharIds.Dynamo) {
 				character = new Dynamo(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			}else if (charNum == 6) {
+			}else if (charNum == (int)CharIds.GBD) {
 				character = new GBD(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			}else if (charNum == 7) {
+			}else if (charNum == (int)CharIds.Iris) {
 				character = new Iris(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
 			}
-			else if (charNum == 8) {
+			else if (charNum == (int)CharIds.Lumine) {
 				character = new Lumine(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
@@ -1098,9 +1112,9 @@ public partial class Player {
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false
 				);
-			} else {
-				throw new Exception("Error: Non-valid char ID: " + charNum);
-			}
+			} //else {
+			//	throw new Exception("Error: Non-valid char ID: " + charNum);
+			//}
 			// Hyper mode overrides (POST)
 			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
 				if (isX) {
@@ -1552,7 +1566,7 @@ public partial class Player {
 		return false;//character != null &&
 			//isX && !isDisguisedAxl &&
 			//character.charState is not Die && !Global.level.is1v1() &&
-			//!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && scrap >= ultimateArmorCost;
+			//!hasUltimateArmor() && !canUpgradeGoldenX() && hasAllArmor() && currency= ultimateArmorCost;
 	}
 
 	public void destroy() {
@@ -1722,6 +1736,15 @@ public partial class Player {
 	ExplodeDieEffect explodeDieEffect;
 	public Character limboChar;
 
+
+	 public bool VavaEXTrigger() {
+		return character != null && character is Vile vile && vile.vileRespawnCount == 1;
+	}
+
+	 public bool VavaSTrigger() {
+		return character != null && character is Vile vile && vile.vileRespawnCount == 2;
+	}
+
 	public bool canReviveVile() {
 		if (Global.level.isElimination() ||
 			!lastDeathCanRevive ||
@@ -1798,9 +1821,9 @@ public partial class Player {
 
 		if (toMK5) {
 			vileFormToRespawnAs = 2;
-		} else if (vile.vileForm == 0) {
+		} else if (vile.vileRespawnCount == 0) {
 			vileFormToRespawnAs = 1;
-		} else if (vile.vileForm == 1) {
+		} else if (vile.vileRespawnCount == 1) {
 			vileFormToRespawnAs = 2;
 		}
 
@@ -1823,7 +1846,6 @@ public partial class Player {
 	public void reviveVileNonOwner(bool toMK5) {
 		Vile vile = (character as Vile);
 
-		if (Options.main.swapGoliathInputs) vileFormToRespawnAs = 2;
 		if (toMK5) {
 			vileFormToRespawnAs = 2;
 		} else {

@@ -128,6 +128,9 @@ public class RainStorm : CharState {
 	public RainStorm(bool isUnderwater) : base("rainstorm", "", "") {
 		this.isUnderwater = isUnderwater;
 		superArmor = true;
+		invincible = true;
+		airMove = true;
+		useDashJumpSpeed = true;
 	}
 
 	public override void update() {

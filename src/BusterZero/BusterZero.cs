@@ -123,7 +123,7 @@ public class BusterZero : Character {
 					zeroLemonsOnField.RemoveAt(i);
 				}
 			}
-			if (zeroLemonsOnField.Count >= 3) { return; }
+			if (zeroLemonsOnField.Count >= 1) { return; }
 		}
 		string shootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
@@ -216,13 +216,13 @@ public class BusterZero : Character {
 		return dashSpeed * getRunDebuffs();
 	}
 
-	public override bool canAirDash() {
-		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
-	}
+//	public override bool canAirDash() {
+//		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+//	}
 
-	public override bool canAirJump() {
-		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
-	}
+//	public override bool canAirJump() {
+//		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+//	}
 
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();

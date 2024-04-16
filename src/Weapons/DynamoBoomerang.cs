@@ -71,6 +71,7 @@ public class DynamoBoomerangProj : Projectile {
 	public float maxReverseTime;
 	public float minTime;
 	public float smokeTime;
+	public float projtime;
 	public Actor target;
 	public DynamoBoomerang DynamoBoomerangWeapon;
 
@@ -101,13 +102,11 @@ public class DynamoBoomerangProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (ownedByLocalPlayer && (shooter == null || shooter.destroyed)) {
-			destroySelf("explosion", "explosion", true);
-			return;
-		}
+		projtime = Global.spf;
+		
 		if (owner.character != null) destroySelf("explosion", "explosion", true);
 		
-		if (!locallyControlled) return;
+	//	if (!locallyControlled) return;
 
 			maxReverseTime = 0.4f;
 		
@@ -138,7 +137,7 @@ public class DynamoBoomerangProj : Projectile {
 			if (owner.character.xDir == -1) xDir = 1;
 		
 			Point returnPos = shooter.getCenterPos();
-			if (shooter.sprite.name == "dynamo_rocket_punch") {
+			if (shooter.sprite.name == "vile_rocket_punch") {
 				Point poi = shooter.pos;
 				var pois = shooter.sprite.getCurrentFrame()?.POIs;
 				if (pois != null && pois.Count > 0) {
@@ -148,7 +147,7 @@ public class DynamoBoomerangProj : Projectile {
 			}
 
 			move(pos.directionToNorm(returnPos).times(speed));
-			if (pos.distanceTo(returnPos) < 10) {
+			if (projtime > 0.3f && pos.distanceTo(returnPos) < 10) {
 				returned = true;
 				destroySelf();
 			}
@@ -179,7 +178,7 @@ public class DynamoBoomerangState : CharState {
 
 		Helpers.decrementTime(ref specialPressTime);
 
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+		if (proj != null && !player.input.isHeld(Control.Shoot, player) && proj.time >= proj.minTime) {
 			proj.reversed = true;
 		}
 
@@ -232,7 +231,7 @@ public class DynamoString1 : CharState {
 
 	public override void update()
 	{
-	
+		
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));

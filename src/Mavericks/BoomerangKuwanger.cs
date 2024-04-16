@@ -15,7 +15,7 @@ public class BoomerangKuwanger : Maverick {
 	public BoomerangKuwanger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
+		//stateCooldowns.Add(typeof(BoomerangKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
 
 		//gravityModifier = 2.25f;
@@ -71,7 +71,7 @@ public class BoomerangKuwanger : Maverick {
 				} else if (specialPressed() && !bald) {
 					if (ammo >= 8) {
 						deductAmmo(8);
-					changeState(new BoomerKDeadLiftState());
+					changeState(new BoomerangKDeadLiftState());
 					}
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
@@ -81,7 +81,7 @@ public class BoomerangKuwanger : Maverick {
 				}
 			} else if (state is BoomerKTeleportState teleportState && teleportState.onceTeleportInSound) {
 				if (specialPressed() && !bald) {
-					changeState(new BoomerKDeadLiftState());
+					changeState(new BoomerangKDeadLiftState());
 				}
 			}
 		} else {
@@ -91,7 +91,7 @@ public class BoomerangKuwanger : Maverick {
 					var chr = enemyPlayer.character;
 					if (!chr.canBeDamaged(player.alliance, player.id, null)) return;
 					if (isFacing(chr) && getCenterPos().distanceTo(chr.getCenterPos()) < 10) {
-						changeState(new BoomerKDeadLiftState());
+						changeState(new BoomerangKDeadLiftState());
 					}
 				}
 			}
@@ -123,7 +123,7 @@ public class BoomerangKuwanger : Maverick {
 		return new MaverickState[]
 		{
 				getShootState(),
-				new BoomerKDeadLiftState(),
+				new BoomerangKDeadLiftState(),
 				new BoomerKTeleportState(),
 		};
 	}
@@ -408,11 +408,11 @@ public class BoomerKDashState : MaverickState {
 	}
 }
 
-public class BoomerKDeadLiftState : MaverickState {
+public class BoomerangKDeadLiftState : MaverickState {
 	private Character grabbedChar;
 	float timeWaiting;
 	bool grabbedOnce;
-	public BoomerKDeadLiftState() : base("deadlift") {
+	public BoomerangKDeadLiftState() : base("deadlift") {
 	}
 
 	public override void onEnter(MaverickState oldState) {

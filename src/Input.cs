@@ -120,6 +120,21 @@ public class Input {
 		return false;
 	}
 
+
+	public float checkYDir(Player player) {
+		float dPadDirY = 0;
+		bool pressedDir = false;
+		if (isHeld("up", player)) { dPadDirY--; pressedDir = true; }
+		if (isHeld("down", player)) { dPadDirY++; pressedDir = true; }
+		if (dPadDirY == 0 && pressedDir) {
+			dPadDirY = -lastDirPressed.y;
+		} else {
+			lastDirPressed.y = (int)dPadDirY;
+		}
+		return dPadDirY;
+	}
+
+
 	// Used by Zero's techniques
 	public bool checkDoubleTap2(string control) {
 		bool gapFound = false;

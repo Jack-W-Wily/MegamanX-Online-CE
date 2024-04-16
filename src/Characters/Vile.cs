@@ -14,6 +14,8 @@ public class Vile : Character {
 	public bool isShootingLongshotGizmo;
 	public int longshotGizmoCount;
 	public float gizmoCooldown;
+
+	public float vilegrabextraCooldown;
 	public float mk2missleCooldown;
 	public float ParasiteSwordcooldown;
 	public bool hasFrozenCastleBarrier() {
@@ -21,10 +23,14 @@ public class Vile : Character {
 	}
 	public bool summonedGoliath;
 	public int vileForm;
+	public int vileRespawnCount = 0;
+
 	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
-	public bool isVileMK5 { get { return vileForm == 2; } }
+	public bool isVileMK5 { get { return vileForm == 2;} }
 	public bool isVileMK4 { get { return vileForm == 3; } }
+
+	public bool isVileMK5EX { get { return vileForm == 2 && vileRespawnCount == 2; } }
 	public float vileHoverTime;
 	public float vileMaxHoverTime = 6;
 
@@ -187,6 +193,8 @@ public class Vile : Character {
 		Helpers.decrementTime(ref vileLadderShootCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
+		Helpers.decrementTime(ref vilegrabextraCooldown);
+		
 		Helpers.decrementTime(ref mk2missleCooldown);
 		Helpers.decrementTime(ref ParasiteSwordcooldown);
 
@@ -283,7 +291,7 @@ public class Vile : Character {
 				return;
 			}
 		}  		
-		if (vileStartRideArmor != null && player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
+		if (vileStartRideArmor != null && player.input.isPressed(Control.Special2, player) && player.input.isHeld(Control.Up, player)) {
 			onMechSlotSelect(mmw);
 			return;
 		}
@@ -306,6 +314,14 @@ public class Vile : Character {
 					vileStartRideArmor.unlinkMK5();
 				}
 			}
+		}
+
+
+		if (isVileMK2 && vileStartRideArmor != null &&
+			player.input.isPressed(Control.Special2, player) &&
+			player.input.isHeld(Control.Down, player)
+		) {
+				vileStartRideArmor.explode(true);
 		}
 
 		if (isVileMK5 && vileStartRideArmor != null &&
@@ -776,6 +792,7 @@ public class Vile : Character {
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, ProjIds.VileMK2Grab, player, 0, 0, 0f);
 		}
+	
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
@@ -785,9 +802,13 @@ public class Vile : Character {
 		{
 			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
 		}
-		 if ( sprite.name.Contains("_string"))
+		 if ( sprite.name.Contains("_string") && charState is not VileMK2GrabState)
 		{
 			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+		}
+		 if ( sprite.name.Contains("_string") && charState is VileMK2GrabState)
+		{
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 1f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		if ( sprite.name.Contains("_flamethrower"))
 		{
@@ -867,6 +888,25 @@ public class Vile : Character {
 		base.changeToIdleOrFall();
 	}
 
+	(float twitch, float grow, int time) omegaAura = new(0.015f, 0, 0);
+    private object isThundergodRageActiveBS;
+
+    void updateOmegaAura() {
+		omegaAura.twitch -= 0.05f;
+		if (omegaAura.twitch < 0.05)
+			omegaAura.twitch = 0.15f;
+
+		if (omegaAura.time >= 0 && omegaAura.time < 50)
+			omegaAura.grow += 0.0025f;
+		else if (omegaAura.time >= 55 && omegaAura.time < 105)	
+			omegaAura.grow -= 0.0025f;
+
+		omegaAura.time++;
+		if (omegaAura.time > 110) {
+			omegaAura.time = 0;
+		}
+	}
+
 	public override void render(float x, float y) {
 		if (isSpeedDevilActiveBS.getValue()) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
@@ -882,6 +922,92 @@ public class Vile : Character {
 			);
 		}
 
+
+		// For drawing the growing aura.
+		if ((
+			(vileEXTriggerBS.getValue())
+		)) {
+			// Position to draw the sprite to.
+			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraAlpha = 0.75f;
+			if (player.isVile) {
+				auraAlpha = 0.4f;
+			}
+
+			if (yDir == -1) {
+				drawY -= reversedGravityOffset+2;
+			}
+
+			// Draw aura.
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex, 
+				drawX, drawY,
+				xDir, yDir,
+				null, auraAlpha,
+				auraSize,
+				auraSize,
+				zIndex -1,
+				player.isVile ? player.lastStandShader : player.omegaAuraShader
+			);
+			updateOmegaAura();
+		}
+
+		if (visible && player.isVile && vileEXTriggerBS.getValue()) {
+			float auraSize = 1 + ((omegaAura.twitch - 0.05f) * 0.77f) + (omegaAura.grow * 0.025f);
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex, 
+				drawX, drawY,
+				xDir, 1,
+				null, 0.7f,
+				auraSize,
+				auraSize,
+				zIndex + 1
+			);
+			updateOmegaAura();
+		}
+
+		if (visible &&  vileSTriggerBS.getValue()) {
+			float auraSize = 1 + ((omegaAura.twitch - 0.05f) * 0.5f) + (omegaAura.grow * 0.25f);
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraSize2 = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX2 = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize2;
+			float drawY2 = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize2 + 1;
+
+			var shaders = player.darknessmodeShader;//new List<ShaderWrapper> { Global.shaderWrappers["darknessmode"] };
+
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex, 
+				drawX, drawY,
+				xDir, 1,
+				null, 1,
+				auraSize,
+				auraSize,
+				zIndex + 1,
+				shaders
+			);
+
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex, 
+				drawX, drawY,
+				xDir, 1,
+				null, 1,
+				auraSize2,
+				auraSize2,
+				zIndex - 1,
+				shaders
+			);
+
+			updateOmegaAura();
+		}
+		
 		if (player.isMainPlayer && isVileMK5 && vileHoverTime > 0 && charState is not HexaInvoluteState) {
 			float healthPct = Helpers.clamp01((vileMaxHoverTime - vileHoverTime) / vileMaxHoverTime);
 			float sy = -27;

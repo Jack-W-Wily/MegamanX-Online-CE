@@ -93,7 +93,7 @@ public class MechDevilBearPunchWeapon : Weapon {
 
 public class MechStompWeapon : Weapon {
 	public MechStompWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
+		damager = new Damager(player, 2, Global.defFlinch, 0.75f);
 		ammo = 0;
 		index = (int)WeaponIds.MechStomp;
 		killFeedIndex = 19;
@@ -102,7 +102,7 @@ public class MechStompWeapon : Weapon {
 
 public class MechKangarooStompWeapon : Weapon {
 	public MechKangarooStompWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
+		damager = new Damager(player, 2, Global.defFlinch, 0.75f);
 		ammo = 0;
 		index = (int)WeaponIds.MechKangarooStomp;
 		killFeedIndex = 58;
@@ -111,7 +111,7 @@ public class MechKangarooStompWeapon : Weapon {
 
 public class MechFrogStompWeapon : Weapon {
 	public MechFrogStompWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
+		damager = new Damager(player, 1.5f, Global.defFlinch, 0.5f);
 		ammo = 0;
 		index = (int)WeaponIds.MechFrogStomp;
 		killFeedIndex = 51;

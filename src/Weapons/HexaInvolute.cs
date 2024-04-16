@@ -45,6 +45,11 @@ public class HexaInvoluteState : CharState {
 
 		if (player.vileAmmo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
 			character.changeToIdleOrFall();
+			proj?.destroySelf();
+		}
+		if (player.currency > 2 && (player.input.isPressed(Control.Taunt, player) && stateTime > 1)) {
+			character.changeToIdleOrFall();
+			player.currency -= 3;
 		}
 	}
 
@@ -62,7 +67,7 @@ public class HexaInvoluteState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		proj?.destroySelf();
+		//proj?.destroySelf();
 		character.useGravity = true;
 	}
 }
@@ -121,7 +126,12 @@ public class HexaInvoluteProj : Projectile {
 
 	public override void update() {
 		base.update();
-
+		if (owner.character == null) destroySelf();
+		if (owner.character != null && owner.input.isPressed(Control.Special2, owner)) destroySelf();
+		if (owner.character != null && owner.character.charState is not HexaInvoluteState){
+		damager.damage = 0.1f;
+		damager.flinch = 0;
+		}
 		if (ownedByLocalPlayer && owner.character != null) {
 			incPos(owner.character.deltaPos);
 		}

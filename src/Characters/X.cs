@@ -164,7 +164,10 @@ public partial class MegamanX : Character {
 		isXKai = true;
 
 
-		if (charState.canAttack()) player.weapon.addAmmo(0.15f, player);
+		if (charState.canAttack() 
+		&& !player.input.isHeld(Control.Shoot,player) 
+		&& !player.input.isHeld(Control.Special1,player)
+		&& !isInvisibleBS.getValue()) {player.weapon.addAmmo(0.15f, player);}
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (player.loadout.xLoadout.melee == 2){
@@ -313,7 +316,7 @@ public partial class MegamanX : Character {
 				weaponHealTime = 0;
 				weaponHealAmount--;
 				player.weapon.ammo = Helpers.clampMax(player.weapon.ammo + 1, player.weapon.maxAmmo);
-				if (!player.hasArmArmor(3)) {			
+				if (!player.HasFullMax()) {			
 				playSound("heal", forcePlay: true);
 				} else {
 				playSound("healX3", forcePlay: true);
@@ -1561,9 +1564,9 @@ public partial class MegamanX : Character {
 		return player.input.isHeld(Control.Shoot, player);
 	}
 
-	public override bool canAirDash() {
-		return dashedInAir == 0 || (dashedInAir == 1 && player.hasChip(0));
-	}
+//	public override bool canAirDash() {
+//		return dashedInAir == 0 || (dashedInAir == 1 && player.hasChip(0));
+//	}
 
 	public override string getSprite(string spriteName) {
 		return "mmx_" + spriteName;

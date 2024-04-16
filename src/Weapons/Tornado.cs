@@ -38,7 +38,7 @@ public class Tornado : Weapon {
 				if (chargeLevel >= 3) {
 				new TornadoProjCharged(this, pos, xDir, player, netProjId);
 				}
-				if (chargeLevel != 0 && chargeLevel < 3 ) {
+				if (chargeLevel >= 2 && chargeLevel < 3 ) {
 		 		new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare),
 				pos, xDir, player, player.getNextActorNetId(), sendRpc: true);
 				}

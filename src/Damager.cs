@@ -360,8 +360,19 @@ public class Damager {
 				if (character.ownedByLocalPlayer && character.charState is not VileMK2Grabbed) {
 				character.changeState(new VileMK2Grabbed(owner.character), true);}			
 				if (owner.character.ownedByLocalPlayer && owner.character.grabtimeout == 0) {
-				owner.character.changeState(new VileMK2GrabState(character));}			
-		} if (projId == (int)ProjIds.UPGrab	&& 
+				owner.character.changeState(new VileMK2GrabState(character));
+				}			
+		} 
+		if (projId == (int)ProjIds.VileGrab && 
+		(owner.character != null || character != null) && character.canBeGrabbed()) {
+				if (character.ownedByLocalPlayer && character.charState is not VileMK2Grabbed) {
+				character.changeState(new VileMK2Grabbed(owner.character), true);}			
+				if (owner.character.ownedByLocalPlayer && owner.character.grabtimeout == 0) {
+				owner.character.changeState(new VileGrabState(character));
+				}			
+		}
+		
+		if (projId == (int)ProjIds.UPGrab	&& 
 			(owner.character != null || character != null) && character.canBeGrabbed()) {
 				if (character.ownedByLocalPlayer && character.charState is not UPGrabbed) {
 				character.changeState(new UPGrabbed(owner.character), true);}
@@ -469,6 +480,11 @@ public class Damager {
 				(owner.character as Zero).zeroGigaAttackWeapon.addAmmo(1, owner);
 			}
 
+			// Hexa Lifesteal
+			if (owner.isVile && projId == (int)ProjIds.HexaInvolute) {
+				owner.character.addHealth(0.1f);
+			}
+
 			
 
 			#endregion
@@ -536,6 +552,10 @@ public class Damager {
 			 damage > 0 && !isArmorPiercing(projId)) {
 					if (damage < 1) {
 						damage = 0;
+						character.playSound("ding");
+					}
+					if (damage > 1) {
+						damage = 1;
 						character.playSound("ding");
 					}
 				}
@@ -733,7 +753,7 @@ public class Damager {
 			}
 
 			if (damage > 0) {
-				if (flinch > 3 && !isOnFlinchCooldown) {
+				if (flinch > 0 && !isOnFlinchCooldown) {
 					if (weakness) {
 						victim.playSound("weakness");
 					} else {

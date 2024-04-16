@@ -466,7 +466,7 @@ public class WarpIn : CharState {
 		character.visible = true;
 		character.useGravity = true;
 		character.splashable = true;
-		if (player.isVile){
+		if (player.isVile && Helpers.randomRange(0, 10) == 10){
 			character.playSound("vileradio", sendRpc: true);	
 		}
 		if (player.isDynamo){
@@ -1789,8 +1789,8 @@ public class Die : CharState {
 		//	player.preTransformedAxl = player.character;
 		//	Global.level.gameObjects.Remove(player.preTransformedAxl);		
 		//}
-		player.lastDeathWasVileMK2 = vile?.isVileMK2 == true;
-		player.lastDeathWasVileMK5 = vile?.isVileMK5 == true;
+		player.lastDeathWasVileMK2 = vile?.vileRespawnCount == 1;
+		player.lastDeathWasVileMK5 = vile?.vileRespawnCount == 2;
 		player.lastDeathWasSigmaHyper = sigma?.isHyperSigma == true || character is KaiserSigma;
 		player.lastDeathWasXHyper = mmx?.isHyperX == true; ;
 		player.lastDeathPos = character.getCenterPos();
@@ -2009,8 +2009,11 @@ public class LaunchedStateF : GenericGrabbedState {
 				return;
 			}
 
-			var hitWall = Global.level.checkCollisionActor(character, character.xDir * 20, -5);
+			var hitWall = Global.level.checkCollisionActor(character, character.xDir * 2, -2);
 			if (hitWall?.isSideWallHit() == true) {
+
+
+
 			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
 				if(!once){
 				player.health -= 3;
@@ -2026,8 +2029,8 @@ public class LaunchedStateF : GenericGrabbedState {
 		if (!launched) {
 				launched = true;
 				character.unstickFromGround();
-				if (character.xDir == 1) character.vel.x = -600;
-				if (character.xDir == -1) character.vel.x = 600;
+				if (character.xDir == 1) character.vel.x = -200;
+				if (character.xDir == -1) character.vel.x = 200;
 			}
 	}
 }

@@ -117,8 +117,8 @@ public class RideArmor : Actor, IDamagable {
 	}
 
 	public void setMaxHealth() {
-		if (raNum == 2) maxHealth = 24; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
-		else if (raNum == 3) maxHealth = 24; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
+		if (raNum == 2) maxHealth = 32; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
+		else if (raNum == 3) maxHealth = 32; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
 		else maxHealth = 32;
 		if (raNum == 4) goliathHealth = 32;
 		maxHealth *= netOwner.getHealthModifier();
@@ -219,7 +219,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (raNum == 4 && character != null && musicSource == null) {
-			addMusicSource("MMX3-DopplerBattle", getCenterPos(), true);
+			addMusicSource("goliath", getCenterPos(), true);
 		}
 		if (character == null && musicSource != null) {
 			destroyMusicSource();
@@ -638,7 +638,7 @@ public class RideArmor : Actor, IDamagable {
 			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player);
 		} else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null && !character.isInvulnBS.getValue()) {
 			bool canDamage = deltaPos.y > 150 * Global.spf;
-			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 4 : null;
+			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 2 : null;
 			if (!canDamage) overrideDamage = 0;
 			ProjIds overrideProjId = sprite.name.EndsWith("groundpound") ? ProjIds.MechFrogGroundPound : ProjIds.MechStomp;
 			if (raNum == 0) proj = new GenericMeleeProj(new MechStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
@@ -849,7 +849,7 @@ public class RideArmor : Actor, IDamagable {
 			return 15;
 		}
 		if (rideArmorState is RAFall raFall && raFall.hovering && raNum != 2) {
-			return 30;
+			return 80;
 		}
 		if (raNum == 3) {
 			if (isSwimming) {
@@ -1609,6 +1609,19 @@ public class RAGroundPoundStart : RideArmorState {
 
 	public override void update() {
 		base.update();
+		var move = new Point(0, 0);
+		if (player.speedDevil){
+		if (player.input.isHeld(Control.Left, player)) {
+			rideArmor.xDir = -1;
+			move.x = -rideArmor.getRunSpeed();
+		} else if (player.input.isHeld(Control.Right, player)) {
+			rideArmor.xDir = 1;
+			move.x = rideArmor.getRunSpeed();
+		}
+		if (move.magnitude > 0) {
+			rideArmor.move(move);
+		}
+		}
 
 		rideArmor.incPos(new Point(0, -200 * Global.spf));
 
@@ -1635,6 +1648,20 @@ public class RAGroundPound : RideArmorState {
 
 	public override void update() {
 		base.update();
+		var move = new Point(0, 0);
+		if (player.speedDevil){
+		if (player.input.isHeld(Control.Left, player)) {
+			rideArmor.xDir = -1;
+			move.x = -rideArmor.getRunSpeed();
+		} else if (player.input.isHeld(Control.Right, player)) {
+			rideArmor.xDir = 1;
+			move.x = rideArmor.getRunSpeed();
+		}
+		if (move.magnitude > 0) {
+			rideArmor.move(move);
+		}
+		}
+
 		if (player == null) return;
 
 		if (rideArmor.grounded) {
@@ -1654,6 +1681,20 @@ public class RAGroundPoundLand : RideArmorState {
 
 	public override void update() {
 		base.update();
+
+		var move = new Point(0, 0);
+		if (player.speedDevil){
+		if (player.input.isHeld(Control.Left, player)) {
+			rideArmor.xDir = -1;
+			move.x = -rideArmor.getRunSpeed();
+		} else if (player.input.isHeld(Control.Right, player)) {
+			rideArmor.xDir = 1;
+			move.x = rideArmor.getRunSpeed();
+		}
+		if (move.magnitude > 0) {
+			rideArmor.move(move);
+		}
+		}
 
 		if (rideArmor.isAnimOver()) {
 			rideArmor.changeState(new RAIdle(), true);

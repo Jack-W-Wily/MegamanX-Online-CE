@@ -800,9 +800,8 @@ public class GameMode {
 			//Global.sprites["axl_cursor"].drawImmediate(0, Global.level.mainPlayer.character.axlCursorPos.x, Global.level.mainPlayer.character.axlCursorPos.y);
 		}
 
+	
 		if (level.mainPlayer.isX && level.mainPlayer.hasFullGiga()) {
-			Player mostRecentlyScanned = null;
-		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(2)) {
 			Player? mostRecentlyScanned = null;
 			foreach (var player in level.players) {
 				if (player.tagged && player.character != null) {
@@ -858,7 +857,7 @@ public class GameMode {
 			}
 		}
 	}
-
+	
 	public void setHUDErrorMessage(Player player, string message, bool playSound = true, bool resetCooldown = false) {
 		if (player != level.mainPlayer) return;
 		if (resetCooldown) hudErrorMsgTime = 0;
@@ -1419,7 +1418,7 @@ public class GameMode {
 		Weapon weapon = player.lastHudWeapon;
 		if (player.character != null) {
 			weapon = player.weapon;
-			if (player.character is Zero zero && !player.isZBusterZero()) {
+			if (player.character is Zero zero) {
 				weapon = zero.zeroGigaAttackWeapon;
 			}
 			player.lastHudWeapon = weapon;

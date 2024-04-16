@@ -18,8 +18,18 @@ public enum SpecialStateIds {
 	None,
 	AxlRoll,
 	HyorogaStart,
-	XTeleport
+	XTeleport,
+
+	XtremeDash,
+	VileDodge,
+	
+	ZeroGravityRoll,
+	FullPowerNova,
+	HalfPowerNova,
+	ForceNovaStrike
 }
+
+
 
 public static class ArmorParts {
 	public static readonly string[] name = {

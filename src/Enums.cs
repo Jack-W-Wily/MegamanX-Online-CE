@@ -146,6 +146,7 @@ public enum WeaponIds {
 	KKnuckleParry,
 	ZeroShoryuken,
 	MegaPunchWeapon,
+	
 	DropKick,
 	DarkHold,
 
@@ -179,6 +180,7 @@ public enum WeaponIds {
 	VileCutter,
 	VileLaser,
 	VileMK2Grab,
+	VileGrab,
 	NecroBurst,
 	RisingSpecter,
 	VileFlamethrower,
@@ -434,6 +436,15 @@ public enum ProjIds {
 	SuiretsusanProj,
 	TBreaker,
 	TBreakerProj,
+	KKnuckle,
+	KKnuckle2,
+	KKnuckleAirKick,
+	KKnuckleSpinKick,
+	KKnuckleShoryuken,
+	KKnuckleDropKick,
+	KKnuckleMegaPunch,
+	KKnuckleParryStart,
+	KKnuckleParry,
 
 
 	//VilePRojIDS
@@ -478,6 +489,7 @@ public enum ProjIds {
 	Napalm2Wall,
 	Napalm2Flame,
 	VileMK2Grab,
+	VileGrab,
 	NecroBurst,
 	NecroBurstShrapnel,
 	RisingSpecter,

@@ -166,6 +166,7 @@ public class HyorogaStartState : CharState {
 	public override void update() {
 		base.update();
 
+		if (player.input.isPressed(Control.Down, player)) character.changeToIdleOrFall();
 		if (character.sprite.name.Contains("hyoroga_rise")) {
 			if (character.deltaPos.isCloseToZero()) {
 				sprite =  "hyoroga_start";

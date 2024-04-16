@@ -22,7 +22,7 @@ public class CallDownMech : CharState {
 
 		if (rideArmor.rideArmorState is not RACalldown) {
 			/*
-			if (character.isVileMK5)
+			if (vile.isVileMK5)
 			{
 				if (stateTime > 0.75f)
 				{
@@ -95,10 +95,14 @@ public class VileRevive : CharState {
 	}
 
 	public void setFlags() {
+
+	
 		if (!isMK5) {
-			vile.vileForm = 1;
+			//vile.vileForm = 1;
+			vile.vileRespawnCount = 1;
 		} else {
-			vile.vileForm = 2;
+			//vile.vileForm = 2;
+			vile.vileRespawnCount = 2;
 		}
 	}
 
@@ -106,7 +110,7 @@ public class VileRevive : CharState {
 		base.onEnter(oldState);
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
-		character.addMusicSource("MMX3-Doppler", character.getCenterPos(), false);
+		//character.addMusicSource("MMX3-Doppler", character.getCenterPos(), false);
 		if (!isMK5) {
 			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
 			drDopplerAnim.fadeIn = true;

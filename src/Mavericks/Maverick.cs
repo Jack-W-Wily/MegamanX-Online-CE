@@ -92,6 +92,10 @@ public class Maverick : Actor, IDamagable {
 	public WeaponIds weakWeaponId;
 	public WeaponIds weakMaverickWeaponId;
 
+	public float grabHitCooldown;
+
+	public bool isInGrabState;
+
 	private Input _input;
 	public Input input {
 		get {
@@ -197,6 +201,15 @@ public class Maverick : Actor, IDamagable {
 		}
 		healAmount += amount;
 	}
+
+
+	
+	public bool canBeGrabbed(int enemyId, int grabId) {
+		return true;
+	}
+
+
+
 
 	public virtual void setHealth(float lastHealth) {
 		health = lastHealth;

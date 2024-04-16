@@ -58,7 +58,7 @@ public class ShingetsurinProj : Projectile {
 		time = startTime;
 		//vel.x *= (1 - startTime);
 		projId = (int)ProjIds.Shingetsurin;
-		ZBuster2Proj.hyorogaCode(this, player);
+		//ZBuster2Proj.hyorogaCode(this, player);
 		canBeLocal = false;
 
 		if (rpc) {
@@ -94,15 +94,15 @@ public class ZBuster2Proj : Projectile {
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster2_fade";
 		reflectable = true;
-		maxTime = 0.5f;
+		maxTime = 0.25f;
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster2;
 			changeSprite("buster2", true);
 		} else {
 			projId = (int)ProjIds.DZBuster2;
-			damager.flinch = 0;
+			maxTime = 0.5f;
 		}
-		ZBuster2Proj.hyorogaCode(this, player);
+		//ZBuster2Proj.hyorogaCode(this, player);
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -129,7 +129,8 @@ public class ZBuster3Proj : Projectile {
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		reflectable = true;
-		maxTime = 0.5f;
+		if (owner.isX) {maxTime = 1.5f;
+			} else {maxTime = 0.25f;}
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster3;
 		} else {
@@ -137,7 +138,7 @@ public class ZBuster3Proj : Projectile {
 			damager.flinch = Global.halfFlinch;
 			damager.damage = 3;
 		}
-		ZBuster2Proj.hyorogaCode(this, player);
+		//.hyorogaCode(this, player);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -154,7 +155,7 @@ public class ZBuster4Proj : Projectile {
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		reflectable = true;
-		maxTime = 0.5f;
+		maxTime = 0.25f;
 		if (type == 0) {
 			projId = (int)ProjIds.ZBuster4;
 		} else {
@@ -162,7 +163,7 @@ public class ZBuster4Proj : Projectile {
 			damager.damage = 3;
 			damager.flinch = Global.halfFlinch;
 		}
-		ZBuster2Proj.hyorogaCode(this, player);
+		//ZBuster2Proj.hyorogaCode(this, player);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -311,9 +312,19 @@ public class ZSaberProjSwingState : CharState {
 	public override void update() {
 		base.update();
 
+		if (player.isZBusterZero() && base.player.input.isPressed("up", base.player)){
+		character.playSound("ZeroSaberX3", forcePlay: false, sendRpc: true);
+		}
+		 if (player.isZBusterZero() && base.player.input.isHeld("up", base.player)){
+		    character.changeSpriteFromName("rising", true);
+			character.dashedInAir++;
+			float ySpeedMod = 0.5f;
+			character.vel.y = (0f - character.getJumpPower()) * ySpeedMod;
+		}
+
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
-			character.playSound("saberShot", sendRpc: true);
+			character.playSound("ZeroSaberX3", forcePlay: false, sendRpc: true);
 			if (shootProj) {
 				new ZSaberProj(
 					new ZSaber(player), character.pos.addxy(30 * character.xDir, -20),
