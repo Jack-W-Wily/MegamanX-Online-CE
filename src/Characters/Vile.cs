@@ -288,13 +288,13 @@ public class Vile : Character {
 
 		// Vile V Ride control.
 
-		if (!isVileMK5 || vileStartRideArmor != null) {
+		if (!isVileMK5 || rideArmor != null) {
 			if (player.input.isPressed(Control.Shoot, player) && mmw != null && calldownMechCooldown == 0) {
 				onMechSlotSelect(mmw);
 				return;
 			}
 		}  		
-		if (vileStartRideArmor != null && player.input.isPressed(Control.Special2, player) && player.input.isHeld(Control.Up, player)) {
+		if (rideArmor != null && player.input.isPressed(Control.Special2, player) && player.input.isHeld(Control.Up, player)) {
 			onMechSlotSelect(mmw);
 			return;
 		}
@@ -320,14 +320,14 @@ public class Vile : Character {
 		}
 
 
-		if (isVileMK2 && vileStartRideArmor != null &&
+		if (isVileMK2 && rideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player)
 		) {
-				vileStartRideArmor.explode(true);
+				rideArmor.explode(true);
 		}
 
-		if (isVileMK5 && vileStartRideArmor != null &&
+		if (isVileMK5 && rideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player)
 		) {
@@ -344,9 +344,9 @@ public class Vile : Character {
 			}
 		}
 
-		/* if (isVileMK5 && vileStartRideArmor != null && mmw != null && grounded && vileStartRideArmor.grounded && player.input.isPressed(Control.Down, player)) {
-			if (vileStartRideArmor.rideArmorState is not RADeactive) {
-				vileStartRideArmor.changeState(new RADeactive(), true);
+		/* if (isVileMK5 && rideArmor != null && mmw != null && grounded && rideArmor.grounded && player.input.isPressed(Control.Down, player)) {
+			if (rideArmor.rideArmorState is not RADeactive) {
+				rideArmor.changeState(new RADeactive(), true);
 				player.changeWeaponSlot(player.prevWeaponSlot);
 				Global.level.gameMode.setHUDErrorMessage(player, "Deactivated Ride Armor.", playSound: false, resetCooldown: true);
 				return;
@@ -668,8 +668,8 @@ public class Vile : Character {
 					mmw.isMenuOpened = false;
 					int raIndex = player.selectedRAIndex;
 					if (isVileMK5 && raIndex >= 0) raIndex = 5;
-					vileStartRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
-					if (vileStartRideArmor.raNum == 4) summonedGoliath = true;
+					rideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
+					if (rideArmor.raNum == 4) summonedGoliath = true;
 					if (isVileMK5) {
 						startRideArmor.ownedByMK5 = true;
 						startRideArmor.zIndex = zIndex - 1;
@@ -829,7 +829,7 @@ public class Vile : Character {
 		if (isShootingLongshotGizmo) {
 			return false;
 		}
-		if (isVileMK5 && player.weapon is MechMenuWeapon && vileStartRideArmor != null) {
+		if (isVileMK5 && player.weapon is MechMenuWeapon && rideArmor != null) {
 			return false;
 		}
 		if (sprite.name.EndsWith("_idle_shoot") && sprite.frameTime < 0.1f) {

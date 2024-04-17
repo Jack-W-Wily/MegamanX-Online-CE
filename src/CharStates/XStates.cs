@@ -56,7 +56,7 @@ public class BladeDash : CharState {
 		player.character.vel = new Point(0, 0);
 		player.character.dashedInAir++;
 		player.character.globalCollider = character.getDashingCollider();
-		player.character.lastAirDashWasSide = true;
+		//player.character.lastAirDashWasSide = true;
 	}
 
 	public override void onExit(CharState newState) {

@@ -119,7 +119,7 @@ public partial class Player {
 	}
 
 	public bool shouldBlockMechSlotScroll() {
-		if (character != null && character.vileStartRideArmor != null && (character as Vile).isVileMK5 == true) {
+		if (character != null && (character as Vile).rideArmor != null && (character as Vile).isVileMK5 == true) {
 			return true;
 		}
 		return true;// Options.main.blockMechSlotScroll;

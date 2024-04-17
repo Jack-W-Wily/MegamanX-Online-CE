@@ -428,7 +428,7 @@ public class UpgradeArmorMenu : IMainMenu {
 			FontType.Grey, "[OK]: Upgrade, [ALT]: Unupgrade, [BACK]: Back",
 			40, Global.screenH - 18
 		);
-	}
+	
 	/*
 	public static bool updateHyperArmorUpgrades(Player mainPlayer) {
 		if (mainPlayer.character == null) return false;
@@ -461,24 +461,25 @@ public class UpgradeArmorMenu : IMainMenu {
 				return true;
 			}
 		}*/
-		return false;
+	//	return false;
+	//}
 	}
-	
+
 	public static void drawHyperArmorUpgrades(Player mainPlayer, int offY) {
 		if (mainPlayer.character == null) return;
 		if (mainPlayer.character.charState is NovaStrikeState) return;
 
 		string specialText = "";
-		if (mainPlayer.canUpgradeUltimateX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
+		/*if (mainPlayer.canUpgradeUltimateX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
 			specialText = ("[SPC]: Ultimate Armor" +
 				(mainPlayer.character.boughtUltimateArmorOnce ? "" : $" (10 {Global.nameCoins})")
 			);
 		} else if (mainPlayer.canUpgradeGoldenX() && mainPlayer.isX && !mainPlayer.isDisguisedAxl) {
 			specialText = (
 				"[SPC]: Hyper Chip" +
-				(mainPlayer.character.boughtGoldenArmorOnce ? "" : $" (5 {Global.nameCoins})")
+				(mainPlayer.(character as MegamanX).boughtGoldenArmorOnce ? "" : $" (5 {Global.nameCoins})")
 			);
-		}
+		}*/
 
 		if (mainPlayer.hasUltimateArmor()) {
 			specialText += "\n[ALT]: Take Off Ultimate Armor";
@@ -501,7 +502,7 @@ public class UpgradeArmorMenu : IMainMenu {
 		}
 
 	}
-	*/
+	
 	public string getHeadArmorMessage() {
 		if (mainPlayer.isHeadArmorPurchased(xGame)) {
 			return mainPlayer.helmetArmorNum == xGame ? " (Active)" : " (Bought)";

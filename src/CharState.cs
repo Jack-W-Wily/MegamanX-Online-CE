@@ -2071,6 +2071,96 @@ public class GenericGrabbedState : CharState {
 	}
 }
 
+
+public class LaunchedState : GenericGrabbedState {
+	public Character grabbedChar;
+	//private bool once;
+	public bool launched;
+	float launchTime;
+	public LaunchedState(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+			for (int i = 1; i <= 4; i++) {
+						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
+						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+							if(!once){
+							player.health -= 3;
+							once = true;
+							}
+							character.playSound("crash", sendRpc: true);
+							character.shakeCamera(sendRpc: true);
+							//return;
+						}
+			}
+		
+		
+		if (!launched) {
+				launched = true;
+				character.unstickFromGround();
+				character.vel.y = -600;
+			}
+	}
+}
+
+}
+
+public class LaunchedStateF : GenericGrabbedState {
+	public Character grabbedChar;
+	//private bool once;
+	public bool launched;
+	float launchTime;
+	public LaunchedStateF(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+				return;
+			}
+
+			var hitWall = Global.level.checkCollisionActor(character, character.xDir * 2, -2);
+			if (hitWall?.isSideWallHit() == true) {
+
+
+
+			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
+				if(!once){
+				player.health -= 3;
+				once = true;
+				}
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(sendRpc: true);
+					//return;
+				}
+			}
+		
+	
+		if (!launched) {
+				launched = true;
+				character.unstickFromGround();
+				if (character.xDir == 1) character.vel.x = -200;
+				if (character.xDir == -1) character.vel.x = 200;
+			}
+	}
+}
+
 public class NetLimbo : CharState {
 	public NetLimbo() : base("idle", "", "", "") {
 

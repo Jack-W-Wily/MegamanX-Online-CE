@@ -70,7 +70,7 @@ public class Buster : Weapon {
 		if (player.hasFullGiga()) {
 			shootSound = chargeLevel switch {
 				_ when (
-					mmx.stockedCharge
+					player.character.stockedCharge
 				) => "",
 				1 => "buster2X2",
 				2 => "buster3X2",
@@ -80,17 +80,17 @@ public class Buster : Weapon {
 		} else if (player.HasFullMax()) {
 			shootSound = chargeLevel switch {
 				_ when (
-					mmx.stockedCharge
+					player.character.stockedCharge
 				) => "",
 				_ when (
-					mmx.stockedX3Buster
+					player.character.stockedX3Buster
 				) => "",
 				1 => "buster2X3",
 				3 => "",
 				_ => shootSound
 			};
 		}
-		if (mmx.stockedX3Buster) {
+		if (player.character.stockedX3Buster) {
 			if (player.ownedByLocalPlayer) {
 				if (player.character.charState is not WallSlide) {
 					shootTime = 0;

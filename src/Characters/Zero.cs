@@ -304,7 +304,7 @@ public class Zero : Character {
 						if (!doubleBusterDone) {
 							changeState(new ZeroDoubleBuster(true, false), true);
 						} else if (xSaberCooldown == 0) {
-							swingStockedSaber();
+							changeState(new ZSaberProjSwingState(grounded, true), true);
 						}
 						return;
 					}
@@ -322,7 +322,7 @@ public class Zero : Character {
 					if (xSaberCooldown == 0) {
 						xSaberCooldown = 1;
 						if (stockedXSaber) {
-							swingStockedSaber();
+							changeState(new ZSaberProjSwingState(grounded, true), true);
 						} else {
 							changeState(new ZSaberProjSwingState(grounded, false), true);
 						}

@@ -75,6 +75,7 @@ public class NovaStrikeState : CharState {
 			character.changeSpriteFromName(sprite, true);
 			return;
 		}
+		}
 
 		if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _)) {
 			player.character.changeState(new Idle(), true);

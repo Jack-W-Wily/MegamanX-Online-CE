@@ -643,9 +643,7 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-			if (drawPlayer.isZero ) {
-				drawZeroGigaCooldown(drawPlayer);
-			}
+			
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
@@ -785,7 +783,7 @@ public class GameMode {
 		else if (level.mainPlayer.character?.isVileMK5Linked() == true)
 		{
 			string rideArmorName = level.mainPlayer.
-				character.vileStartRideArmor?
+				character.rideArmor?
 				.getRaTypeFriendlyName() ?? "Ride Armor";
 			Helpers.drawTextStd
 				TCat.HUD, "Controlling " + rideArmorName,

@@ -289,18 +289,11 @@ public class Weapon {
 		return (shootTime / rateOfFire) < (1 - percent);
 	}
 
-	public virtual void vileShoot(WeaponIds weaponInput, Vile vile) {
-	}
+	
 
-	// For melee / zero weapons, etc.
-	public virtual void attack(Character character) {
+	
 
-	}
-
-	// Raijingeki2, etc.
-	public virtual void attack2(Character character) {
-
-	}
+	
 
 	public void shoot(Point pos, int xDir, Player player, int chargeLevel, ushort netProjId) {
 		if (player.character == null) return;

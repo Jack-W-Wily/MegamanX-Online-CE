@@ -123,9 +123,9 @@ public class UpgradeMenu : IMainMenu {
 					mainPlayer.maxHealth += mainPlayer.getHeartTankModifier();
 					mainPlayer.character?.addHealth(mainPlayer.getHeartTankModifier());
 					/*
-					if (mainPlayer.isVile && mainPlayer.character?.vileStartRideArmor != null)
+					if (mainPlayer.isVile && mainPlayer.character?.rideArmor != null)
 					{
-						mainPlayer.character.vileStartRideArmor.addHealth(mainPlayer.getHeartTankModifier());
+						mainPlayer.character.rideArmor.addHealth(mainPlayer.getHeartTankModifier());
 					}
 					else if (mainPlayer.isSigma && mainPlayer.currentMaverick != null)
 					{
