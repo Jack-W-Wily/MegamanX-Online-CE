@@ -291,7 +291,7 @@ public class VileCutterProj : Projectile {
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
-		if (vileCutterType != VileCutterType.QuickHomesick) return;
+		if (vileCutterType == VileCutterType.MaroonedTomahawk) return;
 
 		if (other.gameObject is Pickup && pickup == null) {
 			pickup = other.gameObject as Pickup;
