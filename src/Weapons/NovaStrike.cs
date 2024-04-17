@@ -8,7 +8,7 @@ namespace MMXOnline;
 
 public class NovaStrike : Weapon {
 	public const float ammoUsage = 16;
-	public NovaStrike(Player player) : base() {
+	public NovaStrike(Player? player) : base() {
 		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		rateOfFire = 1.5f;
 		index = (int)WeaponIds.NovaStrike;
@@ -61,7 +61,11 @@ public class NovaStrikeState : CharState {
 					} else {
 					leftOrRight = 1;
 					sprite = "nova_strike";
-					}
+				}
+				if (Helpers.randomRange(0, 10) < 10) {
+					character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+				} else {
+					character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
 				}
 			} else {
 			leftOrRight = 1;

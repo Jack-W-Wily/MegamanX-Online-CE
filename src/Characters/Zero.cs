@@ -196,7 +196,6 @@ public class Zero : Character {
 		if (dashAttackCooldown > 0) dashAttackCooldown = Helpers.clampMin0(dashAttackCooldown - Global.spf);
 		if (airAttackCooldown > 0) airAttackCooldown = Helpers.clampMin0(airAttackCooldown - Global.spf);
 		Helpers.decrementTime(ref saberCooldown);
-		Helpers.decrementTime(ref xSaberCooldown);
 		Helpers.decrementTime(ref genmuCooldown);
 		Helpers.decrementTime(ref zSaberShotCooldown);
 		Helpers.decrementTime(ref knuckleSoundCooldown);
@@ -237,10 +236,10 @@ public class Zero : Character {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 
 		if (chargeButtonHeld() && (
-			player.currency > 0 || player.isZBusterZero() || player.weapon is AssassinBullet
+			player.currency > 0 || player.weapon is AssassinBullet
 			) && flag == null && rideChaser == null && rideArmor == null
 		) {
-			if (!stockedXSaber && !isInvulnerableAttack()) {
+			if (!isInvulnerableAttack()) {
 				increaseCharge();
 			}
 		} else {
@@ -729,13 +728,6 @@ public class Zero : Character {
 		return false;
 	}
 
-	public void swingStockedSaber() {
-		xSaberCooldown = 1;
-		doubleBusterDone = false;
-		stockSaber(false);
-		changeState(new ZSaberProjSwingState(grounded, true), true);
-	}
-
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name == "zero_attack3") {
@@ -954,7 +946,7 @@ public class Zero : Character {
 		
 		if (!player.isZBusterZero() && player.currency <= 0) return;
 
-		if (player.isZBusterZero() && chargeLevel == 0) {
+		if (chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
 				if (zeroLemonsOnField[i].destroyed) {
 					zeroLemonsOnField.RemoveAt(i);
@@ -1026,11 +1018,10 @@ public class Zero : Character {
 				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
 				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.15f, player, player.getNextActorNetId(), rpc: true);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				}, 0.15f));
-				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.3f, player, player.getNextActorNetId(), rpc: true);
+					new ShingetsurinProj(
+						new Shingetsurin(player), getShootPos(), xDir,
+						0.3f, player, player.getNextActorNetId(), rpc: true
+					);
 					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
 				}, 0.3f));
 			}
@@ -1091,7 +1082,7 @@ public class Zero : Character {
 				} else {
 					playSound("zbuster3", sendRpc: true);
 					new ZBuster4Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
 				}
 				} else {
@@ -1115,7 +1106,7 @@ public class Zero : Character {
 					playSound("zbuster4", sendRpc: true);
 					zeroLemonCooldown = 0.375f;
 					new ZBuster4Proj(
-						zeroBusterWeapon, shootPos, xDir, type, player, player.getNextActorNetId(), rpc: true
+						zeroBusterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 					);
 				}
 				} else {
@@ -1287,22 +1278,24 @@ public class Zero : Character {
 
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
-			Dictionary<int, Func<Projectile>> retProjs = new();
-			retProjs[(int)ProjIds.AwakenedAura] = () => {
-				//playSound("Aura", forcePlay: true, sendRpc: true); 
-				Point centerPoint = globalCollider.shape.getRect().center();
-				float damage = 2;
-				int flinch = 0;
-				if (isAwakenedGenmuZeroBS.getValue()) {
-					damage = 4;
-					flinch = Global.defFlinch;
+			Dictionary<int, Func<Projectile>> retProjs = new() {
+				[(int)ProjIds.AwakenedAura] = () => {
+					//playSound("awakenedAura", forcePlay: true, sendRpc: true); 
+					Point centerPoint = globalCollider.shape.getRect().center();
+					float damage = 2;
+					int flinch = 0;
+					if (isAwakenedGenmuZeroBS.getValue()) {
+						damage = 4;
+						flinch = Global.defFlinch;
+					}
+					Projectile proj = new GenericMeleeProj(
+						awakenedAuraWeapon, centerPoint,
+						ProjIds.AwakenedAura, player, damage, flinch, 0.5f
+					) {
+						globalCollider = globalCollider.clone()
+					};
+					return proj;
 				}
-				Projectile proj = new GenericMeleeProj(
-					awakenedAuraWeapon, centerPoint,
-					ProjIds.AwakenedAura, player, damage, flinch, 0.5f
-				);
-				proj.globalCollider = globalCollider.clone();
-				return proj;
 			};
 		}
 		return base.getGlobalProjs();
@@ -1426,5 +1419,17 @@ public class Zero : Character {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+
+	public override void addAmmo(float amount) {
+		zeroGigaAttackWeapon?.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		zeroGigaAttackWeapon?.addAmmoPercentHeal(amount);
+	}
+
+	public override bool canAddAmmo() {
+		return (zeroGigaAttackWeapon != null && zeroGigaAttackWeapon.ammo < zeroGigaAttackWeapon.maxAmmo);
 	}
 }

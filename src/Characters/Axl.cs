@@ -129,7 +129,7 @@ public class Axl : Character {
 		if (isZoomingOut || isZoomingIn) return false;
 		if (axlCursorTarget == null && axlHeadshotTarget == null) return false;
 		var hitData = getFirstHitPos(player.adjustedZoomRange, ignoreDamagables: true);
-		if (axlCursorTarget != null && axlHeadshotTarget != null){
+		if (axlCursorTarget != null && axlHeadshotTarget != null) {
 			if (hitData.hitGos.Contains(axlCursorTarget) || hitData.hitGos.Contains(axlHeadshotTarget)) {
 				return true;
 			}
@@ -193,7 +193,7 @@ public class Axl : Character {
 						}
 
 						float xLeeway = c.headshotRadius * 5f;
-						float yLeeway = c.headshotRadius * 2.5f;
+						float yLeeway = c.headshotRadius;
 
 						float xDist = MathF.Abs(hitPoint.x - headPos.x);
 						float yDist = MathF.Abs(hitPoint.y - headPos.y);
@@ -1105,7 +1105,7 @@ public class Axl : Character {
 		var hit = Global.level.checkCollisionsShape(shape, new List<GameObject>() { this }).FirstOrDefault(c => c.gameObject is IDamagable);
 		if (hit != null) {
 			var target = hit.gameObject as IDamagable;
-			if(target != null){
+			if (target != null) {
 				if (target.canBeDamaged(player.alliance, player.id, null)) {
 					axlCursorTarget = target;
 				}
@@ -1790,9 +1790,38 @@ public class Axl : Character {
 	}
 
 	public override bool canCrouch() {
-		if (player.input.getXDir(player) != 0 || isSoftLocked() || isDashing) {
+		if (Options.main.axlAimMode == 0 && player.input.getXDir(player) != 0 || isSoftLocked() || isDashing) {
 			return false;
 		}
 		return true;
+	}
+
+	public override void addAmmo(float amount) {
+		getRefillTargetWeapon()?.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		getRefillTargetWeapon()?.addAmmoPercentHeal(amount);
+	}
+
+	public Weapon? getRefillTargetWeapon() {
+		if (player.weapon.canHealAmmo && player.weapon.ammo < player.weapon.maxAmmo) {
+			return player.weapon;
+		}
+		Weapon? targetWeapon = null;
+		float targetAmmo = Int32.MaxValue;
+		foreach (Weapon weapon in player.weapons) {
+			if (!weapon.canHealAmmo) {
+				continue;
+			}
+			if (weapon != player.weapon &&
+				weapon.ammo < weapon.maxAmmo &&
+				weapon.ammo < targetAmmo
+			) {
+				targetWeapon = weapon;
+				targetAmmo = targetWeapon.ammo;
+			}
+		}
+		return targetWeapon;
 	}
 }

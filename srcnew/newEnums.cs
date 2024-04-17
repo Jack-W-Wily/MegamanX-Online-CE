@@ -19,6 +19,7 @@ public enum SpecialStateIds {
 	AxlRoll,
 	HyorogaStart,
 	XTeleport,
+	PZeroParry,
 
 	XtremeDash,
 	VileDodge,

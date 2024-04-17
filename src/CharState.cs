@@ -55,7 +55,7 @@ public class CharState {
 	// Control system.
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
-	public bool[] altAttackCtrls = new bool[1];
+	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
 	public bool canStopJump;
@@ -93,7 +93,7 @@ public class CharState {
 		// Stop the dash speed on transition to any frame except jump/fall (dash lingers in air) or dash itself
 		// TODO: Add a bool here to charstate.
 		if (newState == null) {
-			character.mk5RideArmorPlatform = null;
+			character.rideArmorPlatform = null;
 			return;
 		}
 		if (newState is not Dash &&
@@ -108,11 +108,11 @@ public class CharState {
 		) {
 			character.onFlinchOrStun(newState);
 		}
-		if (character.mk5RideArmorPlatform != null && (
+		if (character.rideArmorPlatform != null && (
 			newState is Hurt || newState is Die ||
 			newState is CallDownMech || newState?.isGrabbedState == true
 		)) {
-			character.mk5RideArmorPlatform = null;
+			character.rideArmorPlatform = null;
 		}
 		if (invincible) {
 			player.delaySubtank();
@@ -185,7 +185,11 @@ public class CharState {
 	}
 
 	public bool inTransition() {
-		return !string.IsNullOrEmpty(transitionSprite) && sprite == transitionSprite && character?.sprite?.name != null && character.sprite.name.Contains(transitionSprite);
+		return (!string.IsNullOrEmpty(transitionSprite) &&
+			sprite == transitionSprite &&
+			character?.sprite?.name != null &&
+			character.sprite.name.Contains(transitionSprite)
+		);
 	}
 
 	public virtual void render(float x, float y) {
@@ -552,10 +556,26 @@ public class Idle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character is MegamanX mmx && (mmx.isHyperX || player.health < 4)) {
-			sprite = "weak";
-			character.changeSpriteFromName("weak", true);
+		if ((character is MegamanX { isHyperX: true } || player.health < 4)) {
+			if (Global.sprites.ContainsKey(character.getSprite("weak"))) {
+				defaultSprite = "weak";
+				if (!inTransition()) {
+					sprite = defaultSprite;
+					character.changeSpriteFromName("weak", true);
+				}
+			}
 		}
+		if ((character is PunchyZero)) {
+			if (player.health < 4) {
+				defaultSprite = "pweak";
+			} else {
+				defaultSprite = "pidle";
+			}
+			if (!inTransition()) {
+				sprite = defaultSprite;
+				character.changeSpriteFromName(sprite, true);
+			}
+		} 
 		character.dashedInAir = 0;
 	}
 
@@ -1087,7 +1107,6 @@ public class AirDash : CharState {
 		character.vel = new Point(0, 0);
 		character.dashedInAir++;
 		character.globalCollider = character.getDashingCollider();
-		character.lastAirDashWasSide = true;
 		new Anim(character.getDashSparkEffectPos(initialDashDir), "dash_sparks", initialDashDir, null, true);
 	}
 
@@ -1111,7 +1130,6 @@ public class UpDash : CharState {
 		character.useGravity = false;
 		character.vel = new Point(0, -4);
 		character.dashedInAir++;
-		character.lastAirDashWasSide = false;
 		character.frameSpeed = 2;
 	}
 
@@ -1503,7 +1521,7 @@ public class Hurt : CharState {
 	public override bool canEnter(Character character) {
 		if (character.isCCImmune()) return false;
 		if (character.vaccineTime > 0) return false;
-		if (character.mk5RideArmorPlatform != null) return false;
+		if (character.rideArmorPlatform != null) return false;
 		return base.canEnter(character);
 	}
 
@@ -1941,97 +1959,10 @@ public class Die : CharState {
 	}
 
 	public void destroyRideArmor() {
-		if (character.vileStartRideArmor != null) {
-			character.vileStartRideArmor.selfDestructTime = Global.spf;
-			RPC.actorToggle.sendRpc(character.vileStartRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
+		if (character.startRideArmor != null) {
+			character.startRideArmor.selfDestructTime = Global.spf;
+			RPC.actorToggle.sendRpc(character.startRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
 		}
-	}
-}
-public class LaunchedState : GenericGrabbedState {
-	public Character grabbedChar;
-	//private bool once;
-	public bool launched;
-	float launchTime;
-	public LaunchedState(Character grabber) : base(grabber, 1, "") {
-		customUpdate = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (launched) {
-			launchTime += Global.spf;
-			if (launchTime > 0.33f) {
-				character.changeToIdleOrFall();
-				return;
-			}
-
-			for (int i = 1; i <= 4; i++) {
-						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
-						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
-							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-							if(!once){
-							player.health -= 3;
-							once = true;
-							}
-							character.playSound("crash", sendRpc: true);
-							character.shakeCamera(sendRpc: true);
-							//return;
-						}
-			}
-		
-		}
-		if (!launched) {
-				launched = true;
-				character.unstickFromGround();
-				character.vel.y = -600;
-			}
-	}
-}
-
-
-public class LaunchedStateF : GenericGrabbedState {
-	public Character grabbedChar;
-	//private bool once;
-	public bool launched;
-	float launchTime;
-	public LaunchedStateF(Character grabber) : base(grabber, 1, "") {
-		customUpdate = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (launched) {
-			launchTime += Global.spf;
-			if (launchTime > 0.33f) {
-			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-				return;
-			}
-
-			var hitWall = Global.level.checkCollisionActor(character, character.xDir * 2, -2);
-			if (hitWall?.isSideWallHit() == true) {
-
-
-
-			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-				if(!once){
-				player.health -= 3;
-				once = true;
-				}
-				character.playSound("crash", sendRpc: true);
-				character.shakeCamera(sendRpc: true);
-					//return;
-				}
-			}
-		
-	
-		if (!launched) {
-				launched = true;
-				character.unstickFromGround();
-				if (character.xDir == 1) character.vel.x = -200;
-				if (character.xDir == -1) character.vel.x = 200;
-			}
 	}
 }
 

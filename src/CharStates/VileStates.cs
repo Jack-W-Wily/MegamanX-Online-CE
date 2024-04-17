@@ -116,8 +116,8 @@ public class VileRevive : CharState {
 			drDopplerAnim.fadeIn = true;
 			drDopplerAnim.blink = true;
 		} else {
-			if (vile.vileStartRideArmor != null) {
-				vile.vileStartRideArmor.ownedByMK5 = true;
+			if (vile.startRideArmor != null) {
+				vile.startRideArmor.ownedByMK5 = true;
 			}
 		}
 	}
@@ -289,7 +289,7 @@ public class VileHover : CharState {
 		if (hoversound != null && !hoversound.deleted) {
 			hoversound.sound?.Stop();
 		}
-		RPC.stopSound.sendRpc("Vilehover", character.netId);
+		RPC.stopSound.sendRpc("vileHover", character.netId);
 
 	}
 }

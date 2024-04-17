@@ -27,20 +27,17 @@ public partial class Character : Actor, IDamagable {
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
 	public float chargeTime;
-	public const float charge1Time = 0.5f;
-	public const float charge2Time = 1.75f;
-	public const float charge3Time = 3f;
-	public const float charge4Time = 4.25f;
+	public float charge1Time = 0.5f;
+	public float charge2Time = 1.75f;
+	public float charge3Time = 3f;
+	public float charge4Time = 4.25f;
 	public float hyperProgress;
 
 	public Point? sigmaHeadGroundCamCenterPos;
 	public float chargeFlashTime;
 	public ChargeEffect chargeEffect;
 	public float shootAnimTime = 0;
-	public AI ai;
-	public bool slowdown;
-	public bool boughtUltimateArmorOnce;
-	public bool boughtGoldenArmorOnce;
+	public AI? ai;
 
 	public bool CanOnhitCancel;
 
@@ -53,9 +50,8 @@ public partial class Character : Actor, IDamagable {
 
 	public float headbuttAirTime = 0;
 	public int dashedInAir = 0;
-	public bool lastAirDashWasSide;
 	public float healAmount = 0;
-	public SubTank usedSubtank;
+	public SubTank? usedSubtank;
 	public float netSubtankHealAmount;
 	public bool playHealSound;
 	public float healTime = 0;
@@ -131,7 +127,7 @@ public partial class Character : Actor, IDamagable {
 	public decimal damageDebt = 0;
 
 	public bool stopCamUpdate = false;
-	public Anim warpBeam;
+	public Anim? warpBeam;
 	public float flattenedTime;
 	public float saberCooldown;
 
@@ -145,9 +141,9 @@ public partial class Character : Actor, IDamagable {
 	public float darkHoldInvulnTime;
 
 	public float limboRACheckCooldown;
-	public RideArmor rideArmor;
-	public RideChaser rideChaser;
-	public Player lastGravityWellDamager;
+	public RideArmor? rideArmor;
+	public RideChaser? rideChaser;
+	public Player? lastGravityWellDamager;
 
 	// Some things previously in other char files used by multiple characters.
 	public int lastShootPressed;
@@ -156,15 +152,14 @@ public partial class Character : Actor, IDamagable {
 	public int framesSinceLastAttack = 1000;
 	public float grabCooldown;
 
-	public RideArmor vileStartRideArmor;
-	public RideArmor mk5RideArmorPlatform;
-	public float calldownMechCooldown;
+	public RideArmor? startRideArmor;
+	public RideArmor? rideArmorPlatform;
 	public const float maxCalldownMechCooldown = 2;
 	public bool alreadySummonedNewMech;
 
 	// Was on Axl.cs before
 	public int lastXDir;
-	public Anim transformAnim;
+	public Anim? transformAnim;
 	float transformSmokeTime;
 
 	// For states with special propieties.
@@ -182,6 +177,12 @@ public partial class Character : Actor, IDamagable {
 	public float wallKickTimer;
 	public int wallKickDir;
 	public float maxWallKickTime = 12;
+
+	public float infectedTime;
+	public Damager infectedDamager;
+	
+	public float vaccineTime;
+	public float vaccineHurtCooldown;
 
 	// Main character class starts here.
 	public Character(
@@ -203,8 +204,8 @@ public partial class Character : Actor, IDamagable {
 		CharState initialCharState;
 
 		if (ownedByLocalPlayer) {
-			if (isWarpIn) initialCharState = new WarpIn();
-			else initialCharState = new Idle();
+			if (isWarpIn) { initialCharState = new WarpIn(); }
+			else { initialCharState = new Idle(); }
 		} else {
 			initialCharState = new NetLimbo();
 			useGravity = false;
@@ -225,7 +226,8 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["block"] = getBlockCollider();
 
 		changeState(initialCharState);
-  
+		charState = initialCharState;
+
 		visible = isVisible;
 
 		chargeTime = 0;
@@ -249,8 +251,6 @@ public partial class Character : Actor, IDamagable {
 		base.onStart();
 	}
 
-	public float vaccineTime;
-	public float vaccineHurtCooldown;
 	public void addVaccineTime(float time) {
 		if (!ownedByLocalPlayer) return;
 		vaccineTime += time;
@@ -265,8 +265,6 @@ public partial class Character : Actor, IDamagable {
 	}
 	public bool isVaccinated() { return vaccineTime > 0; }
 
-	public float infectedTime;
-	public Damager infectedDamager;
 	public void addInfectedTime(Player attacker, float time) {
 		if (!ownedByLocalPlayer) return;
 		if (isInvulnerable()) return;
@@ -536,7 +534,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canTurn() {
-		if (mk5RideArmorPlatform != null) {
+		if (rideArmorPlatform != null) {
 			return false;
 		}
 		if (this is Vile vile && vile.isShootingLongshotGizmo) {
@@ -546,7 +544,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canMove() {
-		if (mk5RideArmorPlatform != null) {
+		if (rideArmorPlatform != null) {
 			return false;
 		}
 		// TODO: Move this to axl.cs
@@ -562,7 +560,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool canDash() {
 		if (this is MegamanX mmx && mmx.isIX && mmx.IXTimer < 6f) return false;
 		if (player.isAI && charState is Dash) return false;
-		if (mk5RideArmorPlatform != null) return false;
+		if (rideArmorPlatform != null) return false;
 		if (charState is WallKick wallKick && wallKick.stateTime < 0.25f) return false;
 		if (isSoftLocked()) return false;
 		if (isAttacking()) return false;
@@ -571,7 +569,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canJump() {
-		if (mk5RideArmorPlatform != null) return false;
+		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// Jump Cancel System
@@ -629,7 +627,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool canWallClimb() {
 		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
-		if (mk5RideArmorPlatform != null) return false;
+		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
 			return !player.input.isHeld(Control.Jump, player);
@@ -639,7 +637,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool canUseLadder() {
 		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
-		if (mk5RideArmorPlatform != null) return false;
+		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
 			return !player.input.isHeld(Control.Jump, player);
@@ -653,7 +651,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canClimbLadder() {
-		if (mk5RideArmorPlatform != null) {
+		if (rideArmorPlatform != null) {
 			return false;
 		}
 		if (shootAnimTime > 0 ||
@@ -860,6 +858,9 @@ public partial class Character : Actor, IDamagable {
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
 		lastXDir = xDir;
+		if (grounded && !isDashing) {
+			dashedInAir = 0;
+		}
 	}
 
 	public override void onCollision(CollideData other) {
@@ -1183,8 +1184,8 @@ public partial class Character : Actor, IDamagable {
 			flag.changePos(getCenterPos());
 		}
 
-		if (!Global.level.hasGameObject(vileStartRideArmor)) {
-			vileStartRideArmor = null;
+		if (!Global.level.hasGameObject(startRideArmor)) {
+			startRideArmor = null;
 		}
 
 		if (transformAnim != null) {
@@ -1202,20 +1203,6 @@ public partial class Character : Actor, IDamagable {
 			transformAnim.changePos(pos);
 			if (transformAnim.destroyed) {
 				transformAnim = null;
-			}
-		}
-
-		if (stockedCharge) {
-			addRenderEffect(RenderEffectType.ChargePink, 0.033333f, 0.1f);
-		}
-		if (stockedXSaber) {
-			addRenderEffect(RenderEffectType.ChargeGreen, 0.05f, 0.1f);
-		}
-		if (stockedX3Buster) {
-			if (player.weapon is not Buster) {
-				stockedX3Buster = false;
-			} else {
-				addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
 			}
 		}
 
@@ -1310,17 +1297,16 @@ public partial class Character : Actor, IDamagable {
 				if (usedSubtank != null) {
 					usedSubtank.health--;
 				}
-				player.health = Helpers.clampMax(player.health + player.getHealthModifier(), player.maxHealth);
+				player.health = Helpers.clampMax(player.health + 1, player.maxHealth);
 				if (acidTime > 0) {
 					acidTime--;
 					if (acidTime < 0) removeAcid();
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
 					if (!player.hasChip(2)) {
-					playSound("heal", forcePlay: true, sendRpc: true);
-					}
-					else {
-					playSound("MMX3-GoldenHelmetHP" , forcePlay: true, sendRpc: true);
+						playSound("heal", forcePlay: true, sendRpc: true);
+					} else {
+						playSound("goldenHelmetHP", forcePlay: true, sendRpc: true);
 					}
 				}
 			}
@@ -1332,7 +1318,7 @@ public partial class Character : Actor, IDamagable {
 			usedSubtank = null;
 		}
 
-		if (ai != null) {
+		if (ai != null && !Global.isSkippingFrames) {
 			ai.update();
 		}
 
@@ -1357,13 +1343,13 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		// This overrides the ground checks made by Actor.update();
-		if (mk5RideArmorPlatform != null) {
-			changePos(mk5RideArmorPlatform.getMK5Pos().addxy(0, 1));
-			xDir = mk5RideArmorPlatform.xDir;
+		if (rideArmorPlatform != null) {
+			changePos(rideArmorPlatform.getMK5Pos().addxy(0, 1));
+			xDir = rideArmorPlatform.xDir;
 			grounded = true;
 
-			if (mk5RideArmorPlatform.destroyed) {
-				mk5RideArmorPlatform = null;
+			if (rideArmorPlatform.destroyed) {
+				rideArmorPlatform = null;
 			}
 		}
 
@@ -1388,7 +1374,7 @@ public partial class Character : Actor, IDamagable {
 			return false;
 		}
 		if (charState.exitOnLanding && grounded) {
-			charState.landingCode();
+			landingCode();
 		}
 		if (charState.exitOnAirborne && !grounded) {
 			changeState(new Fall());
@@ -1451,8 +1437,8 @@ public partial class Character : Actor, IDamagable {
 		if (charState.attackCtrl) {
 			return attackCtrl();
 		}
-		if (charState.altAttackCtrls.Any(b => b)) {
-			return altAttackCtrl(charState.altAttackCtrls);
+		if (charState.altCtrls.Any(b => b)) {
+			return altCtrl(charState.altCtrls);
 		}
 		return false;
 	}
@@ -1486,7 +1472,7 @@ public partial class Character : Actor, IDamagable {
 			} else if (player.dashPressed(out string dashControl) && canDash()) { //&& charState is not Dash) {
 				changeState(new Dash(dashControl), true);
 				return true;
-			} else if (mk5RideArmorPlatform != null &&
+			} else if (rideArmorPlatform != null &&
 				  player.input.isPressed(Control.Jump, player) &&
 				  player.input.isHeld(Control.Up, player) &&
 				  canEjectFromRideArmor()
@@ -1580,7 +1566,7 @@ public partial class Character : Actor, IDamagable {
 		return false;
 	}
 
-	public virtual bool altAttackCtrl(bool[] ctrls) {
+	public virtual bool altCtrl(bool[] ctrls) {
 		return false;
 	}
 
@@ -1620,8 +1606,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public Point getMK5RideArmorPos() {
-		if (mk5RideArmorPlatform.currentFrame.POIs.Count == 0) return new Point();
-		var charPos = mk5RideArmorPlatform.currentFrame.POIs[0];
+		if (rideArmorPlatform.currentFrame.POIs.Count == 0) return new Point();
+		var charPos = rideArmorPlatform.currentFrame.POIs[0];
 		charPos.x *= xDir;
 		return charPos;
 	}
@@ -1891,8 +1877,8 @@ public partial class Character : Actor, IDamagable {
 
 
 	public virtual Actor getFollowActor() {
-		if (mk5RideArmorPlatform != null) {
-			return mk5RideArmorPlatform;
+		if (rideArmorPlatform != null) {
+			return rideArmorPlatform;
 		}
 		if (player.currentMaverick != null && player.isTagTeam()) {
 			return player.currentMaverick;
@@ -1904,8 +1890,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual Point getCamCenterPos(bool ignoreZoom = false) {
-		if (mk5RideArmorPlatform != null) {
-			return mk5RideArmorPlatform.pos.round().addxy(0, -70);
+		if (rideArmorPlatform != null) {
+			return rideArmorPlatform.pos.round().addxy(0, -70);
 		}
 		if (player.isSigma) {
 			var maverick = player.currentMaverick;
@@ -2093,48 +2079,66 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+	public virtual void changeToLandingOrFall() {
+		if (grounded) {
+			landingCode();
+		} else {
+			changeState(new Fall(), true);
+		}
+	}
+
+	public virtual void landingCode() {
+		playSound("land", sendRpc: true);
+		dashedInAir = 0;
+		changeState(new Idle("land"), true);
+	}
+
 	public virtual void changeState(CharState newState, bool forceChange = false) {
-		if (!forceChange && charState != null && newState != null &&
-			charState.GetType() == newState.GetType() ||
-			!forceChange && changedStateInFrame
+		if (newState == null) {
+			return;
+		}
+		if (!forceChange &&
+			(charState?.GetType() == newState.GetType() || changedStateInFrame)
 		) {
 			return;
 		}
-		if (charState is InRideArmor && newState is Frozen) {
-			(charState as InRideArmor).freeze((newState as Frozen).freezeTime);
-			return;
-		} else if (charState is InRideArmor && newState is Stunned) {
-			(charState as InRideArmor).stun((newState as Stunned).stunTime);
-			return;
-		} else if (charState is InRideArmor && newState is Crystalized) {
-			(charState as InRideArmor).crystalize((newState as Crystalized).crystalizedTime);
+		// Set the character as soon as posible.
+		newState.character = this;
+		// For Ride Armor stuns.
+		if (charState is InRideArmor inRideArmor) {
+			if (newState is Frozen frozenState) {
+				inRideArmor.freeze(frozenState.freezeTime);
+				return;
+			} else if (newState is Stunned stunned) {
+				inRideArmor.stun(stunned.stunTime);
+				return;
+			} else if (newState is Crystalized crystalized) {
+				inRideArmor.crystalize(crystalized.crystalizedTime);
+				return;
+			}
+		}
+		if (charState?.canExit(this, newState) == false) {
 			return;
 		}
-
-		if (charState != null && !charState.canExit(this, newState)) {
-			return;
-		}
-		if (newState != null && !newState.canEnter(this)) {
+		if (!newState.canEnter(this)) {
 			return;
 		}
 		changedStateInFrame = true;
-		newState.character = this;
 
-		if (shootAnimTime == 0 || !newState.canShoot()) {
-			changeSprite(getSprite(newState.sprite), true);
-		} else {
+		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
+		} else {
+			changeSprite(getSprite(newState.sprite), true);
 		}
-		var oldState = charState;
-		if (oldState != null) {
-			oldState.onExit(newState);
-		}
+		CharState? oldState = charState;
+		oldState?.onExit(newState);
+
 		charState = newState;
 		newState.onEnter(oldState);
 
 		//if (!newState.canShoot()) {
-		//this.shootTime = 0;
-		//this.shootAnimTime = 0;
+		//	this.shootTime = 0;
+		//	this.shootAnimTime = 0;
 		//}
 	}
 
@@ -2177,10 +2181,10 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (rideArmor == null && rideChaser == null && mk5RideArmorPlatform == null) {
+		if (rideArmor == null && rideChaser == null && rideArmorPlatform == null) {
 			base.render(x, y);
-		} else if (mk5RideArmorPlatform != null) {
-			var rideArmorPos = mk5RideArmorPlatform.pos;
+		} else if (rideArmorPlatform != null) {
+			var rideArmorPos = rideArmorPlatform.pos;
 			var charPos = getMK5RideArmorPos().addxy(0, 1);
 			base.render(rideArmorPos.x + charPos.x - pos.x, rideArmorPos.y + charPos.y - pos.y);
 		} else if (rideArmor != null) {
@@ -2766,7 +2770,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Special conditions for decimal damage.
 		if (damage % 1 != 0) {
-			decimal damageDec = (decimal)damage % 1m;
+			decimal damageDec = damage % 1m;
 
 		}
 		// This is to defend from overkill damage.
@@ -2809,31 +2813,38 @@ public partial class Character : Actor, IDamagable {
 		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
 			addDamageTextHelper(attacker, (float)damage, player.maxHealth, true);
 		}
-		if (player.health > 0 && damage > 0 && ownedByLocalPlayer) {
+		if (player.health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
 			decimal modifier = (decimal)player.maxHealth > 0 ? (16 / (decimal)player.maxHealth) : 1;
-			float gigaAmmoToAdd = (float)(1 + (damage * 2 * modifier));
+			decimal gigaDamage = (decimal)damage;
+			if (originalDamage > damage) {
+				gigaDamage = originalDamage;
+			}
+			float gigaAmmoToAdd = (float)(1 + (gigaDamage * 2 * modifier));
 			if (this is Zero zero) {
 				zero.zeroGigaAttackWeapon.addAmmo(gigaAmmoToAdd, player);
+			}
+			if (this is PunchyZero punchyZero) {
+				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
 			}
 			if (this is MegamanX) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
 					if (gigaCrush.ammo < 32) {
-						playSound("MMX2-GigaCrushRecharge");	
+						playSound("gigaCrushAmmoRecharge");
 					}
 					if (gigaCrush.ammo == 32 && player.health < 8 && player.health > 4) {
-						playSound("MMX2-GigaCrushFull");	
+						playSound("gigaCrushAmmoFull");
 					}
 				}
 				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
 				if (hyperBuster != null) {
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
-					if (hyperBuster.ammo < 32){
-						playSound("MMX3-HyperchargeRecharge");	
+					if (hyperBuster.ammo < 32) {
+						playSound("hyperchargeRecharge");
 					}
 					if (hyperBuster.ammo == 32 && player.health < 8 && player.health > 4) {
-						playSound("MMX3-HyperchargeFull");	
+						playSound("hyperchargeFull");
 					}
 				}
 				var novaStrike = player.weapons.FirstOrDefault(w => w is NovaStrike);
@@ -2980,18 +2991,16 @@ public partial class Character : Actor, IDamagable {
 		healAmount += player.maxHealth;
 	}
 
-	public void addAmmo(float amount) {
-		if (player.isX && player.weapon.ammo >= player.weapon.maxAmmo) {
-			foreach (var weapon in player.weapons) {
-				if (weapon == player.weapon) continue;
-				if (weapon.ammo == weapon.maxAmmo) continue;
-				weapon.ammo = Math.Clamp(weapon.ammo + amount, 0, weapon.maxAmmo);
-				break;
-			}
-			return;
-		}
+	public virtual void addAmmo(float amount) {
+		player.weapon?.addAmmoHeal(amount);
+	}
 
-		weaponHealAmount += amount;
+	public virtual void addPercentAmmo(float amount) {
+		player.weapon?.addAmmoPercentHeal(amount);
+	}
+
+	public virtual bool canAddAmmo() {
+		return false;
 	}
 
 	public virtual void increaseCharge() {
@@ -3014,7 +3023,6 @@ public partial class Character : Actor, IDamagable {
 			stopCharge();
 		}
 		dropFlagProgress = 0;
-		stockedCharge = false;
 		this.flag = flag;
 		stingChargeTime = 0;
 		if (beeSwarm != null) {
@@ -3025,6 +3033,8 @@ public partial class Character : Actor, IDamagable {
 				mmx.chargedRollingShieldProj.destroySelf();
 			}
 			mmx.popAllBubbles();
+			mmx.stockedCharge = false;
+			mmx.stockedX3Buster = false;
 		}
 		if (player.isDisguisedAxl && player.ownedByLocalPlayer) {
 			player.revertToAxl();
@@ -3104,7 +3114,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalizeEnd() {
 		isCrystalized = false;
-		playSound("freezebreak2");
+		playSound("cystalizeDashingX2");
 		for (int i = 0; i < 8; i++) {
 			var anim = new Anim(getCenterPos().addxy(Helpers.randomRange(-20, 20), Helpers.randomRange(-20, 20)), "crystalhunter_piece", Helpers.randomRange(0, 1) == 0 ? -1 : 1, null, false);
 			anim.frameIndex = Helpers.randomRange(0, 1);
@@ -3282,12 +3292,12 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void getOffMK5Platform() {
-		if (mk5RideArmorPlatform != null) {
-			if (mk5RideArmorPlatform != vileStartRideArmor) {
-				mk5RideArmorPlatform.character = null;
-				mk5RideArmorPlatform.changeState(new RADeactive(), true);
+		if (rideArmorPlatform != null) {
+			if (rideArmorPlatform != startRideArmor) {
+				rideArmorPlatform.character = null;
+				rideArmorPlatform.changeState(new RADeactive(), true);
 			}
-			mk5RideArmorPlatform = null;
+			rideArmorPlatform = null;
 		}
 	}
 
@@ -3302,27 +3312,24 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void onMechSlotSelect(MechMenuWeapon mmw) {
-		if (vileStartRideArmor == null) {
+		if (startRideArmor == null) {
 			if (!mmw.isMenuOpened) {
 				mmw.isMenuOpened = true;
 				return;
 			}
 		}
 
-		if (player.isAI) {
-			calldownMechCooldown = maxCalldownMechCooldown;
-		}
-		if (vileStartRideArmor == null) {
+		if (startRideArmor == null) {
 			if (alreadySummonedNewMech) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
 			} else if (canAffordRideArmor()) {
 				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
 				alreadySummonedNewMech = true;
-				if (vileStartRideArmor != null) vileStartRideArmor.selfDestructTime = 1000;
+				if (startRideArmor != null) startRideArmor.selfDestructTime = 1000;
 				buyRideArmor();
 				mmw.isMenuOpened = false;
 				int raIndex = player.selectedRAIndex;
-				vileStartRideArmor = new RideArmor(
+				startRideArmor = new RideArmor(
 					player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true
 				);
 			}

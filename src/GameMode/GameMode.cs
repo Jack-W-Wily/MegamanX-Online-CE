@@ -1215,12 +1215,12 @@ public class GameMode {
 			mechBarExists = true;
 			damageSavings = 0;
 		}
-		if (isMech && player.character?.mk5RideArmorPlatform != null) {
+		if (isMech && player.character?.rideArmorPlatform != null) {
 			spriteName = "hud_health_base_mech";
-			health = player.character.mk5RideArmorPlatform.health;
-			maxHealth = player.character.mk5RideArmorPlatform.maxHealth;
-			twoLayerHealth = player.character.mk5RideArmorPlatform.goliathHealth;
-			frameIndex = player.character.mk5RideArmorPlatform.raNum;
+			health = player.character.rideArmorPlatform.health;
+			maxHealth = player.character.rideArmorPlatform.maxHealth;
+			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
+			frameIndex = player.character.rideArmorPlatform.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
 			if (player.weapon is not Buster) {
 				baseX += 15;
@@ -1239,9 +1239,9 @@ public class GameMode {
 			damageSavings = 0;
 		}
 
-		maxHealth /= player.getHealthModifier();
-		health /= player.getHealthModifier();
-		damageSavings /= player.getHealthModifier();
+		//maxHealth /= player.getHealthModifier();
+		//health /= player.getHealthModifier();
+		//damageSavings /= player.getHealthModifier();
 
 		baseY += 25;
 		var healthBaseSprite = spriteName;
@@ -1420,6 +1420,9 @@ public class GameMode {
 			weapon = player.weapon;
 			if (player.character is Zero zero) {
 				weapon = zero.zeroGigaAttackWeapon;
+			}
+			if (player.character is PunchyZero punchyZero) {
+				weapon = punchyZero.gigaAttack;
 			}
 			player.lastHudWeapon = weapon;
 		}
@@ -1690,7 +1693,7 @@ public class GameMode {
 
 		if (player.isVile && player.character != null &&
 			player.character.rideArmor != null &&
-			player.character.rideArmor == player.character.vileStartRideArmor
+			player.character.rideArmor == player.character.startRideArmor
 			&& player.character.rideArmor.raNum == 2
 		) {
 			int x = 10, y = 155;
@@ -1849,12 +1852,8 @@ public class GameMode {
 		}
 	}
 
-	public void drawZeroGigaCooldown(Player player) {
+	public void drawZeroGigaCooldown(Weapon weapon) {
 		// This runs once per character.
-		Weapon? weapon = null;
-		if (player.character is Zero zero) {
-			weapon = zero.zeroGigaAttackWeapon;
-		}
 		if (weapon == null || weapon.shootTime <= 0) {
 			return;
 		}
@@ -1868,8 +1867,8 @@ public class GameMode {
 	}
 
 	public void drawWeaponSlot(Weapon weapon, float x, float y) {
-		if (weapon is MechMenuWeapon && level.mainPlayer.character?.vileStartRideArmor != null) {
-			int index = 37 + level.mainPlayer.character.vileStartRideArmor.raNum;
+		if (weapon is MechMenuWeapon && level.mainPlayer.character?.startRideArmor != null) {
+			int index = 37 + level.mainPlayer.character.startRideArmor.raNum;
 			if (index == 42) index = 119;
 			Global.sprites["hud_weapon_icon"].drawToHUD(index, x, y);
 		} else if (weapon is MechMenuWeapon && level.mainPlayer.isSelectingRA()) {
@@ -1910,7 +1909,10 @@ public class GameMode {
 			drawTransformPreviewInfo(dnaCore, x, y);
 		}
 
-		if (weapon is HyperBuster && level.mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0) {
+		if (weapon is HyperBuster &&
+			!mainPlayer.isSpectator &&
+			mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
+		) {
 			drawWeaponSlotAmmo(x, y, 0);
 		} else if (weapon is HyperBuster hb) {
 			drawWeaponSlotCooldown(x, y, hb.shootTime / hb.getRateOfFire(level.mainPlayer));

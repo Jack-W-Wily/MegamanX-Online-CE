@@ -579,10 +579,12 @@ public class Damager {
 						victim?.playSound("hurt");
 					}
 
-					if (flinch == 0) flinch = Global.defFlinch;
+					if (flinch == 0) {
+						flinch = Global.defFlinch;
+					}
 					int hurtDir = -character.xDir;
-					if (damagingActor != null) {
-						hurtDir = damagingActor.pos.x > character.pos.x ? -1 : 1;
+					if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
+						hurtDir = 1;
 					}
 					if (projId == (int)ProjIds.GravityWellCharged) {
 						hurtDir = 0;
@@ -806,8 +808,16 @@ public class Damager {
 		
 			return true;
 		}	
-
-		damagable.applyDamage(owner, weaponKillFeedIndex, finalDamage, projId);
+		if ((damage > 0 || finalDamage > 0) && character != null &&
+			character.ownedByLocalPlayer &&
+			character.specialState == (int)SpecialStateIds.PZeroParry &&
+			charState is PZeroParry	zeroParryState &&
+			zeroParryState.canParry(damagingActor, projId)
+		) {
+			zeroParryState.counterAttack(owner, damagingActor);
+			return true;
+		}
+		damagable?.applyDamage(owner, weaponKillFeedIndex, finalDamage, projId);
 
 		return true;
 	}
@@ -891,7 +901,7 @@ public class Damager {
 		return 1000 + projId;
 	}
 
-	public static bool hitFromBehind(Actor actor, Actor damager, Player? projOwner, int projId) {
+	public static bool hitFromBehind(Actor actor, Actor? damager, Player? projOwner, int projId) {
 		return hitFromSub(
 			actor, damager,
 			projOwner, projId,
@@ -942,7 +952,7 @@ public class Damager {
 	}
 
 	private static bool hitFromSub(
-		Actor actor, Actor damager, Player projOwner, int projId,
+		Actor actor, Actor? damager, Player? projOwner, int projId,
 		Func<Actor, float, bool> checkDelta,
 		Func<Actor, Point, bool> checkPos
 	) {
@@ -992,9 +1002,9 @@ public class Damager {
 			damagePos = projOwner.character.pos;
 		} else if (damager is Projectile prj && prj.hitboxActor != null && !prj.hitboxActor.destroyed) {
 			damagePos = prj.hitboxActor.pos;
-		} else if (damager is GenericMeleeProj && projOwner.character != null) {
+		} else if (damager is GenericMeleeProj && projOwner?.character != null) {
 			damagePos = projOwner.character.pos;
-		} else if (damager is not GenericMeleeProj) {
+		} else if (damager is not GenericMeleeProj and not null) {
 			damagePos = damager.pos;
 		}
 

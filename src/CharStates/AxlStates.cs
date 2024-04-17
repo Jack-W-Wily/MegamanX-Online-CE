@@ -107,6 +107,9 @@ public class Hover : CharState {
 			exhaustPos(), "hover_exhaust", axl.getAxlXDir(), player.getNextActorNetId(), false, sendRpc: true
 		);
 		hoverExhaust.setzIndex(ZIndex.Character - 1);
+		if (character.ownedByLocalPlayer) {
+			sound = character.playSound("axlHover", forcePlay: false, sendRpc: true);
+		}
 	}
 
 	public override void onExit(CharState newState) {

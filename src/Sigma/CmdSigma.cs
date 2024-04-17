@@ -83,7 +83,7 @@ public class CmdSigma : BaseSigma {
 					}
 				}
 				changeSprite(getSprite(charState.attackSprite), true);
-				playSound("SigmaSaber", sendRpc: true);
+				playSound("sigmaSaber", sendRpc: true);
 				return true;
 			}
 			changeState(new SigmaSlashState(charState), true);
@@ -134,5 +134,17 @@ public class CmdSigma : BaseSigma {
 			return proj;
 		}
 		return base.getProjFromHitbox(collider, centerPoint);
+	}
+
+	public override void addAmmo(float amount) {
+		weaponHealAmount += amount;
+	}
+
+	public override void addPercentAmmo(float amount) {
+		weaponHealAmount += amount * 0.32f;
+	}
+
+	public override bool canAddAmmo() {
+		return (player.sigmaAmmo < 32);
 	}
 }

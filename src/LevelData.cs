@@ -222,12 +222,11 @@ public class LevelData {
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 		} else {
-			maxPlayers = 22;
+			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 			supportedGameModesSet.Add(GameMode.Nightmare);
 		}
-
 		if (levelJson.supportsCTF == true) {
 			supportedGameModesSet.Add(GameMode.CTF);
 		}

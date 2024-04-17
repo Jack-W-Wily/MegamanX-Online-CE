@@ -1071,6 +1071,13 @@ class Program {
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
 		bool useFrameSkip = false;
+		// Debug stuff.
+		bool isFrameStep = false;
+		bool continueNextFrameStep = false;
+		bool f5Released = true;
+		bool f6Released = true;
+		// WARNING DISABLE THIS FOR NON-DEBUG BUILDS
+		bool frameStepEnabled = true;
 
 		// Main loop itself.
 		while (window.IsOpen) {
@@ -1083,6 +1090,24 @@ class Program {
 			if (deltaTime >= 1 || deltaTimeAlt >= 1) {
 				window.DispatchEvents();
 				lastAltUpdateTime = timeNow;
+				if (frameStepEnabled) {
+					if (Keyboard.IsKeyPressed(Key.F5)) {
+						if (f5Released) {
+							isFrameStep = !isFrameStep;
+							f5Released = false;
+						}
+					} else {
+						f5Released = true;
+					}
+					if (Keyboard.IsKeyPressed(Key.F6)) {
+						if (f6Released) {
+							continueNextFrameStep = true;
+							f6Released = false;
+						}
+					} else {
+						f6Released = true;
+					}
+				}
 			}
 			if (deltaTime >= 1) {
 			} else {
@@ -1095,6 +1120,11 @@ class Program {
 				lastSecondFPS = timeSecondsNow;
 				videoUpdatesThisSecond = 0;
 				framesUpdatesThisSecond = 0;
+			}
+			// For debug framestep.
+			if (isFrameStep && !continueNextFrameStep) {
+				lastUpdateTime = timeNow;
+				continue;
 			}
 			// Disable frameskip in the menu.
 			if (Global.level != null) {
@@ -1109,10 +1139,12 @@ class Program {
 			if (Global.level?.levelData?.bgColor != null) {
 				clearColor = Global.level.levelData.bgColor;
 			}
-			if (!useFrameSkip) {
+			if (!useFrameSkip || isFrameStep) {
 				update();
 				framesUpdatesThisSecond++;
 				deltaTime = 0;
+				deltaTimeSavings = 0;
+				continueNextFrameStep = false;
 			} else {
 				// Logic update happens here.
 				while (deltaTime >= 1) {
@@ -1181,21 +1213,20 @@ class Program {
 		// For Windows OS.
 		cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
 			@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
-		).GetValue(
+		)?.GetValue(
 			"ProcessorNameString"
-		) as String;
+		) as String ?? "Windows";
 #endif
 #if LINUX
-	cpuName = "Linux CPU";
-
+	cpuName = "Linux";
 #endif
 #if MACOS
-	cpuName = "MAC CPU";
+	cpuName = "Darwin";
 #endif
 		// Fix simbols.
-		cpuName.Replace("(R)", "®");
-		cpuName.Replace("(C)", "©");
-		cpuName.Replace("(TM)", "ª"); //Todo, implement proper trademark simbol.
+		cpuName = cpuName.Replace("(R)", "®");
+		cpuName = cpuName.Replace("(C)", "©");
+		cpuName = cpuName.Replace("(TM)", "®"); //Todo, implement proper trademark simbol.
 		return cpuName;
 	}
 
