@@ -26,19 +26,15 @@ public class CharState {
 	public float framesJumpNotHeld = 0;
 	public bool once;
 	public bool useGravity = true;
-
 	public bool invincible;
 	public bool stunResistant;
 	public bool superArmor;
 	public bool immuneToWind;
 	public int accuracy;
 	public bool isGrabbedState;
-
 	public bool wasVileHovering;
-
 	// For grab states (I am grabber)
 	public bool isGrabbing;
-
 	// For grabbed states (I am the grabbed)
 	public float grabTime = 4;
 
@@ -713,8 +709,6 @@ public class SwordBlock : CharState {
 		if (!player.isZero && !player.isSigma && ! player.input.isHeld(Control.Up, player)) {
 		character.changeState(new Idle());	
 		}
-			
-	
 
 		if (!player.isControllingPuppet()) {
 			bool leftGuard = player.input.isHeld(Control.Left, player);
@@ -722,9 +716,7 @@ public class SwordBlock : CharState {
 
 			if (leftGuard) character.xDir = -1;
 			else if (rightGuard) character.xDir = 1;
-		}
-
-		
+		}	
 
 		if ((player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.Shoot, player) )&& !player.isControllingPuppet()) {
 			//if (character != null) {
@@ -909,7 +901,7 @@ public class Dash : CharState {
 				if (!character.sprite.name.EndsWith("backwards")) {
 					character.changeSpriteFromName("dash_backwards", false);
 				}
-			} else {
+		} else {
 				if (character.sprite.name.EndsWith("backwards")) {
 					character.changeSpriteFromName("dash", false);
 				}
@@ -919,14 +911,14 @@ public class Dash : CharState {
 
 	public override void update() {
 		dashBackwardsCode(character, initialDashDir);
-
 		base.update();
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
-
-
-		if (player.isGBD) character.turnToInput(player.input, player);
+		if (player.isGBD) {
+			character.turnToInput(player.input, player);
+			initialDashDir = character.xDir;
+		}
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// Phoenix Dash
 		Helpers.decrementTime(ref trailTime);
@@ -939,28 +931,23 @@ public class Dash : CharState {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
 			if (trailTime <= 0){
-
 			trailTime = 0.04f;
 			new Anim(new Point(character.pos.x, character.pos.y), "splash", 1, null, true);
 			character.playSound("splash");
 			}
 		}
 
-		if (player.hasBurnerX()) {
-		
+		if (player.hasBurnerX()) {	
 			if (trailTime <= 0){
 			trailTime = 4f;
 			character.playSound("flamemShoot", sendRpc: true);
-			new FlameMFireballProj(new FlameMFireballWeapon(), character.pos, character.xDir, player.input.isHeld(Control.Down, player), player, player.getNextActorNetId(), rpc: true);
-
+			new FlameMFireballProj(new FlameMFireballWeapon(), 
+			character.pos, character.xDir,
+			player.input.isHeld(Control.Down, player), 
+			player, player.getNextActorNetId(), rpc: true);
 			}
 		}
-
-
-		
-
-	
-		//>>>>>>>>>>>>>>>>>>>>>>>
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
@@ -999,9 +986,8 @@ public class Dash : CharState {
 			character.move(move);
 		} else {
 			var move = new Point(0, 0);
-	move.x = character.getDashSpeed() * initialDashDir * speedModifier;
-		
-			//move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier; ;
+			if (!player.isX) move.x = character.getDashSpeed() * initialDashDir * speedModifier;		
+			if (player.isX) move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier; ;
 			character.move(move);
 		}
 		if (dashTime <= Global.spf * 3 || stop) {
@@ -1043,6 +1029,13 @@ public class AirDash : CharState {
 		Dash.dashBackwardsCode(character, initialDashDir);
 
 		base.update();
+
+
+		if (player.isGBD) {
+			character.turnToInput(player.input, player);
+			initialDashDir = character.xDir;
+		}
+
 
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
@@ -1246,8 +1239,10 @@ public class WallSlide : CharState {
 					}
 				}
 			}
-
-			if (!(player.HasFullShadow())
+			if (player.isGBD && (character as GBD).isOnBike){
+			character.move(new Point(0, -300));
+			} 
+			if (!(player.HasFullShadow() && !(character as GBD).isOnBike )
 			&& !(player.isAxl 
 			&& player.input.isHeld(Control.Shoot,player))
 			){

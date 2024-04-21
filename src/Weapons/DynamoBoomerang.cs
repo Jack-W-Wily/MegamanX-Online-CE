@@ -71,17 +71,16 @@ public class DynamoBoomerangProj : Projectile {
 	public float maxReverseTime;
 	public float minTime;
 	public float smokeTime;
-	public float projtime;
 	public Actor target;
-	public DynamoBoomerang DynamoBoomerangWeapon;
+	public DynamoBoomerang rocketPunchWeapon;
 
 	public static float getSpeed(int type) {
-		return 500;
+	return 500;
 	}
 
 	public DynamoBoomerangProj(DynamoBoomerang weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, getSpeed(weapon.type), 2, player, "dynamo_spinningblade", 20, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.DynamoBoomerang;
+		projId = (int)ProjIds.RocketPunch;
 		this.player = player;
 		shooter = player.character;
 		destroyOnHit = false;
@@ -89,9 +88,10 @@ public class DynamoBoomerangProj : Projectile {
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
 		minTime = 0.2f;
 		maxReverseTime = 0.4f;
-		
-		DynamoBoomerangWeapon = weapon;
-		
+		if (weapon.type == (int)RocketPunchType.GoGetterRight) {
+			maxReverseTime = 0.3f;
+		}
+		rocketPunchWeapon = weapon;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -102,14 +102,11 @@ public class DynamoBoomerangProj : Projectile {
 
 	public override void update() {
 		base.update();
-		projtime = Global.spf;
-		
-		if (owner.character != null) destroySelf("explosion", "explosion", true);
-		
-	//	if (!locallyControlled) return;
-
-			maxReverseTime = 0.4f;
-		
+		if (ownedByLocalPlayer && (shooter == null || shooter.destroyed)) {
+			destroySelf("explosion", "explosion", true);
+			return;
+		}
+		if (!locallyControlled) return;
 		if (!reversed && target != null) {
 			vel = new Point(0, 0);
 			if (pos.x > target.pos.x) xDir = -1;
@@ -120,7 +117,7 @@ public class DynamoBoomerangProj : Projectile {
 				reversed = true;
 			}
 		}
-		if (!reversed && owner.character != null) {
+		if (!reversed && rocketPunchWeapon.type == (int)RocketPunchType.GoGetterRight) {
 			if (player.input.isHeld(Control.Up, player)) {
 				incPos(new Point(0, -300 * Global.spf));
 			} else if (player.input.isHeld(Control.Down, player)) {
@@ -128,14 +125,14 @@ public class DynamoBoomerangProj : Projectile {
 			}
 		}
 
-		if (!reversed && time > maxReverseTime && owner.character != null) {
+		if (!reversed && time > maxReverseTime) {
 			reversed = true;
 		}
-		if (reversed && owner.character != null) {
+		if (reversed) {
 			vel = new Point(0, 0);
-			if (owner.character.xDir == 1) xDir = -1;
-			if (owner.character.xDir == -1) xDir = 1;
-		
+			if (shooter.xDir == 1) xDir = -1;
+			if (shooter.xDir == -1) xDir = 1;
+
 			Point returnPos = shooter.getCenterPos();
 			if (shooter.sprite.name == "vile_rocket_punch") {
 				Point poi = shooter.pos;
@@ -147,12 +144,19 @@ public class DynamoBoomerangProj : Projectile {
 			}
 
 			move(pos.directionToNorm(returnPos).times(speed));
-			if (projtime > 0.3f && pos.distanceTo(returnPos) < 10) {
+			if (pos.distanceTo(returnPos) < 10) {
 				returned = true;
 				destroySelf();
 			}
 		}
 	}
+
+	/*
+	public override void onHitWall(CollideData other) {
+		if (!ownedByLocalPlayer) return;
+		reversed = true;
+	}
+	*/
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
@@ -703,11 +707,11 @@ public class DynamoDownShoot : Projectile
 	public DynamoDownShoot(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false)
 		: base(weapon, pos, xDir, 75f, 3f, player, "dynamo_buster_proj", 1, 0.5f, netProjId, player.ownedByLocalPlayer)
 	{
-		projId = (int)ProjIds.PeaceOutRoller;
+		projId = (int)ProjIds.DynamoDownShoot;
 		maxTime = 0.525f;
 		if (type == 1)
 		{
-			maxTime = 0.4f;
+			maxTime = 0.8f;
 		} else {
 			floorHitbox = new Collider(new Rect(0, 0, 4, 4).getPoints(), false, this, false, false, 0, new Point(0, 0));
 		}
@@ -721,7 +725,8 @@ public class DynamoDownShoot : Projectile
 		}
 		if (type == 0)
 		{
-			base.vel.y = 50f;
+			angle = 90;
+			base.vel.y = 40f;
 			useGravity = true;
 			gravityModifier = 0.5f;
 		}

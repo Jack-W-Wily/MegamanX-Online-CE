@@ -138,13 +138,13 @@ public class VileLoadout {
 	public List<Weapon> getWeaponsFromLoadout(bool includeMech) {
 		var weapons = new List<Weapon>();
 	{
-		weapons.Add(new VileCannon((VileCannonType)cannon));
+	//	weapons.Add(new VileCannon((VileCannonType)cannon));
 		weapons.Add(new Vulcan((VulcanType)vulcan));
 		 
-		if (includeMech) {
-			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
-			weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
-		}
+	//	if (includeMech) {
+	//		weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
+	//		weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
+	//	}
 		}
 		return weapons;
 	}

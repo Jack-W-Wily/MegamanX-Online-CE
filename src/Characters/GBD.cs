@@ -17,6 +17,8 @@ public class GBD : Character {
 
 	public float shiningSparkStacks = 0;
 
+	public bool isOnBike;
+
 
 public override bool normalCtrl() {
 	
@@ -124,7 +126,15 @@ public override bool normalCtrl() {
 				xSaberCooldown = 1f;
                 changeState(new EnfrenteMeuDisco2(), true);
 					}
-		if (charState.canAttack() && xSaberCooldown == 0f &&
+		if (player.input.isPressed(Control.Special2, player))
+					{	
+        if (!player.input.isHeld(Control.Down, player))  isOnBike = true;
+		if (player.input.isHeld(Control.Down, player))  isOnBike = false;
+					}
+		
+			if (charState is KnockedDown)  isOnBike = false;
+				
+		if (charState.canAttack() && !isOnBike && xSaberCooldown == 0f &&
 		 player.input.isPressed(Control.WeaponRight, player))
 					{
 				changeState(new XTeleportState(), true);
@@ -146,7 +156,7 @@ public override bool normalCtrl() {
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
-			else if (sprite.name.Contains("dash"))
+			else if (sprite.name.Contains("dash") && (isOnBike || shiningSparkStacks > 10 ))
 		{
 			return  new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 30, 0.5f, null, isShield: false, isDeflectShield: true);;
 		}
@@ -179,6 +189,7 @@ public override bool normalCtrl() {
 	}
 
 	public override string getSprite(string spriteName) {
+		if (isOnBike) return "tgbdbike_" + spriteName;
 		return "tgbd_" + spriteName;
 	}
 }

@@ -8,7 +8,7 @@ public class ParasiticBomb : Weapon {
 	public static float beeRange = 120;
 
 	public ParasiticBomb() : base() {
-		shootSounds = new List<string>() { "", "", "", "" };
+		shootSounds = new List<string>() { "buster", "buster", "buster", "buster" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.ParasiticBomb;
 		weaponBarBaseIndex = 18;
@@ -20,7 +20,6 @@ public class ParasiticBomb : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (chargeLevel < 3) {
-			player.character.playSound("buster");
 			new ParasiticBombProj(this, pos, xDir, player, netProjId);
 		} else {
 			if (player.character.ownedByLocalPlayer && player.character.beeSwarm == null) {

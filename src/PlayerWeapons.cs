@@ -119,9 +119,13 @@ public partial class Player {
 	}
 
 	public bool shouldBlockMechSlotScroll() {
-		if (character != null && (character as Vile).rideArmor != null && (character as Vile).isVileMK5 == true) {
-			return true;
-		}
+	//	if (player.isVile && // Fixed
+	//	character != null &&
+	//	(character as Vile).rideArmor != null &&
+	//	 (character as Vile).isVileMK5 == true) {
+	//		return true;
+	//	} //REMOVED THIS DUE TO BREAKING ALL WEAPONS SCROLLS IN THE GAME
+			// GOOD FUCKING JOB GACEL I'LL FIGURE OUT HOW I FIX THIS LATER
 		return true;// Options.main.blockMechSlotScroll;
 	}
 

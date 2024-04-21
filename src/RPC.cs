@@ -727,11 +727,11 @@ public class RPCActorToggle : RPC {
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
 			actor.addMusicSource("MMX1-WolfSigmaIntro", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddDrLightMusicSource) {
-			actor.addMusicSource("MMX1-DrLight", actor.getCenterPos(), false);
+			actor.addMusicSource("drlight", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddDrDopplerMusicSource) {
 			actor.addMusicSource("MMX3-Doppler", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddGoliathMusicSource) {
-			actor.addMusicSource("MMX3-DopplerBattle", actor.getCenterPos(), true);
+			actor.addMusicSource("goliath", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddViralSigmaMusicSource) {
 			actor.addMusicSource("MMX2-JudgementDay", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserSigmaMusicSource) {

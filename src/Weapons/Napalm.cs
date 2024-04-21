@@ -491,15 +491,11 @@ public class HoutenjinStartState : CharState {
 	public override void update() {
 		base.update();
 		CrystalHunterCharged proj;
-		CrystalHunterCharged proj2;
-		CrystalHunterCharged proj3;
-		CrystalHunterCharged proj4;
 		if (stateTime < 0.1f){
-		proj =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
-		proj2 =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
-		proj3 =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
-		proj4 =  new CrystalHunterCharged(character.pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: 0.25f, sendRpc: true);
-				
+		proj =  new CrystalHunterCharged(character.pos, 
+		player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, 
+		overrideTime: 0.25f, sendRpc: true);		
 		}
 		if (stateTime < 0.1f) {
 			character.turnToInput(player.input, player);
@@ -655,10 +651,12 @@ public class DragonsWrath : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 
@@ -726,6 +724,7 @@ public class SeaDragonRageAttack : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 
@@ -793,6 +792,7 @@ public class WildHorseKick : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 

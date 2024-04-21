@@ -519,6 +519,43 @@ public class LevelData {
 		if (Global.level.gameMode is Nightmare) {
 			return "theplace";
 		}
+		// X themes
+		if (!is1v1() && Options.main.preferredCharacter == 0) {
+		if (Helpers.randomRange(0,1) == 0)	return "x5";
+		if (Helpers.randomRange(0,1) == 1)	return "x4";
+		}
+		//Zero Themes
+		if (!is1v1() && Options.main.preferredCharacter == 1) {
+			return "awakeroadagain";
+		}
+		//Vile Themes
+		if (!is1v1() && Options.main.preferredCharacter == 2) {
+		 return "mhxvava";
+		}
+		// AXL Themes
+		if (!is1v1() && Options.main.preferredCharacter == 3) {
+		 return "axlx7";
+		}
+		//Sigma Themes
+		if (!is1v1() && Options.main.preferredCharacter == 4) {
+		if (Helpers.randomRange(0,1) == 0)	return "sigmax4x5";
+		if (Helpers.randomRange(0,1) == 1)	return "sigmax8";
+		}
+		//Dynamo Themes
+		if (!is1v1() && Options.main.preferredCharacter == 5) {
+		if (Helpers.randomRange(0,1) == 0)	return "tastetheblood";
+		if (Helpers.randomRange(0,1) == 1)	return "dynamo";
+		}
+		// GBD Themes
+		if (!is1v1() && Options.main.preferredCharacter == 6) {
+		 return "x2opening";
+		}
+		// Iris Themes
+		if (!is1v1() && Options.main.preferredCharacter == 7) {
+		 return "iris";
+		}
+
+
 
 		if (name == "japetribute_1v1") {
 			return "japetribute_1v1";

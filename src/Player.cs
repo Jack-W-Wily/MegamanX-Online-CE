@@ -1064,7 +1064,7 @@ public partial class Player {
 					false, charNetId, ownedByLocalPlayer
 				);
 			} else if (charNum == (int)CharIds.Sigma) {
-				if (isSigma3()) {
+				/*if (isSigma3()) {
 					character = new Doppma(
 						this, pos.x, pos.y, xDir,
 						false, charNetId, ownedByLocalPlayer
@@ -1074,12 +1074,12 @@ public partial class Player {
 						this, pos.x, pos.y, xDir,
 						false, charNetId, ownedByLocalPlayer
 					);
-				} else {
+				} else {*/
 					character = new CmdSigma(
 						this, pos.x, pos.y, xDir,
 						false, charNetId, ownedByLocalPlayer
 					);
-				}
+				//}
 			} else if (charNum == (int)CharIds.Rock) {
 				character = new Rock(
 					

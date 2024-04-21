@@ -16,7 +16,7 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "WC 3.1";
+	public static string versionName = "WC 3.2";
 	public static string subVersionName = "Alpha 11";
 	public static string subVersionShortName = "a11";
 

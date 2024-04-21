@@ -744,8 +744,11 @@ public partial class Character : Actor, IDamagable {
 		if (mmx.CurrentArmor == 8) runSpeed *= 1.35f;
 		}
 		if (player.isGBD && this is GBD gbd){
-		if (gbd.shiningSparkStacks > 10){
+		if (!gbd.isOnBike && gbd.shiningSparkStacks > 10){
 			runSpeed *= 1.5f;
+		}
+		if (gbd.isOnBike){
+			runSpeed *= 2; //gbd.shiningSparkStacks;
 		}
 		}
 		return runSpeed;
@@ -941,12 +944,17 @@ public partial class Character : Actor, IDamagable {
 			BurstCooldown == 0 && player.currency > 1 &&
 				(sprite.name.Contains("grabbed") || 
 				sprite.name.Contains("hurt") || 
+				sprite.name.Contains("lose") || 
+				sprite.name.Contains("frozen") ||
+				sprite.name.Contains("freeze") || 
+				sprite.name.Contains("stunned") ||  
 				sprite.name.Contains("knocked")
 				)
 			){
 		playSound("gigaCrushLate", forcePlay: false, sendRpc: true);
 		player.currency -= 2;
 		BurstCooldown = 10;
+		invulnTime = 2;
 		changeToIdleOrFall(); 
 		new MechFrogStompShockwave(new MechFrogStompWeapon(player), pos.addxy(-10 * xDir, 0f), xDir, player, player.getNextActorNetId(), rpc: true);
 			}

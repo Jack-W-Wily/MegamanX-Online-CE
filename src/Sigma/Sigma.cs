@@ -322,9 +322,9 @@ public abstract class BaseSigma : Character {
 
 		//KillingSpreeThemes
 		if (KillingSpree == 5){
-				if (musicSource == null) {
-					addMusicSource("sigmabattle", getCenterPos(), true);
-				}
+			if (musicSource == null) {
+				addMusicSource("ourbloodboils", getCenterPos(), true);
+			}
 		} 
 
 		if (!ownedByLocalPlayer) {

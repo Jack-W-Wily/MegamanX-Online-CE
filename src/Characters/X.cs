@@ -166,7 +166,7 @@ public partial class MegamanX : Character {
 		//KillingSpreeThemes
 		if (KillingSpree == 5){
 				if (musicSource == null) {
-					addMusicSource("bossroom", getCenterPos(), true);
+					addMusicSource("fightX", getCenterPos(), true);
 				}
 		} 
 

@@ -17,7 +17,7 @@ public class PlasmaGun : AxlWeapon {
 
 		if (altFire == 1) {
 			altFireCooldown = 0.1f;
-			shootSounds[3] = "";
+		//	shootSounds[3] = "";
 		}
 	}
 
