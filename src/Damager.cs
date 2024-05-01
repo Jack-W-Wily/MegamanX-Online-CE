@@ -199,7 +199,7 @@ public class Damager {
 		}
 
 		if (damagable.isInvincible(owner, projId) && damage > 0) {
-			victim.playSound("ding");
+			victim.playSound("m10ding");
 			return true;
 		}
 
@@ -216,7 +216,7 @@ public class Damager {
 		if (damagable is CrackedWall cw) {
 			float? overrideDamage = CrackedWall.canDamageCrackedWall(projId, cw);
 			if (overrideDamage != null && overrideDamage == 0 && damage > 0) {
-				cw.playSound("ding");
+				cw.playSound("m10ding");
 				return true;
 			}
 			damage = overrideDamage ?? damage;
@@ -542,7 +542,7 @@ public class Damager {
 
 					if (damage < 1) {
 						damage = 0;
-						character.playSound("ding");
+						character.playSound("m10ding");
 					}
 				}
 			}
@@ -715,7 +715,7 @@ public class Damager {
 					) {
 						damage = MathF.Floor(damage * 0.5f);
 						if (damage == 0) {
-							maverick.playSound("ding");
+							maverick.playSound("m10ding");
 						}
 					}
 				}
@@ -724,7 +724,7 @@ public class Damager {
 				if (maverick is CrystalSnail cs) {
 					if ((hitFromBehind(maverick, damagingActor, owner)) && !cs.noShell) {
 						damage = 0;
-						maverick.playSound("ding");
+						maverick.playSound("m10ding");
 					}
 				}
 				*/
@@ -739,7 +739,7 @@ public class Damager {
 
 						flinch = 0;
 						damage = 0;
-						maverick.playSound("ding");
+						maverick.playSound("m10ding");
 						if (owner.ownedByLocalPlayer &&
 							owner.character is Zero zero &&
 							!zero.isHyperZero()

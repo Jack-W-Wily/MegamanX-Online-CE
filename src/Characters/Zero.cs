@@ -1022,7 +1022,7 @@ public class Zero : Character {
 						new Shingetsurin(player), getShootPos(), xDir,
 						0.3f, player, player.getNextActorNetId(), rpc: true
 					);
-					playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
+					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				}, 0.3f));
 			}
 			if (chargeLevel == 4 && !isAwakenedGenmuZero()) {
@@ -1280,7 +1280,7 @@ public class Zero : Character {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
-					//playSound("awakenedAura", forcePlay: true, sendRpc: true); 
+					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
 					Point centerPoint = globalCollider.shape.getRect().center();
 					float damage = 2;
 					int flinch = 0;
@@ -1410,6 +1410,9 @@ public class Zero : Character {
 		}
 		if (isNightmareZeroBS.getValue()) {
 			palette = player.nightmareZeroShader;
+		}
+		if (isAwakenedZeroBS.getValue()) {
+			palette = player.zeroazPaletteShader;
 		}
 		if (palette != null) {
 			shaders.Add(palette);

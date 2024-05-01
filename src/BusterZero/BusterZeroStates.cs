@@ -19,7 +19,7 @@ public class BusterZeroMelee : CharState {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
-			character.playSound("ZeroSaberX3", sendRpc: true);
+			character.playSound("zerosaberx3", sendRpc: true);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -169,8 +169,8 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 4 && !fired) {
-			character.playSound("ZeroSaberX3", sendRpc: true);
+		if (character.frameIndex >= 7 && !fired) {
+			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
 			new DZHadangekiProj(
@@ -226,7 +226,7 @@ public class BusterZeroHadangekiWall : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {
-			character.playSound("ZeroSaberX3", sendRpc: true);
+			character.playSound("zerosaberx3", sendRpc: true);
 			zero.stockedSaber = false;
 			fired = true;
 			new DZHadangekiProj(
@@ -256,6 +256,7 @@ public class HyperBusterZeroStart : CharState {
 	public float radius = 200;
 	public float time;
 	BusterZero zero = null!;
+	Anim? LightX3;
 
 	public HyperBusterZeroStart() : base("hyper_start") {
 		invincible = true;
@@ -289,13 +290,20 @@ public class HyperBusterZeroStart : CharState {
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
-
+		LightX3 = new Anim(
+				character.pos.addxy(50 * character.xDir, 0f),
+				"LightX3", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: false, sendRpc: true
+			);
+		LightX3.fadeIn = true;
 		character.player.currency -= 10;
-		character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);
+		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		LightX3?.destroySelf();
 		character.useGravity = true;
 		if (character != null) {
 			character.invulnTime = 0.5f;

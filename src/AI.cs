@@ -407,10 +407,13 @@ public class AI {
 					}
 				}
 			}
-
+			// this makes the AI harder, the lower the number, the more acts the AI will do
+			// at 0.01 is just absurd, the zero AI gets at kaizo levels.
+			// can possibly cause bugs if you put that value
+			// funny enough fighting Nightmare Zero with 0.01 is pretty much as MMX6 LV 4 Xtreme mode :skull:
 			shootTime += Global.spf;
-			if (shootTime > 0.1) {
-				shootTime = 0;
+			if (shootTime > 0.08) {
+			shootTime = 0;
 			}
 		}
 		//End of AI should attack
@@ -1264,7 +1267,7 @@ public class AI {
 				if (isTargetInAir && isTargetSuperClose && !(character.charState is VileRevive or HexaInvoluteState) && player.vileAmmo >= 24)
 					character.changeState(new RisingSpecterState(vile.grounded), true);
 			}
-			int Vattack = Helpers.randomRange(0, 18);
+			int Vattack = Helpers.randomRange(0, 12);
 			if (vile?.charState?.isGrabbedState == false && !player.isDead && vile.charState.canAttack()
 				&& !(character.charState is VileRevive or HexaInvoluteState or NecroBurstAttack
 				or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState)) {
@@ -1634,8 +1637,8 @@ public class AI {
 				  else if (zero1.grounded && zero1.sprite.name == "zero_attack3" && zero1.framePercent > 0.5) {
 					zero1.changeState(new ZeroUppercut(new RisingWeapon(zero1.player), zero1.isUnderwater()), forceChange: true);
 				}
-				  // Do Hyouretsuzan if is at 80% of the animation of rising
-				  else if (zero1.sprite.name == "zero_rising" && zero1.framePercent > 0.8f) {
+				// Do Hyouretsuzan if is at 50% of the animation of rising
+				else if (zero1.sprite.name == "zero_rising" && zero1.framePercent > 0.5f) {
 					zero1.changeState(new ZeroFallStab(new HyouretsuzanWeapon(player)), forceChange: true);
 				}
 				if (!zero1.grounded && zero1.zeroAirSpecialWeapon.type == (int)AirSpecialType.Kuuenzan && !zero1.isAttacking() && zero1.charState.canAttack() && !(zero1.sprite.name == "zero_attack_air2")) {
@@ -1673,16 +1676,17 @@ public class AI {
 	}
 	public void doSigmaAI(Character sigma4) {
 		// Sigma:
-		if (character is BaseSigma baseSigma1) {
-
-			if (player.canReviveSigma(out var spawnPoint)) {
-				player.reviveSigma(spawnPoint);
-			}
+		// deactivated until fixed
+		//if (character is BaseSigma baseSigma1) {
+		//	
+		//	if (player.canReviveSigma(out var spawnPoint)){
+		//		player.reviveSigma(spawnPoint);
+		//	}
 
 			//if (jumpTime >= 0.4) {
 			//	player.release(Control.Jump);
 			//}
-		}
+		//}	
 	}
 } // End of AI
 

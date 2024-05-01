@@ -416,7 +416,7 @@ public class ViralSigmaBeamProj : Projectile {
 		Helpers.decrementTime(ref explosionTime);
 		if (soundTime == 0) {
 			playSound("viralSigmaBeam");
-			soundTime = 0.164f;
+			soundTime = 0.289f;
 		}
 		if (explosionTime == 0) {
 			playSound("explosion");
@@ -449,7 +449,7 @@ public class ViralSigmaRevive : CharState {
 			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
 				state = 1;
 				character.frameSpeed = 1;
-				character.addMusicSource("MMX2-JudgementDay", character.pos, true);
+				character.addMusicSource("mmx2_judgementday", character.pos, true);
 				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddViralSigmaMusicSource);
 				character.visible = true;
 			}

@@ -12,7 +12,9 @@ public class HyperZeroStart : CharState {
 	[AllowNull]
 	Zero zero;
 
-	public HyperZeroStart(int type) : base(type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
+	public HyperZeroStart(int type) : base(
+		type == 2 ? "hyper_start3" : 
+		type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
 		invincible = true;
 	}
 
@@ -69,7 +71,7 @@ public class HyperZeroStart : CharState {
 				destroyOnEnd: false, sendRpc: true
 			);
 			drWilyAnim.fadeIn = true;
-			character.playSound("BlackZeroEntry", forcePlay: false, sendRpc: true);
+			character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 		} else if (zero.zeroHyperMode == 1) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,

@@ -101,6 +101,7 @@ public class ShinMessenkou : Weapon {
 
 public class Rakuhouha : CharState {
 	public Weapon weapon;
+	Anim? rakuanim;
 	RakuhouhaType type { get { return (RakuhouhaType)weapon.type; } }
 	bool fired = false;
 	bool fired2 = false;
@@ -119,7 +120,15 @@ public class Rakuhouha : CharState {
 		bool isShinMessenkou = type == RakuhouhaType.ShinMessenkou;
 		bool isDarkHold = type == RakuhouhaType.DarkHold;
 		// isDarkHold = true;
-
+		if (character.frameIndex == 5 && !once && !isDarkHold) {
+			once = true;
+			rakuanim = new Anim(
+				character.pos.addxy(character.xDir, 0),
+				"zero_rakuanim", character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
 		float x = character.pos.x;
 		float y = character.pos.y;
 		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
@@ -396,12 +405,12 @@ public class Rekkoha : CharState {
 			loop++;
 		}
 
-		if (stateTime >= 0.15f && !sound) {
+		if (character.frameIndex == 5 && !sound) {
 			sound = true;
-			character.playSound("RekkohaX6", sendRpc: true);
+			character.playSound("rekkohax6", sendRpc: true);
 		}
 
-		if (stateTime > 0.4f && !fired1) {
+		if (stateTime > 26/60f && !fired1) {
 			fired1 = true;
 			new RekkohaProj(weapon, new Point(character.pos.x, topScreenY), player, player.getNextActorNetId(), rpc: true);
 		}
