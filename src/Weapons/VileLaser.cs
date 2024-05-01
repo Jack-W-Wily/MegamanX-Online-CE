@@ -58,11 +58,12 @@ public class VileLaser : Weapon {
 			NecroBurstAttack.shoot(vile);
 			vile.rideArmor.explode(shrapnel: inRideArmor.isHiding);
 		} else {
-			if (type == (int)VileLaserType.NecroBurst) {
+			if ( Global.level.mainPlayer.input.isHeld("down", Global.level.mainPlayer) ){//type == (int)VileLaserType.NecroBurst) {
 				vile.changeState(new NecroBurstAttack(vile.grounded), true);
-			} else if (type == (int)VileLaserType.RisingSpecter) {
+			} if ( Global.level.mainPlayer.input.isHeld("up", Global.level.mainPlayer) ){//type == (int)VileLaserType.RisingSpecter) {
 				vile.changeState(new RisingSpecterState(vile.grounded), true);
-			} else if (type == (int)VileLaserType.StraightNightmare) {
+			} if (!Global.level.mainPlayer.input.isHeld("down", Global.level.mainPlayer) 
+			&& !Global.level.mainPlayer.input.isHeld("up", Global.level.mainPlayer) ){//type == (int)VileLaserType.StraightNightmare) {
 				vile.changeState(new StraightNightmareAttack(vile.grounded), true);
 			}
 		}

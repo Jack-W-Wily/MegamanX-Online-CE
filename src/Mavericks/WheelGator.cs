@@ -138,8 +138,6 @@ public class WheelGSpinWheelProj : Projectile {
 
 	private int bounces;
 
-	private bool isDynamoBlade;
-
 
 	public WheelGSpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 250, 1, player, "wheelg_proj_wheel", Global.defFlinch, hitCooldown, netProjId, player.ownedByLocalPlayer) {
@@ -148,28 +146,9 @@ public class WheelGSpinWheelProj : Projectile {
 			destroySelf();
 			player.currency -= 1;
 			new SpinWheelProjChargedStart(new SpinWheel(), pos, xDir, damager.owner, player.getNextActorNetId());
-		}
-		if (player?.character != null && player.isGBD){
-			changeSprite("meudisco2_proj", resetFrame: true);
-			damager.hitCooldown = 0.3f;
-			}
+		}	
 		maxTime = 2f;
-		destroyOnHit = false;
-		if (!isDynamoBlade){
-		useGravity = true;
-		vel = new Point(xDir * 200, -200f);
-		base.collider.wallOnly = true;
-		}
-		if (player?.character != null && player.isDynamo){
-			changeSprite("dynamo_verticalbladeproj", resetFrame: true);
-			isDynamoBlade = true;
-			useGravity = false;
-			damager.hitCooldown = 0.3f;
-			}
-		if (isDynamoBlade) {
-		vel = new Point(xDir * 300, 0f);
-		useGravity = false;
-		}
+		destroyOnHit = false;	
 		if (rpc)
 		{
 			rpcCreate(pos, player, netProjId, xDir);
@@ -179,20 +158,13 @@ public class WheelGSpinWheelProj : Projectile {
 	public override void update()
 	{
 		base.update();
-		if (!isDynamoBlade) {
+		
 		vel.x = xDir * 250;
 		if (lastHitTime > 0f)
 		{
 			vel.x = xDir * 4;
 		}
 		Helpers.decrementTime(ref lastHitTime);
-		}
-		if (isDynamoBlade){
-		if (ownedByLocalPlayer && MathF.Abs(vel.x) < 400f)
-		{
-			vel.x -= Global.spf * 450f * (float)xDir;
-		}
-		}
 	}
 
 	public override void onHitWall(CollideData other)
@@ -202,8 +174,7 @@ public class WheelGSpinWheelProj : Projectile {
 		{
 			return;
 		}
-		if (!isDynamoBlade){
-		bounces++;
+	bounces++;
 		if ((other.hitData.normal ?? new Point(0f, -1f)).isSideways())
 		{
 			vel.x *= -1f;
@@ -219,7 +190,7 @@ public class WheelGSpinWheelProj : Projectile {
 			}
 			incPos(new Point(0f, 5 * MathF.Sign(vel.y)));
 		}
-		}
+		
 	}
 
 	public override void onHitDamagable(IDamagable damagable)

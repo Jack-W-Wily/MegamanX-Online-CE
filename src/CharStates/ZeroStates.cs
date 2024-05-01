@@ -71,7 +71,7 @@ public class HyperZeroStart : CharState {
 				destroyOnEnd: false, sendRpc: true
 			);
 			drWilyAnim.fadeIn = true;
-			character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
+			//character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 		} else if (zero.zeroHyperMode == 1) {
 			drWilyAnim = new Anim(
 				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,
@@ -160,13 +160,20 @@ public class KKnuckleParryStartState : CharState {
 		}
 
 		character.playSound("zeroParry", sendRpc: true);
-	if (player.isZero)	character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
-	if (!player.isZero) character.changeToIdleOrFall();
+	if (player.isZero)character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
+	if (player.isZain)character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
+	
+	
+	if (player.isX) {
+		character.changeState(new Idle(), true);
+		character.parryCooldown = 0;
+		character.addHealth(1);
+	}
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
+		//character.parryCooldown = character.maxParryCooldown;
 	}
 
 	public bool canParry(Actor damagingActor) {

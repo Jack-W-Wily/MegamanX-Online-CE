@@ -11,6 +11,9 @@ public class Iris : Character {
 
 	}
 
+	public NewIrisCrystal irisCrystal;
+	
+
 	public override bool normalCtrl() {
 	
 		if (player.input.isHeld(Control.Up, player) &&
@@ -25,13 +28,39 @@ public class Iris : Character {
 
 		public override void update(){
 		base.update();
+
+		if (irisCrystal == null && player.health > 0 && ownedByLocalPlayer){
+		irisCrystal = new NewIrisCrystal(new IrisCrystal(), pos, getShootXDir(), player, player.getNextActorNetId(), rpc: true);
+		}
+
 		if (charState.canAttack() && xSaberCooldown == 0f &&
 		 player.input.isPressed(Control.WeaponLeft, player))
-					{
-				xSaberCooldown = 1f;
+			{
+				xSaberCooldown = 1.5f;
+				
                 changeState(new RaySplasherChargedState(), true);
-					}
+			}
+
+		if (charState.canAttack()  && !player.input.isHeld(Control.Up, player) &&
+		 player.input.isPressed(Control.Shoot, player))
+				{	
+        changeState(new IrisCrystalBashState(), true);
+				}
+		if (charState.canAttack()  && player.input.isHeld(Control.Up, player) &&
+		 player.input.isPressed(Control.Shoot, player))
+				{	
+        changeState(new IrisCrystalRisingBash(), true);
+				}
+		if (charState.canAttack()  && !player.input.isHeld(Control.Up, player) &&
+		 player.input.isPressed(Control.Special1, player))
+				{	
+        changeState(new IrisCrystalCharge(), true);
+				}
+
 		}
+
+
+		
 
 	public override bool canDash() {
 		return true;
@@ -53,6 +82,15 @@ public class Iris : Character {
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
+		 if (  sprite.name.Contains("attack") && !sprite.name.Contains("rising"))
+		{
+			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
+		}
+		 if (  sprite.name.Contains("rising"))
+		{
+			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 3f, 30);
+		}
+
 		return proj;
 	}
 }

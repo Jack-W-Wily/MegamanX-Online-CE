@@ -66,9 +66,9 @@ public class SigmaSlashProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, damage, player, "sigma_proj_slash", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		reflectable = false;
+		reflectable = true;
 		destroyOnHit = false;
-		shouldShieldBlock = false;
+		shouldShieldBlock = true;
 		setIndestructableProperties();
 		maxTime = 0.1f;
 		projId = (int)ProjIds.SigmaSlash;

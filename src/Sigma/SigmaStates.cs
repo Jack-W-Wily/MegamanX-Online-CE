@@ -56,7 +56,7 @@ public class CallDownMaverick : CharState {
 			}
 		}
 
-		if (character.isAnimOver()) {
+		if (stateTime > 0.1f) {
 			character.changeState(new Idle(), true);
 		}
 	}

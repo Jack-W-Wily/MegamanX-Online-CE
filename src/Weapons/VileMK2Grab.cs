@@ -281,9 +281,9 @@ public bool isGroundAttack = true;
 			character.vel.y = 0f - character.getJumpPower();
 		}
 	
-		if (  ((character as Vile).isVileMK2 
-		|| (character as Vile).isVileMK2 || 
-		(character as Vile).isVileMK5EX) 
+		if (  ((character as Vile).isVileMK2 ||
+		 (character as Vile).isVileMK2 || 
+		 (character as Vile).isVileMK5) 
 		&& base.player.input.isHeld("up", base.player))
 		{
 			character.useGravity = true;	
@@ -334,22 +334,15 @@ public bool isGroundAttack = true;
 		}
 
 		//Godpress
-		if (((character as Vile).isVileMK2 || 
-		(character as Vile).isVileMK2 || 
-		(character as Vile).isVileMK5EX) 
+		if (((character as Vile).isVileMK2 ||
+		 (character as Vile).isVileMK2 || 
+		 (character as Vile).isVileMK5)  
 		&& base.player.input.isHeld("special2", base.player)){
-		sprite = "godpress_grab";
 		character.changeSpriteFromName("godpress_grab", resetFrame: true);
-			if (((character as Vile).isVileMK2 || 
-			(character as Vile).isVileMK2 || 
-			(character as Vile).isVileMK5EX) 
-			&& base.player.input.isHeld("special2", base.player)
-			&& character.sprite.name.EndsWith("godpress_grab"))
-			{
-			character.isDashing = true;
-			character.move(new Point(character.xDir * 200, 0f));
-			character.useGravity =  false;	
-			CollideData collideData = Global.level.checkCollisionActor(character, character.xDir * 20, -5f);
+		character.isDashing = true;
+		character.move(new Point(character.xDir * 200, 0f));
+		character.useGravity =  false;	
+		CollideData collideData = Global.level.checkCollisionActor(character, character.xDir * 20, -5f);
 				if (collideData != null && collideData.isSideWallHit())
 				{
 				crashAndDamage();
@@ -357,7 +350,6 @@ public bool isGroundAttack = true;
 				character.shakeCamera(sendRpc: true);
 				character.changeState(new Idle());
 				}
-			}
 		}
 		//MKV Ride the Lightning
 		/*if ((character as Vile).isVileMK5 
@@ -466,19 +458,12 @@ public bool isGroundAttack = true;
 	{
 		if (victim is IDamagable damagable) {
 				new Damager(player, 2f, 0, 1f).applyDamage(
-					damagable, weakness: false, new VileMK2Grab(), character,   (int)ProjIds.VileMK2Grab
-				);
+					damagable, weakness: false, new VileMK2Grab(), character,   (int)ProjIds.VileMK2Grab);
 		}
-		new BBuffaloCrashProj(player.weapon, character.pos, character.xDir, base.player, base.player.getNextActorNetId(), rpc: true);
 		character.playSound("crash", forcePlay: false, sendRpc: true);
 		character.shakeCamera(sendRpc: true);
-
-		if (  (character as Vile).isVileMK5EX && base.player.input.isHeld("dash", base.player))
-	 {
 		Point spawnPos2 = character.pos.addxy(0 * character.xDir, -150f);
-		 new DynamoBeam(new Napalm(NapalmType.SplashHit), victim.pos, character.xDir, player, player.getNextActorNetId(), sendRpc: true);
-	
-		}
+		new DynamoBeam(new Napalm(NapalmType.SplashHit), victim.pos, character.xDir, player, player.getNextActorNetId(), sendRpc: true);
 	}
 
 

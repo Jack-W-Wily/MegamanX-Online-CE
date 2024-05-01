@@ -127,6 +127,11 @@ public class NapalmGrenadeProj : Projectile {
 	}
 }
 
+
+
+
+
+
 public class NapalmPartProj : Projectile {
 	int times;
 	float xDist;
@@ -145,7 +150,7 @@ public class NapalmPartProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		gravityModifier = 0.25f;
-		frameIndex = Helpers.randomRange(0, sprite.frames.Count - 1);
+	//	frameIndex = Helpers.randomRange(0, sprite.frames.Count - 1);
 		if (isTimeOffset) {
 			timeOffset = napalmPeriod * 0.5f;
 		}
@@ -428,6 +433,7 @@ public class SplashHitAttack : CharState {
 	public SplashHitAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;
+		airMove = true;
 	}
 
 	public static string getSprite(NapalmAttackType napalmAttackType) {
@@ -471,6 +477,9 @@ public class HoutenjinWeapon : Weapon {
 		killFeedIndex = 113;
 	}
 }
+
+
+
 
 public class HoutenjinWeaponF : Weapon {
 	public HoutenjinWeaponF(Player player) : base() {
@@ -620,8 +629,8 @@ public class DragonsWrath : CharState {
 
 
 			if (!character.grounded){
-			if (player.input.isHeld(Control.Jump, player)){
-			character.useGravity = false;} else {character.useGravity = true;}
+			 character.useGravity = false;
+			 character.changeSpriteFromName("flamethrower", false);
 			}
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
@@ -632,7 +641,7 @@ public class DragonsWrath : CharState {
 				}
 				shootTime = 0;
 				character.playSound("flamethrower");
-				if (player.input.isHeld(Control.WeaponLeft, player) && !character.grounded){
+				if (!character.grounded){
 				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
 				} 
 				else {	new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.DragonsWrath), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
@@ -688,8 +697,8 @@ public class SeaDragonRageAttack : CharState {
 
 
 			if (!character.grounded){
-			if (player.input.isHeld(Control.Jump, player)){
-			character.useGravity = false;} else {character.useGravity = true;}
+			 character.useGravity = false;
+			 character.changeSpriteFromName("flamethrower", false);
 			}
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
@@ -700,7 +709,7 @@ public class SeaDragonRageAttack : CharState {
 				}
 				shootTime = 0;
 				character.playSound("flamethrower");
-				if (player.input.isHeld(Control.WeaponLeft, player) && !character.grounded){
+				if (!character.grounded){
 				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi.Value, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
 				} 
 				else {	new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.SeaDragonRage), poi.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
@@ -739,6 +748,7 @@ public class WildHorseKick : CharState {
 	public WildHorseKick(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;
+		airMove = true;
 	}
 
 	public static string getSprite(NapalmAttackType napalmAttackType) {
@@ -752,12 +762,6 @@ public class WildHorseKick : CharState {
 		base.update();
 			if (character.grounded){
 			isGrounded = true;
-			}
-
-
-			if (!character.grounded){
-			if (player.input.isHeld(Control.Jump, player)){
-			character.useGravity = false;} else {character.useGravity = true;}
 			}
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
@@ -787,7 +791,7 @@ public class WildHorseKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		
 	}
 
 	public override void onExit(CharState newState) {
@@ -795,6 +799,121 @@ public class WildHorseKick : CharState {
 		character.useGravity = true;
 	}
 }
+
+
+
+public class HotIcecleAttack : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public HotIcecleAttack(string transitionSprite = "")
+		: base("hoticecle", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.playSound("dynamoslash", sendRpc: true);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+		}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+public class MaceBashAttack : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public MaceBashAttack(string transitionSprite = "")
+		: base("macestomp", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+
+		if (character.grounded){
+		character.slideVel = character.xDir * character.getDashSpeed();	
+		}
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.playSound("dynamoslash", sendRpc: true);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+		}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
 
 public class MK2NapalmGrenadeProj : Projectile {
 	public MK2NapalmGrenadeProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
@@ -999,7 +1118,7 @@ public class SplashHitProj : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		destroyOnHit = false;
-		maxTime = 1.5f;
+		maxTime = 0.7f;
 		this.player = player;
 
 		if (sendRpc) {

@@ -100,14 +100,11 @@ public partial class MegamanX : Character {
 	}
 
 	public bool canShootSpecialBuster() {
-		if (isHyperX && (charState is Dash || charState is AirDash)) {
+		if ((charState is Dash || charState is AirDash)) {
 			return false;
 		}
-		return isSpecialBuster() &&
-			!Buster.isNormalBuster(player.weapon) &&
-			!isInvisibleBS.getValue() &&
-			player.armorFlag == 0 &&
-			streamCooldown == 0;
+		return!Buster.isNormalBuster(player.weapon) &&
+			!isInvisibleBS.getValue();
 	}
 
 	public bool hasExpandedMoveset() {
@@ -136,7 +133,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool canShootSpecialBusterOnBuster() {
-		return isSpecialBuster() && !isInvisibleBS.getValue() && player.armorFlag == 0;
+		return isSpecialBuster() && !isInvisibleBS.getValue() && player.armorFlag == 0 && charState is not Dash && charState is not AirDash;
 	}
 
 	public void refillUnpoBuster() {
@@ -462,46 +459,26 @@ public partial class MegamanX : Character {
 				charState.isGrabbing = true;
 				changeSpriteFromName("ix_grab", true);
 			}
-
-
-		if (isXKai && player.isXisu()){
-			 if (player.input.isHeld(Control.Down, player) &&
-				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 &&
-				  (charState is Idle || charState is Run || charState is Fall || charState is Jump)
-			  )
-			if (unpoAbsorbedProj != null) {
-					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-					unpoAbsorbedProj = null;
-					return;
-				} else {
-					changeState(new XUPParryStartState(), true);
-				}
-		}
 		if (isXKai && player.isKai()){
-			 	 if (player.input.isHeld(Control.Down, player) &&
-				  player.input.isWeaponLeftOrRightPressed(player)){
+			 	 if (player.input.isHeld(Control.Up, player) &&
+				  player.input.isPressed("special1",player)){
 					changeState(new KKnuckleParryStartState(), true);	
 				}}
 
-		if (player.hasUltimateArmor() || isXKai && !isInvulnerableAttack()) {
-			if (isHyperX && charState.attackCtrl && player.input.isPressed(Control.Shoot, player)) {
-				if (unpoShotCount <= 0) {
-					upPunchCooldown = 0.5f;
-					changeState(new XUPPunchState(grounded), true);
-					return;
-				}
-			} else if (player.input.isPressed(Control.Special1, player) && !isInvisible() &&
+	
+			 if (isXKai && player.input.isPressed(Control.Special1, player) && !isInvisible() &&
 				  (charState is Dash || charState is AirDash)) {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
-			} else if (isHyperX && player.input.isPressed(Control.Special1, player) &&
+			} 
+			if (player.input.isPressed(Control.Special1, player) && !player.input.isHeld(Control.Down, player) &&
 				  (charState is Idle || charState is Run || charState is Fall || charState is Jump)) {
 				upPunchCooldown = 0.5f;
 				changeState(new XUPPunchState(grounded), true);
 				return;
-			} else if (
-				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 && SigmaCounters > 2 &&
-				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
+			}  
+			if ( player.input.isHeld("down", player) && player.input.isPressed("special1", player) && parryCooldown == 0 &&
+				  (charState is XUPPunchState || charState is XUPGrabState)
 			  ) {
 				if (unpoAbsorbedProj != null) {
 					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
@@ -511,7 +488,7 @@ public partial class MegamanX : Character {
 					changeState(new XUPParryStartState(), true);
 				}
 			}
-		}
+		
 
 		if (charState.attackCtrl &&
 			 canShoot() &&
@@ -1403,6 +1380,14 @@ public partial class MegamanX : Character {
 		{
 			return new GenericMeleeProj(new HoutenjinWeaponF(player), centerPoint, ProjIds.HoutenjinF, player, 1f, 0, 3f, null, isShield: true, isDeflectShield: true);
 		}
+		if ((player.hasFullLight() 
+		|| (player.isXisu() && player.weapon is RollingShield)
+		|| player.hasUltimateArmor()
+		|| isReturnIX
+		) && sprite.name.Contains("fall") && player.input.isPressed("jump", player))
+		{
+			return new GenericMeleeProj(new GBDKick(), centerPoint, ProjIds.GBDKick, player, 2f, 4, 0f);
+		}
 
 		return proj;
 	}
@@ -1656,7 +1641,7 @@ public partial class MegamanX : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (isSpecialBuster() && player.input.isHeld(Control.Special1, player)) {
+		if (player.input.isHeld(Control.Special1, player)) {
 			return true;
 		}
 		return player.input.isHeld(Control.Shoot, player);

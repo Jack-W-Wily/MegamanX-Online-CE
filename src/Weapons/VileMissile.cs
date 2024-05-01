@@ -178,6 +178,7 @@ public class StunShotProj : Projectile {
 		projId = (int)ProjIds.ElectricShock;
 		maxTime = 0.75f;
 		destroyOnHit = true;
+		reflectable = true;
 		canBeLocal = false; // TODO: Remove the need for this.
 
 		if (vel != null) {
@@ -210,6 +211,7 @@ public class VileMK2StunShotProj : Projectile {
 	public VileMK2StunShotProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
 		base(weapon, pos, xDir, 150, 1, player, "vile_stun_shot2", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "vile_stun_shot_fade";
+		reflectable = true;
 		projId = (int)ProjIds.MK2StunShot;
 		maxTime = 0.75f;
 		destroyOnHit = true;

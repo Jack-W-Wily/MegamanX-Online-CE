@@ -158,7 +158,9 @@ public class TornadoProjCharged : Projectile {
 	public float growTime = 0;
 	public float maxLengthTime = 0;
 
-	public TornadoProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", Global.defFlinch, 0.33f, netProjId, player.ownedByLocalPlayer) {
+	public TornadoProjCharged(Weapon weapon,
+	 Point pos, int xDir, Player player,  ushort netProjId) 
+	 : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", Global.defFlinch, 2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TornadoCharged;
 		sprite.visible = false;
 		spriteStart = Global.sprites["tornado_charge"].clone();

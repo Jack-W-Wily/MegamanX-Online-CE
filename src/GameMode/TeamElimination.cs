@@ -109,11 +109,11 @@ public class Nightmare : GameMode {
 			"Alive: " + (redPlayersAlive.Count).ToString() + "/" + (bluePlayersAlive.Count).ToString(),
 			5, 15, Alignment.Left
 		);
-		if (virusStarted != 1) {
-			drawTimeIfSet(25);
-		} else {
-			drawVirusTime(25);
-		}
+		//if (virusStarted != 1) {
+		//	drawTimeIfSet(0);
+		//} else {
+		//	drawVirusTime(0);
+		//}
 	}
 
 	public override void checkIfWinLogic() {

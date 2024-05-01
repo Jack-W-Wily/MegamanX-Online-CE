@@ -42,6 +42,11 @@ public class ZSaberProj : Projectile {
 			damager.damage = 4;
 			genericShader = player.zeroPaletteShader;
 		}
+		if (owner.character is Zain){
+		changeSprite("zain_projslash", true);
+		reflectable = false;
+		damager.damage = 8;
+		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -49,6 +54,7 @@ public class ZSaberProj : Projectile {
 
 	public override void update() {
 		base.update();
+		
 		if (time > 0.5) {
 			destroySelf(fadeSprite);
 		}

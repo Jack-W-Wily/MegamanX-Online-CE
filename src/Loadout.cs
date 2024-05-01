@@ -140,10 +140,10 @@ public class VileLoadout {
 	//	weapons.Add(new VileCannon((VileCannonType)cannon));
 		weapons.Add(new Vulcan((VulcanType)vulcan));
 		 
-	//	if (includeMech) {
-	//		weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
-	//		weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
-	//	}
+		if (includeMech) {
+			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
+			weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
+		}
 		}
 		return weapons;
 	}

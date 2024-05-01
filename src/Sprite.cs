@@ -531,7 +531,7 @@ public class Sprite {
 			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
 				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 					Trail trail = character.lastFiveTrailDraws[i];
-					if (character.isDashing) {
+					if (character.isDashing || character.vileSTriggerBS.getValue()) {
 						trail.action.Invoke(trail.time);
 					}
 					trail.time -= Global.spf;

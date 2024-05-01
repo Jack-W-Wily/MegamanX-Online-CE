@@ -69,7 +69,7 @@ public class ArmoredArmadillo : Maverick {
 		} else if (state is ArmoredAGuardState) {
 			drainAmmo(1);
 		} else if (state is not ArmoredARollEnterState && state is not ArmoredARollExitState && state is not ArmoredAGuardState) {
-			rechargeAmmo(2);
+			rechargeAmmo(4);
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
@@ -80,12 +80,19 @@ public class ArmoredArmadillo : Maverick {
 					if (ammo > 0) {
 						changeState(new ArmoredAGuardState());
 					}
-				} else if (input.isPressed(Control.Dash, player)) {
+				} else if (input.isPressed(Control.Dash, player) && !player.input.isHeld("down", player)) {
 					if (ammo >= 8) {
 						deductAmmo(8);
 						changeState(new ArmoredARollEnterState());
 					}
 				}
+				 if (input.isPressed(Control.Dash, player) && player.input.isHeld("down", player)) {
+					if (ammo >= 8) {
+						deductAmmo(8);
+						changeState(new DropRoll());
+					}
+				}
+
 			}
 		} else {
 			if (state is MIdle || state is MJump || state is MFall || state is MRun || state is MShoot) {
@@ -162,6 +169,9 @@ public class ArmoredArmadillo : Maverick {
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("roll")) {
 			return new GenericMeleeProj(rollWeapon, centerPoint, ProjIds.ArmoredARoll, player, damage: hasNoArmor() ? 2 : 3);
+		}
+		if (sprite.name.Contains("sword")) {
+			return new GenericMeleeProj(rollWeapon, centerPoint, ProjIds.MechFrogStompShockwave, player, damage: hasNoArmor() ? 2 : 3);
 		}
 		return null;
 	}
@@ -277,13 +287,15 @@ public class ArmoredAGuardChargeState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.playSound("4earmoredaCharge", sendRpc: true);
+	//	maverick.playSound("4earmoredaCharge", sendRpc: true);
 	}
 
 	public override void update() {
 		base.update();
 		if (player == null) return;
-
+		if (player.input.isPressed("special1", player)) {
+			maverick.changeState(new ArmoredAGuardSwordState(damage));
+		}
 		if (stateTime > 1.7f) {
 			maverick.changeState(new ArmoredAGuardReleaseState(damage));
 		}
@@ -313,6 +325,28 @@ public class ArmoredAGuardReleaseState : MaverickState {
 			}
 		}
 
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+}
+
+
+
+public class ArmoredAGuardSwordState : MaverickState {
+	float damage;
+	public ArmoredAGuardSwordState(float damage) : base("sword", "") {
+		this.damage = damage;
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.playSound("sigmaSaber", sendRpc: true);
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new MIdle());
 		}
@@ -378,6 +412,52 @@ public class ArmoredARollEnterState : MaverickState {
 		}
 	}
 }
+
+
+
+
+public class DropRoll : MaverickState {
+	public DropRoll() : base("roll_enter", "") {
+		
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -ArmoredArmadillo.rollTransJumpPower;
+		maverick.frameSpeed = 0;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+
+		Point airMove = new Point(0, 0);
+		
+		if (!maverick.grounded) {
+
+			if (input.isHeld(Control.Left, player)) {
+				airMove.x = -maverick.getRunSpeed() * maverick.getDashSpeed();
+				maverick.xDir = -1;
+			} else if (input.isHeld(Control.Right, player)) {
+				airMove.x = maverick.getRunSpeed() * maverick.getDashSpeed();
+				maverick.xDir = 1;
+			}
+		}
+		maverick.stopCeiling();
+
+		if (maverick.vel.y > 0) {
+			maverick.frameSpeed = 1;
+		}
+		if (maverick.grounded) {
+			maverick.playSound("armoredaCrash", sendRpc: true);
+			maverick.shakeCamera(sendRpc: true);
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player), maverick.pos.addxy(6 * maverick.xDir, 0f), maverick.xDir, player, player.getNextActorNetId(), rpc: true);	
+			maverick.changeState(new ArmoredARollExitState());
+		}
+	}
+}
+
 
 public class ArmoredARollState : MaverickState {
 	public Point rollDir;

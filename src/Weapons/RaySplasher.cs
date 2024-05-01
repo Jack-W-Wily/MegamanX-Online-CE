@@ -283,7 +283,6 @@ public class RaySplasherTurret : Actor, IDamagable
 			{
 				velY = 0f;
 				if (playerOwner.character != null && playerOwner.input.isPressed("weaponright", playerOwner)){
-				new TriadThunderQuake(playerOwner.weapon, pos.addxy(-10 * xDir, 0f), 1, playerOwner, playerOwner.getNextActorNetId(), rpc: true);	
 				state = 1;
 				}
 				changeSprite("iris_crystal_idle", resetFrame: true);
@@ -301,7 +300,6 @@ public class RaySplasherTurret : Actor, IDamagable
 		{
 		changeSprite("iris_crystal_idle", resetFrame: true);
 		if (playerOwner.character != null && playerOwner.input.isPressed("weaponright", playerOwner)){
-				new TriadThunderQuake(playerOwner.weapon, pos.addxy(-10 * xDir, 0f), 1, playerOwner, playerOwner.getNextActorNetId(), rpc: true);	
 				state = 1;
 				}
 		}
@@ -344,7 +342,7 @@ public class RaySplasherTurret : Actor, IDamagable
 				return;
 			}
 			raySplasherShootTime += Global.spf;
-			if (raySplasherShootTime > 0.4f &&  playerOwner.input.isHeld("shoot", playerOwner))
+			if (raySplasherShootTime > 0.4f &&  playerOwner.input.isPressed(Control.WeaponRight, playerOwner))
 			{
 				playSound("buster2");
 				RaySplasherProj raySplasherProj = new RaySplasherProj(new RaySplasher(), pos, (!(pos.x > target.getCenterPos().x)) ? 1 : (-1), raySplasherMod % 3, 0, isTurret: true, netOwner, netOwner.getNextActorNetId(), rpc: true);

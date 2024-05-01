@@ -319,9 +319,6 @@ public partial class Actor : GameObject {
 			spriteName = spriteName.Replace("mmx_", "xisu_").Replace("mmx_", "xisu_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
-		
-		
-
 		if (matchingVoice != null) {
 			playSound(matchingVoice);
 		}

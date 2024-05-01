@@ -64,6 +64,9 @@ public class SoundBufferWrapper {
 				else if (subpiece == "iris") {
 					charNum = 7;
 				}
+				else if (subpiece == "zain") {
+					charNum = 14;
+				}
 			}
 		}
 	}

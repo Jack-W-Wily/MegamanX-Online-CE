@@ -176,6 +176,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.NapalmGrenade:
 				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.HolyWaterGranade:
+				proj = new HolyWaterGranadeProj(new Weapon(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.Napalm:
 				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, arguments[extraDataIndex] != 0, 0);
 				break;
@@ -482,6 +485,22 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.MaroonedTomahawk:
 				proj = new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.IrisCrystal:
+				proj = new NewIrisCrystal(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.HolyBible:
+				proj = new HolyBibleProj(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.ShieldBoomerang:
+				proj = new ShieldBoomerangProj(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.ShieldBoomerang2:
+				proj = new ShieldBoomerangProj2(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.HolyCross:
+				proj = new HolyCrossProj(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
+
 			case (int)ProjIds.WildHorseKick:
 				proj = new FlamethrowerProj(
 					new VileFlamethrower(VileFlamethrowerType.WildHorseKick),

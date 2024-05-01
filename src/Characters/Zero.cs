@@ -747,7 +747,7 @@ public class Zero : Character {
 			);
 		} else if (sprite.name.Contains("hyouretsuzan")) {
 			return new GenericMeleeProj(
-				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan2, player, 1, 12, 0.5f
+				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan, player, 1, 12, 0.15f
 			);
 		} else if (sprite.name.Contains("rakukojin")) {
 			float damage = 3 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
@@ -831,10 +831,10 @@ public class Zero : Character {
 		
 		proj = sprite.name switch {
 			"zero_attack" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 3, 0.25f, isReflectShield: false
 			),
 			"zero_attack2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 3, 0.25f, isReflectShield: false
 			),
 			"zero_attack3" => new GenericMeleeProj(
 					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 20, 0.25f, isReflectShield: false
@@ -843,16 +843,16 @@ public class Zero : Character {
 				zeroAirSpecialWeapon, centerPoint, ProjIds.HyorogaSwing, player, 4, 1, 0.25f
 			),
 			"zero_attack_dash" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberdash, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaberdash, player, 1, 7, 0.25f, isReflectShield: false
 			),
 			"zero_attack_dash2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.Shippuuga, player, 1, Global.halfFlinch, 0.25f
+				zSaberWeapon, centerPoint, ProjIds.Shippuuga, player, 1, 30, 0.25f
 			),
 			"zero_attack_air" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.Rising, player, 2, 4, 0.25f, isReflectShield: false
 			),
 			"zero_attack_air2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.125f, isDeflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.Rising, player, 0.5f, 1, 0.125f, isDeflectShield: false
 			),
 			"zero_ladder_attack" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaberladder, player, 1, 1, 0.25f, isReflectShield: false
@@ -879,16 +879,16 @@ public class Zero : Character {
 				new EBladeWeapon(player), centerPoint, ProjIds.EBlade, player, 1, Global.defFlinch, 0.1f
 			),
 			"zero_rising" => new GenericMeleeProj(
-				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1, 1, 0.15f
+				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1, 4, 0.15f
 			),
 			"zero_rising2" => new GenericMeleeProj(
-				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 1, 0.25f
+				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 4, 0.25f
 			),
 			"superzero_attack" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 3, 0.25f, isReflectShield: false
 			),
 			"superzero_attack2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 3, 0.25f, isReflectShield: false
 			),
 			"superzero_attack3" => new GenericMeleeProj(
 					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 20, 0.25f, isReflectShield: false
@@ -903,10 +903,10 @@ public class Zero : Character {
 				zSaberWeapon, centerPoint, ProjIds.Shippuuga, player, 1, Global.halfFlinch, 0.25f
 			),
 			"superzero_attack_air" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.Rising, player, 2, 4, 0.25f, isReflectShield: false
 			),
 			"superzero_attack_air2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 1, 1, 0.125f, isDeflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaberair, player, 0.5f, 1, 0.125f, isDeflectShield: true
 			),
 			"superzero_ladder_attack" => new GenericMeleeProj(
 				zSaberWeapon, centerPoint, ProjIds.ZSaberladder, player, 1, 1, 0.25f, isReflectShield: false
@@ -933,7 +933,7 @@ public class Zero : Character {
 				new EBladeWeapon(player), centerPoint, ProjIds.EBlade, player, 1, Global.defFlinch, 0.1f
 			),
 			"superzero_rising" => new GenericMeleeProj(
-				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 1, 0.15f
+				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 1.5f, 4, 0.15f
 			),
 			_ => null
 		};

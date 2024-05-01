@@ -13,8 +13,8 @@ public class DynamoRoyal : Weapon
 
 	public DynamoRoyal(Projectile otherProj)
 	{
-		index = 34;
-		weaponSlotIndex = 118;
+		index = 125;
+		weaponSlotIndex = 125;
 		killFeedIndex = 168;
 		absorbedProj = otherProj;
 	}
@@ -27,8 +27,8 @@ public class DynamoTrick : Weapon
 
 	public DynamoTrick()
 	{
-		index = 101;
-		weaponSlotIndex = 101;
+		index = 124;
+		weaponSlotIndex = 124;
 		killFeedIndex = 168;
 	//	absorbedProj = otherProj;
 	}
@@ -51,7 +51,7 @@ public class DynamoBoomerang : Weapon {
 	public float vileAmmoUsage;
 	public string projSprite;
 	public DynamoBoomerang() : base() {
-		index = (int)WeaponIds.RocketPunch;
+		index = (int)WeaponIds.DynamoBoomerang;
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 31;
@@ -214,6 +214,361 @@ public class DynamoBoomerangState : CharState {
 		character.frameIndex = 0;
 		stateTime = 0;
 		shot = false;
+	}
+}
+
+
+
+
+public class HolyCross : CharState {
+
+	private bool shot;
+	private float partTime;
+
+	private float chargeTime;
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	HolyCrossProj proj;
+
+	public HolyCross(string transitionSprite = "")
+		: base("rocket_punch", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+
+		if (proj == null && character.frameIndex >= 3 && character.ownedByLocalPlayer){
+		proj = new HolyCrossProj(new ShieldBoomerang(), character.getShootPos(), character.xDir, player, player.getNextActorNetId(), rpc : true);
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+	
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+		
+		}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+public class HolyCrossProj : Projectile {
+	public float angleDist = 0;
+	public float turnDir = 1;
+	public Pickup pickup;
+	public float angle2;
+
+	public float maxSpeed = 350;
+	public float returnTime = 0.55f;
+	public float turnSpeed = 100;
+	public float maxAngleDist = 280;
+	public float soundCooldown;
+
+	public HolyCrossProj(ShieldBoomerang weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
+		base(weapon, pos, xDir, 150, 2, player, "dynamo_holycross_proj", 8, 0.8f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.ShieldBoomerang;
+		destroyOnHit = false;
+		
+		this.vel.y = 50;
+		angle2 = 0;
+		if (xDir == -1) angle2 = -180;
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+	
+		if (other.gameObject is Pickup && pickup == null) {
+			pickup = other.gameObject as Pickup;
+			if (!pickup.ownedByLocalPlayer) {
+				pickup.takeOwnership();
+				RPC.clearOwnership.sendRpc(pickup.netId);
+			}
+		}
+
+		var character = other.gameObject as Character;
+		if (time > returnTime && character != null && character.player == damager.owner) {
+			destroySelf();
+			character.player.vileAmmo = Helpers.clampMax(character.player.vileAmmo + 8, character.player.vileMaxAmmo);
+		}
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (pickup != null) {
+			pickup.useGravity = true;
+			pickup.collider.isTrigger = false;
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!destroyed && pickup != null) {
+			pickup.collider.isTrigger = true;
+			pickup.useGravity = false;
+			pickup.changePos(pos);
+		}
+
+		soundCooldown -= Global.spf;
+		if (soundCooldown <= 0) {
+			soundCooldown = 0.3f;
+			playSound("cutter", sendRpc: true);
+		}
+
+		if (time > returnTime) {
+			if (angleDist < maxAngleDist) {
+				var angInc = (-xDir * turnDir) * Global.spf * turnSpeed;
+				angle2 += angInc;
+				angleDist += MathF.Abs(angInc);
+				vel.x = Helpers.cosd(angle2) * maxSpeed;
+			} 
+			 if (damager.owner.character != null) {
+				var dTo = pos.directionTo(damager.owner.character.getCenterPos()).normalize();
+				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
+				destAngle = Helpers.to360(destAngle);
+				angle2 = Helpers.lerpAngle(angle2, destAngle, Global.spf * 10);
+				vel.x = Helpers.cosd(angle2) * maxSpeed;
+				vel.y = Helpers.sind(angle2) * maxSpeed;
+			} else {
+				destroySelf();
+			}
+		}
+	}
+
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+		}
+	}
+
+}
+
+
+
+
+
+public class HolyWaterAttack : CharState {
+	bool shot;
+	NapalmAttackType napalmAttackType;
+	float shootTime;
+	int shootCount;
+
+	public HolyWaterAttack(NapalmAttackType napalmAttackType, string transitionSprite = "") :
+		base(getSprite(napalmAttackType), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite(NapalmAttackType napalmAttackType) {
+		return "rocket_punch";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (napalmAttackType == NapalmAttackType.Napalm) {
+			if (!shot && character.sprite.frameIndex == 2) {
+				shot = true;
+				Projectile proj;
+				proj = new HolyWaterGranadeProj(player.vileNapalmWeapon, character.getShootPos(), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				
+			}
+			
+		} 
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+public class HolyWaterGranadeProj : Projectile {
+	bool exploded;
+	public HolyWaterGranadeProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, xDir, 150, 2, player, "dynamo_holywater_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.HolyWaterGranade;
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+		this.vel = new Point(speed * xDir, -200);
+		useGravity = true;
+		collider.wallOnly = true;
+		fadeSound = "explosion";
+		fadeSprite = "explosion";
+		shouldShieldBlock = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (grounded) {
+			explode();
+		}
+	}
+
+	public override void onHitWall(CollideData other) {
+		xDir *= -1;
+		explode();
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (ownedByLocalPlayer) explode();
+	}
+
+	public void explode() {
+		if (exploded) return;
+		exploded = true;
+		if (ownedByLocalPlayer) {
+			for (int i = -3; i <= 3; i++) {
+				new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), false, i * 10, rpc: true);
+				new NapalmPartProj(weapon, pos.addxy(0, 0), 1, owner, owner.getNextActorNetId(), true, i * 10, rpc: true);
+			}
+		}
+		destroySelf();
+	}
+}
+
+
+
+
+public class DaggerThrow : CharState {
+
+	private bool shot;
+	private float partTime;
+
+	private float chargeTime;
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	DynamoDaggerProj proj;
+
+	public DaggerThrow(string transitionSprite = "")
+		: base("rocket_punch", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+
+		if (proj == null && character.frameIndex >= 3 && character.ownedByLocalPlayer){
+		proj = new DynamoDaggerProj(
+					character.getShootPos(), character.getShootXDir(),
+					player, player.getNextActorNetId(), rpc: true
+				);
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+	
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+		
+		}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+public class DynamoDaggerProj : Projectile {
+	public DynamoDaggerProj(
+		Point pos, int xDir, Player player, ushort? netId, bool rpc = false
+	) : base(
+		ZeroBuster.netWeapon, pos, xDir,
+		350, 1.5f, player, "dynamo_dagger_proj", 2, 0,
+		netId, player.ownedByLocalPlayer
+	) {
+		fadeOnAutoDestroy = true;
+		fadeSprite = "dynamo_dagger_proj";
+		reflectable = true;
+		maxTime = 0.5f;
+		projId = (int)ProjIds.DynamoDagger;
+
+		if (rpc) {
+			rpcCreate(pos, player, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new DynamoDaggerProj(
+			args.pos, args.xDir, args.player, args.netId
+		);
 	}
 }
 
@@ -577,6 +932,71 @@ public class DynamoGroundPound1 : CharState
 			{
 			character.changeState(new Idle(), forceChange: true);
 			}
+	}
+}
+
+
+
+public class HolyBibleProj : Projectile {
+	public float angleDist = 0;
+	public float turnDir = 1;
+	public Pickup pickup;
+	public float angle2;
+	public float maxSpeed = 350;
+	public float returnTime = 0.15f;
+	public float turnSpeed = 300;
+	public float maxAngleDist = 180;
+	public float soundCooldown;
+	public float yPos;
+	public float initTime;
+
+	public HolyBibleProj(IrisCrystal weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
+		base(weapon, pos, xDir, 350, 2, player, "dynamo_holybible_proj", 1, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		//fadeSprite = weapon.fadeSprite;
+		projId = (int)ProjIds.HolyBible;
+		destroyOnHit = false;
+		maxAngleDist = 45;
+		returnTime = 0;
+		damager.damage = 1;
+		damager.hitCooldown = 0.33f;
+		this.vel.y = 50;
+		angle2 = 0;
+		if (xDir == -1) angle2 = -180;
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (pickup != null) {
+			pickup.useGravity = true;
+			pickup.collider.isTrigger = false;
+		}
+	}
+
+
+	public override void update() {
+		base.update();
+
+		xDir = owner.character.xDir;
+		if (owner.character.charState is Die || time > 2f) destroySelf();
+		if (owner.character == null || !Global.level.gameObjects.Contains(owner.character)){ 
+			destroySelf();
+			return;
+		}
+		time += Global.spf;
+		if (time > 2) time = 0;
+		float x = 20 * MathF.Sin(time * 5);
+		yPos = -15 * time;
+		Point newPos = owner.character.pos.addxy(x, yPos);
+		changePos(newPos);	
 	}
 }
 

@@ -171,7 +171,7 @@ public class GameMode {
 		else if (mode == TeamElimination) return "t.elim";
 		else if (mode == KingOfTheHill) return "koth";
 		else if (mode == Race) return "race";
-		else if (mode == Nightmare) return "Nightmare";
+		else if (mode == Nightmare) return "nm";
 		else return "dm";
 	}
 
@@ -1187,14 +1187,23 @@ public class GameMode {
 		}
 
 		int frameIndex = player.charNum;
-		if (player.charNum == (int)CharIds.PunchyZero) {
-			frameIndex = 1;
+		if (player.isZero && player.character is Zero zero && zero.isNightmareZero) {
+			frameIndex = 7;
 		}
-		if (player.charNum == (int)CharIds.BusterZero) {
-			frameIndex = 1;
+		if (player.charNum == (int)CharIds.Sigma && player.weapon is  SigmaMenuWeapon) {
+			frameIndex = 5;
 		}
-		if (player.charNum == 6) {
-			frameIndex = 0;
+		if (player.charNum == (int)CharIds.Zain) {
+			frameIndex = 4;
+		}
+		if (player.charNum == (int)CharIds.GBD) {
+			frameIndex = 8;
+		}
+		if (player.charNum == (int)CharIds.Iris) {
+			frameIndex = 9;
+		}
+		if (player.charNum == (int)CharIds.Dynamo) {
+			frameIndex = 10;
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
 
@@ -1396,7 +1405,7 @@ public class GameMode {
 			return;
 		}
 
-		if (player.isVile) {
+		if (player.isVile ||player.isZain) {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
 			baseY -= 16;
@@ -1723,6 +1732,13 @@ public class GameMode {
 			Weapon? gigaCrush = player.weapons.FirstOrDefault((Weapon w) => w is GigaCrush);
 			if (gigaCrush != null) {
 				drawWeaponSlot(gigaCrush, gigaWeaponX, 159);
+				gigaWeaponX += 18;
+			}
+		}
+		if (player.character != null) {
+			Weapon? Blocking = player.weapons.FirstOrDefault((Weapon w) => w is Blocking);
+			if (Blocking != null) {
+				drawWeaponSlot(Blocking, gigaWeaponX, 159);
 				gigaWeaponX += 18;
 			}
 		}
@@ -2930,6 +2946,7 @@ public class GameMode {
 		} else if (charNum == 1) charName = "Zero";
 		else if (charNum == 2) charName = "Vile";
 		else if (charNum == 5) charName = "Dynamo";
+		else if (charNum == 14) charName = "Zain";
 		else if (charNum == 6) charName = "GBD";
 		else if (charNum == 3) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";

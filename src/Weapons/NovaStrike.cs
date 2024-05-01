@@ -6,6 +6,36 @@ using System.Threading.Tasks;
 
 namespace MMXOnline;
 
+
+
+public class Blocking : Weapon {
+	public Blocking(Player? player) : base() {
+		rateOfFire = 0.15f;
+		index = (int)WeaponIds.Blocking;
+		weaponBarBaseIndex = 42;
+		weaponBarIndex = 36;
+		weaponSlotIndex = 95;
+		killFeedIndex = 104;
+		ammo = 32;
+	}
+
+	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
+		if (player.character.ownedByLocalPlayer) {
+			player.character.changeState(new SwordBlock(), true);
+		}
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+	
+		return 2;
+	}
+
+	public override bool canShoot(int chargeLevel, Player player) {
+		return player.character?.flag == null && ammo >= 2;
+	}
+}
+
+
 public class NovaStrike : Weapon {
 	public const float ammoUsage = 16;
 	public NovaStrike(Player? player) : base() {

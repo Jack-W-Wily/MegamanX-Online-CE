@@ -3,6 +3,7 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
 public class CallDownMech : CharState {
 	RideArmor rideArmor;
 	bool isNew;
@@ -22,7 +23,7 @@ public class CallDownMech : CharState {
 
 		if (rideArmor.rideArmorState is not RACalldown) {
 			/*
-			if (vile.isVileMK5)
+			if (character.isVileMK5)
 			{
 				if (stateTime > 0.75f)
 				{
@@ -50,6 +51,7 @@ public class CallDownMech : CharState {
 		base.onExit(newState);
 	}
 }
+
 
 public class VileRevive : CharState {
 	public float radius = 200;

@@ -156,7 +156,7 @@ public class SpiralMagnumProj : Projectile {
 		base(weapon, pos, 1, 1000, 2, player, "spiralmagnum_proj", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		this.target = target;
-		reflectable = false;
+		reflectable = true;
 		vel.x = bulletDir.x * 1000;
 		vel.y = bulletDir.y * 1000;
 		angle = bulletDir.angle;
@@ -248,7 +248,7 @@ public class SpiralMagnumProj : Projectile {
 				if (proj != null && (proj.isShield || proj.isDeflectShield || proj.isReflectShield))
 				{
 					destroySelf();
-					playSound("m10ding");
+					playSound("ding");
 					return;
 				}
 			}
@@ -273,7 +273,7 @@ public class SpiralMagnumProj : Projectile {
 				vel.y *= -1;
 				weakness = false;
 				time = 0;
-				playSound("m10ding");
+				playSound("ding");
 				Global.serverClient?.rpc(RPC.playerToggle, (byte)damager.owner.id, (byte)RPCToggleType.PlayDingSound);
 				return;
 			}

@@ -587,7 +587,7 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.AddTransformEffect) {
 			player.character?.addTransformAnim();
 		} else if (toggleId == RPCToggleType.PlayDingSound) {
-			player.character?.playSound("m10ding");
+			player.character?.playSound("ding");
 		} else if (toggleId == RPCToggleType.StartCrystalize) {
 			player.character?.crystalizeStart();
 		} else if (toggleId == RPCToggleType.StopCrystalize) {

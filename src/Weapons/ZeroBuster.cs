@@ -294,6 +294,7 @@ public class ZSaberProjSwingState : CharState {
 	bool fired;
 	bool grounded;
 	bool shootProj;
+	bool once;
 	public ZSaberProjSwingState(
 		bool grounded, bool shootProj
 	) : base(
@@ -320,6 +321,27 @@ public class ZSaberProjSwingState : CharState {
 			character.dashedInAir++;
 			float ySpeedMod = 0.5f;
 			character.vel.y = (0f - character.getJumpPower()) * ySpeedMod;
+		}
+
+		 if (player.isZain && base.player.input.isHeld("up", base.player)
+		 && character is Zain zain && zain.ZainCounters > 0){
+		    character.changeSpriteFromName("rising", true);
+			character.dashedInAir++;
+			float ySpeedMod = 0.5f;
+			if (!once){
+				once = true;
+				zain.ZainCounters -= 1;
+			}
+			character.vel.y = (0f - character.getJumpPower()) * ySpeedMod;
+		}
+
+		 if (player.isZain && base.player.input.isHeld("down", base.player)
+		 && character is Zain zain2 && zain2.ZainCounters > 0){
+		    character.changeSpriteFromName("thrust", true);
+			if (!once){
+				once = true;
+				zain2.ZainCounters -= 1;
+			}
 		}
 
 		if (character.frameIndex >= 4 && !fired) {

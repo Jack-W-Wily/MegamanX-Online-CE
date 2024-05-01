@@ -6,7 +6,7 @@ public class TriadThunder : Weapon {
 	public static TriadThunder netWeapon = new TriadThunder();
 
 	public TriadThunder() : base() {
-		shootSounds = new List<string>() { "triadThunder", "triadThunder", "triadThunder", "" };
+		shootSounds = new List<string>() { "triadThunder", "triadThunder", "triadThunder", "crash" };
 		rateOfFire = 2.25f;
 		index = (int)WeaponIds.TriadThunder;
 		weaponBarBaseIndex = 19;

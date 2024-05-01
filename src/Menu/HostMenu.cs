@@ -130,7 +130,7 @@ public class HostMenu : IMainMenu {
 	}
 	public byte teamNum {
 		get { return savedMatchSettings.hostMenuSettings.teamNum; }
-		set { savedMatchSettings.hostMenuSettings.teamNum = value; }
+		set { savedMatchSettings.hostMenuSettings.teamNum = 2; }
 	}
 
 	public static int prevMapSizeIndex;

@@ -72,7 +72,9 @@ public class CmdSigma : BaseSigma {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
-		if (lenientAttackPressed && saberCooldown == 0) {
+		if (!player.input.isHeld("down", player) &&
+		lenientAttackPressed && saberCooldown == 0
+		 && charState is not SwordBlock) {
 			//saberCooldown = sigmaSaberMaxCooldown;
 
 			if (charState is WallSlide or LadderClimb) {

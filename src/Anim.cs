@@ -132,7 +132,7 @@ public class Anim : Actor {
 	public override void update() {
 		base.update();
 		
-		if (Global.level.mainPlayer.charNum != 5 && sprite.name == "risingspecter_muzzle") {
+		if (Global.level.mainPlayer.charNum == 2 && sprite.name == "risingspecter_muzzle") {
 			float sin = MathF.Sin(Global.time * 100);
 			float sinDamp = Helpers.clamp01(1 - (time / 0.5f));
 			xScale = (0.75f + sin * 0.25f) * sinDamp;

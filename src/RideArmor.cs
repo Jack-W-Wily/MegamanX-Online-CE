@@ -606,12 +606,12 @@ public class RideArmor : Actor, IDamagable {
 					} else if (chr?.startRideArmor != this || selfDestructTime > 0) {
 						return;
 					}
-				} else {
+				} //else {
 					// Non-neutral ride armors: don't allow other characters to take
-					if (!isNeutral && chr.player != netOwner) {
-						return;
-					}
-				}
+				//	if (!isNeutral && chr.player != netOwner) {
+				//		return;
+				//	}
+			//	}
 
 				putCharInRideArmor(chr);
 			}

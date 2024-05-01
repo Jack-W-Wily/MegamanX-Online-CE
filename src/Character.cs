@@ -15,7 +15,8 @@ public partial class Character : Actor, IDamagable {
 		"Sigma",
 		"Dynamo",
 		"GBD",
-		"Iris"
+		"Iris",
+		"Zain"
 	};
 	public CharState charState;
 	public Player player;
@@ -216,9 +217,10 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["crouch*"] = getCrouchingCollider();
 		spriteToCollider["ra_*"] = getRaCollider();
 		spriteToCollider["rc_*"] = getRcCollider();
+		spriteToCollider["bike_*"] = getRcCollider();
 		spriteToCollider["warp_beam"] = null;
 		spriteToCollider["warp_out"] = null;
-		spriteToCollider["warp_in"] = null;
+		//spriteToCollider["warp_in"] = null;
 		spriteToCollider["revive"] = null;
 		spriteToCollider["revive_to5"] = null;
 		spriteToCollider["die"] = null;
@@ -818,9 +820,6 @@ public partial class Character : Actor, IDamagable {
 		var rect = new Rect(0, 0, 18, 34);
 		if (sprite.name.Contains("_ra_")) {
 			rect.y2 = 20;
-		}
-		if (sprite.name.Contains("_grabbed")){
-			rect.y2 = 1;
 		}
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
@@ -3122,7 +3121,7 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalizeEnd() {
 		isCrystalized = false;
-		playSound("crystalizeDashingX2");
+		//playSound("crystalizeDashingX2");
 		for (int i = 0; i < 8; i++) {
 			var anim = new Anim(getCenterPos().addxy(Helpers.randomRange(-20, 20), Helpers.randomRange(-20, 20)), "crystalhunter_piece", Helpers.randomRange(0, 1) == 0 ? -1 : 1, null, false);
 			anim.frameIndex = Helpers.randomRange(0, 1);

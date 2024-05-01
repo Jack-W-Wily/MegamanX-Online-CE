@@ -463,14 +463,15 @@ public class XUPGrabState : CharState {
 			}
 		}
 
-		if (leechTime > 0.33f) {
+		if (leechTime > 0.5f) {
 			leechTime = 0;
 			if (character.sprite.name.Contains("nghost")){
 					character.addHealth(1);
-			var damager = new Damager(player, 1, 0, 0);
+			var damager = new Damager(player, 6, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}
-			if (player.isX && mmx.VileCounters > 1){
+			if (Global.level.gameMode is not Nightmare &&
+			player.isX && mmx.VileCounters > 1 || player.isXisu() && player.weapon is Torpedo){
 			character.addHealth(1);
 			var damager = new Damager(player, 1, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
@@ -518,6 +519,9 @@ public class XUPGrabState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		var damager = new Damager(player, 1, 0, 0);
+		damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
+	
 	}
 
 	public override void onExit(CharState newState) {
@@ -759,7 +763,10 @@ public class XRevive : CharState {
 		if (character.isAnimOver()) {
 			mmx.isHyperX = true;
 			if (player.HasFullForce())player.setUltimateArmor(true);
-			if (player.HasFullMax())player.setGoldenArmor(true);
+			if (player.HasFullMax()){
+				player.setGoldenArmor(true);
+				player.addHyperCharge();
+			}
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 		}

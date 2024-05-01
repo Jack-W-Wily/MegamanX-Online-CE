@@ -1622,7 +1622,7 @@ public class AI {
 	public void doZeroAI(Character zero4) {
 		// Zero:
 		if (character is Zero zero1) {
-			if (player.isZSaber() && !zero1.isAwakenedZeroBS.getValue() && !(zero1.charState is HyperZeroStart or DarkHoldState or Hurt) && zero1.sprite.name != null) {
+			if (player.isZSaber() && player.character.charState.canAttack() && !(zero1.charState is HyperZeroStart or DarkHoldState or Hurt) && zero1.sprite.name != null) {
 				// huhahu section
 				if (zero1.grounded && zero1.sprite.name == "zero_attack" || zero1.sprite.name == "zero_attack_dash" && zero1.framePercent > 0.65) {
 					zero1.changeSprite("zero_attack2", true);

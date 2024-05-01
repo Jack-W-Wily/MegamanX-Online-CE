@@ -151,6 +151,7 @@ public enum WeaponIds {
 	DarkHold,
 
 	//Vile Weapons
+	BlockableLaunch,
 	Houtenjin,
 	HoutenjinF,
 	MechMenuWeapon,
@@ -287,21 +288,47 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
-	//New wcut weapons
+
+
+	//Dynamo
 	DynamoBoomerang,
 	DynamoTrick,
 	DynamoRoyal,
 	DynamoSword,
+
+	//Iris Stuff
+	IrisCrystal,
+
+
+	// Blocking
+    Blocking,
+
+
+	// GBD
+	ShieldBoomerang,
+
 	//>>>>>>>>
 	DNACore = 250
+
+	
 }
 
 public enum ProjIds {
+	//GBD
+	ShieldBoomerang,
+	ShieldBoomerang2,
+	//Iris
+	IrisCrystal,
+	//Dynamo
+	HolyCross,
+	DynamoDagger,
+	HolyWaterGranade,
+	HolyBible,
 	DynamoBoomerang,
 	DynamoBeam,
 	DynamoDownShoot,
 
-
+	//X
 	Buster,
 	Buster2,
 	Buster3,
@@ -448,6 +475,7 @@ public enum ProjIds {
 
 
 	//VilePRojIDS
+	HotIcecle,
 	Houtenjin,
 	HoutenjinF,
 	ElectricShock,

@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class GigaCrush : Weapon {
 	public GigaCrush() : base() {
-		shootSounds = new List<string>() { "gigaCrushX2", "gigaCrushX2", "gigaCrushX2", "gigaCrushX2" };
+		shootSounds = new List<string>() { "dynamocharge", "dynamocharge", "dynamocharge", "dynamocharge" };
 		rateOfFire = 1;
 		ammo = 0;
 		index = (int)WeaponIds.GigaCrush;
@@ -31,37 +31,13 @@ public class GigaCrush : Weapon {
 		}
 	}
 
-	public override float getAmmoUsage(int chargeLevel) {
-		if (Global.level.mainPlayer.hasFullGiga() || Global.level.mainPlayer.HasFullFalcon()) {
-			return 32;
-		}
-		if (Global.level.mainPlayer.HasFullMax()) {
-			return 10;
-		}
-		if (Global.level.mainPlayer.HasFullForce()) {
-		return 16;
-		}
-		if (!Global.level.mainPlayer.isX) {
+	public override float getAmmoUsage(int chargeLevel) {		
 		return 32;
-		}
-		return 0;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		if (!Global.level.mainPlayer.isX) {
+	
 		return player.character?.flag == null && ammo >= 32;	
-		}
-		if (Global.level.mainPlayer.hasFullGiga() ||Global.level.mainPlayer.HasFullFalcon()) {
-		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 16 : 32);	
-		}
-		if (Global.level.mainPlayer.HasFullMax()) {
-		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 5 : 10);	
-		}
-		if (Global.level.mainPlayer.HasFullForce()) {
-		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 8 : 16);	
-		}
-		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? 33 : 33);	
-		
 	}
 }
 

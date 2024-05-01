@@ -224,8 +224,9 @@ public class LevelData {
 		} else {
 			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
-			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
 			supportedGameModesSet.Add(GameMode.Nightmare);
+			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
+			
 		}
 		if (levelJson.supportsCTF == true) {
 			supportedGameModesSet.Add(GameMode.CTF);
@@ -363,7 +364,7 @@ public class LevelData {
 		return Global.levelDatas[level].customMapUrl;
 	}
 
-	public List<string> gameModeSortOrder = new List<string> { GameMode.Deathmatch, GameMode.TeamDeathmatch, GameMode.CTF, GameMode.KingOfTheHill, GameMode.ControlPoint, GameMode.Elimination, GameMode.TeamElimination, GameMode.Race };
+	public List<string> gameModeSortOrder = new List<string> { GameMode.Deathmatch, GameMode.TeamDeathmatch, GameMode.CTF, GameMode.KingOfTheHill, GameMode.ControlPoint, GameMode.Elimination, GameMode.TeamElimination, GameMode.Race, GameMode.Nightmare };
 	public int gameModeSortFunc(string a, string b) {
 		int aIndex = gameModeSortOrder.IndexOf(a);
 		int bIndex = gameModeSortOrder.IndexOf(b);
@@ -520,39 +521,60 @@ public class LevelData {
 			return "theplace";
 		}
 		// X themes
-		if (!is1v1() && Options.main.preferredCharacter == 0) {
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isX) {
+		if (Global.level.mainPlayer.loadout.xLoadout.melee == 0){
 		if (Helpers.randomRange(0,1) == 0)	return "x5";
 		if (Helpers.randomRange(0,1) == 1)	return "x4";
 		}
+		if (Global.level.mainPlayer.loadout.xLoadout.melee == 1){
+		return "absolutezero";
+		}
+		if (Global.level.mainPlayer.loadout.xLoadout.melee == 2){
+		return "goliath";
+		}
+		}
 		//Zero Themes
-		if (!is1v1() && Options.main.preferredCharacter == 1) {
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isZero) {
 			return "awakeroadagain";
 		}
 		//Vile Themes
-		if (!is1v1() && Options.main.preferredCharacter == 2) {
-		 return "mhxvava";
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isVile) {
+		if (Helpers.randomRange(0,3) == 0)	return "mhxvava";
+		if (Helpers.randomRange(0,3) == 1)	return "DivineHate";
+		if (Helpers.randomRange(0,3) == 2)	return "EndlessDespair";
+		if (Helpers.randomRange(0,3) == 3)	return "CrisisReverted";
 		}
 		// AXL Themes
-		if (!is1v1() && Options.main.preferredCharacter == 3) {
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isAxl) {
 		 return "axlx7";
 		}
 		//Sigma Themes
-		if (!is1v1() && Options.main.preferredCharacter == 4) {
-		if (Helpers.randomRange(0,1) == 0)	return "sigmax4x5";
-		if (Helpers.randomRange(0,1) == 1)	return "sigmax8";
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isSigma) {
+		if (Helpers.randomRange(0,3) == 0)	return "sigmax4x5";
+		if (Helpers.randomRange(0,3) == 1)	return "sigmax8";
+		if (Helpers.randomRange(0,3) == 2)	return "sigmax6";
+		if (Helpers.randomRange(0,3) == 3)	return "sigmax4final";
 		}
 		//Dynamo Themes
-		if (!is1v1() && Options.main.preferredCharacter == 5) {
-		if (Helpers.randomRange(0,1) == 0)	return "tastetheblood";
-		if (Helpers.randomRange(0,1) == 1)	return "dynamo";
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isDynamo) {
+		if (Helpers.randomRange(0,2) == 0)	return "tastetheblood";
+		if (Helpers.randomRange(0,2) == 1)	return "dynamo";
+		if (Helpers.randomRange(0,2) == 2)	return "Monkey";
 		}
 		// GBD Themes
-		if (!is1v1() && Options.main.preferredCharacter == 6) {
-		 return "x2opening";
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isGBD) {	
+		if (Helpers.randomRange(0,1) == 0)	return "x2opening";
+		if (Helpers.randomRange(0,1) == 1)	return "BlueWaterBlueSky";
 		}
 		// Iris Themes
-		if (!is1v1() && Options.main.preferredCharacter == 7) {
-		 return "iris";
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isIris) {
+		if (Helpers.randomRange(0,1) == 0)	return "iris";
+		if (Helpers.randomRange(0,1) == 1)	return "MakenaiAiGaKittoAru";
+		}
+		// Zain Themes
+		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isZain) {
+			return "RequiemNitanchouDiesIrae";
+		
 		}
 
 

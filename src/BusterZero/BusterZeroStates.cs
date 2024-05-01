@@ -297,8 +297,8 @@ public class HyperBusterZeroStart : CharState {
 				destroyOnEnd: false, sendRpc: true
 			);
 		LightX3.fadeIn = true;
-		character.player.currency -= 10;
-		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
+		character.player.currency -= 5;
+		//character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
 
 	public override void onExit(CharState newState) {

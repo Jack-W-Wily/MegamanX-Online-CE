@@ -34,11 +34,12 @@ public enum CharIds {
 	GBD = 6,
 	Iris = 7,
 	Lumine = 8,
-	PunchyZero = 11,
-	BusterZero = 12,
-	// Non vanilla chars start here.
+	PunchyZero = 9,
 	Rock = 10,
-
+	Reploid = 11,
+	NightmareGhost = 12,
+	BusterZero = 13,
+	Zain = 14,
 }
 
 public class CharSelection {
@@ -67,7 +68,8 @@ public class CharSelection {
 					new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
 					new CharSelection("dynamo", 5, 1, 0, "smenu_dynamo", 0),
 					new CharSelection("Green Biker Dude", 6, 1, 0, "smenu_gbd", 0),
-					new CharSelection("Iris", 7, 1, 0, "smenu_iris", 0),					
+					new CharSelection("Iris", 7, 1, 0, "smenu_iris", 0),	
+					new CharSelection("Zain", 14, 1, 0, "smenu_zain", 0),				
 					new CharSelection(" X (X3)>", 0, 3, 0, "smenu_x", 0),
 					new CharSelection("<X (X2)>", 0, 2, 0, "smenu_x", 0),
 				};

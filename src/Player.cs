@@ -160,6 +160,7 @@ public partial class Player {
 	public bool isGBD { get { return charNum == 6; } }
 	public bool isIris { get { return charNum == 7; } }
 	public bool isLumine { get { return charNum == 8; } }
+	public bool isZain { get { return charNum == 14; } }
 
 
 
@@ -233,6 +234,9 @@ public partial class Player {
 		{ (int)CharIds.GBD, new List<SubTank>() },
 		{ (int)CharIds.Iris, new List<SubTank>() },
 		{ (int)CharIds.Lumine, new List<SubTank>() },
+		{ (int)CharIds.Reploid, new List<SubTank>() },
+		{ (int)CharIds.NightmareGhost, new List<SubTank>() },
+		{ (int)CharIds.Zain, new List<SubTank>() },
 	};
 	// Heart tanks
 	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
@@ -248,6 +252,9 @@ public partial class Player {
 		{ (int)CharIds.GBD, 0 },
 		{ (int)CharIds.Lumine, 0 },
 		{ (int)CharIds.Iris, 0 },
+		{ (int)CharIds.NightmareGhost, 0 },
+		{ (int)CharIds.Reploid, 0 },
+		{ (int)CharIds.Zain, 0 },
 	};
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -260,7 +267,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 10;
+	public const int maxCharCurrencyId = 20;
 	public static int curMul = Helpers.randomRange(2, 8);
 	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
@@ -470,6 +477,18 @@ public partial class Player {
 			{ 6, 0 },
 			{ 7, 0 },
 			{ 8, 0 },
+			{ 9, 0 },
+			{ 10, 0 },
+			{ 11, 0 },
+			{ 12, 0 },
+			{ 13, 0 },
+			{ 14, 0 },
+			{ 15, 0 },
+			{ 16, 0 },
+			{ 17, 0 },
+			{ 18, 0 },
+			{ 19, 0 },
+			{ 20, 0 },
 		};
 
 	public int hyperChargeSlot;
@@ -615,7 +634,7 @@ public partial class Player {
 
 		this.input = input;
 		this.ownedByLocalPlayer = ownedByLocalPlayer;
-
+		//this.xArmor1v1 = playerData.armorSet;
 		this.xArmor1v1 = playerData?.armorSet ?? 1;
 		if (Global.level.is1v1() && isX) {
 			bootsArmorNum = xArmor1v1;
@@ -712,6 +731,7 @@ public partial class Player {
 		}
 		int bonus = 0;
 		if (isSigma) bonus = 4;
+		if (isZain) bonus = 4;
 		if (isDynamo) bonus = 2;
 		if (isVile) bonus = -8;
 		if (isIris) bonus = -4;
@@ -1043,7 +1063,7 @@ public partial class Player {
 					currency = 9999;
 				}
 			}
-
+			if (Global.level.gameMode is not Nightmare){
 			if (charNum == (int)CharIds.X) {
 				character = new MegamanX(
 					this, pos.x, pos.y, xDir,
@@ -1097,6 +1117,11 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
+			}else if (charNum == (int)CharIds.Zain) {
+				character = new Zain(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			}else if (charNum == (int)CharIds.Iris) {
 				character = new Iris(
 					this, pos.x, pos.y, xDir,
@@ -1108,11 +1133,25 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			}   else {
+			} else {
 				character = new Character(
 					this, pos.x, pos.y, xDir, false, charNetId,
 					ownedByLocalPlayer, mk2VileOverride: mk2VileOverride, mk5VileOverride: false
 				);
+			}
+			}  else {
+				if (alliance == GameMode.blueAlliance){
+				character = new Reploid(
+					this, pos.x, pos.y, xDir, false, charNetId,
+					ownedByLocalPlayer
+				);
+				}
+				if (alliance == GameMode.redAlliance){
+				character = new NightmareGhost(
+					this, pos.x, pos.y, xDir, false, charNetId,
+					ownedByLocalPlayer
+				);
+				}
 			} //else {
 			//	throw new Exception("Error: Non-valid char ID: " + charNum);
 			//}
@@ -1516,6 +1555,10 @@ public partial class Player {
 		return bodyArmorNum > 0 && bootsArmorNum > 0 && armArmorNum > 0 && helmetArmorNum > 0;
 	}
 
+	public bool isNormalBodyX() {
+		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 0 && !mmx.isXKai && !mmx.isIX;
+	}
+
 	public bool hasFullLight() {
 		return character != null && character is MegamanX mmx && mmx.CurrentArmor == 1;
 	}
@@ -1672,9 +1715,9 @@ public partial class Player {
 				) {
 					return false;
 				}
-				if ((character as MegamanX)?.shotgunIceChargeTime > 0f) {
-					return false;
-				}
+				//if ((character as MegamanX)?.shotgunIceChargeTime > 0f) {
+				//	return false;
+				//}
 				if (character.charState is Frozen ||
 					character.charState is Stunned ||
 					character.charState is Crystalized

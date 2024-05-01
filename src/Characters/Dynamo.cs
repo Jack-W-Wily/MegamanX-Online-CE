@@ -15,6 +15,10 @@ public class Dynamo : Character {
 
 	public int NightmareBullets = 0;
 
+	public HolyBibleProj holyBible;
+	
+
+
 
 	public int DynamoCounters = 0;
 
@@ -113,13 +117,32 @@ public class Dynamo : Character {
 		charState.canAttack() && player.input.isPressed("special1", player))
 					{
 		DynamoBoomerangCD = 1.2f;
-        changeState(new EnfrenteMeuDisco2());		
+		new HolyBibleProj(new IrisCrystal(), pos, getShootXDir(), player, player.getNextActorNetId(), rpc: true);
 		}
 		}
 		// Dynamo STance 3
 		if (DynamoStance == 2){
-		if (grounded && charState.canAttack() && player.input.isPressed("shoot", player))
-					{
+
+			if (grounded && charState.canAttack() && player.input.isPressed("shoot", player))
+			{
+				if (!player.input.isHeld("down", player) 
+				&& !player.input.isHeld("up", player)){
+				changeState(new DaggerThrow() );		
+				}
+				if (player.input.isHeld("down", player) 
+				&& !player.input.isHeld("up", player) && DynamoBoomerangCD == 0 ){
+					DynamoBoomerangCD = 2f;
+				changeState(new HolyWaterAttack(NapalmAttackType.Napalm));		
+				}
+				if (!player.input.isHeld("down", player) 
+				&& player.input.isHeld("up", player) && DynamoPunchCD == 0){
+					DynamoPunchCD = 1f;
+				changeState(new HolyCross());		
+				}
+
+			}
+		if (grounded && charState.canAttack() && player.input.isPressed("specail1", player))
+				{
 				if (NightmareBullets > 0)
 					{
 			if (NightmareBullets != 3)changeState(new DynamoShoot(grounded, shootProj: false), forceChange: true);
@@ -127,8 +150,8 @@ public class Dynamo : Character {
 				NightmareBullets -= 1;				
 					}
                  changeState(new DynamoParryStartState());
-					}
-		if (DynamoBoomerangCD == 0 && 
+				}
+		if (DynamoBoomerangCD == 0 && !grounded &&
 		charState.canAttack() && player.input.isPressed("special1", player))
 					{
 				DynamoBoomerangCD = 1.5f;
@@ -158,17 +181,21 @@ public class Dynamo : Character {
 				0, 0, 0, isDeflectShield: true
 			);
 		}
-		else if ( sprite.name.Contains("_projswing") && !collider.isHurtBox())
+		 if ( sprite.name.Contains("_projswing") && !collider.isHurtBox())
 		{
 			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
 		}
-		else if ( sprite.name.Contains("_string") && !collider.isHurtBox())
+		 if ( sprite.name.Contains("_string") && !collider.isHurtBox())
 		{
 			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
-		else if ( sprite.name.Contains("_nova_strike") && !collider.isHurtBox())
+		 if ( sprite.name.Contains("_nova_strike") && !collider.isHurtBox())
 		{
 			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 1f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+		}
+		if ( sprite.name.Contains("chargegp"))
+		{
+			return new GenericMeleeProj(new HoutenjinWeaponF(player), centerPoint, ProjIds.HoutenjinF, player, 1f, 0, 3f, null, isShield: true, isDeflectShield: true);
 		}
 		return null;
 	}

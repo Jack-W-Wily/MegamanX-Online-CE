@@ -81,10 +81,6 @@ public class SpinningBladeProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		if (player?.character != null && player.isGBD){
-			changeSprite("meudisco_proj", resetFrame: true);
-			
-		}
 	}
 
 	public override void update()
@@ -106,10 +102,7 @@ public class SpinningBladeProj : Projectile {
 		}
 		if (time >= 1) damager.damage = 3;
 		if (time >= 1) damager.flinch = 4;
-		if (owner?.character != null && owner.isGBD){
-			changeSprite("meudisco_proj", resetFrame: true);
-			damager.flinch = 1;
-		}
+		
 	}
 
 	public override void onDestroy()

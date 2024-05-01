@@ -320,14 +320,14 @@ public class Vile : Character {
 		}
 
 
-		if (isVileMK2 && rideArmor != null &&
+		if (isVileMK2 && startRideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player)
 		) {
-				rideArmor.explode(true);
+				startRideArmor.explode(true);
 		}
 
-		if (isVileMK5 && rideArmor != null &&
+		if (isVileMK5 && startRideArmor != null &&
 			player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player)
 		) {
@@ -363,7 +363,7 @@ public class Vile : Character {
 		if (charState is Dash || charState is AirDash) {
 			if (useGrabCooldown == 0 && (player.input.isHeld(Control.Shoot, player))) {
 				charState.isGrabbing = true;
-				charState.superArmor = true;
+				invulnTime = 0.3f;
 				changeSpriteFromName("dash_grab", true);
 			}
 		}
@@ -372,14 +372,14 @@ public class Vile : Character {
 		// Vile Moves
 
 		// Houtenjin
-		if (isVileMK5 && player.currency > 0 &&
+		if (isVileMK5 && isCharging() && getChargeLevel() >= 4  &&
 		downpressedtimes >= 2 && 
 		mk2missleCooldown == 0 &&
 		player.input.isPressed(Control.WeaponLeft, player)){
 		downpressedtimes = 0;
 		changeState(new HoutenjinStartState(), true);
 		mk2missleCooldown = 2f;
-		player.currency -= 1;
+		stopCharge();
 		}
 
 
@@ -482,20 +482,31 @@ public class Vile : Character {
 
 		//WildHorseKick
 		if (player.input.isPressed(Control.WeaponLeft, player) 
-		&&  !player.input.isHeld(Control.Down, player)) {
+		&&  !player.input.isHeld(Control.Down, player)
+		&&  !player.input.isHeld(Control.Up, player)
+		&& (player.input.isHeld(Control.Left, player)
+		|| player.input.isHeld(Control.Right, player))) {
 		changeState(new WildHorseKick(NapalmAttackType.Napalm), true);
 		}
 		//DragonWrath
-		if (player.input.isPressed(Control.WeaponLeft, player) && player.input.isHeld(Control.Down, player)) {
+		if (player.input.isPressed(Control.WeaponLeft, player) 
+		&& !player.input.isHeld(Control.Left, player)
+		&& !player.input.isHeld(Control.Right, player)) {
 		changeState(new DragonsWrath(NapalmAttackType.Napalm), true);
 		}
 		
 		//SeaDragonRage
-		if (player.input.isPressed(Control.WeaponLeft, player) && player.input.isHeld(Control.Up, player)) {
+		if (player.input.isPressed(Control.WeaponLeft, player) 
+		&& player.input.isHeld(Control.Down, player)) {
 		changeState(new SeaDragonRageAttack(NapalmAttackType.Napalm), true);
 		}
-		
-	
+
+		//SplashHit
+		if (player.input.isPressed(Control.WeaponLeft, player) 
+		&& player.input.isHeld(Control.Up, player) && player.vileAmmo > 20) {
+		changeState(new SplashHitAttack(NapalmAttackType.Napalm), true);
+		player.vileAmmo -= 20;
+		}
 		}
 
 
@@ -505,6 +516,18 @@ public class Vile : Character {
 			player.weapon.vileShoot(WeaponIds.Vulcan, this);
 		}
 
+			if (isVileMK1 && player.vileAmmo > 5 && charState.canAttack() && player.input.checkShoryuken(player, xDir,Control.Dash)) {
+		 	player.vileAmmo -= 6;
+			changeState(new HotIcecleAttack(), true);
+			}
+
+
+		if (isVileMK1 && player.vileAmmo > 5 && charState.canAttack() && player.input.checkHadoken(player, xDir,Control.Dash)) {
+		 	player.vileAmmo -= 6;
+			changeState(new MaceBashAttack(), true);
+			slideVel = xDir * getDashSpeed();	
+		}
+	
 		//Ouroboros Bitch
 		if (( isVileMK4 || Options.main.swapGoliathInputs) && mk2missleCooldown == 0){
 		if (player.input.isPressed(Control.WeaponRight, player) &&  player.vileAmmo > 8) {
@@ -520,6 +543,7 @@ public class Vile : Character {
 		 	player.vileAmmo -= 6;
 			changeState(new DynamoString1(), true);
 			}
+			
 		}
 		//Mk2 Missle Thinggy
 			if (isVileMK2 && player.input.isPressed(Control.WeaponRight, player) && mk2missleCooldown == 0){
@@ -667,9 +691,9 @@ public class Vile : Character {
 					buyRideArmor();
 					mmw.isMenuOpened = false;
 					int raIndex = player.selectedRAIndex;
-					if (isVileMK5 && raIndex >= 0) raIndex = 5;
-					rideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
-					if (rideArmor.raNum == 4) summonedGoliath = true;
+					if (isVileMK5 && raIndex == 4) raIndex++;
+					startRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
+					if (startRideArmor.raNum == 4) summonedGoliath = true;
 					if (isVileMK5) {
 						startRideArmor.ownedByMK5 = true;
 						startRideArmor.zIndex = zIndex - 1;
@@ -821,6 +845,15 @@ public class Vile : Character {
 		{
 			return new GenericMeleeProj(new HoutenjinWeapon(player), centerPoint, ProjIds.Houtenjin, player, 1f, 0, 1f, null, isShield: true, isDeflectShield: true);
 		}
+		if ( sprite.name.Contains("hoticecle"))
+		{
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.HotIcecle, player, 2f, 0, 0.4f, null, isShield: true, isDeflectShield: true);
+		}
+		if ( sprite.name.Contains("macestomp"))
+		{
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.MechFrogStompShockwave, player, 2f, 0, 0.4f, null, isShield: true, isDeflectShield: true);
+		}
+		
 	
 		return proj;
 	}
@@ -911,7 +944,7 @@ public class Vile : Character {
 	}
 
 	public override void render(float x, float y) {
-		if (isSpeedDevilActiveBS.getValue()) {
+		if (isSpeedDevilActiveBS.getValue() || vileSTriggerBS.getValue()) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
@@ -953,7 +986,7 @@ public class Vile : Character {
 				auraSize,
 				auraSize,
 				zIndex -1,
-				player.isVile ? player.lastStandShader : player.omegaAuraShader
+				player.isVile ? player.omegaAuraShader : player.omegaAuraShader
 			);
 			updateOmegaAura();
 		}
@@ -984,28 +1017,29 @@ public class Vile : Character {
 			float drawX2 = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize2;
 			float drawY2 = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize2 + 1;
 
-			var shaders = player.darknessmodeShader;//new List<ShaderWrapper> { Global.shaderWrappers["darknessmode"] };
+			float auraAlpha = 0.75f;
 
+				
 			Global.sprites[sprite.name].draw(
 				sprite.frameIndex, 
 				drawX, drawY,
-				xDir, 1,
-				null, 1,
+				xDir, yDir,
+				null, auraAlpha,
 				auraSize,
 				auraSize,
-				zIndex + 1,
-				shaders
+				zIndex +1,
+				player.omegaAuraShader
 			);
 
 			Global.sprites[sprite.name].draw(
 				sprite.frameIndex, 
-				drawX, drawY,
-				xDir, 1,
-				null, 1,
+				drawX2, drawY2,
+				xDir, yDir,
+				null, auraAlpha,
 				auraSize2,
 				auraSize2,
-				zIndex - 1,
-				shaders
+				zIndex -1,
+				player.omegaAuraShader
 			);
 
 			updateOmegaAura();

@@ -157,9 +157,12 @@ public class GenericMeleeProj : Projectile {
 				hyouretsuzanState.quakeBlazerExplode(false);
 			}
 		}
-		//>>> Zero Uppercut Bullshit
+		//>>> Uppercut Bullshit
 		
-		if (projId == (int)ProjIds.Ryuenjin || projId == (int)ProjIds.EBlade || projId == (int)ProjIds.Rising){
+		if (projId == (int)ProjIds.Ryuenjin 
+		|| projId == (int)ProjIds.EBlade 
+		|| projId == (int)ProjIds.Rising
+		|| projId == (int)ProjIds.HotIcecle){
 			if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;

@@ -381,6 +381,12 @@ public class WarpIn : CharState {
 		if (!character.ownedByLocalPlayer) return;
 		if (!Global.level.mainPlayer.readyTextOver) return;
 
+
+		if (stateTime > 0) {
+			character.changeState(new Intro());
+			character.invulnTime = 1f;
+		}
+
 		if (warpAnim == null && !warpAnimOnce) {
 			warpAnimOnce = true;
 			warpAnim = new Anim(character.pos.addxy(0, -yOffset), character.getSprite("warp_beam"), character.xDir, player.getNextActorNetId(), false, sendRpc: true);
@@ -404,7 +410,7 @@ public class WarpIn : CharState {
 			}
 
 			if (character.isAnimOver()) {
-				character.changeState(new Idle());
+				character.changeState(new Intro());
 			}
 			return;
 		}
@@ -469,6 +475,7 @@ public class WarpIn : CharState {
 		if (player.isVile && Helpers.randomRange(0, 10) == 10){
 			character.playSound("vileradio", sendRpc: true);	
 		}
+		
 		if (player.isDynamo){
 		player.weapons.Add(new DynamoTrick());
 		player.weapons.Add(new DynamoSword());
@@ -927,6 +934,14 @@ public class Dash : CharState {
 			character.turnToInput(player.input, player);
 			initialDashDir = character.xDir;
 		}
+
+
+		if (player.isZain && player.input.isHeld("shoot", player)) {
+			distanceModifier = 1.5f;
+			character.changeSpriteFromName("spinslash", true);
+			initialDashDir = character.xDir;
+			character.useGravity = true;
+		}
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// Phoenix Dash
 		Helpers.decrementTime(ref trailTime);
@@ -1044,6 +1059,13 @@ public class AirDash : CharState {
 			initialDashDir = character.xDir;
 		}
 
+		if (player.isZain && player.input.isHeld("shoot", player)) {
+			distanceModifier = 1.5f;
+			character.changeSpriteFromName("spinslash", true);
+			initialDashDir = character.xDir;
+			character.useGravity = true;
+		}
+
 
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
@@ -1066,7 +1088,12 @@ public class AirDash : CharState {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
 		}
-		if (dashTime > Global.spf * 28 * distanceModifier || stop) {
+		if (
+		(player. isX && 
+		(player.hasFullLight() ||
+		player.HasFullGaea() ||
+		player.isNormalBodyX())) || 
+		dashTime > Global.spf * 28 * distanceModifier || stop) {
 			if (!stop) {
 				dashTime = 0;
 				stop = true;
@@ -1250,7 +1277,7 @@ public class WallSlide : CharState {
 			if (player.isGBD && (character as GBD).isOnBike){
 			character.move(new Point(0, -300));
 			} 
-			if (!(player.HasFullShadow() && !(character as GBD).isOnBike )
+			if (!(player.HasFullShadow())
 			&& !(player.isAxl 
 			&& player.input.isHeld(Control.Shoot,player))
 			){
@@ -1467,13 +1494,34 @@ public class Taunt : CharState {
 		if (character.sprite.name == "zero_win2" && character.frameIndex == 1 && !once) {
 			once = true;
 			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir, -25f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
 		}
+	}
+}
+
+
+
+public class Intro : CharState {
+	float tauntTime = 1;
+	public Intro() : base("warp_in") {
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.charNum == 0) tauntTime = 0.75f;
+		if (player.charNum == 1) tauntTime = 0.7f;
+		if (player.charNum == 3) tauntTime = 0.75f;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isAnimOver()) {
+				character.changeState(new Idle());
+			}
 	}
 }
 
@@ -1905,11 +1953,6 @@ public class Die : CharState {
 			anim.xDir = sigma.lastHyperSigmaXDir;
 			anim.frameSpeed = 0;
 		}
-		if (character is Zero zero) {
-			if (zero.isNightmareZeroBS.getValue()) {
-				character.playSound("zndie", sendRpc: true);
-			}
-		}
 	}
 
 	public override void onExit(CharState newState) {
@@ -2105,10 +2148,12 @@ public class LaunchedState : GenericGrabbedState {
 	//private bool once;
 	public bool launched;
 	float launchTime;
+	bool once;
 	public LaunchedState(Character grabber) : base(grabber, 1, "") {
 		customUpdate = true;
 	}
 
+	
 	public override void update() {
 		base.update();
 
@@ -2123,71 +2168,26 @@ public class LaunchedState : GenericGrabbedState {
 						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
 						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-							if(!once){
-							player.health -= 3;
-							once = true;
+							if (!once){
+								once = true;
+								player.health -= 3;
 							}
 							character.playSound("crash", sendRpc: true);
 							character.shakeCamera(sendRpc: true);
 							//return;
 						}
 			}
-		
-		
-		if (!launched) {
+	
+		}
+
+			if (!launched) {
 				launched = true;
 				character.unstickFromGround();
 				character.vel.y = -600;
-			}
+			}	 
 	}
 }
 
-}
-
-public class LaunchedStateF : GenericGrabbedState {
-	public Character grabbedChar;
-	//private bool once;
-	public bool launched;
-	float launchTime;
-	public LaunchedStateF(Character grabber) : base(grabber, 1, "") {
-		customUpdate = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (launched) {
-			launchTime += Global.spf;
-			if (launchTime > 0.33f) {
-			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-				return;
-			}
-
-			var hitWall = Global.level.checkCollisionActor(character, character.xDir * 2, -2);
-			if (hitWall?.isSideWallHit() == true) {
-
-
-
-			character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-				if(!once){
-				player.health -= 3;
-				once = true;
-				}
-				character.playSound("crash", sendRpc: true);
-				character.shakeCamera(sendRpc: true);
-					//return;
-				}
-			}
-		
-	
-		if (!launched) {
-				launched = true;
-				character.unstickFromGround();
-				if (character.xDir == 1) character.vel.x = -200;
-				if (character.xDir == -1) character.vel.x = 200;
-			}
-	}
-}
 
 public class NetLimbo : CharState {
 	public NetLimbo() : base("idle", "", "", "") {
