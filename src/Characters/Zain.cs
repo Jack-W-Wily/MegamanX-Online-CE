@@ -137,7 +137,7 @@ public override bool normalCtrl() {
 		}
 		if (  sprite.name.Contains("thrust"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.Raijingeki, player, 4f, 0, 0.15f);
+			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.Raijingeki, player, 2f, 0, 0.15f);
 		}
 		return null;
 	}

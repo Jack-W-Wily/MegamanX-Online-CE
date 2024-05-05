@@ -1050,7 +1050,8 @@ public class AirDash : CharState {
 
 	public override void update() {
 		Dash.dashBackwardsCode(character, initialDashDir);
-
+		float speedModifier = 1;
+		float distanceModifier = 1;
 		base.update();
 
 
@@ -1070,8 +1071,7 @@ public class AirDash : CharState {
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
-		float speedModifier = 1;
-		float distanceModifier = 1;
+		
 		if (player.isX && player.hasFullGiga()) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;

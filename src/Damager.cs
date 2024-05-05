@@ -404,7 +404,7 @@ public class Damager {
 	//Get Launched by Houtenjin
 	if (projId == (int)ProjIds.Houtenjin 
 	|| projId == (int)ProjIds.TornadoCharged
-	|| projId == (int)ProjIds.BlockableLaunch && !character.spriteName.Contains("block")) {	
+	|| projId == (int)ProjIds.BlockableLaunch && !character.sprite.name.Contains("block")) {	
 		character.changeState(new LaunchedState(owner.character), true);
 	}
 	if (projId == (int)ProjIds.HoutenjinF) {	
@@ -489,7 +489,8 @@ public class Damager {
 			if (owner?.character?.isNightmareZeroBS.getValue() == true) {
 				character.addInfectedTime(owner, 0.8f);
 			}
-			if (owner.isZero) {
+			// Zero gaining ammo
+			if (owner.character != null && owner.isZero && owner.health > 0 ) {
 				(owner.character as Zero).zeroGigaAttackWeapon.addAmmo(1, owner);
 			}
 

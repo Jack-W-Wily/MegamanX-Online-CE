@@ -1398,7 +1398,6 @@ public partial class Actor : GameObject {
 	public SoundWrapper playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
 		soundKey = soundKey.ToLowerInvariant();
 		if (!Global.soundBuffers.ContainsKey(soundKey)) return null;
-		if (!Global.soundBuffers.ContainsKey(soundKey) && !ownedByLocalPlayer) return null;
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}
 

@@ -39,13 +39,11 @@ public class StingProj : Projectile {
 		} else if (type == 2 || type == 3) {
 			var sprite = "sting_up";
 			if (type == 3) {
-			//	yDir = -1; this is the code
-			// that was on the wrong place making Csting display incorrectly
 				vel.y = -150;
 			} else {
 				vel.y = 150;
 				yDir = -1;
-				yDir = -1;
+			
 			}
 			changeSprite(sprite, false);
 			reflectable = true;

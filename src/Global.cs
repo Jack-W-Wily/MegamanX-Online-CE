@@ -302,6 +302,20 @@ public partial class Global {
 	public static int realSpriteCount = 0;
 
 	// For indexing purposes.
+
+
+/*	private static List<string> _soundNames;
+	public static List<string> soundNames {
+		get {
+			if (_soundNames == null) {
+				_soundNames = soundBuffers.Keys.ToList();
+				_soundNames.Sort(Helpers.invariantStringCompare);
+			}
+			return _soundNames;
+		}
+	}*/
+
+
 	public static Dictionary<string, ushort> soundIndexByName = new();
 	public static Dictionary<int, string> soundNameByIndex = new();
 	public static int soundCount = 0;

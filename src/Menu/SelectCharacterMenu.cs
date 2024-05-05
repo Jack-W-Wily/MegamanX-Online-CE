@@ -34,24 +34,15 @@ public enum CharIds {
 	GBD = 6,
 	Iris = 7,
 	Lumine = 8,
-	PunchyZero = 9,
-	X,
-	Zero,
-	Vile,
-	Axl,
-	Sigma,
-	PunchyZero,
-	BusterZero,
-	// Non-standart chars start here.
-	WolfSigma = 100,
-	ViralSigma,
-	KaiserSigma,
-	// Non-vanilla chars start here.
+	PunchyZero = 9,	
 	Rock = 10,
 	Reploid = 11,
 	NightmareGhost = 12,
 	BusterZero = 13,
 	Zain = 14,
+	WolfSigma = 100,
+	ViralSigma = 101,
+	KaiserSigma = 102,
 }
 
 public class CharSelection {

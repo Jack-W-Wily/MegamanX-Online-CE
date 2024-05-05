@@ -971,6 +971,13 @@ public partial class Character : Actor, IDamagable {
 		downpressedtimes = 0;
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
+
+		//>>>>>>>>>>>>>>>>>>
+		//Fix attempt on the camera
+		if (charState is InRideChaser || sprite.name.Contains("bike")){
+			var prevCamPos = getCamCenterPos();
+			Global.level.snapCamPos(getCamCenterPos(), prevCamPos);
+		}
 		if (charState is Idle) {
 		CanOnhitCancel = false;
 		}

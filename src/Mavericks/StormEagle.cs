@@ -242,6 +242,7 @@ public class StormEBirdProj : Projectile, IDamagable {
 
 public class StormEGustProj : Projectile {
 	float maxSpeed = 250;
+
 	public StormEGustProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 250, 0, player, "storme_proj_gust", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.StormEGust;
@@ -250,6 +251,8 @@ public class StormEGustProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+
+		
 	}
 
 	public override void update() {
@@ -378,6 +381,11 @@ public class StormEGustState : MaverickState {
 			if (!maverick.isUnderwater()) maverick.playSound("stormeFlap", sendRpc: true);
 		}
 
+		if (player.input.isPressed(Control.Taunt, player) && player.currency > 4){
+			player.currency -= 5;
+			maverick.changeState(new StormECageState(), true);
+		}
+
 		gustTime += Global.spf;
 		if (gustTime > 0.1f) {
 			gustTime = 0;
@@ -396,6 +404,50 @@ public class StormEGustState : MaverickState {
 			}
 		}
 	}
+}
+
+
+
+
+public class StormECageState : MaverickState {
+	float soundTime = 0.5f;
+	float gustTime;
+	bool once;
+	public StormECageState() : base("taunt", "") {
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+
+		if (!once){
+		new TornadoProjCharged(new StormETornadoWeapon(), maverick.pos.addxy(300,0), maverick.xDir,  player, player.getNextActorNetId());
+		new TornadoProjCharged(new StormETornadoWeapon(), maverick.pos.addxy(-300,0),maverick.xDir,  player, player.getNextActorNetId());
+		once = true;
+		}
+
+		soundTime += Global.spf;
+		if (soundTime > 0.4f) {
+			soundTime = 0;
+			if (!maverick.isUnderwater()) maverick.playSound("stormeFlap", sendRpc: true);
+		}
+
+
+		
+			if (stateTime > 0.5) {
+				maverick.changeState(new MIdle());
+			}
+		}
 }
 
 public class StormEEggState : MaverickState {

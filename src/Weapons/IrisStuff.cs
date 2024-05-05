@@ -416,7 +416,7 @@ public class NewIrisCrystal : Projectile {
 	public override void update() {
 		base.update();
 
-		xDir = owner.character.xDir;
+		if (owner.character != null) xDir = owner.character.xDir;
 		if (owner.character.charState is Die) destroySelf();
 		if (owner.character == null || !Global.level.gameObjects.Contains(owner.character)){ 
 			destroySelf();

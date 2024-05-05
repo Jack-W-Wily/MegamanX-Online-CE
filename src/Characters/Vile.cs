@@ -18,6 +18,7 @@ public class Vile : Character {
 	public float vilegrabextraCooldown;
 	public float mk2missleCooldown;
 	public float ParasiteSwordcooldown;
+	public float TomahawCooldown;
 	public bool hasFrozenCastleBarrier() {
 		return player.frozenCastle;
 	}
@@ -193,14 +194,18 @@ public class Vile : Character {
 			calldownMechCooldown -= Global.spf;
 			if (calldownMechCooldown < 0) calldownMechCooldown = 0;
 		}
+
+
+		// Vile Cooldown system
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref vileLadderShootCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 		Helpers.decrementTime(ref vilegrabextraCooldown);
-		
 		Helpers.decrementTime(ref mk2missleCooldown);
 		Helpers.decrementTime(ref ParasiteSwordcooldown);
+		Helpers.decrementTime(ref TomahawCooldown);
+
 
 		if (player.weapon is not AssassinBullet && (player.vileLaserWeapon.type > -1 || (isVileMK5 || isVileMK4))) {
 			if (player.input.isHeld(Control.Special1, player) && charState is not Die && invulnTime == 0 && flag == null && player.vileAmmo >= player.vileLaserWeapon.getAmmoUsage(0)) {
@@ -209,7 +214,7 @@ public class Vile : Character {
 				if (isCharging() && getChargeLevel() >= 3) {
 					if (getChargeLevel() >= 4 && (isVileMK5 || isVileMK4)) {
 						if (isVileMK5)changeState(new HexaInvoluteState(), true);
-						if (isVileMK4)changeState(new Rakuhouha(new ShinMessenkou(player)), true);				
+						if (isVileMK4)changeState(new Rakuhouha(new ShinMessenkou()), true);				
 			
 					} else {
 					player.vileLaserWeapon.vileShoot(WeaponIds.VileLaser, this);
@@ -395,10 +400,11 @@ public class Vile : Character {
 			}
 		
 		// Marrowed Tomahawk
-		if (downpressedtimes >= 2 && player.vileAmmo > 8 &&
+		if (downpressedtimes >= 2 && player.vileAmmo > 8 && TomahawCooldown == 0 &&
 		player.input.isPressed(Control.Special1, player)){
 		downpressedtimes = 0;
 		 player.vileAmmo -= 8;
+		 TomahawCooldown = 0.5f;
 		changeState(new MaroonedTomahawkAttackState(), true);
 		}
 

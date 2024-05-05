@@ -478,6 +478,7 @@ public enum ProjIds {
 	HotIcecle,
 	Houtenjin,
 	HoutenjinF,
+	BlockableLaunch,
 	ElectricShock,
 	MK2StunShot,
 	VileMissile,

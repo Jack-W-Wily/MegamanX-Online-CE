@@ -1000,37 +1000,47 @@ public class Zero : Character {
 		int xDir = getShootXDir();
 
 		if (isAwakenedZero() && player.input.isHeld(Control.Special2,player)) {
-			var proj = new ShingetsurinProj(new Shingetsurin(player), shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true);
+			var proj = new ShingetsurinProj(getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
 			playSound("ShingetsurinX5", sendRpc: true);
 			player.currency -= 1;
 			if (player.currency < 0) player.currency = 0;
 			if (chargeLevel >= 2 && isAwakenedGenmuZero()) {
 				Global.level.delayedActions.Add(new DelayedAction(() => {
-					var proj = new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.15f, player, player.getNextActorNetId(), rpc: true);
-					playSound("saShingetsurinX5ber3", sendRpc: true);
+					var proj = new ShingetsurinProj(getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
+				playSound("saShingetsurinX5ber3", sendRpc: true);
 				}, 0.15f));
 			}
 			if (chargeLevel >= 3 && isAwakenedGenmuZero()) {
 				Global.level.delayedActions.Add(new DelayedAction(() => {
-					var proj = new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0.3f, player, player.getNextActorNetId(), rpc: true);
+					var proj =new ShingetsurinProj(getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
 					playSound("ShingetsurinX5", sendRpc: true);
 				}, 0.3f));
 			}
 			if (chargeLevel == 4 && isAwakenedGenmuZero()) {
 				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
+				 	new ShingetsurinProj(getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
+					playSound("ShingetsurinX5", sendRpc: true);
+					
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
-					new ShingetsurinProj(
-						getShootPos(), xDir,
-						0.3f, player, player.getNextActorNetId(), rpc: true
-					);
+					new ShingetsurinProj(getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
 					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 				}, 0.3f));
 			}
 			if (chargeLevel == 4 && !isAwakenedGenmuZero()) {
 				playSound("ShingetsurinX5", forcePlay: false, sendRpc: true);
-				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
-		
+				new ShingetsurinProj(getShootPos(), xDir,
+					0, player, player.getNextActorNetId(), rpc: true
+				);
 			}
 			if (!player.isZBusterZero() || !player.isAI) {
 				player.currency--;
