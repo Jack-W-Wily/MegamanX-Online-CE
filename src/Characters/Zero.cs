@@ -80,11 +80,13 @@ public class Zero : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
+		charId = CharIds.Zero;
+
 		zSaberWeapon = new ZSaber(player);
 		kKnuckleWeapon = new KKnuckleWeapon(player);
 		shippuugaWeapon = new ShippuugaWeapon(player);
 		raijingeki2Weapon = new Raijingeki2Weapon(player);
-		zeroShinMessenkouWeapon = new ShinMessenkou(player);
+		zeroShinMessenkouWeapon = new ShinMessenkou();
 		zeroDarkHoldWeapon = new DarkHoldWeapon();
 		zeroBusterWeapon = new ZeroBuster();
 		zSaberProjSwingWeapon = new ZSaberProjSwing(player);
@@ -616,7 +618,7 @@ public class Zero : Character {
 					if (charState is Crouch) {
 						return;
 					}
-					if (Global.spriteNames.Contains(getSprite(attackSprite))) {
+					if (Global.spriteIndexByName.ContainsKey(getSprite(attackSprite))) {
 						playSound(attackSound, sendRpc: true);
 					}
 					if (charState is Run) changeState(new Idle(), true);
@@ -1019,7 +1021,7 @@ public class Zero : Character {
 				new ShingetsurinProj(new Shingetsurin(player), getShootPos(), xDir, 0, player, player.getNextActorNetId(), rpc: true);
 				Global.level.delayedActions.Add(new DelayedAction(delegate {
 					new ShingetsurinProj(
-						new Shingetsurin(player), getShootPos(), xDir,
+						getShootPos(), xDir,
 						0.3f, player, player.getNextActorNetId(), rpc: true
 					);
 					playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
@@ -1280,7 +1282,7 @@ public class Zero : Character {
 		if (player.isZero && isAwakenedZeroBS.getValue() && globalCollider != null) {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
-					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
+					//playSound("awakenedaura", forcePlay: true, sendRpc: true); 
 					Point centerPoint = globalCollider.shape.getRect().center();
 					float damage = 2;
 					int flinch = 0;

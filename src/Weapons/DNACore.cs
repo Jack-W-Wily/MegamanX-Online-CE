@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -36,43 +37,56 @@ public class DNACore : AxlWeapon {
 	public List<Weapon> weapons = new List<Weapon>();
 	public bool usedOnce = false;
 
-	public DNACore(Character? character) : base(0) {
-		if (character != null) {
-			charNum = character.player.charNum;
-			loadout = character.player.loadout;
-			maxHealth = character.player.maxHealth;
-			name = character.player.name;
-			alliance = character.player.alliance;
-			armorFlag = character.player.armorFlag;
-			frozenCastle = character.isFrozenCastleActiveBS.getValue();
-			speedDevil = character.isSpeedDevilActiveBS.getValue();
-			ultimateArmor = character.hasUltimateArmorBS.getValue();
-			if (charNum == 0) weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
-			if (charNum == 1) {
-				Zero zero = character as Zero;
-				rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
-				if (character.isNightmareZeroBS.getValue()) rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
+	public DNACore(Character character) : base(0) {
+		charNum = character.player.charNum;
+		loadout = character.player.loadout;
+		maxHealth = character.player.maxHealth;
+		name = character.player.name;
+		alliance = character.player.alliance;
+		armorFlag = character.player.armorFlag;
+		frozenCastle = character.isFrozenCastleActiveBS.getValue();
+		speedDevil = character.isSpeedDevilActiveBS.getValue();
+		ultimateArmor = character.hasUltimateArmorBS.getValue();
+		if (charNum == 0) weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
+		if (charNum == 1 && character is Zero zero2) {
+			rakuhouhaAmmo = zero2.zeroGigaAttackWeapon.ammo;
+			if (character.isNightmareZeroBS.getValue()) rakuhouhaAmmo = zero2.zeroDarkHoldWeapon.ammo;
+		}
+		if (charNum == 2) weapons = loadout.vileLoadout.getWeaponsFromLoadout(false);
+		if (charNum == 3) {
+			weapons = loadout.axlLoadout.getWeaponsFromLoadout();
+			if (weapons.Count > 0 && character.player.axlBulletType > 0) {
+				weapons[0] = character.player.getAxlBulletWeapon();
 			}
-			if (charNum == 2) weapons = loadout.vileLoadout.getWeaponsFromLoadout(false);
-			if (charNum == 3) {
-				weapons = loadout.axlLoadout.getWeaponsFromLoadout();
-				if (weapons.Count > 0 && character.player.axlBulletType > 0) {
-					weapons[0] = character.player.getAxlBulletWeapon();
-				}
-			}
-			if (charNum == 4) {
-				rakuhouhaAmmo = character.player.sigmaAmmo;
-			}
-
-			// For any hyper modes added here, be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()
-			if (character.sprite.name.Contains("vilemk2")) hyperMode = DNACoreHyperMode.VileMK2;
-			else if (character.sprite.name.Contains("vilemk5")) hyperMode = DNACoreHyperMode.VileMK5;
-			else if (character is Zero zero && zero.isBlackZero()) hyperMode = DNACoreHyperMode.BlackZero;
-			else if (character is Axl axl && axl.isWhiteAxl()) hyperMode = DNACoreHyperMode.WhiteAxl;
-			else if (character.isAwakenedZeroBS.getValue()) hyperMode = DNACoreHyperMode.AwakenedZero;
-			else if (character.isNightmareZeroBS.getValue()) hyperMode = DNACoreHyperMode.NightmareZero;
+		}
+		if (charNum == 4) {
+			rakuhouhaAmmo = character.player.sigmaAmmo;
 		}
 
+		// For any hyper modes added here, be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()
+		if (character.sprite.name.Contains("vilemk2")) hyperMode = DNACoreHyperMode.VileMK2;
+		else if (character.sprite.name.Contains("vilemk5")) hyperMode = DNACoreHyperMode.VileMK5;
+		else if (character is Zero zero && zero.isBlackZero()) hyperMode = DNACoreHyperMode.BlackZero;
+		else if (character is Axl axl && axl.isWhiteAxl()) hyperMode = DNACoreHyperMode.WhiteAxl;
+		else if (character.isAwakenedZeroBS.getValue()) hyperMode = DNACoreHyperMode.AwakenedZero;
+		else if (character.isNightmareZeroBS.getValue()) hyperMode = DNACoreHyperMode.NightmareZero;
+
+		rateOfFire = 1f;
+		index = (int)WeaponIds.DNACore;
+		weaponBarBaseIndex = 30 + charNum;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 30 + charNum;
+		if (charNum == 4) weaponSlotIndex = 65;
+		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {
+			weaponBarBaseIndex = 31;
+		}
+		sprite = "axl_arm_pistol";
+	}
+
+	public DNACore() : base(0) {
+		charNum = 0;
+		name = "error";
+		loadout = null!;
 		rateOfFire = 1f;
 		index = (int)WeaponIds.DNACore;
 		weaponBarBaseIndex = 30 + charNum;
@@ -82,14 +96,16 @@ public class DNACore : AxlWeapon {
 		sprite = "axl_arm_pistol";
 	}
 
-	public override void axlShoot(Player player, AxlBulletType axlBulletType = AxlBulletType.Normal, int? overrideChargeLevel = null) {
+	public override void axlShoot(
+		Player player, AxlBulletType axlBulletType = AxlBulletType.Normal,
+		int? overrideChargeLevel = null
+	) {
 		player.lastDNACore = this;
 		player.lastDNACoreIndex = player.weaponSlot;
 		player.savedDNACoreWeapons.Remove(this);
 		player.weapons.RemoveAt(player.weaponSlot);
-		player.character.cleanupBeforeTransform();
 		player.preTransformedAxl = player.character;
 		Global.level.gameObjects.Remove(player.preTransformedAxl);
-		player.transformAxl(this);
+		player.transformAxl(this, player.getNextATransNetId());
 	}
 }

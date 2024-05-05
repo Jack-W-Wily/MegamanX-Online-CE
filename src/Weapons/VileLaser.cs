@@ -56,7 +56,7 @@ public class VileLaser : Weapon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)VileLaserType.NecroBurst && vile.charState is InRideArmor inRideArmor) {
 			NecroBurstAttack.shoot(vile);
-			vile.rideArmor.explode(shrapnel: inRideArmor.isHiding);
+			vile.rideArmor?.explode(shrapnel: inRideArmor.isHiding);
 		} else {
 			if ( Global.level.mainPlayer.input.isHeld("down", Global.level.mainPlayer) ){//type == (int)VileLaserType.NecroBurst) {
 				vile.changeState(new NecroBurstAttack(vile.grounded), true);
@@ -72,8 +72,8 @@ public class VileLaser : Weapon {
 
 public class RisingSpecterState : CharState {
 	bool shot = false;
-	public Anim muzzle;
 	bool grounded;
+
 	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall", "", "", "") {
 		this.grounded = grounded;
 	}
@@ -94,7 +94,9 @@ public class RisingSpecterState : CharState {
 
 		if (!shot) {
 			shot = true;
-			shoot(character as Vile);
+			if (character is Vile vile) {
+				shoot(vile);
+			}
 		}
 
 		if (stateTime > 0.5f) {
@@ -310,7 +312,9 @@ public class RAShrapnelProj : Projectile {
 		}
 
 		if (rpc) {
-			byte[] spriteIndexBytes = BitConverter.GetBytes((ushort)Global.spriteNames.IndexOf(spriteName));
+			byte[] spriteIndexBytes = BitConverter.GetBytes(
+				Global.spriteIndexByName.GetValueOrCreate(spriteName, ushort.MaxValue)
+			);
 			byte hasRaColorShaderByte = hasRaColorShader ? (byte)1 : (byte)0;
 			rpcCreate(pos, player, netProjId, xDir, spriteIndexBytes[0], spriteIndexBytes[1], hasRaColorShaderByte);
 		}
@@ -328,7 +332,9 @@ public class StraightNightmareAttack : CharState {
 
 		if (!shot) {
 			shot = true;
-			shoot(character as Vile);
+			if (character is Vile vile) {
+				shoot(vile);
+			}
 		}
 
 		if (character.sprite.isAnimOver()) {

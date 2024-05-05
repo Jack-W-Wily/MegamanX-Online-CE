@@ -761,8 +761,8 @@ public class GameMode {
 			level.mainPlayer.character?.disguiseCoverBlown != true
 		) {
 			Fonts.drawText(
-				FontType.Grey, "Disguised as " + level.mainPlayer.disguise.targetName,
-				Global.halfScreenW, 190, Alignment.Center
+				FontType.RedishOrange, "Disguised as " + level.mainPlayer.disguise?.targetName,
+				Global.halfScreenW, 8, Alignment.Center
 			);
 		} else if (
 			level.mainPlayer.isPuppeteer() && level.mainPlayer.currentMaverick != null &&
@@ -1847,15 +1847,17 @@ public class GameMode {
 				break;
 			}
 		}
-
+		int offsetX = 0;
 		for (var i = 0; i < player.weapons.Count; i++) {
 			var weapon = player.weapons[i];
-			var x = startX + (i * width);
+			var x = startX + (i * width) + offsetX;
 			var y = startY;
 			if (player.isX && Options.main.gigaCrushSpecial && weapon is GigaCrush) {
+				offsetX -= width;
 				continue;
 			}
 			if (player.isX && Options.main.novaStrikeSpecial && weapon is NovaStrike) {
+				offsetX -= width;
 				continue;
 			}
 			drawWeaponSlot(weapon, x, y);
@@ -2870,8 +2872,12 @@ public class GameMode {
 		if (loggedStatsOnce) return;
 		loggedStatsOnce = true;
 
-		if (Global.serverClient == null) return;
-		if (level.isTraining()) return;
+		if (Global.serverClient == null) {
+			return;
+		}
+		if (level.isTraining()) {
+			return;
+		}
 		bool is1v1 = level.is1v1();
 		var nonSpecPlayers = Global.level.nonSpecPlayers();
 		int botCount = nonSpecPlayers.Count(p => p.isBot);
@@ -2882,8 +2888,13 @@ public class GameMode {
 
 		if (this is FFADeathMatch && !mainPlayer.isSpectator && isFairDeathmatch(mainPlayer)) {
 			long val = playerWon(mainPlayer) ? 100 : 0;
-			Logger.logEvent("dm_win_rate", mainPlayerCharName, val, forceLog: true);
-			Logger.logEvent("dm_unique_win_rate_" + mainPlayerCharName, Global.deviceId + "_" + mainPlayer.name, val, forceLog: true);
+			Logger.logEvent(
+				"dm_win_rate", mainPlayerCharName, val, forceLog: true
+			);
+			Logger.logEvent(
+				"dm_unique_win_rate_" + mainPlayerCharName,
+				Global.deviceId + "_" + mainPlayer.name, val, forceLog: true
+			);
 		}
 
 		if (is1v1 && !mainPlayer.isSpectator && !isMirrorMatchup()) {
@@ -2904,11 +2915,21 @@ public class GameMode {
 				if (matchOverResponse.winningAlliances.Contains(blueAlliance)) val = 100;
 				else if (matchOverResponse.winningAlliances.Contains(redAlliance)) val = 0;
 				else {
-					Logger.logEvent("map_stalemate_rates", level.levelData.name + ":" + level.server.gameMode, 100, false, true);
+					Logger.logEvent(
+						"map_stalemate_rates",
+						level.levelData.name + ":" + level.server.gameMode,
+						100, false, true
+					);
 					return;
 				}
-				Logger.logEvent("map_win_rates", level.levelData.name + ":" + level.server.gameMode, val, false, true);
-				Logger.logEvent("map_stalemate_rates", level.levelData.name + ":" + level.server.gameMode, 0, false, true);
+				Logger.logEvent(
+					"map_win_rates",
+					level.levelData.name + ":" + level.server.gameMode,
+					val, false, true
+				);
+				Logger.logEvent(
+					"map_stalemate_rates", level.levelData.name + ":" + level.server.gameMode, 0, false, true
+				);
 			}
 		}
 	}
@@ -2927,7 +2948,7 @@ public class GameMode {
 	}
 
 	public bool isFairDeathmatch(Player mainPlayer) {
-		int kills = mainPlayer.charNumToKills[mainPlayer.realCharNum];
+		int kills = mainPlayer.charNumToKills.GetValueOrDefault(mainPlayer.realCharNum);
 		if (kills < mainPlayer.kills / 2) return false;
 		if (kills < 10) return false;
 		return true;

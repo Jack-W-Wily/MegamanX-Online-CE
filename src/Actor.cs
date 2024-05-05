@@ -44,7 +44,7 @@ public partial class Actor : GameObject {
 	public float yPushVel = 0;
 
 	public Dictionary<int, SoundWrapper> netSounds = new Dictionary<int, SoundWrapper>();
-	public string startSound;
+	public string startSound = "";
 	public bool isStatic;
 	public bool startMethodCalled;
 	// Angle stuff.
@@ -63,8 +63,8 @@ public partial class Actor : GameObject {
 	public bool visible = true;
 	public bool timeSlow;
 	public bool destroyed;
-	public ShaderWrapper genericShader;
-	public virtual List<ShaderWrapper> getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
+	public ShaderWrapper? genericShader;
+	public virtual List<ShaderWrapper>? getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
 	public float alpha = 1;
 	public float xScale = 1;
 	public float yScale = 1;
@@ -229,18 +229,17 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual void changeSprite(string spriteName, bool resetFrame) {
-		string oldSpriteName = sprite?.name;
-
+		string oldSpriteName = sprite?.name ?? "";
 		if (spriteName == null) return;
-
 		if (sprite != null) {
 			if (sprite.name == spriteName) return;
 		}
 
 		if (!Global.sprites.ContainsKey(spriteName)) return;
 
-		if (sprite != null) Global.level.removeFromGridFast(this);
-
+		if (sprite != null) {
+			Global.level.removeFromGridFast(this);
+		}
 		int oldFrameIndex = sprite?.frameIndex ?? 0;
 		float oldFrameTime = sprite?.frameTime ?? 0;
 		float oldAnimTime = sprite?.animTime ?? 0;
@@ -1061,11 +1060,15 @@ public partial class Actor : GameObject {
 				}
 			}
 
-			int spriteIndex = Global.spriteNames.IndexOf(sprite.name);
+			
+			int spriteIndex = -1;
+			if (Global.spriteIndexByName.ContainsKey(sprite.name)) {
+				spriteIndex = Global.spriteIndexByName[sprite.name];
+			}
 			if (netSpriteIndex != null && netSpriteIndex != spriteIndex) {
 				int index = (int)netSpriteIndex;
-				if (index >= 0 && index < Global.spriteNames.Count) {
-					string spriteName = Global.spriteNames[index];
+				if (index >= 0 && index < Global.spriteCount) {
+					string spriteName = Global.spriteNameByIndex[index];
 					changeSprite(spriteName, true);
 				}
 			}
@@ -1301,6 +1304,7 @@ public partial class Actor : GameObject {
 
 		//console.log("DESTROYING")
 		Global.level.removeGameObject(this);
+		ushort spriteNameIndex = ushort.MaxValue;
 		if (spriteName != null) {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
 			// TODO: Fix this. WTF GM19.
@@ -1313,9 +1317,13 @@ public partial class Actor : GameObject {
 
 			anim.xScale = xScale;
 			anim.yScale = yScale;
+			spriteNameIndex = Global.spriteIndexByName[spriteName];
 		}
+		ushort fadeSoundIndex = ushort.MaxValue;
 		if (fadeSound != null) {
+			fadeSound = fadeSound.ToLowerInvariant();
 			playSound(fadeSound);
+			fadeSoundIndex = Global.soundIndexByName[fadeSound];
 		}
 
 		// Character should not run destroy RPC. The destroyCharacter RPC handles that already
@@ -1323,7 +1331,10 @@ public partial class Actor : GameObject {
 			if ((ownedByLocalPlayer || doRpcEvenIfNotOwned) && netId != null && !disableRpc) {
 				float speed = vel.magnitude;
 				if (speed == 0) speed = deltaPos.magnitude / Global.spf;
-				RPC.destroyActor.sendRpc(netId.Value, (ushort)Global.spriteNames.IndexOf(spriteName), (ushort)Global.soundNames.IndexOf(fadeSound), pos, favorDefenderProjDestroy, speed);
+				RPC.destroyActor.sendRpc(
+					netId.Value, spriteNameIndex,
+					fadeSoundIndex, pos, favorDefenderProjDestroy, speed
+				);
 			}
 		}
 
@@ -1385,6 +1396,8 @@ public partial class Actor : GameObject {
 	}
 
 	public SoundWrapper playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
+		soundKey = soundKey.ToLowerInvariant();
+		if (!Global.soundBuffers.ContainsKey(soundKey)) return null;
 		if (!Global.soundBuffers.ContainsKey(soundKey) && !ownedByLocalPlayer) return null;
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}
@@ -1687,7 +1700,7 @@ public partial class Actor : GameObject {
 
 	public void setRaColorShader() {
 		if (sprite.name == "neutralra_pieces") {
-			genericShader = Helpers.cloneGenericPaletteShader("paletteChimera");
+			genericShader = Helpers.cloneGenericPaletteShader("paletteEG01");
 			genericShader?.SetUniform("palette", 1);
 		} else if (sprite.name == "kangaroo_pieces") {
 			genericShader = Helpers.cloneGenericPaletteShader("paletteKangaroo");

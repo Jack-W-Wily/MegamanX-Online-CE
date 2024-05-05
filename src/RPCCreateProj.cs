@@ -118,21 +118,20 @@ public partial class RPCCreateProj : RPC {
 				proj = new ShotgunIceProjCharged(new ShotgunIce(), pos, xDir, player, 1, true, netProjByte);
 				break;
 			case (int)ProjIds.Rakuhouha: {
-					float velX = (float)arguments[extraDataIndex + 1] * 100;
-					float velY = (float)arguments[extraDataIndex + 2] * 100;
+					float velX = (float)extraData[1] / 100f;
+					float velY = (float)extraData[2] / 100f;
 					proj = new RakuhouhaProj(
-						new RakuhouhaWeapon(player), pos, false,
-						velX, velY, player, netProjByte, arguments[extraDataIndex]
+						RakuhouhaWeapon.netWeapon, pos, false,
+						velX, velY, player, netProjByte, extraData[0]
 					);
 					break;
 				}
-
 			case (int)ProjIds.CFlasher: {
-					float velX = (float)arguments[extraDataIndex + 1] * 100;
-					float velY = (float)arguments[extraDataIndex + 2] * 100;
+					float velX = (float)extraData[1] / 100f;
+					float velY = (float)extraData[2] / 100f;
 					proj = new RakuhouhaProj(
-						new CFlasher(player), pos, true,
-						velX, velY, player, netProjByte, arguments[extraDataIndex]
+						CFlasher.netWeapon, pos, true,
+						velX, velY, player, netProjByte, extraData[0]
 					);
 					break;
 				}
@@ -234,7 +233,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new GigaCrushProj(new GigaCrush(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Rekkoha:
-				proj = new RekkohaProj(new RekkohaWeapon(player), pos, player, netProjByte);
+				proj = new RekkohaProj(RekkohaWeapon.netWeapon, pos, player, netProjByte);
 				break;
 			case (int)ProjIds.AcidBurstSmall:
 				proj = new AcidBurstProjSmall(new AcidBurst(), pos, xDir, new Point(), (ProjIds)projId, player, netProjByte);
@@ -339,10 +338,10 @@ public partial class RPCCreateProj : RPC {
 			proj = new DynamoBoomerangProj(new DynamoBoomerang(), pos, xDir, player, netProjByte);
 			break;
 			case (int)ProjIds.ShinMessenkou:
-				proj = new ShinMessenkouProj(new ShinMessenkou(null), pos, xDir, player, netProjByte);
+				proj = new ShinMessenkouProj(new ShinMessenkou(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Shingetsurin:
-				proj = new ShingetsurinProj(new Shingetsurin(null), pos, xDir, 0, player, netProjByte);
+				proj = new ShingetsurinProj(pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.VileMissile:
 				proj = new VileMissileProj(new VileMissile(VileMissileType.HumerusCrush), pos, xDir, 0, player, netProjByte);
@@ -369,7 +368,7 @@ public partial class RPCCreateProj : RPC {
 					ushort spriteIndex = BitConverter.ToUInt16(
 						new byte[] { arguments[extraDataIndex], arguments[extraDataIndex + 1] }, 0
 					);
-					string spriteName = Global.spriteNames[spriteIndex];
+					string spriteName = Global.spriteNameByIndex[spriteIndex];
 					byte hasRaColorShaderByte = arguments[extraDataIndex + 2];
 					proj = new RAShrapnelProj(
 						new VileLaser(VileLaserType.NecroBurst),

@@ -1101,6 +1101,7 @@ public class HostMenu : IMainMenu {
 				errorMessage = "Could not connect to self.";
 			}
 		}
+		Program.setLastUpdateTimeAsNow();
 	}
 
 	public static void reCreateP2PMatch(
@@ -1147,6 +1148,7 @@ public class HostMenu : IMainMenu {
 				errorMessage = "Could not connect to self.";
 			}
 		}
+		Program.setLastUpdateTimeAsNow();
 	}
 
 	public void onMapSizeChange(int prevMapSizeIndex, int newMapSizeIndex) {

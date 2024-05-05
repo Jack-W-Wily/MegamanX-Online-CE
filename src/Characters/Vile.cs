@@ -55,6 +55,7 @@ public class Vile : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
+		charId = CharIds.Vile;
 
 		
 			if (Options.main.swapGoliathInputs){

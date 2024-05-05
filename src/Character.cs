@@ -185,6 +185,8 @@ public partial class Character : Actor, IDamagable {
 	public float vaccineTime;
 	public float vaccineHurtCooldown;
 
+	public CharIds charId;
+
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -2836,27 +2838,37 @@ public partial class Character : Actor, IDamagable {
 			if (this is MegamanX) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
+					float currentAmmo = gigaCrush.ammo;
 					gigaCrush.addAmmo(gigaAmmoToAdd, player);
-					if (gigaCrush.ammo < 32) {
-						playSound("gigaCrushAmmoRecharge");
-					}
-					if (gigaCrush.ammo == 32 && player.health < 8 && player.health > 4) {
-						playSound("gigaCrushAmmoFull");
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, gigaCrush.ammo,
+							gigaCrush.getAmmoUsage(0), gigaCrush.maxAmmo
+						);
 					}
 				}
 				var hyperBuster = player.weapons.FirstOrDefault(w => w is HyperBuster);
 				if (hyperBuster != null) {
+					float currentAmmo = hyperBuster.ammo;
 					hyperBuster.addAmmo(gigaAmmoToAdd, player);
-					if (hyperBuster.ammo < 32) {
-						playSound("hyperchargeRecharge");
-					}
-					if (hyperBuster.ammo == 32 && player.health < 8 && player.health > 4) {
-						playSound("hyperchargeFull");
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, hyperBuster.ammo,
+							hyperBuster.getAmmoUsage(0), hyperBuster.maxAmmo,
+							"hyperchargeRecharge", "hyperchargeFull"
+						);
 					}
 				}
 				var novaStrike = player.weapons.FirstOrDefault(w => w is NovaStrike);
 				if (novaStrike != null) {
+					float currentAmmo = novaStrike.ammo;
 					novaStrike.addAmmo(gigaAmmoToAdd, player);
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, novaStrike.ammo,
+							novaStrike.getAmmoUsage(0), novaStrike.maxAmmo
+						);
+					}
 				}
 				//fgMoveAmmo += gigaAmmoToAdd;
 				//if (fgMoveAmmo > 32) fgMoveAmmo = 32;
@@ -3096,6 +3108,12 @@ public partial class Character : Actor, IDamagable {
 		parasiteDamager = null;
 		removeAcid();
 		removeBurn();
+		burnTime = 0;
+		acidTime = 0;
+		oilTime = 0;
+		player.possessedTime = 0;
+		igFreezeProgress = 0;
+		infectedTime = 0;
 	}
 
 	public bool canBeHealed(int healerAlliance) {

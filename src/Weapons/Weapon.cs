@@ -68,17 +68,16 @@ public class Weapon {
 	}
 
 	public static List<Weapon> getAllSwitchableWeapons(AxlLoadout axlLoadout) {
-		var weaponList = new List<Weapon>()
-		{
-				new GigaCrush(),
-				new HyperBuster(),
-				new NovaStrike(null),
-				new DoubleBullet(),
-				new DNACore(null),
-				new VileMissile(VileMissileType.ElectricShock),
-				new VileCannon(VileCannonType.FrontRunner),
-				new Vulcan(VulcanType.CherryBlast),
-			};
+		var weaponList = new List<Weapon>() {
+			new GigaCrush(),
+			new HyperBuster(),
+			new NovaStrike(null),
+			new DoubleBullet(),
+			new DNACore(),
+			new VileMissile(VileMissileType.ElectricShock),
+			new VileCannon(VileCannonType.FrontRunner),
+			new Vulcan(VulcanType.CherryBlast),
+		};
 		weaponList.AddRange(getAllXWeapons());
 		weaponList.AddRange(getAllAxlWeapons(axlLoadout));
 		weaponList.AddRange(getAllSigmaWeapons(null));
@@ -419,5 +418,20 @@ public class Weapon {
 			return;
 		}
 		weaponHealAmount += MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
+	}
+
+	public static void gigaAttackSoundLogic(
+		Actor actor, float oldAmmo, float newAmmo, float steps, float maxAmmo,
+		string normalSound = "gigaCrushRecharge", string maxSound = "gigaCrushAmmoFull"
+	) {
+		if (oldAmmo >= newAmmo) {
+			return;
+		}
+		float nextCharge = MathF.Ceiling(oldAmmo / steps) * steps;
+		if (newAmmo >= maxAmmo) {
+			actor.playSound(maxSound);
+		} else {
+			actor.playSound(normalSound);
+		}
 	}
 }

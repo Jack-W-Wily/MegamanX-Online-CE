@@ -18,7 +18,7 @@ public partial class Actor {
 
 		var args = new List<byte>() { networkIdBytes[0], networkIdBytes[1] };
 
-		int spriteIndex = Global.spriteNames.IndexOf(sprite.name);
+		ushort spriteIndex = Global.spriteIndexByName.GetValueOrCreate(sprite.name, ushort.MaxValue);
 
 		List<bool> mask = new List<bool>();
 		for (int i = 0; i < 8; i++) mask.Add(false);
@@ -129,7 +129,7 @@ public partial class Actor {
 				byte axlArmAngle = Helpers.angleToByte(axl.netArmAngle);
 				args.Add(axlArmAngle);
 				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes(
-					(ushort)Global.spriteNames.IndexOf(axl.getAxlArmSpriteName())
+					Global.spriteIndexByName.GetValueOrCreate(axl.getAxlArmSpriteName(), ushort.MaxValue)
 				);
 				args.AddRange(netAxlArmSpriteIndexBytes);
 				args.Add((byte)character.player.axlBulletType);
@@ -348,7 +348,7 @@ public class RPCUpdateActor : RPC {
 				actor.visible = visible;
 
 				if (actor is Character character) {
-					// char mask section
+					// Char mask section
 					byte charMask = arguments[i++];
 					bool[] charMaskBools = Helpers.byteToBoolArray(charMask);
 
@@ -377,7 +377,7 @@ public class RPCUpdateActor : RPC {
 					character.player.currency = currency;
 
 					// X section.
-					if (character.player.isX && character is MegamanX) {
+					if (character.player.isX && character is MegamanX mmx) {
 						character.player.weapon.ammo = ammo;
 						byte armorByte = arguments[i++];
 						byte armorByte2 = arguments[i++];

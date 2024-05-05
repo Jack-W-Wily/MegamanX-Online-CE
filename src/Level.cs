@@ -1049,9 +1049,15 @@ public partial class Level {
 	}
 
 	public bool isAfkWarn() {
-		if (Global.isOffline || server?.hidden == true || Global.debug) return false;
-		if (gameMode.isOver && !Global.isHost) return false;
-		if (Global.level.mainPlayer.isSpectator) return false;
+		if (Global.isOffline ||
+			server?.hidden == true ||
+			Global.debug ||
+			gameMode.isOver ||
+			Global.isHost ||
+			Global.level.mainPlayer.isSpectator
+		) {
+			return false;
+		}
 		return time - Global.input.lastUpdateTime > afkWarnTime;
 	}
 
@@ -1061,9 +1067,16 @@ public partial class Level {
 	}
 
 	public bool isAfk() {
-		if (Global.isOffline || server?.hidden == true || Global.debug) return false;
-		if (gameMode.isOver && !Global.isHost) return false;
-		if (Global.level.mainPlayer.isSpectator) return false;
+		if (Global.isOffline ||
+			server?.hidden == true ||
+			Global.debug ||
+			gameMode.isOver ||
+			Global.isHost ||
+			Global.level.mainPlayer.isSpectator
+
+		) {
+			return false;
+		}
 		return time - Global.input.lastUpdateTime > afkKickTime;
 	}
 

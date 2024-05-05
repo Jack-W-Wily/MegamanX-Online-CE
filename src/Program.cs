@@ -197,7 +197,7 @@ class Program {
 
 		loadText.Add("Loading Sprite JSONS...");
 		loadMultiThread(loadText, window, loadSprites);
-		loadText[loadText.Count - 1] = "Sprite JSONS OK.";
+		loadText[loadText.Count - 1] = $"Loaded {Global.realSpriteCount} Sprite JSONs.";
 
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
@@ -207,9 +207,7 @@ class Program {
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
-		loadText[loadText.Count - 1] = "SFX Loaded.";
-		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add(">W:HA! No need I'll do all the testing myself");
-			
+		loadText[loadText.Count - 1] = $"Loaded {Global.soundCount} SFX files.";
 
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
@@ -412,10 +410,10 @@ class Program {
 			if (Global.level.gameMode.shouldDrawRadar()) {
 				yPos = 219;
 			}
-			//Fonts.drawText(
-			//	FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
-			//	Alignment.Right
-			//);
+			Fonts.drawText(
+				FontType.BlueMenu, "VFPS:" + vfps.ToString(), Global.screenW - 5, yPos - 10,
+				Alignment.Right
+			);
 			Fonts.drawText(
 				FontType.BlueMenu, "FPS:" + fps.ToString(), Global.screenW - 5, yPos,
 				Alignment.Right
@@ -873,6 +871,22 @@ class Program {
 				}
 			}
 		}
+
+		// Create sprite RPC index data for RPC purposes.
+		List<String> arrayBuffer = Global.sprites.Keys.ToList();
+		arrayBuffer.Sort(Helpers.invariantStringCompare);
+
+		for (int i = 0; i < arrayBuffer.Count; i++) {
+			// For HUD purposes.
+			Global.realSpriteCount++;
+			// Skip custom map sprites.
+			if (!string.IsNullOrEmpty(Global.sprites[arrayBuffer[i]].customMapName)) {
+				continue;
+			}
+			Global.spriteIndexByName[arrayBuffer[i]] = (ushort)i;
+			Global.spriteNameByIndex[i] = arrayBuffer[i];
+			Global.spriteCount++;
+		}
 	}
 
 	static string loadSpritesSub(string[] spriteFilePaths) {
@@ -893,38 +907,50 @@ class Program {
 	}
 
 	static void loadSounds() {
-		var soundNames = Helpers.getFiles(Global.assetPath + "assets/sounds", true, "ogg", "wav");
+		var soundNames = Helpers.getFiles(Global.assetPath + "assets/sounds", true, "ogg", "wav", "mp3", "flac");
 		if (soundNames.Count > 65535) {
 			throw new Exception("Cannot have more than 65535 sounds.");
 		}
 
-		var fileChecksumDict = new Dictionary<string, string>();
+		//var fileChecksumDict = new Dictionary<string, string>();
 		for (int i = 0; i < soundNames.Count; i++) {
 			string file = soundNames[i];
-			string name = Path.GetFileNameWithoutExtension(file);
-			fileChecksumDict[name] = "";
+			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+			//fileChecksumDict[name] = "";
 			Global.soundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Regular));
 		}
 		//addToFileChecksumBlob(fileChecksumDict);
 
 		// Voices
-		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav");
+		var voiceNames = Helpers.getFiles(Global.assetPath + "assets/voices", true, "ogg", "wav", "mp3", "flac");
 		for (int i = 0; i < voiceNames.Count; i++) {
 			string file = voiceNames[i];
-			string name = Path.GetFileNameWithoutExtension(file);
+			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();;
 			Global.voiceBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.Voice));
 		}
 
 		// Char-Specific Overrides
-		var overrideNames = Helpers.getFiles(Global.assetPath + "assets/sounds_overrides", true, "ogg", "wav");
+		var overrideNames = Helpers.getFiles(
+			Global.assetPath + "assets/sounds_overrides", true, "ogg", "wav", "mp3", "flac"
+		);
 		for (int i = 0; i < overrideNames.Count; i++) {
 			string file = overrideNames[i];
-			string name = Path.GetFileNameWithoutExtension(file);
+			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();;
 			if (Global.soundBuffers.ContainsKey(name)) {
 				Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 			} else {
 				Global.charSoundBuffers.Add(name, new SoundBufferWrapper(name, file, SoundPool.CharOverride));
 			}
+		}
+
+		// Create sound-index list for RPC purposes.
+		List<String> arrayBuffer = Global.soundBuffers.Keys.ToList();
+		arrayBuffer.Sort(Helpers.invariantStringCompare);
+
+		for (int i = 0; i < arrayBuffer.Count; i++) {
+			Global.soundIndexByName[arrayBuffer[i]] = (ushort)i;
+			Global.soundNameByIndex[i] = arrayBuffer[i];
+			Global.soundCount++;
 		}
 	}
 
@@ -1052,7 +1078,14 @@ class Program {
 
 		return true;
 	}
+	public static decimal deltaTimeSavings = 0;
+	public static decimal lastUpdateTime = 0;
 
+	public static void setLastUpdateTimeAsNow() {
+		deltaTimeSavings = 0;
+		TimeSpan timeSpam = (DateTimeOffset.UtcNow - Global.UnixEpoch);
+		lastUpdateTime = timeSpam.Ticks;
+	}
 
 	// Main loop.
 	// GM19 used some deltatime system.
@@ -1062,8 +1095,6 @@ class Program {
 		// Variables for stuff.
 		decimal deltaTime = 0;
 		decimal deltaTimeAlt = 0;
-		decimal deltaTimeSavings = 0;
-		decimal lastUpdateTime = 0;
 		decimal lastAltUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
 		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
@@ -1109,8 +1140,7 @@ class Program {
 					}
 				}
 			}
-			if (deltaTime >= 1) {
-			} else {
+			if (!(deltaTime >= 1)) {
 				continue;
 			}
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
@@ -1146,11 +1176,12 @@ class Program {
 				deltaTimeSavings = 0;
 				continueNextFrameStep = false;
 			} else {
+				// Frameskip limiter.
+				if (deltaTime >= 10) {
+					deltaTime = 10;
+				}
 				// Logic update happens here.
 				while (deltaTime >= 1) {
-					if (deltaTime >= 10) {
-						deltaTime = 10;
-					}
 					// This is to only send RPC is when not frameskipping.
 					if (deltaTime >= 2) {
 						Global.isSkippingFrames = true;

@@ -45,6 +45,7 @@ public class StingProj : Projectile {
 			} else {
 				vel.y = 150;
 				yDir = -1;
+				yDir = -1;
 			}
 			changeSprite(sprite, false);
 			reflectable = true;

@@ -67,10 +67,12 @@ public class WaitMenu : IMainMenu {
 		if (Global.serverClient.isHost) {
 			if ((Global.input.isPressedMenu(Control.MenuConfirm) || Global.quickStartOnline) && recreateWaitTime <= 0) {
 				Action onCreate = new Action(() => {
-					if (server.players.Count > 1) {
-						Logger.logEvent("host_2ormore", Logger.getMatchLabel(server.level, server.gameMode), server.players.Count);
-					}
-
+					/*if (server.players.Count > 1) {
+						Logger.logEvent(
+							"host_2ormore", Logger.getMatchLabel(server.level, server.gameMode),
+							server.players.Count
+						);
+					}*/
 					Global.level.startLevel(server, false);
 					var rpcStartLevelJson = new RPCStartLevelJson(server);
 					Global.serverClient.rpc(RPC.startLevel, JsonConvert.SerializeObject(rpcStartLevelJson));
@@ -142,6 +144,7 @@ public class WaitMenu : IMainMenu {
 				Global.serverClient = null;
 				Thread.Sleep(200);
 				Menu.change(new JoinMenu(false));
+				Program.setLastUpdateTimeAsNow();
 			}
 		}
 

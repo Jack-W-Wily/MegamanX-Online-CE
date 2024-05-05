@@ -35,6 +35,18 @@ public enum CharIds {
 	Iris = 7,
 	Lumine = 8,
 	PunchyZero = 9,
+	X,
+	Zero,
+	Vile,
+	Axl,
+	Sigma,
+	PunchyZero,
+	BusterZero,
+	// Non-standart chars start here.
+	WolfSigma = 100,
+	ViralSigma,
+	KaiserSigma,
+	// Non-vanilla chars start here.
 	Rock = 10,
 	Reploid = 11,
 	NightmareGhost = 12,

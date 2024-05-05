@@ -295,32 +295,16 @@ public partial class Global {
 	public static Dictionary<string, ShaderWrapper> shaderWrappers = new Dictionary<string, ShaderWrapper>();
 	public static Dictionary<string, string> shaderCodes = new Dictionary<string, string>();
 
-	private static List<string> _spriteNames;
-	public static List<string> spriteNames {
-		get {
-			if (_spriteNames == null) {
-				_spriteNames = new List<string>();
-				foreach (var kvp in sprites) {
-					if (string.IsNullOrEmpty(kvp.Value.customMapName)) {
-						_spriteNames.Add(kvp.Key);
-					}
-				}
-				_spriteNames.Sort(Helpers.invariantStringCompare);
-			}
-			return _spriteNames;
-		}
-	}
+	// For indexing purposes.
+	public static Dictionary<string, ushort> spriteIndexByName = new();
+	public static Dictionary<int, string> spriteNameByIndex = new();
+	public static int spriteCount = 0;
+	public static int realSpriteCount = 0;
 
-	private static List<string> _soundNames;
-	public static List<string> soundNames {
-		get {
-			if (_soundNames == null) {
-				_soundNames = soundBuffers.Keys.ToList();
-				_soundNames.Sort(Helpers.invariantStringCompare);
-			}
-			return _soundNames;
-		}
-	}
+	// For indexing purposes.
+	public static Dictionary<string, ushort> soundIndexByName = new();
+	public static Dictionary<int, string> soundNameByIndex = new();
+	public static int soundCount = 0;
 
 	// First: existing, second: new cloned sprite
 	public static Dictionary<string, string> spriteAliases = new Dictionary<string, string>()
@@ -617,6 +601,7 @@ public partial class Global {
 	}
 
 	public static void playSound(string soundKey, bool playIfExists = true) {
+		soundKey = soundKey.ToLowerInvariant();
 		if (!playIfExists && sounds.Any(s => s.soundBuffer.soundKey == soundKey)) return;
 		SoundWrapper sound = new SoundWrapper(soundBuffers[soundKey], null);
 		Global.sounds.Add(sound);
