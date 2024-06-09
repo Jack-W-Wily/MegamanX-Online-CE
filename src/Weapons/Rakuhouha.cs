@@ -287,10 +287,6 @@ public class Massenkou : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void onExit(CharState newState) {
 		weapon.shootTime = weapon.rateOfFire;
 		base.onExit(newState);
@@ -300,27 +296,28 @@ public class Massenkou : CharState {
 public class RakuhouhaProj : Projectile {
 	bool isCFlasher;
 	public RakuhouhaProj(
-		Weapon weapon, Point pos, bool isCFlasher, float xVel,
-		float yVel, Player player, ushort netProjId, int angle, bool rpc = false
+		Weapon weapon, Point pos, bool isCFlasher, float byteAngle,
+		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xVel >= 0 ? 1 : -1, 300, 1, player, isCFlasher ? "cflasher" : "rakuhouha",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		this.isCFlasher = isCFlasher;
+		byteAngle = byteAngle % 256;
 
-		if (angle == 45) {
+		/*if (angle == 128+16) {
 			var sprite = isCFlasher ? "cflasher_diag" : "rakuhouha_diag";
 			changeSprite(sprite, false);
-		} else if (angle == 90) {
+		} else if (angle == 128+32) {
 			var sprite = isCFlasher ? "cflasher_up" : "rakuhouha_up";
 			changeSprite(sprite, false);
-		} else if (angle == 135) {
+		} else if (angle == 128) {
 			xDir = -1;
 			var sprite = isCFlasher ? "cflasher_diag" : "rakuhouha_diag";
 			changeSprite(sprite, false);
 		} else if (angle == 180) {
 			xDir = -1;
-		}
+		}*/
 
 		if (!isCFlasher) {
 			fadeSprite = "rakuhouha_fade";
@@ -333,19 +330,15 @@ public class RakuhouhaProj : Projectile {
 
 		reflectable = true;
 		projId = (int)ProjIds.Rakuhouha;
-		if (isCFlasher) projId = (int)ProjIds.CFlasher;
-		vel.x = xVel * 300;
-		vel.y = yVel * 300;
+		if (isCFlasher) {
+			projId = (int)ProjIds.CFlasher;
+		}
+		vel.x = 300 * Helpers.cosb(byteAngle);
+		vel.y = 300 * Helpers.sinb(byteAngle);
+		this.byteAngle = byteAngle;
 
 		if (rpc) {
-			rpcCreate(
-				pos, player, netProjId, xDir,
-				new Byte[]{
-					(byte)angle,
-					(byte)MathInt.Round(xVel * 100),
-					(byte)MathInt.Round(yVel * 100)
-				}
-			);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
 	}
 
@@ -557,15 +550,39 @@ public class RekkohaEffect : Effect {
 		offsetX += pos.x;
 		offsetY += pos.y;
 
-		float alpha = 0.5f;
+		float baseAlpha = 0.4f;
+		float alpha = baseAlpha;
 		if (effectTime < 0.25f) {
-			alpha = 0.5f * (effectTime * 4);
+			alpha = baseAlpha * (effectTime * 4);
 		}
 		if (effectTime > 1.75f) {
-			alpha = 0.5f - 0.5f * ((effectTime - 1.75f) * 4);
+			alpha = baseAlpha - baseAlpha * ((effectTime - 1.75f) * 4);
 		}
 		alpha *= 1.5f;
 
+		for (int i = 0; i < 50 * scale; i++) {
+			float offY = (effectTime * 448) * (i % 2 == 0 ? 1 : -1);
+			while (offY > 596) offY -= 596;
+			while (offY < -596) offY += 596;
+
+			int index = i + (int)(effectTime * 20);
+
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY - 596,
+				1, 1, null, alpha, 1, 1, ZIndex.Backwall + 5
+			);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY,
+				1, 1, null, alpha, 1, 1, ZIndex.Backwall + 5
+			);
+			Global.sprites["rekkoha_effect_strip"].draw(
+				index % 3,
+				offsetX + i * 8, offsetY + offY + 596,
+				1, 1, null, alpha, 1, 1, ZIndex.Backwall + 5
+			);
+		}
 		for (int i = 0; i < 50 * scale; i++) {
 			float offY = (effectTime * 448) * (i % 2 == 0 ? 1 : -1);
 			while (offY > 596) offY -= 596;

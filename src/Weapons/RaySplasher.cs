@@ -95,7 +95,7 @@ public class RaySplasherProj : Projectile {
 
 public class RaySplasherTurret : Actor, IDamagable
 {
-	private int state;
+	private int state = 0;
 
 	private bool isIgnis;
 

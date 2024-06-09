@@ -249,7 +249,7 @@ public class Axl : Character {
 	}
 
 	public bool canChangeDir() {
-		return !(charState is InRideArmor) && !(charState is Die) && !(charState is Frozen) && !(charState is Stunned);
+		return !(charState is InRideArmor) && !(charState is Die) && !(charState is GenericStun);
 	}
 
 	float assassinSmokeTime;

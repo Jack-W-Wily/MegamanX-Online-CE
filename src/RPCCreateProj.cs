@@ -70,10 +70,10 @@ public partial class RPCCreateProj : RPC {
 				proj = new XSaberProj(new XSaber(player), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
-				proj = new Buster3Proj(new Buster(), pos, xDir, arguments[extraDataIndex], player, netProjByte);
+				proj = new Buster3Proj(new Buster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Proj2:
-				proj = new BusterX3Proj2(new Buster(), pos, xDir, 0, player, netProjByte);
+				proj = new BusterX3Proj2(new Buster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Plasma:
 				proj = new BusterPlasmaProj(new Buster(), pos, xDir, player, netProjByte);
@@ -118,24 +118,19 @@ public partial class RPCCreateProj : RPC {
 				proj = new ShotgunIceProjCharged(new ShotgunIce(), pos, xDir, player, 1, true, netProjByte);
 				break;
 			case (int)ProjIds.Rakuhouha: {
-					float velX = (float)extraData[1] / 100f;
-					float velY = (float)extraData[2] / 100f;
-					proj = new RakuhouhaProj(
-						RakuhouhaWeapon.netWeapon, pos, false,
-						velX, velY, player, netProjByte, extraData[0]
-					);
-					break;
-				}
+				proj = new RakuhouhaProj(
+					RakuhouhaWeapon.netWeapon, pos, false,
+					byteAngle, player, netProjByte 
+				);
+				break;
+			}
 			case (int)ProjIds.CFlasher: {
-					float velX = (float)extraData[1] / 100f;
-					float velY = (float)extraData[2] / 100f;
-					proj = new RakuhouhaProj(
-						CFlasher.netWeapon, pos, true,
-						velX, velY, player, netProjByte, extraData[0]
-					);
-					break;
-				}
-
+				proj = new RakuhouhaProj(
+					RakuhouhaWeapon.netWeapon, pos, true,
+					byteAngle, player, netProjByte 
+				);
+				break;
+			}
 			case (int)ProjIds.Hadouken:
 				proj = new HadoukenProj(new HadoukenWeapon(player), pos, xDir, player, netProjByte);
 				break;
@@ -212,13 +207,15 @@ public partial class RPCCreateProj : RPC {
 				proj = new VulcanProj(new Vulcan(VulcanType.BuckshotDance), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.SilkShotShrapnel:
-				proj = new SilkShotProjShrapnel(new SilkShot(), pos, xDir, player, 0, new Point(), netProjByte);
+				proj = new SilkShotProjShrapnel(
+					SilkShot.netWeapon, pos, xDir, player, extraData[1], extraData[0], netProjByte
+				);
 				break;
 			case (int)ProjIds.SpinWheelCharged:
 				proj = new SpinWheelProjCharged(new SpinWheel(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.SonicSlicer:
-				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, 0, player, netProjByte);
+				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.StrikeChain:
 				proj = new StrikeChainProj(
@@ -356,7 +353,7 @@ public partial class RPCCreateProj : RPC {
 				);
 				break;
 			case (int)ProjIds.Gemnu:
-				proj = new GenmuProj(new Genmu(), pos, xDir, 0, player, netProjByte);
+				proj = new GenmuProj(pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.PeaceOutRoller:
 				proj = new PeaceOutRollerProj(new VileBall(VileBallType.PeaceOutRoller), pos, xDir, player, 0, netProjByte);

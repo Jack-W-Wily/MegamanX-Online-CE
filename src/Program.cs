@@ -376,14 +376,13 @@ class Program {
 				}
 				for (int i = Global.sounds.Count - 1; i >= 0; i--) {
 					Global.sounds[i].update();
-					if (!Global.sounds[i].deleted && Global.sounds[i].sound.Status == SoundStatus.Stopped) {
+					if (Global.sounds[i].deleted || Global.sounds[i].sound.Status == SoundStatus.Stopped) {
 						Global.sounds[i].sound.Dispose();
 						Global.sounds[i].deleted = true;
 						Global.sounds.RemoveAt(i);
 					}
 				}
-
-				Global.music.update();
+				Global.music?.update();
 			}
 
 			Global.input.clearInput();
@@ -418,17 +417,18 @@ class Program {
 			);
 		}
 		// TODO: Make this work for errors.
-		if (Global.debug) {
+		//if (Global.debug) {
 			//Draw debug strings
 			//Global.debugString1 = ((int)Math.Round(1.0f / Global.spf2)).ToString();
 			/*if (Global.level != null && Global.level.character != null) {
 				Global.debugString2 = Mathf.Floor(Global.level.character.pos.x / 8).ToString("0") + "," +
 				Mathf.Floor(Global.level.character.pos.y / 8).ToString("0");
 			}*/
-			Fonts.drawText(FontType.Red, Global.debugString1, 20, 20);
+			/*Fonts.drawText(FontType.Red, Global.debugString1, 20, 20);
 			Fonts.drawText(FontType.Red, Global.debugString2, 20, 30);
 			Fonts.drawText(FontType.Red, Global.debugString3, 20, 40);
-		}
+			*/
+		//}
 
 		DevConsole.drawConsole();
 	}
@@ -913,7 +913,7 @@ class Program {
 			string file = soundNames[i];
 			string name = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
 			if (Global.soundBuffers.ContainsKey(name)) {
-
+				throw new Exception("Duplicated sound: " + name);
 			}
 			Global.soundBuffers[name] = new SoundBufferWrapper(name, file, SoundPool.Regular);
 		}
@@ -953,49 +953,101 @@ class Program {
 
 	static void loadMusics() {
 		string path = Global.assetPath + "assets/music";
-		List<string> files = Helpers.getFiles(path, true, "ogg");
-		files = files.Concat(Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "ogg")).ToList();
+		List<string> files = Helpers.getFiles(path, true, "wav", "ogg", "flac");
+		files = files.Concat(
+			Helpers.getFiles(Global.assetPath + "assets/maps_custom", true, "wav", "ogg", "flac")
+		).ToList();
 
 		for (int i = 0; i < files.Count; i++) {
-			string name = Path.GetFileNameWithoutExtension(files[i]);
+			bool isIniMusic = File.Exists(
+				Path.GetDirectoryName(files[i]) + "/" +
+				Path.GetFileNameWithoutExtension(files[i]) + ".ini"
+			);
+			bool isLocal = !files[i].Contains("assets/maps_custom");
 
-			var pieces = name.Split('.');
-			string baseName = pieces[0];
-			if (files[i].Contains("assets/maps_custom")) {
-				var filePieces = files[i].Split('/').ToList();
-				filePieces.Pop();
-				string customMapName = filePieces.Pop();
-				if (baseName == "music") {
-					baseName = customMapName;
-				} else {
-					baseName = customMapName + ":" + baseName;
-				}
+			if (isIniMusic) {
+				loadMusicData(files[i]);
+			} if (isLocal) {
+				loadMusicWithoutData(files[i]);
+			} else {
+				loadMusicDataLegacy(files[i]);
 			}
-
-			int pieceIndex = 1;
-			double startPos = 0;
-			double endPos = 0;
-			if (pieceIndex < pieces.Length &&
-				double.TryParse(
-					pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
-					CultureInfo.InvariantCulture, out startPos
-				)
-			) {
-				pieceIndex++;
-			}
-			if (pieceIndex < pieces.Length &&
-				double.TryParse(
-					pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
-					CultureInfo.InvariantCulture, out endPos
-				)
-			) {
-				pieceIndex++;
-			}
-			string charOverride = pieceIndex < pieces.Length ? ("." + pieces[pieceIndex]) : "";
-			MusicWrapper musicWrapper = new MusicWrapper(files[i], startPos, endPos, loop: (endPos != 0));
-
-			Global.musics[baseName + charOverride] = musicWrapper;
 		}
+	}
+	
+	static void loadMusicData(string file) {
+		string name = Path.GetFileNameWithoutExtension(file);
+		string iniLocation = (
+			Path.GetDirectoryName(file) + "/" +
+			Path.GetFileNameWithoutExtension(file) + ".ini"
+		);
+		Dictionary<string, object> iniData = IniParser.Parse(iniLocation);
+
+		double startPos = 0;
+		double endPos = 0;
+		if (iniData.ContainsKey("loopData") && iniData["loopData"] is Dictionary<string, object> loopData) {
+			if (loopData.ContainsKey("loopStart") && loopData["loopStart"] is Decimal loopStart) {
+				startPos = (double)loopStart;
+			}
+			if (loopData.ContainsKey("loopEnd") && loopData["loopEnd"] is Decimal loopEnd) {
+				endPos = (double)loopEnd;
+			}
+		}
+		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, true);
+		if (endPos == 0) {
+			musicWrapper.endPos =  musicWrapper.music.Duration.AsSeconds();
+		}
+		Global.musics[name] = musicWrapper;
+	}
+
+	static void loadMusicWithoutData(string file) {
+		string name = Path.GetFileNameWithoutExtension(file);
+
+		MusicWrapper musicWrapper = new MusicWrapper(file, 0, 0, true);
+		musicWrapper.endPos =  musicWrapper.music.Duration.AsSeconds();
+
+		Global.musics[name] = musicWrapper;
+	}
+
+	static void loadMusicDataLegacy(string file) {
+		string name = Path.GetFileNameWithoutExtension(file);
+
+		var pieces = name.Split('.');
+		string baseName = pieces[0];
+		if (file.Contains("assets/maps_custom")) {
+			var filePieces = file.Split('/').ToList();
+			filePieces.Pop();
+			string customMapName = filePieces.Pop();
+			if (baseName == "music") {
+				baseName = customMapName;
+			} else {
+				baseName = customMapName + ":" + baseName;
+			}
+		}
+
+		int pieceIndex = 1;
+		double startPos = 0;
+		double endPos = 0;
+		if (pieceIndex < pieces.Length &&
+			double.TryParse(
+				pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
+				CultureInfo.InvariantCulture, out startPos
+			)
+		) {
+			pieceIndex++;
+		}
+		if (pieceIndex < pieces.Length &&
+			double.TryParse(
+				pieces[pieceIndex].Replace(',', '.'), NumberStyles.Any,
+				CultureInfo.InvariantCulture, out endPos
+			)
+		) {
+			pieceIndex++;
+		}
+		string charOverride = pieceIndex < pieces.Length ? ("." + pieces[pieceIndex]) : "";
+		MusicWrapper musicWrapper = new MusicWrapper(file, startPos, endPos, loop: (endPos != 0));
+
+		Global.musics[baseName + charOverride] = musicWrapper;
 	}
 
 	static void loadShaders() {
@@ -1106,6 +1158,10 @@ class Program {
 		bool f6Released = true;
 		// WARNING DISABLE THIS FOR NON-DEBUG BUILDS
 		bool frameStepEnabled = true;
+		var clearColor = Color.Black;
+		//if (Global.level?.levelData?.bgColor != null) {
+		//	clearColor = Global.level.levelData.bgColor;
+		//}
 
 		// Main loop itself.
 		while (window.IsOpen) {
@@ -1161,10 +1217,6 @@ class Program {
 			}
 			if (Global.isMouseLocked) {
 				Mouse.SetPosition(new Vector2i((int)Global.halfScreenW, (int)Global.halfScreenH), Global.window);
-			}
-			var clearColor = Color.Black;
-			if (Global.level?.levelData?.bgColor != null) {
-				clearColor = Global.level.levelData.bgColor;
 			}
 			if (!useFrameSkip || isFrameStep) {
 				update();
@@ -1237,20 +1289,20 @@ class Program {
 
 	public static string getCpuName() {
 		string cpuName = "Unknown";
-#if WINDOWS
-		// For Windows OS.
-		cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
-			@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
-		)?.GetValue(
-			"ProcessorNameString"
-		) as String ?? "Windows";
-#endif
-#if LINUX
-	cpuName = "Linux";
-#endif
-#if MACOS
-	cpuName = "Darwin";
-#endif
+		#if WINDOWS
+			// For Windows OS.
+			cpuName = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(
+				@"HARDWARE\DESCRIPTION\System\CentralProcessor\0\"
+			)?.GetValue(
+				"ProcessorNameString"
+			) as String ?? "Windows";
+		#endif
+		#if LINUX
+			cpuName = "Linux";
+		#endif
+		#if MACOS
+			cpuName = "Darwin";
+		#endif
 		// Fix simbols.
 		cpuName = cpuName.Replace("(R)", "®");
 		cpuName = cpuName.Replace("(C)", "©");
@@ -1266,8 +1318,9 @@ class Program {
 	}
 
 	public static void loadExceptionHandler(Task task) {
-        var exception = task.Exception;
-        Console.WriteLine(exception);
+        if (task.Exception != null) {
+			Logger.LogFatalException(task.Exception);
+		}
     }
 
 
@@ -1277,6 +1330,7 @@ class Program {
 		decimal lastUpdateTime = 0;
 		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
 		bool exit = false;
+		Color clearColor = Color.Black;
 
 		// Main loop itself.
 		while (window.IsOpen && !exit) {
@@ -1290,7 +1344,6 @@ class Program {
 			} else {
 				continue;
 			}
-			Color clearColor = Color.Black;
 			window.Clear(clearColor);
 			for (int i = 0; i < loadText.Count; i++) {
 				Fonts.drawText(FontType.Grey, loadText[i], 8, 8 + (10 * i), isLoading: true);

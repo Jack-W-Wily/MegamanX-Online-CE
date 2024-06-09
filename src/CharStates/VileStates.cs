@@ -46,10 +46,6 @@ public class CallDownMech : CharState {
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
 	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 

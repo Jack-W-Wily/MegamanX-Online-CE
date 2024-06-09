@@ -624,10 +624,7 @@ public abstract class BaseSigma : Character {
 	public override void render(float x, float y) {
 		base.render(x, y);
 
-		bool drewStatusProgress = drawStatusProgress();
-		bool drewSubtankHealing = drawSubtankHealing();
-
-		if (!drewStatusProgress && !drewSubtankHealing && player.isSigma && tagTeamSwapProgress > 0) {
+		if (tagTeamSwapProgress > 0) {
 			float healthBarInnerWidth = 30;
 
 			float progress = 1 - (tagTeamSwapProgress / 1);
@@ -654,9 +651,7 @@ public abstract class BaseSigma : Character {
 			deductLabelY(labelCooldownOffY);
 		}
 
-		if (!drewStatusProgress && !drewSubtankHealing &&
-			player.isViralSigma() && charState is ViralSigmaPossessStart
-		) {
+		if (player.isViralSigma() && charState is ViralSigmaPossessStart) {
 			float healthBarInnerWidth = 30;
 
 			float progress = (possessEnemyTime / maxPossessEnemyTime);

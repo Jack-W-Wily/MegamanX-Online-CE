@@ -15,6 +15,8 @@ public class MechMenuWeapon : Weapon {
 		index = (int)WeaponIds.MechMenuWeapon;
 		weaponSlotIndex = 46;
 		this.type = (int)type;
+		drawAmmo = false;
+		drawCooldown = false;
 
 		if (type == VileMechMenuType.None) {
 			displayName = "None";
@@ -279,9 +281,6 @@ public class MechChainProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-
-		removeRenderEffect(RenderEffectType.RedShadow);
-		removeRenderEffect(RenderEffectType.BlueShadow);
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

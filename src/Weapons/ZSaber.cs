@@ -18,6 +18,17 @@ public class ZSaber : Weapon {
 		displayName = "Z-Saber";
 		description = new string[] { "Zero's trusty beam saber." };
 	}
+
+	public ZSaber() : base() {
+		index = (int)WeaponIds.ZSaber;
+		weaponBarBaseIndex = 21;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 48;
+		killFeedIndex = 9;
+		type = (int)ZeroAttackLoadoutType.ZSaber;
+		displayName = "Z-Saber";
+		description = new string[] { "Zero's trusty beam saber." };
+	}
 }
 
 public class ShippuugaWeapon : Weapon {
@@ -38,9 +49,13 @@ public class ZSaberProj : Projectile {
 		fadeSprite = "zsaber_shot_fade";
 		reflectable = true;
 		projId = (int)ProjIds.ZSaberProj;
-		if (player.character is Zero zero && zero.isBlackZero2() == true) {
-			damager.damage = 4;
-			genericShader = player.zeroPaletteShader;
+		if (player.character is Zero zero) {
+			if (zero.isBlackZero() == true) {
+				genericShader = player.zeroPaletteShader;
+			}
+			if (zero.isAwakenedZeroBS.getValue() == true) {
+				genericShader = player.zeroAzPaletteShader;
+			}
 		}
 		if (owner.character is Zain){
 		changeSprite("zain_projslash", true);

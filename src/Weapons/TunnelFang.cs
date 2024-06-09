@@ -134,7 +134,7 @@ public class TunnelFangProj : Projectile {
 }
 
 public class TunnelFangProjCharged : Projectile {
-	public MegamanX character;
+	public MegamanX? character;
 	float sparksCooldown;
 
 	float timer = 5;
@@ -180,8 +180,11 @@ public class TunnelFangProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		changePos(character.getShootPos());
-		xDir = character.getShootXDir();
+		if (character != null) {
+			changePos(character.getShootPos());
+			xDir = character.getShootXDir();
+		}
+		
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {

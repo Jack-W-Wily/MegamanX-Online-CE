@@ -71,14 +71,6 @@ public class Raijingeki : CharState {
 			character.changeState(new Idle());
 		}
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
 
 
@@ -202,10 +194,6 @@ public class TBreakerState : CharState {
 		zero = character as Zero;
 	}
 
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-
 	public override void update() {
 		base.update();
 
@@ -261,54 +249,3 @@ public class TBreakerProj : Projectile {
 		}
 	}
 }
-
-public class MegaPunchWeapon : Weapon {
-	public MegaPunchWeapon(Player player) : base() {
-		damager = new Damager(player, 3, Global.defFlinch, 0.06f);
-		index = (int)WeaponIds.MegaPunchWeapon;
-		killFeedIndex = 106;
-		type = (int)GroundSpecialType.MegaPunch;
-	}
-
-	public override void attack(Character character) {
-		character.changeState(new MegaPunchState(false), true);
-	}
-
-	public override void attack2(Character character) {
-		character.changeState(new MegaPunchState(true), true);
-	}
-}
-
-public class MegaPunchState : CharState {
-	bool isAlt;
-	public MegaPunchState(bool isAlt) : base("megapunch", "") {
-		this.isAlt = isAlt;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-
-	public override void update() {
-		base.update();
-
-		if (isAlt) {
-			if (character.sprite.frameIndex % 2 == 0) character.sprite.frameSpeed = 2;
-			else character.sprite.frameSpeed = 1;
-		}
-
-		if (character.frameIndex >= 7 && !once) {
-			once = true;
-			character.playSound("megapunch", sendRpc: true);
-		}
-
-		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-}
-

@@ -643,7 +643,65 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-			
+			if (drawPlayer.character is Zero zero) {
+				int yStart = 159;
+				if (zero.isNightmareZero) {
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+					Fonts.drawText(
+						FontType.Grey,
+						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
+					);
+					yStart += 12;
+					Global.sprites["virusalert"].drawToHUD(0, 36, 214);
+				}
+				int xStart = 11;
+				if (zero.zeroGigaAttackWeapon.shootTime > 0) {
+					drawZeroGigaCooldown(zero.zeroGigaAttackWeapon, y: yStart);
+					xStart += 15;
+				}
+				if (zero.saberCooldown > 0 && zero.isAwakenedGenmuZero() || zero.genmuCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 2);
+					if (zero.saberCooldown > zero.genmuCooldown) {
+						cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
+					}
+					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+				if (zero.saberCooldown > 0 || zero.genmuCooldown > 1) {
+					float cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
+					if (zero.genmuCooldown - 1 > zero.saberCooldown) {
+						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 1, 1);
+					}
+					drawGigaWeaponCooldown(zero.isAwakenedGenmuZero() ? 48 : 102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+			}
+			if (drawPlayer.character is PunchyZero punchyZero) {
+				int xStart = 11;
+				int yStart = 159;
+				if (punchyZero.isViral) {
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+					Fonts.drawText(
+						FontType.Grey,
+						"x" + punchyZero.freeBusterShots, 16, 152, Alignment.Left
+					);
+					yStart += 12;
+				}
+				if (punchyZero.gigaAttack.shootTime > 0) {
+					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
+					xStart += 15;
+				}
+				if (punchyZero.swingCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(punchyZero.swingCooldown, 60);
+					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+				if (punchyZero.parryCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(punchyZero.parryCooldown, 30);
+					drawGigaWeaponCooldown(120, cooldown, xStart, yStart);
+					xStart += 15;
+				}
+			}
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
@@ -1229,7 +1287,7 @@ public class GameMode {
 			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
 			frameIndex = player.character.rideArmorPlatform.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
-			if (player.weapon is not Buster) {
+			if (player.weapon.drawAmmo) {
 				baseX += 15;
 			}
 			mechBarExists = false;
@@ -1256,12 +1314,13 @@ public class GameMode {
 		baseY -= 16;
 		int barIndex = 0;
 
-		if (mainPlayer.character is MegamanX mmx &&
+		if (player.character is MegamanX mmx &&
 			(mmx.isHyperX == true || player.character?.charState is XRevive)
 		) {
-			if (mmx.unpoDamageMaxCooldown >= 2) barIndex = 1;
-			else if (mmx.unpoDamageMaxCooldown >= 1) barIndex = 3;
-			else if (mmx.unpoDamageMaxCooldown >= 0.5f) barIndex = 4;
+			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
+			if (hpPercent >= 75) barIndex = 1;
+			else if (hpPercent >= 50) barIndex = 3;
+			else if (hpPercent >= 25) barIndex = 4;
 			else barIndex = 5;
 		}
 
@@ -1322,13 +1381,9 @@ public class GameMode {
 
 	public bool shouldDrawWeaponAmmo(Player player, Weapon weapon) {
 		if (weapon == null) return false;
-		if (weapon.index == 0 && weapon is not Buster) return false;
-		if (weapon is AbsorbWeapon) return false;
-		if (weapon is DNACore) return false;
-		if (weapon is AssassinBullet) return false;
-		if (weapon is UndisguiseWeapon) return false;
+		if (weapon.weaponSlotIndex == 0) return false;
+		if (!player.weapon.drawAmmo) return false;
 		if (weapon is NovaStrike && level.isHyper1v1()) return false;
-		if (weapon is Buster buster) return false;
 
 		return true;
 	}
@@ -1341,7 +1396,7 @@ public class GameMode {
 
 		// Small Bars option.
 		float ammoDisplayMultiplier = 1;
-		if (Options.main.enableSmallBars && !forceSmallBarsOff) {
+		if (player.weapon.allowSmallBar && Options.main.enableSmallBars && !forceSmallBarsOff) {
 			ammoDisplayMultiplier = 0.5f;
 		}
 
@@ -1441,7 +1496,7 @@ public class GameMode {
 			for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
 				var floorOrCeiling = Math.Ceiling(weapon.ammo * ammoDisplayMultiplier);
 				// Weapons that cost the whole bar go here, so they don't show up as full but still grayed out
-				if (weapon is RekkohaWeapon || weapon is GigaCrush) {
+				if (weapon.drawRoundedDown || weapon is RekkohaWeapon || weapon is GigaCrush) {
 					floorOrCeiling = Math.Floor(weapon.ammo * ammoDisplayMultiplier);
 				}
 				if (i < floorOrCeiling) {
@@ -1596,16 +1651,19 @@ public class GameMode {
 			}
 
 			int topLeftX = 10;
-			int topLeftY = 35;
-			int w = 120;
-			int lineHeight = 4;
+			int topLeftY = 30;
+			int w = 180;
+			int lineHeight = 10;
 
 			DrawWrappers.DrawRect(
-				topLeftX - 5, topLeftY - 5, topLeftX + w,
-				topLeftY + 6 + currentLineH, true, Helpers.MenuBgColor, 1, ZIndex.HUD - 10, isWorldPos: false
+				topLeftX - 2,
+				topLeftY + lineHeight - 2,
+				topLeftX + w,
+				topLeftY + currentLineH + lineHeight - 1,
+				true, Helpers.MenuBgColor, 1, ZIndex.HUD - 10, isWorldPos: false
 			);
 
-			currentLineH = -6;
+			currentLineH = 0;
 
 			bool showNetStats = Global.debug;
 			if (showNetStats) {
@@ -1668,7 +1726,7 @@ public class GameMode {
 				"Sound Count: " + Global.sounds.Count, topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
 
-			Fonts.drawText(
+			/*Fonts.drawText(
 				FontType.Grey,
 				"List Counts: " + Global.level.getListCounts(), topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
@@ -1679,6 +1737,7 @@ public class GameMode {
 				FontType.Grey,
 				"Avg frame process time: " + avgFrameProcessTime.ToString("0.00") + " ms", topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
+			*/
 			//float graphYHeight = 20;
 			//drawDiagnosticsGraph(Global.lastFrameProcessTimes, topLeftX, topLeftY + (currentLineH += lineHeight) + graphYHeight, 1);
 
@@ -1721,7 +1780,7 @@ public class GameMode {
 
 		var iconW = 8;
 		var iconH = 8;
-		var width = 20;
+		var width = 15;
 
 		var startX = getWeaponSlotStartX(player, ref iconW, ref iconH, ref width);
 		var startY = Global.screenH - 12;
@@ -1860,7 +1919,15 @@ public class GameMode {
 				offsetX -= width;
 				continue;
 			}
-			drawWeaponSlot(weapon, x, y);
+			if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
+				DrawWrappers.DrawRectWH(
+					x - 7, y - 8, 14, 15, false,
+					Color.Black, 1, ZIndex.HUD, false
+				);
+				drawWeaponSlot(weapon, x, y-1, true);
+			} else {
+				drawWeaponSlot(weapon, x, y);
+			}
 		}
 
 		if (player == mainPlayer && mainPlayer.isSelectingCommand()) {
@@ -1868,13 +1935,13 @@ public class GameMode {
 		}
 	}
 
-	public void drawZeroGigaCooldown(Weapon weapon) {
+	public void drawZeroGigaCooldown(Weapon weapon, int x = 11, int y = 159) {
 		// This runs once per character.
 		if (weapon == null || weapon.shootTime <= 0) {
 			return;
 		}
 		float cooldown = Helpers.progress(weapon.shootTime, weapon.rateOfFire);
-		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown);
+		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown, x, y);
 	}
 
 	public void drawGigaWeaponCooldown(int slotIndex, float cooldown, int x = 11, int y = 159) {
@@ -1882,8 +1949,8 @@ public class GameMode {
 		drawWeaponSlotCooldown(x, y, cooldown);
 	}
 
-	public void drawWeaponSlot(Weapon weapon, float x, float y) {
-		if (weapon is MechMenuWeapon && level.mainPlayer.character?.startRideArmor != null) {
+	public void drawWeaponSlot(Weapon weapon, float x, float y, bool selected = false) {
+		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.startRideArmor != null) {
 			int index = 37 + level.mainPlayer.character.startRideArmor.raNum;
 			if (index == 42) index = 119;
 			Global.sprites["hud_weapon_icon"].drawToHUD(index, x, y);
@@ -1892,8 +1959,16 @@ public class GameMode {
 		} else if (weapon is not AbsorbWeapon) {
 			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, x, y);
 		}
-
-		if (weapon.ammo < weapon.maxAmmo && weapon is not UndisguiseWeapon && weapon is not MechMenuWeapon) {
+		if (selected) {
+			if (!weapon.canShoot(0, mainPlayer)) {
+				drawWeaponStateOverlay(x, y, 2);
+			} else if (weapon.shootTime > 0 && weapon.rateOfFire > 10f/60f && weapon.drawCooldown) {
+				drawWeaponStateOverlay(x, y, 1);
+			} else if (selected) {
+				drawWeaponStateOverlay(x, y, 0);
+			}
+		}
+		if (weapon.ammo < weapon.maxAmmo && weapon.drawAmmo) {
 			drawWeaponSlotAmmo(x, y, weapon.ammo / weapon.maxAmmo);
 		}
 
@@ -1934,7 +2009,8 @@ public class GameMode {
 			drawWeaponSlotCooldown(x, y, hb.shootTime / hb.getRateOfFire(level.mainPlayer));
 		} else if (weapon is NovaStrike ns) {
 			drawWeaponSlotCooldown(x, y, ns.shootTime / ns.rateOfFire);
-		} else if (weapon is SigmaMenuWeapon) {
+		}
+		if (weapon is SigmaMenuWeapon) {
 			drawWeaponSlotCooldown(x, y, weapon.shootTime / 4);
 		}
 
@@ -1993,9 +2069,9 @@ public class GameMode {
 			}
 		}
 
-		if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
+		/*if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
 			drawWeaponSlotSelected(x, y);
-		}
+		}*/
 
 		if (weapon is AxlWeapon && Options.main.axlLoadout.altFireArray[Weapon.wiToFi(weapon.index)] == 1) {
 			Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "B");
@@ -2042,6 +2118,20 @@ public class GameMode {
 			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
+	}
+
+	private void drawWeaponStateOverlay(float x, float y, int type) {
+		Color cooldownColour = type switch {
+			1 => new Color(255, 212, 128, 128),
+			2 => new Color(255, 128, 128, 128),
+			_ => new Color(128, 255, 128, 128),
+		};
+		DrawWrappers.DrawRectWH(
+			x - 6f, y - 6f,
+			12f, 12f, filled: false,
+			cooldownColour, 1,
+			1000000L, isWorldPos: false
+		);
 	}
 
 	private void drawWeaponText(float x, float y, string text) {
@@ -2194,14 +2284,14 @@ public class GameMode {
 		for (int i = 0; i < dnaCore.weapons.Count && i < 6; i++) {
 			weapons.Add(dnaCore.weapons[i]);
 		}
-		if (dnaCore.charNum == 1 && dnaCore.loadout.zeroLoadout.melee != 2) {
+		if (dnaCore.charNum == (int)CharIds.Zero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
-				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(null, dnaCore.loadout.zeroLoadout.gigaAttack));
+				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(null, dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
 			}
 		}
-		if (dnaCore.charNum == 4) {
+		if (dnaCore.charNum == (int)CharIds.Sigma) {
 			if (sigmaForm == 0) weapons.Add(new Weapon() {
 				weaponSlotIndex = 111,
 				ammo = dnaCore.rakuhouhaAmmo,
@@ -2751,7 +2841,7 @@ public class GameMode {
 		if (level.mainPlayer.character != null && level.mainPlayer.readyTextOver && level.mainPlayer.canReviveX()) {
 			Fonts.drawTextEX(
 				FontType.Blue, Helpers.controlText("[CMD]: Activate Raging Charge"),
-				Global.screenW / 2, 10 + Global.screenH / 2
+				Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 			);
 		}
 

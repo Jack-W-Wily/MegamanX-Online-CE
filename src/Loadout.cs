@@ -79,7 +79,6 @@ public class ZeroLoadout {
 	[ProtoMember(6)] public int hyperMode;
 	[ProtoMember(7)] public int groundSpecial;
 	[ProtoMember(8)] public int airSpecial;
-	[ProtoMember(9)] public int melee;
 
 	public static ZeroLoadout createRandom() {
 		return new ZeroLoadout() {
@@ -111,7 +110,6 @@ public class ZeroLoadout {
 			if (downThrustA > 2) downThrustA = 0;
 		}
 		if (hyperMode < 0 || hyperMode > 2) hyperMode = 0;
-		if (melee < 0 || melee > 2) melee = 0;
 	}
 
 	private bool inRange(int weaponNum) {
@@ -356,7 +354,8 @@ public class SigmaLoadout {
 		return new SigmaLoadout() {
 			maverick1 = randPool[0] - (int)WeaponIds.ChillPenguin,
 			maverick2 = randPool[1] - (int)WeaponIds.ChillPenguin,
-			sigmaForm = Helpers.randomRange(0, 2)
+			sigmaForm = Helpers.randomRange(0, 2),
+			commandMode = 2,
 			// Gacel: So it was an option for third maverick before?
 			//maverick3 = randPool[2],
 		};
@@ -371,6 +370,7 @@ public class LoadoutData {
 	[ProtoMember(4)] public VileLoadout vileLoadout = new VileLoadout();
 	[ProtoMember(5)] public AxlLoadout axlLoadout = new AxlLoadout();
 	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new SigmaLoadout();
+	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
 		return new LoadoutData() {
@@ -391,6 +391,7 @@ public class LoadoutData {
 			vileLoadout = Helpers.cloneProtobuf(Options.main.vileLoadout),
 			axlLoadout = Helpers.cloneProtobuf(Options.main.axlLoadout),
 			sigmaLoadout = Helpers.cloneProtobuf(Options.main.sigmaLoadout),
+			pzeroLoadout = Helpers.cloneProtobuf(Options.main.pzeroLoadout),
 		};
 	}
 }

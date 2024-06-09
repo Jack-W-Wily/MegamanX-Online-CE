@@ -152,6 +152,7 @@ public class BladeArmorWPSword : CharState {
 
 
 public class XHover : CharState {
+	public SoundWrapper? sound;
 	float hoverTime;
 	int startXDir;
 	bool isFalcon;

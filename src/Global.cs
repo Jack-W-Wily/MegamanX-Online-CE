@@ -17,8 +17,8 @@ namespace MMXOnline;
 public partial class Global {
 	public static decimal version = 20m;
 	public static string versionName = "WC 3.2";
-	public static string subVersionName = "Alpha 11";
-	public static string subVersionShortName = "a11";
+	public static string subVersionName = "Alpha 12";
+	public static string subVersionShortName = "a12";
 
 
 
@@ -32,7 +32,9 @@ public partial class Global {
 	public const string checksumPrefix = "[Community Edition]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumKey = checksumPrefix + " DEVTEST-13-03-2024";
+	public const string checksumPrefix2 = "A12-RC1-Devtest";
+	// Final checksum key.
+	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.
 	public static string shortForkName = "W.Cut";
 
@@ -606,7 +608,6 @@ public partial class Global {
 	public static readonly int defFlinch = 26;
 	public static readonly int halfFlinch = 13;
 	public static readonly int miniFlinch = 6;
-	public static readonly int fourFrameFlinch = 4;
 
 	public static DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
@@ -616,10 +617,12 @@ public partial class Global {
 
 	public static void playSound(string soundKey, bool playIfExists = true) {
 		soundKey = soundKey.ToLowerInvariant();
-		if (!playIfExists && sounds.Any(s => s.soundBuffer.soundKey == soundKey)) return;
-		SoundWrapper sound = new SoundWrapper(soundBuffers[soundKey], null);
-		Global.sounds.Add(sound);
-		sound.sound.Play();
+		if (!playIfExists && sounds.Any(s => s.soundBuffer.soundKey == soundKey)) {
+			return;
+		}
+		SoundWrapper soundWrapper = new SoundWrapper(soundBuffers[soundKey], null);
+		Global.sounds.Add(soundWrapper);
+		soundWrapper.sound.Play();
 	}
 
 	public static void changeMusic(string newMusic) {

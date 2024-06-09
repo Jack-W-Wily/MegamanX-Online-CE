@@ -73,7 +73,7 @@ public class SonicSlicerProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class SonicSlicerProj : Projectile {
 			xDir *= -1;
 			vel.x *= -1;
 			new Anim(pos, "sonicslicer_sparks", xDir, null, true);
-			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+			//RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
 		}
 
 		int velYSign = MathF.Sign(vel.y);
@@ -98,7 +98,7 @@ public class SonicSlicerProj : Projectile {
 				playSound("dingX2");
 				vel.y *= -1;
 				new Anim(pos, "sonicslicer_sparks", xDir, null, true);
-				RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
+				//RPC.actorToggle.sendRpc(netId, RPCActorToggleType.SonicSlicerBounce);
 			}
 		}
 	}
@@ -107,7 +107,7 @@ public class SonicSlicerProj : Projectile {
 		base.render(x, y);
 		float ox = -vel.x * Global.spf * 3;
 		float oy = -vel.y * Global.spf * 3;
-		twin.draw(frameIndex, pos.x + x + ox, pos.y + y + oy, 1, 1, null, 1, 1, 1, zIndex);
+		twin.draw(frameIndex, pos.x + x + ox, pos.y + y + oy, 1, 1, null, 0.5f, 1, 1, zIndex);
 	}
 }
 
@@ -128,8 +128,7 @@ public class SonicSlicerProjCharged : Projectile {
 		if (num == 4) dest = pos.addxy(60, -100);
 
 		vel.x = 0;
-		vel.y = -500;
-		useGravity = true;
+		useGravity = false;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, 1);
@@ -138,14 +137,14 @@ public class SonicSlicerProjCharged : Projectile {
 
 	public override void update() {
 		base.update();
-		vel.y += Global.speedMul * getGravity();
 		if (!fall) {
 			float x = Helpers.lerp(pos.x, dest.x, Global.spf * 10);
 			changePos(new Point(x, pos.y));
-			if (vel.y > 0) {
-				fall = true;
-				yDir = -1;
-			}
+			vel.y += -40;
 		}
+		if (vel.y <= -375) fall = true;
+		if (vel.y > 100) yDir = -1;
+		if (fall) vel.y += 30;
+		
 	}
 }

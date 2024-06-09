@@ -44,6 +44,7 @@ public class GigaCrush : Weapon {
 public class GigaCrushProj : Projectile {
 	public float radius = 10;
 	public float maxActiveTime;
+	bool pilarCreated;
 
 	public GigaCrushProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
@@ -76,6 +77,10 @@ public class GigaCrushProj : Projectile {
 		}
 		radius += Global.spf * 400;
 
+		if (!pilarCreated && time > maxActiveTime - 0.2) {
+			new GigaCrushPilar(pos, ZIndex.Character + 10);
+			pilarCreated = true;
+		}
 		if (time > maxActiveTime) {
 			destroySelf(disableRpc: false);
 		}
@@ -91,8 +96,58 @@ public class GigaCrushProj : Projectile {
 	}
 }
 
+public class GigaCrushPilar : Effect {
+	public float radius = 10;
+	public float time;
+	public float maxActiveTime = 40;
+	public long zIndex;
+
+	public GigaCrushPilar(Point pos, long zIndex) : base(pos) {
+		this.zIndex = zIndex;
+	}
+
+	public override void update() {
+		// Because we do not have this built-in for the Effect class.
+		if (time >= maxActiveTime) {
+			destroySelf();
+		}
+		// Time added at the end of update because we count from 0.
+		time += Global.speedMul;
+	}
+
+	public override void render(float x, float y) {
+		double transparency = (time - 6) / (maxActiveTime - 6);
+		if (transparency < 0) { transparency = 0; }
+		if (transparency > 1) { transparency = 1; }
+	
+		float progess = time  / maxActiveTime;
+		progess = MathF.Sqrt(progess);
+		float size = 150 * progess;
+		(float top, float bot)[] yOffsets = {
+			(-145, -135),
+			(-135, -125),
+			(-125, 125),
+			(125, 135),
+			(135, 145)
+		};
+		double[] baseTrans = {
+			50, 100, 175, 100, 50
+		};
+		for (int i = 0; i < yOffsets.Length; i++) {
+			DrawWrappers.DrawRect(
+				pos.x + x - size,
+				pos.y + y + yOffsets[i].top,
+				pos.x + x + size,
+				pos.y + y + yOffsets[i].bot,
+				true, new(255, 255, 255, (byte)(baseTrans[i] - baseTrans[i] * transparency)),
+				0, zIndex
+			);
+		}
+	}
+}
+
 public class GigaCrushCharState : CharState {
-	GigaCrushProj proj;
+	GigaCrushProj? proj;
 	bool fired;
 	Point moveDir = new(0, -20);
 

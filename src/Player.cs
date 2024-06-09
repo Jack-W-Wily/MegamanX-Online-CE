@@ -307,7 +307,7 @@ public partial class Player {
 		if (Global.serverClient != null) {
 			string msg = name + " now spectating.";
 			if (newSpectateValue == false) msg = name + " stopped spectating.";
-			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(msg, null, null, true), sendRpc: true);
+			Global.level.gameMode.chatMenu.addChatEntry(new ChatEntry(msg, "", null, true), sendRpc: true);
 			RPC.makeSpectator.sendRpc(id, newSpectateValue);
 		} else {
 			isSpectator = newSpectateValue;
@@ -402,7 +402,7 @@ public partial class Player {
 			Global.level.gameMode.chatMenu.addChatEntry(
 				new ChatEntry(
 					name + " was autobalanced to " +
-					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), null, null, true
+					GameMode.getTeamName(serverPlayer.autobalanceAlliance.Value), "", null, true
 				), true);
 			forceKill();
 			currency += 5;
@@ -414,9 +414,9 @@ public partial class Player {
 	// Shaders
 	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
-	public ShaderWrapper zeroPaletteShader = Helpers.cloneShaderSafe("hyperzero");
-	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteNightmareZero");
-	public ShaderWrapper zeroazPaletteShader = Helpers.cloneGenericPaletteShader("hyperAwakenedZeroPalette");
+	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
+	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
+	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("paletteAwakenedZero");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
 	public ShaderWrapper viralSigmaShader2 = Helpers.cloneShaderSafe("viralsigma");
@@ -706,7 +706,7 @@ public partial class Player {
 	public float getMaxHealth() {
 		// 1v1 is the only mode without possible heart tanks/sub tanks
 		if (Global.level.is1v1()) {
-			return MathF.Ceiling(32 * getHealthModifier());
+			return MathF.Ceiling(28 * getHealthModifier());
 		}
 		int bonus = 0;
 		if (isSigma) bonus = 4;
@@ -959,10 +959,28 @@ public partial class Player {
 			bool sendRpc = ownedByLocalPlayer;
 			var charNetId = getCharActorNetId();
 			if (shouldRespawn()) {
-				var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
-				if (spawnPoint == null) return;
-				int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
-				spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+				if (Global.level.gameMode is TeamDeathMatch && Global.level.teamNum > 2) {
+					List<Player> spawnPoints = Global.level.players.FindAll(
+						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
+					);
+					if (spawnPoints.Count != 0) {
+						Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character;
+						Point warpInPos = Global.level.getGroundPosNoKillzone(
+							randomChar.pos, Global.screenH
+						) ?? randomChar.pos;
+						spawnCharAtPoint(warpInPos, randomChar.xDir, charNetId, sendRpc);
+					} else {
+						var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
+						int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
+						spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+					}
+				}
+				else {
+					var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
+					if (spawnPoint == null) return;
+					int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
+					spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+				}
 			}
 		}
 
@@ -1156,7 +1174,7 @@ public partial class Player {
 						zero.blackZeroTime = 100000;
 						zero.hyperZeroUsed = true;
 					} else {
-						zero.awakenedZeroTime = Global.spf;
+						zero.awakenedZeroTime = 0;
 						zero.hyperZeroUsed = true;
 						currency = 9999;
 					}
@@ -1593,7 +1611,7 @@ public partial class Player {
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.blackZeroTime = zero.maxHyperZeroTime;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
-				zero.awakenedZeroTime = Global.spf;
+				zero.awakenedZeroTime = 0;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				zero.isNightmareZero = true;
 			}
@@ -1918,17 +1936,32 @@ public partial class Player {
 	}
 
 	public void awardCurrency() {
+		// Cannot gain scrap or ST.
+		if (Global.level.is1v1()) return;
 		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
+
+		// First we fill ST.
+		if (isVile) {
+			fillSubtank(2);
+		} else if (isAxl) {
+			fillSubtank(3);
+		} else {
+			fillSubtank(4);
+		}
+		if (character is Zero zero && zero.isNightmareZero) {
+			zero.freeBusterShots++;
+			return;
+		}
+		if (character is PunchyZero pzero && pzero.isViral) {
+			pzero.freeBusterShots++;
+			return;
+		}
+		// Check for stuff that cannot gain scraps.
 		if (character?.isCCImmuneHyperMode() == true) return;
 		//if (character is Zero zero && (zero.isNightmareZero)) return;
 		//if (character != null && character.isBlackZero2()) return;
 		if (character != null && character.rideArmor != null && character.charState is InRideArmor) return;
 		if (isX && hasUltimateArmor()) return;
-		//if (isX && hasAnyChip() && !hasGoldenArmor()) return;
-		//if (isX && hasGoldenArmor()) return;
-		if (Global.level.is1v1()) return;
-
-		if (isZero || isVile) { fillSubtank(2); } else if (isAxl) { fillSubtank(3); } else if (isX || isSigma) { fillSubtank(4); } else { fillSubtank(4); }
 
 		currency++;
 	}
@@ -2091,8 +2124,12 @@ public partial class Player {
 		respawnTime = 0;
 		character = limboChar;
 		limboChar = null;
+		if (character?.destroyed == false) {
+			character.destroySelf();
+		}
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
+		/*
 		if (isSigma1()) {
 			if (Global.level.is1v1()) {
 				character.changePos(new Point(Global.level.width / 2, character.pos.y));
@@ -2102,7 +2139,7 @@ public partial class Player {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
 		} else if (character is Doppma) {
-			character.destroySelf();
+		*/
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
 				character.netId, character.ownedByLocalPlayer
@@ -2117,21 +2154,21 @@ public partial class Player {
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
 			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
-		}
+		//}
 		RPC.playerToggle.sendRpc(id, RPCToggleType.ReviveSigma);
 	}
 
 	public void reviveSigmaNonOwner(Point spawnPoint) {
 		clearSigmaWeapons();
 		maxHealth = MathF.Ceiling(32 * getHealthModifier());
-		if (character is Doppma) {
+		//if (character is Doppma) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
 				character.netId, character.ownedByLocalPlayer
 			);
 			character = kaiserSigma;
-		}
+		//}
 		character.changeSprite("sigma3_kaiser_enter", true);
 	}
 
@@ -2139,7 +2176,7 @@ public partial class Player {
 		currency -= reviveXCost;
 		hyperXRespawn = true;
 		respawnTime = 0;
-		character.changeState(new XReviveStart(), true);
+		character.changeState(new XRevive(), true);
 	}
 
 	public void reviveXNonOwner() {
@@ -2449,7 +2486,7 @@ public partial class Player {
 		int? control = Control.controllerNameToMapping[keyboard].GetValueOrDefault(inputMapping);
 		if (control == null) return;
 		Key key = (Key)control;
-		input.keyPressed[key] = !input.keyHeld.ContainsKey(key) || !input.keyHeld[key];
+		input.keyPressed[key] = !input.keyHeld.GetValueOrDefault(key);
 		input.keyHeld[key] = true;
 	}
 
@@ -2709,7 +2746,8 @@ public partial class Player {
 		if (character.charState is WarpOut) return false;
 		if (character.charState.invincible) return false;
 		if (character.isCStingInvisible()) return false;
-		if (character.isHyperSigmaBS.getValue()) return false;
+		// TODO: Add Wolf Check here.
+		//if (character.isHyperSigmaBS.getValue()) return false;
 
 		return false;
 	}

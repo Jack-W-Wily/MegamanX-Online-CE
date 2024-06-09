@@ -57,18 +57,20 @@ public class Projectile : Actor {
 		useGravity = false;
 		damager = new Damager(player, damage, flinch, hitCooldown);
 		this.xDir = xDir;
-		if (Global.level.gameMode.isTeamMode && !(this is NapalmPartProj) && !(this is FlameBurnerProj)) {
-			if (Global.level.teamNum == 2) {
-				if (player.alliance == GameMode.blueAlliance) {
-					addRenderEffect(RenderEffectType.BlueShadow);
-				} else {
-					addRenderEffect(RenderEffectType.RedShadow);
-				}
-			} else if (damager != null &&
-				!damager.owner.isMainPlayer &&
-				damager.owner.alliance == Global.level.mainPlayer.alliance
-			) {
-				addRenderEffect(RenderEffectType.GreenShadow);
+		if ((Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) &&
+			this is not NapalmPartProj or FlameBurnerProj
+		) {
+			RenderEffectType? allianceEffect = player.alliance switch {
+				0 => RenderEffectType.BlueShadow,
+				1 => RenderEffectType.RedShadow,
+				2 => RenderEffectType.GreenShadow,
+				3 => RenderEffectType.PurpleShadow,
+				4 => RenderEffectType.YellowShadow,
+				5 => RenderEffectType.OrangeShadow,
+				_ => null
+			};
+			if (allianceEffect != null) {
+				addRenderEffect(allianceEffect.Value);
 			}
 		}
 		this.ownerPlayer = player;
@@ -343,8 +345,16 @@ public  void isGaeaproj() {
 		return false;
 	}
 
-	public override void destroySelf(string spriteName = null, string fadeSound = null, bool disableRpc = false, bool doRpcEvenIfNotOwned = false, bool favorDefenderProjDestroy = false) {
-		base.destroySelf(fadeSprite, this.fadeSound, disableRpc, doRpcEvenIfNotOwned, favorDefenderProjDestroy: favorDefenderProjDestroy);
+	public override void destroySelf(
+		string spriteName = null, string fadeSound = null,
+		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
+		bool favorDefenderProjDestroy = false
+	) {
+		base.destroySelf(
+			fadeSprite, this.fadeSound,
+			disableRpc, doRpcEvenIfNotOwned,
+			favorDefenderProjDestroy: favorDefenderProjDestroy
+		);
 	}
 
 	public void destroySelfNoEffect(bool disableRpc = false, bool doRpcEvenIfNotOwned = false) {
@@ -635,7 +645,7 @@ public  void isGaeaproj() {
 	}
 
 	// Can be used in lieu of the on<PROJ>Damage() method in damager method with caveat that this causes issues where the actor isn't created yet leading to point blank shots under lag not running this
-	public virtual DamagerMessage onDamage(IDamagable damagable, Player attacker) {
+	public virtual DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
 		return null;
 	}
 

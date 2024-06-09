@@ -34,29 +34,32 @@ public class SpinWheel : Weapon {
 public class SpinWheelProj : Projectile {
 	int started;
 	float startedTime;
-	public Anim sparks;
+	public Anim? sparks;
 	float soundTime;
 	float startMaxTime = 2.5f;
 	float lastHitTime;
 	const float hitCooldown = 0.2f;
+	float maxTimeProj = 2.5f;
+
 	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 1, hitCooldown, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		projId = (int)ProjIds.SpinWheel;
+		maxTimeProj = startMaxTime;
+		maxTime = startMaxTime;
 	}
 
 	public override void update() {
 
 
 		base.update();
-
-		if (!ownedByLocalPlayer) {
+		if (ownedByLocalPlayer && time >= maxTimeProj) {
+			destroySelf();
 			return;
 		}
-
-		projId = (int)ProjIds.SpinWheel;
 		if (collider != null) {
 			collider.isTrigger = false;
 			collider.wallOnly = true;
@@ -65,14 +68,16 @@ public class SpinWheelProj : Projectile {
 			started = 1;
 			changeSprite("spinwheel_proj", true);
 			useGravity = true;
-			collider.isTrigger = false;
-			collider.wallOnly = true;
+			if (collider != null) {
+				collider.isTrigger = false;
+				collider.wallOnly = true;
+			}
 		}
 		if (started == 1) {
 			startedTime += Global.spf;
 			if (startedTime > 1) {
 				started = 2;
-				maxTime = startMaxTime;
+				maxTimeProj = startMaxTime;
 			}
 		}
 		if (started == 2) {
@@ -81,11 +86,15 @@ public class SpinWheelProj : Projectile {
 			Helpers.decrementTime(ref lastHitTime);
 			if (Global.level.checkCollisionActor(this, 0, -1) == null) {
 				var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
-				if (collideData != null && collideData.hitData != null && !((Point)collideData.hitData.normal).isAngled()) {
+				if (collideData != null && collideData.hitData != null &&
+					collideData.hitData.normal != null && !((Point)collideData.hitData.normal).isAngled()
+				) {
 					xDir *= -1;
 					if (sparks != null) sparks.xDir *= -1;
-					maxTime = startMaxTime;
-					startMaxTime -= 0.2f;
+					maxTimeProj = startMaxTime;
+					if (ownedByLocalPlayer) {
+						startMaxTime -= 0.2f;
+					}
 				}
 			}
 			soundTime += Global.spf;
@@ -97,13 +106,14 @@ public class SpinWheelProj : Projectile {
 		if (started > 0 && grounded && !destroyed) {
 			if (sparks == null) {
 				sparks = new Anim(pos, "spinwheel_sparks", xDir, null, false);
-				playSound("spinWheelGround", forcePlay: true, sendRpc: true);
-
+				playSound("spinWheelGround", forcePlay: true);
 			}
 			sparks.pos = pos.addxy(-xDir * 10, 10);
 			sparks.visible = true;
 		} else {
-			if (sparks != null) sparks.visible = false;
+			if (sparks != null) {
+				sparks.visible = false;
+			}
 		}
 	}
 

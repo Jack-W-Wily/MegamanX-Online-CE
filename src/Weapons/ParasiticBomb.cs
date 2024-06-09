@@ -22,8 +22,8 @@ public class ParasiticBomb : Weapon {
 		if (chargeLevel < 3) {
 			new ParasiticBombProj(this, pos, xDir, player, netProjId);
 		} else {
-			if (player.character.ownedByLocalPlayer && player.character.beeSwarm == null) {
-				player.character.beeSwarm = new BeeSwarm(player.character);
+			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx && mmx.beeSwarm == null) {
+				mmx.beeSwarm = new BeeSwarm(mmx);
 			}
 		}
 	}
@@ -35,7 +35,7 @@ public class ParasiticBomb : Weapon {
 }
 
 public class ParasiticBombProj : Projectile {
-	public Character host;
+	public Character? host;
 	public ParasiticBombProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 200, 0, player, "parasitebomb", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		this.weapon = weapon;
@@ -128,35 +128,35 @@ public class ParasiteCarry : CharState {
 }
 
 public class BeeSwarm {
-	public Character character;
+	public MegamanX mmx;
 	public List<BeeCursorAnim> beeCursors = new List<BeeCursorAnim>();
 	int currentIndex;
 	float currentTime = 0f;
 	const float beeCooldown = 1f;
 
-	public BeeSwarm(Character character) {
-		this.character = character;
+	public BeeSwarm(MegamanX mmx) {
+		this.mmx = mmx;
 
 		beeCursors = new List<BeeCursorAnim>()
 		{
-				new BeeCursorAnim(getCursorStartPos(0), character),
-				new BeeCursorAnim(getCursorStartPos(1), character),
-				new BeeCursorAnim(getCursorStartPos(2), character),
-				new BeeCursorAnim(getCursorStartPos(3), character),
+				new BeeCursorAnim(getCursorStartPos(0), mmx),
+				new BeeCursorAnim(getCursorStartPos(1), mmx),
+				new BeeCursorAnim(getCursorStartPos(2), mmx),
+				new BeeCursorAnim(getCursorStartPos(3), mmx),
 			};
 	}
 
 	public Point getCursorStartPos(int index) {
-		Point cPos = character.getCenterPos();
+		Point cPos = mmx.getCenterPos();
 		if (index == 0) return cPos.addxy(-15, -17);
 		else if (index == 1) return cPos.addxy(15, -17);
 		else if (index == 2) return cPos.addxy(-15, 17);
 		else return cPos.addxy(15, 17);
 	}
 
-	public Actor getAvailableTarget() {
-		Point centerPos = character.getCenterPos();
-		var targets = Global.level.getTargets(centerPos, character.player.alliance, true, ParasiticBomb.beeRange);
+	public Actor? getAvailableTarget() {
+		Point centerPos = mmx.getCenterPos();
+		var targets = Global.level.getTargets(centerPos, mmx.player.alliance, true, ParasiticBomb.beeRange);
 
 		foreach (var target in targets) {
 			if (beeCursors.Any(b => b.target == target)) {
@@ -185,7 +185,7 @@ public class BeeSwarm {
 				beeCursors[i].pos = getCursorStartPos(i);
 			}
 			if (beeCursors[i].state == 4) {
-				beeCursors[i] = new BeeCursorAnim(getCursorStartPos(i), character);
+				beeCursors[i] = new BeeCursorAnim(getCursorStartPos(i), mmx);
 			}
 		}
 
@@ -204,10 +204,10 @@ public class BeeSwarm {
 	}
 
 	public bool shouldDestroy() {
-		if (!character.player.input.isHeld(Control.Shoot, character.player)) return true;
-		if (character.player.weapon is not ParasiticBomb) return true;
-		var pb = character.player.weapon as ParasiticBomb;
-		if (pb.ammo <= 0) return true;
+		if (!mmx.player.input.isHeld(Control.Shoot, mmx.player)) return true;
+		if (mmx.player.weapon is not ParasiticBomb) return true;
+		var pb = mmx.player.weapon as ParasiticBomb;
+		if (pb?.ammo <= 0) return true;
 		return false;
 	}
 
@@ -216,14 +216,14 @@ public class BeeSwarm {
 			beeCursor.destroySelf();
 		}
 		beeCursors.Clear();
-		character.beeSwarm = null;
+		mmx.beeSwarm = null;
 	}
 }
 
 public class BeeCursorAnim : Anim {
 	public int state = 0;
-	MegamanX character;
-	public Actor target;
+	MegamanX? character;
+	public Actor? target;
 	public BeeCursorAnim(Point pos, Character character)
 		: base(pos, "parasite_cursor_start", 1, character.player.getNextActorNetId(), false, true, character.ownedByLocalPlayer) {
 		this.character = character as MegamanX;
@@ -244,26 +244,29 @@ public class BeeCursorAnim : Anim {
 				state = 2;
 			}
 		} else if (state == 2) {
-			if (target.destroyed) {
+			if (target!.destroyed) {
 				state = 3;
-				return;
+				return;			
 			}
 			move(pos.directionToNorm(target.getCenterPos()).times(350));
 			if (pos.distanceTo(target.getCenterPos()) < 5) {
 				state = 3;
 				changeSprite("parasite_cursor_lockon", true);
-			}
+			}		
 		} else if (state == 3) {
-			pos = target.getCenterPos();
+			pos = target!.getCenterPos();
+			
 			if (isAnimOver()) {
 				state = 4;
 				destroySelf();
-				if (!target.destroyed) {
-					character.chargeTime = character.charge3Time;
-					character.shoot(true);
-					character.chargeTime = 0;
-					new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);
-				}
+				if (!target!.destroyed) {
+					if (character != null) {
+						character.chargeTime = character.charge3Time;
+						character.shoot(true);
+						character.chargeTime = 0;
+						new ParasiticBombProjCharged(new ParasiticBomb(), character.getShootPos(), character.pos.x - target.getCenterPos().x < 0 ? 1 : -1, character.player, character.player.getNextActorNetId(), target, rpc: true);
+					}	
+				}			
 			}
 		}
 	}

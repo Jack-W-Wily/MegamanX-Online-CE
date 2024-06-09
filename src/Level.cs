@@ -759,22 +759,22 @@ public partial class Level {
 				} else {
 					alliance = Server.getMatchInitAutobalanceTeam(players, teamNum);
 				}
-
+				int[] charList = {0, 1, 2, 4, 5, 6};
 				if (equalCharDistribution) {
 					if (!Global.level.gameMode.isTeamMode) {
-						charNum = equalCharDistributer % 5;
+						charNum = charList[equalCharDistributer % charList.Length];
 						equalCharDistributer++;
 					} else {
 						if (alliance == GameMode.redAlliance) {
-							charNum = equalCharDistributerRed % 5;
+							charNum = charList[equalCharDistributerRed % charList.Length];
 							equalCharDistributerRed++;
 						} else {
-							charNum = equalCharDistributerBlue % 5;
+							charNum = charList[equalCharDistributerBlue % charList.Length];
 							equalCharDistributerBlue++;
 						}
 					}
 				} else {
-					charNum = Helpers.randomRange(0, 5);
+					charNum = charList[Helpers.randomRange(0, 3)];
 				}
 
 				PlayerCharData playerData = null;

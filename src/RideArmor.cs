@@ -15,7 +15,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public RideArmorState rideArmorState;
 	public Character mk5Rider;
-	public Character character;
+	public Character? character;
 	public Character grabbedCharacter;
 	public bool changedStateInFrame;
 	public bool isDashing;
@@ -678,7 +678,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 	}
 
-	public void addDamageText(string text) {
+	public void addDamageText(string text, FontType color) {
 		int xOff = 0;
 		int yOff = 0;
 
@@ -687,7 +687,7 @@ public class RideArmor : Actor, IDamagable {
 				yOff -= (6 - (int)damageTexts[i].time);
 			}
 		}
-		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), false));
+		damageTexts.Add(new DamageText(text, 0, pos, new Point(xOff, yOff), (int)color));
 	}
 
 	public void playHurtAnim() {
@@ -2279,19 +2279,19 @@ public class InRideArmor : CharState {
 	}
 
 	public void freeze(float freezeTime) {
-		if (frozenTime == 0 && character.freezeInvulnTime == 0) {
+		if (freezeTime > frozenTime) {
 			frozenTime = freezeTime;
 		}
 	}
 
 	public void stun(float timeToStun) {
-		if (stunTime == 0 && frozenTime == 0 && character.stunInvulnTime == 0) {
+		if (timeToStun > stunTime) {
 			stunTime = timeToStun;
 		}
 	}
 
 	public void crystalize(float timeToCrystalize) {
-		if (crystalizeTime == 0 && frozenTime == 0 && character.crystalizeInvulnTime == 0) {
+		if (timeToCrystalize > crystalizeTime) {
 			crystalizeTime = timeToCrystalize;
 			character.crystalizeStart();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (byte)RPCToggleType.StartCrystalize);

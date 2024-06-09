@@ -100,7 +100,7 @@ public class CharState {
 			character.isDashing = false;
 		}
 		if (newState is Hurt || newState is Die ||
-			newState is Frozen || newState is Crystalized || newState is Stunned
+			newState is GenericStun
 		) {
 			character.onFlinchOrStun(newState);
 		}
@@ -168,15 +168,6 @@ public class CharState {
 	}
 
 	public virtual bool canExit(Character character, CharState newState) {
-		if (character.charState is Die &&
-			newState is not VileRevive &&
-			newState is not WolfSigmaRevive &&
-			newState is not ViralSigmaRevive &&
-			newState is not KaiserSigmaRevive &&
-			newState is not XReviveStart
-		) {
-			return false;
-		}
 		return true;
 	}
 
@@ -626,10 +617,6 @@ public class Run : CharState {
 		normalCtrl = true;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
 	public override void update() {
 		base.update();
 		var move = new Point(0, 0);
@@ -665,10 +652,6 @@ public class Crouch : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.globalCollider = character.getCrouchingCollider();
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 
 	public override void update() {
@@ -762,10 +745,6 @@ public class ZeroClang : CharState {
 	public ZeroClang(int dir) : base("clang") {
 		hurtDir = dir;
 		hurtSpeed = dir * 100;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
 	}
 
 	public override void update() {
@@ -930,6 +909,10 @@ public class Dash : CharState {
 	public override void update() {
 		dashBackwardsCode(character, initialDashDir);
 		base.update();
+
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
+			dashTime = 50;
+		}
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
@@ -1324,14 +1307,6 @@ public class WallKick : CharState {
 		if (character.vel.y > 0) {
 			character.changeState(new Fall());
 		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
 	}
 }
 
@@ -2039,6 +2014,20 @@ public class Die : CharState {
 			RPC.actorToggle.sendRpc(character.startRideArmor.netId, RPCActorToggleType.StartMechSelfDestruct);
 		}
 	}
+
+	public override bool canExit(Character character, CharState newState) {
+		if (character.charState is Die &&
+			newState is not VileRevive and
+			not WolfSigmaRevive and
+			not ViralSigmaRevive and
+			not KaiserSigmaRevive and
+			not XReviveStart and
+			not XRevive
+		) {
+			return false;
+		}
+		return base.canExit(character, newState);
+	}
 }
 
 public class GenericGrabbedState : CharState {
@@ -2056,7 +2045,7 @@ public class GenericGrabbedState : CharState {
 	public GenericGrabbedState(
 		Actor grabber, float maxGrabTime, string grabSpriteSuffix,
 		bool reverseZIndex = false, bool freeOnHitWall = true,
-		bool lerp = true, string additionalGrabSprite = null, float maxNotGrabbedTime = 0.5f
+		bool lerp = true, string additionalGrabSprite = "", float maxNotGrabbedTime = 0.5f
 	) : base(
 		"grabbed"
 	) {

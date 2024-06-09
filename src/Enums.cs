@@ -362,6 +362,7 @@ public enum ProjIds {
 	BubbleSplashCharged,
 	SilkShot,
 	SilkShotShrapnel,
+	SilkShotChargedLv2,
 	SilkShotCharged,
 	SpinWheel,
 	SpinWheelChargedStart,

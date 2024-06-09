@@ -8,13 +8,19 @@ public class HyperZeroStart : CharState {
 	public float radius = 200;
 	public float time;
 	[AllowNull]
-	Anim drWilyAnim;
+	Anim? ZeroVirus;
+	Anim? VirusEffect;
+	Anim? VirusEffectParts;
+	Anim? VirusHead;
+	Anim? DrLight;
+
 	[AllowNull]
 	Zero zero;
 
 	public HyperZeroStart(int type) : base(
 		type == 2 ? "hyper_start3" : 
-		type == 1 ? "hyper_start2" : "hyper_start", "", "", "") {
+		type == 1 ? "hyper_start2" : 
+		type == 0 ? "hyper_start" : "", "", "") {
 		invincible = true;
 	}
 
@@ -36,6 +42,7 @@ public class HyperZeroStart : CharState {
 					zero.awakenedZeroTime = 9999;//Global.spf;
 					RPC.setHyperZeroTime.sendRpc(character.player.id, zero.awakenedZeroTime, 2);
 				} else if (zero.zeroHyperMode == 2) {
+					zero.zeroDarkHoldWeapon.ammo = zero.zeroGigaAttackWeapon.ammo;
 					zero.isNightmareZero = true;
 				}
 				character.playSound("ching");
@@ -73,8 +80,9 @@ public class HyperZeroStart : CharState {
 			drWilyAnim.fadeIn = true;
 			//character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 		} else if (zero.zeroHyperMode == 1) {
-			drWilyAnim = new Anim(
-				character.pos.addxy(30 * character.xDir, -30), "drwily", -character.xDir,
+			ZeroVirus = new Anim(
+				character.pos.addxy(70 , -10),
+				"zerovirus", -character.xDir,
 				player.getNextActorNetId(), false, sendRpc: true
 			);
 			drWilyAnim.fadeIn = true;
@@ -82,9 +90,15 @@ public class HyperZeroStart : CharState {
 			//character.player.awakenedCurrencyEnd = (character.player.currency - 10);
 			character.playSound("AwakenedZeroEntry", forcePlay: false, sendRpc: true);
 		} else if (zero.zeroHyperMode == 2) {
-			drWilyAnim = new Anim(
-				character.pos.addxy(30 * character.xDir, -30), "gate", -character.xDir,
-				player.getNextActorNetId(), false, sendRpc: true
+			VirusEffect = new Anim(
+				character.pos.addxy(character.xDir, +10),
+				"viruseffect", character.xDir,
+				player.getNextActorNetId(), true, sendRpc: true
+			);
+			VirusEffectParts = new Anim(
+				character.pos.addxy(character.xDir, +10),
+				"viruseffectparts", character.xDir,
+				player.getNextActorNetId(), true, sendRpc: true
 			);
 			drWilyAnim.fadeIn = true;
 			drWilyAnim.blink = true;
@@ -97,12 +111,23 @@ public class HyperZeroStart : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		drWilyAnim?.destroySelf();
-		if (character != null) {
-			character.invulnTime = 0.5f;
-		}
-		if (character is Zero zero) {
-			zero.hyperZeroUsed = false;
+		ZeroVirus?.destroySelf();
+		VirusEffect?.destroySelf();
+		VirusEffectParts?.destroySelf();
+		VirusHead?.destroySelf();
+		DrLight?.destroySelf();
+		character.invulnTime = 0.5f;
+		zero.hyperZeroUsed = false;
+
+		if (zero.zeroHyperMode == 0) {
+			zero.blackZeroTime = zero.maxHyperZeroTime + 0.5f;
+			RPC.setHyperZeroTime.sendRpc(zero.player.id, zero.blackZeroTime, 0);
+		} else if (zero.zeroHyperMode == 1) {
+			zero.awakenedCurrencyTime = -30;
+			RPC.setHyperZeroTime.sendRpc(zero.player.id, zero.awakenedZeroTime, 2);
+		} else if (zero.zeroHyperMode == 2) {
+			zero.isNightmareZero = true;
+			zero.freeBusterShots = 10;
 		}
 	}
 

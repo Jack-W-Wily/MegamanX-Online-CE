@@ -287,8 +287,4 @@ public class MissileAttack : CharState {
 		base.onEnter(oldState);
 		shootLogic(character as Vile);
 	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }

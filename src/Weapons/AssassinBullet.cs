@@ -14,6 +14,7 @@ public class AssassinBullet : AxlWeapon {
 		weaponBarIndex = 28;
 		weaponSlotIndex = 47;
 		killFeedIndex = 61;
+		drawAmmo = false;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -105,7 +106,7 @@ public class AssassinBulletProj : Projectile {
 		damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: overrideDamage);
 
 		if (weakness) {
-			(damagable as Character).addDamageText("Headshot!", false);
+			//(damagable as Character).addDamageText("Headshot!", false);
 			playSound("hurt");
 		}
 	}

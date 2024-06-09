@@ -211,20 +211,19 @@ public class ZeroDoubleBuster : CharState {
 			shootPressedAgain = true;
 		}
 
-		int type = player.isZBusterZero() ? 1 : 0;
 		if (!fired1 && character.frameIndex == 3) {
 			fired1 = true;
 			if (!isPinkCharge) {
 				character.playSound("buster3", sendRpc: true);
 				new ZBuster4Proj(
 					zero.zeroBusterWeapon, character.getShootPos(),
-					character.getShootXDir(), type, player, player.getNextActorNetId(), rpc: true
+					character.getShootXDir(), 1, player, player.getNextActorNetId(), rpc: true
 				);
 			} else {
 				character.playSound("buster2", sendRpc: true);
 				new ZBuster2Proj(
 					zero.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(),
-					type, player, player.getNextActorNetId(), rpc: true
+					0, player, player.getNextActorNetId(), rpc: true
 				);
 			}
 		}
@@ -238,7 +237,7 @@ public class ZeroDoubleBuster : CharState {
 			character.playSound("buster3", sendRpc: true);
 			new ZBuster4Proj(
 				zero.zeroBusterWeapon, character.getShootPos(), character.getShootXDir(),
-				type, player, player.getNextActorNetId(), rpc: true
+				0, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 

@@ -48,7 +48,14 @@ public partial class MegamanX : Character {
 	public GravityWellProj gravityWell;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
-	public int unpoShotCount;
+	public int unpoShotCount {
+		get {
+			if (player.weapon is not Buster { isUnpoBuster: true }) {
+				return 0;
+			}
+			return MathInt.Floor(player.weapon.ammo / player.weapon.getAmmoUsage(0));
+		}
+	}
 
 	public float hadoukenCooldownTime;
 
@@ -88,6 +95,8 @@ public partial class MegamanX : Character {
 
 	public float xSaberCooldown;
 	public float stockedChargeFlashTime;
+	
+	public BeeSwarm? beeSwarm;
 
 	public MegamanX(
 		Player player, float x, float y, int xDir,
@@ -137,7 +146,7 @@ public partial class MegamanX : Character {
 	}
 
 	public void refillUnpoBuster() {
-		if (player.weapons.Count > 0) player.weapons[0].ammo = 32;
+		if (player.weapons.Count > 0) player.weapons[0].ammo = player.weapons[0].maxAmmo;
 	}
 
 	public override void update() {
@@ -304,10 +313,23 @@ public partial class MegamanX : Character {
 			headbuttAirTime += Global.spf;
 		}
 
+		if (isHyperXBS.getValue()) {
+			if (musicSource == null) {
+				addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
+			}
+		} else {
+			destroyMusicSource();
+		}
+
 		if (!ownedByLocalPlayer) {
 			Helpers.decrementTime(ref barrierTime);
 			return;
 		}
+
+		if (beeSwarm != null) {
+			beeSwarm.update();
+		}
+
 		updateBarrier();
 
 		if (hasFgMoveEquipped()) {
@@ -498,6 +520,7 @@ public partial class MegamanX : Character {
 			player.input.isPressed(Control.Special1, player) &&
 			!isAttacking() && !isInvisible() &&
 			!charState.isGrabbing
+			!charState.isGrabbing
 		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 1f;
@@ -510,10 +533,10 @@ public partial class MegamanX : Character {
 		}
 
 		if (isHyperX) {
-			if (unpoTime > 12) unpoDamageMaxCooldown = 1;
-			if (unpoTime > 24) unpoDamageMaxCooldown = 0.75f;
-			if (unpoTime > 36) unpoDamageMaxCooldown = 0.5f;
-			if (unpoTime > 48) unpoDamageMaxCooldown = 0.25f;
+			//if (unpoTime > 12) unpoDamageMaxCooldown = 1;
+			//if (unpoTime > 24) unpoDamageMaxCooldown = 0.75f;
+			//if (unpoTime > 36) unpoDamageMaxCooldown = 0.5f;
+			//if (unpoTime > 48) unpoDamageMaxCooldown = 0.25f;
 
 			if (!player.HasFullMax() &&
 			charState is not XUPGrabState && charState is not XUPParryMeleeState && charState is not XUPParryProjState) {
@@ -1127,8 +1150,6 @@ public partial class MegamanX : Character {
 				} else {
 					ammoUsage = 8;
 				}
-			} else if (weapon is Buster buster) {
-				ammoUsage = 0;
 			} else {
 				ammoUsage = weapon.getAmmoUsage(chargeLevel);
 			}
@@ -1148,7 +1169,7 @@ public partial class MegamanX : Character {
 
 	// Fast upgrading via command key.
 	public void quickArmorUpgrade() {
-		if (!player.input.isHeld(Control.Special1, player)) {
+		if (!player.input.isHeld(Control.Special2, player)) {
 			hyperProgress = 0;
 			return;
 		}

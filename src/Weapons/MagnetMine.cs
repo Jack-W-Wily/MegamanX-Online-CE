@@ -39,8 +39,13 @@ public class MagnetMineProj : Projectile, IDamagable {
 	public Player player;
 	float maxSpeed = 150;
 
-	public MagnetMineProj(Weapon weapon, Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 2, player, "magnetmine_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public MagnetMineProj(
+		Weapon weapon, Point pos, int xDir, int yDir,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 75, 2, player, "magnetmine_proj",
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		//maxTime = 2f;
 		maxDistance = 224;
 		fadeSprite = "explosion";
@@ -110,7 +115,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 			landed = true;
 			updateDamager(4);
 
-			if (player.isMainPlayer) {
+			if (player.isMainPlayer && !Global.level.gameMode.isTeamMode) {
 				removeRenderEffect(RenderEffectType.BlueShadow);
 				removeRenderEffect(RenderEffectType.RedShadow);
 				addRenderEffect(RenderEffectType.GreenShadow);
@@ -158,7 +163,12 @@ public class MagnetMineProjCharged : Projectile {
 
 	float soundTime;
 	float startY;
-	public MagnetMineProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) : base(weapon, pos, xDir, 50, 1, player, "magnetmine_charged", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer) {
+	public MagnetMineProjCharged(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 50, 1, player, "magnetmine_charged",
+		Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 4f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -191,6 +201,9 @@ public class MagnetMineProjCharged : Projectile {
 					vel.y = Helpers.clampMax(vel.y + Global.spf * 2000, 300);
 				}
 			}
+			if (vel.y != 0) {
+				forceNetUpdateNextFrame = true;
+			}
 
 			if (pos.y > startY + maxY) {
 				pos.y = startY + maxY;
@@ -204,7 +217,6 @@ public class MagnetMineProjCharged : Projectile {
 			if (soundTime == 0.1f) {
 				playSound("magnetminechargedtravelX2", forcePlay: false, sendRpc: true);
 			}
-
 		}
 	}
 
@@ -214,11 +226,14 @@ public class MagnetMineProjCharged : Projectile {
 		var go = other.gameObject;
 		if (go is Projectile) {
 			var proj = go as Projectile;
-			if (!proj.shouldVortexSuck) return;
-			if (proj is MagnetMineProj magnetMine && !magnetMine.canBeSucked(damager.owner.alliance)) return;
-
-			size += proj.damager.damage;
-			proj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+			if (proj != null) {
+				if (!proj.shouldVortexSuck) return;
+				if (proj is MagnetMineProj magnetMine && !magnetMine.canBeSucked(damager.owner.alliance)) return;
+				size += proj.damager.damage;
+				proj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+			}
+			
+			
 			if (size > 10) {
 				changeSprite("magnetmine_charged3", true);
 				damager.damage = 4;
