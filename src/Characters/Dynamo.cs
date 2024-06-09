@@ -141,15 +141,18 @@ public class Dynamo : Character {
 				}
 
 			}
-		if (grounded && charState.canAttack() && player.input.isPressed("specail1", player))
+		if (grounded && charState.canAttack() && player.input.isPressed(Control.Special1, player))
 				{
-				if (NightmareBullets > 0)
+			if (!player.input.isLeftOrRightHeld(player)){
+				changeState(new DynamoParryStartState());
+			}
+				if (NightmareBullets > 0 && player.input.isLeftOrRightHeld(player))
 					{
-			if (NightmareBullets != 3)changeState(new DynamoShoot(grounded, shootProj: false), forceChange: true);
-			if (NightmareBullets == 3)changeState(new DynamoNightmareBullet(grounded, shootProj: false), forceChange: true);			
-				NightmareBullets -= 1;				
+		if (NightmareBullets != 3)changeState(new DynamoShoot(grounded, shootProj: false), forceChange: true);
+		if (NightmareBullets == 3)changeState(new DynamoNightmareBullet(grounded, shootProj: false), forceChange: true);			
+					NightmareBullets -= 1;				
 					}
-                 changeState(new DynamoParryStartState());
+    
 				}
 		if (DynamoBoomerangCD == 0 && !grounded &&
 		charState.canAttack() && player.input.isPressed("special1", player))
@@ -191,7 +194,7 @@ public class Dynamo : Character {
 		}
 		 if ( sprite.name.Contains("_nova_strike") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 1f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		if ( sprite.name.Contains("chargegp"))
 		{

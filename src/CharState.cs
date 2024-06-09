@@ -770,6 +770,9 @@ public class ZeroClang : CharState {
 
 	public override void update() {
 		base.update();
+		if (!character.sprite.name.Contains("clang")){
+			character.changeSpriteFromName("land",false);
+		}
 		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
 			character.move(new Point(hurtSpeed, 0));
@@ -971,7 +974,7 @@ public class Dash : CharState {
 			}
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		if (!player.input.isHeld(initialDashButton, player) && !stop) {
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
 		if (player.isX && player.hasFullLight()) {
@@ -1068,7 +1071,7 @@ public class AirDash : CharState {
 		}
 
 
-		if (!player.input.isHeld(initialDashButton, player) && !stop) {
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
 		
@@ -1643,6 +1646,7 @@ public class GoliathDragged : CharState {
 	public RideArmor goliath;
 	public GoliathDragged(RideArmor goliath) : base("hurt") {
 		this.goliath = goliath;
+		superArmor = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -1659,14 +1663,14 @@ public class GoliathDragged : CharState {
 	public override void update() {
 		base.update();
 
-		var goliathDash = goliath.rideArmorState as RADash;
-		if (goliathDash == null || !goliath.isAttacking()) {
+	
+		if (goliath.rideArmorState is not RADash || !goliath.isAttacking()) {
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 			return;
 		}
-
-		character.move(goliathDash.getDashVel());
+		character.vel.y = 0;
+		character.changePos(goliath.pos.addxy(30 * goliath.xDir, -20));
 	}
 }
 
@@ -2151,6 +2155,7 @@ public class LaunchedState : GenericGrabbedState {
 	bool once;
 	public LaunchedState(Character grabber) : base(grabber, 1, "") {
 		customUpdate = true;
+		superArmor = true;
 	}
 
 	

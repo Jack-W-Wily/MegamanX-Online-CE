@@ -160,7 +160,7 @@ public class TornadoProjCharged : Projectile {
 
 	public TornadoProjCharged(Weapon weapon,
 	 Point pos, int xDir, Player player,  ushort netProjId) 
-	 : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", Global.defFlinch, 2f, netProjId, player.ownedByLocalPlayer) {
+	 : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", 0, 2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TornadoCharged;
 		sprite.visible = false;
 		spriteStart = Global.sprites["tornado_charge"].clone();
@@ -221,11 +221,13 @@ public class TornadoProjCharged : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		/*
-		character.move(new Point(this.speed * 0.9 * this.xDir, 0));
-		if(character.isClimbingLadder()) {
-		  character.setFall();
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr && chr.charState is not LaunchedState) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
 		}
-		*/
 	}
 }

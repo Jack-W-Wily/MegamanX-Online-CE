@@ -1413,6 +1413,10 @@ public partial class Actor : GameObject {
 				CmdSigma => "sigma",
 				NeoSigma => "neosigma",
 				Doppma => "doppma",
+				Dynamo => "dynamo",
+				Iris => "iris",
+				GBD => "tgbd",
+				Zain => "zain",
 				_ => "error"
 			};
 

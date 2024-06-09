@@ -407,6 +407,15 @@ public class Damager {
 	|| projId == (int)ProjIds.BlockableLaunch && !character.sprite.name.Contains("block")) {	
 		character.changeState(new LaunchedState(owner.character), true);
 	}
+	//Godpress Goliath
+/*	if (projId == (int)ProjIds.MechGoliathPunch 
+	&& !character.sprite.name.Contains("block")
+	&& !character.sprite.name.Contains("grabbed")
+	&& !character.sprite.name.Contains("knocked")) {	
+		DISABLED THIS ONE UNTIL PROPER FIXES
+		character.changeState(new GoliathDragged(owner.character.rideArmor), true);
+	}*/ 
+	//>>>>>>>>>>>>>>>>>>>>>
 	if (projId == (int)ProjIds.HoutenjinF) {	
 			character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 			owner.character.isDashing = true;
@@ -761,15 +770,15 @@ public class Damager {
 						damage = 0;
 						maverick.playSound("ding");
 						if (owner.ownedByLocalPlayer) {
-							if (victim.sprite.name.Contains("block")
-							|| projId == (int)ProjIds.ZSaber 
+							if (victim.sprite.name.Contains("block") &&(
+							 projId == (int)ProjIds.ZSaber 
 							|| projId == (int)ProjIds.ZSaber1 
 							|| projId == (int)ProjIds.ZSaber2 
 							|| projId == (int)ProjIds.ZSaber3 
 							|| projId == (int)ProjIds.SigmaSlash
 							|| projId == (int)ProjIds.Rising
 							|| projId == (int)ProjIds.UPPunch
-							) {
+							)) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
 						}

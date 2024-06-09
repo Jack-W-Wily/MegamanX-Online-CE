@@ -392,8 +392,9 @@ public  void isGaeaproj() {
 		}
 
 		var gmp = this as GenericMeleeProj;
-		var isSaber = gmp != null && gmp.isZSaber();
-		if (isSaber && owner.character?.isCCImmune() != true) {
+		var isSaber = gmp != null && (weapon is ZSaber
+		|| weapon is RakukojinWeapon || weapon is XUPPunch || weapon is RisingWeapon);
+		if (isSaber && owner.character?.isCCImmune() != true && gmp != null) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && otherProj != null && otherProj.owner.alliance != owner.alliance) {
 				if ((otherProj.canClangChar() && charsCanClang(owner.character, otherProj.owner.character)) || otherProj.isShield) {

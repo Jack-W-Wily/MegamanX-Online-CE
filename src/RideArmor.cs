@@ -633,7 +633,8 @@ public class RideArmor : Actor, IDamagable {
 			} else if (raNum == 4) {
 				proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player), centerPoint, ProjIds.MechGoliathPunch, player);
 			} else if (raNum == 5) {
-				proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechDevilBearPunch, player);
+			if (!sprite.name.Contains("dash"))	proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.Rising, player);
+			if (sprite.name.Contains("dash"))	proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechGoliathPunch, player);
 			}
 		} else if (sprite.name.Contains("charge")) {
 			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player);

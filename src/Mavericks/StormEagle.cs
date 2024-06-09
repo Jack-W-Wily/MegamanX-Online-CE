@@ -381,7 +381,7 @@ public class StormEGustState : MaverickState {
 			if (!maverick.isUnderwater()) maverick.playSound("stormeFlap", sendRpc: true);
 		}
 
-		if (player.input.isPressed(Control.Taunt, player) && player.currency > 4){
+		if (player.input.isPressed(Control.Down, player) && player.currency > 4){
 			player.currency -= 5;
 			maverick.changeState(new StormECageState(), true);
 		}
@@ -431,8 +431,8 @@ public class StormECageState : MaverickState {
 
 
 		if (!once){
-		new TornadoProjCharged(new StormETornadoWeapon(), maverick.pos.addxy(300,0), maverick.xDir,  player, player.getNextActorNetId());
-		new TornadoProjCharged(new StormETornadoWeapon(), maverick.pos.addxy(-300,0),maverick.xDir,  player, player.getNextActorNetId());
+		new TornadoProjCharged(new StormETornadoWeapon(), maverick.pos.addxy(100,0), maverick.xDir,  player, player.getNextActorNetId());
+		new TornadoProjCharged(new StormETornadoWeapon(), maverick.pos.addxy(-100,0),maverick.xDir,  player, player.getNextActorNetId());
 		once = true;
 		}
 
@@ -444,7 +444,7 @@ public class StormECageState : MaverickState {
 
 
 		
-			if (stateTime > 0.5) {
+			if (stateTime > 0.2) {
 				maverick.changeState(new MIdle());
 			}
 		}

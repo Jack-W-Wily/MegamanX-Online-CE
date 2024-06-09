@@ -153,6 +153,8 @@ public class VileHover : CharState {
 	float flyVelMaxSpeed = 200;
 	public float fallY;
 
+	bool lockhover;
+
 
 	SoundWrapper hoversound;
 
@@ -166,6 +168,13 @@ public class VileHover : CharState {
 	public override void update() {
 		base.update();
 		if (player == null) return;
+		
+		if (stateTime == 0) character.downpressedtimes = 0;
+		if (character.downpressedtimes == 2){
+		lockhover = true;
+		character.downpressedtimes = 0;
+		}
+
 
 		if (character.flag != null) {
 			character.changeToIdleOrFall();
@@ -184,6 +193,8 @@ public class VileHover : CharState {
 			character.vel.y = 0;
 		}
 
+		if (lockhover) character.stopMoving();
+
 		Point move = getHoverMove();
 
 		if (!character.sprite.name.EndsWith("cannon_air") || character.sprite.time > 0.1f) {
@@ -196,7 +207,13 @@ public class VileHover : CharState {
 			}
 		}
 
-		if (move.magnitude > 0) {
+		if (move.magnitude > 0 && !player.input.isHeld("down", base.player) && base.player.input.isHeld("jump", base.player)) {
+			character.move(move);
+		}
+		if (move.magnitude > 0 && player.input.isHeld("down", base.player) && !base.player.input.isHeld("jump", base.player)) {
+			character.move(move);
+		}
+		if (move.magnitude > 0 && !player.input.isHeld("down", base.player) && !base.player.input.isHeld("jump", base.player)) {
 			character.move(move);
 		}
 

@@ -451,8 +451,11 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public bool launched;
 	float launchTime;
+	bool once;
+
 	public DeadLiftGrabbed(BoomerangKuwanger grabber) : base(grabber, 1, "") {
 		customUpdate = true;
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -468,11 +471,14 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 			for (int i = 1; i <= 4; i++) {
 						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
 						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+							if (!once){
 							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-							player.health -= 3;
+							character.applyDamage(null, null, 3, null);
+							once = true;
 							character.playSound("crash", sendRpc: true);
 							character.shakeCamera(sendRpc: true);
 							//return;
+							}
 						}
 			}
 			//if (character.stopCeiling()) {

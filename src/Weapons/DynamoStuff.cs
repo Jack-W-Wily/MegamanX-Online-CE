@@ -1296,7 +1296,6 @@ public class DynamoParryStartState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
 	}
 
 	public bool canParry(Actor damagingActor) {

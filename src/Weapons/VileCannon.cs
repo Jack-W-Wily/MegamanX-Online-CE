@@ -326,8 +326,8 @@ public class FrontRunnerAttack : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		shootLogic(vile);
-		character.useGravity = false;
-		character.stopMoving();
+		//character.useGravity = false;
+		//character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {

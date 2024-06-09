@@ -173,7 +173,7 @@ public class BBuffaloIceProj : Projectile {
 public class BBuffaloIceProjGround : Projectile, IDamagable {
 	float health = 6;
 	public BBuffaloIceProjGround(Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 3, player, "bbuffalo_proj_ice", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 0, 1, player, "bbuffalo_proj_ice", Global.defFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 5;
 		projId = (int)ProjIds.BBuffaloIceProjGround;
 		destroyOnHit = true;
@@ -481,7 +481,9 @@ public class BBuffaloDragged : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public BBuffaloDragged(BlizzardBuffalo grabber) :
 		base(grabber, maxGrabTime, "_dash", reverseZIndex: true, freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab") {
+		superArmor = true;
 	}
+
 
 	public override void update() {
 		base.update();

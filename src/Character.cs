@@ -3319,7 +3319,8 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canLandOnRideArmor() {
 		if (charState is Fall) return true;
-		if (charState is VileHover vh && vh.fallY > 0) return true;
+		if (charState is VileHover vh && vh.fallY > 0 
+		&& !player.input.isHeld(Control.Down, player)) return true;
 		return false;
 	}
 

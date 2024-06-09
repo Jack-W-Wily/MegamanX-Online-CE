@@ -422,6 +422,9 @@ public enum ProjIds {
 	NovaStrike,
 	X6Saber,
 
+
+	// Zero
+	
 	ZBuster,
 	ZSaber,
 	ZSaber1,

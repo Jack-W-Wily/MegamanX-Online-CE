@@ -369,7 +369,7 @@ label:
 				// that AI sucks if you Disable
 				// The AI's ilegal moves that's the only
 				// Way to make it viable
-				else if (isAI) {
+				if (isAI) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
 						weapons.Add(new Sting());
@@ -398,9 +398,31 @@ label:
 					//if (hasArmArmor(3)) weapons.Add(new HyperBuster());
 					//if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
 					}
-				 else if (loadout.xLoadout.melee == 0) {
+				  if (loadout.xLoadout.weapon1 > 0 && 
+					loadout.xLoadout.weapon1 < 9 &&
+					loadout.xLoadout.weapon2 > 0 && 
+					loadout.xLoadout.weapon2 < 9 &&
+					loadout.xLoadout.weapon3 > 0 && 
+					loadout.xLoadout.weapon3 < 9 ||
+					loadout.xLoadout.weapon1 > 8 && 
+					loadout.xLoadout.weapon1 < 17 &&
+					loadout.xLoadout.weapon2 > 8 && 
+					loadout.xLoadout.weapon2 < 17 &&
+					loadout.xLoadout.weapon3 > 8 && 
+					loadout.xLoadout.weapon3 < 17 ||
+					loadout.xLoadout.weapon1 > 16 && 
+					loadout.xLoadout.weapon1 < 25 &&
+					loadout.xLoadout.weapon2 > 16 && 
+					loadout.xLoadout.weapon2 < 25 &&
+					loadout.xLoadout.weapon3 > 16 && 
+					loadout.xLoadout.weapon3 < 25) {
 					//weapons.Add(new GigaCrush());
-					if (xArmor1v1 == 1) {
+					if (loadout.xLoadout.weapon1 > 0 && 
+					loadout.xLoadout.weapon1 < 9 &&
+					loadout.xLoadout.weapon2 > 0 && 
+					loadout.xLoadout.weapon2 < 9 &&
+					loadout.xLoadout.weapon3 > 0 && 
+					loadout.xLoadout.weapon3 < 9 ) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
 						weapons.Add(new Sting());
@@ -411,7 +433,13 @@ label:
 						weapons.Add(new Boomerang());
 						weapons.Add(new ShotgunIce());
 						
-					} else if (xArmor1v1 == 2) {
+					} else if (
+					loadout.xLoadout.weapon1 > 8 && 
+					loadout.xLoadout.weapon1 < 17 &&
+					loadout.xLoadout.weapon2 > 8 && 
+					loadout.xLoadout.weapon2 < 17 &&
+					loadout.xLoadout.weapon3 > 8 && 
+					loadout.xLoadout.weapon3 < 17) {
 						weapons.Add(new Buster());
 						weapons.Add(new CrystalHunter());
 						weapons.Add(new BubbleSplash());
@@ -422,7 +450,13 @@ label:
 						weapons.Add(new MagnetMine());
 						weapons.Add(new SpeedBurner(this));
 						
-					} else if (xArmor1v1 == 3) {
+					} else if (
+					loadout.xLoadout.weapon1 > 16 && 
+					loadout.xLoadout.weapon1 < 25 &&
+					loadout.xLoadout.weapon2 > 16 && 
+					loadout.xLoadout.weapon2 < 25 &&
+					loadout.xLoadout.weapon3 > 16 && 
+					loadout.xLoadout.weapon3 < 25) {
 						weapons.Add(new Buster());
 						weapons.Add(new AcidBurst());
 						weapons.Add(new ParasiticBomb());
