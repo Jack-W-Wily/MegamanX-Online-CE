@@ -79,6 +79,7 @@ public class ZeroLoadout {
 	[ProtoMember(6)] public int hyperMode;
 	[ProtoMember(7)] public int groundSpecial;
 	[ProtoMember(8)] public int airSpecial;
+	[ProtoMember(9)] public int melee;
 
 	public static ZeroLoadout createRandom() {
 		return new ZeroLoadout() {
@@ -90,6 +91,7 @@ public class ZeroLoadout {
 			hyperMode = Helpers.randomRange(0, 2),
 			groundSpecial = Helpers.randomRange(0, 2),
 			airSpecial = Helpers.randomRange(0, 2),
+			melee = Helpers.randomRange(0, 2),
 		};
 	}
 
@@ -110,6 +112,7 @@ public class ZeroLoadout {
 			if (downThrustA > 2) downThrustA = 0;
 		}
 		if (hyperMode < 0 || hyperMode > 2) hyperMode = 0;
+			if (melee < 0 || melee > 2) melee = 0;
 	}
 
 	private bool inRange(int weaponNum) {

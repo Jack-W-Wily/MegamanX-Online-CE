@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class Vile : Character {
 	public float vulcanLingerTime;
-	public const int callNewMechCost = 5;
+	public const int callNewMechCost = 3;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public float vileLadderShootCooldown;
@@ -474,7 +474,7 @@ public class Vile : Character {
 		}
 
 		//Front Runner
-		if (player.vileAmmo > 8 &&
+		if (player.vileAmmo > 8 && (grounded || charState is VileHover || isVileMK2) &&
 		player.input.isPressed(Control.Special1, player) 
 		&& charState is not FrontRunnerAttack 
 		&& charState is not MissileAttack 
@@ -484,6 +484,32 @@ public class Vile : Character {
 		changeState(new FrontRunnerAttack(false, false), true);
 		vileAmmoRechargeCooldown = 0.15f;
 
+		}
+
+
+		//Air Bombs
+		if (player.vileAmmo > 8 && !isVileMK2 && !grounded &&
+		player.input.isPressed(Control.Special1, player) 
+		&& charState is not AerialRaidAttack 
+		&& charState is not MissileAttack 
+		&& charState is not StunBallsAttack 
+		&& charState is not ParasiteSwordAttackState 
+		&& charState is not MaroonedTomahawkAttackState) {
+		changeState(new AerialRaidAttack(false), true);
+		
+		}
+
+		//Peace out roller
+		if (player.vileAmmo > 12 && !grounded &&
+		player.input.isPressed(Control.Special1, player) 
+		&& player.input.isHeld(Control.Down, player) 
+		&& charState is not PeaceOutRollerAttack 
+		&& charState is not MissileAttack 
+		&& charState is not StunBallsAttack 
+		&& charState is not ParasiteSwordAttackState 
+		&& charState is not MaroonedTomahawkAttackState) {
+		changeState(new PeaceOutRollerAttack(false), true);
+		player.vileAmmo -= 12;
 		}
 
 

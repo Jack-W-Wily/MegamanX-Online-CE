@@ -35,6 +35,7 @@ public class RideArmor : Actor, IDamagable {
 	public bool ownedByMK5;
 	public int hawkBombCount;
 	public int maxHawkBombCount;
+	public float hawkbombCooldown;
 
 	public float consecutiveJumpTimeout;
 	public int consecutiveJump;
@@ -86,6 +87,14 @@ public class RideArmor : Actor, IDamagable {
 			else if (owner.vileNapalmWeapon.type == 2) maxHawkBombCount = 2;
 			else maxHawkBombCount = 3;
 			hawkBombCount = maxHawkBombCount;
+
+			if (hawkBombCount == 0){
+			Helpers.decrementTime(ref hawkbombCooldown);
+		}
+		if (hawkBombCount > 0){
+			hawkbombCooldown = 8;
+		}
+		if (hawkbombCooldown == 0)hawkBombCount = maxHawkBombCount;
 		}
 
 		netActorCreateId = NetActorCreateId.RideArmor;
@@ -277,6 +286,9 @@ public class RideArmor : Actor, IDamagable {
 		base.postUpdate();
 
 		updateProjectileCooldown();
+		
+
+		
 
 		if (grounded && flyTime > 0) {
 			flyTime -= Global.spf * 6;
@@ -307,7 +319,7 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
-		if (raNum == 2 && isUnderwater() && character != null && character.isUnderwater() && selfDestructTime == 0) {
+		if (isNeutral && raNum == 2 && isUnderwater() && character != null && character.isUnderwater() && selfDestructTime == 0) {
 			if (hawkElec == null) {
 				hawkElec = new Anim(pos.addxy(0, -20), "hawk_elec", 1, null, false);
 			}
@@ -446,18 +458,18 @@ public class RideArmor : Actor, IDamagable {
 
 
 		// Devilbear special pup control
-		if (raNum == 5 &&  (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
+		if (ownedByMK5 &&  (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))
 		&& player.input.isPressed(Control.WeaponRight, player)) {
 		changeState(new RADash());
 		}
-		if (raNum == 5 &&  (player.input.isHeld(Control.Up, player))
+		if (ownedByMK5 &&  (player.input.isHeld(Control.Up, player))
 		&& player.input.isPressed(Control.WeaponRight, player)) {
 		changeState(new RADash());
 		vel.y = -getJumpPower();
 		}
 
 		bool attackConditionMet = canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;
-		if (raNum == 5) attackConditionMet = canAttack() && character.player.input.isHeld(Control.WeaponRight, character.player);
+		if (ownedByMK5) attackConditionMet = canAttack() && character.player.input.isHeld(Control.WeaponRight, character.player);
 		if (attackConditionMet) {
 			if (rideArmorState is RARun) changeState(new RAIdle(), true);
 			if (rideArmorState is RAJump) changeState(new RAFall(), true);
@@ -626,8 +638,12 @@ public class RideArmor : Actor, IDamagable {
 		Projectile proj = null;
 
 		if (sprite.name.Contains("attack")) {
-			if (raNum == 0) {
-				proj = new GenericMeleeProj(new MechPunchWeapon(player), centerPoint, ProjIds.MechPunch, player);
+			if (raNum == 0 && isNeutral) {
+			 	proj = new GenericMeleeProj(new MechPunchWeapon(player), centerPoint, ProjIds.MechPunch, player);
+			}
+			if (raNum == 0 && !isNeutral) {
+	if (!sprite.name.Contains("dash")) 	proj = new GenericMeleeProj(new MechPunchWeapon(player), centerPoint, ProjIds.MechPunch, player);
+	if (sprite.name.Contains("dash")) 	proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechPunch, player);
 			} else if (raNum == 1) {
 				proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player), centerPoint, ProjIds.MechKangarooPunch, player);
 			} else if (raNum == 4) {
@@ -1707,7 +1723,9 @@ public class RAGroundPoundLand : RideArmorState {
 		base.onEnter(oldState);
 		if (player == null) return;
 		rideArmor.playSound("crash", sendRpc: true);
+		if (player.frozenCastle){
 		new MechFrogStompShockwave(new MechFrogStompWeapon(player), rideArmor.pos.addxy(6 * rideArmor.xDir, 0), rideArmor.xDir, player, player.getNextActorNetId(), rpc: true);
+		}
 		if (rideArmor.consecutiveJump < 2) rideArmor.consecutiveJumpTimeout = 0.25f;
 		else rideArmor.consecutiveJump = 0;
 	}

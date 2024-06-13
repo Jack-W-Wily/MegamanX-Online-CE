@@ -58,7 +58,7 @@ public class Buster : Weapon {
 		return weapon is Buster buster && buster.isUnpoBuster;
 	}
 
-	public Buster() : base() {
+	/*public Buster() : base() {
 		index = (int)WeaponIds.Buster;
 		killFeedIndex = 0;
 		weaponBarBaseIndex = 0;
@@ -67,7 +67,7 @@ public class Buster : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 0;
 		rateOfFire = 0.15f;
-	}
+	}*/
 
 	public override bool canShoot(int chargeLevel, Player player) {
 		if (!base.canShoot(chargeLevel, player)) return false;

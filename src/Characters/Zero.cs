@@ -62,8 +62,8 @@ public class Zero : Character {
 	private Weapon _zeroGigaAttackWeapon;
 	public Weapon zeroGigaAttackWeapon {
 		get {
-			if (isAwakenedZero() == true) { return zeroShinMessenkouWeapon; }
-			if (isNightmareZeroBS.getValue() == true) { return zeroShinMessenkouWeapon; }
+			//if (isAwakenedZero() == true) { return zeroShinMessenkouWeapon; }
+			//if (isNightmareZeroBS.getValue() == true) { return zeroShinMessenkouWeapon; }
 			return _zeroGigaAttackWeapon;
 		}
 		set {
@@ -346,7 +346,7 @@ public class Zero : Character {
 			}
 
 			if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost &&
-				!isBlackZero2()) {
+				!isBlackZero()) {
 				hyperProgress = 0;
 				changeState(new HyperZeroStart(0), true);
 			}
@@ -1128,6 +1128,7 @@ public class Zero : Character {
 		}
 
 		chargeTime = 0;
+		int currencyUse = 0;
 		//saberCooldown = 0.5f;
 		if (currencyUse > 0) {
 			if (freeBusterShots > 0) {
@@ -1156,10 +1157,15 @@ public class Zero : Character {
 	public bool isBlackZero() {
 		return blackZeroTime > 0;
 	}
+	
+
+	public bool isBlackZero2() {
+		return player.isZBusterZero() && blackZeroTime > 0;
+	}
 
 	// These methods below can't be used by non-owners of the character since the times aren't sync'd. Use the BS states instead
 	public bool isAwakenedZero() {
-		return awakenedZeroTime >= 0;
+		return awakenedZeroTime > 0;
 	}
 
 	public bool isAwakenedGenmuZero() {

@@ -144,17 +144,14 @@ public class Rakuhouha : CharState {
 			}  if (isDarkHold) {
 				darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);
 			} if (isRakuhouha || isCFlasher) {
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.7f, -0.7f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.38f, -0.92f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0, -1, player, player.getNextActorNetId(), 90, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.92f, -0.38f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.71f, -0.71f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.38f, -0.92f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 1, 0, player, player.getNextActorNetId(), 0, rpc: true);
+	
+				for (int i = 256; i >= 128; i -= 16) {
+					new RakuhouhaProj(
+						weapon, new Point(x, y), isCFlasher, i,
+						player, player.getNextActorNetId(), rpc: true
+					);
+				}
 			}
-
 			if (!isCFlasher && !isDarkHold) {
 				character.shakeCamera(sendRpc: true);
 				character.playSound("rakuhouha", sendRpc: true);
@@ -218,12 +215,9 @@ public class DarkHoldS : CharState {
 		float y = character.pos.y;
 		if (character.frameIndex > 7 && !fired && character.frameIndex < 12) {
 			fired = true;
+			darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);	
+			character.playSound("cflasher", sendRpc: true);
 		}
-
-		  if (isDarkHold) {
-				darkHoldProj = new DarkHoldProj(weapon, new Point(x, y), character.xDir, player, player.getNextActorNetId(), rpc: true);	
-				character.playSound("cflasher", sendRpc: true);
-			}
 
 		
 
@@ -271,16 +265,13 @@ public class Massenkou : CharState {
 			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
 		character.pos.addxy(6 * character.xDir, 0), character.xDir, 
 		player, player.getNextActorNetId(), rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -1, 0, player, player.getNextActorNetId(), 180, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.92f, -0.38f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.7f, -0.7f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, -0.38f, -0.92f, player, player.getNextActorNetId(), 135, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0, -1, player, player.getNextActorNetId(), 90, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.92f, -0.38f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.71f, -0.71f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 0.38f, -0.92f, player, player.getNextActorNetId(), 45, rpc: true);
-				new RakuhouhaProj(weapon, new Point(x, y), isCFlasher, 1, 0, player, player.getNextActorNetId(), 0, rpc: true);
-			}
+		for (int i = 256; i >= 128; i -= 16) {
+					new RakuhouhaProj(
+						weapon, new Point(x, y), isCFlasher, i,
+						player, player.getNextActorNetId(), rpc: true
+					);
+				}
+		}
 					
 		if (character.isAnimOver()) {
 			character.changeState(new Idle());
@@ -295,11 +286,13 @@ public class Massenkou : CharState {
 
 public class RakuhouhaProj : Projectile {
 	bool isCFlasher;
+
 	public RakuhouhaProj(
 		Weapon weapon, Point pos, bool isCFlasher, float byteAngle,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xVel >= 0 ? 1 : -1, 300, 1, player, isCFlasher ? "cflasher" : "rakuhouha",
+		weapon, pos,1,// xVel >= 0 ? 1 : -1,
+		 300, 1, player, isCFlasher ? "cflasher" : "rakuhouha",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		this.isCFlasher = isCFlasher;

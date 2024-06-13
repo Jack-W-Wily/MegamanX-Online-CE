@@ -1503,6 +1503,8 @@ public class Intro : CharState {
 	}
 }
 
+
+/*
 public class KnockedDown : CharState {
 	public int hurtDir;
 	public float hurtSpeed;
@@ -1543,6 +1545,8 @@ public class KnockedDown : CharState {
 		}
 	}
 }
+
+
 
 public class Hurt : CharState {
 	public int hurtDir;
@@ -1617,11 +1621,24 @@ public class Hurt : CharState {
 	}
 }
 
+
 public class GoliathDragged : CharState {
 	public RideArmor goliath;
 	public GoliathDragged(RideArmor goliath) : base("hurt") {
 		this.goliath = goliath;
 		superArmor = true;
+	}
+
+	public override void update() {
+	//	base.update();
+
+		if (goliath.rideArmorState is not RADash || !goliath.isAttacking()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+			return;
+		}
+		character.vel.y = 0;
+		character.changePos(goliath.pos.addxy(30 * goliath.xDir, -20));
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -1635,20 +1652,9 @@ public class GoliathDragged : CharState {
 		character.useGravity = true;
 	}
 
-	public override void update() {
-		base.update();
 
-	
-		if (goliath.rideArmorState is not RADash || !goliath.isAttacking()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
-			return;
-		}
-		character.vel.y = 0;
-		character.changePos(goliath.pos.addxy(30 * goliath.xDir, -20));
-	}
 }
-
+*/
 public class Frozen : CharState {
 	public float startFreezeTime;
 	public float freezeTime;
@@ -1694,7 +1700,7 @@ public class Stunned : CharState {
 	public Stunned() : base("lose") {
 	}
 
-/*
+
 	public override bool canEnter(Character character) {
 		if (
 			character.stunInvulnTime > 0 ||
@@ -1711,7 +1717,7 @@ public class Stunned : CharState {
 		}
 		return true;
 	}
-*/
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.ownedByLocalPlayer) return;

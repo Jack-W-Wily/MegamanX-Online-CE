@@ -68,7 +68,7 @@ public partial class Character : Actor, IDamagable {
 	public float parryCooldown;
 	public float JumpCancelTime;
 	public float maxParryCooldown = 0.5f;
-
+	public float miniFlinchTime;
 
 
 	public bool stockedCharge;
@@ -657,7 +657,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canAirJump() {
 		if (this is Zero zero) {
-			return dashedInAir == 0 || (dashedInAir == 1 && zero.isBlackZero2());
+			return dashedInAir == 0 || (dashedInAir == 1 && zero.isAwakenedZero());
 		}
 		if (this is MegamanX mmx) {
 			return dashedInAir == 0 && mmx.ZeroCounters > 0;
@@ -961,7 +961,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 	}
-
+/*
 	public List<Tuple<string, int>> lastDTInputs = new List<Tuple<string, int>>();
 	public string holdingDTDash;
 	const int doubleDashFrames = 20;
@@ -971,7 +971,7 @@ public partial class Character : Actor, IDamagable {
 	public bool dropFlagUnlocked;
 	long originalZIndex;
 	bool viralOnce;
-
+*/
 
 	public override void update() {
 		//Burst System

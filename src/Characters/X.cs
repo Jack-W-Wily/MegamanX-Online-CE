@@ -48,14 +48,17 @@ public partial class MegamanX : Character {
 	public GravityWellProj gravityWell;
 	public int totalChipHealAmount;
 	public const int maxTotalChipHealAmount = 32;
-	public int unpoShotCount {
+
+
+	public int unpoShotCount;/*
+	 {
 		get {
 			if (player.weapon is not Buster { isUnpoBuster: true }) {
 				return 0;
 			}
 			return MathInt.Floor(player.weapon.ammo / player.weapon.getAmmoUsage(0));
 		}
-	}
+	}*/
 
 	public float hadoukenCooldownTime;
 
@@ -313,13 +316,7 @@ public partial class MegamanX : Character {
 			headbuttAirTime += Global.spf;
 		}
 
-		if (isHyperXBS.getValue()) {
-			if (musicSource == null) {
-				addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
-			}
-		} else {
-			destroyMusicSource();
-		}
+	
 
 		if (!ownedByLocalPlayer) {
 			Helpers.decrementTime(ref barrierTime);
@@ -519,7 +516,6 @@ public partial class MegamanX : Character {
 			&& (CurrentArmor == 5 && player.health < 6 || CurrentArmor > 6 || ZeroCounters > 0) &&
 			player.input.isPressed(Control.Special1, player) &&
 			!isAttacking() && !isInvisible() &&
-			!charState.isGrabbing
 			!charState.isGrabbing
 		) {
 			if (xSaberCooldown == 0) {

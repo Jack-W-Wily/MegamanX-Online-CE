@@ -40,7 +40,7 @@ public class TorpedoProj : Projectile, IDamagable {
 	public float maxSpeed = 150;
 	int type;
 	public TorpedoProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, float? angle = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 2, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 1, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 1.5f, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 1, 0f, netProjId, player.ownedByLocalPlayer) {
 		if (type == 0) projId = (int)ProjIds.Torpedo;
 		else if (type == 1) projId = (int)ProjIds.TorpedoCharged;
 		else if (type == 2) projId = (int)ProjIds.MechTorpedo;
@@ -107,6 +107,7 @@ public class TorpedoProj : Projectile, IDamagable {
 			} else {
 				useGravity = true;
 				homing = true;
+				vel.x = 200 * xDir;
 			}
 		}
 	}

@@ -347,8 +347,7 @@ public class RPCApplyDamage : RPC {
 		ushort projId = BitConverter.ToUInt16(
 			new byte[] { arguments[17], arguments[18] }, 0
 		);
-		byte linkedMeleeId = arguments[19];
-		bool isLinkedMelee = (linkedMeleeId != byte.MaxValue);
+		bool isLinkedMelee = arguments[19] == 1;
 
 		var player = Global.level.getPlayerById(ownerId);
 		var victim = Global.level.getActorByNetId(victimId);
@@ -358,15 +357,31 @@ public class RPCApplyDamage : RPC {
 			Actor mainActor = Global.level.getActorByNetId(actorId);
 			List<Projectile> projs = new();
 			if (mainActor != null) {
-				// We try to search anything with a matching MeleeID.
-				actor = mainActor.getMeleeProjById(linkedMeleeId, mainActor.pos, false);
-
+				// We try to search anything with a matching ProjID.
+				foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
+					Projectile proj = mainActor.getProjFromHitboxBase(collider);
+					if (proj != null) {
+						if (proj.projId == projId) {
+							actor = proj;
+							break;
+						}
+					}
+				}
+				// If that fails we search anything at all.
+				if (actor == null) {
+					foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
+						Projectile proj = mainActor.getProjFromHitboxBase(collider);
+						if (proj != null) {
+							actor = proj;
+							break;
+						}
+					}
+				}
 				// If that fails... screw it we create one.
 				if (actor == null) {
 					actor = new GenericMeleeProj(
 						new Weapon(), mainActor.pos, (ProjIds)projId,
-						player, damage, flinch, hitCooldown, mainActor,
-						addToLevel: false
+						player, damage, flinch, hitCooldown, mainActor
 					);
 				}
 			}
@@ -638,7 +653,7 @@ public class RPCPlayerToggle : RPC {
 			}
 		} else if (toggleId == RPCToggleType.ReviveSigma) {
 			if (player.character is BaseSigma) {
-				player.reviveSigmaNonOwner(player.character.pos);
+				player.reviveSigma(player.character.pos);
 			}
 		}
 	}
@@ -710,27 +725,25 @@ public class RPCActorToggle : RPC {
 			new Anim(actor.pos, "sonicslicer_sparks", actor.xDir, null, true);
 		} else if (toggleId == RPCActorToggleType.StartGravityWell && actor is GravityWellProjCharged gw) {
 			gw.started = true;
-		}
-		else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
-			actor.addMusicSource("wolfSigma", actor.pos.addxy(0, -75), false);
+		} else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
+			actor.addMusicSource("mmx1_wolfsigma", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
-			actor.addMusicSource("wolfSigmaIntro", actor.pos.addxy(0, -75), false, loop: false);
+			actor.addMusicSource("mmx1_wolfsigmaintro", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddDrLightMusicSource) {
 			actor.addMusicSource("drlight", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddDrDopplerMusicSource) {
-			actor.addMusicSource("demo_X3", actor.getCenterPos(), false, loop: false);
+			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), false);
 		} else if (toggleId == RPCActorToggleType.AddGoliathMusicSource) {
 			actor.addMusicSource("goliath", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddViralSigmaMusicSource) {
-			actor.addMusicSource("virusSigma", actor.getCenterPos(), true);
+			actor.addMusicSource("mmx2_judgementday", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("kaiserSigma", actor.getCenterPos(), true);
+			actor.addMusicSource("mmx3_kaisersigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("demo_X3", actor.getCenterPos(), true);
-		}
-		else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
+			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), true);
+		} else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {
 			actor.shakeCamera();

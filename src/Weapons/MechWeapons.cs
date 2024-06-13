@@ -208,7 +208,7 @@ public class MechMissileProj : Projectile, IDamagable {
 	public float smokeTime = 0;
 	public bool isDown;
 	public MechMissileProj(Weapon weapon, Point pos, int xDir, bool isDown, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 2, player, "hawk_missile", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 2, player, "hawk_missile", 10, 0f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MechMissile;
 		maxTime = 0.5f;
 		fadeOnAutoDestroy = true;

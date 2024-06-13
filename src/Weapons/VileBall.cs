@@ -85,7 +85,7 @@ public class VileBombProj : Projectile {
 	int type;
 	bool split;
 	public VileBombProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 2, player, type == 0 ? "vile_bomb_air" : "vile_bomb_ground", 4, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 100, 1, player, type == 0 ? "vile_bomb_air" : "vile_bomb_ground", 4, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.VileBomb;
 		if (type == 0) maxTime = 0.45f;
 		if (type == 1) maxTime = 0.3f;
@@ -138,7 +138,7 @@ public class PeaceOutRollerProj : Projectile {
 	public PeaceOutRollerProj(
 		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 75, 3, player, "ball_por_proj", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 75, 2, player, "ball_por_proj", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.PeaceOutRoller;
 		maxTime = 0.5f;
@@ -351,6 +351,89 @@ public class VileElectricBomb : Weapon {
 
 
 
+
+public class AerialRaidAttack : CharState {
+	int bombNum;
+	bool isNapalm;
+
+	public AerialRaidAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		this.isNapalm = isNapalm;
+	}
+
+	public override void update() {
+		base.update();
+
+			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+				character.changeState(new Fall(), true);
+				return;
+			}
+
+			var inputDir = player.input.getInputDir(player);
+			if (inputDir.x == 0) inputDir.x = character.xDir;
+			if (stateTime > 0f && bombNum == 0) {
+				bombNum++;
+				new VileBombProj(player.vileBallWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+			if (stateTime > 0.23f && bombNum == 1) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeState(new Fall(), true);
+					return;
+				}
+				bombNum++;
+				new VileBombProj(player.vileBallWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+			if (stateTime > 0.45f && bombNum == 2) {
+				if (!vile.tryUseVileAmmo(player.vileBallWeapon.getAmmoUsage(0))) {
+					character.changeState(new Fall(), true);
+					return;
+				}
+				bombNum++;
+				new VileBombProj(player.vileBallWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+
+			if (stateTime > 0.68f) {
+				character.changeToIdleOrFall();
+			}
+	}
+}
+
+
+
+public class PeaceOutRollerAttack : CharState {
+	int bombNum;
+	bool isNapalm;
+
+	public PeaceOutRollerAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		this.isNapalm = isNapalm;
+	}
+
+	public override void update() {
+		base.update();
+
+				if (stateTime > 0f && bombNum == 0) {
+				bombNum++;
+				new PeaceOutRollerProj(player.vileBallWeapon, character.pos, character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+
+}
 
 public class StunBallsAttack : CharState {
 	int bombNum;
