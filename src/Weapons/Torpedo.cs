@@ -11,7 +11,8 @@ public class Torpedo : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;
 		weaknessIndex = 3;
-		shootSounds = new List<string>() { "torpedo", "torpedo", "torpedo", "buster3" };
+		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
+
 		rateOfFire = 0.25f;
 	}
 
@@ -45,8 +46,8 @@ public class TorpedoProj : Projectile, IDamagable {
 		else if (type == 1) projId = (int)ProjIds.TorpedoCharged;
 		else if (type == 2) projId = (int)ProjIds.MechTorpedo;
 		else if (type == 3) {
-			projId = (int)ProjIds.LaunchOTorpedo;
-
+		
+			if (!owner.isHighMax)	projId = (int)ProjIds.LaunchOTorpedo;
 			if (!player.isDynamo && !owner.hasMizuX() && !owner.hasBurnerX()){
 			changeSprite("launcho_proj_ht", true);
 			damager.damage = 2;
@@ -66,6 +67,14 @@ public class TorpedoProj : Projectile, IDamagable {
 		if (owner.character != null && owner.hasMizuX()){
 		changeSprite("mizubusterproj_2", true);
 		damager.flinch = 4;
+		damager.damage = 1;
+		maxSpeed = 200;
+		}
+
+		if (owner.character != null && owner.isHighMax){
+		changeSprite("highmax_spark_proj", true);
+		projId = (int)ProjIds.LaunchOTorpedo;
+		damager.flinch = 10;
 		damager.damage = 1;
 		maxSpeed = 200;
 		}

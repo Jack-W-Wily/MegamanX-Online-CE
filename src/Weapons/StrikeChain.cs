@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class StrikeChain : Weapon {
 	public StrikeChain() : base() {
-		shootSounds = new List<string>() { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged" };
+		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged" };
 		rateOfFire = 0.75f;
 		index = (int)WeaponIds.StrikeChain;
 		weaponBarBaseIndex = 14;
@@ -78,7 +78,10 @@ public class StrikeChainProj : Projectile {
 	
 			if (!player.isVile)changeSprite(xDir == 1 ? "strikechain_charged" : "strikechain_charged_left", true);
 			maxDist = 180;
-			if (player.isVile)damager.damage = 2;
+			if (player.isVile){
+				damager.damage = 2;
+				damager.hitCooldown = 0.8f;
+			}
 			if (!player.isVile)damager.damage = 4;
 			speed *= 1.5f;
 		}

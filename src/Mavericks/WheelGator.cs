@@ -11,14 +11,17 @@ public class WheelGator : Maverick {
 	public float damageEaten;
 	//public ShaderWrapper eatenShader;
 
-	public WheelGator(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public WheelGator(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 1.25f));
 		stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 2f));
 
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
-		isHeavy = true;
+		//isHeavy = true;
 		canClimbWall = true;
 		awardWeaponId = WeaponIds.SpinWheel;
 		weakWeaponId = WeaponIds.StrikeChain;
@@ -32,6 +35,9 @@ public class WheelGator : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Heavy;
+		canStomp = true;
 	}
 
 	public override void update() {
@@ -319,8 +325,11 @@ public class WheelGEatState : MaverickState {
 }
 
 public class WheelGSpitProj : Projectile {
-	public WheelGSpitProj(Weapon weapon, Point pos, int xDir, Point unitVel, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "wheelg_proj_spit", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public WheelGSpitProj(
+		Weapon weapon, Point pos, int xDir, Point unitVel, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "wheelg_proj_spit", 0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.WheelGSpit;
 		maxDistance = 150;
 		vel = unitVel.times(400);

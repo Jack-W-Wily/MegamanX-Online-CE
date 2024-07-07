@@ -631,7 +631,7 @@ public class RPCPlayerToggle : RPC {
 			}
 		} else if (toggleId == RPCToggleType.SetBlackZero) {
 			if (player.character is Zero zero) {
-				zero.blackZeroTime = zero.maxHyperZeroTime;
+				zero.blackZeroTime = 9999;
 			}
 		} else if (toggleId == RPCToggleType.SetWhiteAxl) {
 			if (player.character is Axl axl) {
@@ -1697,7 +1697,7 @@ public class RPCHeal : RPC {
 		var damagable = actor as IDamagable;
 		if (damagable != null) {
 			if (actor.ownedByLocalPlayer) {
-				damagable.heal(player, healAmount, allowStacking: false, drawHealText: true);
+				damagable.heal(player, healAmount, allowStacking: true, drawHealText: true);
 			}
 		}
 	}

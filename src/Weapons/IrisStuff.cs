@@ -370,6 +370,8 @@ public class IrisCrystal : Weapon {
 
 public class NewIrisCrystal : Projectile {
 	public float angleDist = 0;
+
+	public float state = 0;
 	public float turnDir = 1;
 	public Pickup pickup;
 	public float angle2;
@@ -417,21 +419,27 @@ public class NewIrisCrystal : Projectile {
 		base.update();
 
 		if (owner.character != null) xDir = owner.character.xDir;
-		if (owner.character.charState is Die) destroySelf();
+		if (owner.character == null || owner.character.charState is Die) destroySelf();
 		if (owner.character == null || !Global.level.gameObjects.Contains(owner.character)){ 
 			destroySelf();
 			return;
 		}
-		if (owner.character.charState is IrisCrystalRisingBash ){
-		if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
-		changePos(owner.character.pos);
-		}
-		if (owner.character.charState is IrisCrystalBashState ){
-		if (sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
-		changePos(owner.character.pos);
+
+		if (owner.character.charState is IrisCrystalRisingBash )state = 1;
+		if (state == 1){
+			if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
+			changePos(owner.character.pos);
 		}
 
-		if (owner.character.charState is IrisCrystalCharge) {
+		if (owner.character.charState is IrisCrystalBashState )state = 2;		
+		if (state == 2){
+			if (sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
+			changePos(owner.character.pos);
+		}
+
+		
+		if (owner.character.charState is IrisCrystalCharge) state = 4;
+		if (state == 4) {
 			if (owner.input.isHeld(Control.Up, owner)) {
 				vel.y = -100;
 			} 
@@ -457,7 +465,9 @@ public class NewIrisCrystal : Projectile {
 
 
 		if( owner.character.charState is  IrisSpawnBeam
-		|| owner.character.charState is  IrisSpawnIce){
+		|| owner.character.charState is  IrisSpawnIce) state = 5;
+		
+		if (state == 5) {
 			vel.x = 0;
 			vel.y = 0;
 		}
@@ -467,6 +477,9 @@ public class NewIrisCrystal : Projectile {
 		&& owner.character.charState is not IrisSpawnBeam
 		&& owner.character.charState is not IrisSpawnIce
 		&& owner.character.charState is not IrisCrystalCharge){
+		state = 0;
+		}
+		if (state == 0) {
 		time += Global.spf;
 		if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
 		if (time > 2) time = 0;

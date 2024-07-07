@@ -30,6 +30,7 @@ public class ArmoredArmadillo : Maverick {
 			createActorRpc(player.id);
 		}
 
+		// Ammo.
 		usesAmmo = true;
 		canHealAmmo = true;
 		ammo = 32;
@@ -368,8 +369,8 @@ public class ArmoredAZappedState : MaverickState {
 		}
 
 		if (stateTime > 1f) {
-			(maverick as ArmoredArmadillo).removeArmor(true);
-			maverick.changeState(new MIdle());
+			//(maverick as ArmoredArmadillo).removeArmor(true);
+			maverick.changeToIdleOrFall();
 		}
 	}
 
@@ -382,9 +383,9 @@ public class ArmoredAZappedState : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		if (maverick is ArmoredArmadillo aa && !aa.noArmor) {
+		/*if (maverick is ArmoredArmadillo aa && !aa.noArmor) {
 			aa.removeArmor(true);
-		}
+		}*/
 	}
 }
 

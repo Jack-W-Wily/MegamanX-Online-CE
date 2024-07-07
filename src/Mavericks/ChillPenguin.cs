@@ -11,8 +11,12 @@ public class ChillPenguin : Maverick {
 	public ChillPBlizzardWeapon blizzardWeapon = new ChillPBlizzardWeapon();
 	public ChillPSlideWeapon slideWeapon;
 
-	public ChillPenguin(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public ChillPenguin(
+		Player player, Point pos, Point destPos,
+		int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		slideWeapon = new ChillPSlideWeapon(player);
 		stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
 		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
@@ -31,6 +35,8 @@ public class ChillPenguin : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
+
+		armorClass = ArmorClass.Light;
 	}
 
 	public override void update() {
@@ -62,8 +68,11 @@ public class ChillPenguin : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new ChillPSlideState(false));
 				}
+				else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
+				}
 			} else if (state is MJump || state is MFall) {
-				if (input.isHeld(Control.Special1, player)) {
+				if (input.isHeld(Control.Up, player)) {
 					var hit = Global.level.checkCollisionActor(this, 0, -ChillPBlizzardState.switchSpriteHeight - 5);
 					if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
 						changeState(new ChillPBlizzardState(false));
@@ -79,7 +88,10 @@ public class ChillPenguin : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			new ChillPIceProj(iceShotWeapon, pos, xDir, player, input.isHeld(Control.Down, player) ? 1 : 0, player.getNextActorNetId(), rpc: true);
+			new ChillPIceProj(
+				iceShotWeapon, pos, xDir, player,
+				input.isHeld(Control.Down, player) ? 1 : 0, player.getNextActorNetId(), rpc: true
+			);
 		}, null);
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.5f);
@@ -122,6 +134,9 @@ public class ChillPenguin : Maverick {
 		Projectile proj = null;
 		if (isSlidingAndCanDamage()) {
 			proj = new GenericMeleeProj(slideWeapon, centerPoint, ProjIds.ChillPSlide, player);
+		}
+		if (sprite.name.EndsWith("guard") ) {
+			proj = new GenericMeleeProj(slideWeapon, centerPoint, ProjIds.ChillPSlide, player, isDeflectShield : true);
 		}
 
 		return proj;
@@ -175,8 +190,13 @@ public class ChillPSlideWeapon : Weapon {
 public class ChillPIceProj : Projectile {
 	public int type = 0;
 	public Character hitChar;
-	public ChillPIceProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Character hitChar = null, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 3, player, "chillp_proj_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public ChillPIceProj(
+		Weapon weapon, Point pos, int xDir, Player player,
+		int type, ushort netProjId, Character hitChar = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, 3, player, "chillp_proj_ice",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ChillPIceShot;
 		maxTime = 0.75f;
 		this.hitChar = hitChar;
@@ -257,8 +277,12 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 	public float health = 8;
 	public float maxHealth = 8;
 
-	public ChillPIceStatueProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "chillp_proj_statue", 0, 0, netProjId, player.ownedByLocalPlayer) {
+	public ChillPIceStatueProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "chillp_proj_statue",
+		0, 0, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ChillPIcePenguin;
 		fadeSound = "iceBreak";
 		shouldShieldBlock = false;
@@ -284,7 +308,9 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
-		if (other.gameObject is Wall && other.hitData?.normal != null && other.hitData.normal.Value.isSideways() && !deltaPos.isZero() && MathF.Abs(deltaPos.x) > 0.1f) {
+		if (other.gameObject is Wall && other.hitData?.normal != null &&
+		other.hitData.normal.Value.isSideways() && !deltaPos.isZero() && MathF.Abs(deltaPos.x) > 0.1f
+	) {
 			destroySelf();
 		} else if (other.gameObject is ChillPenguin cp && cp.isSlidingAndCanDamage() && cp.player == owner) {
 			destroySelf();
@@ -322,8 +348,12 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 
 public class ChillPBlizzardProj : Projectile {
 	const float pushSpeed = 150;
-	public ChillPBlizzardProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 0, player, "chillp_wind", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	public ChillPBlizzardProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "chillp_wind",
+		0, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.ChillPBlizzard;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
@@ -383,7 +413,10 @@ public class ChillPIceBlowState : MaverickState {
 			Point? shootPos = maverick.getFirstPOI();
 			if (shootPos != null) {
 				shootTime = 0.1f;
-				new ShotgunIceProjCharged((maverick as ChillPenguin).iceWindWeapon, shootPos.Value, maverick.xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				new ShotgunIceProjCharged(
+					(maverick as ChillPenguin).iceWindWeapon, shootPos.Value,
+					maverick.xDir, player, 1, true, player.getNextActorNetId(), rpc: true
+				);
 				if (!soundOnce) {
 					soundOnce = true;
 					maverick.playSound("icyWind", sendRpc: true);
@@ -415,12 +448,17 @@ public class ChillPIceBlowState : MaverickState {
 	}
 
 	public void addIceStatueIfSpace(Point pos) {
-		player.iceStatues.Add(new ChillPIceStatueProj((maverick as ChillPenguin).iceStatueWeapon, pos, maverick.xDir, player, player.getNextActorNetId(), sendRpc: true));
+		player.iceStatues.Add(new ChillPIceStatueProj(
+			(maverick as ChillPenguin).iceStatueWeapon, pos,
+			maverick.xDir, player, player.getNextActorNetId(), sendRpc: true)
+		);
 		/*
 		var rect = new Rect(pos.addxy(-14, -32), pos.addxy(14, 0));
-		if (Global.level.checkCollisionShape(rect.getShape(), null) == null)
-		{
-			player.iceStatues.Add(new ChillPIceStatueProj((maverick as ChillPenguin).iceStatueWeapon, pos, maverick.xDir, player, player.getNextActorNetId(), sendRpc: true));
+		if (Global.level.checkCollisionShape(rect.getShape(), null) == null) {
+			player.iceStatues.Add(
+				new ChillPIceStatueProj((maverick as ChillPenguin).iceStatueWeapon,
+				pos, maverick.xDir, player, player.getNextActorNetId(), sendRpc: true)
+			);
 		}
 		*/
 	}
@@ -482,7 +520,10 @@ public class ChillPBlizzardState : MaverickState {
 				once = true;
 				float topY = Global.level.getTopScreenY(maverick.pos.y);
 				if (player.isPuppeteer() && player.currentMaverick == maverick) topY = maverick.pos.y - 80;
-				new ChillPBlizzardProj((maverick as ChillPenguin).blizzardWeapon, new Point(maverick.pos.x, topY), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				new ChillPBlizzardProj(
+					(maverick as ChillPenguin).blizzardWeapon, new Point(maverick.pos.x, topY),
+					maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				);
 				maverick.playSound("chillpBlizzard", sendRpc: true);
 			}
 			if (maverick.sprite.isAnimOver()) {
@@ -538,7 +579,9 @@ public class ChillPSlideState : MaverickState {
 		if (input.isPressed(Control.Jump, player) && maverick.grounded && canDamageOrJump()) {
 			maverick.vel.y = -maverick.getJumpPower() * 0.75f;
 		}
-		if (!maverick.grounded && maverick.vel.y < 0 && Global.level.checkCollisionActor(maverick, 0, maverick.vel.y * Global.spf * 2) != null) {
+		if (!maverick.grounded && maverick.vel.y < 0 &&
+			Global.level.checkCollisionActor(maverick, 0, maverick.vel.y * Global.spf * 2) != null
+		) {
 			maverick.vel.y = 0;
 		}
 

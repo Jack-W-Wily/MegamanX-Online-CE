@@ -83,6 +83,13 @@ public class ZeroUppercut : CharState {
 	public override void update() {
 		base.update();
 
+
+		if (stateTime < 0.8f){
+			character.specialState = (int)SpecialStateIds.AxlRoll;	
+		} 
+		if (stateTime > 0.7f){	
+			character.specialState = (int)SpecialStateIds.None;
+		}
 		if (character.sprite.frameIndex >= 3 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
@@ -169,6 +176,7 @@ public class ZeroUppercut : CharState {
 
 	public override void onExit(CharState newState) {
 		weapon.shootTime = weapon.rateOfFire;
+		character.specialState = (int)SpecialStateIds.None;
 		base.onExit(newState);
 	}
 }

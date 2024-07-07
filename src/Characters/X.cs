@@ -163,11 +163,11 @@ public partial class MegamanX : Character {
 			addRenderEffect(RenderEffectType.ChargeGreen, 0.05f, 0.1f);
 		}
 		if (stockedX3Buster) {
-			if (player.weapon is not Buster) {
-				stockedX3Buster = false;
-			} else {
+	//		if (player.weapon is not Buster) {
+	//			stockedX3Buster = false;
+	//		} else {
 				addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
-			}
+			//}
 		}
 		player.armorFlag = 0;
 
@@ -777,7 +777,7 @@ public partial class MegamanX : Character {
 
 		if (player.input.isHeld(Control.Up, player) &&
 			!isAttacking() && grounded && charState is Idle && 
-			charState is not SwordBlock
+			noBlockTime == 0 && charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());
 			return true;
@@ -1048,6 +1048,33 @@ public partial class MegamanX : Character {
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
 		}
 
+
+		if (chargeLevel >= 3 && player.HasFullMax() && player.weapon is Buster) {
+			stockedCharge = true;
+			if (player.weapon is Buster) {
+				shootTime = hasUltimateArmorBS.getValue() ? 0.5f : 0.25f;
+			} else shootTime = 0.5f;
+			if (!sprite.name.Contains("x2_shot")) {
+			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.StockCharge);
+		}} else if (stockedCharge) {
+			stockedCharge = false;
+			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
+		}
+
+
+		if (chargeLevel >= 3 && player.HasFullMax()) {
+			stockedX3Buster = true;
+			if (player.weapon is Buster) {
+				shootTime = hasUltimateArmorBS.getValue() ? 0.5f : 0.25f;
+			} else shootTime = 0.5f;
+			if (!sprite.name.Contains("x2_shot")) {
+			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.StockCharge);
+		}} else if (stockedX3Buster) {
+			stockedX3Buster = false;
+			Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
+		}
+
+
 		if (!player.weapon.isStream) {
 			chargeTime = 0;
 		} else {
@@ -1121,10 +1148,10 @@ public partial class MegamanX : Character {
 
 		weapon.getProjectile(pos, xDir, player, chargeLevel, netProjId);
 
-		if (weapon.soundTime == 0) {
-			if (weapon.shootSounds != null && weapon.shootSounds.Count > 0) {
+	if (weapon.soundTime == 0) {
+			if (weapon.shootSounds != null && weapon.shootSounds.Length > 0) {
 				player.character.playSound(weapon.shootSounds[chargeLevel]);
-			}
+		}
 			if (weapon is FireWave) {
 				weapon.soundTime = 0.25f;
 			}

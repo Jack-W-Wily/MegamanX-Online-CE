@@ -32,6 +32,7 @@ public class Dynamo : Character {
 	public override bool normalCtrl() {
 	
 		if (player.input.isHeld(Control.Up, player) &&
+		noBlockTime == 0 &&
 			!isAttacking() && grounded &&
 			charState is not SwordBlock
 		) {
@@ -59,6 +60,24 @@ public class Dynamo : Character {
 			Helpers.decrementTime(ref DynamoStringCD);
 			Helpers.decrementTime(ref DynamoBoomerangCD);
 			Helpers.decrementTime(ref DynamoPunchCD);
+
+
+		// Dark Hold Activation Dynamo
+		if (downpressedtimes >= 2 && player.input.isPressed(Control.Taunt, player)) 
+				if (player.currency > 2) {
+					player.currency -= 3;
+					int darkholdcd = 2;
+					changeState(new DarkHoldS(new DarkHoldWeapon()), true);					
+		}
+	
+		if (charState is Dash || charState is AirDash) {
+			if (useGrabCooldown == 0 && (player.input.isHeld(Control.Shoot, player))) {
+				charState.isGrabbing = true;
+				changeSpriteFromName("_nova_strike", true);
+			}
+		}
+
+
 		//dynamostuff
 		if (player.weapon is DynamoTrick)
 		{
@@ -186,15 +205,15 @@ public class Dynamo : Character {
 		}
 		 if ( sprite.name.Contains("_projswing") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
 		}
 		 if ( sprite.name.Contains("_string") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.Rising, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		 if ( sprite.name.Contains("_nova_strike") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.HoutenjinF, player, 2f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		if ( sprite.name.Contains("chargegp"))
 		{

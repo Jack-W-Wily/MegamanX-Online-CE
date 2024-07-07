@@ -522,19 +522,21 @@ label:
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllAxlWeapons(axlLoadout).Select(w => w.clone()).ToList();
 					weapons[0] = getAxlBullet(axlBulletType);
-				} else if (Global.level.is1v1() || !Global.level.is1v1()) {
-					weapons.Add(new AxlBullet());
-					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
-					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
-					weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
-					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
-					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
-					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
-					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
-					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
+				} else if (Global.level.is1v1() ) {
+					weapons.Add(new DoubleBullet());
+					//weapons.Add(new AxlBullet());
+					//weapons.Add(new RayGun(axlLoadout.rayGunAlt));
+					//weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
+					//weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
+					//weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
+					//weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
+					//weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
+					//weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
+					//weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
 				} else {
-					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
-					weapons.Insert(0, getAxlBullet(axlBulletType));
+				//	weapons = loadout.axlLoadout.getWeaponsFromLoadout();
+				//	weapons.Insert(0, getAxlBullet(axlBulletType));
+					weapons.Add(new DoubleBullet());
 				}
 
 				foreach (var dnaCore in savedDNACoreWeapons) {
@@ -704,7 +706,13 @@ label:
 		foreach (var weapon in weapons) {
 			weapon.update();
 			if (character != null && health > 0) {
-				weapon.charLinkedUpdate(character, false);
+				bool alwaysOn = false;
+				if (weapon is GigaCrush && Options.main.gigaCrushSpecial ||
+					weapon is NovaStrike && Options.main.novaStrikeSpecial
+				) {
+					alwaysOn = true;
+				}
+				weapon.charLinkedUpdate(character, alwaysOn);
 			}
 		}
 	}

@@ -4,17 +4,23 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Hurt : CharState {
+	public float flinchYPos;
+	public bool isCombo;
 	public int hurtDir;
 	public float hurtSpeed;
 	public float flinchTime;
 	public bool spiked;
 
-	public Hurt(int dir, int flinchFrames, bool spiked = false) : base("hurt") {
+	public Hurt(int dir, int flinchFrames, bool spiked = false, float? oldComboPos = null) : base("hurt") {
 		this.flinchTime = flinchFrames;
 		hurtDir = dir;
 		hurtSpeed = dir * 1.6f;
 		flinchTime = flinchFrames;
 		this.spiked = spiked;
+		if (oldComboPos != null) {
+			isCombo = true;
+			flinchYPos = oldComboPos.Value;
+		}
 	}
 
 	public bool isMiniFlinch() {
@@ -37,11 +43,15 @@ public class Hurt : CharState {
 		}
 		if (!spiked) {
 			character.vel.y = (-0.125f * (flinchTime - 1)) * 60f;
+			if (isCombo && character.pos.y < flinchYPos) {
+				// Magic equation. Changing gravity from 0.25 probably super-break this.
+				// That said, we do not change base gravity.
+				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
+			}
 		}
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
+		if (!isCombo) {
+			flinchYPos = character.pos.y;
+		}
 	}
 
 	public override void update() {
@@ -85,9 +95,9 @@ public class GenericStun : CharState {
 	public bool changeAnim = true;
 	public bool canPlayFrozenSound = true;
 	public bool canPlayStaticSound = true;
-	public float flinchFrames = Global.defFlinch;
 	public int hurtDir;
 	public float hurtSpeed;
+	public float flinchYPos;
 
 	public float flinchTime;
 	public float flinchMaxTime;
@@ -97,7 +107,7 @@ public class GenericStun : CharState {
 	}
 
 	public override void update() {
-		reduceStunFrames(ref flinchTime);
+		Helpers.decrementFrames(ref flinchTime);
 
 		crystalizeLogic();
 		paralizeAnimLogic();
@@ -147,6 +157,7 @@ public class GenericStun : CharState {
 		character.crystalizeInvulnTime = 2;
 
 		if (!character.isCrystalized && character.crystalizedTime > 0) {
+			changeAnim = true;
 			character.crystalizeStart();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StartCrystalize);
 		}
@@ -208,12 +219,17 @@ public class GenericStun : CharState {
 		if (flinchTime > flinchFrames) {
 			return;
 		}
-		this.flinchFrames = flinchFrames;
-		if (flinchTime <= 0) {
-			hurtSpeed = 1.6f * xDir;
-			if (flinchFrames >= 2) {
-				character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
+		bool isCombo = (flinchFrames != 0);
+
+		hurtSpeed = 1.6f * xDir;
+		if (flinchFrames >= 2) {
+			character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
+			if (isCombo && character.pos.y < flinchYPos) {
+				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
+		}
+		if (!isCombo) {
+			flinchYPos = character.pos.y;
 		}
 		flinchTime = flinchFrames;
 		flinchMaxTime = flinchFrames;
@@ -227,6 +243,7 @@ public class GenericStun : CharState {
 			hurtDir = hurtState.hurtDir;
 			hurtSpeed = hurtState.hurtSpeed;
 			flinchTime = hurtState.flinchTime - hurtState.frameTime;
+			flinchYPos = hurtState.flinchYPos;
 			if (flinchTime < 0) {
 				flinchTime = 0;
 			}
@@ -238,7 +255,7 @@ public class GenericStun : CharState {
 			paralyzeAnim.destroySelf();
 			paralyzeAnim = null;
 		}
-		if (character.crystalizedTime != 0) {
+		if (character.crystalizedTime != 0 || character.isCrystalized) {
 			character.crystalizeEnd();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize);
 		}
@@ -249,17 +266,16 @@ public class GenericStun : CharState {
 		base.onExit(newState);
 	}
 
-	
 	public void reduceStunFrames(ref float arg) {
 		arg -= getTimerFalloff();
 		if (arg <= 0) {
 			arg = 0;
 		}
 	}
-	
+
 	public float getTimerFalloff() {
-		float healthPercent = 0.25f * (player.health / player.maxHealth);
-		return (Global.speedMul * (2 - healthPercent));
+		float healthPercent = 1 * (player.health / player.maxHealth);
+		return (Global.speedMul * (2 + healthPercent));
 	}
 }
 
@@ -271,6 +287,7 @@ public class KnockedDown : CharState {
 		hurtDir = dir;
 		hurtSpeed = dir * 100;
 		flinchTime = 0.5f;
+		superArmor = true;
 	}
 
 	public override bool canEnter(Character character) {
@@ -284,6 +301,49 @@ public class KnockedDown : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.vel.y = -100;
+	}
+
+	public override void update() {
+		base.update();
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
+			character.move(new Point(hurtSpeed, 0));
+		}
+
+		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+			player.character.increaseCharge();
+		}
+
+		if (stateTime >= flinchTime) {
+			character.changeState(new Idle());
+		}
+	}
+}
+
+
+
+public class PushedOver : CharState {
+	public int hurtDir;
+	public float hurtSpeed;
+	public float flinchTime;
+	public PushedOver(int dir) : base("knocked_down") {
+		hurtDir = dir;
+		hurtSpeed = dir * 400;
+		flinchTime = 0.5f;
+		superArmor = true;
+	}
+
+	public override bool canEnter(Character character) {
+		if (character.isCCImmune()) return false;
+		if (character.charState.superArmor || character.charState.invincible) return false;
+		if (character.isInvulnerable()) return false;
+		if (character.vaccineTime > 0) return false;
+		return base.canEnter(character);
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -200;
 	}
 
 	public override void update() {

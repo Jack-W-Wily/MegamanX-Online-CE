@@ -155,6 +155,7 @@ public class FlamethrowerProj : Projectile {
 		if (!napalmInput) {
 			vel = new Point(xDir, 2f);
 			vel = vel.normalize().times(350);
+
 			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
 				this.vel.x = xDir * 350;
 				this.vel.y = 225;
@@ -163,7 +164,7 @@ public class FlamethrowerProj : Projectile {
 			vel = new Point(xDir, -0.5f);
 			vel = vel.normalize().times(350);
 			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
-				this.vel.x = xDir * 350;
+			if (!owner.isAxl)	this.vel.x = xDir * 350;
 				this.vel.y = -250;
 				destroyTime = 0.4f;
 			}
@@ -184,8 +185,28 @@ public class FlamethrowerProj : Projectile {
 		AxlFlinch = Helpers.randomRange(1, 30);
 		damager.damage = AxlDMG;
 		damager.flinch = AxlFlinch;
-		vel = new Point(xDir, 2f);
-		vel = vel.normalize().times(350);
+			if (owner.isAxl && owner.character != null && owner.character.charState is RisingBarrage)
+			{
+			this.vel.y = -250;	
+			}
+		if (!napalmInput) {
+			vel = new Point(xDir, 2f);
+			vel = vel.normalize().times(350);
+
+			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
+				this.vel.x = xDir * 350;
+				this.vel.y = 225;
+			}
+		} else {
+			vel = new Point(xDir, -0.5f);
+			vel = vel.normalize().times(350);
+			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
+			if (!owner.isAxl)	this.vel.x = xDir * 350;
+				this.vel.y = -250;
+				destroyTime = 0.4f;
+			}
+		}
+	
 		}
 	}
 

@@ -372,12 +372,6 @@ public class WarpIn : CharState {
 		if (!character.ownedByLocalPlayer) return;
 		if (!Global.level.mainPlayer.readyTextOver) return;
 
-
-		if (stateTime > 0) {
-			character.changeState(new Intro());
-			character.invulnTime = 1f;
-		}
-
 		if (warpAnim == null && !warpAnimOnce) {
 			warpAnimOnce = true;
 			warpAnim = new Anim(character.pos.addxy(0, -yOffset), character.getSprite("warp_beam"), character.xDir, player.getNextActorNetId(), false, sendRpc: true);
@@ -717,9 +711,9 @@ public class SwordBlock : CharState {
 		}	
 
 		if ((player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.Shoot, player) )&& !player.isControllingPuppet()) {
-			//if (character != null) {
-			//	character.noBlockTime = 0.25f;
-			//}
+			if (character != null) {
+				character.noBlockTime = 0.25f;
+			}
 			character.changeState(new Idle());
 			return;
 		}
@@ -1064,6 +1058,9 @@ public class AirDash : CharState {
 		}
 		if (player.isX && player.HasFullBlade()) {
 			character.changeState(new BladeDash());
+		}
+		if (player.isX && player.HasFullMax() && player.input.isHeld(Control.Up, player)) {
+			character.changeState(new UpDash(Control.Dash));
 		}
 		if (player.isX && player.HasFullFalcon()) {
 			distanceModifier = 0.5f;;

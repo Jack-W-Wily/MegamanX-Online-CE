@@ -9,7 +9,7 @@ public class MaverickWeapon : Weapon {
 	public bool summonedOnce;
 	public float lastHealth;
 	public const float summonerCooldown = 2;
-	public const float tagTeamCooldown = 4;
+	public const float tagTeamCooldown = 0;
 	public const float strikerCooldown = 4;
 	public SavedMaverickData? smd;
 	protected Maverick? _maverick;

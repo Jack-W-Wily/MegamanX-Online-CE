@@ -17,7 +17,7 @@ public class Iris : Character {
 	public override bool normalCtrl() {
 	
 		if (player.input.isHeld(Control.Up, player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() && grounded && noBlockTime == 0 &&
 			charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());
@@ -29,7 +29,7 @@ public class Iris : Character {
 		public override void update(){
 		base.update();
 
-		if (irisCrystal == null && player.health > 0 && ownedByLocalPlayer){
+		if (irisCrystal == null && player.health > 0 && ownedByLocalPlayer && !Global.level.gameMode.isOver){
 		irisCrystal = new NewIrisCrystal(new IrisCrystal(), pos, getShootXDir(), player, player.getNextActorNetId(), rpc: true);
 		}
 

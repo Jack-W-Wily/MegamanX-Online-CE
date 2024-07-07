@@ -7,7 +7,7 @@ namespace MMXOnline;
 
 public class SpinningBlade : Weapon {
 	public SpinningBlade() : base() {
-		shootSounds = new List<string>() { "spinningBlade", "spinningBlade", "spinningBlade", "spinningBladeCharged" };
+		shootSounds = new string[] { "spinningBlade", "spinningBlade", "spinningBlade", "spinningBladeCharged" };
 		rateOfFire = 1.25f;
 		index = (int)WeaponIds.SpinningBlade;
 		weaponBarBaseIndex = 20;

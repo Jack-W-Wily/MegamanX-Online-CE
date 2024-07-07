@@ -73,6 +73,8 @@ public bool isGroundAttack = true;
 
 	bool SpawnShockwave;
 
+	bool TriggerGroundColision;
+
 	int combonum = 0;
 
 	public override void update() {
@@ -89,11 +91,11 @@ public bool isGroundAttack = true;
 
 		if (player.isVile && player.input.isPressed(Control.Shoot,player)){
 			combonum += 1;
-		}
-		if (combonum == 1)character.changeSpriteFromName("string_1", true);
-		if (combonum == 2)character.changeSpriteFromName("string_1", true);
-		if (combonum == 3)character.changeSpriteFromName("string_1", true);
 		
+		if (combonum == 1)character.changeSpriteFromName("string_1", true);
+		if (combonum == 2)character.changeSpriteFromName("string_2", true);
+		if (combonum == 3)character.changeSpriteFromName("string_3", true);
+		}
 
 		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
 			victimWasGrabbedSpriteOnce = true;
@@ -221,14 +223,14 @@ public bool isGroundAttack = true;
 		if (  (character as Vile).isVileMK5 && base.player.input.isHeld("right", base.player) 
 		&& base.player.input.isPressed("weaponright", base.player))
 					{
-		if ((character as Vile).isVileMK5)		{
+		if ((character as Vile).isVileMK5){
 		character.changeSprite("vilemk5_gravity_grab", true);
 		}
-		if (!(character as Vile).isVileMK5)		{
+		if (!(character as Vile).isVileMK5){
 		character.changeSprite("vilemkv_gravity_grab", true);
 		}
 		character.playSound("hurt", forcePlay: false, sendRpc: true);
-			if (victim is IDamagable damagable) {
+			if (victim is IDamagable damagable){
 				new Damager(player, 2f, 0, 3f).applyDamage(
 					damagable, weakness: false, new VileMK2Grab(), character,   (int)ProjIds.VileMK2Grab
 				);
@@ -245,7 +247,7 @@ public bool isGroundAttack = true;
 				);
 			}
 		}//MKV Special UNlocked
-		if (  (character as Vile).isVileMK5
+		if (  (character as Vile).isVileMK5EX
 		&& base.player.input.isPressed("special2", base.player)
 		&& vile.vilegrabextraCooldown == 0f)
 		{
@@ -265,78 +267,73 @@ public bool isGroundAttack = true;
 		}
 		//Rising Death Test
     	if (((character as Vile).isVileMK2 ||
-		 (character as Vile).isVileMK2 || 
-		 (character as Vile).isVileMK5) 
-		 && base.player.input.isPressed("up", base.player))
-	     {
-			if ((character as Vile).isVileMK2){
-			character.changeSprite("vilemk2ex_air_grab", true);
-			}
-			if ((character as Vile).isVileMK5){
-			character.changeSprite("vilemk5_air_grab", true);
-			}
-			if ((character as Vile).isVileMK5EX){
-			character.changeSprite("vilemkv_rising_grab", true);
-			}
+		 (character as Vile).isVileMK2EX || 
+		 (character as Vile).isVileMK5 ||
+		  (character as Vile).isVileMK5EX
+		 ) ) {
+			if (base.player.input.isPressed("up", base.player)){
+				if ((character as Vile).isVileMK2){
+				character.changeSprite("vilemk2ex_air_grab", true);
+				}
+				if ((character as Vile).isVileMK2EX){
+				character.changeSprite("vilemk2ex_air_grab", true);
+				}
+				if ((character as Vile).isVileMK5){
+				character.changeSprite("vilemk5_air_grab", true);
+				}
+				if ((character as Vile).isVileMK5EX){
+				character.changeSprite("vilemkv_rising_grab", true);
+				}
 			character.vel.y = 0f - character.getJumpPower();
-		}
-	
-		if (  ((character as Vile).isVileMK2 ||
-		 (character as Vile).isVileMK2 || 
-		 (character as Vile).isVileMK5) 
-		&& base.player.input.isHeld("up", base.player))
-		{
+			}
+			if (base.player.input.isHeld("up", base.player)){
 			character.useGravity = true;	
 			float speed = 300f;
 			float yFactor = 1f;;
-			CollideData collideData = Global.level.checkCollisionActor(character, character.xDir * 20, -5f);
-			if (collideData != null && collideData.isCeilingHit())
-			{
-			crashAndDamage();
-			character.playSound("crash", forcePlay: false, sendRpc: true);
-			character.shakeCamera(sendRpc: true);
-			character.changeState(new Idle());
-			}
-			if (collideData != null && collideData.isGroundHit())
-			{
-			crashAndDamage();
-			character.playSound("crash", forcePlay: false, sendRpc: true);
-			character.shakeCamera(sendRpc: true);
-			character.changeState(new Idle());
-			}
-			if (state == 2)
-			{
-			yFactor = -1f;
-			}
+				CollideData collideData = Global.level.checkCollisionActor(character, character.xDir * 20, -5f);
+				if (collideData != null && collideData.isCeilingHit()){
+				crashAndDamage();
+				character.playSound("crash", forcePlay: false, sendRpc: true);
+				character.shakeCamera(sendRpc: true);
+				character.changeState(new Idle());
+				}
+				if (state == 2)	{
+				yFactor = -1f;
+				}
 			Point moveAmount = new Point(character.xDir * 50, (0f - speed) * yFactor);
-			if (state != 1)
-			{
-			character.move(moveAmount);
-			yDist += Global.spf * speed;
-			}
-			if (state == 0)
-			{
-				if (base.player.input.isHeld("jump", base.player))
-				{
+				if (state != 1)	{
+				character.move(moveAmount);
+				yDist += Global.spf * speed;
+				}
+				if (state == 0){
+					if (base.player.input.isHeld("jump", base.player))
+					{
 					reverse();
-				}
-			return;
-			}
-			if (state == 1)
-			{
-			topDelay += Global.spf;
-				if (topDelay > 0.1f)
-				{
-				state = 2;
-				}
-			return;
+					}return;}
+				if (state == 1){
+				topDelay += Global.spf;
+					if (topDelay > 0.1f){
+					state = 2;
+					}return;}
 			}
 		}
-
+		if (TriggerGroundColision){
+			CollideData collideData = Global.level.checkCollisionActor(character, character.xDir * 20, -5f);	
+		if (collideData != null && collideData.isGroundHit() || character.grounded)
+			{
+			crashAndDamage();
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			character.changeState(new Idle());
+			}
+		}
 		//Godpress
-		if (((character as Vile).isVileMK2 ||
-		 (character as Vile).isVileMK2 || 
-		 (character as Vile).isVileMK5)  
+		if ((
+		(character as Vile).isVileMK2 ||
+		(character as Vile).isVileMK2EX || 
+		(character as Vile).isVileMK5EX || 
+		(character as Vile).isVileMK5
+		)  
 		&& base.player.input.isHeld("special2", base.player)){
 		character.changeSpriteFromName("godpress_grab", resetFrame: true);
 		character.isDashing = true;
@@ -439,6 +436,7 @@ public bool isGroundAttack = true;
 
 	public void reverse()
 	{
+		TriggerGroundColision = true;
 		if (((character as Vile).isVileMK2 
 		
 		|| (character as Vile).isVileMK5EX) && state == 0)
@@ -453,13 +451,9 @@ public bool isGroundAttack = true;
 		}
 	}
 
-
+	
 	public void crashAndDamage()
 	{
-		if (victim is IDamagable damagable) {
-				new Damager(player, 2f, 0, 1f).applyDamage(
-					damagable, weakness: false, new VileMK2Grab(), character,   (int)ProjIds.VileMK2Grab);
-		}
 		character.playSound("crash", forcePlay: false, sendRpc: true);
 		character.shakeCamera(sendRpc: true);
 		Point spawnPos2 = character.pos.addxy(0 * character.xDir, -150f);

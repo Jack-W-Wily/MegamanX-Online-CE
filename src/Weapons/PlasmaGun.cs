@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class PlasmaGun : AxlWeapon {
 	public PlasmaGun(int altFire) : base(altFire) {
-		shootSounds = new List<string>() { "plasmaGun", "plasmaGun", "plasmaGun", "plasmaGun" };
+		shootSounds = new string[] { "plasmaGun", "plasmaGun", "plasmaGun", "plasmaGun" };
 		rateOfFire = 1.5f;
 		altFireCooldown = 2f;
 		index = (int)WeaponIds.PlasmaGun;
@@ -65,8 +65,13 @@ public class PlasmaGun : AxlWeapon {
 public class PlasmaGunProj : Projectile {
 	Axl axl;
 	float dist;
-	public PlasmaGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 600, 3, player, "plasmagun_proj", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
+	public PlasmaGunProj(
+		Weapon weapon, Point pos, int xDir, Player player,
+		Point bulletDir, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, 1, 600, 3, player, "plasmagun_proj",
+		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.PlasmaGun;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;

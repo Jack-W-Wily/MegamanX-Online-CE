@@ -10,40 +10,35 @@ public class SelectZeroWeaponMenu : IMainMenu {
 	public bool inGame;
 	public string error = "";
 
-	public static List<Weapon> meleeWeapons = new List<Weapon>()
-	{
-			new ZSaber(null),
-			new KKnuckleWeapon(null),
-			new ZeroBuster(),
-		};
+	public static List<Weapon> meleeWeapons = new List<Weapon>() {
+		new ZSaber(null),
+		new KKnuckleWeapon(null),
+		new ZeroBuster(),
+	};
 
-	public static List<Weapon> groundSpecialWeapons = new List<Weapon>()
-	{
-			new RaijingekiWeapon(null),
-			new SuiretsusenWeapon(null),
-			new TBreakerWeapon(null)
-		};
+	public static List<Weapon> groundSpecialWeapons = new List<Weapon>() {
+		new RaijingekiWeapon(null),
+		new SuiretsusenWeapon(null),
+		new TBreakerWeapon(null)
+	};
 
-	public static List<Weapon> airSpecialWeapons = new List<Weapon>()
-	{
-			new KuuenzanWeapon(null),
-			new FSplasherWeapon(null),
-			new HyorogaWeapon(null)
-		};
+	public static List<Weapon> airSpecialWeapons = new List<Weapon>() {
+		new KuuenzanWeapon(null),
+		new FSplasherWeapon(null),
+		new HyorogaWeapon(null)
+	};
 
-	public static List<Weapon> uppercutWeapons = new List<Weapon>()
-	{
-			new RyuenjinWeapon(null),
-			new EBladeWeapon(null),
-			new RisingWeapon(null)
-		};
+	public static List<Weapon> uppercutWeapons = new List<Weapon>() {
+		new RyuenjinWeapon(null),
+		new EBladeWeapon(null),
+		new RisingWeapon(null)
+	};
 
-	public static List<Weapon> downThrustWeapons = new List<Weapon>()
-	{
-			new HyouretsuzanWeapon(null),
-			new RakukojinWeapon(null),
-			new QuakeBlazerWeapon(null)
-		};
+	public static List<Weapon> downThrustWeapons = new List<Weapon>() {
+		new HyouretsuzanWeapon(null),
+		new RakukojinWeapon(null),
+		new QuakeBlazerWeapon(null)
+	};
 
 	public static List<Weapon> gigaAttackWeapons = new List<Weapon>() {
 		new RakuhouhaWeapon(),
@@ -51,17 +46,16 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		new RekkohaWeapon()
 	};
 
-	public static List<Tuple<string, List<Weapon>>> zeroWeaponCategories = new List<Tuple<string, List<Weapon>>>()
-	{
-			Tuple.Create("Ground Atk", meleeWeapons),
-			Tuple.Create("Ground Spc", groundSpecialWeapons),
-			Tuple.Create("Air Spc", airSpecialWeapons),
-			Tuple.Create("Uppercut(Spc)", uppercutWeapons),
-			Tuple.Create("Uppercut(Atk)", uppercutWeapons),
-			Tuple.Create("Down thrust(Spc)", downThrustWeapons),
-			Tuple.Create("Down thrust(Atk)", downThrustWeapons),
-			Tuple.Create("Giga attack", gigaAttackWeapons),
-		};
+	public static List<Tuple<string, List<Weapon>>> zeroWeaponCategories = new List<Tuple<string, List<Weapon>>>() {
+		Tuple.Create("Ground Spc", meleeWeapons),
+		Tuple.Create("Ground Spc", groundSpecialWeapons),
+		Tuple.Create("Air Spc", airSpecialWeapons),
+		Tuple.Create("Uppercut(Spc)", uppercutWeapons),
+		Tuple.Create("Uppercut(Atk)", uppercutWeapons),
+		Tuple.Create("Down thrust(Spc)", downThrustWeapons),
+		Tuple.Create("Down thrust(Atk)", downThrustWeapons),
+		Tuple.Create("Giga attack", gigaAttackWeapons),
+	};
 
 	public IMainMenu prevMenu;
 

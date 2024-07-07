@@ -16,9 +16,9 @@ public abstract class MGrabbed : MaverickState {
 	public bool customUpdate;
 	public float mashTimeDecay {
 		get {
-			if (maverick.isHeavy) {
-				return Global.spf * heavyDecayMultiplier;
-			}
+			//if (maverick.isHeavy) {
+			//	return Global.spf * heavyDecayMultiplier;
+			//}
 			return Global.spf;
 		}
 	}
@@ -169,7 +169,7 @@ public class MvrkBeetleGrabbedState : MGrabbed {
 			launchTime += Global.spf;
 			if (launchTime > 0.33f) {
 				maverick.changeToIdleFallOrFly();
-			} else if (maverick.stopCeiling() && !maverick.isHeavy) {
+			} else if (maverick.stopCeiling()) {// && !maverick.isHeavy) {
 				(grabber as GravityBeetle).meleeWeapon.applyDamage(
 					maverick, weakness: false,
 					grabber, (int)ProjIds.GBeetleLiftCrash
@@ -228,7 +228,7 @@ public class MvrkDeadLiftGrabbed : MGrabbed {
 			launchTime += Global.spf;
 			if (launchTime > 0.33f) {
 				maverick.changeToIdleFallOrFly();
-			} else if (maverick.stopCeiling() && !maverick.isHeavy) {
+			} else if (maverick.stopCeiling()) {
 				new BoomerangKDeadLiftWeapon(
 					(grabber as Maverick).player
 				).applyDamage(

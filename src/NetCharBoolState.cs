@@ -134,7 +134,7 @@ public partial class Character {
 		isDefenderFavoredBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.Two, (character) => { return character.player.isDefenderFavored; });
 		hasSubtankCapacityBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.Two, (character) => { return character.player.hasSubtankCapacity(); });
 		isNightmareZeroBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.Two, (character) => {
-			return (character as Zero)?.isNightmareZero == true || character is Vile vile && Options.main.swapGoliathInputs || player.isXisu();
+			return (character as Zero)?.isNightmareZero == true || character is Vile vile && vile.isVileMK4 || player.isXisu();
 		});
 		isDarkHoldBS = new NetCharBoolState(this, 7, NetCharBoolStateNum.Two, (character) => { return character.charState is DarkHoldState; });
 	}

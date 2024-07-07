@@ -400,8 +400,12 @@ public class FireNadeAttack : CharState {
 				proj = new MK2NapalmGrenadeProj(player.vileNapalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 				
 			}
+			if (character.loopCount > 0) {
+				character.changeState(new Idle(), true);
+				return;
+			}
 		} 
-		if (stateTime >1f) {
+		if (stateTime >1f || character.isAnimOver()) {
 			character.changeState(new Idle(), true);
 		}
 	}
@@ -426,15 +430,15 @@ public class SplashHitAttack : CharState {
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;
 		airMove = true;
+		airSprite = "air_bomb_attack";
 	}
 
 	public static string getSprite(NapalmAttackType napalmAttackType) {
-		return napalmAttackType == NapalmAttackType.Flamethrower ? "crouch_flamethrower" : "crouch_nade";
+		return napalmAttackType == NapalmAttackType.Flamethrower ?  "crouch_nade" : "crouch_nade";
 	}
 
 	public override void update() {
 		base.update();
-
 		if (napalmAttackType == NapalmAttackType.Napalm) {
 			if (!shot && character.sprite.frameIndex == 2) {
 				shot = true;
@@ -455,10 +459,15 @@ public class SplashHitAttack : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		if (character.sprite.name.Contains("air")){
+		character.useGravity = false;
+		character.stopMoving();
+		}
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 
@@ -809,7 +818,7 @@ public class HotIcecleAttack : CharState {
 
 	public override void update()
 	{
-	
+		
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -838,11 +847,13 @@ public class HotIcecleAttack : CharState {
 			character.stopMovingWeak();
 			pushBackSpeed = 100;
 		}
+		character.specialState = (int)SpecialStateIds.AxlRoll;	
 		}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		character.specialState = (int)SpecialStateIds.None;	
     }
 }
 
@@ -858,12 +869,17 @@ public class MaceBashAttack : CharState {
 	public MaceBashAttack(string transitionSprite = "")
 		: base("macestomp", "", "", transitionSprite)
 	{
-	
 	}
 
 	public override void update()
 	{
-	
+		if (stateTime < 0.8f){
+			character.specialState = (int)SpecialStateIds.AxlRoll;	
+		} 
+		if (stateTime > 0.7f){	
+			character.specialState = (int)SpecialStateIds.None;
+		}
+		
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -901,6 +917,7 @@ public class MaceBashAttack : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		character.specialState = (int)SpecialStateIds.None;
     }
 }
 

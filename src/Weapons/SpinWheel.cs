@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class SpinWheel : Weapon {
 	public SpinWheel() : base() {
-		shootSounds = new List<string>() { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged" };
+		shootSounds = new string[] { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.SpinWheel;
 		weaponBarBaseIndex = 12;
@@ -41,7 +41,7 @@ public class SpinWheelProj : Projectile {
 	const float hitCooldown = 0.2f;
 	float maxTimeProj = 2.5f;
 
-	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
+	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = true) :
 		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 1, hitCooldown, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		if (rpc) {

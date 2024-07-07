@@ -313,6 +313,7 @@ public class Damager {
 				case (int)ProjIds.MorphMPowder:
 				case (int)ProjIds.Raijingeki:
 				case (int)ProjIds.Raijingeki2:
+				case (int)ProjIds.HighmaxStun:
 					character?.paralize();
 					break;
 			}
@@ -524,11 +525,7 @@ public class Damager {
 	}*/ 
 	//>>>>>>>>>>>>>>>>>>>>>
 	if (projId == (int)ProjIds.HoutenjinF) {	
-			character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
-			owner.character.isDashing = true;
-			owner.character.dashedInAir += 1;
-			owner.character.vel.y = 0f - owner.character.getJumpPower();
-			owner.character.changeState(new WallKick(), true);
+			character.changeState(new PushedOver(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 	}
 	//GBD's Mighty Kick
 	if (projId == (int)ProjIds.GBDKick && !(character.charState is SwordBlock)) {	
@@ -548,15 +545,19 @@ public class Damager {
 				} if (projId == (int)ProjIds.Hyouretsuzan) {
 					character.addIgFreezeProgress(3);
 				} if (projId == (int)ProjIds.HotIcecle) {
-				character.freeze(2);
-				
-				} if (projId == (int)ProjIds.Hyouretsuzan2) {
-				character.freeze(2);
+				character.addIgFreezeProgress(4);
+				flinch = 0;
+				} 
+				 if (projId == (int)ProjIds.Napalm) {
+				character.addIgFreezeProgress(1);
+				}
+				if (projId == (int)ProjIds.Hyouretsuzan2) {
+				character.addIgFreezeProgress(4);
 				flinch = 0;
 				} if (projId == (int)ProjIds.VelGIce) {
-					character.addIgFreezeProgress(2);
+					character.addIgFreezeProgress(4);
 				} if (projId == (int)ProjIds.BBuffaloBeam) {
-					character.freeze(2);
+					character.addIgFreezeProgress(4);
 				} if (projId == (int)ProjIds.PlasmaGun) {
 					if (mmx != null) {
 					mmx.barrierCooldown = 3;
@@ -591,18 +592,16 @@ public class Damager {
 			}
 			if (weaponIndex == (int)WeaponIds.Boomerang || weaponIndex == (int)WeaponIds.BoomerangKBoomerang) {
 				if (character.player.isX) character.stingChargeTime = 0;
-			} 
-			//if (projId == (int)ProjIds.FlameMOil) {
-			//character.addOilTime(owner, 8);
-			//character.playSound("flamemOil");
-			//}
-			 if (projId == (int)ProjIds.DarkHold) {
-				character.addDarkHoldTime(owner, 4);
-			} if (projId == (int)ProjIds.MagnaCTail) {
+			//} //else if (projId == (int)ProjIds.FlameMOil) {
+		//		character.addOilTime(owner, 8);
+		//		character.playSound("flamemOil");
+			} else if (projId == (int)ProjIds.DarkHold) {
+				character.addDarkHoldTime(4, owner);
+			} else if (projId == (int)ProjIds.MagnaCTail) {
 				character.addInfectedTime(owner, 4f);
 			}
 
-			if (owner?.character?.isNightmareZeroBS.getValue() == true) {
+			if (owner?.character?.isNightmareZeroBS.getValue() == true && projId == (int)ProjIds.Raijingeki2) {
 				character.addInfectedTime(owner, 0.8f);
 			}
 			// Zero gaining ammo
@@ -787,52 +786,11 @@ public class Damager {
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 2;
 			}
-
-			if (!maverick.state.superArmor) {
-				if (flinch < Global.halfFlinch) flinch = 0;
-				// Large mavericks
-				if (maverick.isHeavy) {
-					flinch = 0;
-				}
-				// Small mavericks
-				else if (maverick is ChillPenguin || maverick is Velguarder || maverick is MorphMothCocoon ||
-					maverick is BubbleCrab || maverick is CrystalSnail
-				) {
-
-				}
-				// Medium mavericks
-				else {
-					flinch = (flinch == Global.defFlinch ? Global.halfFlinch : flinch);
-				}
-			} else {
-				flinch = 0;
-			}
-
-			bool isOnFlinchCooldown = false;
-
-			float flinchCooldownTime = 0.75f; ;
-			if (projectileFlinchCooldowns.ContainsKey(projId)) {
-				flinchCooldownTime = projectileFlinchCooldowns[projId];
-			}
-			int flinchKey = getFlinchKeyFromProjId(projId);
-			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
-				maverick.flinchCooldown[flinchKey] = 0;
-			}
-			if (maverick.flinchCooldown[flinchKey] > 0) {
-				isOnFlinchCooldown = true;
-			} else {
-				maverick.flinchCooldown[flinchKey] = flinchCooldownTime;
-			}
-
-			weakness = false;
-			if (maverick.checkWeakness(
+			// Weakness system.
+			weakness = maverick.checkWeakness(
 				(WeaponIds)weaponIndex, (ProjIds)projId, out MaverickState newState, owner?.isSigma ?? true
-			)) {
-				weakness = true;
-			}
-			if (weakness && damage < 2 && (
-				projId == (int)ProjIds.CrystalHunter || projId == (int)ProjIds.CSnailCrystalHunter)
-			) {
+			);
+			if (weakness && damage < 2 && projId is (int)ProjIds.CrystalHunter or (int)ProjIds.CSnailCrystalHunter) {
 				damage = 2;
 			}
 			if (weakness && damage < 1 && (
@@ -842,23 +800,81 @@ public class Damager {
 			)) {
 				damage = 1;
 			}
-			if (weakness && damage < 2 && (projId == (int)ProjIds.ParasiticBomb)) {
+			if (weakness && damage < 2 && projId == (int)ProjIds.ParasiticBomb) {
 				damage = 2;
 			}
-
-			if (newState != null && !isOnFlinchCooldown) {
+			// Get flinch cooldown index.
+			bool isOnFlinchCooldown = false;
+			float flinchCooldownTime = 0;
+			int flinchKey = getFlinchKeyFromProjId(projId);
+			if (projectileFlinchCooldowns.ContainsKey(projId)) {
+				flinchCooldownTime = projectileFlinchCooldowns[projId];
+			}
+			if (!maverick.player.isTagTeam() && flinchCooldownTime < 0.75f) {
+				flinchCooldownTime = 0.75f;
+			}
+			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
+				maverick.flinchCooldown[flinchKey] = 0;
+			}
+			// Weakness states and flinch weakness.
+			if (newState != null && maverick.weaknessCooldown == 0) {
+				maverick.weaknessCooldown = 1.75f;
+				flinch = 0;
 				if (maverick.ownedByLocalPlayer) {
 					maverick.changeState(newState, true);
 				}
 			}
-
-			if (weakness) {
-				flinch = Global.defFlinch;
-				if (isOnFlinchCooldown) {
+			// Weakness flinch.
+			else if (weakness && !isOnFlinchCooldown) {
+				if (flinch <= 0) {
+					flinchCooldownTime = 0.75f;
 					flinch = Global.miniFlinch;
-					isOnFlinchCooldown = false;
 				}
-			} else {
+				else if (flinch < Global.halfFlinch) {
+					flinch = Global.halfFlinch;
+				}
+				else if (flinch < Global.defFlinch) {
+					flinch = Global.defFlinch;
+				}
+				else if (flinch < Global.defFlinch) {
+					flinch = Global.superFlinch;
+				}
+			}
+			// Superarmor.
+			if (maverick.state.superArmor) {
+				flinch = 0;
+			}
+			// Set flinch cooldown if it exists.
+			if (flinch > 0) {
+				if (maverick.flinchCooldown[flinchKey] > 0) {
+					isOnFlinchCooldown = true;
+				} else {
+					maverick.flinchCooldown[flinchKey] = flinchCooldownTime;
+				}
+			}
+			// For backshield and similar stuff.
+			if (!weakness) {
+				// Flinch reduction.
+				if (flinch > 0) {
+					// Large mavericks
+					if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
+						if (flinch <= Global.miniFlinch) {
+							flinch = 0;
+						} else {
+							flinch = Global.miniFlinch;
+						}
+					}
+					// Medium mavericks
+					else if (maverick.armorClass == Maverick.ArmorClass.Medium) {
+						if (flinch <= Global.miniFlinch) {
+							flinch = 0;
+						} else if (flinch <= Global.halfFlinch) {
+							flinch = Global.miniFlinch;
+						} else {
+							flinch = Global.halfFlinch;
+						}
+					}
+				}
 				if (maverick is ArmoredArmadillo aa) {
 					if ((hitFromBehind(maverick, damagingActor, owner, projId) ||
 						maverick.sprite.name == "armoreda_roll"
@@ -870,7 +886,6 @@ public class Damager {
 						}
 					}
 				}
-
 				/*
 				if (maverick is CrystalSnail cs) {
 					if ((hitFromBehind(maverick, damagingActor, owner)) && !cs.noShell) {
@@ -879,8 +894,7 @@ public class Damager {
 					}
 				}
 				*/
-
-				if (maverick.sprite.name == "armoreda_block" &&  !isArmorPiercingOrElectric(projId)) {
+				if (maverick.sprite.name == "armoreda_block" && damage > 0 && !isArmorPiercingOrElectric(projId)) {
 					if (hitFromFront(maverick, damagingActor, owner, projId)) {
 						if (maverick.ownedByLocalPlayer && damage > 0//&&
 							//damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit
@@ -907,7 +921,6 @@ public class Damager {
 					}
 				}
 			}
-
 			if (damage > 0) {
 				if (flinch > 0 && !isOnFlinchCooldown) {
 					if (weakness) {
@@ -915,14 +928,12 @@ public class Damager {
 					} else {
 						victim?.playSound("hurt");
 					}
-					if (newState == null) {
+					if (newState == null && maverick.ownedByLocalPlayer) {
 						int hurtDir = -maverick.xDir;
-						if (damagingActor != null) {
-							hurtDir = damagingActor.pos.x > maverick.pos.x ? -1 : 1;
+						if (!hitFromFront(maverick, damagingActor, owner, projId)) {
+							hurtDir *= -1;
 						}
-						if (maverick.ownedByLocalPlayer) {
-							maverick.changeState(new MHurt(hurtDir, flinch), true);
-						}
+						maverick.changeState(new MHurt(hurtDir, flinch), true);
 					}
 				} else {
 					victim?.playSound("hit");

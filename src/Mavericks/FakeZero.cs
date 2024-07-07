@@ -53,6 +53,19 @@ public class FakeZero : Maverick {
 		}
 	}
 
+
+		public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile proj = null;
+		
+		if (sprite.name.EndsWith("guard") ) {
+			proj =	new GenericMeleeProj(
+				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
+			);
+		}
+
+		return proj;
+	}
+
 	public override float getAirSpeed() {
 		return jumpXMomentum;
 	}

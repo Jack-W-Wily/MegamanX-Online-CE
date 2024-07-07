@@ -133,7 +133,8 @@ public partial class Character : Actor, IDamagable {
 	public float saberCooldown;
 
 	public const float maxLastAttackerTime = 5;
-
+	public float shiningSparkStacks = 0;
+	
 	public float igFreezeProgress;
 	public float freezeInvulnTime;
 	public float stunInvulnTime;
@@ -225,6 +226,7 @@ public partial class Character : Actor, IDamagable {
 	public float frozenMaxTime;
 	public float crystalizedTime;
 	public float crystalizedMaxTime;
+	public float noBlockTime = 0;
 	
 	// Buffs.
 	public float vaccineTime;
@@ -325,12 +327,12 @@ public partial class Character : Actor, IDamagable {
 		if (infectedTime > 8) infectedTime = 8;
 	}
 
-	public void addDarkHoldTime(Player attacker, float time) {
+	public void addDarkHoldTime(float darkHoldTime, Player attacker) {
 		if (!ownedByLocalPlayer) return;
 		if (isInvulnerable()) return;
 		if (isVaccinated()) return;
 
-		changeState(new DarkHoldState(this), true);
+		changeState(new DarkHoldState(this, darkHoldTime), true);
 	}
 
 	public void addAcidTime(Player attacker, float time) {
@@ -430,58 +432,6 @@ public partial class Character : Actor, IDamagable {
 		ShaderWrapper? palette = null;
 
 		// TODO: Send this to the respective classes.
-
-		if (this is Vile vile) {
-			if (!vile.isVileMK4 && Options.main.swapGoliathInputs){
-				palette = player.nightmareZeroShader;
-			}
-		}
-		if (player.isX) {
-			int index = player.weapon.index;
-			if (index == (int)WeaponIds.GigaCrush || index == (int)WeaponIds.ItemTracer || index == (int)WeaponIds.AssassinBullet || index == (int)WeaponIds.Undisguise || index == (int)WeaponIds.UPParry) index = 0;
-			if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
-				index = player.weapons[player.hyperChargeSlot].index;
-			}
-			if (player.hasGoldenArmor() && player.weapon is Buster) index = 25;
-			if (hasUltimateArmorBS.getValue() && player.weapon is Buster) index = 31;
-			palette = player.xPaletteShader;
-
-			if (!isCStingInvisibleGraphics()) {
-				palette?.SetUniform("palette", index);
-				palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
-			} else {
-				palette?.SetUniform("palette", (this as MegamanX).cStingPaletteIndex % 9);
-				palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
-			}
-		} else if (this is Zero zero) {
-			int paletteNum = 0;
-			
-			if (zero.blackZeroTime > 3) paletteNum = 1;
-			else if (zero.blackZeroTime > 0) {
-				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
-				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
-			}
-			palette = player.zeroPaletteShader;
-			palette?.SetUniform("palette", paletteNum);
-			if (player.loadout.zeroLoadout.hyperMode == 2) {
-				palette?.SetUniform("paletteTexture", Global.textures["paletteNightmareZero"]);
-			}
-			if (!player.isZBusterZero() && player.loadout.zeroLoadout.hyperMode != 2) {
-				palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
-			} 
-			if (player.isZBusterZero()) {
-				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
-			}
-			
-		} else if (player.isAxl) {
-
-		} else if (player.isViralSigma()) {
-			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
-			if (sprite.name.Contains("_enter")) paletteNum = 0;
-			palette = player.viralSigmaShader;
-			palette?.SetUniform("palette", paletteNum);
-			palette?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
-		}
 		if (palette != null) shaders.Add(palette);
 
 		if (player.isPossessed() && player.possessedShader != null) {
@@ -541,6 +491,54 @@ public partial class Character : Actor, IDamagable {
 				shaders.Add(player.invisibleShader);
 			}
 		}
+
+		if (player.isX) {
+			int index = player.weapon.index;
+			if (index == (int)WeaponIds.GigaCrush || index == (int)WeaponIds.ItemTracer || index == (int)WeaponIds.AssassinBullet || index == (int)WeaponIds.Undisguise || index == (int)WeaponIds.UPParry) index = 0;
+			if (index == (int)WeaponIds.HyperBuster && ownedByLocalPlayer) {
+				index = player.weapons[player.hyperChargeSlot].index;
+			}
+			if (player.hasGoldenArmor() && player.weapon is Buster) index = 25;
+			if (hasUltimateArmorBS.getValue() && player.weapon is Buster) index = 31;
+			palette = player.xPaletteShader;
+
+			if (!isCStingInvisibleGraphics()) {
+				palette?.SetUniform("palette", index);
+				palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
+			} else {
+				palette?.SetUniform("palette", (this as MegamanX).cStingPaletteIndex % 9);
+				palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
+			}
+		} else if (this is Zero zero) {
+			int paletteNum = 0;
+			
+			if (zero.blackZeroTime > 3) paletteNum = 1;
+			else if (zero.blackZeroTime > 0) {
+				int mod = MathInt.Ceiling(zero.blackZeroTime) * 2;
+				paletteNum = (Global.frameCount % (mod * 2)) < mod ? 0 : 1;
+			}
+			palette = player.zeroPaletteShader;
+			palette?.SetUniform("palette", paletteNum);
+			if (player.loadout.zeroLoadout.hyperMode == 2) {
+				palette?.SetUniform("paletteTexture", Global.textures["paletteNightmareZero"]);
+			}
+			if (!player.isZBusterZero() && player.loadout.zeroLoadout.hyperMode != 2) {
+				palette?.SetUniform("paletteTexture", Global.textures["hyperZeroPalette"]);
+			} 
+			if (player.isZBusterZero()) {
+				palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
+			}
+			
+		} else if (player.isAxl) {
+
+		} else if (player.isViralSigma()) {
+			int paletteNum = 6 - MathInt.Ceiling((player.health / player.maxHealth) * 6);
+			if (sprite.name.Contains("_enter")) paletteNum = 0;
+			palette = player.viralSigmaShader;
+			palette?.SetUniform("palette", paletteNum);
+			palette?.SetUniform("paletteTexture", Global.textures["paletteViralSigma"]);
+		}
+		
 
 		return shaders;
 	}
@@ -1010,14 +1008,14 @@ public partial class Character : Actor, IDamagable {
 
 		//>>>>>>>>>>>>>>>>>>
 		//Fix attempt on the camera
-		if (charState is InRideChaser || sprite.name.Contains("bike")){
+		if (ownedByLocalPlayer && ( charState is InRideChaser || sprite.name.Contains("bike"))){
 			var prevCamPos = getCamCenterPos();
 			Global.level.snapCamPos(getCamCenterPos(), prevCamPos);
 		}
 		if (charState is Idle) {
 		CanOnhitCancel = false;
 		}
-		if (charState is not InRideChaser) {
+		if (ownedByLocalPlayer && charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
 		Helpers.decrementTime(ref useGrabCooldown);
@@ -1027,7 +1025,8 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementTime(ref dropFlagCooldown);
 		Helpers.decrementTime(ref parryCooldown);
 		Helpers.decrementTime(ref JumpCancelTime);
-
+		Helpers.decrementTime(ref noBlockTime);
+	
 		if (sprite.name.Contains("_grab")) useGrabCooldown = 1.5f;
 
 		if (ownedByLocalPlayer && player.possessedTime > 0) {
@@ -1254,8 +1253,8 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		/*
-		if (!ownedByLocalPlayer || player.isAI)
+		
+	/*	if (!ownedByLocalPlayer || player.isAI)
 		{
 			if (isInvisibleBS.getValue() && player.alliance != Global.level.mainPlayer.alliance)
 			{
@@ -1796,7 +1795,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isToughGuyHyperMode() {
-		return false;
+		return player.isHighMax;
 	}
 
 	public bool isImmuneToKnockback() {
@@ -1818,11 +1817,7 @@ public partial class Character : Actor, IDamagable {
 			return true;
 		}
 		if (!ignoreRideArmorHide && !string.IsNullOrEmpty(sprite?.name) && sprite.name.Contains("ra_hide")) return true;
-		if (specialState == (int)SpecialStateIds.AxlRoll ||
-			specialState == (int)SpecialStateIds.XTeleport
-		) {
-			return true;
-		}
+		
 		if (sprite != null && sprite.name.Contains("viral_exit")) {
 			return true;
 		}
@@ -1853,14 +1848,18 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canBeGrabbed() {
-		return grabInvulnTime == 0 && !isCCImmune() && charState is not DarkHoldState;
+		return !charState.invincible && grabInvulnTime == 0 && !isCCImmune() && charState is not DarkHoldState;
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
-	
+		if (specialState == (int)SpecialStateIds.AxlRoll ||
+			specialState == (int)SpecialStateIds.XTeleport
+		) {
+			return false;
+		}
 		if (sprite.name.Contains("houtenjin")) return false;
 		// Bommerang can go thru invisibility check
 		if (player.alliance != damagerAlliance && projId != null && isCStingVulnerable(projId.Value)) {
@@ -2148,13 +2147,13 @@ public partial class Character : Actor, IDamagable {
 		bool clampTo3 = true;
 		switch (this) {
 			case MegamanX mmx:
-				clampTo3 = !mmx.isHyperX;
+				clampTo3 = player.weapon is not Buster && !player.HasFullForce();
 				break;
 			case Zero zero:
 				clampTo3 = !zero.canUseDoubleBusterCombo();
 				break;
 			case Vile vile:
-				clampTo3 = !vile.isVileMK5;
+				clampTo3 = false;//!vile.isVileMK5;
 				break;
 			case BusterZero:
 				clampTo3 = false;
@@ -2253,8 +2252,11 @@ public partial class Character : Actor, IDamagable {
 	public float getLabelOffY() {
 		float offY = 42;
 		if (player.isZero) offY = 45;
+		if (player.isZain) offY = 45;
 		if (player.isVile) offY = 50;
+		if (player.isDynamo) offY = 55;
 		if (player.isSigma) offY = 62;
+		if (player.isHighMax) offY = 62;
 		if (sprite.name.Contains("_ra_")) offY = 25;
 		if (player.isMainPlayer && player.isTagTeam() && player.currentMaverick != null) {
 			offY = player.currentMaverick.getLabelOffY();
@@ -2605,7 +2607,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool drawStatusProgress() {
-		if (!Options.main.showMashProgress) {
+		if (!Options.main.showMashProgress || Global.level.mainPlayer.character != this) {
 			return false;
 		}
 
@@ -2845,6 +2847,11 @@ public partial class Character : Actor, IDamagable {
 		decimal decimalHP = (decimal)player.health;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
+
+		// For Dark Hold break.
+		if (damage > 0 && charState is DarkHoldState dhs && dhs.frameTime > 10 && !Damager.isDot(projId)) {
+			changeToIdleOrFall();
+		}
 
 		if (attacker == player && axl?.isWhiteAxl() == true) {
 			damage = 0;
@@ -3220,10 +3227,23 @@ public partial class Character : Actor, IDamagable {
 				miniFlinchTime = 0.1f;
 			}
 		}
-		if (charState is not Die and not InRideArmor and not InRideChaser &&
-			(charState is not Hurt hurtState || MathF.Floor(hurtState.stateTime * 60f) >= flinchFrames)
-		) {
+		if (charState is Hurt hurtState) {
+			if (hurtState.frameTime <= flinchFrames) {
+				// You can probably add a check here that sets "hurtState.yStartPos" to null if you.
+				// Want to add a flinch attack that pushes up on chain-flinch.
+				changeState(new Hurt(dir, flinchFrames, false, hurtState.flinchYPos), true);
+				return;
+			}
+			return;
+		}
+		if (charState is GenericStun stunState) {
+			// We disable the jump as we mid-flinch movement.
+			changeState(new Hurt(dir, flinchFrames, true, stunState.flinchYPos), true);
+			return;
+		}
+		if (charState is not Die and not InRideArmor and not InRideChaser) {
 			changeState(new Hurt(dir, flinchFrames, spiked), true);
+			return;
 		}
 	}
 

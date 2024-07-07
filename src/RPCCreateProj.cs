@@ -75,6 +75,12 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.BusterX3Proj2:
 				proj = new BusterX3Proj2(new Buster(), pos, xDir, extraData[0], player, netProjByte);
 				break;
+			case (int)ProjIds.BusterX3Proj1:
+				proj = new BusterX3Proj1(new Buster(), pos, xDir, extraData[0], player, netProjByte);
+				break;
+			case (int)ProjIds.BusterX3Proj3:
+				proj = new BusterX3Proj3(new Buster(), pos, xDir, extraData[0], player, netProjByte);
+				break;
 			case (int)ProjIds.BusterX3Plasma:
 				proj = new BusterPlasmaProj(new Buster(), pos, xDir, player, netProjByte);
 				break;
@@ -398,6 +404,9 @@ public partial class RPCCreateProj : RPC {
 				proj = new LaunchOWhirlpoolProj(new LaunchOWhirlpoolWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.LaunchOTorpedo:
+				proj = new TorpedoProj(new LaunchOHomingTorpedoWeapon(), pos, xDir, player, 3, netProjByte);
+				break;
+			case (int)ProjIds.HighmaxStun:
 				proj = new TorpedoProj(new LaunchOHomingTorpedoWeapon(), pos, xDir, player, 3, netProjByte);
 				break;
 			case (int)ProjIds.BoomerangKBoomerang:

@@ -12,7 +12,7 @@ public class RaySplasher : Weapon {
 	public static RaySplasher netWeapon = new RaySplasher();
 
 	public RaySplasher() : base() {
-		shootSounds = new List<string>() { "raySplasher", "raySplasher", "raySplasher", "warpIn" };
+		shootSounds = new string[] { "raySplasher", "raySplasher", "raySplasher", "warpIn" };
 		rateOfFire = 1f;
 		index = (int)WeaponIds.RaySplasher;
 		weaponBarBaseIndex = 21;
@@ -127,7 +127,7 @@ public class RaySplasherTurret : Actor, IDamagable
 
 	
 
-	public RaySplasherTurret(Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = false)
+	public RaySplasherTurret(Point pos, Player player, int xDir, ushort netId, bool ownedByLocalPlayer, bool rpc = true)
 		: base("raysplasher_turret_start", pos, netId, ownedByLocalPlayer, dontAddToLevel: false)
 	{
 		if (player != null && ownedByLocalPlayer) {
@@ -191,6 +191,10 @@ public class RaySplasherTurret : Actor, IDamagable
 		updateProjectileCooldown();
 
 		if (playerOwner?.character == null) {
+				destroySelf();
+		}
+		if (playerOwner?.character != null &&
+		 playerOwner.character.sprite.name.Contains("knocked")) {
 				destroySelf();
 		}
 		if (!ownedByLocalPlayer)
@@ -270,7 +274,7 @@ public class RaySplasherTurret : Actor, IDamagable
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (!isIgnis && irisCrystal){
 		//if (anim == null)  anim =
-		 new Anim(pos, "iris_crystal_fade", xDir,playerOwner.getNextActorNetId(), true, sendRpc: true);
+		// new Anim(pos, "iris_cannon_idle", xDir,playerOwner.getNextActorNetId(), true, sendRpc: true);
 	
 		if (state == 0)
 		{
@@ -285,7 +289,7 @@ public class RaySplasherTurret : Actor, IDamagable
 				if (playerOwner.character != null && playerOwner.input.isPressed("weaponright", playerOwner)){
 				state = 1;
 				}
-				changeSprite("iris_crystal_idle", resetFrame: true);
+				changeSprite("iris_cannon_idle", resetFrame: true);
 			}
 		}else if (state == 1)
 		{
@@ -295,10 +299,10 @@ public class RaySplasherTurret : Actor, IDamagable
 			if (playerOwner.character != null &&playerOwner.character != null && !playerOwner.input.isHeld("weaponright", playerOwner)){
 				state = 2;
 			}
-			changeSprite("iris_crystal_bash", resetFrame: true);	
+			changeSprite("iris_cannon_fire", resetFrame: true);	
 		}else if (state == 2)
 		{
-		changeSprite("iris_crystal_idle", resetFrame: true);
+		changeSprite("iris_cannon_idle", resetFrame: true);
 		if (playerOwner.character != null && playerOwner.input.isPressed("weaponright", playerOwner)){
 				state = 1;
 				}
@@ -322,7 +326,7 @@ public class RaySplasherTurret : Actor, IDamagable
 			{
 				target = closestTarget;
 				state = 1;
-				changeSprite("iris_crystal_shoot", resetFrame: true);
+				changeSprite("iris_cannon_fire", resetFrame: true);
 			}
 		}
 		else
@@ -338,7 +342,7 @@ public class RaySplasherTurret : Actor, IDamagable
 			{
 				state = 1;
 				target = null;
-				changeSprite("iris_crystal_idle", resetFrame: true);
+				changeSprite("iris_cannon_idle", resetFrame: true);
 				return;
 			}
 			raySplasherShootTime += Global.spf;

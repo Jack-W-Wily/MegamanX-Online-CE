@@ -23,15 +23,15 @@ public class Vile : Character {
 		return player.frozenCastle;
 	}
 	public bool summonedGoliath;
-	public int vileForm;
+	public int vileForm = Options.main.vileLoadout.cannon;
 	public int vileRespawnCount = 0;
 
-	public bool isVileMK1 { get { return vileForm == 0; } }
-	public bool isVileMK2 { get { return vileForm == 1; } }
-	public bool isVileMK5 { get { return vileForm == 2;} }
-	public bool isVileMK4 { get { return vileForm == 3; } }
-
-	public bool isVileMK5EX { get { return vileForm == 2 && vileRespawnCount == 2; } }
+	public bool isVileMK1 { get { return vileForm == 0  && !Options.main.swapGoliathInputs; } }
+	public bool isVileMK2 { get { return vileForm == 1  && !Options.main.swapGoliathInputs; } }
+	public bool isVileMK5 { get { return vileForm == 2  && !Options.main.swapGoliathInputs;} }
+	public bool isVileMK2EX { get { return vileForm == 1  && Options.main.swapGoliathInputs; } }
+	public bool isVileMK4 { get { return vileForm == 0  && Options.main.swapGoliathInputs; } }
+	public bool isVileMK5EX { get { return vileForm == 2 && Options.main.swapGoliathInputs; } }
 	public float vileHoverTime;
 	public float vileMaxHoverTime = 6;
 
@@ -59,15 +59,7 @@ public class Vile : Character {
 		charId = CharIds.Vile;
 
 		
-			if (Options.main.swapGoliathInputs){
-			vileForm = 3;
-			}
-			if (player.vileCannonWeapon.type == 2) {
-				vileForm = 2;
-			} 
-			if (player.vileCannonWeapon.type == 1) {
-				vileForm = 1;
-			}
+	
 			if (player.vileFormToRespawnAs == 2 || Global.quickStartVileMK5 == true) {
 				vileForm = 2;	
 			} else if (player.vileFormToRespawnAs == 1 || Global.quickStartVileMK2 == true) {
@@ -211,7 +203,7 @@ public class Vile : Character {
 			if (player.input.isHeld(Control.Special1, player) && charState is not Die && invulnTime == 0 && flag == null && player.vileAmmo >= player.vileLaserWeapon.getAmmoUsage(0)) {
 				increaseCharge();
 			} else {
-				if (isCharging() && getChargeLevel() >= 3) {
+				if (isCharging() && getChargeLevel() >= 3 && !player.input.isHeld(Control.Dash, player)) {
 					if (getChargeLevel() >= 4 && (isVileMK5 || isVileMK4)) {
 						if (isVileMK5)changeState(new HexaInvoluteState(), true);
 						if (isVileMK4)changeState(new Rakuhouha(new ShinMessenkou()), true);				
@@ -369,7 +361,8 @@ public class Vile : Character {
 		if (charState is Dash || charState is AirDash) {
 			if (useGrabCooldown == 0 && (player.input.isHeld(Control.Shoot, player))) {
 				charState.isGrabbing = true;
-				invulnTime = 0.3f;
+			
+				if (getChargeLevel() >= 3) invulnTime = 0.3f;
 				changeSpriteFromName("dash_grab", true);
 			}
 		}
@@ -562,22 +555,37 @@ public class Vile : Character {
 		}
 	
 		//Ouroboros Bitch
-		if (( isVileMK4 || Options.main.swapGoliathInputs) && mk2missleCooldown == 0){
+		if (( isVileMK4) && mk2missleCooldown == 0){
 		if (player.input.isPressed(Control.WeaponRight, player) &&  player.vileAmmo > 8) {
-			mk2missleCooldown = 0.5f;
+			mk2missleCooldown = 0.7f;
 			 player.vileAmmo -= 8;
 			changeState(new Ouroboros(), true);
 			}
 			if ( player.vileAmmo > 8 && (charState.canAttack() || charState is SwordBlock) && player.input.isPressed(Control.Shoot, player)&& player.input.isHeld(Control.Up, player) && charState is not VileMK2GrabState) {
 			player.vileAmmo -= 8;
 			changeState(new ChainGrab(), true);	
+			}	
+		}
+		
+		if (( isVileMK5EX) && mk2missleCooldown == 0){
+		if (player.input.isPressed(Control.WeaponRight, player) &&  player.vileAmmo > 15) {
+			mk2missleCooldown = 0.7f;
+			 player.vileAmmo -= 16;
+			changeState(new JudgeMentCut(), true);
 			}
-			if ( player.vileAmmo > 5 && charState.canAttack() && player.input.isPressed(Control.Shoot, player)&& player.input.isHeld(Control.Down, player) && charState is not Dash) {
+		}
+
+			if ( player.vileAmmo > 5 && 
+			(charState is WildHorseKick
+			|| charState is SeaDragonRageAttack
+			|| charState is DragonsWrath
+			)
+			 && player.input.isPressed(Control.Shoot, player)
+			 && player.input.isHeld(Control.Down, player)) {
 		 	player.vileAmmo -= 6;
 			changeState(new DynamoString1(), true);
 			}
-			
-		}
+		
 		//Mk2 Missle Thinggy
 			if (isVileMK2 && player.input.isPressed(Control.WeaponRight, player) && mk2missleCooldown == 0){
 			Point? headPosNullable = getVileMK2StunShotPos();
@@ -660,7 +668,7 @@ public class Vile : Character {
 			changeSpriteFromName("fall", true);
 		}
 		if (player.input.isHeld(Control.Up, player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() && grounded && noBlockTime == 0 &&
 			charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());
@@ -880,7 +888,7 @@ public class Vile : Character {
 		}
 		if ( sprite.name.Contains("hoticecle"))
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.HotIcecle, player, 2f, 0, 0.4f, null, isShield: true, isDeflectShield: true);
+			return new GenericMeleeProj(new HyouretsuzanWeapon(player), centerPoint, ProjIds.HotIcecle, player, 2f, 0, 0.4f, null, isShield: true, isDeflectShield: true);
 		}
 		if ( sprite.name.Contains("macestomp"))
 		{
@@ -935,16 +943,17 @@ public class Vile : Character {
 		if (isVileMK4){
 		return "vilemk4_" + spriteName;	
 		}
-		if (isVileMK5) {
-			if (!Options.main.swapGoliathInputs){
-			return "vilemk5_" + spriteName;
-			} else { return "vilemkv_" + spriteName;}
+		if (isVileMK2EX){
+		return "vilemk2ex_" + spriteName;	
 		}
-		if (isVileMK2) {
-			if (!Options.main.swapGoliathInputs){
-			return "vilemk2_" + spriteName;
-			} else { return "vilemk2ex_" + spriteName;}
-			
+		if (isVileMK5EX) {
+			return "vilemkv_" + spriteName;		
+		}
+		if (isVileMK5) {
+			return "vilemk5_" + spriteName;		
+		}
+		if (isVileMK2) {	
+			return "vilemk2_" + spriteName;	
 		}
 		return "vile_" + spriteName;
 	}

@@ -40,6 +40,7 @@ public enum CharIds {
 	NightmareGhost = 12,
 	BusterZero = 13,
 	Zain = 14,
+	HighMax = 16,
 	WolfSigma = 100,
 	ViralSigma = 101,
 	KaiserSigma = 102,
@@ -64,17 +65,16 @@ public class CharSelection {
 		get {
 			return new List<CharSelection>()
 			{
-					new CharSelection("<X (X1)", 0, 1, 0, "smenu_x", 0),			
+					new CharSelection("X", 0, 1, 0, "smenu_x", 0),			
 					new CharSelection("Zero", 1, 1, 0, "smenu_zero", 0),
 					new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
 					new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
 					new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
-					new CharSelection("dynamo", 5, 1, 0, "smenu_dynamo", 0),
+					new CharSelection("D Y N A M O", 5, 1, 0, "smenu_dynamo", 0),
 					new CharSelection("Green Biker Dude", 6, 1, 0, "smenu_gbd", 0),
 					new CharSelection("Iris", 7, 1, 0, "smenu_iris", 0),	
-					new CharSelection("Zain", 14, 1, 0, "smenu_zain", 0),				
-					new CharSelection(" X (X3)>", 0, 3, 0, "smenu_x", 0),
-					new CharSelection("<X (X2)>", 0, 2, 0, "smenu_x", 0),
+					new CharSelection("Zain", 14, 1, 0, "smenu_zain", 0),	
+					new CharSelection("HighMax", 16, 1, 0, "smenu_zain", 0),					
 				};
 		}
 	}

@@ -190,7 +190,9 @@ public class KKnuckleParryStartState : CharState {
 		character.playSound("zeroParry", sendRpc: true);
 	if (player.isZero)character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
 	if (player.isZain)character.changeState(new KKnuckleParryMeleeState(counterAttackTarget), true);
-	
+	if (character is Zero zero && zero.isNightmareZero){
+		zero.freeBusterShots += 1;
+	}
 	
 	if (player.isX) {
 		character.changeState(new Idle(), true);
@@ -201,6 +203,7 @@ public class KKnuckleParryStartState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		
 		//character.parryCooldown = character.maxParryCooldown;
 	}
 

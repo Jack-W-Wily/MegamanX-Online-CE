@@ -9,7 +9,7 @@ public class MegaCrush : Weapon {
 	public static float overclockVirusTime = 1.5f;
 
 	public MegaCrush() {
-		shootSounds = new List<string> { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "" };
 		rateOfFire = 1f;
 		ammo = 0f;
 		index = (int)NewWeaponIds.MegaCrush;

@@ -27,7 +27,7 @@ public class Zain : Character {
 public override bool normalCtrl() {
 	
 		if (player.input.isHeld(Control.Up, player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() && grounded &&noBlockTime == 0 &&
 			charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());
@@ -42,7 +42,7 @@ public override bool normalCtrl() {
 		Helpers.decrementTime(ref CounterTimer);
 		Helpers.decrementTime(ref CounterAddcooldown);
 		player.vileAmmo += 1;
-		if (ZainCounters > 4) ZainCounters = 4;
+		if (ZainCounters >8 ) ZainCounters =8;
 		if (ZainCounters < 0) ZainCounters = 0;
 		if (CounterTimer == 0 && CounterAddcooldown == 0){
 		ZainCounters += 1;

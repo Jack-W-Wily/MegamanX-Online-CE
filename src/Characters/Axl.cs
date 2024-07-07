@@ -360,11 +360,43 @@ public class Axl : Character {
 
 		updateAxlAim();
 
+		if (charState.canAttack()){
+			if (player.input.isPressed(Control.Special1, player) 
+			&& !player.input.isHeld(Control.Up, player) 
+			&& !player.input.isHeld(Control.Down, player)
+			&& !player.input.isLeftOrRightHeld(player)){
+				vel.y = -getJumpPower() * 2f;
+			changeState(new EvasionBarrage(), true);
+			invulnTime = 0.2f;
+			}
+			if (player.input.isPressed(Control.Special1, player) 
+			&& !player.input.isHeld(Control.Up, player) 
+			&& !player.input.isHeld(Control.Down, player)
+			&& player.input.isLeftOrRightHeld(player)){
+			changeState(new OcelotSpin(), true);
+			invulnTime = 0.2f;
+			}
+			if (player.input.isPressed(Control.Special1, player) 
+			&& !player.input.isHeld(Control.Up, player) 
+			&& player.input.isHeld(Control.Down, player)
+			&& !player.input.isLeftOrRightHeld(player)){
+			changeState(new RisingBarrage(), true);
+			invulnTime = 0.2f;
+			}
+			if (player.input.isPressed(Control.Special1, player) 
+			&& player.input.isHeld(Control.Up, player) 
+			&& !player.input.isHeld(Control.Down, player)
+			&& !player.input.isLeftOrRightHeld(player)){
+			changeState(new TailShot(), true);
+			invulnTime = 0.4f;
+			}
 	
-		if (dodgeRollCooldown == 0 && player.canControl) {
+		}
+		if (dodgeRollCooldown == 0 && player.canControl && !sprite.name.Contains("hurt")  && !sprite.name.Contains("grabbed")) {
 			
-			if (charState is SwordBlock && player.input.isPressed(Control.Special1, player)) {
+			if (player.input.checkShoryuken(player, xDir , Control.Special1)) {
 				changeState(new RainStorm(isUnderwater()), true);
+				invulnTime = 0.5f;
 			}
 
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player) && canDash()) {
@@ -766,7 +798,7 @@ public class Axl : Character {
 			return true;
 		}
 		if (player.input.isHeld(Control.Up, player) && 
-			!isAttacking() && grounded &&
+			!isAttacking() && grounded && noBlockTime == 0 && !player.input.isHeld(Control.Shoot, player) &&
 			charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());
@@ -786,6 +818,24 @@ public class Axl : Character {
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, ProjIds.GBDKick, player, 1f, 4, 0f);
 		}
+		 if (  sprite.name.Contains("evasionshot"))
+		{
+			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.MechFrogStompShockwave, player,1f, 0);
+		}
+		 if (  sprite.name.Contains("risingbarrage"))
+		{
+			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.BlockableLaunch, player,1f, 0);
+		}
+		 if (  sprite.name.Contains("tailshot"))
+		{
+			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
+		}
+		 if (  sprite.name.Contains("ocelotspin"))
+		{
+			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 0.5f, 1, 0.125f, isDeflectShield: true);
+		}
+
+		
 		return proj;
 	}
 	
@@ -1457,6 +1507,10 @@ public class Axl : Character {
 		charState is VileMK2Grabbed ||
 		charState is SwordBlock ||  
 		charState is RainStorm || 
+		charState is EvasionBarrage || 
+		charState is RisingBarrage || 
+		charState is OcelotSpin || 
+		charState is TailShot || 
 		charState is KnockedDown || sprite.name.Contains("win") || sprite.name.Contains("lose") || ladderClimb || charState is DeadLiftGrabbed || charState is UPGrabbed || charState is WhirlpoolGrabbed || charState is InRideChaser);
 	}
 
@@ -1830,5 +1884,17 @@ public class Axl : Character {
 			}
 		}
 		return targetWeapon;
+	}
+
+	public override bool canAddAmmo() {
+		if (player.weapon == null) { return false; }
+		bool hasEmptyAmmo = false;
+		foreach (Weapon weapon in player.weapons) {
+			if (weapon.canHealAmmo && weapon.ammo < weapon.maxAmmo) {
+				hasEmptyAmmo = true;
+				break;
+			}
+		}
+		return hasEmptyAmmo;
 	}
 }

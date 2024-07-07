@@ -828,13 +828,13 @@ public class GameMode {
 		) {
 			if (level.mainPlayer.currentMaverick.isPuppeteerTooFar()) {
 				Fonts.drawText(
-					FontType.Grey, mw.displayName + " too far to control",
-					Global.halfScreenW, 190, Alignment.Center);
+					FontType.RedishOrange, mw.displayName + " too far to control",
+					Global.halfScreenW, 186, Alignment.Center);
 			} else {
-				Fonts.drawText(
-					FontType.Grey, "Controlling " + mw.displayName, Global.halfScreenW, 190,
+				/*Fonts.drawText(
+					FontType.Grey, "Controlling " + mw.displayName, Global.halfScreenW, 186,
 					Alignment.Center
-				);
+				);*/
 			}
 		}
 		/*
@@ -1248,6 +1248,9 @@ public class GameMode {
 		if (player.isZero && player.character is Zero zero && zero.isNightmareZero) {
 			frameIndex = 7;
 		}
+		if (player.isHighMax) {
+			frameIndex = 7;
+		}
 		if (player.charNum == (int)CharIds.Sigma && player.weapon is  SigmaMenuWeapon) {
 			frameIndex = 5;
 		}
@@ -1407,16 +1410,14 @@ public class GameMode {
 			) {
 				return;
 			}
-			
-			if (player.currentMaverick != null && 
-			player.isMainPlayer && player.currentMaverick.canFly &&
-				player.currentMaverick.flyBar < player.currentMaverick.maxFlyBar
+			if (player.currentMaverick != null && player.isMainPlayer &&
+				player.currentMaverick.canFly && player.currentMaverick.flyBar < player.currentMaverick.maxFlyBar
 			) {
 				renderAmmo(
 					baseX, ref baseY,
 					player.currentMaverick.flyBarIndexes.icon,
 					player.currentMaverick.flyBarIndexes.units,
-					MathF.Ceiling((player.currentMaverick.flyBar / player.currentMaverick.maxAmmo) * 28),
+					MathF.Ceiling((player.currentMaverick.flyBar / player.currentMaverick.maxFlyBar) * 28),
 					maxAmmo: 28, allowSmall: false
 				);
 			}

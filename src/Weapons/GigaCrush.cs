@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class GigaCrush : Weapon {
 	public GigaCrush() : base() {
-		shootSounds = new List<string>() { "dynamocharge", "dynamocharge", "dynamocharge", "dynamocharge" };
+		shootSounds = new string[] { "dynamocharge", "dynamocharge", "dynamocharge", "dynamocharge" };
 		rateOfFire = 1;
 		ammo = 0;
 		index = (int)WeaponIds.GigaCrush;

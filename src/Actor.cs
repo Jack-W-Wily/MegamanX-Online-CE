@@ -73,6 +73,7 @@ public partial class Actor : GameObject {
 	public float gravityWellModifier = 1;
 	public Dictionary<string, float> projectileCooldown { get; set; } = new Dictionary<string, float>();
 	public Dictionary<int, float> flinchCooldown { get; set; } = new Dictionary<int, float>();
+
 	public MusicWrapper musicSource;
 	public bool checkLadderDown = false;
 	public List<DamageText> damageTexts = new List<DamageText>();
@@ -165,6 +166,8 @@ public partial class Actor : GameObject {
 	public float bubbleTime;
 	public float bigBubbleTime;
 	public float waterTime;
+
+	public float timeStopTime;
 
 	public Actor(string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel) {
 		this.pos = pos;
@@ -495,10 +498,16 @@ public partial class Actor : GameObject {
 		}
 
 		if (!locallyControlled) {
-			//frameSpeed = 0;
+			frameSpeed = 0;
+			timeStopTime = 0;
 			sprite.time += Global.spf;
 		}
-
+		if (timeStopTime > 0) {
+			timeStopTime--;
+			if (timeStopTime <= 0) {
+				timeStopTime = 0;
+			}
+		};
 		if (locallyControlled && sprite != null) {
 			int oldFrameIndex = sprite.frameIndex;
 			sprite?.update();
@@ -1125,6 +1134,7 @@ public partial class Actor : GameObject {
 		if (!shouldRender(x, y)) {
 			return;
 		}
+
 		//console.log(this.pos.x + "," + this.pos.y);
 
 		var drawX = MathF.Round(pos.x);
@@ -1418,6 +1428,7 @@ public partial class Actor : GameObject {
 				Iris => "iris",
 				GBD => "tgbd",
 				Zain => "zain",
+				HighMax => "highmax",
 				_ => "error"
 			};
 

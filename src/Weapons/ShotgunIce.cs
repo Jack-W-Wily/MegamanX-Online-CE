@@ -13,7 +13,7 @@ public class ShotgunIce : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 8;
 		weaknessIndex = 4;
-		shootSounds = new List<string>() { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
+		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
 		rateOfFire = 0.5f;
 	}
 
@@ -70,7 +70,6 @@ public class ShotgunIceProj : Projectile {
 			vel = new Point(maxSpeed * velOverride.Value.x, maxSpeed * (velOverride.Value.y * 0.5f));
 		}
 		reflectable = true;
-		useGravity = true;
 		//this.fadeSound = "explosion";
 		if (rpc) {
 			byte[] extraArgs;

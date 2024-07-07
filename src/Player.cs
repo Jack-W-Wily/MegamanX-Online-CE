@@ -160,6 +160,7 @@ public partial class Player {
 	public bool isGBD { get { return charNum == 6; } }
 	public bool isIris { get { return charNum == 7; } }
 	public bool isLumine { get { return charNum == 8; } }
+	public bool isHighMax { get { return charNum == 16; } }
 	public bool isZain { get { return charNum == 14; } }
 
 
@@ -237,6 +238,7 @@ public partial class Player {
 		{ (int)CharIds.Reploid, new List<SubTank>() },
 		{ (int)CharIds.NightmareGhost, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
+		{ (int)CharIds.HighMax, new List<SubTank>() },
 	};
 	// Heart tanks
 	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
@@ -255,6 +257,7 @@ public partial class Player {
 		{ (int)CharIds.NightmareGhost, 0 },
 		{ (int)CharIds.Reploid, 0 },
 		{ (int)CharIds.Zain, 0 },
+		{ (int)CharIds.HighMax, 0 },
 	};
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -267,7 +270,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 20;
+	public const int maxCharCurrencyId = 30;
 	public static int curMul = Helpers.randomRange(2, 8);
 	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
@@ -710,11 +713,13 @@ public partial class Player {
 		}
 		int bonus = 0;
 		if (isSigma) bonus = 4;
+		if (isHighMax) bonus = 8;
 		if (isZain) bonus = 4;
 		if (isDynamo) bonus = 2;
-		if (isVile) bonus = -8;
+		if (isVile) bonus = -10;
 		if (isIris) bonus = -4;
 		if (isAxl) bonus = -4;
+		if (isZero) bonus = -2;
 		return (28 + bonus + (heartTanks * getHeartTankModifier())) * getHealthModifier();
 	}
 
@@ -728,7 +733,7 @@ public partial class Player {
 
 	public void applyLoadoutChange() {
 		loadout = LoadoutData.createFromOptions(id);
-		if (isSigma) loadout.sigmaLoadout.commandMode = 1;// && Global.level.is1v1()) {
+		if (isSigma && loadout.sigmaLoadout.commandMode == 0) loadout.sigmaLoadout.commandMode = 1;// && Global.level.is1v1()) {
 	//		if (maverick1v1 != null) loadout.sigmaLoadout.commandMode = 3;
 	//		else loadout.sigmaLoadout.commandMode = 1;
 	//	}
@@ -1131,7 +1136,14 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			}else if (charNum == (int)CharIds.Iris) {
+			}
+			else if (charNum == (int)CharIds.HighMax) {
+				character = new HighMax(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			}
+			else if (charNum == (int)CharIds.Iris) {
 				character = new Iris(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
@@ -1171,7 +1183,7 @@ public partial class Player {
 				}
 				if (character is Zero zero) {
 					if (loadout.zeroLoadout.hyperMode == 0) {
-						zero.blackZeroTime = 100000;
+						zero.blackZeroTime = 9999;
 						zero.hyperZeroUsed = true;
 					} else {
 						zero.awakenedZeroTime = 0;
@@ -1324,7 +1336,39 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, true, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.Vile) {
+		} 
+		else if (data.charNum == (int)CharIds.Zain) {
+			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (data.charNum == (int)CharIds.Iris) {
+			retChar = new Iris(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (data.charNum == (int)CharIds.GBD) {
+			retChar = new GBD(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (data.charNum == (int)CharIds.Dynamo) {
+			retChar = new Dynamo(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (data.charNum == (int)CharIds.HighMax) {
+			retChar = new HighMax(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, true, isWarpIn: false
+			);
+		}
+
+		else if (data.charNum == (int)CharIds.Vile) {
 			retChar = new Vile(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, true, isWarpIn: false,
@@ -1488,7 +1532,25 @@ public partial class Player {
 		if (charNum == (int)CharIds.Zero) {
 			weapons.Add(new ZSaber(this));
 		}
+		if (charNum == (int)CharIds.Zain) {
+			weapons.Add(new ZSaber(this));
+		}
+		if (charNum == (int)CharIds.Dynamo) {
+			weapons.Add(new DynamoTrick());
+			weapons.Add(new DynamoSword());
+			weapons.Add(new DynamoRoyal(null));
+		}
+	
 		if (charNum == (int)CharIds.BusterZero) {
+			weapons.Add(new KKnuckleWeapon(this));
+		}
+		if (charNum == (int)CharIds.HighMax) {
+			weapons.Add(new KKnuckleWeapon(this));
+		}
+		if (charNum == (int)CharIds.GBD) {
+			weapons.Add(new KKnuckleWeapon(this));
+		}
+		if (charNum == (int)CharIds.Iris) {
 			weapons.Add(new KKnuckleWeapon(this));
 		}
 		if (charNum == (int)CharIds.PunchyZero) {
@@ -1536,7 +1598,13 @@ public partial class Player {
 					this, character.pos.x, character.pos.y, character.xDir,
 					true, dnaNetId, true, isWarpIn: false
 				);
-			} else {
+			} 
+			else if (dnaCore.loadout.sigmaLoadout.sigmaForm == 0) {
+					retChar = new CmdSigma(
+					this, character.pos.x, character.pos.y, character.xDir,
+					true, dnaNetId, true, isWarpIn: false
+				);
+			}else {
 				retChar = new CmdSigma(
 					this, character.pos.x, character.pos.y, character.xDir,
 					true, dnaNetId, true, isWarpIn: false
@@ -1557,7 +1625,38 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else {
+		} 
+		else if (charNum == (int)CharIds.Dynamo) {
+			retChar = new Dynamo(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
+		else if (charNum == (int)CharIds.Iris) {
+			retChar = new Iris(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
+		else if (charNum == (int)CharIds.GBD) {
+			retChar = new GBD(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
+		else if (charNum == (int)CharIds.Zain) {
+			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
+		else if (charNum == (int)CharIds.HighMax) {
+			retChar = new HighMax(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
+		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		if (retChar is Vile vile) {
@@ -1609,7 +1708,7 @@ public partial class Player {
 			zero.zeroDarkHoldWeapon.ammo = dnaCore.rakuhouhaAmmo;
 
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
-				zero.blackZeroTime = zero.maxHyperZeroTime;
+				zero.blackZeroTime = 9999;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
 				zero.awakenedZeroTime = 0;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {

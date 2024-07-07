@@ -323,13 +323,13 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 1) {
 			Fonts.drawText(FontType.Yellow, "LIGHT", optionPos1.x, optionPos1.y, selected: selectArrowPosY == 0 && !showChips);
 		
-			//Fonts.drawText(FontType.Blue, "Grants a headbutt attack on jump.", optionPos1.x + 5, optionPos1.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold Taunt, Press RIGHT", optionPos1.x + 5, optionPos1.y + 10);
 		}
 		
 		if (xGame == 2) {
 				Fonts.drawText(FontType.Yellow, "FALCON", optionPos1.x, optionPos1.y, selected: selectArrowPosY == 0 && !showChips);
 		
-			//Fonts.drawText(FontType.Blue, "Scan and tag enemies with SPECIAL.", optionPos1.x + 5, optionPos1.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold [CMD], Press RIGHT", optionPos1.x + 5, optionPos1.y + 10);
 		}
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos1.x, optionPos1.y, selected: selectArrowPosY == 0 && !showChips);
@@ -347,12 +347,12 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 1) {
 			Fonts.drawText(FontType.Yellow, "GIGA", optionPos2.x, optionPos2.y, selected: selectArrowPosY == 1 && !showChips);
 		
-			//Fonts.drawText(FontType.Blue, string.Format("Reduces damage and flinch received."), optionPos2.x + 5, optionPos2.y + 10);
+			Fonts.drawText(FontType.Blue, string.Format("Hold Taunt, Press DOWN"), optionPos2.x + 5, optionPos2.y + 10);
 		}
 		if (xGame == 2) {
 			Fonts.drawText(FontType.Yellow, "GAEA", optionPos2.x, optionPos2.y, selected: selectArrowPosY == 1 && !showChips);
 		
-			//Fonts.drawText(FontType.Blue, "Grants the Giga Crush attack", optionPos2.x + 5, optionPos2.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold [CMD], Press DOWN", optionPos2.x + 5, optionPos2.y + 10);
 			//Fonts.drawText(FontType.Blue, "and reduces damage received.", optionPos2.x + 5, optionPos2.y + 20);
 		}
 		if (xGame == 3) {
@@ -372,11 +372,11 @@ public class UpgradeArmorMenu : IMainMenu {
 		{
 				Fonts.drawText(FontType.Yellow, "MAX", optionPos3.x, optionPos3.y, selected: selectArrowPosY == 2 && !showChips);
 		
-			//Fonts.drawText(FontType.Blue, "Charge shots 50% faster.", optionPos3.x + 5, optionPos3.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold Taunt, Press UP", optionPos3.x + 5, optionPos3.y + 10);
 		}
 		if (xGame == 2) {
 			Fonts.drawText(FontType.Yellow, "BLADE", optionPos3.x, optionPos3.y, selected: selectArrowPosY == 2 && !showChips);
-			//Fonts.drawText(FontType.Blue, "Store an extra charge shot.", optionPos3.x + 5, optionPos3.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold [CMD], press UP", optionPos3.x + 5, optionPos3.y + 10);
 		}
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos3.x, optionPos3.y, selected: selectArrowPosY == 2 && !showChips);
@@ -395,12 +395,12 @@ public class UpgradeArmorMenu : IMainMenu {
 		if (xGame == 1) {
 			Fonts.drawText(FontType.Yellow, "FORCE", optionPos4.x, optionPos4.y, selected: selectArrowPosY == 3 && !showChips);
 		
-			//Fonts.drawText(FontType.Blue, "Ground dash 15% faster.", optionPos4.x + 5, optionPos4.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold Taunt, Press LEFT", optionPos4.x + 5, optionPos4.y + 10);
 		}
 		if (xGame == 2) {
 			Fonts.drawText(FontType.Yellow, "SHADOW", optionPos4.x, optionPos4.y, selected: selectArrowPosY == 3 && !showChips);
 		
-			//		Fonts.drawText(FontType.Blue, "Air dash 15% faster.", optionPos4.x + 5, optionPos4.y + 10);
+			Fonts.drawText(FontType.Blue, "Hold [CMD], Press LEFT", optionPos4.x + 5, optionPos4.y + 10);
 		}
 		if (xGame == 3) {
 			Fonts.drawText(FontType.Yellow, "", optionPos4.x, optionPos4.y, selected: selectArrowPosY == 3 && !showChips);

@@ -165,7 +165,7 @@ public class RocketPunchProj : Projectile {
 			}
 		}
 
-		if (!reversed && time > maxReverseTime) {
+		if (shooter != null && !reversed && time > maxReverseTime) {
 			reversed = true;
 		}
 		if (reversed) {

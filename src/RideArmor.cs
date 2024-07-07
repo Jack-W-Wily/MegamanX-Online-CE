@@ -469,7 +469,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		bool attackConditionMet = canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;
-		if (ownedByMK5) attackConditionMet = canAttack() && character.player.input.isHeld(Control.WeaponRight, character.player);
+		if (ownedByMK5) attackConditionMet = canAttack() && character.player.input.isHeld(Control.WeaponRight, character.player) && punchCooldown == 0;
 		if (attackConditionMet) {
 			if (rideArmorState is RARun) changeState(new RAIdle(), true);
 			if (rideArmorState is RAJump) changeState(new RAFall(), true);
@@ -1762,7 +1762,7 @@ public class RADash : RideArmorState {
 		var move = getDashVel();
 		rideArmor.move(move);
 		bool isHeldDashAttack = rideArmor.raNum == 4 && player.input.isHeld(Control.Shoot, player);
-		if (rideArmor.raNum == 5) isHeldDashAttack = player.input.isHeld(Control.WeaponLeft, player);
+		if (rideArmor.ownedByMK5) isHeldDashAttack = player.input.isHeld(Control.WeaponLeft, player);
 		if (isHeldDashAttack) {
 			dashTime = 0;
 			dashAttackTime += Global.spf;

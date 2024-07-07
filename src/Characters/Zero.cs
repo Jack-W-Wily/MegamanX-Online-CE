@@ -32,8 +32,9 @@ public class Zero : Character {
 
 
 	public float awakenedZeroTime;
+	public float GenmuZeroTimer;
 	public bool hyperZeroUsed;
-	public bool isNightmareZero;
+	public bool isNightmareZero = Global.level.mainPlayer.loadout.zeroLoadout.hyperMode == 2;
 	//public ShaderWrapper zeroPaletteShader;
 	//public ShaderWrapper nightmareZeroShader;
 	public int quakeBlazerBounces;
@@ -138,9 +139,9 @@ public class Zero : Character {
 
 	public override void update() {
 		base.update();
-	if (player.loadout.zeroLoadout.hyperMode == 2){
-	isNightmareZero = true;
-	}
+	//if (player.loadout.zeroLoadout.hyperMode == 2){
+	//isNightmareZero = true;
+	//}
 
 	if (infectedTime > 8) {
 			awakenedZeroTime = 8;
@@ -241,8 +242,7 @@ public class Zero : Character {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 
 		if (chargeButtonHeld() && (
-				player.currency > 0 && !isNightmareZero ||
-				freeBusterShots > 0 && isNightmareZero ||
+				player.currency > 0 ||
 				player.weapon is AssassinBullet
 			) &&
 			flag == null && rideChaser == null && rideArmor == null
@@ -373,13 +373,26 @@ public class Zero : Character {
 				}
 			}
 		}
-		if (downpressedtimes < 2 && grounded && player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Special1, player)) {
+		if (downpressedtimes >= 2 && grounded && player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.WeaponLeft, player)) {
 				if (rakuhouhaCooldown == 0 && flag == null) {
-			
+					downpressedtimes = 0;
 				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
 				if (gigaWeapon.ammo >= 16) {
 					zeroGigaAttackWeapon.addAmmo(-16, player);		
 					changeState(new Rakuhouha(zeroGigaAttackWeapon), true);				
+				}
+			}
+		}
+		if ((isNightmareZero || isAwakenedZero())
+		&& downpressedtimes >= 2 
+		&& grounded && player.input.isHeld(Control.Down, player) 
+		&& player.input.isPressed(Control.WeaponRight, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+				downpressedtimes = 0;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= 16) {
+					zeroGigaAttackWeapon.addAmmo(-16, player);		
+					changeState(new ShinMasenkou(zeroGigaAttackWeapon), true);				
 				}
 			}
 		}
@@ -455,9 +468,11 @@ public class Zero : Character {
 		//>>>>>>>>>>>>>>>>>
 		//Giga Canceling everything
 
+		//Giga Attacks
+
 		if (downpressedtimes >= 2 && player.input.isPressed(Control.Special1, player)) {
 				if (rakuhouhaCooldown == 0 && flag == null) {
-				spcActivated = true;
+				
 				downpressedtimes = 0;
 				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
 				if (gigaWeapon.ammo >= 10) {
@@ -466,9 +481,9 @@ public class Zero : Character {
 				}
 			}
 		}
-		if (downpressedtimes < 2 && grounded && player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Special1, player)) {
-				if (spcPressed && rakuhouhaCooldown == 0 && flag == null) {
-				spcActivated = true;
+		if (downpressedtimes >= 2 && grounded && player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.WeaponLeft, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+					downpressedtimes = 0;
 				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
 				if (gigaWeapon.ammo >= 16) {
 					zeroGigaAttackWeapon.addAmmo(-16, player);		
@@ -476,6 +491,31 @@ public class Zero : Character {
 				}
 			}
 		}
+		if ((isNightmareZero || isAwakenedZero())
+		&& downpressedtimes >= 2 
+		&& grounded && player.input.isHeld(Control.Down, player) 
+		&& player.input.isPressed(Control.WeaponRight, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+				downpressedtimes = 0;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= 16) {
+					zeroGigaAttackWeapon.addAmmo(-16, player);		
+					changeState(new ShinMasenkou(zeroGigaAttackWeapon), true);				
+				}
+			}
+		}
+		
+		if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.WeaponLeft, player) && player.input.isPressed(Control.WeaponRight, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+			
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (gigaWeapon.ammo >= 32) {
+					zeroGigaAttackWeapon.addAmmo(-32, player);		
+					changeState(new Rekkoha(zeroGigaAttackWeapon), true);					
+				}
+			}
+		}
+		
 		
 		if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.WeaponLeft, player) && player.input.isPressed(Control.WeaponRight, player)) {
 				if (rakuhouhaCooldown == 0 && flag == null) {
@@ -487,13 +527,36 @@ public class Zero : Character {
 				}
 			}
 		}
-		if (downpressedtimes >= 2 && player.input.isPressed(Control.Taunt, player)) {
+		// Dark Hold Activation
+		if (!isNightmareZero && downpressedtimes >= 2 && player.input.isPressed(Control.Taunt, player)) {
 				if (rakuhouhaCooldown == 0 && flag == null) {
 				spcActivated = true;
 				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
 				if (gigaWeapon.ammo >= 32) {
 					zeroGigaAttackWeapon.addAmmo(-32, player);		
 					changeState(new DarkHoldS(zeroGigaAttackWeapon), true);					
+				}
+			}
+		}
+		// Dark Hold Activation Nightmare Zero
+		if (isNightmareZero && downpressedtimes >= 2 && player.input.isPressed(Control.Taunt, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+				spcActivated = true;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (freeBusterShots > 1) {
+					freeBusterShots -= 2;
+					changeState(new DarkHoldS(zeroGigaAttackWeapon), true);					
+				}
+			}
+		}
+		// Genmui Activation Nightmare Zero
+		if (isNightmareZero && downpressedtimes >= 2 && player.input.isPressed(Control.Special2, player)) {
+				if (rakuhouhaCooldown == 0 && flag == null) {
+				spcActivated = true;
+				float gigaAmmoUsage = gigaWeapon.getAmmoUsage(0);
+				if (freeBusterShots > 1) {
+					freeBusterShots -= 2;
+					changeState(new GenmuState(), true);					
 				}
 			}
 		}
@@ -676,7 +739,7 @@ public class Zero : Character {
 		if (changedState) {
 			return true;
 		}
-		if (player.isZSaber() && grounded && (
+		if (player.isZSaber() && grounded && !isNightmareZero && noBlockTime == 0 && (
 				player.input.isHeld(Control.WeaponLeft, player) ||
 				(player.input.isHeld(Control.WeaponRight, player) && !isAwakenedZero())
 			) && (
@@ -690,7 +753,7 @@ public class Zero : Character {
 		 if (!isDashing && (
 				  player.input.isPressed(Control.WeaponLeft, player) ||
 				  player.input.isPressed(Control.WeaponRight, player)
-			  ) && (
+			  ) && noBlockTime == 0 && (
 				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
 			  )
 		  ) {
@@ -698,10 +761,10 @@ public class Zero : Character {
 				changeState(new SwordBlock());
 				return true;
 			}
-			 else if (parryCooldown == 0 && isNightmareZero) {
+			 if (player.input.isHeld(Control.Up, player) && parryCooldown == 0 && isNightmareZero) {
 				changeState(new KKnuckleParryStartState());
 				return true;
-				}
+			}
 			
 		}
 		return false;
@@ -742,7 +805,7 @@ public class Zero : Character {
 			);
 		} else if (sprite.name.Contains("hyouretsuzan")) {
 			return new GenericMeleeProj(
-				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan, player, 1, 12, 0.15f
+				new HyouretsuzanWeapon(player), centerPoint, ProjIds.Hyouretsuzan2, player, 1, 0, 0.15f
 			);
 		} else if (sprite.name.Contains("rakukojin")) {
 			float damage = 3 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
@@ -880,13 +943,13 @@ public class Zero : Character {
 				new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2, 4, 0.25f
 			),
 			"superzero_attack" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 3, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaber1, player, 1, 4, 0.25f, isReflectShield: false
 			),
 			"superzero_attack2" => new GenericMeleeProj(
-				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 3, 0.25f, isReflectShield: false
+				zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 1, 10, 0.25f, isReflectShield: false
 			),
 			"superzero_attack3" => new GenericMeleeProj(
-					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 20, 0.25f, isReflectShield: false
+					zSaberWeapon, centerPoint, ProjIds.ZSaber2, player, 2, 25, 0.25f, isReflectShield: false
 			),
 			"superzero_hyoroga_attack" =>  new GenericMeleeProj(
 				zeroAirSpecialWeapon, centerPoint, ProjIds.HyorogaSwing, player, 4, 1, 0.25f
@@ -1045,7 +1108,7 @@ public class Zero : Character {
 			// >>>>>>>>>>>>>>>
 			// New buster type changes
 			int type = 0;
-			if (player.isZBusterZero()) {
+			if (player.isZBusterZero() || isNightmareZero) {
 			type = 1;
 			}
 			if (!player.isZBusterZero() && !isBlackZero() && !isNightmareZero){
@@ -1142,6 +1205,7 @@ public class Zero : Character {
 	public bool canUseDoubleBusterCombo() {
 		if (isBlackZero()) return true;
 		if (player.isZBusterZero()) return true;
+		if (isNightmareZero) return true;
 		return false;
 	}
 
@@ -1169,7 +1233,7 @@ public class Zero : Character {
 	}
 
 	public bool isAwakenedGenmuZero() {
-		return awakenedZeroTime >= 30 * 60;
+		return GenmuZeroTimer >= 15;
 	}
 
 	public float awakenedCurrencyTime;
@@ -1177,6 +1241,7 @@ public class Zero : Character {
 	public int awakenedAuraFrame;
 	public void updateAwakenedZero() {
 		awakenedZeroTime += Global.speedMul;
+		GenmuZeroTimer += Global.spf;
 		awakenedCurrencyTime += Global.speedMul;
 		int currencyDeductTime = 60;
 		if (isAwakenedGenmuZero()) {

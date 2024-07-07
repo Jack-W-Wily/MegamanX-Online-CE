@@ -120,6 +120,252 @@ public class Hover : CharState {
 }
 
 
+public class OcelotSpin : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public OcelotSpin(string transitionSprite = "")
+		: base("ocelotspin", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+public class TailShot : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public TailShot(string transitionSprite = "")
+		: base("tailshot", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+public class EvasionBarrage : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public EvasionBarrage(string transitionSprite = "")
+		: base("evasionshot", "", "", transitionSprite)
+	{
+	
+	}
+
+	float projTime;
+
+	public override void update()
+	{
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-90 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-80 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+			var gunpos = character.getFirstPOI();
+		
+			if (character.sprite.frameIndex >= 2 && character.currentFrame.POIs.Count > 0) {
+			character.move(new Point(character.xDir * 150, -120f));
+			Point poi = character.currentFrame.POIs[0];
+			projTime += Global.spf;
+			if (projTime > 0.06f) {
+				projTime = 0;
+				var anim = new Anim(character.getCenterPos(), "shoryuken_fade", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+				anim.vel = new Point(-character.xDir * 50, 25);	
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), gunpos.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				character.playSound("axlBullet", sendRpc: true);
+			}
+		} 
+
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+public class RisingBarrage : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public RisingBarrage(string transitionSprite = "")
+		: base("risingbarrage", "", "", transitionSprite)
+	{
+	
+	}
+
+	float projTime;
+
+public override void update()
+	{
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-90 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-80 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		var gunpos = character.getFirstPOI();
+		
+			if (character.sprite.frameIndex >= 2 && character.currentFrame.POIs.Count > 0) {
+			character.move(new Point(character.xDir * 150, -120f));
+			Point poi = character.currentFrame.POIs[0];
+			projTime += Global.spf;
+			
+			if (projTime > 0.06f) {
+				projTime = 0;
+				var anim = new Anim(character.pos, "shoryuken_fade", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+				anim.vel = new Point(-character.xDir * 50, 25);	
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), gunpos.Value, character.xDir, true, player, player.getNextActorNetId(), sendRpc: true);
+				character.playSound("axlBullet", sendRpc: true);
+			}
+		} 
+
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
 public class RainStorm : CharState {
 	bool jumpedYet;
 	float timeInWall;
@@ -131,7 +377,6 @@ public class RainStorm : CharState {
 	public RainStorm(bool isUnderwater) : base("rainstorm", "", "") {
 		this.isUnderwater = isUnderwater;
 		superArmor = true;
-		invincible = true;
 		airMove = true;
 		useDashJumpSpeed = true;
 	}
@@ -148,6 +393,7 @@ public class RainStorm : CharState {
 			character.dashedInAir++;
 			character.vel.y = -character.getJumpPower() * 1.5f;
 		}
+			var gunpos = character.getFirstPOI();
 		
 		if (character.sprite.frameIndex >= 2 && character.currentFrame.POIs.Count > 0) {
 			character.move(new Point(character.xDir * 150, -120f));
@@ -157,7 +403,7 @@ public class RainStorm : CharState {
 				projTime = 0;
 				var anim = new Anim(character.getCenterPos(), "shoryuken_fade", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
 				anim.vel = new Point(-character.xDir * 50, 25);	
-				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), character.pos, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
+				new FlamethrowerProj(new VileFlamethrower(VileFlamethrowerType.WildHorseKick), gunpos.Value, character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
 				character.playSound("axlBullet", sendRpc: true);
 			}
 		} 

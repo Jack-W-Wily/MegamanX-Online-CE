@@ -312,3 +312,85 @@ public class VileHover : CharState {
 
 	}
 }
+
+
+
+
+public class JudgeMentCut : CharState {
+
+	private bool shot;
+	private float partTime;
+
+	private float chargeTime;
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public JudgeMentCut(string transitionSprite = "")
+		: base("super_shoot", "", "", transitionSprite)
+	{
+		airMove = true;
+	}
+
+	public override void update()
+	{
+
+		Point poi;
+		poi = character.getFirstPOIOrDefault();
+		
+		if (!shot){
+			shot = true;
+		Point spawnPos2 = poi.addxy(50 * character.xDir, -20f);
+		
+			Actor closestTarget2 = Global.level.getClosestTarget(poi, base.player.alliance, checkWalls: true, 150f);
+			if (closestTarget2 != null)
+			{
+				spawnPos2.x = closestTarget2.pos.x;
+			}
+		 chargeTime = 0;
+			new GBeetleGravityWellProj(player.weapon, spawnPos2,
+			 character.xDir, chargeTime, player, player.getNextActorNetId()
+			 , sendRpc: true);
+		}
+		if (pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}//Grappler Cancel
+		if (character.shiningSparkStacks > 10 && base.player.input.isPressed("dash", base.player))
+		{
+			character.changeToIdleOrFall();
+		}//Grappler Taunt Cancel
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+		character.playSound("judgementcut", forcePlay: false, sendRpc: true);
+}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+	

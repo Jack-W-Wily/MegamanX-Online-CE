@@ -25,7 +25,7 @@ public class GBD : Character {
 public override bool normalCtrl() {
 	
 		if (player.input.isHeld(Control.Up, player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() && grounded && noBlockTime == 0 &&
 			charState is not SwordBlock
 		) {
 			changeState(new SwordBlock());

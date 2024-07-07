@@ -11,7 +11,7 @@ public class Tornado : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
 		weaknessIndex = 2;
-		shootSounds = new List<string>() { "tornado", "tornado", "tornado", "buster3" };
+		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
 		rateOfFire = 2f;
 		switchCooldown = 0.5f;
 	}
@@ -162,7 +162,7 @@ public class TornadoProjCharged : Projectile {
 	 Point pos, int xDir, Player player,  ushort netProjId) 
 	 : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", 0, 2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TornadoCharged;
-		sprite.visible = false;
+		sprite.visible = true;
 		spriteStart = Global.sprites["tornado_charge"].clone();
 		for (var i = 0; i < maxLength; i++) {
 			var midSprite = Global.sprites["tornado_charge"].clone();

@@ -334,7 +334,10 @@ public enum ProjIds {
 	Buster3,
 	Buster4,
 	BusterUnpo,
+	BusterX3Proj1,
 	BusterX3Proj2,
+	BusterX3Proj3,
+	BusterX3Proj4,
 	BusterX3Plasma,
 	BusterX3PlasmaHit,
 	Torpedo,
@@ -761,6 +764,14 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+
+	// Highmax
+	HighmaxPunch,
+	HighmaxStun,
+	HighmaxBall1,
+	HighmaxBall2,
+	HighmaxBall3,
+
 
 	// Special damage types.
 	SelfDmg = 30000,

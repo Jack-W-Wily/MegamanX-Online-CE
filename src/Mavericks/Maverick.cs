@@ -54,14 +54,27 @@ public class Maverick : Actor, IDamagable {
 	public (int icon, int units) barIndexes = (0, 0);
 
 	// Movement.
+	public bool canStomp;
 	public float dashSpeed = 1;
-	public bool isHeavy;
 	public bool canClimb;
 	public bool canClimbWall;
 	public bool canFly;
 	public float maxFlyBar = 16;
+
+	public float maverickHealthRegenTimer;
+	public float canRegen = 0;
+
 	public float flyBar = 16;
 	public (int icon, int units) flyBarIndexes = (0, 0);
+
+	// Defense.
+	public float weaknessCooldown;
+	public ArmorClass armorClass = ArmorClass.Medium;
+	public enum ArmorClass {
+		Light,
+		Medium,
+		Heavy
+	}
 
 	// Other vars.
 	public float width;
@@ -212,7 +225,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 
-
+	
 
 	public virtual void setHealth(float lastHealth) {
 		health = lastHealth;
@@ -231,6 +244,7 @@ public class Maverick : Actor, IDamagable {
 		base.update();
 
 		Helpers.decrementTime(ref invulnTime);
+		Helpers.decrementTime(ref weaknessCooldown);
 
 		if (grounded) {
 			lastGroundedPos = pos;
@@ -327,6 +341,17 @@ public class Maverick : Actor, IDamagable {
 
 		if (player == null) return;
 
+		//New pup mav regen system
+		if (player.isPuppeteer() && health < 3 ) {
+			changeState(new MExit(pos, true));
+			canRegen = 1;
+		}
+		if (canRegen > 0)addHealth(1, false);
+		if (health == maxHealth) canRegen = 0;
+		//
+
+
+
 		if (player.isStriker()) {
 			strikerTime += Global.spf;
 			if (strikerTime > 3) {
@@ -339,8 +364,16 @@ public class Maverick : Actor, IDamagable {
 				}
 			}
 		}
+	}
 
+	public override void stateUpdate() {
+		base.stateUpdate();
 		state.update();
+	}
+	
+	public override void statePostUpdate() {
+		base.statePostUpdate();
+		state.stateFrame += 1f * Global.speedMul;
 	}
 
 	public override void onCollision(CollideData other) {
