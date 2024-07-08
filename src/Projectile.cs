@@ -9,8 +9,8 @@ public class Projectile : Actor {
 	public Player owner {
 		get { return damager.owner; }
 	}
-	public string fadeSprite;
-	public string fadeSound;
+	public string fadeSprite = "";
+	public string fadeSound = "";
 	public float time = 0;
 	public float maxTime = float.MaxValue;
 	public bool fadeOnAutoDestroy;
@@ -35,14 +35,43 @@ public class Projectile : Actor {
 	public bool isDeflectShield;
 	public bool shouldVortexSuck = true;
 	bool damagedOnce;
-	public ShaderWrapper nightmareZeroShader;
 	//public int? destroyFrames;
 	public Player ownerPlayer;
-	public Actor hitboxActor;
+	public Actor? hitboxActor;
 
 	public bool isMelee;
 	public int meleeId = -1;
-	public Actor owningActor;
+	public bool isOwnerLinked;
+	public Actor? owningActor;
+
+	const float leeway = 500;
+
+	public float wallCrawlSpeed = 250;
+	public bool wallCrawlUpdateAngle;
+
+	bool clangedOnce;
+	bool acidFadeOnce;
+	
+	public float shieldBounceTimeX = 0;
+	public float shieldBounceTimeY = 0;
+	public float shieldBounceMaxTime = 0.25f;
+	public float halfShieldBounceMaxTime => (shieldBounceMaxTime / 2f);
+	
+	// Wall crawl.
+	public struct WallPathNodeData {
+		public WallPathNode bestStartNode;
+		public Point? bestPointOnLine;
+		public float minDist;
+	}
+	int wallCrawlDir = 1;
+	WallPathNode? currentNode;
+	// Legacy wall crawl stuff.
+	bool useLegacyWallCrawl;
+	GameObject? currentWall;
+	List<Point> dests = new();
+	int? destIndex;
+	float initWallCooldown;
+	
 
 	public Projectile(
 		Weapon weapon, Point pos, int xDir, float speed, float damage,
@@ -141,7 +170,6 @@ public  void isGaeaproj() {
 		return (int)(Helpers.to360(angle.Value) * 0.5f);
 	}
 
-	const float leeway = 500;
 	public override void update() {
 		base.update();
 
@@ -200,14 +228,8 @@ public  void isGaeaproj() {
 		*/
 	}
 
-	public override List<ShaderWrapper> getShaders() {
+	public override List<ShaderWrapper>? getShaders() {
 		var shaders = new List<ShaderWrapper>();
-		if (owner?.character?.isNightmareZeroBS.getValue() == true && Global.shaders.ContainsKey("nightmareZero")) {
-			if (nightmareZeroShader == null) {
-				nightmareZeroShader = ownerPlayer.nightmareZeroShader;
-			}
-			shaders.Add(nightmareZeroShader);
-		}
 		if (shaders.Count > 0) {
 			return shaders;
 		} else {
@@ -367,7 +389,7 @@ public  void isGaeaproj() {
 		if (!defender.sprite.name.Contains("attack") 
 		&& !defender.sprite.name.Contains("block")) return false;
 		if (defender.sprite.name.Contains("sigma2")) return false;
-		if ((attacker as Zero)?.isHyperZero() == true) return false;
+		if ((attacker as Zero)?.hypermodeActive() == true) return false;
 
 		// Not facing each other
 		if (attacker.pos.x >= defender.pos.x && (attacker.xDir != -1 || defender.xDir != 1)) return false;
@@ -384,7 +406,6 @@ public  void isGaeaproj() {
 		return (this is GenericMeleeProj || this is SigmaSlashProj);
 	}
 
-	bool clangedOnce;
 	public override void onCollision(CollideData other) {
 		if (weapon == null) return;
 		//if (destroyed) return;    // If this causes issues use the destroyFrames system instead
@@ -734,7 +755,6 @@ public  void isGaeaproj() {
 		rpcCreateHelper(pos, player, netProjId, byteAngle, true, extraData);
 	}
 
-	bool acidFadeOnce;
 	public void acidFadeEffect() {
 		if (!acidFadeOnce) acidFadeOnce = true;
 		else return;
@@ -782,11 +802,6 @@ public  void isGaeaproj() {
 		}
 	}
 
-	public float shieldBounceTimeX = 0;
-	public float shieldBounceTimeY = 0;
-	public float shieldBounceMaxTime = 0.25f;
-	public float halfShieldBounceMaxTime { get { return shieldBounceMaxTime / 2f; } }
-
 	public void updateBubbleBounce() {
 		if (shieldBounceTimeY > 0) {
 			shieldBounceTimeY += Global.spf;
@@ -831,12 +846,6 @@ public  void isGaeaproj() {
 		}
 	}
 
-	public float wallCrawlSpeed = 250;
-	public bool wallCrawlUpdateAngle;
-
-	int wallCrawlDir = 1;
-	WallPathNode currentNode;
-	bool useLegacyWallCrawl;
 
 	public void setupWallCrawl(Point initialMoveDir) {
 		useLegacyWallCrawl = Global.level.levelData.wallPathNodes.Count == 0;
@@ -855,12 +864,6 @@ public  void isGaeaproj() {
 		} else {
 			updateModernWallCrawl();
 		}
-	}
-
-	public struct WallPathNodeData {
-		public WallPathNode bestStartNode;
-		public Point? bestPointOnLine;
-		public float minDist;
 	}
 
 	public WallPathNodeData getBestWallPath(List<WallPathNode> wallPaths) {
@@ -939,10 +942,6 @@ public  void isGaeaproj() {
 	}
 
 	#region legacy wall crawl code, still needed for maps without wall paths
-	GameObject currentWall;
-	List<Point> dests;
-	int? destIndex;
-	float initWallCooldown;
 
 	public void setupLegacyWallCrawl() {
 		var wallCollideDatas = Global.level.getTriggerList(this, 0, 0, null, typeof(Wall));

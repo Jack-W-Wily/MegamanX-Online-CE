@@ -1,0 +1,171 @@
+﻿using System;
+
+namespace MMXOnline;
+
+public enum ZeroAttackLoadoutType {
+	ZSaber,
+	KKnuckle,
+	ZBuster,
+}
+
+public class ZSaber : Weapon {
+	public static ZSaber staticWeapon = new();
+
+	public ZSaber() : base() {
+		//damager = new Damager(player, 3, 0, 0.5f);
+		index = (int)WeaponIds.ZSaber;
+		weaponBarBaseIndex = 21;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 48;
+		killFeedIndex = 9;
+		type = (int)ZeroAttackLoadoutType.ZSaber;
+		displayName = "Z-Saber";
+		description = new string[] { "Zero's trusty beam saber." };
+	}
+}
+
+public class ShippuugaWeapon : Weapon {
+	public static ShippuugaWeapon staticWeapon = new();
+
+	public ShippuugaWeapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.5f);
+		index = (int)WeaponIds.Shippuuga;
+		weaponBarBaseIndex = 21;
+		killFeedIndex = 39;
+	}
+}
+
+public class KKnuckleWeapon : Weapon {
+	public KKnuckleWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.25f);
+		index = (int)WeaponIds.KKnuckle;
+		weaponBarBaseIndex = 21;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 120;
+		killFeedIndex = 106;
+		type = (int)ZeroAttackLoadoutType.KKnuckle;
+		displayName = "K-Knuckle";
+		description = new string[] { "Use your fists to teach foes a lesson." };
+	}
+}
+
+public class Shingetsurin : Weapon {
+	public static Shingetsurin netWeapon = new();
+
+	public Shingetsurin() : base() {
+		index = (int)WeaponIds.Shingetsurin;
+		killFeedIndex = 85;
+		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	}
+}
+
+public class ZSaberProjSwing : Weapon {
+	public ZSaberProjSwing() : base() {
+		index = (int)WeaponIds.ZSaberProjSwing;
+		killFeedIndex = 9;
+		//damager = new Damager(player, 3, Global.defFlinch, 0.5f);
+	}
+}
+
+
+public class RaijingekiWeapon : Weapon {
+	public static RaijingekiWeapon staticWeapon = new();
+
+	public RaijingekiWeapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.Raijingeki;
+		weaponBarBaseIndex = 22;
+		weaponBarIndex = weaponBarBaseIndex;
+		killFeedIndex = 10;
+		type = (int)GroundSpecialType.Raijingeki;
+		displayName = "Raijingeki";
+		description = new string[] { "Powerful lightning attack." };
+	}
+
+	public static Weapon getWeaponFromIndex(int index) {
+		return index switch {
+			(int)GroundSpecialType.Raijingeki => new RaijingekiWeapon(),
+			(int)GroundSpecialType.Suiretsusen => new SuiretsusenWeapon(),
+			(int)GroundSpecialType.TBreaker => new TBreakerWeapon(),
+			_ => throw new Exception("Invalid Zero air special weapon index!")
+		};
+	}
+
+	public override void attack(Character character) {
+		character.changeState(new Raijingeki(false), true);
+	}
+
+	public override void attack2(Character character) {
+		character.changeState(new Raijingeki(true), true);
+	}
+}
+
+public class Raijingeki2Weapon : Weapon {
+	public static Raijingeki2Weapon staticWeapon = new();
+
+	public Raijingeki2Weapon() : base() {
+		//damager = new Damager(player, 2, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.Raijingeki2;
+		weaponBarBaseIndex = 40;
+		killFeedIndex = 35;
+	}
+}
+
+public class TBreakerWeapon : Weapon {
+	public static TBreakerWeapon staticWeapon = new();
+
+	public TBreakerWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.TBreaker;
+		killFeedIndex = 107;
+		type = (int)GroundSpecialType.TBreaker;
+		displayName = "T-Breaker";
+		description = new string[] { "A mighty hammer that can shatter barriers." };
+	}
+
+	public override void attack(Character character) {
+		character.changeState(new TBreakerState(false), true);
+	}
+
+	public override void attack2(Character character) {
+		character.changeState(new TBreakerState(true), true);
+	}
+}
+
+public class SuiretsusenWeapon : Weapon {
+	public static SuiretsusenWeapon staticWeapon = new();
+
+	public SuiretsusenWeapon() : base() {
+		//damager = new Damager(player, 3, Global.defFlinch, 0.06f);
+		index = (int)WeaponIds.Suiretsusen;
+		killFeedIndex = 110;
+		type = (int)GroundSpecialType.Suiretsusen;
+		displayName = "Suiretsusen";
+		description = new string[] { "Water element glaive with good reach." };
+	}
+
+	public override void attack(Character character) {
+		character.changeState(new SuiretsusanState(false), true);
+	}
+
+	public override void attack2(Character character) {
+		character.changeState(new SuiretsusanState(true), true);
+	}
+}
+
+public class AwakenedAura : Weapon {
+	public AwakenedAura() : base() {
+		index = (int)WeaponIds.AwakenedAura;
+		killFeedIndex = 87;
+		//damager = new Damager(player, 2, 0, 0.5f);
+	}
+}
+
+public class Genmu : Weapon {
+	public static Genmu netWeapon = new();
+
+	public Genmu() : base() {
+		index = (int)WeaponIds.Gemnu;
+		killFeedIndex = 84;
+	}
+}
