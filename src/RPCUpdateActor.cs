@@ -6,7 +6,12 @@ using Lidgren.Network;
 namespace MMXOnline;
 
 public partial class Actor {
-	public void sendActorNetData() {
+	public virtual List<byte>? getCustomActorNetData() {
+		return null;
+	}
+	public virtual void updateCustomActorNetData(byte[] data) { }
+
+	public virtual void sendActorNetData() {
 		byte[] networkIdBytes = Helpers.convertToBytes((ushort)netId);
 		if ((netId == 10 || netId == 11) && this is not Flag) {
 			//string msg = string.Format(
@@ -60,7 +65,7 @@ public partial class Actor {
 		}
 		// add angle
 		if (mask[4]) {
-			byte[] angleBytes = BitConverter.GetBytes((float)byteAngle);
+			byte[] angleBytes = BitConverter.GetBytes(byteAngle ?? 0);
 			args.AddRange(angleBytes);
 		}
 
@@ -68,199 +73,10 @@ public partial class Actor {
 		byte[] spriteBytes = BitConverter.GetBytes((ushort)spriteIndex);
 		args.AddRange(spriteBytes);
 
-		// Add character stuff
-		if (this is Character character) {
-			// This gets parsed in RPCUpdateActor
-			bool[] charMask = new bool[8];
-			charMask[0] = character.acidTime > 0;
-			charMask[1] = character.burnTime > 0;
-			charMask[2] = character.chargeTime > 0;
-			charMask[3] = character.igFreezeProgress > 0;
-			charMask[4] = character.oilTime > 0;
-			charMask[5] = character.infectedTime > 0;
-			charMask[6] = character.vaccineTime > 0;
-			charMask[7] = false;
-			byte charMaskByte = Helpers.boolArrayToByte(charMask);
-
-			int weaponIndex = character.player.weapon.index;
-			if (weaponIndex == (int)WeaponIds.HyperBuster) {
-				weaponIndex = character.player.weapons[character.player.hyperChargeSlot].index;
-			}
-			int health = MathInt.Ceiling(character.player.health);
-			int maxHealth = MathInt.Ceiling(character.player.maxHealth);
-			if (character.player.currentMaverick != null) {
-				health = MathInt.Ceiling(character.player.currentMaverick.health);
-				maxHealth = MathInt.Ceiling(character.player.currentMaverick.maxHealth);
-			}
-
-			int ammo = character.player.weapon == null ? 0 : (int)character.player.weapon.ammo;
-			int charIndex = character.player.charNum;
-			int alliance = character.player.alliance;
-			if (character.rideArmor != null) ammo = MathInt.Ceiling(character.rideArmor.health);
-
-			args.Add(charMaskByte);
-			args.Add((byte)weaponIndex);
-			args.Add((byte)health);
-			args.Add((byte)maxHealth);
-			args.Add((byte)ammo);
-			args.Add((byte)charIndex);
-			args.Add((byte)alliance);
-			args.Add(character.updateAndGetNetCharState1());  // Packs bool states (BS's) into one byte
-			args.Add(character.updateAndGetNetCharState2());
-			args.Add(character.updateAndGetNetCharState3());
-			args.Add(character.updateAndGetNetCharState4());
-			args.Add((byte)character.player.currency);
-			
-
-			if (character is MegamanX mmx) {
-				byte[] armorBytes = BitConverter.GetBytes(character.player.armorFlag);
-				args.AddRange(armorBytes);
-			}
-			if (character is Zero zero) {
-				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
-			}
-			if (character is Vile vile) {
-				ammo = (int)character.player.vileAmmo;
-				args.Add((byte)vile.cannonAimNum);
-			}
-			if (character is Axl axl) {
-
-		
-				byte axlArmAngle = Helpers.angleToByte(axl.netArmAngle);
-				args.Add(axlArmAngle);
-				byte[] netAxlArmSpriteIndexBytes = BitConverter.GetBytes(
-					Global.spriteIndexByName.GetValueOrCreate(axl.getAxlArmSpriteName(), ushort.MaxValue)
-				);
-				args.AddRange(netAxlArmSpriteIndexBytes);
-				args.Add((byte)character.player.axlBulletType);
-			}
-			if (character is BaseSigma sigma) {
-				ammo = (int)character.player.sigmaAmmo;
-			}
-			// Status effects.
-			if (charMask[0]) {
-				args.Add((byte)(int)(character.acidTime * 20));
-			}
-			if (charMask[1]) {
-				args.Add((byte)(int)(character.burnTime * 20));
-			}
-			if (charMask[2]) {
-				args.Add((byte)(int)(character.chargeTime * 20));
-			}
-			if (charMask[3]) {
-				args.Add((byte)(int)(character.igFreezeProgress * 20));
-			}
-			// We don't have room for more individual status flags. So just cram all the rarest statuses in the 7th flag
-			// Gacel: What the actual hell GM19. We have room.
-			if (charMask[5]) {
-				args.Add((byte)(int)(character.oilTime * 20));
-			}
-			if (charMask[6]) {
-				args.Add((byte)(int)(character.infectedTime * 20));
-			}
-			if (charMask[7]) {
-				args.Add((byte)(int)(character.vaccineTime * 20));
-			}
-
-			byte[] raNetIdBytes = BitConverter.GetBytes(character.rideArmor?.netId ?? 0);
-			args.AddRange(raNetIdBytes);
-
-			if (Global.level.supportsRideChasers) {
-				byte[] rcNetIdBytes = BitConverter.GetBytes(character.rideChaser?.netId ?? 0);
-				args.AddRange(rcNetIdBytes);
-			}
-		} else if (this is Maverick maverick) {
-			args.Add((byte)(int)(maverick.alpha * 100));
-			args.Add((byte)MathF.Ceiling(maverick.health));
-			args.Add((byte)(int)(maverick.invulnTime * 20));
-
-			if (this is StingChameleon sc) {
-				args.Add((byte)(sc.isInvisible ? 1 : 0));
-			} else if (this is WireSponge ws) {
-				byte[] chargeTime = BitConverter.GetBytes(ws.chargeTime);
-				args.AddRange(chargeTime);
-			} else if (this is WheelGator wg) {
-				args.Add((byte)(int)(wg.damageEaten * 10));
-			} else if (this is MorphMothCocoon mmc) {
-				args.Add((byte)mmc.currencyAbsorbed);
-				byte[] xBytes = BitConverter.GetBytes(mmc.latchPos.x);
-				args.AddRange(xBytes);
-				byte[] yBytes = BitConverter.GetBytes(mmc.latchPos.y);
-				args.AddRange(yBytes);
-			} else if (this is MagnaCentipede ms) {
-				args.Add((byte)(ms.reversedGravity ? 1 : 0));
-			}
-		} else if (this is RideArmor ra) {
-			args.Add((byte)ra.raNum);
-			args.Add((byte)(ra.character != null ? 1 : 0)); // 1 means riding it, 0 means not
-			args.Add((byte)(ra.neutralId));
-			args.Add((byte)MathF.Ceiling(ra.health));
-		} else if (this is RideChaser rc) {
-			args.Add((byte)rc.drawState);
-			args.Add((byte)(rc.character != null ? 1 : 0)); // 1 means riding it, 0 means not
-			args.Add((byte)(rc.neutralId));
-			args.Add((byte)MathF.Ceiling(rc.health));
-		} else if (this is Flag flag) {
-			var chrNetIdBytes = BitConverter.GetBytes(flag.chr?.netId ?? 0);
-			args.AddRange(chrNetIdBytes);
-			args.Add(flag.hasUpdraft() ? (byte)1 : (byte)0);
-			args.Add(flag.pickedUpOnce ? (byte)1 : (byte)0);
-			args.Add((byte)(int)flag.timeDropped);
-		} else if (this is WSpongeSideChainProj sideChain) {
-			byte[] xBytes = BitConverter.GetBytes(sideChain.netOrigin.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(sideChain.netOrigin.y);
-			args.AddRange(yBytes);
-		} else if (this is WSpongeUpChainProj upChain) {
-			byte[] xBytes = BitConverter.GetBytes(upChain.netOrigin.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(upChain.netOrigin.y);
-			args.AddRange(yBytes);
-		} else if (this is BBuffaloBeamProj bbBeamProj) {
-			byte[] xBytes = BitConverter.GetBytes(bbBeamProj.startPos.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(bbBeamProj.startPos.y);
-			args.AddRange(yBytes);
-		} else if (this is MorphMBeamProj beamProj) {
-			byte[] xBytes = BitConverter.GetBytes(beamProj.endPos.x);
-			args.AddRange(xBytes);
-			byte[] yBytes = BitConverter.GetBytes(beamProj.endPos.y);
-			args.AddRange(yBytes);
-		} else if (this is ViralSigmaBeamProj vsBeamProj) {
-			byte[] botY = BitConverter.GetBytes(vsBeamProj.bottomY);
-			args.AddRange(botY);
-		} else if (this is KaiserSigmaBeamProj ksBeamProj) {
-			byte[] beamAngle = BitConverter.GetBytes(ksBeamProj.beamAngle);
-			byte[] beamWidth = BitConverter.GetBytes(ksBeamProj.beamWidth);
-			args.AddRange(beamAngle);
-			args.AddRange(beamWidth);
-		} else if (this is GBeetleGravityWellProj wellProj) {
-			args.Add((byte)wellProj.state);
-			byte[] radiusFactor = BitConverter.GetBytes(wellProj.radiusFactor);
-			args.AddRange(radiusFactor);
-			byte[] maxRadius = BitConverter.GetBytes(wellProj.maxRadius);
-			args.AddRange(maxRadius);
-
-		} else if (this is VoltCSuckProj voltcSuckProj) {
-			byte[] voltCatfishNetId = BitConverter.GetBytes(voltcSuckProj.vc?.netId ?? 0);
-			args.AddRange(voltCatfishNetId);
-		} else if (this is BHornetCursorProj cursorProj) {
-			byte[] targetNetId = BitConverter.GetBytes(cursorProj.target?.netId ?? 0);
-			args.AddRange(targetNetId);
-		} else if (this is BHornetBeeProj beeProj) {
-			byte[] targetNetId = BitConverter.GetBytes(beeProj.latchTarget?.netId ?? 0);
-			args.AddRange(targetNetId);
-		} else if (this is HexaInvoluteProj hiProj) {
-			byte[] hiAng = BitConverter.GetBytes(hiProj.ang);
-			args.AddRange(hiAng);
+		List<byte>? customData = getCustomActorNetData();
+		if (customData != null) {
+			args.AddRange(customData);
 		}
-		/*
-		else if (this is ShotgunIceProjSled sips)
-		{
-			byte ridden = sips.ridden ? (byte)1 : (byte)0;
-			args.Add(ridden);
-		}
-		*/
 
 		Global.serverClient?.rpc(RPC.updateActor, args.ToArray());
 
@@ -305,11 +121,15 @@ public class RPCUpdateActor : RPC {
 		float? byteAngle = null;
 
 		if (maskBools[0]) {
-			xPos = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
+			xPos = BitConverter.ToSingle(
+				new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
+			);
 			i += 4;
 		}
 		if (maskBools[1]) {
-			yPos = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
+			yPos = BitConverter.ToSingle(
+				new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
+			);
 			i += 4;
 		}
 		if (maskBools[2]) {
@@ -321,7 +141,9 @@ public class RPCUpdateActor : RPC {
 			i++;
 		}
 		if (maskBools[4]) {
-			byteAngle = BitConverter.ToSingle(new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0);
+			byteAngle = BitConverter.ToSingle(
+				new byte[] { arguments[i], arguments[i + 1], arguments[i + 2], arguments[i + 3] }, 0
+			);
 			i += 4;
 		}
 
@@ -658,13 +480,10 @@ public class RPCUpdateActor : RPC {
 			throw new Exception(msg);
 		}
 
-		if (actor == null) {
-			int? playerId = Player.getPlayerIdFromCharNetId(netId);
-			if (playerId != null) {
-				var player = Global.level.getPlayerById(playerId.Value);
-				if (player != null) {
-					Global.level.addFailedSpawn(playerId.Value, new Point(xPos ?? 0, yPos ?? 0), xDir ?? 1, netId);
-				}
+		if (actor != null) {
+			// We send custom data here.
+			if (i >= arguments.Length - 1) {
+				actor.updateCustomActorNetData(arguments[i..]);
 			}
 		}
 	}

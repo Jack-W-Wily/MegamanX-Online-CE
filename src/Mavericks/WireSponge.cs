@@ -106,6 +106,20 @@ public class WireSponge : Maverick {
 	public override MaverickState getRandomAttackState() {
 		return aiAttackStates().GetRandomItem();
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.AddRange(BitConverter.GetBytes(chargeTime));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		base.updateCustomActorNetData(data);
+		data = data[Maverick.CustomNetDataLength..];
+
+		chargeTime = BitConverter.ToSingle(data);
+	}
 }
 
 public class WSpongeChainSpinProj : Projectile {
@@ -213,7 +227,7 @@ public class WSpongeSideChainProj : Projectile {
 
 		// Hooked character? Wait for them to become hooked before pulling back. Wait a max of 200 ms
 		var hookedChar = hookedActor as Character;
-		if (hookedChar != null && !hookedChar.ownedByLocalPlayer && !hookedChar.isStrikeChainHookedBS.getValue()) {
+		if (hookedChar != null && !hookedChar.ownedByLocalPlayer && !hookedChar.isStrikeChainState) {
 			hookWaitTime += Global.spf;
 			if (hookWaitTime < 0.2f) return;
 		}
@@ -379,6 +393,21 @@ public class WSpongeSideChainProj : Projectile {
 
 	public bool isLatched() {
 		return state == 2;
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(netOrigin.x));
+		customData.AddRange(BitConverter.GetBytes(netOrigin.y));
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		float originX = BitConverter.ToSingle(data[0..4], 0);
+		float originY = BitConverter.ToSingle(data[4..8], 0);
+
+		netOrigin = new Point(originX, originY);
 	}
 }
 
@@ -602,6 +631,20 @@ public class WSpongeUpChainProj : Projectile {
 		for (int i = 0; i < pieceCount; i++) {
 			Global.sprites["wsponge_vine_base_up"].draw(0, pos.x, origin.y - (len * i), xDir, 1, null, 1, 1, 1, ZIndex.Background + 100);
 		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(netOrigin.x));
+		customData.AddRange(BitConverter.GetBytes(netOrigin.y));
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		float originX = BitConverter.ToSingle(data[0..4], 0);
+		float originY = BitConverter.ToSingle(data[4..8], 0);
+		netOrigin = new Point(originX, originY);
 	}
 }
 

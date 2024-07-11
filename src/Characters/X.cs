@@ -101,6 +101,12 @@ public partial class MegamanX : Character {
 	
 	public BeeSwarm? beeSwarm;
 
+	public float parryCooldown;
+	public float maxParryCooldown = 0.5f;
+
+	public bool stingActive;
+	public bool isHyperChargeActive;
+
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -168,6 +174,14 @@ public partial class MegamanX : Character {
 	//		} else {
 				addRenderEffect(RenderEffectType.ChargeOrange, 0.05f, 0.1f);
 			//}
+		}
+
+		Helpers.decrementTime(ref barrierCooldown);
+
+		if (stingActive) {
+			addRenderEffect(RenderEffectType.Invisible);
+		} else {
+			removeRenderEffect(RenderEffectType.Invisible);
 		}
 		player.armorFlag = 0;
 
@@ -322,6 +336,8 @@ public partial class MegamanX : Character {
 			Helpers.decrementTime(ref barrierTime);
 			return;
 		}
+		Helpers.decrementTime(ref parryCooldown);
+		isHyperChargeActive = shouldShowHyperBusterCharge();
 
 		if (beeSwarm != null) {
 			beeSwarm.update();
@@ -1160,7 +1176,7 @@ public partial class MegamanX : Character {
 		// Only deduct ammo if owned by local player
 		if (ownedByLocalPlayer) {
 			float ammoUsage;
-			if (player.character.isInvisibleBS.getValue() && chargeLevel < 3) {
+			if ((player.character as MegamanX)?.stingActive == true && chargeLevel < 3) {
 				ammoUsage = 4;
 			} else if (weapon is FireWave) {
 				if (chargeLevel < 3) {
@@ -1454,7 +1470,7 @@ public partial class MegamanX : Character {
 		Weapon weapon = player.weapon;
 		if (charState is SwordBlock) return true;
 		if (weapon is RollingShield && chargedRollingShieldProj != null) return false;
-		if (isInvisibleBS.getValue()) return false;
+		if (stingActive) return false;
 		if (flag != null) return false;
 		if (player.weapons.Count == 0) return false;
 		if (weapon is AbsorbWeapon) return false;
@@ -1566,7 +1582,7 @@ public partial class MegamanX : Character {
 				shootPos.x + x + (3 * xDir), shootPos.y + y, 1, 1, null, 1, 1, 1, zIndex
 			);
 		}
-		if (isHyperChargeActiveBS.getValue() && visible) {
+		if (isHyperChargeActive && visible) {
 			drawHyperCharge(x, y);
 		}
 		base.render(x, y);
@@ -1633,7 +1649,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool shouldDrawFgCooldown() {
-		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !isInvisibleBS.getValue() && canAffordFgMove() && hadoukenCooldownTime == 0;
+		return !isInvulnerableAttack() && chargedRollingShieldProj == null && !stingActive && canAffordFgMove() && hadoukenCooldownTime == 0;
 	}
 
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
@@ -1719,7 +1735,7 @@ public partial class MegamanX : Character {
 		if (player.hasGoldenArmor()) {
 			index = 25;
 		}
-		if (hasUltimateArmorBS.getValue()) {
+		if (hasUltimateArmor) {
 			index = 0;
 		}
 		palette = player.xPaletteShader;

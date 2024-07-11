@@ -46,6 +46,8 @@ public class RideArmor : Actor, IDamagable {
 	public static ShaderWrapper paletteHawk = Helpers.cloneGenericPaletteShader("paletteHawk");
 	public static ShaderWrapper paletteFrog = Helpers.cloneGenericPaletteShader("paletteFrog");
 
+	bool netColorShadersSet;
+
 	public RideArmor(
 		Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
@@ -652,9 +654,11 @@ public class RideArmor : Actor, IDamagable {
 			if (!sprite.name.Contains("dash"))	proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.Rising, player);
 			if (sprite.name.Contains("dash"))	proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechGoliathPunch, player);
 			}
-		} else if (sprite.name.Contains("charge")) {
+		}
+		else if (sprite.name.Contains("charge")) {
 			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player);
-		} else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null && !character.isInvulnBS.getValue()) {
+		}
+		else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null) {
 			bool canDamage = deltaPos.y > 150 * Global.spf;
 			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 2 : null;
 			if (!canDamage) overrideDamage = 0;
@@ -1029,6 +1033,35 @@ public class RideArmor : Actor, IDamagable {
 			RPC.creditPlayerKillVehicle.sendRpc(killer, assister, this, weaponIndex);
 		}
 	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+		customData.Add((byte)raNum);
+		// 1 means riding it, 0 means not.
+		customData.Add((byte)(character != null ? 1 : 0)); 
+		customData.Add((byte)neutralId);
+		customData.Add((byte)MathF.Ceiling(health));
+
+		return customData;
+	}
+
+	public override void updateCustomActorNetData(byte[] data) {
+		raNum = data[0];
+
+		int isOwnerRiding = data[1];
+		if (isOwnerRiding == 0) {
+			character = null;
+		} else if (isOwnerRiding == 1) {
+			character = netOwner?.character;
+		}
+
+		neutralId = data[2];
+		health = data[3];
+
+		if (!netColorShadersSet) {
+			setColorShaders();
+		}
+	}
 }
 
 public class RideArmorState {
@@ -1294,7 +1327,7 @@ public class RAIdle : RideArmorState {
 
 		Helpers.decrementTime(ref attackCooldown);
 
-		if (rideArmor.raNum == 1 && player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking() && !character.isInvulnBS.getValue()) {
+		if (rideArmor.raNum == 1 && player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking()) {
 			shootHeldTime += Global.spf;
 			if (shootHeldTime > 0.5f) {
 				shootHeldTime = 0;

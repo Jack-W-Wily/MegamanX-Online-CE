@@ -1043,8 +1043,10 @@ public partial class Level {
 
 	public bool isSendMessageFrame() {
 		return (
-			!Global.isSkippingFrames &&
-			Global.level.nonSkippedframeCount % Global.tickRate == 0
+			!Global.isSkippingFrames && (
+				Global.tickRate <= 1 ||
+				Global.level.nonSkippedframeCount % Global.tickRate == 0
+			)
 		);
 	}
 

@@ -1,4 +1,6 @@
-﻿using SFML.Graphics;
+﻿using System;
+using System.Collections.Generic;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -489,6 +491,21 @@ public class GBeetleGravityWellProj : Projectile {
 		{
 			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, drawRadius, filled: true, Color.Black, 1f, -2999990L);
 		}
+	}
+
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = new();
+
+		customData.AddRange(BitConverter.GetBytes(radiusFactor));
+		customData.AddRange(BitConverter.GetBytes(maxRadius));
+		customData.Add((byte)state);
+
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		radiusFactor = BitConverter.ToSingle(data[0..4], 0);
+		maxRadius = BitConverter.ToSingle(data[4..8], 0);
+		state = data[8];
 	}
 }
 

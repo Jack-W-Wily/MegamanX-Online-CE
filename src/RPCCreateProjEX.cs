@@ -23,7 +23,8 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.DZBuster2, DZBuster2Proj.rpcInvoke },
 		{ (int)ProjIds.DZBuster3, DZBuster3Proj.rpcInvoke },
 		{ (int)ProjIds.DynamoDagger, DynamoDaggerProj.rpcInvoke },
-
+		// Mavericks
+		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke }
 	};
 
 }

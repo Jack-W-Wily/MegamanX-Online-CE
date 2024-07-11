@@ -1416,8 +1416,7 @@ public class GameMode {
 
 		if (player.isSigma) {
 			if (player.character == null ||
-				(player.isSigma3() && player.currentMaverick == null) ||
-				(player.isSigma1() && player.character.isHyperSigmaBS.getValue())
+				(player.character is KaiserSigma && player.currentMaverick == null)
 			) {
 				return;
 			}
@@ -1444,7 +1443,7 @@ public class GameMode {
 					player.currentMaverick.maxAmmo
 				);
 			}
-			if (player.isSigma2() && player.character.isHyperSigmaBS.getValue() && player.currentMaverick == null) {
+			if (player.character is ViralSigma) {
 				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
 			} else if (player.isMainPlayer && player.currentMaverick == null) {
 				int hudWeaponBaseIndex = 50;
