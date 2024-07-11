@@ -326,7 +326,8 @@ public class Maverick : Actor, IDamagable {
 			destroySelf();
 			} else {
 			incPos(new Point(0, 50));
-			applyDamage(Damager.envKillDamage, player, this, null, null);
+			applyDamage(null, null, Damager.envKillDamage, null);
+			}
 		}
 
 		if (autoExit) {
@@ -701,7 +702,7 @@ public class Maverick : Actor, IDamagable {
 		changeSprite(spriteName, resetFrame);
 	}
 
-	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		if (this is FakeZero fz && fz.state is FakeZeroGuardState) {
 			ammo += damage;
 			if (ammo > 32) ammo = 32;

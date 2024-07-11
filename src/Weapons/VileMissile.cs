@@ -181,6 +181,11 @@ public class StunShotProj : Projectile {
 		reflectable = true;
 		canBeLocal = false; // TODO: Remove the need for this.
 
+		if (owner.character != null && owner.isHighMax){
+		changeSprite("highmax_spark_proj", true);
+		damager.damage = 1;
+		}
+
 		if (vel != null) {
 			if (type == 0) {
 				var norm = vel.Value.normalize();

@@ -98,7 +98,7 @@ public class XUPParryStartState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		mmx.parryCooldown = mmx.maxParryCooldown;
+		character.parryCooldown = character.maxParryCooldown;
 	}
 }
 
@@ -199,61 +199,7 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		if (character is MegamanX mmx) {
-			mmx.parryCooldown = mmx.maxParryCooldown;
-		}
-	}
-}
-
-
-public class XDeadLift : CharState {
-	Actor counterAttackTarget;
-	float damage;
-	public XDeadLift(Actor counterAttackTarget, float damage) : base("deadlift", "", "", "") {
-		invincible = true;
-		this.counterAttackTarget = counterAttackTarget;
-		this.damage = damage;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (counterAttackTarget != null) {
-			character.turnToPos(counterAttackTarget.pos);
-
-			float dist = character.pos.distanceTo(counterAttackTarget.pos);
-			if (dist < 150) {
-				if (character.frameIndex >= 4 && !once) {
-					if (character.pos.distanceTo(counterAttackTarget.pos) > 10) {
-						character.moveToPos(counterAttackTarget.pos, 350);
-					}
-				}
-			}
-		}
-
-		Point? shootPos = character.getFirstPOI("melee");
-		if (!once && shootPos != null) {
-			once = true;
-			new UPParryMeleeProj(new XUPParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
-			character.playSound("upParryAttack", sendRpc: true);
-			character.shakeCamera(sendRpc: true);
-		}
-
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		//character.frameIndex = 2;
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		if (character is MegamanX mmx) {
-			mmx.parryCooldown = mmx.maxParryCooldown;
-		}
+		character.parryCooldown = character.maxParryCooldown;
 	}
 }
 
@@ -416,9 +362,7 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		if (character is MegamanX mmx) {
-			mmx.parryCooldown = mmx.maxParryCooldown;
-		}
+		character.parryCooldown = character.maxParryCooldown;
 	}
 }
 

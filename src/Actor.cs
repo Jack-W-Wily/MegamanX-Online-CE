@@ -63,7 +63,6 @@ public partial class Actor : GameObject {
 	public bool visible = true;
 	public bool timeSlow;
 	public bool destroyed;
-	public float destroyedOnFrame;
 	public ShaderWrapper? genericShader;
 	public virtual List<ShaderWrapper>? getShaders() { return genericShader != null ? new List<ShaderWrapper> { genericShader } : null; }
 	public float alpha = 1;
@@ -75,7 +74,7 @@ public partial class Actor : GameObject {
 	public Dictionary<string, float> projectileCooldown { get; set; } = new Dictionary<string, float>();
 	public Dictionary<int, float> flinchCooldown { get; set; } = new Dictionary<int, float>();
 
-	public MusicWrapper? musicSource;
+	public MusicWrapper musicSource;
 	public bool checkLadderDown = false;
 	public List<DamageText> damageTexts = new List<DamageText>();
 	//public ShaderWrapper invisibleShader;
@@ -117,11 +116,11 @@ public partial class Actor : GameObject {
 	public float reversedGravityOffset = 40;
 
 	public NetActorCreateId netActorCreateId;
-	public Player? netOwner;
+	public Player netOwner;
 	float createRpcTime;
 
 	public bool splashable;
-	private Anim _waterWade = null!;
+	private Anim _waterWade;
 	public Anim waterWade {
 		get {
 			if (_waterWade == null) {
@@ -132,82 +131,18 @@ public partial class Actor : GameObject {
 	}
 
 	public float lastWaterY;
-
-	public float underwaterTime;
-	public float bubbleTime;
-	public float bigBubbleTime;
-	public float waterTime;
-
-	public float timeStopTime;
-
-	public Actor(
-		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel
-	) {
-		this.pos = pos;
-		prevPos = pos;
-		/*
-		if (Global.debug && Global.serverClient != null && netId != null
-			&& Global.level.getActorByNetId(netId.Value) != null
-		) {
-			string netIdDump = Global.level.getNetIdDump();
-			Helpers.WriteToFile("netIdDump.txt", netIdDump);
-			throw new Exception(
-				"The netId " + netId.ToString() + " (sprite " + spriteName + " ) was already used."
-			);
-		}
-		*/
-		this.netId = netId;
-		this.ownedByLocalPlayer = ownedByLocalPlayer;
-		vel = new Point(0, 0);
-		useGravity = true;
-		frameIndex = 0;
-		frameSpeed = 1;
-		frameTime = 0;
-		name = "";
-		xDir = 1;
-		yDir = 1;
-		grounded = false;
-		zIndex = ++Global.level.autoIncActorZIndex;
-		if (spriteName is not null and not "") {
-			changeSprite(spriteName, true);
-			if (sprite == null) {
-				string typeName = GetType().ToString().Replace("MMXOnline", "");
-				throw new Exception(
-					"Error null sprite at object" + typeName +
-					"with spritename variable \"" + spriteName + "\""
-				);
-			}
-		}
-		lastNetUpdate = Global.time;
-
-		if (netId is not null and >= Level.firstNormalNetId) {
-			Global.level.actorsById[netId.Value] = this;
-		}
-
-		if (!dontAddToLevel) {
-			Global.level.addGameObject(this);
-		}
-
-		if (isWading() || isUnderwater()) {
-			waterTime = 10;
-			underwaterTime = 10;
-		}
-	}
-
 	public bool isUnderwater() {
 		float colliderHeight;
 		if (globalCollider == null) colliderHeight = 10;
 		else colliderHeight = globalCollider.shape.maxY - globalCollider.shape.minY;
 
 		// May need a new overridable method to get "visual" height for situations like these
-		if (sprite?.name?.StartsWith("sigma2_viral_") == true) {
+		if (sprite?.name?.Contains("sigma2_viral_") == true) {
 			colliderHeight = 50;
 		}
 
 		foreach (var waterRect in Global.level.waterRects) {
-			if (pos.x > waterRect.x1 && pos.x < waterRect.x2 &&
-				pos.y - colliderHeight > waterRect.y1 && pos.y < waterRect.y2
-			) {
+			if (pos.x > waterRect.x1 && pos.x < waterRect.x2 && pos.y - colliderHeight > waterRect.y1 && pos.y < waterRect.y2) {
 				lastWaterY = waterRect.y1;
 				return true;
 			}
@@ -225,6 +160,49 @@ public partial class Actor : GameObject {
 			}
 		}
 		return false;
+	}
+
+	public float underwaterTime;
+	public float bubbleTime;
+	public float bigBubbleTime;
+	public float waterTime;
+
+	public float timeStopTime;
+
+	public Actor(string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel) {
+		this.pos = pos;
+		prevPos = pos;
+
+		if (Global.debug && Global.serverClient != null && netId != null && Global.level.getActorByNetId(netId.Value) != null) {
+			string netIdDump = Global.level.getNetIdDump();
+			Helpers.WriteToFile("netIdDump.txt", netIdDump);
+			//Global.logToConsole("The netId " + netId.ToString() + " (sprite " + spriteName + " ) was already used", showConsole: true);
+			throw new Exception("The netId " + netId.ToString() + " (sprite " + spriteName + " ) was already used.");
+		}
+
+		this.netId = netId;
+		this.ownedByLocalPlayer = ownedByLocalPlayer;
+		vel = new Point(0, 0);
+		useGravity = true;
+		frameIndex = 0;
+		frameSpeed = 1;
+		frameTime = 0;
+		name = "";
+		xDir = 1;
+		yDir = 1;
+		grounded = false;
+		zIndex = ++Global.level.autoIncActorZIndex;
+		changeSprite(spriteName, true);
+		lastNetUpdate = Global.time;
+
+		if (!dontAddToLevel) {
+			Global.level.addGameObject(this);
+		}
+
+		if (isWading() || isUnderwater()) {
+			waterTime = 10;
+			underwaterTime = 10;
+		}
 	}
 
 	public void createActorRpc(int playerId) {
@@ -257,9 +235,7 @@ public partial class Actor : GameObject {
 		string oldSpriteName = sprite?.name ?? "";
 		if (spriteName == null) return;
 		if (sprite != null) {
-			if (sprite.name == spriteName) {	
-				return;
-			}
+			if (sprite.name == spriteName) return;
 		}
 
 		if (!Global.sprites.ContainsKey(spriteName)) return;
@@ -314,7 +290,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void playOverrideVoice(string spriteName) {
-		Character? chr = this as Character;
+		Character chr = this as Character;
 		int charNum = chr != null ? chr.player.charNum : 4;
 		spriteName = spriteName.Replace("_na_", "_")
 							   .Replace("_bald_", "_")
@@ -380,7 +356,7 @@ public partial class Actor : GameObject {
 
 	public Frame currentFrame {
 		get {
-			return sprite.getCurrentFrame();
+			return sprite?.getCurrentFrame();
 		}
 	}
 
@@ -405,76 +381,70 @@ public partial class Actor : GameObject {
 		deltaPos = pos.subtract(prevPos);
 		prevPos = pos;
 
-		if (!useFrameProjs) {
-			return;
-		}
-		if (sprite == null) {
-			return;
-		}
-		// Frame-based hitbox projectile section
-		string spriteKey = sprite.name + "_" + sprite.frameIndex.ToString();
-		// Frame hitboxes.
-		List<Collider> hitboxes = sprite.getCurrentFrame().hitboxes.ToList();
-		// Global hitboxes.
-		hitboxes.AddRange(sprite.hitboxes);
+		if (useFrameProjs) {
+			// Frame-based hitbox projectile section
+			string spriteKey = null;
+			if (sprite != null) {
+				spriteKey = sprite.name + "_" + sprite.frameIndex.ToString();
+				var hitboxes = sprite.getCurrentFrame().hitboxes.ToList();
+				hitboxes.AddRange(sprite.hitboxes);
 
-		// Delete old stuff.
-		foreach (string key in spriteFrameToProjs.Keys) {
-			if (key != spriteKey) {
-				if (spriteFrameToProjs[key] != null) {
-					foreach (Projectile proj in spriteFrameToProjs[key]) {
-						proj.destroySelf();
+				if (spriteFrameToProjs.ContainsKey(spriteKey) && spriteFrameToProjs[spriteKey] != null) {
+					foreach (var proj in spriteFrameToProjs[spriteKey]) {
+						proj.incPos(deltaPos);
+						updateProjFromHitbox(proj);
+					}
+				} else if (hitboxes != null) {
+					foreach (var hitbox in hitboxes) {
+						var proj = getProjFromHitboxBase(hitbox);
+						if (proj != null) {
+							if (!spriteFrameToProjs.ContainsKey(spriteKey) || spriteFrameToProjs[spriteKey] == null) {
+								spriteFrameToProjs[spriteKey] = new List<Projectile>();
+							}
+							spriteFrameToProjs[spriteKey].Add(proj);
+						}
 					}
 				}
-				spriteFrameToProjs.Remove(key);
 			}
-		}
-		// Move if same frame.
-		if (spriteFrameToProjs.GetValueOrDefault(spriteKey) != null) {
-			foreach (var proj in spriteFrameToProjs[spriteKey]) {
+
+			foreach (var key in spriteFrameToProjs.Keys) {
+				if (key != spriteKey) {
+					if (spriteFrameToProjs[key] != null) {
+						foreach (var proj in spriteFrameToProjs[key]) {
+							//proj.destroyFrames = 2;
+							proj.destroySelf();
+						}
+					}
+					spriteFrameToProjs.Remove(key);
+				}
+			}
+
+			// Global hitbox projectile section
+			foreach (var proj in globalProjs) {
 				proj.incPos(deltaPos);
 				updateProjFromHitbox(proj);
 			}
-		}
-		// Get new if new frame.
-		else if (hitboxes != null) {
-			foreach (var hitbox in hitboxes) {
-				Projectile? proj = getProjFromHitboxBase(hitbox);
-				if (proj != null) {
-					if (spriteFrameToProjs.GetValueOrDefault(spriteKey) == null) {
-						spriteFrameToProjs[spriteKey] = new List<Projectile>();
-					}
-					spriteFrameToProjs[spriteKey].Add(proj);
+
+			// Get misc. projectiles based on conditions (i.e. headbutt, awakened zero aura)
+			var projToCreateDict = getGlobalProjs();
+
+			// If the projectile id wasn't returned, remove it from current globalProj list.
+			for (int i = globalProjs.Count - 1; i >= 0; i--) {
+				if (!projToCreateDict.ContainsKey(globalProjs[i].projId)) {
+					//globalProjs[i].destroyFrames = 2;
+					globalProjs[i].destroySelf();
+					globalProjs.RemoveAt(i);
 				}
 			}
-		}
 
-		// ----------------------------------------
-		// Global hitbox projectile section
-		foreach (var proj in globalProjs) {
-			proj.incPos(deltaPos);
-			updateProjFromHitbox(proj);
-		}
-
-		// Get misc. projectiles based on conditions (i.e. headbutt, awakened zero aura)
-		var projToCreateDict = getGlobalProjs();
-
-		// If the projectile id wasn't returned, remove it from current globalProj list.
-		for (int i = globalProjs.Count - 1; i >= 0; i--) {
-			if (!projToCreateDict.ContainsKey(globalProjs[i].projId)) {
-				//globalProjs[i].destroyFrames = 2;
-				globalProjs[i].destroySelf();
-				globalProjs.RemoveAt(i);
-			}
-		}
-
-		// For all projectiles to create, add to the global proj list ONLY if the proj id doesn't already exist
-		foreach (var kvp in projToCreateDict) {
-			var projIdToCreate = kvp.Key;
-			var projFunction = kvp.Value;
-			if (!globalProjs.Any(p => p.projId == projIdToCreate)) {
-				var newlyCreatedProj = projFunction();
-				globalProjs.Add(newlyCreatedProj);
+			// For all projectiles to create, add to the global proj list ONLY if the proj id doesn't already exist
+			foreach (var kvp in projToCreateDict) {
+				var projIdToCreate = kvp.Key;
+				var projFunction = kvp.Value;
+				if (!globalProjs.Any(p => p.projId == projIdToCreate)) {
+					var newlyCreatedProj = projFunction();
+					globalProjs.Add(newlyCreatedProj);
+				}
 			}
 		}
 	}
@@ -709,17 +679,13 @@ public partial class Actor : GameObject {
 				}
 				yDist *= yMod;
 
-				CollideData? collideData = Global.level.checkCollisionActor(this, 0, yDist, checkPlatforms: true);
+				CollideData collideData = Global.level.checkCollisionActor(this, 0, yDist, checkPlatforms: true);
 
 				var hitActor = collideData?.gameObject as Actor;
 				bool isPlatform = false;
 				bool tooLowOnPlatform = false;
 				if (hitActor?.isPlatform == true) {
-					bool dropThruWolfPaw = (
-						hitActor is WolfSigmaHand &&
-						chr != null && !chr.grounded &&
-						chr.player.input.isHeld(Control.Down, chr.player)
-					);
+					bool dropThruWolfPaw = hitActor is WolfSigmaHand && chr != null && !chr.grounded && chr.player.input.isHeld(Control.Down, chr.player);
 					if (!dropThruWolfPaw) {
 						isPlatform = true;
 						if (pos.y > hitActor.getTopY() + 10) {
@@ -1329,7 +1295,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	// Optionally take in a sprite to draw when destroyed
+	//Optionally take in a sprite to draw when destroyed
 	public virtual void destroySelf(
 		string spriteName = "", string fadeSound = "",
 		bool disableRpc = false, bool doRpcEvenIfNotOwned = false,
@@ -1342,15 +1308,6 @@ public partial class Actor : GameObject {
 
 		if (!destroyed) {
 			destroyed = true;
-			destroyedOnFrame = Global.frameCount;
-			if (netId is not null and >= Level.firstNormalNetId &&
-				Global.level.actorsById.ContainsKey(netId.Value)
-			) {
-				if (Global.level.actorsById[netId.Value] == this) {
-					Global.level.actorsById.Remove(netId.Value);
-					Global.level.destroyedActorsById[netId.Value] = this;
-				}
-			}
 			onDestroy();
 		} else {
 			return;
@@ -1449,11 +1406,9 @@ public partial class Actor : GameObject {
 		return new Point(xPos, yPos);
 	}
 
-	public SoundWrapper? playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
+	public SoundWrapper playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
 		soundKey = soundKey.ToLowerInvariant();
-		if (!Global.soundBuffers.ContainsKey(soundKey)) {
-			throw new Exception($"Attempted playing missing sound with name \"{soundKey}\"");
-		}
+		if (!Global.soundBuffers.ContainsKey(soundKey)) return null;
 		return playSound(Global.soundBuffers[soundKey], forcePlay: forcePlay, sendRpc: sendRpc);
 	}
 
@@ -1485,11 +1440,9 @@ public partial class Actor : GameObject {
 		return new SoundWrapper(soundBuffer, this);
 	}
 
-	public SoundWrapper? playSound(SoundBufferWrapper soundBuffer, bool forcePlay = false, bool sendRpc = false) {
+	public SoundWrapper playSound(SoundBufferWrapper soundBuffer, bool forcePlay = false, bool sendRpc = false) {
 		var recentClipCount = Global.level.recentClipCount;
-		if (recentClipCount.ContainsKey(soundBuffer.soundKey) &&
-			recentClipCount[soundBuffer.soundKey].Count > 1
-		) {
+		if (recentClipCount.ContainsKey(soundBuffer.soundKey) && recentClipCount[soundBuffer.soundKey].Count > 1) {
 			if (!forcePlay) {
 				return null;
 			}
@@ -1643,8 +1596,8 @@ public partial class Actor : GameObject {
 	}
 
 	public Point getFirstPOIOrDefault(string tag, int? frameIndex = null) {
-		Frame frame = frameIndex != null ? sprite.frames[frameIndex.Value] : sprite.getCurrentFrame();
-		if (frame.POIs?.Count > 0) {
+		Frame frame = frameIndex != null ? sprite?.frames?[frameIndex.Value] : sprite?.getCurrentFrame();
+		if (frame?.POIs?.Count > 0) {
 			int poiIndex = frame.POITags.FindIndex(t => t == tag);
 			if (poiIndex >= 0) {
 				Point poi = frame.POIs[poiIndex];
@@ -1756,7 +1709,7 @@ public partial class Actor : GameObject {
 		DrawWrappers.DrawRect(pos.x - 46 + sx, pos.y + 15 - width + sy, pos.x - 43 + sx, pos.y + 15 + sy, true, color, 0, ZIndex.HUD - 1);
 	}
 
-	public CollideData? getHitWall(float x, float y) {
+	public CollideData getHitWall(float x, float y) {
 		var hits = Global.level.checkCollisionsActor(this, x, y, checkPlatforms: true);
 		var bestWall = hits.FirstOrDefault(h => h.gameObject is Wall wall && !wall.collider.isClimbable);
 		if (bestWall != null) return bestWall;
@@ -1791,45 +1744,5 @@ public partial class Actor : GameObject {
 
 	public virtual float getGravity() {
 		return Global.level.gravity * gravityModifier * gravityWellModifier;
-	}
-
-	public Actor[] getCloseActors(
-		int distance, bool isRequesterAI = false,
-		bool checkWalls = false, bool includeAllies = false
-	) {
-		List<Actor> closeActors = new();
-		int halfDist = MathInt.Floor(distance / 2f);
-
-		Point checkPos = new Point(MathF.Round(pos.x), MathF.Round(pos.y));
-		Shape shape = Rect.createFromWH(
-			pos.x - halfDist, pos.y - halfDist,
-			halfDist, halfDist
-		).getShape();
-		var hits = Global.level.checkCollisionsShape(shape, null);
-		int alliance = -1;
-		if (includeAllies) {
-			alliance = this switch {
-				Character selfChar => selfChar.player.alliance,
-				Projectile selfProj => selfProj.damager.owner.alliance,
-				Maverick selfMvrk => selfMvrk.player.alliance,
-				_ => -1
-			};
-		}
-		foreach (CollideData hit in hits) {
-			if (hit.gameObject is not Actor actor || actor == this) {
-				continue;
-			}
-			if (!includeAllies && alliance != -1) {
-				if (actor is Character character && character.player.alliance == alliance ||
-					actor is Projectile proj && proj.damager?.owner.alliance == alliance ||
-					actor is Maverick maverick && maverick.player.alliance == alliance ||
-					actor is DarkHoldProj
-				) {
-					continue;
-				}
-			}
-			closeActors.Add(actor);
-		}
-		return closeActors.ToArray();
 	}
 }

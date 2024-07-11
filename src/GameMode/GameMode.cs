@@ -643,22 +643,34 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
+			if (drawPlayer.character is Zain Zain) {
+				int yStart = 159;
+				
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+					Fonts.drawText(
+						FontType.Grey,
+						"x" + Zain.ZainCounters, 16, 152, Alignment.Left
+					);
+					yStart += 12;
+				
+			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
-				if (zero.isViral) {
+				if (zero.isNightmareZero) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
 						FontType.Grey,
 						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
 					);
 					yStart += 12;
+					Global.sprites["virusalert"].drawToHUD(0, 36, 214);
 				}
 				int xStart = 11;
-				if (zero.gigaAttack.shootTime > 0) {
-					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
+				if (zero.zeroGigaAttackWeapon.shootTime > 0) {
+					drawZeroGigaCooldown(zero.zeroGigaAttackWeapon, y: yStart);
 					xStart += 15;
 				}
-				if (zero.saberCooldown > 0 && zero.awakenedPhase >= 2 || zero.genmuCooldown > 0) {
+				if (zero.saberCooldown > 0 && zero.isAwakenedGenmuZero() || zero.genmuCooldown > 0) {
 					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 2);
 					if (zero.saberCooldown > zero.genmuCooldown) {
 						cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
@@ -671,7 +683,7 @@ public class GameMode {
 					if (zero.genmuCooldown - 1 > zero.saberCooldown) {
 						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 1, 1);
 					}
-					drawGigaWeaponCooldown(zero.awakenedPhase >= 2 ? 48 : 102, cooldown, xStart, yStart);
+					drawGigaWeaponCooldown(zero.isAwakenedGenmuZero() ? 48 : 102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
 			}
@@ -1481,7 +1493,7 @@ public class GameMode {
 		if (player.character != null) {
 			weapon = player.weapon;
 			if (player.character is Zero zero) {
-				weapon = zero.gigaAttack;
+				weapon = zero.zeroGigaAttackWeapon;
 			}
 			if (player.character is PunchyZero punchyZero) {
 				weapon = punchyZero.gigaAttack;
@@ -2288,7 +2300,7 @@ public class GameMode {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
-				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
+				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(null, dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
 			}
 		}
 		if (dnaCore.charNum == (int)CharIds.Sigma) {

@@ -388,11 +388,14 @@ public class Axl : Character {
 			&& !player.input.isHeld(Control.Down, player)
 			&& !player.input.isLeftOrRightHeld(player)){
 			changeState(new TailShot(), true);
-			invulnTime = 0.4f;
+			invulnTime = 0.25f;
 			}
 	
 		}
-		if (dodgeRollCooldown == 0 && player.canControl && !sprite.name.Contains("hurt")  && !sprite.name.Contains("grabbed")) {
+		if (charState is not RainStorm && dodgeRollCooldown == 0
+		 && player.canControl
+		 && !sprite.name.Contains("hurt")
+		 && !sprite.name.Contains("grabbed")) {
 			
 			if (player.input.checkShoryuken(player, xDir , Control.Special1)) {
 				changeState(new RainStorm(isUnderwater()), true);

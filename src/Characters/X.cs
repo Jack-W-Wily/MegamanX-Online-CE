@@ -98,11 +98,8 @@ public partial class MegamanX : Character {
 
 	public float xSaberCooldown;
 	public float stockedChargeFlashTime;
-
+	
 	public BeeSwarm? beeSwarm;
-
-	public float parryCooldown;
-	public float maxParryCooldown = 0.5f;
 
 	public MegamanX(
 		Player player, float x, float y, int xDir,
@@ -325,7 +322,6 @@ public partial class MegamanX : Character {
 			Helpers.decrementTime(ref barrierTime);
 			return;
 		}
-		Helpers.decrementTime(ref parryCooldown);
 
 		if (beeSwarm != null) {
 			beeSwarm.update();
@@ -544,7 +540,7 @@ public partial class MegamanX : Character {
 				UPDamageCooldown += Global.spf;
 				if (UPDamageCooldown > unpoDamageMaxCooldown) {
 					UPDamageCooldown = 0;
-					applyDamage(1, player, this, null, null);
+					applyDamage(null, null, 1, null);
 				}
 			}
 		}
@@ -1796,6 +1792,6 @@ public partial class MegamanX : Character {
 	public override void increaseCharge() {
 		float factor = 1;
 		if (player.hasArmArmor(1)) { factor = 1.5f; }
-		chargeTime += Global.speedMul * factor;
+		chargeTime += Global.spf * factor;
 	}
 }

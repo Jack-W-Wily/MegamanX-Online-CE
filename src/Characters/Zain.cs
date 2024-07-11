@@ -51,21 +51,7 @@ public override bool normalCtrl() {
 		player.vileAmmo = 0;
 		
 		} 
-		if (ZainCounters == 0){
-		Global.level.gameMode.setHUDErrorMessage(player, "0", playSound: false);		
-		}
-		if (ZainCounters == 1){
-		Global.level.gameMode.setHUDErrorMessage(player, "1", playSound: false);		
-		}
-		if (ZainCounters == 2){
-		Global.level.gameMode.setHUDErrorMessage(player, "2", playSound: false);		
-		}
-		if (ZainCounters == 3){
-		Global.level.gameMode.setHUDErrorMessage(player, "3", playSound: false);		
-		}
-		if (ZainCounters == 4){
-		Global.level.gameMode.setHUDErrorMessage(player, "4", playSound: false);		
-		}
+		
 
 		
 

@@ -83,7 +83,7 @@ public class Hurt : CharState {
 			player.character.increaseCharge();
 		}
 
-		if (stateFrames >= flinchTime) {
+		if (frameTime >= flinchTime) {
 			character.changeToLandingOrFall(false);
 		}
 	}
@@ -95,7 +95,7 @@ public class GenericStun : CharState {
 	public bool changeAnim = true;
 	public bool canPlayFrozenSound = true;
 	public bool canPlayStaticSound = true;
-	public int hurtDir = 1;
+	public int hurtDir;
 	public float hurtSpeed;
 	public float flinchYPos;
 
@@ -124,10 +124,7 @@ public class GenericStun : CharState {
 
 		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0) {
 			if (flinchTime > 0) {
-				character.changeState(
-					new Hurt(hurtDir, MathInt.Ceiling(flinchTime), false, flinchYPos
-					), true
-				);
+				character.setHurt(-character.xDir, MathInt.Ceiling(flinchTime), true);
 				return;
 			}
 			character.changeToIdleOrFall();
@@ -153,7 +150,7 @@ public class GenericStun : CharState {
 	}
 
 	public void crystalizeLogic() {
-		if (character.crystalizedTime == 0 && !character.isCrystalized) {
+		if (character.crystalizedTime == 0) {
 			return;
 		}
 		reduceStunFrames(ref character.crystalizedTime);
@@ -175,6 +172,8 @@ public class GenericStun : CharState {
 		if (character.paralyzedTime == 0) {
 			return;
 		}
+		character.stopMoving();
+		character.useGravity = false;
 		if (canPlayStaticSound) {
 			character.playSound("voltcStatic");
 			canPlayStaticSound = false;
@@ -216,20 +215,23 @@ public class GenericStun : CharState {
 		hurtDir = xDir;
 		if (player.isX && player.hasBodyArmor(1)) {
 			flinchFrames = MathInt.Floor(flinchFrames * 0.75f);
+			sprite = "hurt2";
+			character.changeSpriteFromName("hurt2", true);
 		}
 		if (flinchTime > flinchFrames) {
 			return;
 		}
-		bool isCombo = (flinchTime != 0);
+		bool isCombo = (flinchFrames != 0);
+
 		hurtSpeed = 1.6f * xDir;
-		if (!isCombo) {
-			flinchYPos = character.pos.y;
-		}
 		if (flinchFrames >= 2) {
 			character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
 			if (isCombo && character.pos.y < flinchYPos) {
 				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
+		}
+		if (!isCombo) {
+			flinchYPos = character.pos.y;
 		}
 		flinchTime = flinchFrames;
 		flinchMaxTime = flinchFrames;
@@ -238,12 +240,11 @@ public class GenericStun : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
-		hurtDir = -character.xDir;
 		// To continue the flinch if was flinched before the stun.
 		if (oldState is Hurt hurtState) {
 			hurtDir = hurtState.hurtDir;
 			hurtSpeed = hurtState.hurtSpeed;
-			flinchTime = hurtState.flinchTime - hurtState.stateFrames;
+			flinchTime = hurtState.flinchTime - hurtState.frameTime;
 			flinchYPos = hurtState.flinchYPos;
 			if (flinchTime < 0) {
 				flinchTime = 0;
@@ -263,12 +264,12 @@ public class GenericStun : CharState {
 		character.paralyzedTime = 0;
 		character.frozenTime = 0;
 		character.crystalizedTime = 0;
-
+		character.useGravity = true;
 		base.onExit(newState);
 	}
 
 	public void reduceStunFrames(ref float arg) {
-		arg -= player.mashValue() * 60f;
+		arg -= getTimerFalloff();
 		if (arg <= 0) {
 			arg = 0;
 		}

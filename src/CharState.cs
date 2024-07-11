@@ -21,7 +21,7 @@ public class CharState {
 	public Collider wallKickLeftWall;
 	public Collider wallKickRightWall;
 	public float stateTime;
-	public float stateFrames;
+	public float frameTime;
 	public string enterSound;
 	public float framesJumpNotHeld = 0;
 	public bool once;
@@ -54,7 +54,6 @@ public class CharState {
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
-	public bool canJump;
 	public bool canStopJump;
 	public bool exitOnLanding;
 	public bool exitOnAirborne;
@@ -131,9 +130,6 @@ public class CharState {
 			character.stopMoving();
 		}
 		wasGrounded = character.grounded;
-		if (this is not Jump and not WallKick && oldState?.canStopJump == false) {
-			canStopJump = false;
-		}
 	}
 
 	public virtual bool canEnter(Character character) {
@@ -619,7 +615,7 @@ public class Run : CharState {
 		base.update();
 		var move = new Point(0, 0);
 		float runSpeed = character.getRunSpeed();
-		if (stateFrames <= 4) {
+		if (frameTime <= 4) {
 			runSpeed = 60 * character.getRunDebuffs();
 		}
 		if (player.input.isHeld(Control.Left, player)) {
@@ -860,7 +856,7 @@ public class Dash : CharState {
 		enterSound = "dash";
 		this.initialDashButton = initialDashButton;
 		accuracy = 10;
-		exitOnAirborne = true;
+		//exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
 	}
@@ -1200,6 +1196,9 @@ public class WallSlide : CharState {
 		base.onEnter(oldState);
 		mmx = character as MegamanX;
 		character.dashedInAir = 0;
+		if (character is Zero zero) {
+			zero.quakeBlazerBounces = 0;
+		}
 		if (player.isAI) {
 			character.ai.jumpTime = 0;
 		}

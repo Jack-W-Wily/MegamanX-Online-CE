@@ -81,6 +81,12 @@ public partial class Character {
 		shouldDrawArmBS = new NetCharBoolState(this, 2, NetCharBoolStateNum.One, (character) => {
 			return (character as Axl)?.shouldDrawArm() == true;
 		});
+		isAwakenedZeroBS = new NetCharBoolState(this, 3, NetCharBoolStateNum.One, (character) => {
+			return (character as Zero)?.isAwakenedZero() == true;
+		});
+		isAwakenedGenmuZeroBS = new NetCharBoolState(this, 4, NetCharBoolStateNum.One, (character) => {
+			return (character as Zero)?.isAwakenedGenmuZero() == true;
+		});
 		isInvisibleBS = new NetCharBoolState(this, 5, NetCharBoolStateNum.One, (character) => { return character.isInvisible(); });
 		isReturnIXBS = new NetCharBoolState(this, 6, NetCharBoolStateNum.One, (character) => {
 			return (character as MegamanX)?.isReturnIX == true;
@@ -97,6 +103,8 @@ public partial class Character {
 		isFrozenCastleActiveBS.updateValue();
 		isStrikeChainHookedBS.updateValue();
 		shouldDrawArmBS.updateValue();
+		isAwakenedZeroBS.updateValue();
+		isAwakenedGenmuZeroBS.updateValue();
 		isInvisibleBS.updateValue();
 		isReturnIXBS.updateValue();
 		isHyperSigmaBS.updateValue();
@@ -138,6 +146,7 @@ public partial class Character {
 		hasUltimateArmorBS.updateValue();
 		isDefenderFavoredBS.updateValue();
 		hasSubtankCapacityBS.updateValue();
+		isNightmareZeroBS.updateValue();
 		isDarkHoldBS.updateValue();
 		return netCharState2;
 	}

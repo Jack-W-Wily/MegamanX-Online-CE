@@ -19,7 +19,7 @@ public class PunchyZero : Character {
 
 	// Weapons.
 	public PunchyZeroMeleeWeapon meleeWeapon = new();
-	public PZeroParryWeapon parryWeapon = new();
+	public KKnuckleParry parryWeapon = new();
 	public Weapon gigaAttack;
 	public AwakenedAura awakenedAuraWeapon = new();
 	public ZSaber saberSwingWeapon = new();
@@ -77,20 +77,6 @@ public class PunchyZero : Character {
 			updateAwakenedAura();
 		}
 
-		if (!Global.level.isHyper1v1()) {
-			if (isAwakened && ownedByLocalPlayer) {
-				if (musicSource == null) {
-					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
-				}
-			} else if (isViral && ownedByLocalPlayer) {
-				if (musicSource == null) {
-					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
-				}
-			} else {
-				destroyMusicSource();
-			}
-		}
-
 		base.update();
 
 		// Hypermode timer.
@@ -126,7 +112,7 @@ public class PunchyZero : Character {
 			chargeLogic(shoot);
 		}
 	}
-
+	
 	public override bool canCharge() {
 		return (player.currency > 0 || freeBusterShots > 0) && donutsPending == 0;
 	}
@@ -134,7 +120,7 @@ public class PunchyZero : Character {
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Shoot, player);
 	}
-
+	
 	public void setShootAnim() {
 		string shootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
@@ -158,7 +144,7 @@ public class PunchyZero : Character {
 	}
 
 	public void shoot(int chargeLevel) {
-		if (player.currency <= 0 && freeBusterShots <= 0) { return; }
+		if (player.currency <= 0) { return; }
 		if (chargeLevel == 0) { return; }
 		int currencyUse = 0;
 
@@ -176,19 +162,19 @@ public class PunchyZero : Character {
 			currencyUse = 1;
 			playSound("buster2X3", sendRpc: true);
 			new ZBuster2Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				busterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 2) {
 			currencyUse = 1;
 			playSound("buster3X3", sendRpc: true);
 			new ZBuster3Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				busterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
 			currencyUse = 1;
 			playSound("buster4", sendRpc: true);
 			new ZBuster4Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				busterWeapon, shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 		if (currencyUse > 0) {
@@ -201,7 +187,7 @@ public class PunchyZero : Character {
 	}
 
 	public void shootDonuts(int chargeLevel) {
-		if (player.currency <= 0 && freeBusterShots <= 0) { return; }
+		if (player.currency <= 0) { return; }
 		if (chargeLevel == 0) { return; }
 		int currencyUse = 0;
 
@@ -262,18 +248,18 @@ public class PunchyZero : Character {
 			swingPressTime--;
 		}
 		if (player.input.isPressed(Control.Shoot, player)) {
-			shootPressTime = 6;
+			shootPressTime = 10;
 		}
 		if (player.input.isPressed(Control.Special1, player)) {
-			specialPressTime = 6;
+			specialPressTime = 10;
 		}
 		if (player.input.isPressed(Control.WeaponLeft, player) ||
 			player.input.isPressed(Control.WeaponRight, player) && !isAwakened
 		) {
-			parryPressTime = 6;
+			parryPressTime = 10;
 		}
 		if (player.input.isPressed(Control.WeaponRight, player) && isAwakened) {
-			swingPressTime = 6;
+			swingPressTime = 10;
 		}
 	}
 
@@ -382,7 +368,7 @@ public class PunchyZero : Character {
 			return true;
 		}
 		if (yDir == 1) {
-			if (gigaAttack.shootTime > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
+			if (gigaAttack.shootTime > 0 && gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
 				return false;
 			}
 			if (gigaAttack is RekkohaWeapon) {
@@ -487,15 +473,15 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
-				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch, 0.5f,
+				meleeWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch, 0.25f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, Global.defFlinch, 0.5f,
+				meleeWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, Global.defFlinch, 0.25f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch, 0.5f,
+				meleeWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch, 0.25f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Parry => new GenericMeleeProj(

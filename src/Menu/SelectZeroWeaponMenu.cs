@@ -10,28 +10,34 @@ public class SelectZeroWeaponMenu : IMainMenu {
 	public bool inGame;
 	public string error = "";
 
+	public static List<Weapon> meleeWeapons = new List<Weapon>() {
+		new ZSaber(null),
+		new KKnuckleWeapon(null),
+		new ZeroBuster(),
+	};
+
 	public static List<Weapon> groundSpecialWeapons = new List<Weapon>() {
-		RaijingekiWeapon.staticWeapon,
-		SuiretsusenWeapon.staticWeapon,
-		TBreakerWeapon.staticWeapon,
+		new RaijingekiWeapon(null),
+		new SuiretsusenWeapon(null),
+		new TBreakerWeapon(null)
 	};
 
 	public static List<Weapon> airSpecialWeapons = new List<Weapon>() {
-		KuuenzanWeapon.staticWeapon,
-		FSplasherWeapon.staticWeapon,
-		HyorogaWeapon.staticWeapon,
+		new KuuenzanWeapon(null),
+		new FSplasherWeapon(null),
+		new HyorogaWeapon(null)
 	};
 
 	public static List<Weapon> uppercutWeapons = new List<Weapon>() {
-		RyuenjinWeapon.staticWeapon,
-		DenjinWeapon.staticWeapon,
-		RisingFangWeapon.staticWeapon
+		new RyuenjinWeapon(null),
+		new EBladeWeapon(null),
+		new RisingWeapon(null)
 	};
 
 	public static List<Weapon> downThrustWeapons = new List<Weapon>() {
-		HyouretsuzanWeapon.staticWeapon,
-		RakukojinWeapon.staticWeapon,
-		DanchienWeapon.staticWeapon
+		new HyouretsuzanWeapon(null),
+		new RakukojinWeapon(null),
+		new QuakeBlazerWeapon(null)
 	};
 
 	public static List<Weapon> gigaAttackWeapons = new List<Weapon>() {

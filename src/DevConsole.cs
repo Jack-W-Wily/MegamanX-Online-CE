@@ -138,9 +138,7 @@ public class DevConsole {
 	public static void aiRevive() {
 		if (Global.debug) {
 			Global.shouldAiAutoRevive = true;
-			Global.level.otherPlayer.character?.applyDamage(
-				Damager.envKillDamage, Global.level.otherPlayer, Global.level.otherPlayer.character, null, null
-			);
+			Global.level.otherPlayer.character?.applyDamage(null, null, Damager.envKillDamage, null);
 		}
 	}
 

@@ -117,10 +117,7 @@ public partial class Actor {
 				args.AddRange(armorBytes);
 			}
 			if (character is Zero zero) {
-				ammo = MathInt.Ceiling(zero.gigaAttack.ammo);
-			}
-			if (character is PunchyZero pzero) {
-				ammo = MathInt.Ceiling(pzero.gigaAttack.ammo);
+				ammo = MathInt.Ceiling(zero.zeroGigaAttackWeapon.ammo);
 			}
 			if (character is Vile vile) {
 				ammo = (int)character.player.vileAmmo;
@@ -148,7 +145,7 @@ public partial class Actor {
 				args.Add((byte)(int)(character.burnTime * 20));
 			}
 			if (charMask[2]) {
-				args.Add((byte)MathInt.Ceiling(character.chargeTime / 3));
+				args.Add((byte)(int)(character.chargeTime * 20));
 			}
 			if (charMask[3]) {
 				args.Add((byte)(int)(character.igFreezeProgress * 20));
@@ -331,21 +328,7 @@ public class RPCUpdateActor : RPC {
 		spriteIndex = BitConverter.ToUInt16(new byte[] { arguments[i], arguments[i + 1] }, 0);
 		i += 2;
 
-		Actor? actor = Global.level.getActorByNetId(netId, true);
-
-		if (actor == null) {
-			int? playerId = Player.getPlayerIdFromCharNetId(netId);
-			if (playerId != null) {
-				var player = Global.level.getPlayerById(playerId.Value);
-				if (player != null) {
-					Global.level.addFailedSpawn(
-						playerId.Value, new Point(xPos ?? 0, yPos ?? 0), xDir ?? 1, netId
-					);
-				}
-			}
-			return;
-		}
-
+		Actor actor = Global.level.getActorByNetId(netId);
 		try {
 			if (actor != null && !actor.ownedByLocalPlayer) {
 				// In case we are updating a local object.
@@ -405,7 +388,7 @@ public class RPCUpdateActor : RPC {
 					}
 					// Zero section.
 					if (character.player.isZero && character is Zero zero) {
-						zero.gigaAttack.ammo = ammo;
+						zero.zeroGigaAttackWeapon.ammo = ammo;
 					}
 					// Vile section.
 					if (character.player.isVile && character is Vile vile) {
@@ -447,7 +430,7 @@ public class RPCUpdateActor : RPC {
 					// charge section
 					if (charMaskBools[2]) {
 						byte chargeTime = arguments[i++];
-						character.chargeTime = chargeTime * 3;
+						character.chargeTime = chargeTime / 20f;
 					} else {
 						character.chargeTime = 0;
 					}
@@ -673,6 +656,16 @@ public class RPCUpdateActor : RPC {
 			string msg = string.Format("Index out of bounds. Actor type: {0}, args len: {1}, i: {2}, netId: {3}",
 				actor.GetType().ToString(), arguments.Length.ToString(), i.ToString(), netId.ToString());
 			throw new Exception(msg);
+		}
+
+		if (actor == null) {
+			int? playerId = Player.getPlayerIdFromCharNetId(netId);
+			if (playerId != null) {
+				var player = Global.level.getPlayerById(playerId.Value);
+				if (player != null) {
+					Global.level.addFailedSpawn(playerId.Value, new Point(xPos ?? 0, yPos ?? 0), xDir ?? 1, netId);
+				}
+			}
 		}
 	}
 }

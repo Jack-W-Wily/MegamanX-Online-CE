@@ -419,9 +419,11 @@ public class RaySplasherTurret : Actor, IDamagable
 			
 	}
 
-	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
-		if (projId == (int)ProjIds.SpinningBlade) {
-			damage *= 2;
+	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId)
+	{
+		if (projId == 60)
+		{
+			damage *= 2f;
 		}
 		addDamageTextHelper(owner, damage, 4f, sendRpc: false);
 		health -= damage;

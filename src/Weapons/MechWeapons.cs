@@ -240,7 +240,7 @@ public class MechMissileProj : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

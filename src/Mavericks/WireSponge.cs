@@ -830,7 +830,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		moveWithMovingPlatform();
 	}
 
-	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();

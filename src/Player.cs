@@ -762,17 +762,21 @@ public partial class Player {
 
 	// The first net id this player could possibly own. This includes the "reserved" ones
 	public ushort getStartNetId() {
-		return (ushort)(Level.firstNormalNetId + (ushort)(id * netIdsPerPlayer));
+		return (ushort)(Level.maxReservedNetId + (ushort)(id * netIdsPerPlayer));
 	}
 
 	// The character net id is always the first net id of the player
 	public ushort getCharActorNetId() {
+		if (isLocalAI) {
+			return Global.level.mainPlayer.getStartNetId();
+		}
+
 		return getStartNetId();
 	}
 
 	public static int? getPlayerIdFromCharNetId(ushort charNetId) {
 		int netIdInt = charNetId;
-		int maxIdInt = Level.firstNormalNetId;
+		int maxIdInt = Level.maxReservedNetId;
 		int diff = (netIdInt - maxIdInt);
 		if (diff < 0) return null;
 		if (diff % netIdsPerPlayer != 0) {
@@ -790,6 +794,9 @@ public partial class Player {
 	}
 
 	public ushort getNextATransNetId() {
+		if (isLocalAI) {
+			return Global.level.mainPlayer.getStartNetId();
+		}
 		var retId = curATransNetId;
 		curATransNetId++;
 		if (curATransNetId >= getStartNetId() + 10) {
@@ -800,26 +807,18 @@ public partial class Player {
 
 	// Usually, only the main player is allowed to get the next actor net id. The exception is if you call setNextActorNetId() first. The assert checks for that in debug.
 	public ushort getNextActorNetId(bool allowNonMainPlayer = false) {
-		// Increase by 1 normall.
-		int retId = curMaxNetId;
-		curMaxNetId++;
-		// Use this to avoid duplicates.
-		if (ownedByLocalPlayer) {
-			while (
-				Global.level.actorsById.GetValueOrDefault(curMaxNetId) != null &&
-				curMaxNetId <= getStartNetId() + netIdsPerPlayer
-			) {
-				// Overwrite if destroyed.
-				if (Global.level.actorsById[curMaxNetId].destroyed) {
-					break;
-				}
-				curMaxNetId++;
-			}
+		if (isLocalAI) {
+			return Global.level.mainPlayer.getStartNetId();
 		}
+
+		var retId = curMaxNetId;
+		curMaxNetId++;
+
 		if (curMaxNetId >= getStartNetId() + netIdsPerPlayer) {
 			curMaxNetId = getFirstAvailableNetId();
 		}
-		return (ushort)retId;
+
+		return retId;
 	}
 
 	public void setNextActorNetId(ushort curMaxNetId) {
@@ -1178,7 +1177,7 @@ public partial class Player {
 			//	throw new Exception("Error: Non-valid char ID: " + charNum);
 			//}
 			// Hyper mode overrides (POST)
-			if (Global.level.isHyperMatch() && ownedByLocalPlayer) {
+			if (Global.level.isHyper1v1() && ownedByLocalPlayer) {
 				if (isX) {
 					setUltimateArmor(true);
 				}
@@ -1187,7 +1186,9 @@ public partial class Player {
 						zero.blackZeroTime = 9999;
 						zero.hyperZeroUsed = true;
 					} else {
-						zero.awakenedPhase = 1;
+						zero.awakenedZeroTime = 0;
+						zero.hyperZeroUsed = true;
+						currency = 9999;
 					}
 				}
 				if (character is Axl axl) {
@@ -1703,15 +1704,15 @@ public partial class Player {
 		}
 
 		if (character is Zero zero) {
-			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
-			zero.gigaAttack.ammo = dnaCore.rakuhouhaAmmo;
+			zero.zeroGigaAttackWeapon.ammo = dnaCore.rakuhouhaAmmo;
+			zero.zeroDarkHoldWeapon.ammo = dnaCore.rakuhouhaAmmo;
 
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) {
 				zero.blackZeroTime = 9999;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) {
-				zero.awakenedPhase = 1;
+				zero.awakenedZeroTime = 0;
 			} else if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
-				zero.isViral = true;
+				zero.isNightmareZero = true;
 			}
 		} else if (charNum == (int)CharIds.Axl && character is Axl axl) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
@@ -1734,9 +1735,11 @@ public partial class Player {
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 
 			if (character is Zero zero) {
-				lastDNACore.rakuhouhaAmmo = zero.gigaAttack.ammo;
-			} else if (character is PunchyZero pzero) {
-				lastDNACore.rakuhouhaAmmo = pzero.gigaAttack.ammo;
+				if (zero.isNightmareZero) {
+					lastDNACore.rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
+				} else {
+					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
+				}
 			} else if (isSigma) {
 				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
 			}
@@ -1755,7 +1758,7 @@ public partial class Player {
 		health = Math.Min(health, maxHealth);
 		loadout = oldAxlLoadout;
 		weapons = oldWeapons;
-		configureStaticWeapons();
+	//	configureStaticWeapons();
 		weaponSlot = 0;
 
 		armorFlag = oldArmorFlag;
@@ -1791,9 +1794,11 @@ public partial class Player {
 			Global.serverClient?.rpc(RPC.axlDisguise, json);
 
 			if (character is Zero zero) {
-				lastDNACore.rakuhouhaAmmo = zero.gigaAttack.ammo;
-			} else if (character is PunchyZero pzero) {
-				lastDNACore.rakuhouhaAmmo = pzero.gigaAttack.ammo;
+				if (zero.isNightmareZero) {
+					lastDNACore.rakuhouhaAmmo = zero.zeroDarkHoldWeapon.ammo;
+				} else {
+					lastDNACore.rakuhouhaAmmo = zero.zeroGigaAttackWeapon.ammo;
+				}
 			} else if (isSigma) {
 				lastDNACore.rakuhouhaAmmo = sigmaAmmo;
 			}
@@ -1804,7 +1809,7 @@ public partial class Player {
 		health = 0;
 		loadout = oldAxlLoadout;
 		configureWeapons();
-		configureStaticWeapons();
+	//	configureStaticWeapons();
 		weaponSlot = 0;
 
 		armorFlag = oldArmorFlag;
@@ -2042,9 +2047,8 @@ public partial class Player {
 		} else {
 			fillSubtank(4);
 		}
-		if (character is Zero zero && zero.isViral) {
+		if (character is Zero zero && zero.isNightmareZero) {
 			zero.freeBusterShots++;
-			return;
 		}
 		if (character is PunchyZero pzero && pzero.isViral) {
 			pzero.freeBusterShots++;
@@ -2365,7 +2369,7 @@ public partial class Player {
 	}
 
 	public void maverick1v1Kill() {
-		character?.applyDamage(1000, null, null, null, null);
+		character?.applyDamage(null, null, 1000, null);
 		character?.destroySelf();
 		character = null;
 		respawnTime = getRespawnTime() * (suicided ? 2 : 1);
@@ -2377,17 +2381,17 @@ public partial class Player {
 	public void forceKill() {
 		if (maverick1v1 != null && Global.level.is1v1()) {
 			//character?.applyDamage(null, null, 1000, null);
-			currentMaverick?.applyDamage(1000, this, character, null, null);
+			currentMaverick?.applyDamage(null, null, 1000, null);
 			return;
 		}
 
 		if (currentMaverick != null && isTagTeam()) {
 			destroyCharacter();
 		} else {
-			character?.applyDamage(1000, this, character, null, null);
+			character?.applyDamage(null, null, 1000, null);
 		}
 		foreach (var maverick in mavericks) {
-			maverick.applyDamage(1000, this, character, null, null);
+			maverick.applyDamage(null, null, 1000, null);
 		}
 	}
 

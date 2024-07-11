@@ -7,11 +7,9 @@ namespace MMXOnline;
 
 // Everything strongly related to actor collision should go here
 public partial class Actor {
-	private Collider _globalCollider = null!;
+	private Collider _globalCollider;
 
-	// One of the possible colliders of an actor.
-	// This is typically used for a collider shared across multiple sprites an actor can be.
-	// Typically used for chars, mavericks, rides, etc.
+	// One of the possible colliders of an actor. This is typically used for a collider shared across multiple sprites an actor can be. Typically used for chars, mavericks, rides, etc.
 	public Collider globalCollider {
 		get {
 			return _globalCollider;
@@ -113,9 +111,6 @@ public partial class Actor {
 			Color hitboxColor = new Color(173, 216, 230, 128);
 			if (allCollider.isAttack()) {
 				hitboxColor = new Color(byte.MaxValue, 0, 0, 128);
-				if (destroyed) {
-					hitboxColor = new Color(128, 0, 255, 128);
-				}
 			} else {
 				hasNonAttackColider = true;
 			}

@@ -28,10 +28,10 @@ public partial class Character : Actor, IDamagable {
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
 	public float chargeTime;
-	public float charge1Time = 30;
-	public float charge2Time = 105;
-	public float charge3Time = 180;
-	public float charge4Time = 255;
+	public float charge1Time = 0.5f;
+	public float charge2Time = 1.75f;
+	public float charge3Time = 3f;
+	public float charge4Time = 4.25f;
 	public float hyperProgress;
 
 	public Point? sigmaHeadGroundCamCenterPos;
@@ -232,9 +232,6 @@ public partial class Character : Actor, IDamagable {
 	public float vaccineTime;
 	public float vaccineHurtCooldown;
 
-	// Ctrl data
-	public int altCtrlsLength = 1;
-
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -339,98 +336,63 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addAcidTime(Player attacker, float time) {
-		if (!ownedByLocalPlayer ||
-			(this as MegamanX)?.chargedRollingShieldProj != null ||
-			isInvulnerable() ||
-			isVaccinated()
-		) {
-			return;
-		}
-		// If attacker is null use the same, else use self.
-		Player newAttacker = attacker ?? burnDamager?.owner ?? player;
-		if (acidDamager == null) {
-			acidDamager = new Damager(newAttacker, 0, 0, 0);
-		} else {
-			acidDamager.owner = newAttacker;
-		}
-		// Reset timer if it's 0.
-		if (acidTime == 0) {
-			acidHurtCooldown = 1;
-		}
-		// Apply time if we do not go over 8.
-		if (acidTime + time >= 8) {
-			acidTime += time;
-		}
+		if (!ownedByLocalPlayer) return;
+		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
+		if (isInvulnerable()) return;
+		if (isVaccinated()) return;
+
+		Damager damager = new Damager(attacker, 0, 0, 0);
+		if (acidTime == 0 || acidDamager == null) {
+			acidDamager = damager;
+		} else if (acidDamager.owner != damager.owner) return;
+		acidHurtCooldown = 0.5f;
+		acidTime += time;
+		oilTime = 0;
+		if (acidTime > 8) acidTime = 8;
 	}
 
 	public void addOilTime(Player attacker, float time) {
-		if (!ownedByLocalPlayer ||
-			(this as MegamanX)?.chargedRollingShieldProj != null ||
-			isInvulnerable() ||
-			isVaccinated()
-		) {
-			return;
-		}
-		// If attacker is null use the same, else use self.
-		Player newAttacker = attacker ?? burnDamager?.owner ?? player;
-		if (oilDamager == null) {
-			oilDamager = new Damager(newAttacker, 0, 0, 0);
-		} else {
-			oilDamager.owner = newAttacker;
-		}
-		// Apply time and limit to 8.
+		if (!ownedByLocalPlayer) return;
+		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
+		if (isInvulnerable()) return;
+		if (isVaccinated()) return;
+
+		Damager damager = new Damager(attacker, 0, 0, 0);
+		if (oilTime == 0 || oilDamager == null) {
+			oilDamager = damager;
+		} else if (oilDamager.owner != damager.owner) return;
 		oilTime += time;
-		if (oilTime >= 8) {
-			oilTime = 8;
-		}
-		// Activate burn if burning.
+		acidTime = 0;
+		if (oilTime > 8) oilTime = 8;
+
 		if (burnTime > 0) {
-			addBurnTime(attacker, new FlameMOilWeapon(), 2);
+			float oldBurnTime = burnTime;
+			burnTime = 0;
+			addBurnTime(attacker, new FlameMOilWeapon(), oldBurnTime + 2);
 			return;
 		}
 	}
 
 	public void addBurnTime(Player? attacker, Weapon weapon, float time) {
-		if (!ownedByLocalPlayer ||
-			(this as MegamanX)?.chargedRollingShieldProj != null ||
-			isInvulnerable() ||
-			isVaccinated()
-		) {
-			return;
-		}
-		// If attacker is null use the same, else use self.
-		Player newAttacker = attacker ?? burnDamager?.owner ?? player;
-		if (burnDamager == null) {
-			burnDamager = new Damager(newAttacker, 0, 0, 0);
+		if (!ownedByLocalPlayer) return;
+		if ((this as MegamanX)?.chargedRollingShieldProj != null) return;
+		if (isInvulnerable()) return;
+		if (isVaccinated()) return;
+
+		Damager damager = new Damager(attacker, 0, 0, 0);
+		if (burnTime == 0 || burnDamager == null) {
+			burnDamager = damager;
 			burnWeapon = weapon;
-		} else {
-			burnDamager.owner = newAttacker;
-			burnWeapon = weapon;
-		}
-		// Reset timer if it's 0.
-		if (burnTime == 0) {
-			burnHurtCooldown = 1;
-		}
-		// Apply time if we do not go over 8.
-		if (burnTime + time >= 8) {
-			burnTime += time;
-		}
-		// Oil explosion.
+		} else if (burnDamager.owner != damager.owner) return;
+		burnHurtCooldown = 0.5f;
+		burnTime += time;
 		if (oilTime > 0) {
 			playSound("flamemOilBurn", sendRpc: true);
-			burnDamager.applyDamage(
-				this, false, weapon, this, (int)ProjIds.Burn,
-				overrideDamage: 2, overrideFlinch: Global.defFlinch
-			);
-			// Apply burn damage instantly.
+			damager.applyDamage(this, false, weapon, this, (int)ProjIds.Burn, overrideDamage: 2, overrideFlinch: Global.defFlinch);
 			burnTime += oilTime;
 			oilTime = 0;
-			burnHurtCooldown = 1;
-			// Double check again in case oil increased over 8.
-			if (burnTime >= 8) {
-				burnTime = 8;
-			}
 		}
+		if (burnTime > 8) burnTime = 8;
 	}
 
 	float igFreezeRecoveryCooldown = 0;
@@ -702,6 +664,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canWallClimb() {
+		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
 		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
@@ -711,7 +674,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canUseLadder() {
-		if (!charState.normalCtrl) return false;
+		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
 		if (rideArmorPlatform != null) return false;
 		if (isSoftLocked()) return false;
 		if (charState is VileHover) {
@@ -721,7 +684,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canStartClimbLadder() {
-		if (!charState.normalCtrl) return false;
+		if (charState is ZSaberProjSwingState || charState is ZeroDoubleBuster) return false;
 		return true;
 	}
 
@@ -745,7 +708,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canShoot() {
-		return charState.attackCtrl;
+		if (isInvulnerableAttack()) {
+			return false;
+		}
+		return true;
 	}
 
 	public virtual bool canChangeWeapons() {
@@ -936,7 +902,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void onCollision(CollideData other) {
-		if (charState is SaberParryStartState punchParry &&
+		if (charState is KKnuckleParryStartState punchParry &&
 			other.gameObject is Projectile proj &&
 			punchParry.canParry(proj) &&
 			proj.owner.alliance != player.alliance &&
@@ -1174,16 +1140,8 @@ public partial class Character : Actor, IDamagable {
 			acidHurtCooldown += Global.spf;
 			if (acidHurtCooldown > 1) {
 				acidHurtCooldown = 0;
-				acidDamager?.applyDamage(
-					this, player.weapon is TunnelFang,
-					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
-					overrideDamage: 1f
-				);
-				new Anim(
-					getCenterPos().addxy(Helpers.randomRange(-6, 6), -20),
-					"torpedo_smoke", 1, null, true) {
-						vel = new Point(0, -50)
-					};
+				acidDamager?.applyDamage(this, player.weapon is TunnelFang, new AcidBurst(), this, (int)ProjIds.AcidBurstPoison, overrideDamage: 1f);
+				new Anim(getCenterPos().addxy(0, -20), "torpedo_smoke", 1, null, true) { vel = new Point(0, -50) };
 			}
 			if (isUnderwater() || charState.invincible || isCCImmune()) {
 				acidTime = 0;
@@ -1335,7 +1293,7 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (player.isVile && !player.isAI && !player.isDisguisedAxl && player.getVileWeightActive() > VileLoadout.maxWeight && charState is not WarpIn && charState is not Die) {
-			applyDamage(Damager.envKillDamage, player, this, null, null);
+			applyDamage(null, null, Damager.envKillDamage, null);
 			return;
 		}
 
@@ -1366,7 +1324,7 @@ public partial class Character : Actor, IDamagable {
 				if (charState is not Die) {
 					incPos(new Point(0, 25));
 				}
-				applyDamage(Damager.envKillDamage, player, this, null, null);
+				applyDamage(null, null, Damager.envKillDamage, null);
 			}
 		}
 
@@ -1451,7 +1409,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override void statePostUpdate() {
 		base.statePostUpdate();
-		charState.stateFrames += 1f * Global.speedMul;
+		charState.frameTime += 1f * Global.speedMul;
 	}
 
 	public virtual bool updateCtrl() {
@@ -1464,9 +1422,8 @@ public partial class Character : Actor, IDamagable {
 		if (charState.exitOnAirborne && !grounded) {
 			changeState(new Fall());
 		}
-		if (canWallClimb() &&
-			(charState.normalCtrl || charState.airMove || charState is WallSlide) &&
-			!grounded && vel.y >= 0 &&
+		if (canWallClimb() && !grounded &&
+			(charState.airMove && vel.y > 0 || charState is WallSlide) &&
 			wallKickTimer <= 0 &&
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
@@ -1498,11 +1455,7 @@ public partial class Character : Actor, IDamagable {
 				xDir = -wallKickDir;
 			}
 			wallKickTimer = maxWallKickTime;
-			if (charState.normalCtrl || charState is WallSlide) {
-				changeState(new WallKick(), true);
-			} else {
-				playSound("jump", sendRpc: true);
-			}
+			changeState(new WallKick(), true);
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
 			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
 			if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
@@ -1520,20 +1473,6 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (charState.airMove && !grounded) {
 			airMove();
-		}
-		if (charState.canJump && (grounded || canAirJump())) {
-			if (player.input.isPressed(Control.Jump, player)) {
-				if (!grounded) {
-					dashedInAir++;
-				} else {
-					grounded = false;
-				}
-				vel.y = -getJumpPower();
-				playSound("jump", sendRpc: true);
-				if (charState.airSprite != null && charState.airSprite != "") {
-					changeSprite(charState.airSprite, false);
-				}
-			}
 		}
 		if (charState.normalCtrl) {
 			normalCtrl();
@@ -2211,7 +2150,7 @@ public partial class Character : Actor, IDamagable {
 				clampTo3 = player.weapon is not Buster && !player.HasFullForce();
 				break;
 			case Zero zero:
-				clampTo3 = !zero.isBlack;
+				clampTo3 = !zero.canUseDoubleBusterCombo();
 				break;
 			case Vile vile:
 				clampTo3 = false;//!vile.isVileMK5;
@@ -2269,7 +2208,6 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Set the character as soon as posible.
 		newState.character = this;
-		newState.altCtrls = new bool[altCtrlsLength];
 		// For Ride Armor stuns.
 		if (charState is InRideArmor inRideArmor) {
 			if (newState is GenericStun) {
@@ -2286,26 +2224,17 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		if (charState?.canExit(this, newState) == false) {
-			return; 
+			return;
 		}
 		if (!newState.canEnter(this)) {
 			return;
 		}
 		changedStateInFrame = true;
+
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
-			string spriteName = sprite?.name ?? "";
 			changeSprite(getSprite(newState.sprite), true);
-
-			if (sprite != null && spriteName == sprite.name && this is not MegamanX) {
-				sprite.frameIndex = 0;
-				sprite.frameTime = 0;
-				sprite.time = 0;
-				sprite.frameSpeed = 1;
-				sprite.loopCount = 0;
-				sprite.visible = true;
-			}
 		}
 		CharState? oldState = charState;
 		oldState?.onExit(newState);
@@ -2910,17 +2839,17 @@ public partial class Character : Actor, IDamagable {
 		deductLabelY(labelNameOffY);
 	}
 
-	public virtual void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
+	public void applyDamage(Player attacker, int? weaponIndex, float fDamage, int? projId) {
 		if (!ownedByLocalPlayer) return;
-		decimal damage = decimal.Parse(fDamage.ToString());
+		decimal damage = (decimal)fDamage;
 		decimal originalDamage = damage;
-		decimal originalHP = decimal.Parse(player.health.ToString());
-		decimal decimalHP = originalHP;
+		decimal originalHP = (decimal)player.health;
+		decimal decimalHP = (decimal)player.health;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
 
 		// For Dark Hold break.
-		if (damage > 0 && charState is DarkHoldState dhs && dhs.stateFrames > 10 && !Damager.isDot(projId)) {
+		if (damage > 0 && charState is DarkHoldState dhs && dhs.frameTime > 10 && !Damager.isDot(projId)) {
 			changeToIdleOrFall();
 		}
 
@@ -3010,28 +2939,18 @@ public partial class Character : Actor, IDamagable {
 			decimalHP - damage <= 0 &&
 			(decimalHP + damageSavings) - damage > 0
 		) {
-			// Apply in the normal way.
 			while (damageSavings >= 1) {
 				damageSavings -= 1;
 				damage -= 1;
 			}
-			// Decimal protection scenario.
-			if (damage > 0 && damageSavings > 0 && damageSavings + (1m/8m) >= damage) {
-				damage = 0;
-				damageSavings = damageSavings - damage;
-				if (damageSavings <= 0) {
-					damageSavings = 0;
-				}
-			} 
 		}
 
 		// If somehow the damage is negative.
 		// Heals are not really applied here.
 		if (damage < 0) { damage = 0; }
 
-		decimalHP = decimalHP - damage;
-		// We use this to attempt to reduce float errors.
-		player.health = float.Parse(decimalHP.ToString());
+		player.health -= (float)damage;
+		decimalHP = (decimal)player.health;
 
 		if (player.showTrainingDps && player.health > 0 && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
@@ -3062,7 +2981,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			float gigaAmmoToAdd = (float)(1 + (gigaDamage * 2 * modifier));
 			if (this is Zero zero) {
-				zero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				zero.zeroGigaAttackWeapon.addAmmo(gigaAmmoToAdd, player);
 			}
 			if (this is PunchyZero punchyZero) {
 				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
@@ -3309,7 +3228,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		if (charState is Hurt hurtState) {
-			if (hurtState.stateFrames <= flinchFrames) {
+			if (hurtState.frameTime <= flinchFrames) {
 				// You can probably add a check here that sets "hurtState.yStartPos" to null if you.
 				// Want to add a flinch attack that pushes up on chain-flinch.
 				changeState(new Hurt(dir, flinchFrames, false, hurtState.flinchYPos), true);
@@ -3489,6 +3408,20 @@ public partial class Character : Actor, IDamagable {
 			};
 		}
 		return retProjs;
+	}
+
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
+			float damagePercent = getKaiserStompDamage();
+			if (damagePercent > 0) {
+				proj.damager.damage = 12 * damagePercent;
+			}
+		} else if (proj.projId == (int)ProjIds.AwakenedAura) {
+			if (isAwakenedGenmuZeroBS.getValue()) {
+				proj.damager.damage = 4;
+				proj.damager.flinch = Global.defFlinch;
+			}
+		}
 	}
 
 	public float getKaiserStompDamage() {
@@ -3730,7 +3663,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Release charge only if not holding and we can attack.
 		// This to prevent from losing charge.
-		else if (canShoot()) {
+		else if (charState.attackCtrl) {
 			int chargeLevel = getChargeLevel();
 			if (isCharging()) {
 				if (chargeLevel >= 1) {

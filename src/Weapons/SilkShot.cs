@@ -41,7 +41,6 @@ public class SilkShotProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 200, 2, player, "silkshot_proj", 0, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 6f;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		useGravity = true;
@@ -106,14 +105,7 @@ public class SilkShotProjShrapnel : Projectile {
 
 public class SilkShotProjCharged : Projectile {
 	bool splitOnce;
-	public SilkShotProjCharged(
-		Weapon weapon, Point pos, int xDir, Player player,
-		ushort netProjId, bool rpc = false
-	) : base(
-		weapon, pos, xDir, 200, 4, player, "silkshot_proj_charged",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
-	) {
-		maxTime = 6f;
+	public SilkShotProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) : base(weapon, pos, xDir, 200, 4, player, "silkshot_proj_charged", Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "explosion";
 		fadeSound = "silkShotChargedExplosion";
 		useGravity = true;
@@ -158,7 +150,6 @@ public class SilkShotProjLv2 : Projectile {
 		SilkShot.netWeapon, pos, xDir, 200, 3, player, "silkshot_proj",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 6f;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		useGravity = true;

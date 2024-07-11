@@ -41,6 +41,7 @@ public class HighMax : Character {
 	public override bool attackCtrl() {
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool dashPressed = player.input.isPressed(Control.Dash, player);
 		if (shootPressed && !player.input.isHeld(Control.Down,player)) {
 			if (IdlePunchCooldown == 0) {
 			
@@ -61,6 +62,10 @@ public class HighMax : Character {
 	
 			}
 		}
+		if (dashPressed) {
+					changeState(new HighMaxChargePunch(), true);		
+					return true;
+		}
 		return base.attackCtrl();
 	}
 
@@ -72,7 +77,14 @@ public class HighMax : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		// Blocking
+		if (player.input.isHeld(Control.Up, player) && 
+			!isAttacking() && grounded && noBlockTime == 0 && !player.input.isHeld(Control.Shoot, player) &&
+			charState is not SwordBlock
+		) {
+			changeState(new SwordBlock());
 	
+		}
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
@@ -91,6 +103,8 @@ public class HighMax : Character {
 		if (charState.exitOnAirborne && !grounded) {
 			changeState(new Fall());
 		}
+
+		
 		if (canWallClimb() && !grounded &&
 			(charState.airMove && vel.y > 0 || charState is WallSlide) &&
 			wallKickTimer <= 0 &&
@@ -162,7 +176,7 @@ public class HighMax : Character {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
+				new RisingWeapon(player), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
 		 if (  sprite.name.Contains("idle_punch"))
@@ -177,7 +191,10 @@ public class HighMax : Character {
 		{
 			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0);
 		}
-
+		 if ( sprite.name.Contains("dash_punch"))
+		{
+			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.HoutenjinF, player, 5f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
+		}
 		return proj;
 	}
 }
