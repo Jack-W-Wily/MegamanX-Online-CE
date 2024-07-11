@@ -1908,7 +1908,7 @@ public class Axl : Character {
 		}
 		return hasEmptyAmmo;
 	}
-
+/*
 	public override bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		bool damaged = base.canBeDamaged(damagerAlliance, damagerPlayerId, projId);
 		if (stealthActive) {
@@ -1916,7 +1916,7 @@ public class Axl : Character {
 		}
 		return damaged;
 	}
-
+	*/
 	public override bool isStealthy(int alliance) {
 		return (player.alliance != alliance && (stealthActive || player.isDisguisedAxl && !disguiseCoverBlown));
 	}

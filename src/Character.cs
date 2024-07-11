@@ -1822,8 +1822,9 @@ public partial class Character : Actor, IDamagable {
 		return !charState.invincible && grabInvulnTime == 0 && !isCCImmune() && charState is not DarkHoldState;
 	}
 
-	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		if (isInvulnerable()) return false;
+
+	public virtual bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+	if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
 		if (specialState == (int)SpecialStateIds.AxlRoll ||
@@ -2822,31 +2823,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public virtual bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		if (isInvulnerable()) return false;
-		if (isDeathOrReviveSprite()) return false;
-		if (Global.level.gameMode.setupTime > 0) return false;
-		if (Global.level.isRace()) {
-			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
-			if (!isAxlSelfDamage) return false;
-		}
-
-		// Self damaging projIds can go thru alliance check
-		bool isSelfDamaging =
-			projId == (int)ProjIds.BlastLauncherSplash ||
-			projId == (int)ProjIds.GreenSpinnerSplash ||
-			projId == (int)ProjIds.NecroBurst ||
-			projId == (int)ProjIds.SniperMissileBlast ||
-			projId == (int)ProjIds.SpeedBurnerRecoil;
-
-		if (isSelfDamaging && damagerPlayerId == player.id) {
-			return true;
-		}
-
-		if (player.alliance == damagerAlliance) return false;
-
-		return true;
-	}
+	
 
 	public virtual void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
