@@ -37,7 +37,7 @@ public enum CharIds {
 	KaiserSigma,
 	// Non-vanilla chars start here.
 	Rock = 10,
-	RockmanX,
+	RMX,
 	AXLWcut,
 	ZeroEND,
 	ZeroX1,
@@ -51,7 +51,7 @@ public enum CharIds {
 	HighMax,
 	Lumine,
 	GATE,
-	
+
 }
 
 public class CharSelection {

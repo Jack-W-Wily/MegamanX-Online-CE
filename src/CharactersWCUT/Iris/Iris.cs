@@ -84,11 +84,11 @@ public class Iris : Character {
 		}
 		 if (  sprite.name.Contains("attack") && !sprite.name.Contains("rising"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
 		}
 		 if (  sprite.name.Contains("rising"))
 		{
-			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 3f, 30);
+	//		return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 3f, 30);
 		}
 
 		return proj;
