@@ -71,6 +71,11 @@ public class TriadThunderProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, new byte[] { (byte)(yDir + 2) });
 		}
+
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
@@ -150,6 +155,11 @@ public class TriadThunderBall : Projectile {
 		projId = (int)ProjIds.TriadThunder;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public override void update() {
@@ -259,35 +269,9 @@ public class TriadThunderProjCharged : Projectile {
 		}
 	}
 
-
-	bool startedWallCrawl;
-	int spriteXDir = 1;
-	string spriteName;
-
 	public override void update() {
 		base.update();
-		if (startedWallCrawl) {
-			updateWallCrawl();
-			if (spriteXDir == -1) {
-				byteAngle -= 128;
-			}
-		} 		
-	}
-
-	public override void onHitWall(CollideData other) {
-		base.onHitWall(other);
-		if (Global.level.levelData.wallPathNodes.Count == 0) return;
-		if (startedWallCrawl) return;
-		if (!ownedByLocalPlayer) return;
-		setupWallCrawl(deltaPos);
-		stopMoving();
-		startedWallCrawl = true;
-		changePos(other.getHitPointSafe());
-		if (deltaPos.x >= 0) {
-			spriteXDir = 1;
-		} else {
-			spriteXDir = -1;;
-		}
+		updateWallCrawl();
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
@@ -309,6 +293,11 @@ public class TriadThunderQuake : Projectile {
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
+		}
+
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
 		}
 	}
 
@@ -354,7 +343,7 @@ public class TriadThunderChargedState : CharState {
 			new TriadThunderProjCharged(weapon, new Point(x, y), 1, 0, player, player.getNextActorNetId(), rpc: true);
 			new TriadThunderQuake(weapon, new Point(x, y), 1, player, player.getNextActorNetId(), rpc: true);
 
-			character.playSound("triadThunderCharged", sendRpc: true);
+			character.playSound("crashX3", forcePlay: false, sendRpc: true);
 		}
 
 		if (stateTime > 0.75f) {

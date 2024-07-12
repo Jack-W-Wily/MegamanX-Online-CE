@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class ShoryukenWeapon : Weapon {
 	public ShoryukenWeapon(Player player) : base() {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+		damager = new Damager(player, Damager.ohkoDamage, Global.defFlinch, 0.5f);
 		ammo = 0;
 		index = (int)WeaponIds.Shoryuken;
 		weaponBarBaseIndex = 32;
@@ -40,13 +34,11 @@ public class Shoryuken : CharState {
 		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
-			character.vel.y = -character.getJumpPower() * 1.5f;
-			if (!isUnderwater) {
-				character.playSound("shoryuken", sendRpc: true);
-			}
+			character.vel.y = -character.getJumpPower() * 4.75f;
+			character.playSound("shoryukenV", sendRpc: true);
 		}
 		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Count > 0) {
-			character.move(new Point(character.xDir * 150, 0));
+			character.move(new Point(character.xDir * 165, 0));
 			Point poi = character.currentFrame.POIs[0];
 			Point firePos = character.pos.addxy(poi.x * character.xDir, poi.y);
 			if (anim == null) {

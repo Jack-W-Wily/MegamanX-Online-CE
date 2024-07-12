@@ -19,18 +19,8 @@ public enum SpecialStateIds {
 	AxlRoll,
 	HyorogaStart,
 	XTeleport,
-	PZeroParry,
-
-	XtremeDash,
-	VileDodge,
-	
-	ZeroGravityRoll,
-	FullPowerNova,
-	HalfPowerNova,
-	ForceNovaStrike
+	PZeroParry
 }
-
-
 
 public static class ArmorParts {
 	public static readonly string[] name = {

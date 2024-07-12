@@ -15,13 +15,13 @@ public class BoomerangKuwanger : Maverick {
 	public BoomerangKuwanger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		//stateCooldowns.Add(typeof(BoomerangKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
+		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
 
-		//gravityModifier = 2.25f;
+		gravityModifier = 1.25f;
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.Boomerang;
 		weakWeaponId = WeaponIds.Torpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;
@@ -54,7 +54,7 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun ||state is MJump || state is MFall || state is BoomerKDashState) {
+			if (state is MIdle || state is MRun || state is BoomerKDashState) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;
@@ -69,10 +69,7 @@ public class BoomerangKuwanger : Maverick {
 				if (shootPressed() && !bald) {
 					changeState(getShootState());
 				} else if (specialPressed() && !bald) {
-					if (ammo >= 8) {
-						deductAmmo(8);
-					changeState(new BoomerangKDeadLiftState());
-					}
+					changeState(new BoomerKDeadLiftState());
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
 						deductAmmo(8);
@@ -81,7 +78,7 @@ public class BoomerangKuwanger : Maverick {
 				}
 			} else if (state is BoomerKTeleportState teleportState && teleportState.onceTeleportInSound) {
 				if (specialPressed() && !bald) {
-					changeState(new BoomerangKDeadLiftState());
+					changeState(new BoomerKDeadLiftState());
 				}
 			}
 		} else {
@@ -91,7 +88,7 @@ public class BoomerangKuwanger : Maverick {
 					var chr = enemyPlayer.character;
 					if (!chr.canBeDamaged(player.alliance, player.id, null)) return;
 					if (isFacing(chr) && getCenterPos().distanceTo(chr.getCenterPos()) < 10) {
-						changeState(new BoomerangKDeadLiftState());
+						changeState(new BoomerKDeadLiftState());
 					}
 				}
 			}
@@ -123,7 +120,7 @@ public class BoomerangKuwanger : Maverick {
 		return new MaverickState[]
 		{
 				getShootState(),
-				new BoomerangKDeadLiftState(),
+				new BoomerKDeadLiftState(),
 				new BoomerKTeleportState(),
 		};
 	}
@@ -413,11 +410,11 @@ public class BoomerKDashState : MaverickState {
 	}
 }
 
-public class BoomerangKDeadLiftState : MaverickState {
+public class BoomerKDeadLiftState : MaverickState {
 	private Character grabbedChar;
 	float timeWaiting;
 	bool grabbedOnce;
-	public BoomerangKDeadLiftState() : base("deadlift") {
+	public BoomerKDeadLiftState() : base("deadlift") {
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -456,11 +453,8 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public bool launched;
 	float launchTime;
-	bool once;
-
 	public DeadLiftGrabbed(BoomerangKuwanger grabber) : base(grabber, 1, "") {
 		customUpdate = true;
-		superArmor = true;
 	}
 
 	public override void update() {
@@ -472,31 +466,18 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-
-			for (int i = 1; i <= 4; i++) {
-						CollideData collideData = Global.level.checkCollisionActor(character, 0, -2 * i * character.getYMod(), autoVel: true);
-						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
-							if (!once){
-							character.changeState(new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-							character.applyDamage(null, null, 3, null);
-							once = true;
-							character.playSound("crash", sendRpc: true);
-							character.shakeCamera(sendRpc: true);
-							//return;
-							}
-						}
+			if (character.stopCeiling()) {
+				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(sendRpc: true);
 			}
-			//if (character.stopCeiling()) {
-			//	new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
-			//}
-			//return;
+			return;
 		}
 
-	if (grabber.sprite.name.Contains("deadlift")) {
+		if (grabber.sprite?.name.EndsWith("_deadlift") == true) {
 			if (grabber.frameIndex < 4) {
 				trySnapToGrabPoint(true);
-			} else 
-			if (!launched) {
+			} else if (!launched) {
 				launched = true;
 				character.unstickFromGround();
 				character.vel.y = -600;

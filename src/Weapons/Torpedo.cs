@@ -12,8 +12,7 @@ public class Torpedo : Weapon {
 		weaponSlotIndex = 1;
 		weaknessIndex = 3;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
-
-		rateOfFire = 0.25f;
+		rateOfFire = 0.625f;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -41,52 +40,21 @@ public class TorpedoProj : Projectile, IDamagable {
 	public float maxSpeed = 150;
 	int type;
 	public TorpedoProj(Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, float? angle = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 1.5f, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 1, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 2, player, (type == 0 ? "torpedo" : type == 1 ? "torpedo_charge" : "frog_torpedo"), 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		if (type == 0) projId = (int)ProjIds.Torpedo;
 		else if (type == 1) projId = (int)ProjIds.TorpedoCharged;
 		else if (type == 2) projId = (int)ProjIds.MechTorpedo;
 		else if (type == 3) {
-		
-			if (!owner.isHighMax)	projId = (int)ProjIds.LaunchOTorpedo;
-			if (!player.isDynamo && !owner.hasMizuX() && !owner.hasBurnerX()){
+			projId = (int)ProjIds.LaunchOTorpedo;
 			changeSprite("launcho_proj_ht", true);
-			damager.damage = 2;
-			}
-			if (owner.character != null && owner.isDynamo){
-		changeSprite("dynamonbulletproj", true);
-		damager.flinch = Global.defFlinch;
-		damager.damage = 4;
-		maxSpeed = 300;
-		}
-		if (owner.character != null && owner.hasBurnerX()){
-		changeSprite("burnerbuster_proj2", true);
-		damager.flinch = 4;
-		damager.damage = 1;
-		maxSpeed = 200;
-		}
-		if (owner.character != null && owner.hasMizuX()){
-		changeSprite("mizubusterproj_2", true);
-		damager.flinch = 4;
-		damager.damage = 1;
-		maxSpeed = 200;
-		}
-
-		if (owner.character != null && owner.isHighMax){
-		changeSprite("highmax_spark_proj", true);
-		projId = (int)ProjIds.LaunchOTorpedo;
-		damager.flinch = 10;
-		damager.damage = 1;
-		maxSpeed = 200;
-		}
-
 		}
 
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;
 		reflectableFBurner = true;
 		customAngleRendering = true;
-		if (type == 1) {
-			damager.damage = 2;
+		if (type == 1 || type == 3) {
+			damager.damage = (type == 1 ? 1 : 2);
 			damager.flinch = Global.halfFlinch;
 		} else if (type == 2) {
 			vel.x = 1;
@@ -116,7 +84,6 @@ public class TorpedoProj : Projectile, IDamagable {
 			} else {
 				useGravity = true;
 				homing = true;
-				vel.x = 200 * xDir;
 			}
 		}
 	}
@@ -131,7 +98,7 @@ public class TorpedoProj : Projectile, IDamagable {
 
 		updateProjectileCooldown();
 		checkLandFrogTorpedo();
-			
+
 		if (ownedByLocalPlayer && homing) {
 			if (target != null) {
 				if (!Global.level.gameObjects.Contains(target)) {
@@ -209,7 +176,7 @@ public class TorpedoProj : Projectile, IDamagable {
 		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex, actor: this);
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

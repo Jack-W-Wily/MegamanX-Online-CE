@@ -17,7 +17,7 @@ public class MorphMoth : Maverick {
 		spriteToCollider.Add("sweep", getDashCollider());
 
 		canFly = true;
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.SilkShot;
 		weakWeaponId = WeaponIds.SpeedBurner;
 		weakMaverickWeaponId = WeaponIds.FlameStag;

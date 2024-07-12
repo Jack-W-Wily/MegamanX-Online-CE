@@ -156,7 +156,7 @@ public class ViralSigmaPossess : CharState {
 			if (character.xScale < 0) character.xScale = 0;
 			character.yScale = character.xScale;
 			character.changePos(target.pos.addxy(0, -20));
-			bool unpossessButtonPressed = player.input.isPressed(Control.Special2, player);
+			bool unpossessButtonPressed = player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Special1, player);
 			if (target.player.possessedTime == 0 || target.destroyed || unpossessButtonPressed) {
 				unpossess();
 			} else {
@@ -385,7 +385,7 @@ public class ViralSigmaBeamProj : Projectile {
 
 	public void getBottomY() {
 		if (ownedByLocalPlayer) {
-			float beamLength = 150;
+			float beamLength = sigma != null ? 150 : sigma.viralSigmaBeamLength * 150;
 			var hit = Global.level.raycast(
 				pos.addxy(0, -10), pos.addxy(0, beamLength), new List<Type>() { typeof(Wall) }
 			);

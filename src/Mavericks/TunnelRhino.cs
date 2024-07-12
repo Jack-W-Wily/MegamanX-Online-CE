@@ -22,8 +22,6 @@ public class TunnelRhino : Maverick {
 		spriteFrameToSounds["tunnelr_run/3"] = "walkStomp";
 		spriteFrameToSounds["tunnelr_run/11"] = "walkStomp";
 
-		//isHeavy = true;
-		canClimbWall = true;
 		awardWeaponId = WeaponIds.TunnelFang;
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
@@ -41,7 +39,7 @@ public class TunnelRhino : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new TunnelRShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -54,7 +52,7 @@ public class TunnelRhino : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 85;
+		return 75;
 	}
 
 	public override string getMaverickPrefix() {
@@ -84,12 +82,18 @@ public class TunnelRhino : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRDash, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(
+				weapon, centerPoint, ProjIds.TunnelRDash, player,
+				damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this
+			);
 		}
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.TunnelRStomp, player, damage: 2 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(
+					weapon, centerPoint, ProjIds.TunnelRStomp, player,
+					damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f
+				);
 			}
 		}
 		return null;

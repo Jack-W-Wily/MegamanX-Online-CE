@@ -23,7 +23,7 @@ public class ChillPenguin : Maverick {
 		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		spriteToCollider.Add("slide", getDashCollider());
-		canClimbWall = true;
+
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);
 
 		awardWeaponId = WeaponIds.ShotgunIce;
@@ -68,11 +68,8 @@ public class ChillPenguin : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new ChillPSlideState(false));
 				}
-				else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
-				}
 			} else if (state is MJump || state is MFall) {
-				if (input.isHeld(Control.Up, player)) {
+				if (input.isHeld(Control.Special1, player)) {
 					var hit = Global.level.checkCollisionActor(this, 0, -ChillPBlizzardState.switchSpriteHeight - 5);
 					if (vel.y < 0 && hit?.gameObject is Wall wall && !wall.topWall) {
 						changeState(new ChillPBlizzardState(false));
@@ -134,9 +131,6 @@ public class ChillPenguin : Maverick {
 		Projectile proj = null;
 		if (isSlidingAndCanDamage()) {
 			proj = new GenericMeleeProj(slideWeapon, centerPoint, ProjIds.ChillPSlide, player);
-		}
-		if (sprite.name.EndsWith("guard") ) {
-			proj = new GenericMeleeProj(slideWeapon, centerPoint, ProjIds.ChillPSlide, player, isDeflectShield : true);
 		}
 
 		return proj;
@@ -323,7 +317,7 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 		owner.iceStatues.RemoveAll(i => i == this);
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();

@@ -15,7 +15,7 @@ public class BlastLauncher : AxlWeapon {
 		switchCooldown = 0.1f;
 		rateOfFire = 0.75f;
 
-		sprite = "axl_arm_glauncher";
+		sprite = "axl_arm_blastlauncher";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 1.5f;
@@ -65,7 +65,7 @@ public class GrenadeProj : Projectile, IDamagable {
 		Weapon weapon, Point pos, int xDir, Player player, Point bulletDir,
 		IDamagable target, Point cursorPos, int chargeLevel, ushort netProjId
 	) : base(
-		weapon, pos, xDir, 300, 0, player, "axl_grenade", 10, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 0, player, "axl_grenade", 0, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		this.target = target;
 
@@ -170,7 +170,7 @@ public class GrenadeProj : Projectile, IDamagable {
 	}
 
 	float health = 2;
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (type == 1) {
 			health -= damage;
 			if (health < 0) {

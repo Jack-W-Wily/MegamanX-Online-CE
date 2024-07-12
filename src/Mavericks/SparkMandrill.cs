@@ -33,7 +33,7 @@ public class SparkMandrill : Maverick {
 		if (sendRpc) {
 			createActorRpc(player.id);
 		}
-		canClimbWall = true;
+
 		usesAmmo = false;
 		canHealAmmo = false;
 		ammo = 32;
@@ -81,7 +81,7 @@ public class SparkMandrill : Maverick {
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
 			shakeCamera(sendRpc: true);
-			playSound("sparkmSpark", sendRpc: true);
+			playSound("sparkmSparkX1", forcePlay: false, sendRpc: true);
 			//deductAmmo(32);
 			new TriadThunderProjCharged(sparkWeapon, pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
 			new TriadThunderProjCharged(sparkWeapon, pos, -xDir, 1, player, player.getNextActorNetId(), rpc: true);

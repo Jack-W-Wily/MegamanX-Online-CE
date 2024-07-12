@@ -16,11 +16,9 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "WC 3.9";
+	public static string versionName = "Revision 20";
 	public static string subVersionName = "Alpha 12";
 	public static string subVersionShortName = "a12";
-
-
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -36,7 +34,7 @@ public partial class Global {
 	// Final checksum key.
 	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.
-	public static string shortForkName = "W.Cut";
+	public static string shortForkName = "CE";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 
@@ -304,20 +302,6 @@ public partial class Global {
 	public static int realSpriteCount = 0;
 
 	// For indexing purposes.
-
-
-/*	private static List<string> _soundNames;
-	public static List<string> soundNames {
-		get {
-			if (_soundNames == null) {
-				_soundNames = soundBuffers.Keys.ToList();
-				_soundNames.Sort(Helpers.invariantStringCompare);
-			}
-			return _soundNames;
-		}
-	}*/
-
-
 	public static Dictionary<string, ushort> soundIndexByName = new();
 	public static Dictionary<int, string> soundNameByIndex = new();
 	public static int soundCount = 0;
@@ -396,9 +380,6 @@ public partial class Global {
 			{ "csnail_fall", "csnail_enter" },
 			{ "csnail_jump", "csnail_exit" },
 
-			{ "tt_csnail_fall", "tt_csnail_enter" },
-			{ "tt_csnail_jump", "tt_csnail_exit" },
-
 			{ "overdriveo_fall", "overdriveo_enter" },
 			{ "overdriveo_jump", "overdriveo_exit" },
 			{ "overdriveo_die", "overdriveo_hurt" },
@@ -432,8 +413,6 @@ public partial class Global {
 			{ "bhornet_jump", "bhornet_exit" },
 
 			{ "drdoppler_jump", "drdoppler_exit" },
-
-			{ "vilemk5_revive", "vilemk5_revive_to5" },
 
 			{ "sigma3_kaiser_idle_body", "sigma3_kaiser_taunt_body" },
 			{ "sigma3_kaiser_empty", "sigma3_kaiser_empty_fadeout" }

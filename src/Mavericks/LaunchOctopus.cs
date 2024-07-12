@@ -18,7 +18,7 @@ public class LaunchOctopus : Maverick {
 		stateCooldowns.Add(typeof(LaunchOWhirlpoolState), new MaverickStateCooldown(false, false, 2));
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.Torpedo;
 		weakWeaponId = WeaponIds.RollingShield;
 		weakMaverickWeaponId = WeaponIds.ArmoredArmadillo;
@@ -51,7 +51,7 @@ public class LaunchOctopus : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (shootPressed()) {
 					if (ammo > 0) {
 						changeState(new LaunchOShoot(grounded));
@@ -199,7 +199,7 @@ public class LaunchOMissile : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}
@@ -343,7 +343,7 @@ public class LaunchOHomingTorpedoState : MaverickState {
 		base.update();
 		if (player == null) return;
 
-		if (maverick.frameIndex == 9 && !shootOnce) {
+		if (maverick.frameIndex == 3 && !shootOnce) {
 			shootOnce = true;
 			maverick.playSound("torpedo", sendRpc: true);
 			var pois = maverick.currentFrame.POIs;

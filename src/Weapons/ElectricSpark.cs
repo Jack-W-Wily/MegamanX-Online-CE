@@ -15,26 +15,10 @@ public class ElectricSpark : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.ownedByLocalPlayer) {
-		
-		if (player.character is MegamanX mmx && !mmx.hasExpandedMoveset()){
 		if (chargeLevel < 3) {
 			new ElectricSparkProj(this, pos, xDir, player, 0, netProjId);
 		} else {
 			new ElectricSparkProjChargedStart(this, pos, xDir, player, netProjId);
-		}
-		} else {
-				if (chargeLevel == 0) {
-				new ElectricSparkProj(this, pos, xDir, player, 0, netProjId);
-				}
-				if (chargeLevel >= 3) {
-				new ElectricSparkProjChargedStart(this, pos, xDir, player, netProjId);
-				}
-				if (chargeLevel >= 2 && chargeLevel < 3 ) {
-		 		new PeaceOutRollerProj(player.vileBallWeapon, 
-				pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
-				}
-			}
 		}
 	}
 }

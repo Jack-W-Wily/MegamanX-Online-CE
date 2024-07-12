@@ -111,142 +111,6 @@ public class CutterAttackState : CharState {
 	}
 }
 
-
-public class MaroonedTomahawkAttackState : CharState {
-	VileCutterProj proj;
-
-	public MaroonedTomahawkAttackState() : base("idle_shoot", "", "", "") {
-		exitOnAirborne = true;
-		normalCtrl = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		groundCodeWithMove();
-
-		if (proj != null && !player.input.isHeld(Control.Special1, player)) {
-			proj.maroon();
-		}
-
-		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-
-	public void shootLogic(Vile vile) {
-		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		Point shootVel = vile.getVileShootVel(true);
-		var poi = vile.sprite.getCurrentFrame().POIs[0];
-		poi.x *= vile.xDir;
-		var player = vile.player;
-		Point muzzlePos = vile.pos.add(poi);
-		proj = new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		shootLogic(character as Vile);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		proj?.maroon();
-	}
-}
-
-
-public class QuickHomesickAttackState : CharState {
-	VileCutterProj proj;
-
-	public QuickHomesickAttackState() : base("idle_shoot", "", "", "") {
-		exitOnAirborne = true;
-		normalCtrl = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		groundCodeWithMove();
-
-		if (proj != null && !player.input.isHeld(Control.Special1, player)) {
-			proj.maroon();
-		}
-
-		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-
-	public void shootLogic(Vile vile) {
-		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		Point shootVel = vile.getVileShootVel(true);
-		var poi = vile.sprite.getCurrentFrame().POIs[0];
-		poi.x *= vile.xDir;
-		var player = vile.player;
-		Point muzzlePos = vile.pos.add(poi);
-		proj = new VileCutterProj(new VileCutter(VileCutterType.QuickHomesick), muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		shootLogic(character as Vile);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		proj?.maroon();
-	}
-}
-
-
-
-public class ParasiteSwordAttackState : CharState {
-	VileCutterProj proj;
-
-	public ParasiteSwordAttackState() : base("idle_shoot", "", "", "") {
-		exitOnAirborne = true;
-		normalCtrl = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		groundCodeWithMove();
-
-		if (proj != null && !player.input.isHeld(Control.Special1, player)) {
-			proj.maroon();
-		}
-
-		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
-		}
-	}
-
-	public void shootLogic(Vile vile) {
-		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		Point shootVel = vile.getVileShootVel(true);
-		var poi = vile.sprite.getCurrentFrame().POIs[0];
-		poi.x *= vile.xDir;
-		var player = vile.player;
-		Point muzzlePos = vile.pos.add(poi);
-		proj = new VileCutterProj(new VileCutter(VileCutterType.ParasiteSword), muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		shootLogic(character as Vile);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		proj?.maroon();
-	}
-}
-
-
-
-
 public class VileCutterProj : Projectile {
 	public float angleDist = 0;
 	public float turnDir = 1;
@@ -261,7 +125,7 @@ public class VileCutterProj : Projectile {
 	public float soundCooldown;
 
 	public VileCutterProj(VileCutter weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 2, player, weapon.projSprite, 1, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 2, player, weapon.projSprite, 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)weapon.projId;
 		destroyOnHit = true;
@@ -291,7 +155,7 @@ public class VileCutterProj : Projectile {
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
-		if (vileCutterType == VileCutterType.MaroonedTomahawk) return;
+		if (vileCutterType != VileCutterType.QuickHomesick) return;
 
 		if (other.gameObject is Pickup && pickup == null) {
 			pickup = other.gameObject as Pickup;
@@ -301,8 +165,7 @@ public class VileCutterProj : Projectile {
 			}
 		}
 
-		var character = other.gameObject as Character;
-		if (vileCutterType != VileCutterType.ParasiteSword && time > returnTime && character != null && character.player == damager.owner) {
+		if (time > returnTime && other.gameObject is Character character && character.player == damager.owner) {
 			if (pickup != null) {
 				pickup.changePos(character.getCenterPos());
 			}
@@ -381,17 +244,4 @@ public class VileCutterProj : Projectile {
 			}
 		}
 	}
-
-
-	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -300));
-		}
-	}
-
 }

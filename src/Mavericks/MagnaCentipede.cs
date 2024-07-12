@@ -20,7 +20,7 @@ public class MagnaCentipede : Maverick {
 		stateCooldowns.Add(typeof(MagnaCDrainState), new MaverickStateCooldown(true, false, 2f));
 
 		weapon = getWeapon();
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.MagnetMine;
 		weakWeaponId = WeaponIds.SilkShot;
 		weakMaverickWeaponId = WeaponIds.MorphMoth;
@@ -69,7 +69,7 @@ public class MagnaCentipede : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (shootHeldTime > 0.2f && magnetMineParent == null && !noTail) {
 					shootHeldTime = 0;
 					changeState(new MagnaCMagnetMineState());
@@ -196,11 +196,10 @@ public class MagnaCShurikenProj : Projectile {
 	public float turnDir = -1;
 	public Pickup pickup;
 	public float maxSpeed = 250;
-	public bool landed;
 	public MagnaCShurikenProj(Weapon weapon, Point pos, int xDir, Point velDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "magnac_shuriken", 10, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 2, player, "magnac_shuriken", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MagnaCShuriken;
-		maxTime = 2f;
+		maxTime = 1f;
 		vel = velDir.times(maxSpeed);
 		angle = velDir.angle;
 
@@ -222,25 +221,9 @@ public class MagnaCShurikenProj : Projectile {
 			vel.x = Helpers.cosd((float)angle) * maxSpeed;
 			vel.y = Helpers.sind((float)angle) * maxSpeed;
 		}
-
-		if (landed && ownedByLocalPlayer) {
-			moveWithMovingPlatform();
-		}
-	}
-
-	public override void onCollision(CollideData other) {
-		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		if (!landed && other.gameObject is Wall) {
-			landed = true;
-			updateDamager(2);
-			vel = new Point();
-			changeSprite("magnetmine_landed", true);
-			playSound("minePlant");
-			maxTime = 5;
-		}
 	}
 }
+
 public class MagnaCShootState : MaverickState {
 	bool shotOnce;
 	public MagnaCShootState() : base("shuriken_throw", "") {
@@ -305,6 +288,7 @@ public class MagnaCMagnetMineParent : Actor {
 		this.maverick = maverick;
 		useGravity = false;
 		originOffset = pos.subtract(maverick.pos);
+
 		var player = maverick.player;
 		pieces.Add(new MagnaCMagnetMineProj(maverick.weapon, pos, new Point(-5 * maverick.xDir, -5), 0, player, player.getNextActorNetId(), rpc: true));
 		pieces.Add(new MagnaCMagnetMineProj(maverick.weapon, pos, new Point(0, 0), 90, player, player.getNextActorNetId(), rpc: true));
@@ -672,7 +656,7 @@ public class MagnaCMagnetPullState : MaverickState {
 			if (stateTime > 1) {
 				maverick.changeToIdleOrFall();
 			}
-		} else if (input.isPressed(Control.Special1, player) && stateTime > 0.25f) {
+		} else if (!input.isHeld(Control.Special1, player) && stateTime > 0.25f) {
 			maverick.changeToIdleOrFall();
 		}
 
@@ -757,26 +741,14 @@ public class MagnaCDrainState : MaverickState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		victim?.releaseGrab(maverick);
-
-		
-				
-	
-		
 	}
 }
 
 public class MagnaCDrainGrabbed : GenericGrabbedState {
-	public const float maxGrabTime = 2;
+	public const float maxGrabTime = 4;
 	public MagnaCDrainGrabbed(MagnaCentipede grabber) : base(grabber, maxGrabTime, "_drain") {
 		this.grabber = grabber;
 		grabTime = maxGrabTime;
-		superArmor = true;
-	}
-
-			public override void update() {
-			base.update();
-		if (!grabber.sprite.name.Contains("drain")) character.changeState(
-			new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
 	}
 }
 

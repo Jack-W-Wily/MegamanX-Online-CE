@@ -167,7 +167,7 @@ public abstract class BaseSigma : Character {
 			}
 		} else if (player.weapon is SigmaMenuWeapon &&
 			player.currentMaverick == null && player.mavericks.Count > 0 &&
-			 player.input.isHeld(Control.Up, player) &&
+			grounded && player.input.isHeld(Control.Up, player) &&
 			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand
 		) {
 			if (player.input.isCommandButtonPressed(player)) {
@@ -179,7 +179,7 @@ public abstract class BaseSigma : Character {
 		}
 
 		if (player.weapon is SigmaMenuWeapon && player.currentMaverick == null &&
-			player.mavericks.Count > 0 &&
+			player.mavericks.Count > 0 && grounded &&
 			(player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player))
 			&& isSummoner && charState is not IssueGlobalCommand && charState is not Dash
 		) {
@@ -204,8 +204,8 @@ public abstract class BaseSigma : Character {
 			) {
 				if (mw.maverick == null) {
 					if (canAffordMaverick(mw)) {
-						//if (!(charState is Idle || charState is Run || charState is Crouch || charState is Jump || charState is Fall   )) return;
-						if (player.mavericks.Count > 0) return;
+						if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+						if (isStriker && player.mavericks.Count > 0) return;
 						buyMaverick(mw);
 						var maverick = player.maverickWeapon.summon(player, pos.addxy(0, -112), pos, xDir);
 						if (isStriker) {
@@ -289,7 +289,7 @@ public abstract class BaseSigma : Character {
 
 		if (tagTeamSwapProgress > 0) {
 			tagTeamSwapProgress += Global.spf * 2;
-			if (tagTeamSwapProgress > 0) {
+			if (tagTeamSwapProgress > 1) {
 				tagTeamSwapProgress = 0;
 				if (tagTeamSwapCase == 0) {
 					var sw = player.weapons.FirstOrDefault(w => w is SigmaMenuWeapon);
@@ -319,15 +319,6 @@ public abstract class BaseSigma : Character {
 
 	public override void update() {
 		base.update();
-
-
-		//KillingSpreeThemes
-		if (KillingSpree == 5){
-			if (musicSource == null) {
-				addMusicSource("ourbloodboils", getCenterPos(), true);
-			}
-		} 
-
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -400,8 +391,9 @@ public abstract class BaseSigma : Character {
 		if (player.currentMaverick != null) {
 			return;
 		}
-		if ((player.currentMaverickCommand == MaverickAIBehavior.Defend && player.currentMaverick != null) &&  player.weapon is MaverickWeapon && (
-			player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player))
+		if (player.weapon is MaverickWeapon && (
+			player.input.isHeld(Control.Shoot, player) ||
+			player.input.isHeld(Control.Special1, player))
 		) {
 			return;
 		}
@@ -438,7 +430,7 @@ public abstract class BaseSigma : Character {
 	}
 
 	public virtual bool canGuard() {
-		if ( isDashing) {
+		if (isDashing) {
 			return false;
 		}
 		return true;
@@ -449,25 +441,11 @@ public abstract class BaseSigma : Character {
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		
+	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
-			if (frameIndex == 2){
-			return new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
-				1, 10, 1, isDeflectShield: true
-			);
-		}
 			return new GenericMeleeProj(
 				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true
-			);
-		}
-		if (sprite.name.Contains("wall_dash") && !collider.isHurtBox()) {
-	
-			return new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
-				1, 10, 1, isDeflectShield: true
 			);
 		}
 		return null;
@@ -550,7 +528,7 @@ public abstract class BaseSigma : Character {
 		if (player.isSummoner()) return 3;
 		if (player.isPuppeteer()) return 3;
 		if (player.isStriker()) return 0;
-		if (player.isTagTeam()) return 1;
+		if (player.isTagTeam()) return 5;
 		return 3;
 	}
 

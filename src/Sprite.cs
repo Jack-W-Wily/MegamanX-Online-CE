@@ -278,27 +278,8 @@ public class Sprite {
 		int[] armors = null;
 		bool drawAxlArms = true;
 		bool hyperBusterReady = false;
-
-
-
-		bool isKAI = false;
-		bool isXISU = false;
-		bool isIX = false;
-		bool isRIX = false;
-		bool isLightX = false;
-		bool isGigaX = false;
-		bool isMaxX = false;
-		bool isForceX = false;
+		bool isUPX = false;
 		bool isUltX = false;
-		bool isShadowX = false;
-		bool isBladeX = false;
-		bool isFalconX = false;
-		bool isGaeaX = false;
-		bool isBurnerX = false;
-		bool isMizuX = false;
-
-
-
 		Character character = actor as Character;
 		if (character != null) {
 			if (character.isInvisibleBS.getValue() && !Global.shaderWrappers.ContainsKey("invisible")) {
@@ -313,22 +294,8 @@ public class Sprite {
 			if (character.player.isAxl && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
-			isLightX = character.player.isX && character.isLightArmorXBS.getValue();
-			isGigaX = character.player.isX && character.isGigaArmorXBS.getValue();
-			isMaxX = character.player.isX && character.isMaxArmorXBS.getValue();
-			isForceX = character.player.isX && character.isForceArmorXBS.getValue();
-			isFalconX = character.player.isX && character.isFalconArmorXBS.getValue();
-			isGaeaX = character.player.isX && character.isGaeaArmorXBS.getValue();
-			isBladeX = character.player.isX && character.isBladeArmorXBS.getValue();
-			isShadowX = character.player.isX && character.isShadowArmorXBS.getValue();
-			isBurnerX = character.player.isX && character.isBurnerXBS.getValue();
-			isMizuX = character.player.isX && character.isMizuXBS.getValue();
-
-			isKAI = character.player.isX && character.player.loadout.xLoadout.melee == 1 && !character.isNightmareZeroBS.getValue();
-			isXISU = character.player.isX && character.player.loadout.xLoadout.melee == 1 && character.isNightmareZeroBS.getValue();
-			isIX = character.player.isX && character.player.loadout.xLoadout.melee == 2;
+			isUPX = character.player.isX && (character.isHyperXBS.getValue() || (character.sprite.name == "mmx_revive" && character.frameIndex > 3));
 			isUltX = character.player.isX && character.hasUltimateArmorBS.getValue();
-			isRIX = character.player.isX && character.isReturnIXBS.getValue();
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;
@@ -531,7 +498,7 @@ public class Sprite {
 			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
 				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 					Trail trail = character.lastFiveTrailDraws[i];
-					if (character.isDashing || character.vileSTriggerBS.getValue()) {
+					if (character.isDashing) {
 						trail.action.Invoke(trail.time);
 					}
 					trail.time -= Global.spf;
@@ -557,61 +524,18 @@ public class Sprite {
 
 		float extraYOff = 0;
 		if (isUltX) {
-			bitmap = Global.textures["XCLEAR"];
+			bitmap = Global.textures["XUltimate"];
 			extraYOff = 3;
 			armors = null;
 		}
 
-		if (isKAI) {
+		if (isUPX) {
 			bitmap = Global.textures["XUP"];
 		}
-		if (isXISU) {
-			bitmap = Global.textures["XISSU"];
-		}
-
-		if (isIX) {
-			if (!isRIX){
-			bitmap = Global.textures["XIX"];
-			} else {bitmap = Global.textures["XRIX"];}
-		}
-
-		if (isLightX) {
-		bitmap = Global.textures["XLight"];
-		}
-		if (isGigaX) {
-		bitmap = Global.textures["XGIGA"];
-		}
-		if (isMaxX) {
-		bitmap = Global.textures["XMAX"];
-		}
-		if (isForceX && !isUltX) {
-		bitmap = Global.textures["XFORCE"];
-		}
-		if (isShadowX) {
-		bitmap = Global.textures["XShadow"];
-		}
-		if (isGaeaX) {
-		bitmap = Global.textures["XGAEA"];
-		}
-		if (isFalconX) {
-		bitmap = Global.textures["XFALCON"];
-		}
-		if (isBladeX && !isMizuX) {
-		bitmap = Global.textures["XBLADE"];
-		}
-		if (isBurnerX) {
-		bitmap = Global.textures["XBurn"];
-		}
-		if (isMizuX) {
-		bitmap = Global.textures["XWater"];
-		}
-
-
-		
 
 		DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1 - extraYOff, currentFrame.rect.w(), currentFrame.rect.h() + extraYOff, x + frameOffsetX, y + frameOffsetY - extraYOff, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true);
 
-		if (isKAI && isUltX ) {
+		if (isUPX) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 			if (Global.isOnFrameCycle(5)) {
 				if (Global.shaderWrappers.ContainsKey("hit")) {

@@ -82,7 +82,7 @@ public class XUPParryStartState : CharState {
 				chr.changeState(new ParriedState(), true);
 			}
 		}
-		//mmx.refillUnpoBuster();
+		mmx.refillUnpoBuster();
 		character.playSound("upParry", sendRpc: true);
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}
@@ -98,7 +98,7 @@ public class XUPParryStartState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
+		mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 
@@ -199,57 +199,9 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
-	}
-}
-
-
-public class XDeadLift : CharState {
-	Actor counterAttackTarget;
-	float damage;
-	public XDeadLift(Actor counterAttackTarget, float damage) : base("deadlift", "", "", "") {
-		invincible = true;
-		this.counterAttackTarget = counterAttackTarget;
-		this.damage = damage;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (counterAttackTarget != null) {
-			character.turnToPos(counterAttackTarget.pos);
-
-			float dist = character.pos.distanceTo(counterAttackTarget.pos);
-			if (dist < 150) {
-				if (character.frameIndex >= 4 && !once) {
-					if (character.pos.distanceTo(counterAttackTarget.pos) > 10) {
-						character.moveToPos(counterAttackTarget.pos, 350);
-					}
-				}
-			}
+		if (character is MegamanX mmx) {
+			mmx.parryCooldown = mmx.maxParryCooldown;
 		}
-
-		Point? shootPos = character.getFirstPOI("melee");
-		if (!once && shootPos != null) {
-			once = true;
-			new UPParryMeleeProj(new XUPParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
-			character.playSound("upParryAttack", sendRpc: true);
-			character.shakeCamera(sendRpc: true);
-		}
-
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		//character.frameIndex = 2;
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.parryCooldown = character.maxParryCooldown;
 	}
 }
 
@@ -362,7 +314,9 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		character.parryCooldown = character.maxParryCooldown;
+		if (character is MegamanX mmx) {
+			mmx.parryCooldown = mmx.maxParryCooldown;
+		}
 	}
 }
 
@@ -416,7 +370,6 @@ public class XUPGrabState : CharState {
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	MegamanX mmx;
 	public XUPGrabState(Character victim) : base("unpo_grab", "", "", "") {
 		this.victim = victim;
 		grabTime = UPGrabbed.maxGrabTime;
@@ -424,7 +377,6 @@ public class XUPGrabState : CharState {
 
 	public override void update() {
 		base.update();
-		mmx = character as MegamanX;
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 
@@ -445,9 +397,7 @@ public class XUPGrabState : CharState {
 			if (character.isDefenderFavored()) {
 				if (leechTime > 0.33f) {
 					leechTime = 0;
-					if (mmx.VileCounters > 1 || character.sprite.name.Contains("nghost") ){
 					character.addHealth(1);
-					}
 				}
 				return;
 			}
@@ -464,56 +414,18 @@ public class XUPGrabState : CharState {
 			if (!character.grounded && !character.sprite.name.EndsWith("2")) {
 				character.changeSpriteFromName("unpo_grab2", true);
 			}
-			if (character.sprite.name.Contains("nghost") && !character.sprite.name.EndsWith("2")) {
-				character.changeSpriteFromName("unpo_grab2", true);
-			}
 		}
 
-		if (leechTime > 0.5f) {
+		if (leechTime > 0.33f) {
 			leechTime = 0;
-			if (character.sprite.name.Contains("nghost")){
-					character.addHealth(1);
-			var damager = new Damager(player, 6, 0, 0);
-			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
-		}
-			if (Global.level.gameMode is not Nightmare &&
-			player.isX && mmx.VileCounters > 1 || player.isXisu() && player.weapon is Torpedo){
 			character.addHealth(1);
 			var damager = new Damager(player, 1, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}
-		}
 
-
-		if (player.isXisu() && player.input.isPressed(Control.Shoot, player)){
-		character.changeState(new XUPParryMeleeState(victim, 3), true);
-		}
-
-		if (player.isXisu() && player.input.isPressed(Control.Up, player) && player.weapon is Boomerang){
-		character.changeState(new XDeadLift(victim, 3), true);
-		}
 		if (player.input.isPressed(Control.Special1, player)) {
-			if (victim.sprite.name.Contains("vile")){
-			mmx.VileCounters += 1;
 			character.changeState(new Idle(), true);
-			}
-			if (victim.sprite.name.Contains("zero")){
-			mmx.ZeroCounters += 1;
-			character.changeState(new Idle(), true);
-			}
-			if (victim.sprite.name.Contains("mmx")){
-			mmx.XCounters += 1;
-			character.changeState(new Idle(), true);
-			}
-			if (victim.sprite.name.Contains("sigma")){
-			mmx.SigmaCounters += 1;
-			character.changeState(new Idle(), true);
-			}
-			if (victim.sprite.name.Contains("axl")){
-			mmx.AxlCounters += 1;
-			character.changeState(new Idle(), true);
-			}
-			
+			return;
 		}
 
 		if (grabTime <= 0) {
@@ -525,9 +437,6 @@ public class XUPGrabState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
-		var damager = new Damager(player, 1, 0, 0);
-		damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
-	
 	}
 
 	public override void onExit(CharState newState) {
@@ -536,7 +445,6 @@ public class XUPGrabState : CharState {
 		character.grabCooldown = 1;
 		victim.grabInvulnTime = 2;
 		victim?.releaseGrab(character);
-		
 	}
 }
 
@@ -751,7 +659,7 @@ public class XRevive : CharState {
 			player.health = 1;
 			character.addHealth(player.maxHealth);
 
-			/*player.weapons.RemoveAll(w => w is not Buster);
+			player.weapons.RemoveAll(w => w is not Buster);
 			if (player.weapons.Count == 0) {
 				player.weapons.Add(new Buster());
 			}
@@ -760,7 +668,7 @@ public class XRevive : CharState {
 				busterWeapon.setUnpoBuster(mmx);
 			}
 			player.weaponSlot = 0;
-			*/
+
 			once = true;
 			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
 			flash.grow = true;
@@ -768,11 +676,6 @@ public class XRevive : CharState {
 
 		if (character.isAnimOver()) {
 			mmx.isHyperX = true;
-			if (player.HasFullForce())player.setUltimateArmor(true);
-			if (player.HasFullMax()){
-				player.setGoldenArmor(true);
-				player.addHyperCharge();
-			}
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 		}
@@ -790,7 +693,6 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
-		character.useGravity = false;
 		mmx = character as MegamanX;
 	}
 
@@ -799,61 +701,7 @@ public class XRevive : CharState {
 		character.useGravity = true;
 		mmx.isHyperX = true;
 		Global.level.addGameObjectToGrid(character);
-		if (character != null) {
-			character.invulnTime = character.maxParryCooldown;
-		}
-	}
-}
-
-public class IXGrow : CharState {
-	public float radius = 200;
-	XReviveAnim reviveAnim;
-	MegamanX mmx;
-
-	public IXGrow() : base("revive_shake") {
-		invincible = true;
-	}
-
-	public override void update() {
-		base.update();
-		if (!character.ownedByLocalPlayer) return;
-
-		if (!once && character.frameIndex >= 1 && sprite == "revive") {
-			character.playSound("ching", sendRpc: true);
-			player.health = 1;
-			character.addHealth(player.maxHealth);
-			player.addHyperCharge();
-			once = true;
-			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
-			flash.grow = true;
-		}
-
-		if (character.isAnimOver()) {
-			mmx.isReturnIX = true;
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
-		}
-
-		if (sprite == "revive_shake" && character.loopCount > 6) {
-			sprite = "revive_shake2";
-			character.changeSpriteFromName(sprite, true);
-		} else if (sprite == "revive_shake2" && character.loopCount > 6) {
-			sprite = "revive";
-			character.changeSpriteFromName(sprite, true);
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
-		character.playSound("xRevive", sendRpc: true);
-		mmx = character as MegamanX;
-		character.useGravity = false;
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
+		mmx.invulnTime = mmx.maxParryCooldown;
 	}
 }
 

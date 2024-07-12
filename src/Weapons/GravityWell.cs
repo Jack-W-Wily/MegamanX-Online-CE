@@ -198,7 +198,7 @@ public class GravityWellProj : Projectile, IDamagable {
 		Global.level.unchargedGravityWells.Remove(this);
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (projId == (int)ProjIds.RaySplasher || projId == (int)ProjIds.RaySplasherTurret) damage *= 2;
 		health -= damage;
 		if (health <= 0) {
@@ -328,7 +328,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (projId == (int)ProjIds.RaySplasher || projId == (int)ProjIds.RaySplasherTurret) damage *= 2;
 		health -= damage;
 		if (health <= 0) {
@@ -385,71 +385,4 @@ public class GravityWellChargedState : CharState {
 		//character.chargedGravityWell?.destroySelf();
 		//character.chargedGravityWell = null;
 	}
-}
-
-
-
-public class GravityBallShoot : CharState {
-
-	private float partTime;
-
-	private float chargeTime;
-
-	private float specialPressTime;
-	
-	public float pushBackSpeed;
-
-	private bool fired;
-
-	bool isSecond;
-
-	public GravityBallShoot(string transitionSprite = "")
-		: base("point_up", "", "", transitionSprite)
-	{
-
-	}
-
-	public override void update()
-	{
-		
-		isSecond = true;
-		if (!fired && character.frameIndex > 1){
-			new GBeetleBallProj(player.weapon, character.getShootPos(), character.xDir, isSecond, player, player.getNextActorNetId(), sendRpc: true);
-			fired = true;
-		}	
-		
-
-		if (!character.grounded && pushBackSpeed > 0) {
-			character.useGravity = false;
-			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
-			pushBackSpeed -= 7.5f;
-		} else {
-			if (!character.grounded) {
-				character.move(new Point(-30 * character.xDir, 0));
-			}
-			character.useGravity = true;
-		}
-
-		base.update();
-		Helpers.decrementTime(ref specialPressTime);
-		if (stateTime > 0.5f) {
-			character.changeToIdleOrFall();
-		}
-		if (character.isAnimOver()) {
-			return;
-		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (!character.grounded) {
-			character.stopMovingWeak();
-			pushBackSpeed = 100;
-		}
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-    }
 }

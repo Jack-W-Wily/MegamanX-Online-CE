@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class GigaCrush : Weapon {
 	public GigaCrush() : base() {
-		shootSounds = new string[] { "dynamocharge", "dynamocharge", "dynamocharge", "dynamocharge" };
+		shootSounds = new string[] { "gigaCrushX2", "gigaCrushX2", "gigaCrushX2", "gigaCrushX2" };
 		rateOfFire = 1;
 		ammo = 0;
 		index = (int)WeaponIds.GigaCrush;
@@ -18,26 +18,17 @@ public class GigaCrush : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (player.character.ownedByLocalPlayer) {
-		if (player.hasFullGiga() || player.HasFullFalcon() ) {
-		player.character.changeState(new GigaCrushCharState(), true);
+			player.character.changeState(new GigaCrushCharState(), true);
+		}
 		new GigaCrushEffect(player.character);
-		}
-		if (player.HasFullMax()) {
-		player.character.changeState(new X3ChargeShot(null), true);
-		}
-		if (player.HasFullForce()){
-		player.character.changeState(new NovaStrikeState(), true);
-		}
-		}
 	}
 
-	public override float getAmmoUsage(int chargeLevel) {		
+	public override float getAmmoUsage(int chargeLevel) {
 		return 32;
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-	
-		return player.character?.flag == null && ammo >= 32;	
+		return player.character?.flag == null && ammo >= (player.hasChip(3) ? 16 : 32);
 	}
 }
 
@@ -151,8 +142,6 @@ public class GigaCrushCharState : CharState {
 	bool fired;
 	Point moveDir = new(0, -20);
 
-	
-
 	public GigaCrushCharState() : base("gigacrush", "", "", "") {
 		invincible = true;
 	}
@@ -160,50 +149,11 @@ public class GigaCrushCharState : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex == 4 && !fired) {
-
-
 			fired = true;
-			float topScreenY = Global.level.getTopScreenY(character.pos.y);
-
-			if (player.HasFullFalcon()) {
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x - 35, 30), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x + 35, topScreenY), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x, 30), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x - 65, topScreenY), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x - 65, 30), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x + 65, topScreenY), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x - 85, 30), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x + 85, topScreenY), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x - 105, 30), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-					new ZBuster3Proj(
-						new ZeroBuster(), new Point(character.pos.x + 105, topScreenY), player.character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-					);
-				
-			}
-			if (!player.HasFullFalcon()) {
 			proj = new GigaCrushProj(
 				new GigaCrush(), character.getCenterPos(), character.xDir,
 				player, player.getNextActorNetId(), rpc: true
 			);
-			}
 		}
 		if (character.sprite.isAnimOver()) {
 			character.changeState(new Idle(), true);
@@ -223,7 +173,7 @@ public class GigaCrushCharState : CharState {
 		player.character.useGravity = false;
 		player.character.vel.y = 0;
 		if (character.ownedByLocalPlayer && player == Global.level.mainPlayer) {
-		if (!player.HasFullFalcon()) new GigaCrushBackwall(character.pos, character);
+			new GigaCrushBackwall(character.pos, character);
 		}
 
 		if (player.input.isHeld("left", base.player)) {

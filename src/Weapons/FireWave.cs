@@ -39,19 +39,6 @@ public class FireWaveProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		var character = damagable as Character;
 	}
-
-
-	public override void onCollision(CollideData other) {
-		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer && frameIndex >= 4) {
-			playSound("flamemOilBurn", sendRpc: true);
-			new FlameMBigFireProj(new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true);
-			// oilSpill.time = 0;
-			oilSpill.destroySelf();
-		}
-	}
-
 }
 
 public class FireWaveProjChargedStart : Projectile {
@@ -183,17 +170,4 @@ public class FireWaveProjCharged : Projectile {
 	public void putOutFire() {
 		base.destroySelf("", "", false, true);
 	}
-
-	public override void onCollision(CollideData other) {
-		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer && frameIndex >= 4) {
-			playSound("flamemOilBurn", sendRpc: true);
-			new FlameMBigFireProj(new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true);
-			// oilSpill.time = 0;
-			oilSpill.destroySelf();
-		}
-	}
-
-	
 }

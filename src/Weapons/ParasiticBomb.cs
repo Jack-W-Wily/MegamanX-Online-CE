@@ -20,6 +20,7 @@ public class ParasiticBomb : Weapon {
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (chargeLevel < 3) {
+			player.character.playSound("buster");
 			new ParasiticBombProj(this, pos, xDir, player, netProjId);
 		} else {
 			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx && mmx.beeSwarm == null) {
@@ -311,7 +312,7 @@ public class ParasiticBombProjCharged : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

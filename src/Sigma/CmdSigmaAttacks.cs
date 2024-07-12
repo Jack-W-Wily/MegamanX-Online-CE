@@ -42,7 +42,7 @@ public class SigmaSlashState : CharState {
 				off = new Point(20, -30);
 			}
 
-			float damage = character.grounded ? 3 : 3;
+			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new SigmaSlashProj(
 				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
@@ -66,12 +66,17 @@ public class SigmaSlashProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, damage, player, "sigma_proj_slash", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		reflectable = true;
+		reflectable = false;
 		destroyOnHit = false;
-		shouldShieldBlock = true;
+		shouldShieldBlock = false;
 		setIndestructableProperties();
 		maxTime = 0.1f;
 		projId = (int)ProjIds.SigmaSlash;
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -97,8 +102,8 @@ public class SigmaBallProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player,
 		ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 1, player, "sigma_proj_ball",
-		3, 0.2f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 400, 2, player, "sigma_proj_ball",
+		0, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.SigmaBall;
 		maxTime = 0.5f;

@@ -8,7 +8,7 @@ public class GBD : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-
+	charId = CharIds.GBD;
 	}
 
 	private float flameCreateTime = 0;

@@ -16,7 +16,6 @@ public class GameMode {
 	public const string TeamElimination = "team elimination";
 	public const string KingOfTheHill = "king of the hill";
 	public const string Race = "race";
-	public const string Nightmare = "Nightmare";
 	public static List<string> allGameModes = new List<string>() {
 		Deathmatch, TeamDeathmatch, CTF, KingOfTheHill,
 		ControlPoint, Elimination, TeamElimination
@@ -171,7 +170,6 @@ public class GameMode {
 		else if (mode == TeamElimination) return "t.elim";
 		else if (mode == KingOfTheHill) return "koth";
 		else if (mode == Race) return "race";
-		else if (mode == Nightmare) return "nm";
 		else return "dm";
 	}
 
@@ -643,34 +641,22 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-			if (drawPlayer.character is Zain Zain) {
-				int yStart = 159;
-				
-					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
-					Fonts.drawText(
-						FontType.Grey,
-						"x" + Zain.ZainCounters, 16, 152, Alignment.Left
-					);
-					yStart += 12;
-				
-			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
-				if (zero.isNightmareZero) {
+				if (zero.isViral) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
 						FontType.Grey,
 						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
 					);
 					yStart += 12;
-					Global.sprites["virusalert"].drawToHUD(0, 36, 214);
 				}
 				int xStart = 11;
-				if (zero.zeroGigaAttackWeapon.shootTime > 0) {
-					drawZeroGigaCooldown(zero.zeroGigaAttackWeapon, y: yStart);
+				if (zero.gigaAttack.shootTime > 0) {
+					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
-				if (zero.saberCooldown > 0 && zero.isAwakenedGenmuZero() || zero.genmuCooldown > 0) {
+				if (zero.saberCooldown > 0 && zero.awakenedPhase >= 2 || zero.genmuCooldown > 0) {
 					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 2);
 					if (zero.saberCooldown > zero.genmuCooldown) {
 						cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
@@ -683,7 +669,7 @@ public class GameMode {
 					if (zero.genmuCooldown - 1 > zero.saberCooldown) {
 						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 1, 1);
 					}
-					drawGigaWeaponCooldown(zero.isAwakenedGenmuZero() ? 48 : 102, cooldown, xStart, yStart);
+					drawGigaWeaponCooldown(zero.awakenedPhase >= 2 ? 48 : 102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
 			}
@@ -852,7 +838,7 @@ public class GameMode {
 		else if (level.mainPlayer.character?.isVileMK5Linked() == true)
 		{
 			string rideArmorName = level.mainPlayer.
-				character.rideArmor?
+				character.vileStartRideArmor?
 				.getRaTypeFriendlyName() ?? "Ride Armor";
 			Helpers.drawTextStd
 				TCat.HUD, "Controlling " + rideArmorName,
@@ -867,8 +853,7 @@ public class GameMode {
 			//Global.sprites["axl_cursor"].drawImmediate(0, Global.level.mainPlayer.character.axlCursorPos.x, Global.level.mainPlayer.character.axlCursorPos.y);
 		}
 
-	
-		if (level.mainPlayer.isX && level.mainPlayer.hasFullGiga()) {
+		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(2)) {
 			Player? mostRecentlyScanned = null;
 			foreach (var player in level.players) {
 				if (player.tagged && player.character != null) {
@@ -924,7 +909,7 @@ public class GameMode {
 			}
 		}
 	}
-	
+
 	public void setHUDErrorMessage(Player player, string message, bool playSound = true, bool resetCooldown = false) {
 		if (player != level.mainPlayer) return;
 		if (resetCooldown) hudErrorMsgTime = 0;
@@ -941,7 +926,7 @@ public class GameMode {
 		if (Global.level.isRace()) return true;
 		if (level.is1v1()) return false;
 		if (level.mainPlayer == null) return false;
-		if (level.mainPlayer.isX && level.mainPlayer.HasFullMax()) {
+		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(3)) {
 			return true;
 		}
 		if (level.mainPlayer.isAxl && level.boundBlasterAltProjs.Any(b => b.state == 1)) {
@@ -1256,26 +1241,11 @@ public class GameMode {
 		}
 
 		int frameIndex = player.charNum;
-		if (player.isZero && player.character is Zero zero && zero.isNightmareZero) {
-			frameIndex = 7;
+		if (player.charNum == (int)CharIds.PunchyZero) {
+			frameIndex = 1;
 		}
-		if (player.isHighMax) {
-			frameIndex = 7;
-		}
-		if (player.charNum == (int)CharIds.Sigma && player.weapon is  SigmaMenuWeapon) {
-			frameIndex = 5;
-		}
-		if (player.charNum == (int)CharIds.Zain) {
-			frameIndex = 4;
-		}
-		if (player.charNum == (int)CharIds.GBD) {
-			frameIndex = 8;
-		}
-		if (player.charNum == (int)CharIds.Iris) {
-			frameIndex = 9;
-		}
-		if (player.charNum == (int)CharIds.Dynamo) {
-			frameIndex = 10;
+		if (player.charNum == (int)CharIds.BusterZero) {
+			frameIndex = 1;
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
 
@@ -1373,7 +1343,7 @@ public class GameMode {
 		// Puppeteer small energy bars.
 		bool forceSmallBarsOff = false;
 		if (!Options.main.smallBarsEx || !allowSmall && maxAmmo > 16) {
-			forceSmallBarsOff = false;
+			forceSmallBarsOff = true;
 		}
 
 		// Small Bars option.
@@ -1431,9 +1401,7 @@ public class GameMode {
 					maxAmmo: 28, allowSmall: false
 				);
 			}
-			
-			if (player.currentMaverick != null && 
-				player.isMainPlayer && player.currentMaverick.usesAmmo) {
+			if (player.currentMaverick != null && player.isMainPlayer && player.currentMaverick.usesAmmo) {
 				renderAmmo(
 					baseX, ref baseY,
 					player.currentMaverick.barIndexes.icon,
@@ -1471,7 +1439,7 @@ public class GameMode {
 			return;
 		}
 
-		if (player.isVile ||player.isZain) {
+		if (player.isVile) {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
 			baseY -= 16;
@@ -1492,7 +1460,7 @@ public class GameMode {
 		if (player.character != null) {
 			weapon = player.weapon;
 			if (player.character is Zero zero) {
-				weapon = zero.zeroGigaAttackWeapon;
+				weapon = zero.gigaAttack;
 			}
 			if (player.character is PunchyZero punchyZero) {
 				weapon = punchyZero.gigaAttack;
@@ -1802,13 +1770,6 @@ public class GameMode {
 			Weapon? gigaCrush = player.weapons.FirstOrDefault((Weapon w) => w is GigaCrush);
 			if (gigaCrush != null) {
 				drawWeaponSlot(gigaCrush, gigaWeaponX, 159);
-				gigaWeaponX += 18;
-			}
-		}
-		if (player.character != null) {
-			Weapon? Blocking = player.weapons.FirstOrDefault((Weapon w) => w is Blocking);
-			if (Blocking != null) {
-				drawWeaponSlot(Blocking, gigaWeaponX, 159);
 				gigaWeaponX += 18;
 			}
 		}
@@ -2299,7 +2260,7 @@ public class GameMode {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
-				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(null, dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
+				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
 			}
 		}
 		if (dnaCore.charNum == (int)CharIds.Sigma) {
@@ -3067,9 +3028,6 @@ public class GameMode {
 			}
 		} else if (charNum == 1) charName = "Zero";
 		else if (charNum == 2) charName = "Vile";
-		else if (charNum == 5) charName = "Dynamo";
-		else if (charNum == 14) charName = "Zain";
-		else if (charNum == 6) charName = "GBD";
 		else if (charNum == 3) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";
 			else if (Options.main.axlAimMode == 1) charName = "AxlAngular";

@@ -10,7 +10,7 @@ public class Dynamo : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-
+	charId = CharIds.Dynamo;
 	}
 
 	public int NightmareBullets = 0;

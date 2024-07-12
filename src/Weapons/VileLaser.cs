@@ -58,12 +58,11 @@ public class VileLaser : Weapon {
 			NecroBurstAttack.shoot(vile);
 			vile.rideArmor?.explode(shrapnel: inRideArmor.isHiding);
 		} else {
-			if (Global.level.mainPlayer.currency > 0 && Global.level.mainPlayer.input.isHeld("down", Global.level.mainPlayer) ){//type == (int)VileLaserType.NecroBurst) {
+			if (type == (int)VileLaserType.NecroBurst) {
 				vile.changeState(new NecroBurstAttack(vile.grounded), true);
-			} if ( Global.level.mainPlayer.input.isHeld("up", Global.level.mainPlayer) ){//type == (int)VileLaserType.RisingSpecter) {
+			} else if (type == (int)VileLaserType.RisingSpecter) {
 				vile.changeState(new RisingSpecterState(vile.grounded), true);
-			} if (!Global.level.mainPlayer.input.isHeld("down", Global.level.mainPlayer) 
-			&& !Global.level.mainPlayer.input.isHeld("up", Global.level.mainPlayer) ){//type == (int)VileLaserType.StraightNightmare) {
+			} else if (type == (int)VileLaserType.StraightNightmare) {
 				vile.changeState(new StraightNightmareAttack(vile.grounded), true);
 			}
 		}
@@ -122,31 +121,20 @@ public class RisingSpecterProj : Projectile {
 	public float sinDampTime = 1;
 	public Anim muzzle;
 	public RisingSpecterProj(Weapon weapon, Point poi, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, poi, xDir, 0, 2, player, "empty", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, poi, xDir, 0, 6, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		vel = new Point();
 		projId = (int)ProjIds.RisingSpecter;
 		shouldVortexSuck = false;
-
-		
 		float destX = xDir * 150;
 		float destY = -100;
-		if (player.isVile){
-		damager.damage = 3;
-		damager.flinch = 35;
-		}
-		if 	(player.isIris){
-		destX = xDir * 100;
-		destY = 0;
-		}
 		Point toDestPos = new Point(destX, destY);
 		pos = poi.addxy(destX * 0.0225f, destY * 0.0225f);
 		destPos = pos.add(toDestPos);
 
 		muzzle = new Anim(poi, "risingspecter_muzzle", xDir, null, false, host: player.character) {
-
 			angle = xDir == 1 ? toDestPos.angle : toDestPos.angle + 180
 		};
 
@@ -367,9 +355,9 @@ public class StraightNightmareProj : Projectile {
 	public float soundTime;
 
 	public StraightNightmareProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "straightnightmare_proj", 4, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 1, player, "straightnightmare_proj", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.StraightNightmare;
-		maxTime = 1;
+		maxTime = 2;
 		sprite.visible = false;
 		for (var i = 0; i < maxLen; i++) {
 			var midSprite = Global.sprites["straightnightmare_proj"].clone();

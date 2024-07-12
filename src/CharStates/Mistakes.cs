@@ -14,18 +14,17 @@ public class XTeleportState : CharState {
 	int width = 18;
 
 	public XTeleportState() : base("land") {
-		invincible = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (!isInvisible && frameTime >= 12 && frameTime < 18) {
+		if (!isInvisible && stateFrames >= 12 && stateFrames < 18) {
 			isInvisible = true;
 			character.specialState = (int)SpecialStateIds.XTeleport;
 			character.useGravity = false;
 		}
-		if (isInvisible && frameTime >= 18) {
+		if (isInvisible && stateFrames >= 18) {
 			isInvisible = false;
 			character.specialState = (int)SpecialStateIds.None;
 			character.useGravity = true;
@@ -116,18 +115,18 @@ public class XTeleportState : CharState {
 			}
 		}
 
-		if (frameTime < 12) {
+		if (stateFrames < 12) {
 			character.visible = Global.isOnFrameCycle(5);
-		} else if (frameTime >= 12 && frameTime < 18) {
+		} else if (stateFrames >= 12 && stateFrames < 18) {
 			character.visible = false;
-		} else if (frameTime >= 18) {
+		} else if (stateFrames >= 18) {
 			if (!onceTeleportInSound) {
 				onceTeleportInSound = true;
 				character.playSound("boomerkTeleport", sendRpc: true);
 			}
 			character.visible = Global.isOnFrameCycle(5);
 		}
-		if (frameTime >= 30) {
+		if (stateFrames >= 30) {
 			character.changeState(new Idle());
 		}
 	}
@@ -170,12 +169,7 @@ public class XTeleportState : CharState {
 		Collider col = new Collider(
 			teleportCollider.getPoints(), false, tempClone, false, false, 0, new Point(0, 0)
 		);
-		if (player.isX){
-		tempClone.changeSprite("mmx_warp_in_beam", false);
-		}
-		if (!player.isX){
-		tempClone.changeSprite("tgbd_land", false);
-		}
+		tempClone.changeSprite("mmx_land", false);
 		tempClone.globalCollider = col;
 		tempClone.alpha = 0.5f;
 		tempClone.xDir = character.xDir;

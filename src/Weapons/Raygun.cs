@@ -19,9 +19,9 @@ public class RayGun : AxlWeapon {
 		killFeedIndex = 33;
 		rateOfFire = 0.1f;
 
-	//	if (altFire == 1) {
-		//	shootSounds[3] = "laser", "laser", "laser2", "laser3";
-	//	}
+		if (altFire == 1) {
+			shootSounds[3] = "";
+		}
 	}
 
 	public override float whiteAxlFireRateMod() {
@@ -85,16 +85,16 @@ public class RayGunProj : Projectile {
 	//float lastAngle;
 	const float maxLen = 50;
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, xDir, 400, 0.5f, player, "axl_raygun_laser", 1, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		reflectable = true;
 		if ((player?.character as Axl)?.isWhiteAxl() == true) {
 			speed = 525;
 			damager.hitCooldown = 0;
-			maxTime *= 1f;
+			maxTime *= 1.5f;
 		}
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		maxTime = 0.25f;
+		maxTime = 0.35f;
 		projId = (int)ProjIds.RayGun;
 		updateAngle();
 		destroyOnHitWall = true;
@@ -191,6 +191,11 @@ public class RayGunAltProj : Projectile {
 			axl.nonOwnerAxlBulletPos = pos;
 		}
 		canBeLocal = false;
+
+		isMelee = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public int getChargeLevel() {
@@ -231,7 +236,7 @@ public class RayGunAltProj : Projectile {
 				soundCooldown = 0.14f;
 			}
 
-		//	chr?.playSound(laserSound);
+			chr?.playSound(laserSound);
 		}
 
 		if (!ownedByLocalPlayer) { return; }

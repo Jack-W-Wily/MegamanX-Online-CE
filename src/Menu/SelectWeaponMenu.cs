@@ -128,13 +128,13 @@ public class SelectWeaponMenu : IMainMenu {
 				if (cursors[selCursorIndex].index == -1) cursors[selCursorIndex].index = 24; //8;
 				else if (cursors[selCursorIndex].index == 8) cursors[selCursorIndex].index = 8; //16;
 				else if (cursors[selCursorIndex].index == 16) cursors[selCursorIndex].index = 16; //24;
-				Global.playSound("menu");
+				Global.playSound("menuX2");
 			} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 				cursors[selCursorIndex].index++;
 				if (cursors[selCursorIndex].index == 9) cursors[selCursorIndex].index = 9; //0;
 				else if (cursors[selCursorIndex].index == 17) cursors[selCursorIndex].index = 17; //9;
 				else if (cursors[selCursorIndex].index == 25) cursors[selCursorIndex].index = 0; //17;
-				Global.playSound("menu");
+				Global.playSound("menuX2");
 			}
 			if (Global.input.isPressedMenu(Control.WeaponLeft)) {
 				cursors[selCursorIndex].cycleLeft();
@@ -142,7 +142,7 @@ public class SelectWeaponMenu : IMainMenu {
 				cursors[selCursorIndex].cycleRight();
 			}
 		} else {
-			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, 2, playSound: true);
+			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, 1, playSound: true);
 		}
 
 		Helpers.menuUpDown(ref selCursorIndex, 0, 3);
@@ -154,7 +154,7 @@ public class SelectWeaponMenu : IMainMenu {
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
 		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
 		if (selectPressed) {
-			if (duplicateWeapons() && Options.main.xLoadout.melee != 3) {
+			if (duplicateWeapons()) {
 				error = "Cannot select same weapon more than once!";
 				return;
 			}
@@ -164,8 +164,7 @@ public class SelectWeaponMenu : IMainMenu {
 				Options.main.xLoadout.melee = cursors[3].index;
 				if (Global.level?.mainPlayer != null) {
 					Global.level.mainPlayer.loadout.xLoadout.melee = cursors[3].index;
-					//Global.level.mainPlayer.syncLoadout();
-					Global.level.mainPlayer.forceKill();
+					Global.level.mainPlayer.syncLoadout();
 				}
 				shouldSave = true;
 			}
@@ -222,15 +221,11 @@ public class SelectWeaponMenu : IMainMenu {
 			if (i == 3) {
 				Fonts.drawText(FontType.Blue, "Special ", 40, yPos + 2, selected: selCursorIndex == i);
 
-				for (int j = 0; j < 3; j++) {
+				for (int j = 0; j < 2; j++) {
 					if (j == 0) {
-						Global.sprites["hud_weapon_icon"].drawToHUD(30, startX2 + (j * wepW), startY + (i * wepH));
-					} 
-					if (j == 1) {
-						Global.sprites["hud_weapon_icon"].drawToHUD(65, startX2 + (j * wepW), startY + (i * wepH));
-					}
-					if (j == 2) {
-						Global.sprites["hud_weapon_icon"].drawToHUD(26, startX2 + (j * wepW), startY + (i * wepH));
+						Global.sprites["hud_weapon_icon"].drawToHUD(0, startX2 + (j * wepW), startY + (i * wepH));
+					} else if (j == 1) {
+						Global.sprites["hud_weapon_icon"].drawToHUD(102, startX2 + (j * wepW), startY + (i * wepH));
 					}
 
 					if (cursors[3].index != j) {
@@ -301,23 +296,16 @@ public class SelectWeaponMenu : IMainMenu {
 				Global.halfScreenW, 126, Alignment.Center
 			);
 			if (cursors[3].index == 0) {
-				Fonts.drawText(FontType.Blue, "Classic X", Global.halfScreenW, 146, Alignment.Center);
+				Fonts.drawText(FontType.Blue, "X-Buster", Global.halfScreenW, 146, Alignment.Center);
 				Fonts.drawText(
-					FontType.Green, "Gets Stronger by Buying armorrs and can switch them midfight.",
+					FontType.Green, "If no armor is equipped,\nSPECIAL will fire the X-Buster.",
 					Global.halfScreenW, wsy, Alignment.Center
 				);
 			}
 			if (cursors[3].index == 1) {
-				Fonts.drawText(FontType.Green, "X Kai", Global.halfScreenW, 146, Alignment.Center);
+				Fonts.drawText(FontType.Green, "Z-Saber", Global.halfScreenW, 146, Alignment.Center);
 				Fonts.drawText(
-					FontType.Blue,"Gets Stronger by Stealinng powers from others.",
-					Global.halfScreenW, wsy, Alignment.Center
-				);
-			}
-				if (cursors[3].index == 2) {
-				Fonts.drawText(FontType.Green, "IX", Global.halfScreenW, 146, Alignment.Center);
-				Fonts.drawText(
-					FontType.Blue,"Gets Stronger overtime by stacking buffs.",
+					FontType.Blue, "If no armor is equipped,\nSPECIAL will swing the Z-Saber.",
 					Global.halfScreenW, wsy, Alignment.Center
 				);
 			}

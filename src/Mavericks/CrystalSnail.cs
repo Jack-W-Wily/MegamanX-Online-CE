@@ -23,7 +23,7 @@ public class CrystalSnail : Maverick {
 		spriteToCollider.Add("shell_dash", getShellCollider());
 
 		weapon = getWeapon();
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.CrystalHunter;
 		weakWeaponId = WeaponIds.MagnetMine;
 		weakMaverickWeaponId = WeaponIds.MagnetMine;
@@ -74,7 +74,7 @@ public class CrystalSnail : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if ((state is MIdle || state is MJump || state is MFall || state is MRun)) {
+			if ((state is MIdle || state is MRun)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CSnailShootState());
 				} else if (input.isPressed(Control.Dash, player)) {
@@ -94,14 +94,11 @@ public class CrystalSnail : Maverick {
 	}
 
 	public override string getMaverickPrefix() {
-		if (Options.main.smallBarsEx){
-		return "tt_csnail";
-		}
 		return "csnail";
 	}
 
 	public override float getRunSpeed() {
-		return noShell ? 100 : 95;
+		return noShell ? 100 : 75;
 	}
 
 	public override MaverickState[] aiAttackStates() {

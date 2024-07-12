@@ -22,7 +22,7 @@ public class BlizzardBuffalo : Maverick {
 
 		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
 		spriteFrameToSounds["bbuffalo_run/6"] = "walkStomp";
-		canClimbWall = true;
+
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
 
@@ -43,7 +43,7 @@ public class BlizzardBuffalo : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -118,7 +118,10 @@ public class BlizzardBuffalo : Maverick {
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BBuffaloStomp, player, damage: 2 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(
+					weapon, centerPoint, ProjIds.BBuffaloStomp,
+					player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f
+				);
 			}
 		}
 		return null;
@@ -257,7 +260,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 		health -= damage;
 		if (health <= 0) {
@@ -535,15 +538,4 @@ public class BBuffaloDragged : GenericGrabbedState {
 		freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab"
 	) {
 	}
-	
-
-	public override void update() {
-		base.update();
-		trySnapToGrabPoint(true);
-
-		if (!grabber.sprite.name.Contains("_dash")) character.changeState(
-			new KnockedDown(character.pos.x < grabber?.pos.x ? -1 : 1), true);
-				
-		}
 }
-

@@ -120,21 +120,6 @@ public class Input {
 		return false;
 	}
 
-
-	public float checkYDir(Player player) {
-		float dPadDirY = 0;
-		bool pressedDir = false;
-		if (isHeld("up", player)) { dPadDirY--; pressedDir = true; }
-		if (isHeld("down", player)) { dPadDirY++; pressedDir = true; }
-		if (dPadDirY == 0 && pressedDir) {
-			dPadDirY = -lastDirPressed.y;
-		} else {
-			lastDirPressed.y = (int)dPadDirY;
-		}
-		return dPadDirY;
-	}
-
-
 	// Used by Zero's techniques
 	public bool checkDoubleTap2(string control) {
 		bool gapFound = false;
@@ -243,8 +228,6 @@ public class Input {
 		}
 		return completed;
 	}
-
-	
 
 	public Dictionary<Key, char> capsLockMapping = new Dictionary<Key, char>() {
 		{ Key.A, 'A' },
@@ -517,11 +500,11 @@ public class Input {
 			return false;
 		}
 
-	/*	if (player?.character != null && player.gridModeHeld) {
+		if (player?.character != null && player.gridModeHeld) {
 			if (inputName == Control.Left || inputName == Control.Right || inputName == Control.Up || inputName == Control.Down) {
 				return false;
 			}
-		}*/
+		}
 
 		if (useAxlCursorControls(player)) {
 			if (inputName == Control.Shoot) {
@@ -583,11 +566,11 @@ public class Input {
 
 		int? keyboardKey = keyboardMapping.GetValueOrDefault(inputName);
 
-	/*	if (player?.character != null && player.gridModeHeld) {
+		if (player?.character != null && player.gridModeHeld) {
 			if (inputName == Control.Left || inputName == Control.Right || inputName == Control.Up || inputName == Control.Down) {
 				return false;
 			}
-		}*/
+		}
 
 		if (keyboardKey != null && isPressed((Key)keyboardKey)) {
 			return true;

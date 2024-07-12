@@ -119,14 +119,11 @@ public partial class Player {
 	}
 
 	public bool shouldBlockMechSlotScroll() {
-	//	if (player.isVile && // Fixed
-	//	character != null &&
-	//	(character as Vile).rideArmor != null &&
-	//	 (character as Vile).isVileMK5 == true) {
-	//		return true;
-	//	} //REMOVED THIS DUE TO BREAKING ALL WEAPONS SCROLLS IN THE GAME
-			// GOOD FUCKING JOB GACEL I'LL FIGURE OUT HOW I FIX THIS LATER
-		return true;// Options.main.blockMechSlotScroll;
+		if (character is Vile { isVileMK5: true, startRideArmor: not null }) {
+			return false;
+		}
+		return Options.main.blockMechSlotScroll;
+		
 	}
 
 	public bool gridModeHeld;
@@ -355,21 +352,14 @@ label:
 		weapons = new List<Weapon>();
 
 		if (ownedByLocalPlayer) {
-		
 			if (isX) {
-				
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
-					if (HasFullMax()) weapons.Add(new HyperBuster());
-				//	if (hasFullGiga()) weapons.Add(new GigaCrush());
-				//	if (HasFullForce()) weapons.Add(new NovaStrike(this));
-				}
-				// Removed X AI having all weapons
-				// Well I'm putting it back you can't stop me gacel
-				// that AI sucks if you Disable
-				// The AI's ilegal moves that's the only
-				// Way to make it viable
-				if (isAI) {
+					if (hasArmArmor(3)) weapons.Add(new HyperBuster());
+					if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
+					if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
+				} else if (Global.level.is1v1()) {
+					if (xArmor1v1 == 1) {
 						weapons.Add(new Buster());
 						weapons.Add(new Torpedo());
 						weapons.Add(new Sting());
@@ -379,67 +369,7 @@ label:
 						weapons.Add(new ElectricSpark());
 						weapons.Add(new Boomerang());
 						weapons.Add(new ShotgunIce());
-						weapons.Add(new CrystalHunter());
-						weapons.Add(new BubbleSplash());
-						weapons.Add(new SilkShot());
-						weapons.Add(new SpinWheel());
-						weapons.Add(new SonicSlicer());
-						weapons.Add(new StrikeChain());
-						weapons.Add(new MagnetMine());
-						weapons.Add(new SpeedBurner(this));
-						weapons.Add(new AcidBurst());
-						weapons.Add(new ParasiticBomb());
-						weapons.Add(new TriadThunder());
-						weapons.Add(new SpinningBlade());
-						weapons.Add(new RaySplasher());
-						weapons.Add(new GravityWell());
-						weapons.Add(new FrostShield());
-						weapons.Add(new TunnelFang());
-					//if (hasArmArmor(3)) weapons.Add(new HyperBuster());
-					//if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
-					}
-				  if (loadout.xLoadout.weapon1 > 0 && 
-					loadout.xLoadout.weapon1 < 9 &&
-					loadout.xLoadout.weapon2 > 0 && 
-					loadout.xLoadout.weapon2 < 9 &&
-					loadout.xLoadout.weapon3 > 0 && 
-					loadout.xLoadout.weapon3 < 9 ||
-					loadout.xLoadout.weapon1 > 8 && 
-					loadout.xLoadout.weapon1 < 17 &&
-					loadout.xLoadout.weapon2 > 8 && 
-					loadout.xLoadout.weapon2 < 17 &&
-					loadout.xLoadout.weapon3 > 8 && 
-					loadout.xLoadout.weapon3 < 17 ||
-					loadout.xLoadout.weapon1 > 16 && 
-					loadout.xLoadout.weapon1 < 25 &&
-					loadout.xLoadout.weapon2 > 16 && 
-					loadout.xLoadout.weapon2 < 25 &&
-					loadout.xLoadout.weapon3 > 16 && 
-					loadout.xLoadout.weapon3 < 25) {
-					//weapons.Add(new GigaCrush());
-					if (loadout.xLoadout.weapon1 > 0 && 
-					loadout.xLoadout.weapon1 < 9 &&
-					loadout.xLoadout.weapon2 > 0 && 
-					loadout.xLoadout.weapon2 < 9 &&
-					loadout.xLoadout.weapon3 > 0 && 
-					loadout.xLoadout.weapon3 < 9 ) {
-						weapons.Add(new Buster());
-						weapons.Add(new Torpedo());
-						weapons.Add(new Sting());
-						weapons.Add(new RollingShield());
-						weapons.Add(new FireWave());
-						weapons.Add(new Tornado());
-						weapons.Add(new ElectricSpark());
-						weapons.Add(new Boomerang());
-						weapons.Add(new ShotgunIce());
-						
-					} else if (
-					loadout.xLoadout.weapon1 > 8 && 
-					loadout.xLoadout.weapon1 < 17 &&
-					loadout.xLoadout.weapon2 > 8 && 
-					loadout.xLoadout.weapon2 < 17 &&
-					loadout.xLoadout.weapon3 > 8 && 
-					loadout.xLoadout.weapon3 < 17) {
+					} else if (xArmor1v1 == 2) {
 						weapons.Add(new Buster());
 						weapons.Add(new CrystalHunter());
 						weapons.Add(new BubbleSplash());
@@ -449,14 +379,8 @@ label:
 						weapons.Add(new StrikeChain());
 						weapons.Add(new MagnetMine());
 						weapons.Add(new SpeedBurner(this));
-						
-					} else if (
-					loadout.xLoadout.weapon1 > 16 && 
-					loadout.xLoadout.weapon1 < 25 &&
-					loadout.xLoadout.weapon2 > 16 && 
-					loadout.xLoadout.weapon2 < 25 &&
-					loadout.xLoadout.weapon3 > 16 && 
-					loadout.xLoadout.weapon3 < 25) {
+						weapons.Add(new GigaCrush());
+					} else if (xArmor1v1 == 3) {
 						weapons.Add(new Buster());
 						weapons.Add(new AcidBurst());
 						weapons.Add(new ParasiticBomb());
@@ -466,12 +390,9 @@ label:
 						weapons.Add(new GravityWell());
 						weapons.Add(new FrostShield());
 						weapons.Add(new TunnelFang());
-					//	weapons.Add(new HyperBuster());
-					
+						weapons.Add(new HyperBuster());
 					}
-				// So everyone has it
-				weapons.Add(new GigaCrush());
-				//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 					foreach (var enemyPlayer in Global.level.players) {
 						if (enemyPlayer.maverick1v1 != null && enemyPlayer.alliance != alliance) {
 							Weapon? weaponToDeplete = null;
@@ -522,21 +443,19 @@ label:
 				if (Global.level.isTraining() && !Global.level.server.useLoadout) {
 					weapons = Weapon.getAllAxlWeapons(axlLoadout).Select(w => w.clone()).ToList();
 					weapons[0] = getAxlBullet(axlBulletType);
-				} else if (Global.level.is1v1() ) {
-					weapons.Add(new DoubleBullet());
-					//weapons.Add(new AxlBullet());
-					//weapons.Add(new RayGun(axlLoadout.rayGunAlt));
-					//weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
-					//weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
-					//weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
-					//weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
-					//weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
-					//weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
-					//weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
+				} else if (Global.level.is1v1()) {
+					weapons.Add(new AxlBullet());
+					weapons.Add(new RayGun(axlLoadout.rayGunAlt));
+					weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
+					weapons.Add(new BlackArrow(axlLoadout.blackArrowAlt));
+					weapons.Add(new SpiralMagnum(axlLoadout.spiralMagnumAlt));
+					weapons.Add(new BoundBlaster(axlLoadout.boundBlasterAlt));
+					weapons.Add(new PlasmaGun(axlLoadout.plasmaGunAlt));
+					weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
+					weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
 				} else {
-				//	weapons = loadout.axlLoadout.getWeaponsFromLoadout();
-				//	weapons.Insert(0, getAxlBullet(axlBulletType));
-					weapons.Add(new DoubleBullet());
+					weapons = loadout.axlLoadout.getWeaponsFromLoadout();
+					weapons.Insert(0, getAxlBullet(axlBulletType));
 				}
 
 				foreach (var dnaCore in savedDNACoreWeapons) {
@@ -559,11 +478,7 @@ label:
 						weapons = Weapon.getAllSigmaWeapons(this, sigmaForm).Select(w => w.clone()).ToList();
 					}
 				} else {
-					if (maverick1v1 != null) {
-					weapons = new List<Weapon>() {Weapon.getAllSigmaWeapons(this).Select(w => w.clone()).ToList()[maverick1v1.Value + 1] };
-					} else{	
 					weapons = loadout.sigmaLoadout.getWeaponsFromLoadout(this, Options.main.sigmaWeaponSlot);
-					}	
 				}
 
 				// Preserve HP on death so can summon for free until they die
@@ -610,15 +525,15 @@ label:
 		headbuttWeapon = new Headbutt(this);
 
 		if (character is Zero zero) {
-			zero.raijingekiWeapon = RaijingekiWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.groundSpecial);
-			zero.zeroAirSpecialWeapon = KuuenzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.airSpecial);
-			zero.zeroUppercutWeaponA = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutA);
-			zero.zeroUppercutWeaponS = RyuenjinWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.uppercutS);
-			zero.zeroDownThrustWeaponA = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustA);
-			zero.zeroDownThrustWeaponS = HyouretsuzanWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.downThrustS);
+			zero.groundSpecial = RaijingekiWeapon.getWeaponFromIndex(loadout.zeroLoadout.groundSpecial);
+			zero.airSpecial = KuuenzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.airSpecial);
+			zero.uppercutA = RyuenjinWeapon.getWeaponFromIndex(loadout.zeroLoadout.uppercutA);
+			zero.uppercutS = RyuenjinWeapon.getWeaponFromIndex(loadout.zeroLoadout.uppercutS);
+			zero.downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.downThrustA);
+			zero.downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(loadout.zeroLoadout.downThrustS);
 
-			zero.zeroGigaAttackWeapon = RakuhouhaWeapon.getWeaponFromIndex(this, loadout.zeroLoadout.gigaAttack);
-			zero.zeroHyperMode = loadout.zeroLoadout.hyperMode;
+			zero.gigaAttack = RakuhouhaWeapon.getWeaponFromIndex(loadout.zeroLoadout.gigaAttack);
+			zero.hyperMode = loadout.zeroLoadout.hyperMode;
 		}
 
 		hadoukenWeapon = new HadoukenWeapon(this);

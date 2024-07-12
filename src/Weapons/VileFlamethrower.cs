@@ -69,22 +69,20 @@ public class VileFlamethrower : Weapon {
 		if (shootTime == 0) {
 			if (weaponInput == WeaponIds.VileFlamethrower) {
 				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
-			
-			//	if (ground == null) {
+				if (ground == null) {
 					if (vile.player.vileAmmo > 0) {
 						vile.setVileShootTime(this);
 						vile.changeState(new FlamethrowerState(), true);
 					}
-			//	}
-			
+				}
 			} else if (weaponInput == WeaponIds.VileBomb) {
 				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
-				//if (ground == null) {
+				if (ground == null) {
 					if (vile.player.vileAmmo > 0) {
 						vile.setVileShootTime(this);
 						vile.changeState(new FlamethrowerState(), true);
 					}
-				//}
+				}
 			} else if (weaponInput == WeaponIds.Napalm) {
 				if (vile.player.vileAmmo > 0) {
 					vile.changeState(new NapalmAttack(NapalmAttackType.Flamethrower), true);
@@ -108,10 +106,10 @@ public class FlamethrowerState : CharState {
 
 		shootTime += Global.spf;
 		if (shootTime > 0.06f) {
-			//if (!vile.tryUseVileAmmo(2)) {
-			//	character.changeToIdleOrFall();
-			//	return;
-			//}
+			if (!vile.tryUseVileAmmo(2)) {
+				character.changeToIdleOrFall();
+				return;
+			}
 			shootTime = 0;
 			character.playSound("flamethrower");
 			new FlamethrowerProj(player.vileFlamethrowerWeapon, character.getPOIPos(shootPOI), character.xDir, false, player, player.getNextActorNetId(), sendRpc: true);
@@ -137,17 +135,14 @@ public class FlamethrowerState : CharState {
 public class FlamethrowerProj : Projectile {
 	bool napalmInput;
 	float destroyTime;
-	float AxlDMG;
-	int AxlFlinch;
 	public FlamethrowerProj(VileFlamethrower weapon, Point pos, int xDir, bool napalmInput, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, weapon.projSprite, 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, weapon.projSprite, 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = weapon.projId;
 		fadeSprite = weapon.projFadeSprite;
 		destroyOnHit = true;
 		this.napalmInput = napalmInput;
 
 		destroyTime = 0.3f;
-		if (!player.isAxl){
 		if (weapon.type == (int)VileFlamethrowerType.SeaDragonRage) {
 			destroyTime = 0.2f;
 		}
@@ -155,7 +150,6 @@ public class FlamethrowerProj : Projectile {
 		if (!napalmInput) {
 			vel = new Point(xDir, 2f);
 			vel = vel.normalize().times(350);
-
 			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
 				this.vel.x = xDir * 350;
 				this.vel.y = 225;
@@ -164,11 +158,11 @@ public class FlamethrowerProj : Projectile {
 			vel = new Point(xDir, -0.5f);
 			vel = vel.normalize().times(350);
 			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
-			if (!owner.isAxl)	this.vel.x = xDir * 350;
+				this.vel.x = xDir * 350;
 				this.vel.y = -250;
 				destroyTime = 0.4f;
 			}
-		}
+
 		}
 
 		angle = vel.angle;
@@ -177,37 +171,6 @@ public class FlamethrowerProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
-
-		if (player.isAxl){
-		changeSprite("axl_bullet", true);
-		destroyTime = 1f;
-		AxlDMG = Helpers.randomRange(1, 2);
-		AxlFlinch = Helpers.randomRange(1, 30);
-		damager.damage = AxlDMG;
-		damager.flinch = AxlFlinch;
-			if (owner.isAxl && owner.character != null && owner.character.charState is RisingBarrage)
-			{
-			this.vel.y = -250;	
-			}
-		if (!napalmInput) {
-			vel = new Point(xDir, 2f);
-			vel = vel.normalize().times(350);
-
-			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
-				this.vel.x = xDir * 350;
-				this.vel.y = 225;
-			}
-		} else {
-			vel = new Point(xDir, -0.5f);
-			vel = vel.normalize().times(350);
-			if (weapon.type == (int)VileFlamethrowerType.DragonsWrath) {
-			if (!owner.isAxl)	this.vel.x = xDir * 350;
-				this.vel.y = -250;
-				destroyTime = 0.4f;
-			}
-		}
-	
-		}
 	}
 
 	public override void update() {
@@ -252,13 +215,5 @@ public class FlamethrowerProj : Projectile {
 		if (weapon.type == (int)VileFlamethrowerType.WildHorseKick) {
 			var character = damagable as Character;
 		}
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -300));
-		}
 	}
-	
 }

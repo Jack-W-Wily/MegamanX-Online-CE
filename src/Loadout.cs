@@ -10,7 +10,7 @@ public class XLoadout {
 	[ProtoMember(1)] public int weapon1;    //0 indexed
 	[ProtoMember(2)] public int weapon2;
 	[ProtoMember(3)] public int weapon3;
-	[ProtoMember(4)] public int melee;
+	[ProtoMember(4)] public int melee = 1;
 
 	public List<int> getXWeaponIndices() {
 		return new List<int>() { weapon1, weapon2, weapon3 };
@@ -29,30 +29,17 @@ public class XLoadout {
 			weapon3 = 2;
 		}
 
-		if (melee < 0 || melee > 2) melee = 0;
+		if (melee < 0 || melee > 1) melee = 0;
 	}
 
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
 		var indices = new List<byte>();
-		if (melee == 1){
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);
-		}
-		if (melee == 0){
-		indices.Add((byte)weapon1);
-		indices.Add((byte)weapon2);
-		indices.Add((byte)weapon3);
-		}
-		if (melee == 2){
-		indices.Add((byte)weapon1);
-		indices.Add((byte)weapon2);
-		indices.Add((byte)weapon3);
-		}
-	//	if (player.HasFullMax()) indices.Add((int)WeaponIds.HyperBuster);
-		//if (player.hasFullGiga()) 
-		indices.Add((int)WeaponIds.GigaCrush);
-	//	if (player.HasFullForce()) indices.Add((int)WeaponIds.NovaStrike);
+		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperBuster);
+		if (player.hasBodyArmor(2)) indices.Add((int)WeaponIds.GigaCrush);
+		if (player.hasUltimateArmor()) indices.Add((int)WeaponIds.NovaStrike);
 
 		return indices.Select(index => {
 			return Weapon.getAllSwitchableWeapons(new AxlLoadout()).Find(w => w.index == index).clone();
@@ -79,7 +66,6 @@ public class ZeroLoadout {
 	[ProtoMember(6)] public int hyperMode;
 	[ProtoMember(7)] public int groundSpecial;
 	[ProtoMember(8)] public int airSpecial;
-	[ProtoMember(9)] public int melee;
 
 	public static ZeroLoadout createRandom() {
 		return new ZeroLoadout() {
@@ -91,7 +77,6 @@ public class ZeroLoadout {
 			hyperMode = Helpers.randomRange(0, 2),
 			groundSpecial = Helpers.randomRange(0, 2),
 			airSpecial = Helpers.randomRange(0, 2),
-			melee = Helpers.randomRange(0, 2),
 		};
 	}
 
@@ -112,7 +97,6 @@ public class ZeroLoadout {
 			if (downThrustA > 2) downThrustA = 0;
 		}
 		if (hyperMode < 0 || hyperMode > 2) hyperMode = 0;
-			if (melee < 0 || melee > 2) melee = 0;
 	}
 
 	private bool inRange(int weaponNum) {
@@ -137,21 +121,20 @@ public class VileLoadout {
 
 	public List<Weapon> getWeaponsFromLoadout(bool includeMech) {
 		var weapons = new List<Weapon>();
-	{
-	//	weapons.Add(new VileCannon((VileCannonType)cannon));
-		weapons.Add(new Vulcan((VulcanType)vulcan));
-		 
+		if (cannon > -1) weapons.Add(new VileCannon((VileCannonType)cannon));
+		if (vulcan > -1) weapons.Add(new Vulcan((VulcanType)vulcan));
+
 		if (includeMech) {
 			weapons.Add(new MechMenuWeapon(VileMechMenuType.All));
 			weapons = Helpers.sortWeapons(weapons, Options.main.weaponOrderingVile);
 		}
-		}
+
 		return weapons;
 	}
 
 	public static VileLoadout createRandom() {
 		return new VileLoadout() {
-			cannon = Helpers.randomRange(0, 3),
+			cannon = Helpers.randomRange(0, 2),
 			vulcan = Helpers.randomRange(0, 2),
 			missile = Helpers.randomRange(0, 2),
 			rocketPunch = Helpers.randomRange(0, 2),
@@ -164,7 +147,7 @@ public class VileLoadout {
 	}
 
 	public void validate() {
-		if (!inRange(cannon, 0, 3)) cannon = 0;
+		if (!inRange(cannon, 0, 2)) cannon = 0;
 		if (!inRange(vulcan, 0, 2)) vulcan = 0;
 		if (!inRange(missile, 0, 2)) missile = 0;
 		if (!inRange(rocketPunch, 0, 2)) rocketPunch = 0;

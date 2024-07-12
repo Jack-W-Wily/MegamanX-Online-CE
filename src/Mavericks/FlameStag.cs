@@ -58,7 +58,7 @@ public class FlameStag : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new FStagShoot(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -411,7 +411,6 @@ public class FStagGrabState : MaverickState {
 	float xVel = 400;
 	public Character victim;
 	float endLagTime;
-	bool grabbedOnce;
 	public FStagGrabState(bool fromDash) : base("dash_grab", "") {
 		if (!fromDash) xVel = 0;
 	}
@@ -430,19 +429,14 @@ public class FStagGrabState : MaverickState {
 			return;
 		}
 
-		if (victim != null && victim.sprite.name.EndsWith("_grabbed")) {
-			grabbedOnce = true;
-		}
-
 		if (maverick.isAnimOver()) {
-			if (grabbedOnce) {
+			if (victim != null) {
 				endLagTime += Global.spf;
 				if (endLagTime > 0.25f) {
 					maverick.changeState(new FStagUppercutState(victim));
 				}
 			} else {
-				maverick.changeState(new FStagUppercutState(victim));
-				//maverick.changeToIdleOrFall();
+				maverick.changeToIdleOrFall();
 			}
 		}
 	}

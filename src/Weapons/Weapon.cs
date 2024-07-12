@@ -59,7 +59,6 @@ public class Weapon {
 		ammo = 32;
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
-		shootSounds = new string[] { "", "", "", "" };
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {
@@ -293,65 +292,8 @@ public class Weapon {
 		return (shootTime / rateOfFire) < (1 - percent);
 	}
 
-	
-
-	
-
-	
-
-	public void shoot(Point pos, int xDir, Player player, int chargeLevel, ushort netProjId) {
-		if (player.character == null) return;
-		if (player.character.stockedCharge) {
-			chargeLevel = 3;
-		}
-
-		getProjectile(pos, xDir, player, chargeLevel, netProjId);
-
-		if (soundTime == 0) {
-		//	if (shootSounds != null && shootSounds.Count > 0) {
-		//		player.character.playSound(shootSounds[chargeLevel]);
-		//	}
-			if (this is FireWave) {
-				soundTime = 0.25f;
-			}
-		}
-
-		// Only deduct ammo if owned by local player
-		if (player.character.ownedByLocalPlayer) {
-			float ammoUsage;
-			if (player.character.isInvisibleBS.getValue() && chargeLevel < 3) {
-				ammoUsage = 4;
-			} else if (this is FireWave) {
-				if (chargeLevel < 3) {
-					float chargeTime = player.character.chargeTime;
-					if (chargeTime < 1) {
-						ammoUsage = Global.spf * 10;
-					} else {
-						ammoUsage = Global.spf * 20;
-					}
-				} else {
-					ammoUsage = 8;
-				}
-			} else if (this is Buster buster) {
-				ammoUsage = 0;
-			} else {
-				ammoUsage = getAmmoUsage(chargeLevel);
-			}
-			addAmmo(-ammoUsage, player);
-
-			/*
-			if (ammo <= 0 && player.character?.isHyperX == true)
-			{
-				player.weapons.Remove(this);
-				player.weaponSlot--;
-				if (player.weaponSlot < 0) player.weaponSlot = 0;
-			}
-			*/
-		}
-	}
-
 	public void addAmmo(float amount, Player player) {
-		if (player.isX && player.hasGoldenArmor() && amount < 0) amount *= 0.5f;
+		if (player.isX && player.hasChip(3) && amount < 0) amount *= 0.5f;
 		ammo += amount;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 	}

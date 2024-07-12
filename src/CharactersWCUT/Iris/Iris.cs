@@ -8,7 +8,7 @@ public class Iris : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-
+	charId = CharIds.Iris;
 	}
 
 	public NewIrisCrystal irisCrystal;

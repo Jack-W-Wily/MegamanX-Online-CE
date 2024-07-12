@@ -137,19 +137,13 @@ public class Anim : Actor {
 	};
 
 	private bool isMaverickDeathAnim(string spriteName) {
-		string[] maverickDieSprites = new string[]
-		{
-				"chillp_die", "sparkm_die", "armoreda_die", "armoreda_na_die", "launcho_die", "boomerk_die", "boomerk_bald_die", "stingc_die", "storme_die", "flamem_die",
-				"wsponge_die", "wheelg_die", "bcrab_die", "fstag_die", "morphmc_die", "morphm_die", "magnac_die", "magnac_notail_die", "csnail_die", "tt_csnail_die",  "overdriveo_die", "fakezero_die",
-				"bbuffalo_die", "tseahorse_die", "tunnelr_die", "voltc_die", "crushc_die", "neont_die", "gbeetle_die", "bhornet_die", "drdoppler_die",
-		};
 		return maverickDieSprites.Any(s => s == spriteName);
 	}
 
 	public override void update() {
 		base.update();
-		
-		if (Global.level.mainPlayer.charNum == 2 && sprite.name == "risingspecter_muzzle") {
+
+		if (sprite.name == "risingspecter_muzzle") {
 			float sin = MathF.Sin(Global.time * 100);
 			float sinDamp = Helpers.clamp01(1 - (time / 0.5f));
 			xScale = (0.75f + sin * 0.25f) * sinDamp;
@@ -195,7 +189,7 @@ public class Anim : Actor {
 			yScale = 1 + 2 * Helpers.clamp01(time / sprite.getAnimLength());
 		}
 
-		if (Global.level.mainPlayer.charNum != 5 &&  sprite.name == "sigma3_kaiser_virus_return") {
+		if (sprite.name == "sigma3_kaiser_virus_return") {
 			xScale -= Global.spf * 2.5f;
 			yScale = xScale;
 			if (xScale < 0) {

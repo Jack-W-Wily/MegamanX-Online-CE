@@ -150,7 +150,7 @@ public class BusterZero : Character {
 					zeroLemonsOnField.RemoveAt(i);
 				}
 			}
-			if (zeroLemonsOnField.Count >= 1) { return; }
+			if (zeroLemonsOnField.Count >= 3) { return; }
 		}
 		string shootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
@@ -236,10 +236,11 @@ public class BusterZero : Character {
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Shoot, player);
 	}
+
 	public override void increaseCharge() {
 		float factor = 1;
 		if (isBlackZero) factor = 1.5f;
-		chargeTime += Global.spf * factor;
+		chargeTime += Global.speedMul * factor;
 	}
 
 	public override float getRunSpeed() {
@@ -261,13 +262,13 @@ public class BusterZero : Character {
 		return dashSpeed * getRunDebuffs();
 	}
 
-//	public override bool canAirDash() {
-//		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
-//	}
+	public override bool canAirDash() {
+		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+	}
 
-//	public override bool canAirJump() {
-//		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
-//	}
+	public override bool canAirJump() {
+		return dashedInAir == 0 || (dashedInAir == 1 && isBlackZero);
+	}
 
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();

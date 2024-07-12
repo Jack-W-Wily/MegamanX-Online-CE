@@ -119,13 +119,14 @@ public class UpgradeMenu : IMainMenu {
 				if (mainPlayer.heartTanks < getMaxHeartTanks() && mainPlayer.currency >= getHeartTankCost()) {
 					mainPlayer.currency -= getHeartTankCost();
 					mainPlayer.heartTanks++;
-					Global.playSound("upgrade");
-					mainPlayer.maxHealth += mainPlayer.getHeartTankModifier();
-					mainPlayer.character?.addHealth(mainPlayer.getHeartTankModifier());
+					Global.playSound("hearthX1");
+					float currentMaxHp = mainPlayer.maxHealth;
+					mainPlayer.maxHealth = mainPlayer.getMaxHealth();
+					mainPlayer.character?.addHealth(mainPlayer.maxHealth - currentMaxHp);
 					/*
-					if (mainPlayer.isVile && mainPlayer.character?.rideArmor != null)
+					if (mainPlayer.isVile && mainPlayer.character?.vileStartRideArmor != null)
 					{
-						mainPlayer.character.rideArmor.addHealth(mainPlayer.getHeartTankModifier());
+						mainPlayer.character.vileStartRideArmor.addHealth(mainPlayer.getHeartTankModifier());
 					}
 					else if (mainPlayer.isSigma && mainPlayer.currentMaverick != null)
 					{

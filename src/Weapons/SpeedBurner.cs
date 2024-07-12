@@ -40,7 +40,7 @@ public class SpeedBurnerProj : Projectile {
 	float airSpawnTime;
 	int groundSpawns;
 	public SpeedBurnerProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 275, 2, player, "speedburner_start", 10, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 275, 2, player, "speedburner_start", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurner;
 		if (rpc) {
@@ -81,19 +81,6 @@ public class SpeedBurnerProj : Projectile {
 			groundSpawnTime = 0.075f;
 		}
 	}
-
-
-	public override void onCollision(CollideData other) {
-		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer && frameIndex >= 4) {
-			playSound("flamemOilBurn", sendRpc: true);
-			new FlameMBigFireProj(new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir, oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true);
-			// oilSpill.time = 0;
-			oilSpill.destroySelf();
-		}
-	}
-	
 }
 
 public class SpeedBurnerProjWater : Projectile {
@@ -101,7 +88,7 @@ public class SpeedBurnerProjWater : Projectile {
 	float offsetTime;
 	float smokeTime;
 	public SpeedBurnerProjWater(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 275, 1, player, "speedburner_underwater", 4, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 275, 1, player, "speedburner_underwater", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurnerWater;
 		initY = pos.y;
@@ -164,7 +151,7 @@ public class SpeedBurnerCharState : CharState {
 
 		CollideData collideData = Global.level.checkCollisionActor(character, character.xDir, 0);
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
-			character.applyDamage(player, (int)WeaponIds.SpeedBurner, 2, (int)ProjIds.SpeedBurnerRecoil);
+			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 			//character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
 			character.changeState(new Idle(), true);
 			character.playSound("hurt", sendRpc: true);

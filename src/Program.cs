@@ -151,13 +151,13 @@ class Program {
 		Fonts.loadFontSprites();
 
 		List<string> loadText = new();
-		loadText.Add("NOM BIOS v" + Global.version + ", Interesting...");
-		//loadText.Add("Copyrigth ©2114, NOM Corporation");
-		//loadText.Add("");
-		loadText.Add("MMXOD " + "Wily Cut" + " Special Edition " + "0.0" + " " + Global.versionName);
+		loadText.Add("NOM BIOS v" + Global.version + ", An Energy Sunstar Ally");
+		loadText.Add("Copyright ©2114, NOM Corporation");
+		loadText.Add("");
+		loadText.Add("MMXOD " + Global.shortForkName + " " + Global.versionName + " " + Global.subVersionName);
 		loadText.Add("");
 		if (String.IsNullOrEmpty(Options.main.playerName)) {
-			loadText.Add("User: Dr. Wily");
+			loadText.Add("User: Dr. Cain");
 		} else {
 			loadText.Add("User: " + Options.main.playerName);
 		}
@@ -165,14 +165,13 @@ class Program {
 		loadText.Add("CPU: " + getCpuName());
 		loadText.Add("Memory: " + (GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1024) + "kb");
 		loadText.Add("");
+
 		// Input
 		Global.input = new Input(false);
 		setupControllers(window);
 
 		if (Options.main.areShadersDisabled() == false) {
-			loadText.Add("Shaders Systems ONLINE.");
-		if (String.IsNullOrEmpty(Options.main.playerName))	loadText.Add(">G:I suppose it was a matter of time before you went loose");
-			
+			loadText.Add("Shaders OK.");
 			loadShaders();
 		} else {
 			loadText.Add("Shaders disabled, skipping.");
@@ -184,14 +183,12 @@ class Program {
 		if (MasterServerData.serverIp == "127.0.0.1") {
 			loadText[loadText.Count - 1] = "Using local conection.";
 		} else {
-			loadText[loadText.Count - 1] = "Conected to Master server.";
+			loadText[loadText.Count - 1] = "Masterserver OK.";
 		}
 
 		loadText.Add("Loading Sprites...");
 		loadMultiThread(loadText, window, loadImages);
 		loadText[loadText.Count - 1] = "Loaded Sprites.";
-		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add(">W:HIHEHAHAHA, OUT OF MY WAY, I have a lot of shit to do");
-
 
 		loadText.Add("Loading Sprite JSONS...");
 		loadMultiThread(loadText, window, loadSprites);
@@ -200,8 +197,6 @@ class Program {
 		loadText.Add("Loading Maps...");
 		loadMultiThread(loadText, window, loadLevels);
 		loadText[loadText.Count - 1] = "Maps Loaded.";
-		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add(">G:This is not quite stable yet,I recomend waiting for now");
-			
 
 		loadText.Add("Loading SFX...");
 		loadMultiThread(loadText, window, loadSounds);
@@ -210,7 +205,7 @@ class Program {
 		loadText.Add("Loading Music...");
 		loadMultiThread(loadText, window, loadMusics);
 		loadText[loadText.Count - 1] = "Music Loaded.";
-		if (String.IsNullOrEmpty(Options.main.playerName)) loadText.Add("let the chaos roll for a little while we're at it shall we?");
+
 		loadText.Add("Calculating checksum...");
 		loadMultiThread(loadText, window, Global.computeChecksum);
 		loadText[loadText.Count - 1] = "Checksum OK.";
@@ -230,27 +225,8 @@ class Program {
 
 		// Force startup config to be fetched
 		Menu.change(new MainMenu());
+		Global.changeMusic("MMX1-TitleScreen");
 
-		//>>>>>>>>>>>>>>>>>>>>>>>
-		// Menu music
-		if (Options.main.preferredCharacter == 0 ){
-		Global.changeMusic("menuX");	
-		}
-		if (Options.main.preferredCharacter == 1 
-		|| Options.main.preferredCharacter == 3
-		|| Options.main.preferredCharacter >= 6){
-		Global.changeMusic("menuZero");	
-		}
-		if (Options.main.preferredCharacter == 2){
-		Global.changeMusic("menuVile");	
-		}
-		if (Options.main.preferredCharacter == 4){
-		Global.changeMusic("MenuSIgma");	
-		}
-		if (Options.main.preferredCharacter == 5){
-		Global.changeMusic("menudynamo");	
-		}
-		// >>>>>>>>>>>>>>>>>>
 		if (mode == 1) {
 			HostMenu menu = new HostMenu(new MainMenu(), null, false, false, true);
 			Menu.change(menu);
@@ -295,7 +271,10 @@ class Program {
 
 	private static void update() {
 		if (Global.levelStarted()) {
-			Helpers.tryWrap(Global.level.update, false);
+			Global.level.update();
+			if (!Global.isSkippingFrames) {
+				Global.level.clearOldActors();
+			}
 		}
 		Menu.update();
 		if (Global.leaveMatchSignal != null) {

@@ -33,31 +33,31 @@ public class VileCannon : Weapon {
 		} else if (vileCannonType == VileCannonType.FrontRunner) {
 			rateOfFire = 0.75f;
 			vileAmmoUsage = 8;
-			displayName = "VAVA";
+			displayName = "Front Runner";
 			projSprite = "vile_mk2_proj";
 			fadeSprite = "vile_mk2_proj_fade";
-			description = new string[] { "Vile's Original Body ,", "Created by Dr.Cain." };
+			description = new string[] { "This cannon not only offers power,", "but can be aimed up and down." };
 			vileWeight = 2;
 		} else if (vileCannonType == VileCannonType.FatBoy) {
 			rateOfFire = 0.75f;
 			vileAmmoUsage = 24;
-			displayName = "VAVA MK2";
+			displayName = "Fat Boy";
 			projSprite = "vile_mk2_fb_proj";
 			fadeSprite = "vile_mk2_fb_proj_fade";
 			killFeedIndex = 90;
 			weaponSlotIndex = 61;
-			description = new string[] { "Used in the Doppletown Incident,", "Created by Dr.Doppler." };
+			description = new string[] { "The most powerful cannon around,", "it consumes a lot of energy." };
 			vileWeight = 3;
 		}
 		if (vileCannonType == VileCannonType.LongshotGizmo) {
 			rateOfFire = 0.1f;
 			vileAmmoUsage = 4;
-			displayName = "VAVA V";
+			displayName = "Longshot Gizmo";
 			projSprite = "vile_mk2_lg_proj";
 			fadeSprite = "vile_mk2_lg_proj_fade";
 			killFeedIndex = 91;
 			weaponSlotIndex = 62;
-			description = new string[] { "Vile's NewGEN body used in the Orbital Elevator Incident,", "Unknown Creator." };
+			description = new string[] { "This cannon fires 5 shots at once,", "but leaves you open to attack." };
 			vileWeight = 4;
 		}
 	}
@@ -122,25 +122,23 @@ public class VileCannon : Weapon {
 	}
 }
 
-
-
 public class VileCannonProj : Projectile {
 	public VileCannonProj(
 		VileCannon weapon, Point pos, float byteAngle, Player player,
 		ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 300, 1, player, weapon.projSprite, 4, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)ProjIds.FrontRunner;
-		maxTime = 0.18f;
+		maxTime = 0.5f;
 		destroyOnHit = true;
 
 		if (weapon.type == (int)VileCannonType.FrontRunner) {
 			// Nothing.
 		} else if (weapon.type == (int)VileCannonType.FatBoy) {
 			xScale = xDir;
-			damager.damage = 3;
+			damager.damage = 4;
 			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.FatBoy;
 			maxTime = 0.35f;
@@ -156,9 +154,9 @@ public class VileCannonProj : Projectile {
 		}
 		// Speed and angle.
 		Point norm = Point.createFromByteAngle(byteAngle);
-		this.vel.x = norm.x * speed * player.character.xDir;
-		this.vel.y = norm.y * speed * player.character.xDir;
-		this.byteAngle = byteAngle * player.character.xDir;
+		this.vel.x = norm.x * speed * xDir;
+		this.vel.y = norm.y * speed;
+		this.byteAngle = byteAngle;
 
 		if (rpc) {
 			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
@@ -257,86 +255,3 @@ public class CannonAttack : CharState {
 		}
 	}
 }
-
-
-public class FrontRunnerAttack : CharState {
-	bool isGizmo;
-	bool grounded;
-	public FrontRunnerAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
-		this.isGizmo = isGizmo;
-		this.grounded = grounded;
-	airMove = true;
-	}
-
-	public static string getSprite(bool isGizmo, bool grounded) {
-		return "idle_shoot" ;
-	}
-
-	public override void update() {
-		base.update();
-	if (vile.gizmoCooldown == 0f) {
-		if (vile.isShootingLongshotGizmo) {
-			return;
-		}
-
-		//groundCodeWithMove();
-
-		if (character.sprite.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-		} else {	
-	vile.changeToIdleOrFall();
-	}
-	}
-
-	public static void shootLogic(Vile vile) {
-
-	
-		
-		vile.tryUseVileAmmo(8);
-		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
-			return;
-		}
-        Point shootVel = vile.getVileShootVel(true);
-
-		var player = vile.player;
-		vile.playSound("frontrunner", sendRpc: true);
-
-		string muzzleSprite = "cannon_muzzle";
-		//if (player.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
-		//if (player.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_lg";
-
-		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
-		if (vile.sprite.name.EndsWith("_grab")) {
-			shootPos = vile.getFirstPOIOrDefault("s");
-		}
-
-		var muzzle = new Anim(shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile);
-		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
-
-
-		new VileCannonProj(
-			new VileCannon(VileCannonType.FrontRunner),
-			shootPos, MathF.Round(shootVel.byteAngle) *  vile.xDir, //vile.longshotGizmoCount,
-			player, player.getNextActorNetId(), rpc: true
-		);
-	}
-
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		shootLogic(vile);
-		//character.useGravity = false;
-		//character.stopMoving();
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		vile.isShootingLongshotGizmo = false;
-		character.useGravity = true;
-		if (isGizmo) {
-			vile.gizmoCooldown = 0.5f;
-		}
-	}
-}
-

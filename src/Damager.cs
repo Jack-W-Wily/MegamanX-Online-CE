@@ -7,7 +7,7 @@ public class Damager {
 	public Player owner;
 	public float damage;
 	public float hitCooldown;
-	public int flinch;  // number of frames to flinch
+	public int flinch; // Number of frames to flinch
 	public float knockback;
 
 	public const float envKillDamage = 2000;
@@ -30,14 +30,14 @@ public class Damager {
 		{ (int)ProjIds.MechPunch, 1 },
 		{ (int)ProjIds.MechKangarooPunch, 1 },
 		{ (int)ProjIds.MechGoliathPunch, 1 },
-		//{ (int)ProjIds.MechDevilBearPunch, 1 },
+		{ (int)ProjIds.MechDevilBearPunch, 1 },
 		{ (int)ProjIds.MechStomp, 1 },
 		{ (int)ProjIds.MechChain, 1 },
 		{ (int)ProjIds.TunnelFangCharged, 1 },
 		{ (int)ProjIds.Headbutt, 1 },
-		//{ (int)ProjIds.RocketPunch, 1 },
-		//{ (int)ProjIds.InfinityGig, 1 },
-		//{ (int)ProjIds.SpoiledBrat, 1 },
+		{ (int)ProjIds.RocketPunch, 1 },
+		{ (int)ProjIds.InfinityGig, 1 },
+		{ (int)ProjIds.SpoiledBrat, 1 },
 		{ (int)ProjIds.SpinningBladeCharged, 1 },
 		{ (int)ProjIds.Shingetsurin, 1 },
 		{ (int)ProjIds.MagnetMineCharged, 1 },
@@ -52,7 +52,7 @@ public class Damager {
 		{ (int)ProjIds.WheelGSpinWheel, 1f },
 		{ (int)ProjIds.Sigma3KaiserStomp, 1f },
 		{ (int)ProjIds.Sigma3KaiserBeam, 1f },
-		//{ (int)ProjIds.UPPunch, 1f },
+		{ (int)ProjIds.UPPunch, 1f },
 		{ (int)ProjIds.CopyShot, 1f },
 		{ (int)ProjIds.NeonTClawAir, 1f },
 		{ (int)ProjIds.NeonTClawDash, 1f },
@@ -91,7 +91,7 @@ public class Damager {
 				weakness = false;
 			}
 
-			if ((chr.infectedTime > 1f || chr.isAttacking()) && newFlinch > 0) {
+			if (chr.player.isAxl && newFlinch > 0) {
 				if (newFlinch < 4) {
 					newFlinch = 4;
 				} else if (newFlinch < 12) {
@@ -205,7 +205,7 @@ public class Damager {
 		}
 
 		if (damagable.isInvincible(owner, projId) && damage > 0) {
-			victim.playSound("ding");
+			victim.playSound("m10ding");
 			return true;
 		}
 
@@ -222,7 +222,7 @@ public class Damager {
 		if (damagable is CrackedWall cw) {
 			float? overrideDamage = CrackedWall.canDamageCrackedWall(projId, cw);
 			if (overrideDamage != null && overrideDamage == 0 && damage > 0) {
-				cw.playSound("ding");
+				cw.playSound("m10ding");
 				return true;
 			}
 			damage = overrideDamage ?? damage;
@@ -274,94 +274,9 @@ public class Damager {
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
 				case (int)ProjIds.MorphMPowder:
-				case (int)ProjIds.Raijingeki:
-				case (int)ProjIds.PlasmaGun:
-				case (int)ProjIds.Raijingeki2:
 					character?.paralize();
 					break;
 			}
-			switch (projId) {
-				case (int)ProjIds.CrystalHunter:
-					character?.crystalize();
-					break;
-				case (int)ProjIds.CSnailCrystalHunter:
-					character?.crystalize();
-					break;
-				case (int)ProjIds.AcidBurst:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				case (int)ProjIds.AcidBurstSmall:
-					damagerMessage = onAcidDamage(damagable, owner, 1);
-					break;
-				case (int)ProjIds.AcidBurstCharged:
-					damagerMessage = onAcidDamage(damagable, owner, 3);
-					break;
-				case (int)ProjIds.TSeahorseAcid1:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				case (int)ProjIds.TSeahorseAcid2:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				/*
-				case (int)ProjIds.TSeahorsePuddle:
-					damagerMessage = onAcidDamage(damagable, owner, 1);
-					break;
-				case (int)ProjIds.TSeahorseEmerge:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				*/
-				case (int)ProjIds.ParasiticBomb:
-					damagerMessage = onParasiticBombDamage(damagable, owner);
-					break;
-				case (int)ProjIds.ElectricShock:
-				case (int)ProjIds.MK2StunShot:
-				case (int)ProjIds.MorphMPowder:
-				case (int)ProjIds.Raijingeki:
-				case (int)ProjIds.Raijingeki2:
-				case (int)ProjIds.HighmaxStun:
-					character?.paralize();
-					break;
-			}
-				switch (projId) {
-				case (int)ProjIds.CrystalHunter:
-					character?.crystalize();
-					break;
-				case (int)ProjIds.CSnailCrystalHunter:
-					character?.crystalize();
-					break;
-				case (int)ProjIds.AcidBurst:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				case (int)ProjIds.AcidBurstSmall:
-					damagerMessage = onAcidDamage(damagable, owner, 1);
-					break;
-				case (int)ProjIds.AcidBurstCharged:
-					damagerMessage = onAcidDamage(damagable, owner, 3);
-					break;
-				case (int)ProjIds.TSeahorseAcid1:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				case (int)ProjIds.TSeahorseAcid2:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				/*
-				case (int)ProjIds.TSeahorsePuddle:
-					damagerMessage = onAcidDamage(damagable, owner, 1);
-					break;
-				case (int)ProjIds.TSeahorseEmerge:
-					damagerMessage = onAcidDamage(damagable, owner, 2);
-					break;
-				*/
-				case (int)ProjIds.ParasiticBomb:
-					damagerMessage = onParasiticBombDamage(damagable, owner);
-					break;
-				case (int)ProjIds.ElectricShock:
-				case (int)ProjIds.MK2StunShot:
-				case (int)ProjIds.MorphMPowder:
-					character?.paralize();
-					break;
-			}
-
 			if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
 			if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
 
@@ -432,194 +347,101 @@ public class Damager {
 				playHurtSound = true;
 			}
 
-			if (character.ownedByLocalPlayer 
-			&& character.charState.superArmor ){ //&& projId != (int)ProjIds.PlasmaGun) { Kill yourself gm19
+			if (character.ownedByLocalPlayer && character.charState.superArmor && projId != (int)ProjIds.PlasmaGun) {
 				flinch = 0;
 			}
 
 			#region effects
 
-			// Damage Effects effects. If adding one here add it to canDamageFrostShield() method too
+			// Burn effects. If adding one here add it to canDamageFrostShield() method too
 			if (projId == (int)ProjIds.FireWave) character.addBurnTime(owner, new FireWave(), 0.5f);
-			if (projId == (int)ProjIds.FireWaveCharged) character.addBurnTime(owner, new FireWave(), 2f);
-			if (projId == (int)ProjIds.SpeedBurner) character.addBurnTime(owner, new SpeedBurner(null), 1);
-			if (projId == (int)ProjIds.SpeedBurnerCharged) { if (character != owner.character) character.addBurnTime(owner, new SpeedBurner(null), 1); } else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
-			if (projId == (int)ProjIds.Napalm2Flame) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
-			if (projId == (int)ProjIds.Ryuenjin) character.addBurnTime(owner, new RyuenjinWeapon(owner), 2);
-			if (projId == (int)ProjIds.FlameBurner) character.addBurnTime(owner, new FlameBurner(0), 0.5f);
-			if (projId == (int)ProjIds.FlameBurnerHyper) character.addBurnTime(owner, new FlameBurner(0), 1);
-			if (projId == (int)ProjIds.CircleBlazeExplosion) character.addBurnTime(owner, new FlameBurner(0), 2);
-			if (projId == (int)ProjIds.QuakeBlazer) character.addBurnTime(owner, new QuakeBlazerWeapon(null), 0.5f);
-			if (projId == (int)ProjIds.QuakeBlazerFlame) character.addBurnTime(owner, new QuakeBlazerWeapon(null), 0.5f);
-			if (projId == (int)ProjIds.FlameMFireball) character.addBurnTime(owner, new FlameMFireballWeapon(), 1);
-			if (projId == (int)ProjIds.FlameMOilFire) character.addBurnTime(owner, new FlameMOilFireWeapon(), 8);
-			if (projId == (int)ProjIds.VelGFire) character.addBurnTime(owner, new VelGFireWeapon(), 0.5f);
-			if (projId == (int)ProjIds.SigmaWolfHeadFlameProj) character.addBurnTime(owner, new WolfSigmaHeadWeapon(), 3);
-			if (projId == (int)ProjIds.WildHorseKick) character.addBurnTime(owner, new VileFlamethrower(VileFlamethrowerType.WildHorseKick), 0.5f);
-			if (projId == (int)ProjIds.FStagFireball) character.addBurnTime(owner, FlameStag.getWeapon(), 1f);
-			if (projId == (int)ProjIds.FStagDash) character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
-			if (projId == (int)ProjIds.DrDopplerDash) character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
-			if (projId == (int)ProjIds.Sigma3Fire) character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
-			
-			//>>>>>>>>>>>>>>>>>>>
-			// Jump Cancel System
-			//if (owner?.character != null){
-			//owner.character.JumpCancelTime = 0.25f;
-			//}
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	//New Revamped Grabs System		
-		if (projId == (int)ProjIds.VileMK2Grab && 
-		(owner.character != null || character != null) && character.canBeGrabbed()) {
-				if (character.ownedByLocalPlayer && character.charState is not VileMK2Grabbed) {
-				character.changeState(new VileMK2Grabbed(owner.character), true);}			
-				if (owner.character.ownedByLocalPlayer && owner.character.grabtimeout == 0) {
-				owner.character.changeState(new VileMK2GrabState(character));
-				}			
-		} 
-		if (projId == (int)ProjIds.VileGrab && 
-		(owner.character != null || character != null) && character.canBeGrabbed()) {
-				if (character.ownedByLocalPlayer && character.charState is not VileMK2Grabbed) {
-				character.changeState(new VileMK2Grabbed(owner.character), true);}			
-				if (owner.character.ownedByLocalPlayer && owner.character.grabtimeout == 0) {
-				owner.character.changeState(new VileGrabState(character));
-				}			
-		}
-		
-		if (projId == (int)ProjIds.UPGrab	&& 
-			(owner.character != null || character != null) && character.canBeGrabbed()) {
-				if (character.ownedByLocalPlayer && character.charState is not UPGrabbed) {
-				character.changeState(new UPGrabbed(owner.character), true);}
-				if (owner.character.ownedByLocalPlayer) {
-				owner.character.changeState(new XUPGrabState(character));}
-		} /*if (projId == (int)ProjIds.LaunchODrain) {
-			character.changeState(new WhirlpoolGrabbed(owner.maverick as LaunchOctopus), true);
-		}  if (projId == (int)ProjIds.BoomerangKDeadLift) {
-				character.changeState(new LaunchedState(owner.character), true);
-			//character.changeState( new DeadLiftGrabbed(owner.maverick as BoomerangKuwanger), true);
-		}  if (projId == (int)ProjIds.WheelGGrab) {
-			character.changeState( new WheelGGrabbed(owner.maverick as WheelGator), true);
-		}  if (projId == (int)ProjIds.FStagUppercut) {
-				character.changeState(new LaunchedState(owner.character), true);
-			 //owner.maverick.changeState( new FStagUppercutState(character));
-			//character.changeState( new FStagGrabbed(owner.maverick as FlameStag), true);
-		}  if (projId == (int)ProjIds.MagnaCTail) {
-			character.changeState( new MagnaCDrainGrabbed(owner.maverick as MagnaCentipede), true);
-		}  if (projId == (int)ProjIds.GBeetleLift) {
-				character.changeState(new LaunchedState(owner.character), true);
-			//character.changeState( new BeetleGrabbedState(owner.maverick as GravityBeetle), true);
-		}  if (projId == (int)ProjIds.CrushCGrab) {
-			//owner.maverick.changeState( new CrushCGrabState(character));
-			character.changeState( new CrushCGrabbed(owner.maverick as CrushCrawfish), true);
-		}  if (projId == (int)ProjIds.BBuffaloDrag) {
-			character.changeState( new BBuffaloDragged(owner.maverick as BlizzardBuffalo), true);
-		}*/
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-	//Get Launched by Houtenjin
-	if (projId == (int)ProjIds.Houtenjin 
-	|| projId == (int)ProjIds.TornadoCharged
-	|| (projId == (int)ProjIds.BlockableLaunch && !victim.sprite.name.Contains("block"))) {		
-		character.changeState(new LaunchedState(owner.character), true);
-	}
-	//Godpress Goliath
-/*	if (projId == (int)ProjIds.MechGoliathPunch 
-	&& !character.sprite.name.Contains("block")
-	&& !character.sprite.name.Contains("grabbed")
-	&& !character.sprite.name.Contains("knocked")) {	
-		DISABLED THIS ONE UNTIL PROPER FIXES
-		character.changeState(new GoliathDragged(owner.character.rideArmor), true);
-	}*/ 
-	//>>>>>>>>>>>>>>>>>>>>>
-	if (projId == (int)ProjIds.HoutenjinF) {	
-			character.changeState(new PushedOver(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
-	}
-	//GBD's Mighty Kick
-	if (projId == (int)ProjIds.GBDKick && !(character.charState is SwordBlock)) {	
-			owner.character.isDashing = true;
-			owner.character.dashedInAir += 1;
-			owner.character.vel.y = 0f - owner.character.getJumpPower();
-			owner.character.changeState(new WallKick(), true);
-	}
+			else if (projId == (int)ProjIds.FireWaveCharged) character.addBurnTime(owner, new FireWave(), 2f);
+			else if (projId == (int)ProjIds.SpeedBurner) character.addBurnTime(owner, new SpeedBurner(null), 1);
+			else if (projId == (int)ProjIds.SpeedBurnerCharged) { if (character != owner?.character) character.addBurnTime(owner, new SpeedBurner(null), 1); } else if (projId == (int)ProjIds.Napalm2 || projId == (int)ProjIds.Napalm2Wall) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1);
+			else if (projId == (int)ProjIds.Napalm2Flame) character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
+			else if (projId == (int)ProjIds.Ryuenjin) {
+				character.addBurnTime(owner, RyuenjinWeapon.staticWeapon, 2);
+			}
+			else if (projId == (int)ProjIds.FlameBurner) character.addBurnTime(owner, new FlameBurner(0), 0.5f);
+			else if (projId == (int)ProjIds.FlameBurnerHyper) character.addBurnTime(owner, new FlameBurner(0), 1);
+			else if (projId == (int)ProjIds.CircleBlazeExplosion) character.addBurnTime(owner, new FlameBurner(0), 2);
+			else if (projId == (int)ProjIds.QuakeBlazer) {
+				character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
+			}
+			else if (projId == (int)ProjIds.QuakeBlazerFlame) {
+				character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
+			}
+			else if (projId == (int)ProjIds.FlameMFireball) character.addBurnTime(owner, new FlameMFireballWeapon(), 1);
+			else if (projId == (int)ProjIds.FlameMOilFire) character.addBurnTime(owner, new FlameMOilFireWeapon(), 8);
+			else if (projId == (int)ProjIds.VelGFire) character.addBurnTime(owner, new VelGFireWeapon(), 0.5f);
+			else if (projId == (int)ProjIds.SigmaWolfHeadFlameProj) character.addBurnTime(owner, new WolfSigmaHeadWeapon(), 3);
+			else if (projId == (int)ProjIds.WildHorseKick) character.addBurnTime(owner, new VileFlamethrower(VileFlamethrowerType.WildHorseKick), 0.5f);
+			else if (projId == (int)ProjIds.FStagFireball) character.addBurnTime(owner, FlameStag.getWeapon(), 1f);
+			else if (projId == (int)ProjIds.FStagDash) character.addBurnTime(owner, FlameStag.getUppercutWeapon(null), 2f);
+			else if (projId == (int)ProjIds.DrDopplerDash) character.addBurnTime(owner, new Weapon(WeaponIds.DrDopplerGeneric, 156), 1f);
+			else if (projId == (int)ProjIds.Sigma3Fire) character.addBurnTime(owner, new Sigma3FireWeapon(), 0.5f);
+
 			// Other effects
-			if (character.charState is not SwordBlock){
-				if (projId == (int)ProjIds.IceGattling) {
+			if (projId == (int)ProjIds.IceGattling) {
 				character.addIgFreezeProgress(1);
-				} if (projId == (int)ProjIds.IceGattlingHeadshot) {
+			} else if (projId == (int)ProjIds.IceGattlingHeadshot) {
 				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.IceGattlingHyper) {
+			} else if (projId == (int)ProjIds.IceGattlingHyper) {
 				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.Hyouretsuzan) {
-					character.addIgFreezeProgress(3);
-				} if (projId == (int)ProjIds.HotIcecle) {
-				character.addIgFreezeProgress(4);
+			} else if (projId == (int)ProjIds.Hyouretsuzan) {
+				character.addIgFreezeProgress(3);
+			} else if (projId == (int)ProjIds.Hyouretsuzan2) {
+				character.freeze();
 				flinch = 0;
-				} 
-				 if (projId == (int)ProjIds.Napalm) {
-				character.addIgFreezeProgress(1);
-				}
-				if (projId == (int)ProjIds.Hyouretsuzan2) {
-				character.addIgFreezeProgress(4);
-				flinch = 0;
-				} if (projId == (int)ProjIds.VelGIce) {
-					character.addIgFreezeProgress(4);
-				} if (projId == (int)ProjIds.BBuffaloBeam) {
-					character.addIgFreezeProgress(4);
-				} if (projId == (int)ProjIds.PlasmaGun) {
-					if (mmx != null) {
+			} else if (projId == (int)ProjIds.VelGIce) {
+				character.addIgFreezeProgress(2, 2 * 60);
+			} else if (projId == (int)ProjIds.BBuffaloBeam) {
+				character.freeze();
+			} else if (projId == (int)ProjIds.PlasmaGun) {
+				if (mmx != null) {
 					mmx.barrierCooldown = 3;
 					mmx.barrierTime = 0;
-					}
-				} if (projId == (int)ProjIds.ShotgunIceCharged) {
-				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.ChillPIceBlow) {
+				}
+			} else if (projId == (int)ProjIds.ShotgunIceCharged) {
+				character.addIgFreezeProgress(4, 5 * 60);
+			} else if (projId == (int)ProjIds.ChillPIceBlow) {
 				character.addIgFreezeProgress(4);
-				} if (projId == (int)ProjIds.HyorogaProj) {
-				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.HyorogaSwing) {
-				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.SeaDragonRage) {
-				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.DistanceNeedler) {
-				character.addIgFreezeProgress(2);
-				} if (projId == (int)ProjIds.SplashLaser) {
+			} else if (projId == (int)ProjIds.HyorogaProj) {
+				character.addIgFreezeProgress(1.5f);
+			} else if (projId == (int)ProjIds.HyorogaSwing) {
+				character.addIgFreezeProgress(4);
+			} else if (projId == (int)ProjIds.SeaDragonRage) {
+				character.addIgFreezeProgress(1);
+			} else if (projId == (int)ProjIds.SplashLaser) {
 				if (damagingActor != null) {
 					character.splashLaserKnockback(damagingActor.deltaPos);
 				}
-				} if (projId == (int)ProjIds.MechFrogStompShockwave || projId == (int)ProjIds.FlameMStompShockwave || projId == (int)ProjIds.TBreakerProj) {
-					if (character.ownedByLocalPlayer) {
+			} else if (projId == (int)ProjIds.MechFrogStompShockwave || projId == (int)ProjIds.FlameMStompShockwave || projId == (int)ProjIds.TBreakerProj) {
+				if (character.grounded && character.ownedByLocalPlayer) {
 					character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
-					}
-				} if (projId == (int)ProjIds.MechFrogGroundPound) {
-					if (!character.grounded) {
+				}
+			} else if (projId == (int)ProjIds.MechFrogGroundPound) {
+				if (!character.grounded) {
 					character.vel.y += 300;
 					spiked = true;
-					}
-				} 
-			}
-			if (weaponIndex == (int)WeaponIds.Boomerang || weaponIndex == (int)WeaponIds.BoomerangKBoomerang) {
+				}
+			} else if (weaponIndex == (int)WeaponIds.Boomerang || weaponIndex == (int)WeaponIds.BoomerangKBoomerang) {
 				if (character.player.isX) character.stingChargeTime = 0;
-			//} //else if (projId == (int)ProjIds.FlameMOil) {
-		//		character.addOilTime(owner, 8);
-		//		character.playSound("flamemOil");
+			} else if (projId == (int)ProjIds.FlameMOil) {
+				character.addOilTime(owner, 8);
+				character.playSound("flamemOil");
 			} else if (projId == (int)ProjIds.DarkHold) {
 				character.addDarkHoldTime(4, owner);
 			} else if (projId == (int)ProjIds.MagnaCTail) {
 				character.addInfectedTime(owner, 4f);
 			}
 
-			if (owner?.character?.isNightmareZeroBS.getValue() == true && projId == (int)ProjIds.Raijingeki2) {
-				character.addInfectedTime(owner, 0.8f);
+			if ((owner?.character as Zero)?.isViral == true) {
+				character.addInfectedTime(owner, damage);
 			}
-			// Zero gaining ammo
-			if (owner.character != null && owner.isZero && owner.health > 0 ) {
-				(owner.character as Zero).zeroGigaAttackWeapon.addAmmo(1, owner);
+			if ((owner?.character as PunchyZero)?.isViral == true) {
+				character.addInfectedTime(owner, damage);
 			}
-
-			// Hexa Lifesteal
-			if (owner.isVile && owner.health > 0 && projId == (int)ProjIds.HexaInvolute) {
-				owner.character.addHealth(0.1f);
-			}
-
-			
 
 			#endregion
 
@@ -639,29 +461,12 @@ public class Damager {
 						damage = 1;
 					}
 				}
-				
 			}
 
-
-		//Gaea new fliches
-			if (owner.character is MegamanX mmxg && mmxg.CurrentArmor == 6 ) {
-				if (flinch < 4) {
-					flinch = 4;
-				} 
-			}
-		//	float flinchCooldown = 0;
-			if (projectileFlinchCooldowns.ContainsKey(projId)) {
-				flinchCooldown = projectileFlinchCooldowns[projId];
-			}
-	//I took off BZ dmg buffs from wcut for obvious reaons
-/* 
-			if (owner.character is Zero zero && zero.isBlackZero() && projId != (int)ProjIds.Burn) {
-				if (flinch >= Global.halfFlinch) {
-					flinch = Global.defFlinch;
-				}
-				damage = MathF.Ceiling(damage * 1.5f);
-			}
-			if (owner?.character is PunchyZero pzero && pzero.isBlack && !isDot(projId)) {
+			if (!isDot(projId) && (
+				owner?.character is Zero zero && zero.isBlack ||
+				owner?.character is PunchyZero pzero && pzero.isBlack
+			)) {
 				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
 					flinchCooldown = 1;
@@ -672,7 +477,7 @@ public class Damager {
 				}
 				damage = MathF.Ceiling(damage * 1.5f);
 			}
-*/
+
 			if (flinchCooldown > 0) {
 				int flinchKey = getFlinchKeyFromProjId(projId);
 				if (!character.flinchCooldown.ContainsKey(flinchKey)) {
@@ -684,53 +489,24 @@ public class Damager {
 					character.flinchCooldown[flinchKey] = flinchCooldown;
 				}
 			}
-			//Backshield code
-			/*
+
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner, projId)) {
 					damage--;
 
 					if (damage < 1) {
 						damage = 0;
-						character.playSound("ding");
+						character.playSound("m10ding");
 					}
 				}
-			}
-			*/
-			//Block Code
-			if (character.sprite.name.Contains("block") &&
-			 damage > 0 && !isArmorPiercing(projId)) {
-				if (character.charState.stateTime < 1f){
-					if (damage < 4) {
-						damage = 0;
-						character.playSound("ding");
-					}
-					if (damage > 4) {
-						damage = 1;
-						character.playSound("ding");
-					}
-					} else {
-						damage /= 2;
-					}
-				}
-			
-			// imunity to small flinches while falling or frozen
-			if ((character.charState is Frozen 
-			|| character.charState is GenericStun
-			|| character.sprite.name.Contains("frozen")
-			||character.sprite.name.Contains("knocked")
-			|| character.sprite.name.Contains("hurt") 
-			)&& flinch < 10) {
-			flinch = 0;
 			}
 
 			if (damage > 0) {
 				bool isShotgunIceAndFrozen = character.sprite.name.Contains("frozen") && weaponKillFeedIndex == 8;
 				if ((flinch > 0) && !isShotgunIceAndFrozen) {
 					victim?.playSound("hurt");
-
 					int hurtDir = -character.xDir;
-					if (damagingActor != null && !hitFromFront(character, damagingActor, owner, projId)) {
+					if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) {
 						hurtDir *= -1;
 					}
 					if (projId == (int)ProjIds.GravityWellCharged) {
@@ -887,7 +663,7 @@ public class Damager {
 					) {
 						damage = MathF.Floor(damage * 0.5f);
 						if (damage == 0) {
-							maverick.playSound("ding");
+							maverick.playSound("m10ding");
 						}
 					}
 				}
@@ -895,31 +671,27 @@ public class Damager {
 				if (maverick is CrystalSnail cs) {
 					if ((hitFromBehind(maverick, damagingActor, owner)) && !cs.noShell) {
 						damage = 0;
-						maverick.playSound("ding");
+						maverick.playSound("m10ding");
 					}
 				}
 				*/
 				if (maverick.sprite.name == "armoreda_block" && damage > 0 && !isArmorPiercingOrElectric(projId)) {
 					if (hitFromFront(maverick, damagingActor, owner, projId)) {
-						if (maverick.ownedByLocalPlayer && damage > 0//&&
-							//damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit
+						if (maverick.ownedByLocalPlayer && damage > 2 &&
+							damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit
 						) {
 							maverick.changeState(new ArmoredAGuardChargeState(damage * 2));
 						}
-
 						flinch = 0;
 						damage = 0;
-						maverick.playSound("ding");
-						if (owner.ownedByLocalPlayer) {
-							if (victim.sprite.name.Contains("block") &&(
-							 projId == (int)ProjIds.ZSaber 
-							|| projId == (int)ProjIds.ZSaber1 
-							|| projId == (int)ProjIds.ZSaber2 
-							|| projId == (int)ProjIds.ZSaber3 
-							|| projId == (int)ProjIds.SigmaSlash
-							|| projId == (int)ProjIds.Rising
-							|| projId == (int)ProjIds.UPPunch
-							)) {
+						maverick.playSound("m10ding");
+						if (owner.ownedByLocalPlayer &&
+							owner.character is Zero zero &&
+							!zero.hypermodeActive()
+						) {
+							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 ||
+								projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3
+							) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
 						}
@@ -967,17 +739,13 @@ public class Damager {
 		}
 		if (finalDamage > 0 && character != null &&
 			character.ownedByLocalPlayer &&
-			charState is KKnuckleParryStartState parryState2
+			charState is SaberParryStartState parryState2
 			&& parryState2.canParry(damagingActor) &&
 			!isDot(projId)
 		) {
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
 			return true;
-		}	else if (finalDamage > 0 && character != null && character.ownedByLocalPlayer && character.charState is DynamoParryStartState parryState3 && parryState3.canParry(damagingActor) && !isDot(projId)) {
-			parryState3.counterAttack(owner, damagingActor, 4);
-		
-			return true;
-		}	
+		}
 		if ((damage > 0 || finalDamage > 0) && character != null &&
 			character.ownedByLocalPlayer &&
 			character.specialState == (int)SpecialStateIds.PZeroParry &&
@@ -987,28 +755,9 @@ public class Damager {
 			zeroParryState.counterAttack(owner, damagingActor);
 			return true;
 		}
-		damagable?.applyDamage(owner, weaponKillFeedIndex, finalDamage, projId);
+		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 
 		return true;
-	}
-
-	private static bool getIsMiniFlinch(int projId) {
-		return
-			projId == (int)ProjIds.ElectricSpark ||
-			projId == (int)ProjIds.TriadThunderBall ||
-			projId == (int)ProjIds.TriadThunderBeam ||
-			projId == (int)ProjIds.TriadThunder ||
-			projId == (int)ProjIds.DistanceNeedler ||
-			projId == (int)ProjIds.RayGun ||
-			projId == (int)ProjIds.RayGun2 ||
-			projId == (int)ProjIds.PlasmaGun2 ||
-			projId == (int)ProjIds.PlasmaGun2Hyper ||
-			projId == (int)ProjIds.VoltTornado ||
-			projId == (int)ProjIds.VoltTornadoHyper ||
-			projId == (int)ProjIds.Sigma2Ball ||
-			projId == (int)ProjIds.VoltCTriadThunder ||
-			projId == (int)ProjIds.DrDopplerBall ||
-			projId == (int)ProjIds.CopyShot;
 	}
 
 	public static bool isArmorPiercingOrElectric(int? projId) {
@@ -1023,12 +772,11 @@ public class Damager {
 			projId == (int)ProjIds.AssassinBulletQuick ||
 			projId == (int)ProjIds.VileMK2Grab ||
 			projId == (int)ProjIds.UPGrab ||
-			projId == (int)ProjIds.GBDKick ||
 			projId == (int)ProjIds.LaunchODrain ||
 			projId == (int)ProjIds.DistanceNeedler ||
 			projId == (int)ProjIds.Raijingeki ||
 			projId == (int)ProjIds.Raijingeki2 ||
-		//	projId == (int)ProjIds.CFlasher ||
+			projId == (int)ProjIds.CFlasher ||
 			projId == (int)ProjIds.AcidBurstPoison ||
 			projId == (int)ProjIds.MetteurCrash;
 	}
@@ -1050,7 +798,7 @@ public class Damager {
 			projId == (int)ProjIds.TriadThunderCharged ||
 			projId == (int)ProjIds.Raijingeki ||
 			projId == (int)ProjIds.Raijingeki2 ||
-			projId == (int)ProjIds.EBlade ||
+			projId == (int)ProjIds.Denjin ||
 			projId == (int)ProjIds.PeaceOutRoller ||
 			projId == (int)ProjIds.PlasmaGun ||
 			projId == (int)ProjIds.PlasmaGun2 ||
@@ -1126,8 +874,10 @@ public class Damager {
 		Func<Actor, float, bool> checkDelta,
 		Func<Actor, Point, bool> checkPos
 	) {
+		if (damager == null) {
+			return false;
+		}
 		if (projId >= 0 && (
-			damager is not Projectile ||
 			projId == (int)ProjIds.Burn ||
 			projId == (int)ProjIds.SelfDmg ||
 			projId == (int)ProjIds.Napalm ||
@@ -1137,10 +887,7 @@ public class Damager {
 		)) {
 			return false;
 		}
-		if (damager is Projectile &&
-			damager is not GenericMeleeProj &&
-			projId != (int)ProjIds.SigmaSlash
-		) {
+		if (damager is not Projectile { isMelee: false }) {
 			if (damager.deltaPos.x != 0) {
 				if (checkDelta(actor, damager.deltaPos.x)) {
 					return true;
@@ -1150,39 +897,23 @@ public class Damager {
 			}
 		}
 		// Calculate based on other values if speed is 0.
-		Point? damagePos = null;
+		Point damagePos = damager.pos;
 
-		if (damager is GenericMeleeProj gmp && gmp.owningActor != null) {
-			damagePos = gmp.owningActor.pos;
-		} else if (projOwner?.character != null && (
-			  projId == (int)ProjIds.PlasmaGun ||
-			  projId == (int)ProjIds.PlasmaGun2 ||
-			  projId == (int)ProjIds.PlasmaGun2Hyper ||
-			  projId == (int)ProjIds.FlameBurner ||
-			  projId == (int)ProjIds.FlameBurnerHyper ||
-			  projId == (int)ProjIds.RayGun2 ||
-			  projId == (int)ProjIds.TriadThunder ||
-			  projId == (int)ProjIds.TriadThunderBall ||
-			  projId == (int)ProjIds.TriadThunderQuake ||
-			  projId == (int)ProjIds.Rekkoha ||
-			  projId == (int)ProjIds.ShotgunIceCharged ||
-			  projId == (int)ProjIds.BubbleSplashCharged ||
-			  projId == (int)ProjIds.SigmaSlash
-		  )) {
-			damagePos = projOwner.character.pos;
-		} else if (damager is Projectile prj && prj.hitboxActor != null && !prj.hitboxActor.destroyed) {
-			damagePos = prj.hitboxActor.pos;
-		} else if (damager is GenericMeleeProj && projOwner?.character != null) {
-			damagePos = projOwner.character.pos;
-		} else if (damager is not GenericMeleeProj and not null) {
-			damagePos = damager.pos;
+		if (damager is Projectile proj) {
+			if (proj.isMelee || proj.isOwnerLinked) {
+				if (proj.owningActor != null) {
+					damagePos = proj.owningActor.pos;
+				} else if (projOwner?.character != null) {
+					damagePos = projOwner.character.pos;
+				}
+			}
+			if (damagePos == null && proj.hitboxActor?.destroyed == false) {
+				damagePos = proj.hitboxActor.pos;
+			}
 		}
 
 		// Call function if pos is not null.
-		if (damagePos != null && checkPos(actor, damagePos.Value)) {
-			return true;
-		}
-		return false;
+		return checkPos(actor, damagePos);
 	}
 
 	private static bool isVictimImmuneToQuake(Actor victim) {

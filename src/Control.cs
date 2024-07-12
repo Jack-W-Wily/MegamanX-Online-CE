@@ -114,7 +114,6 @@ public class Control {
 			if (aimMode == 2) baseStr += "_cur";
 		}
 		if (charNum == 4) baseStr += "sigma";
-		if (charNum == 5) baseStr += "dynamo";
 		return baseStr;
 	}
 

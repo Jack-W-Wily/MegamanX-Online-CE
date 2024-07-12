@@ -55,17 +55,6 @@ public class SoundBufferWrapper {
 					charNum = 3;
 				} else if (subpiece == "sigma") {
 					charNum = 4;
-				} else if (subpiece == "dynamo") {
-					charNum = 5;
-				}
-				else if (subpiece == "gbd") {
-					charNum = 6;
-				}
-				else if (subpiece == "iris") {
-					charNum = 7;
-				}
-				else if (subpiece == "zain") {
-					charNum = 14;
 				}
 			}
 		}

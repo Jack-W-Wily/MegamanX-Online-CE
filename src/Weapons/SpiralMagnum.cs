@@ -153,10 +153,10 @@ public class SpiralMagnumProj : Projectile {
 	bool playedSoundOnce;
 
 	public SpiralMagnumProj(Weapon weapon, Point pos, float jumpDist, int type, Player player, Point bulletDir, IDamagable target, Character headshotChar, ushort netProjId) :
-		base(weapon, pos, 1, 1000, 2, player, "spiralmagnum_proj", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 1000, 2, player, "spiralmagnum_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		this.target = target;
-		reflectable = true;
+		reflectable = false;
 		vel.x = bulletDir.x * 1000;
 		vel.y = bulletDir.y * 1000;
 		angle = bulletDir.angle;
@@ -248,7 +248,7 @@ public class SpiralMagnumProj : Projectile {
 				if (proj != null && (proj.isShield || proj.isDeflectShield || proj.isReflectShield))
 				{
 					destroySelf();
-					playSound("ding");
+					playSound("m10ding");
 					return;
 				}
 			}
@@ -273,7 +273,7 @@ public class SpiralMagnumProj : Projectile {
 				vel.y *= -1;
 				weakness = false;
 				time = 0;
-				playSound("ding");
+				playSound("m10ding");
 				Global.serverClient?.rpc(RPC.playerToggle, (byte)damager.owner.id, (byte)RPCToggleType.PlayDingSound);
 				return;
 			}
@@ -484,7 +484,7 @@ public class SniperMissileProj : Projectile, IDamagable {
 		);
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		health -= damage;
 		if (health <= 0) destroySelf();
 	}

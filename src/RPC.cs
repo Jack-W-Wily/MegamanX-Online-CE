@@ -16,21 +16,6 @@ public class RPC {
 	// Need templates? Use these:
 	// -Sending a value to an actor: RPCChangeDamage
 
-
-	public static HdmCustomRPC hdmCustomRPC;
-
-	public static RPC_CreditKillOther creditKillOther = new RPC_CreditKillOther();
-
-	public static RPC_GiveMaverickAmmo giveMaverickAmmo = new RPC_GiveMaverickAmmo();
-
-	public static RPC_UpdateHdmPlayer updateHdmPlayer = new RPC_UpdateHdmPlayer();
-
-	//public static RPC_CreateEffect createEffect;
-
-	public static RPC_maverickGrabMaverick grabMaverick = new RPC_maverickGrabMaverick();
-
-	
-
 	public static RPCSendString sendString;
 	public static RPCStartLevel startLevel;
 	public static RPCSpawnCharacter spawnCharacter;
@@ -188,9 +173,6 @@ public class RPC {
 			(healDoppler = new RPCHealDoppler()),
 			(resetFlags = new RPCResetFlag()),
 			(custom = new RPCCustom()),
-			(grabMaverick = new RPC_maverickGrabMaverick()),
-			(hdmCustomRPC = new HdmCustomRPC()),
-			//(createEffect = new RPC_CreateEffect()),
 		};
 
 	public virtual void invoke(params byte[] arguments) {
@@ -347,48 +329,33 @@ public class RPCApplyDamage : RPC {
 		ushort projId = BitConverter.ToUInt16(
 			new byte[] { arguments[17], arguments[18] }, 0
 		);
-		bool isLinkedMelee = arguments[19] == 1;
+		byte linkedMeleeId = arguments[19];
+		bool isLinkedMelee = (linkedMeleeId != byte.MaxValue);
 
 		var player = Global.level.getPlayerById(ownerId);
-		var victim = Global.level.getActorByNetId(victimId);
+		var victim = Global.level.getActorByNetId(victimId, true);
 		Actor? actor = null;
 		// For when the projectile was a melee without a NetID.
 		if (isLinkedMelee) {
-			Actor mainActor = Global.level.getActorByNetId(actorId);
+			Actor? mainActor = Global.level.getActorByNetId(actorId, true);
 			List<Projectile> projs = new();
 			if (mainActor != null) {
-				// We try to search anything with a matching ProjID.
-				foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
-					Projectile proj = mainActor.getProjFromHitboxBase(collider);
-					if (proj != null) {
-						if (proj.projId == projId) {
-							actor = proj;
-							break;
-						}
-					}
-				}
-				// If that fails we search anything at all.
-				if (actor == null) {
-					foreach (Collider collider in mainActor.sprite.getCurrentFrame().hitboxes) {
-						Projectile proj = mainActor.getProjFromHitboxBase(collider);
-						if (proj != null) {
-							actor = proj;
-							break;
-						}
-					}
-				}
+				// We try to search anything with a matching MeleeID.
+				actor = mainActor.getMeleeProjById(linkedMeleeId, mainActor.pos, false);
+
 				// If that fails... screw it we create one.
 				if (actor == null) {
 					actor = new GenericMeleeProj(
 						new Weapon(), mainActor.pos, (ProjIds)projId,
-						player, damage, flinch, hitCooldown, mainActor
+						player, damage, flinch, hitCooldown, mainActor,
+						addToLevel: false
 					);
 				}
 			}
 		}
 		// For normal projectiles.
 		else {
-			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId));
+			actor = (actorId == 0 ? null : Global.level.getActorByNetId(actorId, true));
 		}
 
 		if (player != null && victim != null) {
@@ -590,7 +557,7 @@ public class RPCPlayerToggle : RPC {
 		} else if (toggleId == RPCToggleType.AddTransformEffect) {
 			player.character?.addTransformAnim();
 		} else if (toggleId == RPCToggleType.PlayDingSound) {
-			player.character?.playSound("ding");
+			player.character?.playSound("m10ding");
 		} else if (toggleId == RPCToggleType.StartCrystalize) {
 			player.character?.crystalizeStart();
 		} else if (toggleId == RPCToggleType.StopCrystalize) {
@@ -631,7 +598,7 @@ public class RPCPlayerToggle : RPC {
 			}
 		} else if (toggleId == RPCToggleType.SetBlackZero) {
 			if (player.character is Zero zero) {
-				zero.blackZeroTime = 9999;
+				zero.blackZeroTime = Zero.maxBlackZeroTime;
 			}
 		} else if (toggleId == RPCToggleType.SetWhiteAxl) {
 			if (player.character is Axl axl) {
@@ -653,7 +620,7 @@ public class RPCPlayerToggle : RPC {
 			}
 		} else if (toggleId == RPCToggleType.ReviveSigma) {
 			if (player.character is BaseSigma) {
-				player.reviveSigma(player.character.pos);
+				player.reviveSigmaNonOwner(player.character.pos);
 			}
 		}
 	}
@@ -703,7 +670,7 @@ public class RPCActorToggle : RPC {
 				byte damage = arguments[1];
 				CrackedWall crackedWall = Global.level.getCrackedWallById(crackedWallId);
 				if (crackedWall != null) {
-					crackedWall.applyDamage(null, null, damage, null);
+					crackedWall.applyDamage(damage, null, null, null, null);
 				}
 			}
 			return;
@@ -718,32 +685,35 @@ public class RPCActorToggle : RPC {
 
 		ushort netId = BitConverter.ToUInt16(arguments, 0);
 		var actor = Global.level.getActorByNetId(netId);
-		if (actor == null) return;
-
+		if (actor == null) {
+			return;
+		}
 		if (toggleId == RPCActorToggleType.SonicSlicerBounce) {
 			actor.playSound("dingX2");
 			new Anim(actor.pos, "sonicslicer_sparks", actor.xDir, null, true);
 		} else if (toggleId == RPCActorToggleType.StartGravityWell && actor is GravityWellProjCharged gw) {
 			gw.started = true;
-		} else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
-			actor.addMusicSource("mmx1_wolfsigma", actor.pos.addxy(0, -75), false);
+		}
+		else if (toggleId == RPCActorToggleType.AddWolfSigmaMusicSource) {
+			actor.addMusicSource("wolfSigma", actor.pos.addxy(0, -75), false);
 		} else if (toggleId == RPCActorToggleType.AddWolfSigmaIntroMusicSource) {
-			actor.addMusicSource("mmx1_wolfsigmaintro", actor.pos.addxy(0, -75), false);
+			actor.addMusicSource("wolfSigmaIntro", actor.pos.addxy(0, -75), false, loop: false);
 		} else if (toggleId == RPCActorToggleType.AddDrLightMusicSource) {
-			actor.addMusicSource("drlight", actor.getCenterPos(), false);
+			actor.addMusicSource("drLigth_X1", actor.getCenterPos(), false, loop: false);
 		} else if (toggleId == RPCActorToggleType.AddDrDopplerMusicSource) {
-			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), false);
+			actor.addMusicSource("demo_X3", actor.getCenterPos(), false, loop: false);
 		} else if (toggleId == RPCActorToggleType.AddGoliathMusicSource) {
-			actor.addMusicSource("goliath", actor.getCenterPos(), true);
+			actor.addMusicSource("vile_X3", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddViralSigmaMusicSource) {
-			actor.addMusicSource("mmx2_judgementday", actor.getCenterPos(), true);
+			actor.addMusicSource("virusSigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("mmx3_kaisersigma", actor.getCenterPos(), true);
+			actor.addMusicSource("kaiserSigma", actor.getCenterPos(), true);
 		} else if (toggleId == RPCActorToggleType.AddKaiserViralSigmaMusicSource) {
 			actor.destroyMusicSource();
-			actor.addMusicSource("mmx3_doppler", actor.getCenterPos(), true);
-		} else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
+			actor.addMusicSource("demo_X3", actor.getCenterPos(), true);
+		}
+		else if (toggleId == RPCActorToggleType.StartMechSelfDestruct && actor is RideArmor ra) {
 			ra.selfDestructTime = Global.spf;
 		} else if (toggleId == RPCActorToggleType.ShakeCamera) {
 			actor.shakeCamera();
@@ -850,13 +820,15 @@ public class RPCCreateAnim : RPC {
 
 		// The rest of the bytes are for optional, expensive-to-sync data that should be used sparingly.
 		RPCAnimModel extendedAnimModel = null;
-		Actor zIndexRelActor = null;
+		Actor? zIndexRelActor = null;
 		if (arguments.Length > 13) {
 			var argumentsList = arguments.ToList();
 			var restofArgs = argumentsList.GetRange(13, argumentsList.Count - 13);
 			extendedAnimModel = Helpers.deserialize<RPCAnimModel>(restofArgs.ToArray());
 			if (extendedAnimModel.zIndexRelActorNetId != null) {
-				zIndexRelActor = Global.level.getActorByNetId(extendedAnimModel.zIndexRelActorNetId.Value);
+				zIndexRelActor = Global.level.getActorByNetId(
+					extendedAnimModel.zIndexRelActorNetId.Value, true
+				);
 			}
 		}
 
@@ -1690,11 +1662,13 @@ public class RPCHeal : RPC {
 		ushort healNetId = BitConverter.ToUInt16(new byte[] { arguments[1], arguments[2] }, 0);
 		int healAmount = arguments[3];
 
-		var actor = Global.level.getActorByNetId(healNetId);
-		if (actor == null) return;
-		var player = Global.level.getPlayerById(playerId);
+		Actor? actor = Global.level.getActorByNetId(healNetId, true);
+		if (actor == null) {
+			return;
+		}
+		Player player = Global.level.getPlayerById(playerId);
 
-		var damagable = actor as IDamagable;
+		IDamagable? damagable = actor as IDamagable;
 		if (damagable != null) {
 			if (actor.ownedByLocalPlayer) {
 				damagable.heal(player, healAmount, allowStacking: true, drawHealText: true);
@@ -1733,7 +1707,7 @@ public class RPCCommandGrabPlayer : RPC {
 		if (grabber == null || victimChar == null) return;
 		if (!victimChar.canBeGrabbed()) return;
 
-		/*if (!isDefenderFavored) {
+		if (!isDefenderFavored) {
 			if (victimChar.ownedByLocalPlayer && !Helpers.isOfClass(victimChar.charState, grabbedState.GetType())) {
 				victimChar.changeState(grabbedState, true);
 			}
@@ -1744,9 +1718,7 @@ public class RPCCommandGrabPlayer : RPC {
 				}
 				grabber.state.trySetGrabVictim(victimChar);
 			}
-		}*/
-		grabber.state.trySetGrabVictim(victimChar);
-		victimChar.changeState(grabbedState, true);
+		}
 	}
 
 	public override void invoke(params byte[] arguments) {
@@ -1775,15 +1747,11 @@ public class RPCCommandGrabPlayer : RPC {
 			} else if (grabber is StrikeChainProj scp) {
 				scp.hookActor(victimChar);
 			}
+		} else if (hookScenario == CommandGrabScenario.MK2Grab) {
+			if (grabberChar == null || victimChar == null) return;
+			if (!victimChar.canBeGrabbed()) return;
 
-		} 
-		//This shit right here ain't working and I'm tried of trying to fix it so I made
-		//a new and better System in Damager.CS
-	/* else if (hookScenario == CommandGrabScenario.MK2Grab) {
-			//if (grabberChar == null || victimChar == null) return;
-			//if (!victimChar.canBeGrabbed()) return;
-
-			if (!isDefenderFavored || isDefenderFavored) {
+			if (!isDefenderFavored) {
 				if (victim.ownedByLocalPlayer && victimChar.charState is not VileMK2Grabbed) {
 					victimChar.changeState(new VileMK2Grabbed(grabberChar), true);
 				}
@@ -1792,8 +1760,7 @@ public class RPCCommandGrabPlayer : RPC {
 					grabberChar.changeState(new VileMK2GrabState(victimChar));
 				}
 			}
-	
-	} else if (hookScenario == CommandGrabScenario.UPGrab) {
+		} else if (hookScenario == CommandGrabScenario.UPGrab) {
 			if (grabberChar == null || victimChar == null) return;
 			if (!victimChar.canBeGrabbed()) return;
 
@@ -1806,22 +1773,6 @@ public class RPCCommandGrabPlayer : RPC {
 					grabberChar.changeState(new XUPGrabState(victimChar));
 				}
 			}
-		} else*/ if (hookScenario == CommandGrabScenario.WhirlpoolGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new WhirlpoolGrabbed(grabber as LaunchOctopus), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.DeadLiftGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new DeadLiftGrabbed(grabber as BoomerangKuwanger), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.WheelGGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new WheelGGrabbed(grabber as WheelGator), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.FStagGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new FStagGrabbed(grabber as FlameStag), isDefenderFavored, optionalGrabberState: new FStagUppercutState(victimChar));
-		} else if (hookScenario == CommandGrabScenario.MagnaCGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new MagnaCDrainGrabbed(grabber as MagnaCentipede), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.BeetleLiftGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new BeetleGrabbedState(grabber as GravityBeetle), isDefenderFavored);
-		} else if (hookScenario == CommandGrabScenario.CrushCGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new CrushCGrabbed(grabber as CrushCrawfish), isDefenderFavored, optionalGrabberState: new CrushCGrabState(victimChar));
-		} else if (hookScenario == CommandGrabScenario.BBuffaloGrab) {
-			maverickGrabCode(grabberMaverick, victimChar, new BBuffaloDragged(grabber as BlizzardBuffalo), isDefenderFavored);
 		} else if (hookScenario == CommandGrabScenario.Release) {
 			if (victimChar != null) {
 				victimChar.charState?.releaseGrab();
@@ -1891,7 +1842,7 @@ public class RPCClearOwnership : RPC {
 
 	public override void invoke(params byte[] arguments) {
 		ushort netId = BitConverter.ToUInt16(new byte[] { arguments[0], arguments[1] }, 0);
-		var actor = Global.level.getActorByNetId(netId);
+		var actor = Global.level.getActorByNetId(netId, true);
 		if (actor == null) return;
 		actor.ownedByLocalPlayer = false;
 	}
@@ -1912,13 +1863,15 @@ public class RPCPlaySound : RPC {
 		ushort netId = BitConverter.ToUInt16(arguments, 0);
 		ushort soundIndex = BitConverter.ToUInt16(new byte[] { arguments[2], arguments[3] }, 0);
 
-		var actor = Global.level.getActorByNetId(netId);
-		if (actor == null) return;
+		Actor? actor = Global.level.getActorByNetId(netId);
+		if (actor == null) { return; }
 
 		if (soundIndex < Global.soundCount) {
 			string sound = Global.soundNameByIndex[soundIndex];
-			var soundWrapper = actor.playSound(sound);
-			actor.netSounds[soundIndex] = soundWrapper;
+			SoundWrapper? soundWrapper = actor.playSound(sound);
+			if (soundWrapper != null) {
+				actor.netSounds[soundIndex] = soundWrapper;
+			}
 		}
 	}
 
@@ -1945,8 +1898,8 @@ public class RPCStopSound : RPC {
 		ushort netId = BitConverter.ToUInt16(arguments, 0);
 		ushort soundIndex = BitConverter.ToUInt16(new byte[] { arguments[2], arguments[3] }, 0);
 
-		var actor = Global.level.getActorByNetId(netId);
-		if (actor == null) return;
+		var actor = Global.level.getActorByNetId(netId, true);
+		if (actor == null) { return; }
 
 		if (actor.netSounds.ContainsKey(soundIndex)) {
 			SoundWrapper soundWrapper = actor.netSounds[soundIndex];
@@ -1984,7 +1937,7 @@ public class RPCAddDamageText : RPC {
 
 		if (Global.level?.mainPlayer == null) return;
 		if (Global.level.mainPlayer.id != attackerId) return;
-		var actor = Global.level.getActorByNetId(netId);
+		Actor? actor = Global.level.getActorByNetId(netId, true);
 		if (actor == null) return;
 
 		float floatDamage = damage / 10f;
@@ -2085,10 +2038,11 @@ public class RPCBoundBlasterStick : RPC {
 		short yPos = BitConverter.ToInt16(new byte[] { arguments[6], arguments[7] }, 0);
 
 		BoundBlasterAltProj? beaconActor = Global.level.getActorByNetId(beaconNetId) as BoundBlasterAltProj;
-		Actor stuckActor = Global.level.getActorByNetId(stuckActorNetId);
+		Actor? stuckActor = Global.level.getActorByNetId(stuckActorNetId);
 
-		if (beaconActor == null || stuckActor == null) return;
-
+		if (beaconActor == null || stuckActor == null) {
+			return;
+		}
 		beaconActor.isActorStuck = true;
 		beaconActor.stuckActor = stuckActor;
 		beaconActor.stopSyncingNetPos = true;
@@ -2144,7 +2098,7 @@ public class RPCCreditPlayerKillMaverick : RPC {
 
 		Player killer = Global.level.getPlayerById(killerId);
 		Player assister = Global.level.getPlayerById(assisterId);
-		Maverick? victim = Global.level.getActorByNetId(victimNetId) as Maverick;
+		Maverick? victim = Global.level.getActorByNetId(victimNetId, true) as Maverick;
 
 		victim?.creditMaverickKill(killer, assister, weaponIndex);
 	}
@@ -2185,10 +2139,13 @@ public class RPCCreditPlayerKillVehicle : RPC {
 
 		Player killer = Global.level.getPlayerById(killerId);
 		Player assister = Global.level.getPlayerById(assisterId);
-		Actor victim = Global.level.getActorByNetId(victimNetId);
+		Actor? victim = Global.level.getActorByNetId(victimNetId, true);
 
-		if (victim is RideArmor ra) ra.creditKill(killer, assister, weaponIndex);
-		else if (victim is RideChaser rc) rc.creditKill(killer, assister, weaponIndex);
+		if (victim is RideArmor ra) {
+			ra.creditKill(killer, assister, weaponIndex);
+		} else if (victim is RideChaser rc) {
+			rc.creditKill(killer, assister, weaponIndex);
+		}
 	}
 
 	public void sendRpc(Player killer, Player assister, Actor victim, int? weaponIndex) {
@@ -2223,7 +2180,7 @@ public class RPCChangeDamage : RPC {
 		float damage = BitConverter.ToSingle(new byte[] { arguments[2], arguments[3], arguments[4], arguments[5] }, 0);
 		int flinch = arguments[6];
 
-		var proj = Global.level.getActorByNetId(netId) as Projectile;
+		var proj = Global.level.getActorByNetId(netId, true) as Projectile;
 		if (proj?.damager != null) {
 			proj.damager.damage = damage;
 			proj.damager.flinch = flinch;
@@ -2265,10 +2222,13 @@ public class RPCCheckRAEnter : RPC {
 		int raNum = arguments[4];
 
 		Player player = Global.level.getPlayerById(playerId);
-		if (player == null) return;
+		if (player == null) {
+			return;
+		}
 		RideArmor? ra = Global.level.getActorByNetId(raNetId) as RideArmor;
-		if (ra == null) return;
-
+		if (ra == null) {
+			return;
+		}
 		if (ra.isNeutral && ra.ownedByLocalPlayer && !ra.claimed && ra.character == null) {
 			ra.claimed = true;
 			RPC.raEnter.sendRpc(player.id, ra.netId, neutralId, raNum);
@@ -2456,9 +2416,7 @@ public class RPCSyncPossessInput : RPC {
 		player.input.possessedControlHeld[Control.Down] = inputHeldArray[3];
 		player.input.possessedControlHeld[Control.Jump] = inputHeldArray[4];
 		player.input.possessedControlHeld[Control.Dash] = inputHeldArray[5];
-		//player.input.possessedControlHeld[Control.Taunt] = inputHeldArray[6];
-		player.input.possessedControlHeld[Control.Shoot] = inputHeldArray[6];
-		player.input.possessedControlHeld[Control.Special1] = inputHeldArray[7];
+		player.input.possessedControlHeld[Control.Taunt] = inputHeldArray[6];
 
 		player.input.possessedControlPressed[Control.Left] = inputPressedArray[0];
 		player.input.possessedControlPressed[Control.Right] = inputPressedArray[1];
@@ -2466,9 +2424,7 @@ public class RPCSyncPossessInput : RPC {
 		player.input.possessedControlPressed[Control.Down] = inputPressedArray[3];
 		player.input.possessedControlPressed[Control.Jump] = inputPressedArray[4];
 		player.input.possessedControlPressed[Control.Dash] = inputPressedArray[5];
-		//player.input.possessedControlPressed[Control.Taunt] = inputPressedArray[6];
-		player.input.possessedControlPressed[Control.Shoot] = inputPressedArray[6];
-		player.input.possessedControlPressed[Control.Special1] = inputPressedArray[7];
+		player.input.possessedControlPressed[Control.Taunt] = inputPressedArray[6];
 	}
 
 	public void sendRpc(int playerId, byte inputHeldByte, byte inputPressedByte) {

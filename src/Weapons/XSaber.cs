@@ -43,7 +43,7 @@ public class XSaberState : CharState {
 		base.update();
 		if (character.frameIndex >= 6 && !fired) {
 			fired = true;
-			character.playSound("saberShot");
+			character.playSound("zerosaberx3");
 			new XSaberProj(new XSaber(player), character.pos.addxy(20 * character.xDir, -20), character.xDir, player, player.getNextActorNetId(), rpc: true);
 		}
 

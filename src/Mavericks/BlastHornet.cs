@@ -124,7 +124,7 @@ public class BlastHornet : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_stinger_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 7, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		}
 		return null;
 	}
@@ -201,7 +201,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		maxTime = 3;
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}
@@ -272,7 +272,7 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

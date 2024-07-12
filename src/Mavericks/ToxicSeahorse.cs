@@ -18,7 +18,7 @@ public class ToxicSeahorse : Maverick {
 		weakMaverickWeaponId = WeaponIds.BlizzardBuffalo;
 
 		spriteToCollider["teleport"] = getDashCollider(1, 0.25f);
-		canClimbWall = true;
+
 		netActorCreateId = NetActorCreateId.ToxicSeahorse;
 		netOwner = player;
 		if (sendRpc) {
@@ -44,7 +44,7 @@ public class ToxicSeahorse : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -163,7 +163,7 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 		health -= damage;
 		if (health <= 0) {

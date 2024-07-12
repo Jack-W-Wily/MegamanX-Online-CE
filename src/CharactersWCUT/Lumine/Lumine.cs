@@ -8,7 +8,8 @@ public class Lumine : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-
+	charId = CharIds.Lumine;
+	
 	}
 
 
@@ -37,7 +38,7 @@ public class Lumine : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "pallete_" + spriteName;
+		return "lumine_" + spriteName;
 	}
 }
 

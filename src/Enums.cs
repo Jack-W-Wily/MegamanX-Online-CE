@@ -87,8 +87,6 @@ public enum WeaponIds {
 	NovaStrike,
 	X6Saber,
 
-	//Gbd
-	GBDKick,
 	// DO NOT CHANGE THE ORDER OF THESE SIGMA WEAPONS
 	Sigma,
 	ChillPenguin,
@@ -146,14 +144,9 @@ public enum WeaponIds {
 	KKnuckleParry,
 	ZeroShoryuken,
 	MegaPunchWeapon,
-	
 	DropKick,
 	DarkHold,
 
-	//Vile Weapons
-	BlockableLaunch,
-	Houtenjin,
-	HoutenjinF,
 	MechMenuWeapon,
 	MechBuster,
 	MechPunch,
@@ -181,14 +174,12 @@ public enum WeaponIds {
 	VileCutter,
 	VileLaser,
 	VileMK2Grab,
-	VileGrab,
 	NecroBurst,
 	RisingSpecter,
 	VileFlamethrower,
 	StraightNightmare,
 	HexaInvolute,
 
-	//Axl WEeapons
 	AxlBullet,
 	BlastLauncher,
 	RayGun,
@@ -288,56 +279,16 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
-
-
-	//Dynamo
-	DynamoBoomerang,
-	DynamoTrick,
-	DynamoRoyal,
-	DynamoSword,
-
-	//Iris Stuff
-	IrisCrystal,
-
-
-	// Blocking
-    Blocking,
-
-
-	// GBD
-	ShieldBoomerang,
-
-	//>>>>>>>>
 	DNACore = 250
-
-	
 }
 
 public enum ProjIds {
-	//GBD
-	ShieldBoomerang,
-	ShieldBoomerang2,
-	//Iris
-	IrisCrystal,
-	//Dynamo
-	HolyCross,
-	DynamoDagger,
-	HolyWaterGranade,
-	HolyBible,
-	DynamoBoomerang,
-	DynamoBeam,
-	DynamoDownShoot,
-
-	//X
 	Buster,
 	Buster2,
 	Buster3,
 	Buster4,
 	BusterUnpo,
-	BusterX3Proj1,
 	BusterX3Proj2,
-	BusterX3Proj3,
-	BusterX3Proj4,
 	BusterX3Plasma,
 	BusterX3PlasmaHit,
 	Torpedo,
@@ -418,7 +369,6 @@ public enum ProjIds {
 	XSaberProj,
 	Headbutt,
 	UPGrab,
-	GBDKick,
 	UPPunch,
 	UPParryBlock,
 	UPParryMelee,
@@ -426,25 +376,23 @@ public enum ProjIds {
 	NovaStrike,
 	X6Saber,
 
-
-	// Zero
-	
 	ZBuster,
 	ZSaber,
 	ZSaber1,
 	ZSaber2,
 	ZSaber3,
 	ZSaberProj,
-	ZSaberdash,
-	ZSabercrouch,
-	ZSaberair,
-	ZSaberladder,
+	ZSaberDash,
+	ZSaberCrouch,
+	ZSaberAir,
+	ZSaberRollingSlash,
+	ZSaberLadder,
 	ZSaberslide,
 	ZSaberProjSwing,
 	SwordBlock,
 	Ryuenjin,
-	EBlade,
-	Rising,
+	Denjin,
+	RisingFang,
 	Raijingeki,
 	Raijingeki2,
 	Hyouretsuzan,
@@ -470,22 +418,7 @@ public enum ProjIds {
 	SuiretsusanProj,
 	TBreaker,
 	TBreakerProj,
-	KKnuckle,
-	KKnuckle2,
-	KKnuckleAirKick,
-	KKnuckleSpinKick,
-	KKnuckleShoryuken,
-	KKnuckleDropKick,
-	KKnuckleMegaPunch,
-	KKnuckleParryStart,
-	KKnuckleParry,
 
-
-	//VilePRojIDS
-	HotIcecle,
-	Houtenjin,
-	HoutenjinF,
-	BlockableLaunch,
 	ElectricShock,
 	MK2StunShot,
 	VileMissile,
@@ -525,7 +458,6 @@ public enum ProjIds {
 	Napalm2Wall,
 	Napalm2Flame,
 	VileMK2Grab,
-	VileGrab,
 	NecroBurst,
 	NecroBurstShrapnel,
 	RisingSpecter,
@@ -764,17 +696,6 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
-
-	// Highmax
-	HighmaxPunch,
-	HighmaxStun,
-	HighmaxBall1,
-	HighmaxBall2,
-	HighmaxBall3,
-	DesmumeProj2,
-	DesmumeProj3,
-	DesmumeProj1,
-
 
 	// Special damage types.
 	SelfDmg = 30000,

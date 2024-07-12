@@ -11,8 +11,7 @@ public class FlameMammoth : Maverick {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
 		stompWeapon = new FlameMStompWeapon(player);
 		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
-		//isHeavy = true;
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.Tornado;
 		weakMaverickWeaponId = WeaponIds.StormEagle;
@@ -32,7 +31,7 @@ public class FlameMammoth : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {
@@ -135,7 +134,7 @@ public class FlameMFireballProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 250, 2, player, "flamem_proj_fireball",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.FlameMFireball;
 		fadeSprite = "flamem_anim_fireball_fade";

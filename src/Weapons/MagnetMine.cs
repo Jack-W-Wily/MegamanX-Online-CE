@@ -59,23 +59,10 @@ public class MagnetMineProj : Projectile, IDamagable {
 		}
 		canBeLocal = false;
 		destroyOnHit = true;
-		if (player?.character != null && player.isGBD){
-			damager.flinch = 4;
-			}
-		}
+	}
 
-	public override void update()
-	{
+	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer)
-		{
-			time = 0f;
-		}
-		if (player?.character != null && player.isGBD){
-			changeSprite("mine_biker_landed", resetFrame: true);
-			vel.y = Helpers.clampMax(vel.y + Global.spf * 2000, 300);
-		}
-	
 		updateProjectileCooldown();
 
 		if (landed && ownedByLocalPlayer) {
@@ -98,7 +85,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) {
 			return;
 		}

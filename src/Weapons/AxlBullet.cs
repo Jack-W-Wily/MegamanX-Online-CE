@@ -156,7 +156,7 @@ public class DoubleBullet : AxlWeapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel == 1) return 0;
+		if (chargeLevel == 1) return 4;
 		else if (chargeLevel == 2) return 6;
 		else if (chargeLevel >= 3) return 8;
 		else return 1;
@@ -165,11 +165,10 @@ public class DoubleBullet : AxlWeapon {
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile bullet = null;
-		if (chargeLevel < 2) {
+		if (chargeLevel == 0) {
 			bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
 
-		}
-		else if (chargeLevel >= 2)  {
+		} else {
 			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
 		}
 
@@ -181,7 +180,7 @@ public class DoubleBullet : AxlWeapon {
 
 public class AxlBulletProj : Projectile {
 	public AxlBulletProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 1, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBullet;
 		angle = bulletDir.angle;
@@ -189,10 +188,6 @@ public class AxlBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-		if (Helpers.randomRange(0, 10) == 10){
-		damager.flinch = 10;
-		damager.damage = 1;
-		}
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -203,19 +198,16 @@ public class AxlBulletProj : Projectile {
 
 public class MettaurCrashProj : Projectile {
 	public MettaurCrashProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 1, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 1, player, "axl_bullet", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.MetteurCrash;
 		angle = bulletDir.angle;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		maxTime = 0.2f;
+		maxTime = 0.3f;
 		reflectable = true;
 		destroyOnHit = false;
-		if (Helpers.randomRange(0, 10) == 10){
-		damager.flinch = 10;
-		damager.damage = 1;
-		}
+
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -244,10 +236,7 @@ public class BeastKillerProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-		if (Helpers.randomRange(0, 10) == 10){
-		damager.flinch = 10;
-		damager.damage = 1;
-		}
+
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -269,10 +258,7 @@ public class MachineBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-		if (Helpers.randomRange(0, 10) == 10){
-		damager.flinch = 10;
-		damager.damage = 1;
-		}
+
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -294,10 +280,7 @@ public class RevolverBarrelProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-		if (Helpers.randomRange(0, 10) == 10){
-		damager.flinch = 10;
-		damager.damage = 1;
-		}
+
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -333,10 +316,7 @@ public class AncientGunProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.3f;
 		destroyOnHit = false;
-		if (Helpers.randomRange(0, 10) == 10){
-		damager.flinch = 10;
-		damager.damage = 1;
-		}
+
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

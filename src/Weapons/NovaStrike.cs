@@ -1,40 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MMXOnline;
-
-
-
-public class Blocking : Weapon {
-	public Blocking(Player? player) : base() {
-		rateOfFire = 0.15f;
-		index = (int)WeaponIds.Blocking;
-		weaponBarBaseIndex = 42;
-		weaponBarIndex = 36;
-		weaponSlotIndex = 95;
-		killFeedIndex = 104;
-		ammo = 32;
-	}
-
-	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.character.ownedByLocalPlayer) {
-			player.character.changeState(new SwordBlock(), true);
-		}
-	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-	
-		return 2;
-	}
-
-	public override bool canShoot(int chargeLevel, Player player) {
-		return player.character?.flag == null && ammo >= 2;
-	}
-}
-
+﻿namespace MMXOnline;
 
 public class NovaStrike : Weapon {
 	public const float ammoUsage = 16;
@@ -65,7 +29,7 @@ public class NovaStrike : Weapon {
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
-		return player.character?.flag == null && ammo >= (player.hasGoldenArmor() ? ammoUsage / 2 : ammoUsage);
+		return player.character?.flag == null && ammo >= (player.hasChip(3) ? ammoUsage / 2 : ammoUsage);
 	}
 }
 
@@ -83,14 +47,13 @@ public class NovaStrikeState : CharState {
 
 		if (sprite == "nova_strike_start") {
 			if (character.isAnimOver()) {
-				if (player.hasUltimateArmor()){
-					if (player.input.isHeld(Control.Up, player)) {
+				if (player.input.isHeld(Control.Up, player)) {
 					upOrDown = -1;
 					sprite = "nova_strike_up";
-					} else if (player.input.isHeld(Control.Down, player)) {
+				} else if (player.input.isHeld(Control.Down, player)) {
 					upOrDown = 1;
 					sprite = "nova_strike_down";
-					} else {
+				} else {
 					leftOrRight = 1;
 					sprite = "nova_strike";
 				}
@@ -99,14 +62,9 @@ public class NovaStrikeState : CharState {
 				} else {
 					character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
 				}
-			} else {
-			leftOrRight = 1;
-			sprite = "nova_strike";
+				character.changeSpriteFromName(sprite, true);
 			}
-			character.playSound("speedBurnerCharged", sendRpc: true);
-			character.changeSpriteFromName(sprite, true);
 			return;
-		}
 		}
 
 		if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _)) {

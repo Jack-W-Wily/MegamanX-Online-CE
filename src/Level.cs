@@ -11,6 +11,8 @@ public partial class Level {
 	#region dynamic lists
 	// Any list that can grow over time should be put here for memory leak investigation
 	public HashSet<GameObject> gameObjects = new HashSet<GameObject>();
+	public Dictionary<ushort, Actor> actorsById = new();
+	public Dictionary<ushort, Actor> destroyedActorsById = new();
 	public List<Actor> mapSprites = new List<Actor>();
 	public List<List<HashSet<GameObject>>> grid = new List<List<HashSet<GameObject>>>();
 	public HashSet<HashSet<GameObject>> occupiedGridSets = new HashSet<HashSet<GameObject>>();
@@ -81,7 +83,7 @@ public partial class Level {
 	public int height;
 	public bool equalCharDistribution;
 	public bool supportsRideChasers;
-	public bool rideArmorFlight = true;
+	public bool rideArmorFlight;
 	public bool hasMovingPlatforms { get { return movingPlatforms.Count > 0; } }
 
 	public float syncValue;
@@ -101,7 +103,8 @@ public partial class Level {
 	public int startGridCount;
 	public int flaggerCount;
 
-	public const ushort maxReservedNetId = 50;
+	public const ushort maxReservedNetId = firstNormalNetId - 1;
+	public const ushort firstNormalNetId = 50;
 	public const ushort maxReservedCharNetId = 50;
 	public const ushort redFlagNetId = 10;
 	public const ushort blueFlagNetId = 11;
@@ -263,9 +266,8 @@ public partial class Level {
 			gameMode = new KingOfTheHill(this, server.timeLimit);
 		} else if (server.gameMode == GameMode.Race) {
 			gameMode = new Race(this);
-		} else if (server.gameMode == GameMode.Nightmare) {
-			gameMode = new Nightmare(this, server.playTo, server.timeLimit);
 		}
+
 		// Radar dimensions
 		float maxDim = 50f;
 		bool reallyWide = levelData.width > levelData.height * 3;
@@ -680,8 +682,6 @@ public partial class Level {
 			} else if (objectName.StartsWith("Music Source")) {
 				string musicName = instance.properties.musicName ?? "";
 				if (!Global.musics.ContainsKey(musicName)) {
-					
-					
 					//throw new Exception("Music Source with music name " + musicName + " not found.\nIf music is in custom map folder, format as CUSTOM_MAP_NAME:MUSIC_NAME");
 				} else {
 					var actor = new Actor("empty", pos, null, true, false);
@@ -810,10 +810,6 @@ public partial class Level {
 		string musicKey = levelData.getMusicKey(players);
 		Global.changeMusic(musicKey);
 
-		if (Global.music == null){
-		string musicKey2 = levelData.getMusicKey2(players);
-		Global.changeMusic(musicKey2);
-		}
 		if (isHost) {
 			Global.serverClient?.rpc(RPC.updateStarted);
 		}
@@ -952,12 +948,21 @@ public partial class Level {
 		}
 	}
 
-	public Actor getActorByNetId(ushort netId) {
+	public Actor? getActorByNetId(ushort netId, bool getDestroyed = false) {
+		/*
 		foreach (var go in gameObjects) {
 			var actor = go as Actor;
 			if (actor?.netId == netId) {
 				return actor;
 			}
+		}
+		return null;
+		*/
+		if (Global.level.actorsById.ContainsKey(netId)) {
+			return Global.level.actorsById[netId];
+		}
+		if (getDestroyed && Global.level.destroyedActorsById.ContainsKey(netId)) {
+			return Global.level.destroyedActorsById[netId];
 		}
 		return null;
 	}
@@ -1237,7 +1242,7 @@ public partial class Level {
 							if (damagable.projectileCooldown["sigmavirus"] == 0) {
 								actor.playSound("hit");
 								actor.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
-								damagable.applyDamage(null, null, 2, null);
+								damagable.applyDamage(2, null, null, null, null);
 								damagable.projectileCooldown["sigmavirus"] = 1;
 							}
 						}
@@ -1470,18 +1475,18 @@ public partial class Level {
 		if (actor == null) return false;
 
 		if (actor.timeStopTime > 10) {
-			slowAmount = 0.0625f;
+			slowAmount = 0.125f;
 			return true;
 		}
 
 		bool isSlown = false;
 
-		//if (actor is Character chr2) {
-		//	if (chr2.infectedTime > 0) {
-		//		slowAmount = 1 - (0.25f * (chr2.infectedTime / 8));
-		//		isSlown = true;
-		//	}
-		//}
+		if (actor is Character chr2) {
+			if (chr2.infectedTime > 0) {
+				slowAmount = 1 - (0.25f * (chr2.infectedTime / 8));
+				isSlown = true;
+			}
+		}
 
 		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is OverdriveOstrich) {
 			foreach (var cch in chargedCrystalHunters) {
@@ -1580,11 +1585,6 @@ public partial class Level {
 		if (levelData.name == "powerplant2") {
 			drawPowerplant2();
 		}
-
-		if ( gameMode is Nightmare) {
-			drawNightmaremode();
-		}
-
 
 		if (isNon1v1Elimination() && gameMode.virusStarted > 0) {
 			drawSigmaVirus();
@@ -1825,12 +1825,6 @@ public partial class Level {
 			}
 		}
 
-		DrawWrappers.DrawRect(0, 0, width, height, true, new Color(0, 0, 0, alpha), 1, Global.level.mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
-	}
-
-	private void drawNightmaremode() {
-		byte alpha = 0;
-			alpha = 200;
 		DrawWrappers.DrawRect(0, 0, width, height, true, new Color(0, 0, 0, alpha), 1, Global.level.mainPlayer?.character?.zIndex ?? ZIndex.HUD, isWorldPos: true);
 	}
 
@@ -2138,12 +2132,16 @@ public partial class Level {
 		return is1v1() && server?.customMatchSettings?.hyperModeMatch == true;
 	}
 
+	public bool isHyperMatch() {
+		return server?.customMatchSettings?.hyperModeMatch == true;
+	}
+
 	public bool isTraining() {
 		return levelData.isTraining();
 	}
 
 	public bool isElimination() {
-		return gameMode is Elimination || gameMode is TeamElimination || gameMode is Nightmare;
+		return gameMode is Elimination || gameMode is TeamElimination;
 	}
 
 	public bool isNon1v1Elimination() {
@@ -2269,6 +2267,14 @@ public partial class Level {
 		var players = Global.level?.server?.players;
 		if (players == null || players.Count == 0) return 0;
 		return players.Max(p => p.kills);
+	}
+
+	public void clearOldActors() {
+		foreach ((ushort actorId, Actor actor) in destroyedActorsById) {
+			if (frameCount - actor.destroyedOnFrame is > 360 or < 0) {
+				destroyedActorsById.Remove(actorId);
+			}
+		}
 	}
 }
 

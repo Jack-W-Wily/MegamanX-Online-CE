@@ -60,10 +60,6 @@ public class Maverick : Actor, IDamagable {
 	public bool canClimbWall;
 	public bool canFly;
 	public float maxFlyBar = 16;
-
-	public float maverickHealthRegenTimer;
-	public float canRegen = 0;
-
 	public float flyBar = 16;
 	public (int icon, int units) flyBarIndexes = (0, 0);
 
@@ -104,10 +100,6 @@ public class Maverick : Actor, IDamagable {
 	public WeaponIds awardWeaponId;
 	public WeaponIds weakWeaponId;
 	public WeaponIds weakMaverickWeaponId;
-
-	public float grabHitCooldown;
-
-	public bool isInGrabState;
 
 	private Input _input;
 	public Input input {
@@ -218,15 +210,6 @@ public class Maverick : Actor, IDamagable {
 		healAmount += amount;
 	}
 
-
-	
-	public bool canBeGrabbed(int enemyId, int grabId) {
-		return true;
-	}
-
-
-	
-
 	public virtual void setHealth(float lastHealth) {
 		health = lastHealth;
 	}
@@ -251,22 +234,6 @@ public class Maverick : Actor, IDamagable {
 			if (canFly && flyBar < maxFlyBar) {
 				flyBar += 1 * Global.speedMul;
 				if (flyBar > maxFlyBar) { flyBar = maxFlyBar; }
-			}
-
-		 if (player.input.isPressed(Control.Down,player) && !canClimb)
-			{
-				checkLadderDown = true;
-				List<CollideData> ladders2 = Global.level.getTriggerList(this, 0f, 1f, null, typeof(Ladder));
-				if (ladders2.Count > 0)
-				{
-				Rect rect2 = ladders2[0].otherCollider.shape.getRect();
-				float xDist2 = (rect2.x1 + rect2.x2) / 2f - pos.x;
-					if (MathF.Abs(xDist2) < 10f && Global.level.checkCollisionActor(this, xDist2, 30f) == null)
-					{
-						move(new Point(xDist2, 1f), useDeltaTime: false);
-					}
-				}
-				checkLadderDown = false;
 			}
 		}
 
@@ -321,13 +288,8 @@ public class Maverick : Actor, IDamagable {
 		if (!ownedByLocalPlayer) return;
 
 		if (pos.y > Global.level.killY && state is not MEnter && state is not MExit) {
-			if (player.isPuppeteer()){
-
-			destroySelf();
-			} else {
 			incPos(new Point(0, 50));
-			applyDamage(null, null, Damager.envKillDamage, null);
-			}
+			applyDamage(Damager.envKillDamage, player, this, null, null);
 		}
 
 		if (autoExit) {
@@ -340,17 +302,6 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		if (player == null) return;
-
-		//New pup mav regen system
-		if (player.isPuppeteer() && health < 3 ) {
-			changeState(new MExit(pos, true));
-			canRegen = 1;
-		}
-		if (canRegen > 0)addHealth(1, false);
-		if (health == maxHealth) canRegen = 0;
-		//
-
-
 
 		if (player.isStriker()) {
 			strikerTime += Global.spf;
@@ -616,11 +567,11 @@ public class Maverick : Actor, IDamagable {
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		var retProjs = new Dictionary<int, Func<Projectile>>();
 
-		if (globalCollider != null && player.maverick1v1 != null && (sprite.name.Contains("_jump") || sprite.name.Contains("_fall"))) {
+		if (globalCollider != null && Global.level.is1v1() && player.maverick1v1 != null && (sprite.name.Contains("_jump") || sprite.name.Contains("_fall"))) {
 			retProjs[(int)ProjIds.MaverickContactDamage] = () => {
 				Point centerPoint = globalCollider.shape.getRect().center();
-				float damage = 1;
-				int flinch = 4;
+				float damage = 3;
+				int flinch = 0;
 				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch, 0.5f);
 				proj.globalCollider = globalCollider.clone();
 				return proj;
@@ -702,7 +653,7 @@ public class Maverick : Actor, IDamagable {
 		changeSprite(spriteName, resetFrame);
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (this is FakeZero fz && fz.state is FakeZeroGuardState) {
 			ammo += damage;
 			if (ammo > 32) ammo = 32;
@@ -924,7 +875,8 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		
+		if (Global.level.isRace()) return false;
+
 		if (this is BoomerangKuwanger bk && bk.sprite.name.Contains("teleport")) {
 			return false;
 		}

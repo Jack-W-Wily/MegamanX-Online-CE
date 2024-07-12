@@ -388,7 +388,7 @@ public class OptionsMenu : IMainMenu {
 				new MenuOption(
 					30, startY,
 					() => {
-						Helpers.menuLeftRightInc(ref Options.main.preferredCharacter, 0, 7);
+						Helpers.menuLeftRightInc(ref Options.main.preferredCharacter, 0, 4);
 					},
 					(Point pos, int index) => {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];
@@ -954,7 +954,7 @@ public class OptionsMenu : IMainMenu {
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
 							Options.main.axlAimMode = 0;
 						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							Options.main.axlAimMode = 0; //hehehe fuck you axl cursor
+							Options.main.axlAimMode = 2;
 						}
 					},
 					(Point pos, int index) => {
@@ -1236,7 +1236,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
-							optionFontText, "I Like Magical Girls:",
+							optionFontText, "Pup small energy bars:",
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(

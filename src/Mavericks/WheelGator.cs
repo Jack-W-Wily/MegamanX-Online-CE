@@ -21,8 +21,7 @@ public class WheelGator : Maverick {
 
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
-		//isHeavy = true;
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.SpinWheel;
 		weakWeaponId = WeaponIds.StrikeChain;
 		weakMaverickWeaponId = WeaponIds.WireSponge;
@@ -45,7 +44,7 @@ public class WheelGator : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
 						changeState(new WheelGUpBiteState());
@@ -77,8 +76,7 @@ public class WheelGator : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		if (damageEaten > 0) return 200;
-		return 95;
+		return 85;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -98,7 +96,7 @@ public class WheelGator : Maverick {
 			if (hitbox.name == "eat") {
 				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGEat, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 			} else {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.3f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 6, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 			}
 		}
 		if (sprite.name.Contains("grab_start") && deltaPos.y <= 0) {
@@ -152,84 +150,70 @@ public class WheelGator : Maverick {
 }
 
 public class WheelGSpinWheelProj : Projectile {
-	private float lastHitTime;
-
-	private const float hitCooldown = 0.2f;
-
-	private int bounces;
-
-
-	public WheelGSpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 1, player, "wheelg_proj_wheel", Global.defFlinch, hitCooldown, netProjId, player.ownedByLocalPlayer) {
+	float lastHitTime;
+	const float hitCooldown = 0.2f;
+	public WheelGSpinWheelProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 250, 1, player, "wheelg_proj_wheel",
+		Global.defFlinch, hitCooldown, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.WheelGSpinWheel;
-			if (player.isSigma && player.currency > 0 && player.input.isHeld("special2", player)){
-			destroySelf();
-			player.currency -= 1;
-			new SpinWheelProjChargedStart(new SpinWheel(), pos, xDir, damager.owner, player.getNextActorNetId());
-		}	
 		maxTime = 2f;
-		destroyOnHit = false;	
-		if (rpc)
-		{
+
+		destroyOnHit = false;
+		vel = new Point(xDir * 200, -200);
+		useGravity = true;
+		collider.wallOnly = true;
+
+		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
-	public override void update()
-	{
+	public override void update() {
 		base.update();
-		
+
 		vel.x = xDir * 250;
-		if (lastHitTime > 0f)
-		{
-			vel.x = xDir * 4;
-		}
+		if (lastHitTime > 0) vel.x = xDir * 4;
 		Helpers.decrementTime(ref lastHitTime);
 	}
 
-	public override void onHitWall(CollideData other)
-	{
+	int bounces;
+	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer)
-		{
-			return;
-		}
-	bounces++;
-		if ((other.hitData.normal ?? new Point(0f, -1f)).isSideways())
-		{
+
+		bounces++;
+
+		var normal = other.hitData.normal ?? new Point(0, -1);
+		if (normal.isSideways()) {
 			vel.x *= -1f;
 			xDir *= -1;
-			incPos(new Point(5 * MathF.Sign(vel.x), 0f));
-		}
-		else if (bounces < 2)
-		{
+			incPos(new Point(5 * MathF.Sign(vel.x), 0));
+		} else if (bounces < 2) {
 			vel.y *= -0.5f;
-			if (vel.y < -300f)
-			{
-				vel.y = -300f;
-			}
-			incPos(new Point(0f, 5 * MathF.Sign(vel.y)));
+			if (vel.y < -300) vel.y = -300;
+			incPos(new Point(0, 5 * MathF.Sign(vel.y)));
 		}
-		
 	}
 
-	public override void onHitDamagable(IDamagable damagable)
-	{
-		if (damagable is CrackedWall)
-		{
-			damager.hitCooldown = 0.2f;
+	public override void onHitDamagable(IDamagable damagable) {
+		if (damagable is CrackedWall) {
+			damager.hitCooldown = hitCooldown;
 			return;
 		}
-		lastHitTime = 0.2f;
-		if (damagable is Character chr && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback())
-		{
-			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10f);
+
+		lastHitTime = hitCooldown;
+
+		var chr = damagable as Character;
+		if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
+			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10);
 			chr.slowdownTime = 0.25f;
 		}
+
 		base.onHitDamagable(damagable);
 	}
 }
-
 
 public class WheelGShootState : MaverickState {
 	int state;

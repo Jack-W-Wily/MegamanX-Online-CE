@@ -78,7 +78,7 @@ public class BubbleSplash : Weapon {
 
 public class BubbleSplashProj : Projectile {
 	public BubbleSplashProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj_start", 0, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj_start", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.75f;
 		useGravity = false;
 		vel.y = -20 * Helpers.randomRange(0.75f, 1.25f);
@@ -99,18 +99,6 @@ public class BubbleSplashProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		}
-
-
-		public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -300));
-		}
 	}
 
 	public override void update() {
@@ -130,7 +118,7 @@ public class BubbleSplashProjCharged : Projectile {
 	public float yPos;
 	public float initTime;
 	public BubbleSplashProjCharged(Weapon weapon, Point pos, int xDir, Player player, float time, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 20, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 75, 1, player, "bubblesplash_proj1", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		useGravity = false;
 		fadeSprite = "bubblesplash_pop";
 
@@ -146,12 +134,16 @@ public class BubbleSplashProjCharged : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+
+		isOwnerLinked = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
 	}
 
 	public override void update() {
 		base.update();
-		if (character == null || !Global.level.gameObjects.Contains(character)){ 
-			//|| (character.player.weapon is not BubbleSplash)) {// Removed the fact it dissapears when changing weapon
+		if (character == null || !Global.level.gameObjects.Contains(character) || (character.player.weapon is not BubbleSplash)) {
 			destroySelf();
 			return;
 		}
@@ -167,18 +159,6 @@ public class BubbleSplashProjCharged : Projectile {
 	public override void onDestroy() {
 		if (character != null) {
 			character?.chargedBubbles?.Remove(this);
-		}
-	}
-
-
-	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -1300));
 		}
 	}
 }

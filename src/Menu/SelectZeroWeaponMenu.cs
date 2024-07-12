@@ -4,40 +4,35 @@ using System.Linq;
 using SFML.Graphics;
 
 namespace MMXOnline;
+
 public class SelectZeroWeaponMenu : IMainMenu {
-	public List<WeaponCursor> cursors;
+	public WeaponCursor[] cursors;
 	public int selCursorIndex;
 	public bool inGame;
 	public string error = "";
 
-	public static List<Weapon> meleeWeapons = new List<Weapon>() {
-		new ZSaber(null),
-		new KKnuckleWeapon(null),
-		new ZeroBuster(),
-	};
-
 	public static List<Weapon> groundSpecialWeapons = new List<Weapon>() {
-		new RaijingekiWeapon(null),
-		new SuiretsusenWeapon(null),
-		new TBreakerWeapon(null)
+		RaijingekiWeapon.staticWeapon,
+		SuiretsusenWeapon.staticWeapon,
+		TBreakerWeapon.staticWeapon,
 	};
 
 	public static List<Weapon> airSpecialWeapons = new List<Weapon>() {
-		new KuuenzanWeapon(null),
-		new FSplasherWeapon(null),
-		new HyorogaWeapon(null)
+		KuuenzanWeapon.staticWeapon,
+		FSplasherWeapon.staticWeapon,
+		HyorogaWeapon.staticWeapon,
 	};
 
 	public static List<Weapon> uppercutWeapons = new List<Weapon>() {
-		new RyuenjinWeapon(null),
-		new EBladeWeapon(null),
-		new RisingWeapon(null)
+		RyuenjinWeapon.staticWeapon,
+		DenjinWeapon.staticWeapon,
+		RisingFangWeapon.staticWeapon
 	};
 
 	public static List<Weapon> downThrustWeapons = new List<Weapon>() {
-		new HyouretsuzanWeapon(null),
-		new RakukojinWeapon(null),
-		new QuakeBlazerWeapon(null)
+		HyouretsuzanWeapon.staticWeapon,
+		RakukojinWeapon.staticWeapon,
+		DanchienWeapon.staticWeapon
 	};
 
 	public static List<Weapon> gigaAttackWeapons = new List<Weapon>() {
@@ -47,7 +42,6 @@ public class SelectZeroWeaponMenu : IMainMenu {
 	};
 
 	public static List<Tuple<string, List<Weapon>>> zeroWeaponCategories = new List<Tuple<string, List<Weapon>>>() {
-		Tuple.Create("Ground Spc", meleeWeapons),
 		Tuple.Create("Ground Spc", groundSpecialWeapons),
 		Tuple.Create("Air Spc", airSpecialWeapons),
 		Tuple.Create("Uppercut(Spc)", uppercutWeapons),
@@ -63,17 +57,16 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		this.prevMenu = prevMenu;
 		this.inGame = inGame;
 
-		cursors = new List<WeaponCursor>();
-
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[0].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.melee)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[1].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.groundSpecial)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[2].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.airSpecial)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[3].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.uppercutS)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[4].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.uppercutA)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[5].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.downThrustS)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[6].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.downThrustA)));
-		cursors.Add(new WeaponCursor(zeroWeaponCategories[7].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.gigaAttack)));
-		cursors.Add(new WeaponCursor(Options.main.zeroLoadout.hyperMode));
+		cursors = new WeaponCursor[] {
+			new WeaponCursor(zeroWeaponCategories[0].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.groundSpecial)),
+			new WeaponCursor(zeroWeaponCategories[1].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.airSpecial)),
+			new WeaponCursor(zeroWeaponCategories[2].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.uppercutS)),
+			new WeaponCursor(zeroWeaponCategories[3].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.uppercutA)),
+			new WeaponCursor(zeroWeaponCategories[4].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.downThrustS)),
+			new WeaponCursor(zeroWeaponCategories[5].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.downThrustA)),
+			new WeaponCursor(zeroWeaponCategories[6].Item2.FindIndex(w => w.type == Options.main.zeroLoadout.gigaAttack)),
+			new WeaponCursor(Options.main.zeroLoadout.hyperMode)
+		};
 	}
 
 	public void update() {
@@ -85,15 +78,12 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		}
 
 		int maxCatCount = 3;
-		if (selCursorIndex < 8) {
+		if (selCursorIndex < 7) {
 			maxCatCount = zeroWeaponCategories[selCursorIndex].Item2.Count;
 		}
 
-		if (!isIndexDisabled(selCursorIndex)) {
-			Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, maxCatCount - 1, wrap: true, playSound: true);
-		}
-
-		Helpers.menuUpDown(ref selCursorIndex, 0, 8);
+		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, maxCatCount - 1, wrap: true, playSound: true);
+		Helpers.menuUpDown(ref selCursorIndex, 0, cursors.Length - 1);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
 		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
@@ -103,40 +93,35 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				return;
 			}
 
-			int[] oldArray = { 
-				Options.main.zeroLoadout.uppercutS, 
-				Options.main.zeroLoadout.uppercutA, 
-				Options.main.zeroLoadout.downThrustS, 
+			int[] oldArray = {
+				Options.main.zeroLoadout.uppercutS,
+				Options.main.zeroLoadout.uppercutA,
+				Options.main.zeroLoadout.downThrustS,
 				Options.main.zeroLoadout.downThrustA,
-				Options.main.zeroLoadout.gigaAttack, 
-				Options.main.zeroLoadout.hyperMode, 
-				Options.main.zeroLoadout.melee, 
-				Options.main.zeroLoadout.groundSpecial, 
-				Options.main.zeroLoadout.airSpecial 
-				};
-		
+				Options.main.zeroLoadout.gigaAttack,
+				Options.main.zeroLoadout.hyperMode,
+				Options.main.zeroLoadout.groundSpecial,
+				Options.main.zeroLoadout.airSpecial
+			};
 
-			Options.main.zeroLoadout.melee = zeroWeaponCategories[0].Item2[cursors[0].index].type;
-			Options.main.zeroLoadout.groundSpecial = zeroWeaponCategories[1].Item2[cursors[1].index].type;
-			Options.main.zeroLoadout.airSpecial = zeroWeaponCategories[2].Item2[cursors[2].index].type;
-			Options.main.zeroLoadout.uppercutS = zeroWeaponCategories[3].Item2[cursors[3].index].type;
-
-
-			Options.main.zeroLoadout.downThrustA = zeroWeaponCategories[6].Item2[cursors[6].index].type;
-			Options.main.zeroLoadout.gigaAttack = zeroWeaponCategories[7].Item2[cursors[7].index].type;
-			Options.main.zeroLoadout.hyperMode = cursors[8].index;
+			Options.main.zeroLoadout.groundSpecial = zeroWeaponCategories[0].Item2[cursors[0].index].type;
+			Options.main.zeroLoadout.airSpecial = zeroWeaponCategories[1].Item2[cursors[1].index].type;
+			Options.main.zeroLoadout.uppercutS = zeroWeaponCategories[2].Item2[cursors[2].index].type;
+			Options.main.zeroLoadout.uppercutA = zeroWeaponCategories[3].Item2[cursors[3].index].type;
+			Options.main.zeroLoadout.downThrustS = zeroWeaponCategories[4].Item2[cursors[4].index].type;
+			Options.main.zeroLoadout.downThrustA = zeroWeaponCategories[5].Item2[cursors[5].index].type;
+			Options.main.zeroLoadout.gigaAttack = zeroWeaponCategories[6].Item2[cursors[6].index].type;
+			Options.main.zeroLoadout.hyperMode = cursors[7].index;
 			int[] newArray = {
-				Options.main.zeroLoadout.uppercutS, 
-				Options.main.zeroLoadout.uppercutA, 
-				Options.main.zeroLoadout.downThrustS, 
-				Options.main.zeroLoadout.downThrustA, 
-				Options.main.zeroLoadout.gigaAttack, 
-				Options.main.zeroLoadout.hyperMode, 
-				Options.main.zeroLoadout.melee, 
-				Options.main.zeroLoadout.groundSpecial, 
-				Options.main.zeroLoadout.airSpecial 
-				};
-		
+				Options.main.zeroLoadout.uppercutS,
+				Options.main.zeroLoadout.uppercutA,
+				Options.main.zeroLoadout.downThrustS,
+				Options.main.zeroLoadout.downThrustA,
+				Options.main.zeroLoadout.gigaAttack,
+				Options.main.zeroLoadout.hyperMode,
+				Options.main.zeroLoadout.groundSpecial,
+				Options.main.zeroLoadout.airSpecial
+			};
 
 			if (!Enumerable.SequenceEqual(oldArray, newArray)) {
 				Options.main.saveToFile();
@@ -157,8 +142,8 @@ public class SelectZeroWeaponMenu : IMainMenu {
 	}
 
 	public bool duplicateTechniques() {
-		return zeroWeaponCategories[3].Item2[cursors[3].index].type == zeroWeaponCategories[4].Item2[cursors[4].index].type ||
-			zeroWeaponCategories[5].Item2[cursors[5].index].type == zeroWeaponCategories[6].Item2[cursors[6].index].type;
+		return zeroWeaponCategories[3].Item2[cursors[2].index].type == zeroWeaponCategories[3].Item2[cursors[3].index].type ||
+			zeroWeaponCategories[4].Item2[cursors[4].index].type == zeroWeaponCategories[5].Item2[cursors[5].index].type;
 	}
 
 	public void render() {
@@ -182,9 +167,9 @@ public class SelectZeroWeaponMenu : IMainMenu {
 		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
 		Color color;
 		float alpha;
-		for (int i = 0; i < 8; i++) {
-			color = isIndexDisabled(i) ? Helpers.Gray : Color.White;
-			alpha = isIndexDisabled(i) ? 0.5f : 1f;
+		for (int i = 0; i < cursors.Length - 1; i++) {
+			color = Color.White;
+			alpha = 1f;
 			float yPos = startY - 6 + (i * wepH);
 			Fonts.drawText(
 				FontType.Blue, zeroWeaponCategories[i].Item1 + ":", 40,
@@ -198,30 +183,30 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3, alpha);
 		}
 
-		color = isIndexDisabled(8) ? Helpers.Gray : Color.White;
-		alpha = isIndexDisabled(8) ? 0.5f : 1f;
+		color = Color.White;
+		alpha = 1f;
 
-		float hyperModeYPos = startY - 6 + (wepH * 8);
+		float hyperModeYPos = startY - 6 + (wepH * 7);
 		Fonts.drawText(
 			FontType.Blue, "Hyper Mode:", 40, hyperModeYPos,
-			selected: selCursorIndex == 8
+			selected: selCursorIndex == 7
 		);
-		if (cursors[8].index == 0) {
+		if (cursors[7].index == 0) {
 			Fonts.drawText(
 				FontType.Grey, "Black Zero", wepTextX, hyperModeYPos,
-				selected: selCursorIndex == 8
+				selected: selCursorIndex == 7
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(122, wepPosX, hyperModeYPos + 3, alpha);
-		} else if (cursors[8].index == 1) {
+		} else if (cursors[7].index == 1) {
 			Fonts.drawText(
 				FontType.Red, "Awakened Zero", wepTextX, hyperModeYPos,
-				selected: selCursorIndex == 8
+				selected: selCursorIndex == 7
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(87, wepPosX, hyperModeYPos + 3, alpha);
-		} else if (cursors[8].index == 2) {
+		} else if (cursors[7].index == 2) {
 			Fonts.drawText(
 				FontType.DarkPurple, "Viral Zero", wepTextX, hyperModeYPos,
-				selected: selCursorIndex == 8
+				selected: selCursorIndex == 7
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(173, wepPosX, hyperModeYPos + 3, alpha);
 		}
@@ -232,7 +217,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			ZIndex.HUD, false, outlineColor: outlineColor
 		);
 
-		if (selCursorIndex < 8) {
+		if (selCursorIndex < 7) {
 			var wep = zeroWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
 			int posY = 6;
 			foreach (string description in wep.description) {
@@ -242,13 +227,13 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				posY += 9;
 			}
 		} else {
-			if (cursors[8].index == 0) {
+			if (cursors[7].index == 0) {
 				Fonts.drawText(FontType.Green, "This hyper form increases speed and damage.", 40, wsy + 6);
 				Fonts.drawText(FontType.Green, "Lasts 12 seconds.", 40, wsy + 15);
-			} else if (cursors[8].index == 1) {
+			} else if (cursors[7].index == 1) {
 				Fonts.drawText(FontType.Green, "This hyper form grants powerful ranged attacks.", 40, wsy + 6);
 				Fonts.drawText(FontType.Green, $"Lasts until {Global.nameCoins} are depleted.", 40, wsy + 15);
-			} else if (cursors[8].index == 2) {
+			} else if (cursors[7].index == 2) {
 				Fonts.drawText(FontType.Green, "This hyper form infects and disrupts foes on each hit.", 40, wsy + 6);
 				Fonts.drawText(FontType.Green, "Lasts until death.", 40, wsy + 15);
 			}
@@ -273,15 +258,5 @@ public class SelectZeroWeaponMenu : IMainMenu {
 				Global.screenW / 2, 20 + top, alignment: Alignment.Center
 			);
 		}
-	}
-
-	public bool isIndexDisabled(int index) {
-		if (cursors[0].index == 1) {
-			return index >= 1 && index < 7;
-		}
-		if (cursors[0].index == 2) {
-			return index >= 1 && index < 9;
-		}
-		return false;
 	}
 }

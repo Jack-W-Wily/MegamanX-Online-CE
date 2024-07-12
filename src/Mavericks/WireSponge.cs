@@ -18,7 +18,7 @@ public class WireSponge : Maverick {
 		stateCooldowns.Add(typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(WSpongeLightningState), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(WSpongeChainSpinState), new MaverickStateCooldown(false, true, 0.75f));
-		canClimbWall = true;
+
 		weapon = getWeapon();
 		chainWeapon = getChainWeapon(player);
 
@@ -40,7 +40,7 @@ public class WireSponge : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
 						changeState(new WSpongeUpChainStartState());
@@ -873,7 +873,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		moveWithMovingPlatform();
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		health -= damage;
 		if (health <= 0) {
 			destroySelf();

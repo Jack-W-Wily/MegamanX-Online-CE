@@ -3,7 +3,6 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-
 public class CallDownMech : CharState {
 	RideArmor rideArmor;
 	bool isNew;
@@ -46,12 +45,7 @@ public class CallDownMech : CharState {
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
 	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
 }
-
 
 public class VileRevive : CharState {
 	public float radius = 200;
@@ -97,14 +91,10 @@ public class VileRevive : CharState {
 	}
 
 	public void setFlags() {
-
-	
 		if (!isMK5) {
-			//vile.vileForm = 1;
-			vile.vileRespawnCount = 1;
+			vile.vileForm = 1;
 		} else {
-			//vile.vileForm = 2;
-			vile.vileRespawnCount = 2;
+			vile.vileForm = 2;
 		}
 	}
 
@@ -112,7 +102,7 @@ public class VileRevive : CharState {
 		base.onEnter(oldState);
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
-		//character.addMusicSource("MMX3-Doppler", character.getCenterPos(), false);
+		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);
 		if (!isMK5) {
 			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
 			drDopplerAnim.fadeIn = true;
@@ -148,15 +138,11 @@ public class VileRevive : CharState {
 }
 
 public class VileHover : CharState {
+	public SoundWrapper sound;
 	public Point flyVel;
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
 	public float fallY;
-
-	bool lockhover;
-
-
-	SoundWrapper hoversound;
 
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
 		exitOnLanding = true;
@@ -168,13 +154,6 @@ public class VileHover : CharState {
 	public override void update() {
 		base.update();
 		if (player == null) return;
-		
-		if (stateTime == 0) character.downpressedtimes = 0;
-		if (character.downpressedtimes == 2){
-		lockhover = true;
-		character.downpressedtimes = 0;
-		}
-
 
 		if (character.flag != null) {
 			character.changeToIdleOrFall();
@@ -193,8 +172,6 @@ public class VileHover : CharState {
 			character.vel.y = 0;
 		}
 
-		if (lockhover) character.stopMoving();
-
 		Point move = getHoverMove();
 
 		if (!character.sprite.name.EndsWith("cannon_air") || character.sprite.time > 0.1f) {
@@ -207,13 +184,7 @@ public class VileHover : CharState {
 			}
 		}
 
-		if (move.magnitude > 0 && !player.input.isHeld("down", base.player) && base.player.input.isHeld("jump", base.player)) {
-			character.move(move);
-		}
-		if (move.magnitude > 0 && player.input.isHeld("down", base.player) && !base.player.input.isHeld("jump", base.player)) {
-			character.move(move);
-		}
-		if (move.magnitude > 0 && !player.input.isHeld("down", base.player) && !base.player.input.isHeld("jump", base.player)) {
+		if (move.magnitude > 0) {
 			character.move(move);
 		}
 
@@ -223,7 +194,7 @@ public class VileHover : CharState {
 		}
 		if (base.player.input.isHeld("jump", base.player) && !once) {
 			once = true;
-			hoversound =	character.playSound("Vilehover", forcePlay: false, sendRpc: true);
+			sound = character.playSound("vileHover", forcePlay: false, sendRpc: true);
 		}
 	}
 
@@ -305,92 +276,10 @@ public class VileHover : CharState {
 		character.useGravity = true;
 		character.sprite.restart();
 		character.stopMoving();
-		if (hoversound != null && !hoversound.deleted) {
-			hoversound.sound?.Stop();
+		if (sound != null && !sound.deleted) {
+			sound.sound?.Stop();
 		}
 		RPC.stopSound.sendRpc("vileHover", character.netId);
 
 	}
 }
-
-
-
-
-public class JudgeMentCut : CharState {
-
-	private bool shot;
-	private float partTime;
-
-	private float chargeTime;
-
-	private float specialPressTime;
-	
-	public float pushBackSpeed;
-
-	public JudgeMentCut(string transitionSprite = "")
-		: base("super_shoot", "", "", transitionSprite)
-	{
-		airMove = true;
-	}
-
-	public override void update()
-	{
-
-		Point poi;
-		poi = character.getFirstPOIOrDefault();
-		
-		if (!shot){
-			shot = true;
-		Point spawnPos2 = poi.addxy(50 * character.xDir, -20f);
-		
-			Actor closestTarget2 = Global.level.getClosestTarget(poi, base.player.alliance, checkWalls: true, 150f);
-			if (closestTarget2 != null)
-			{
-				spawnPos2.x = closestTarget2.pos.x;
-			}
-		 chargeTime = 0;
-			new GBeetleGravityWellProj(player.weapon, spawnPos2,
-			 character.xDir, chargeTime, player, player.getNextActorNetId()
-			 , sendRpc: true);
-		}
-		if (pushBackSpeed > 0) {
-			character.useGravity = false;
-			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
-			pushBackSpeed -= 7.5f;
-		} else {
-			if (!character.grounded) {
-				character.move(new Point(-30 * character.xDir, 0));
-			}
-			character.useGravity = true;
-		}
-
-		base.update();
-		Helpers.decrementTime(ref specialPressTime);
-		if (stateTime > 0.5f) {
-			character.changeToIdleOrFall();
-		}
-		if (character.isAnimOver()) {
-			return;
-		}//Grappler Cancel
-		if (character.shiningSparkStacks > 10 && base.player.input.isPressed("dash", base.player))
-		{
-			character.changeToIdleOrFall();
-		}//Grappler Taunt Cancel
-		
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (!character.grounded) {
-			character.stopMovingWeak();
-			pushBackSpeed = 100;
-		}
-		character.playSound("judgementcut", forcePlay: false, sendRpc: true);
-}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-    }
-}
-	

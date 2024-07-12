@@ -83,7 +83,7 @@ public class Hurt : CharState {
 			player.character.increaseCharge();
 		}
 
-		if (frameTime >= flinchTime) {
+		if (stateFrames >= flinchTime) {
 			character.changeToLandingOrFall(false);
 		}
 	}
@@ -95,7 +95,7 @@ public class GenericStun : CharState {
 	public bool changeAnim = true;
 	public bool canPlayFrozenSound = true;
 	public bool canPlayStaticSound = true;
-	public int hurtDir;
+	public int hurtDir = 1;
 	public float hurtSpeed;
 	public float flinchYPos;
 
@@ -124,7 +124,10 @@ public class GenericStun : CharState {
 
 		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0) {
 			if (flinchTime > 0) {
-				character.setHurt(-character.xDir, MathInt.Ceiling(flinchTime), true);
+				character.changeState(
+					new Hurt(hurtDir, MathInt.Ceiling(flinchTime), false, flinchYPos
+					), true
+				);
 				return;
 			}
 			character.changeToIdleOrFall();
@@ -150,7 +153,7 @@ public class GenericStun : CharState {
 	}
 
 	public void crystalizeLogic() {
-		if (character.crystalizedTime == 0) {
+		if (character.crystalizedTime == 0 && !character.isCrystalized) {
 			return;
 		}
 		reduceStunFrames(ref character.crystalizedTime);
@@ -172,8 +175,6 @@ public class GenericStun : CharState {
 		if (character.paralyzedTime == 0) {
 			return;
 		}
-		character.stopMoving();
-		character.useGravity = false;
 		if (canPlayStaticSound) {
 			character.playSound("voltcStatic");
 			canPlayStaticSound = false;
@@ -215,23 +216,20 @@ public class GenericStun : CharState {
 		hurtDir = xDir;
 		if (player.isX && player.hasBodyArmor(1)) {
 			flinchFrames = MathInt.Floor(flinchFrames * 0.75f);
-			sprite = "hurt2";
-			character.changeSpriteFromName("hurt2", true);
 		}
 		if (flinchTime > flinchFrames) {
 			return;
 		}
-		bool isCombo = (flinchFrames != 0);
-
+		bool isCombo = (flinchTime != 0);
 		hurtSpeed = 1.6f * xDir;
+		if (!isCombo) {
+			flinchYPos = character.pos.y;
+		}
 		if (flinchFrames >= 2) {
 			character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
 			if (isCombo && character.pos.y < flinchYPos) {
 				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
-		}
-		if (!isCombo) {
-			flinchYPos = character.pos.y;
 		}
 		flinchTime = flinchFrames;
 		flinchMaxTime = flinchFrames;
@@ -240,11 +238,12 @@ public class GenericStun : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
+		hurtDir = -character.xDir;
 		// To continue the flinch if was flinched before the stun.
 		if (oldState is Hurt hurtState) {
 			hurtDir = hurtState.hurtDir;
 			hurtSpeed = hurtState.hurtSpeed;
-			flinchTime = hurtState.flinchTime - hurtState.frameTime;
+			flinchTime = hurtState.flinchTime - hurtState.stateFrames;
 			flinchYPos = hurtState.flinchYPos;
 			if (flinchTime < 0) {
 				flinchTime = 0;
@@ -264,12 +263,12 @@ public class GenericStun : CharState {
 		character.paralyzedTime = 0;
 		character.frozenTime = 0;
 		character.crystalizedTime = 0;
-		character.useGravity = true;
+
 		base.onExit(newState);
 	}
 
 	public void reduceStunFrames(ref float arg) {
-		arg -= getTimerFalloff();
+		arg -= player.mashValue() * 60f;
 		if (arg <= 0) {
 			arg = 0;
 		}
@@ -289,7 +288,6 @@ public class KnockedDown : CharState {
 		hurtDir = dir;
 		hurtSpeed = dir * 100;
 		flinchTime = 0.5f;
-		superArmor = true;
 	}
 
 	public override bool canEnter(Character character) {
@@ -303,49 +301,6 @@ public class KnockedDown : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.vel.y = -100;
-	}
-
-	public override void update() {
-		base.update();
-		if (hurtSpeed != 0) {
-			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
-			character.move(new Point(hurtSpeed, 0));
-		}
-
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
-			player.character.increaseCharge();
-		}
-
-		if (stateTime >= flinchTime) {
-			character.changeState(new Idle());
-		}
-	}
-}
-
-
-
-public class PushedOver : CharState {
-	public int hurtDir;
-	public float hurtSpeed;
-	public float flinchTime;
-	public PushedOver(int dir) : base("knocked_down") {
-		hurtDir = dir;
-		hurtSpeed = dir * 400;
-		flinchTime = 0.5f;
-		superArmor = true;
-	}
-
-	public override bool canEnter(Character character) {
-		if (character.isCCImmune()) return false;
-		if (character.charState.superArmor || character.charState.invincible) return false;
-		if (character.isInvulnerable()) return false;
-		if (character.vaccineTime > 0) return false;
-		return base.canEnter(character);
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.vel.y = -200;
 	}
 
 	public override void update() {

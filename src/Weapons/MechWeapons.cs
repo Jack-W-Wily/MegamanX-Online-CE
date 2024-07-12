@@ -86,7 +86,7 @@ public class MechGoliathPunchWeapon : Weapon {
 
 public class MechDevilBearPunchWeapon : Weapon {
 	public MechDevilBearPunchWeapon(Player player) : base() {
-		damager = new Damager(player, 1, Global.defFlinch, 0.3f);
+		damager = new Damager(player, 2, Global.defFlinch, 0.25f);
 		ammo = 0;
 		index = (int)WeaponIds.MechDevilBearPunch;
 		killFeedIndex = 176;
@@ -95,7 +95,7 @@ public class MechDevilBearPunchWeapon : Weapon {
 
 public class MechStompWeapon : Weapon {
 	public MechStompWeapon(Player player) : base() {
-		damager = new Damager(player, 2, Global.defFlinch, 0.75f);
+		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
 		ammo = 0;
 		index = (int)WeaponIds.MechStomp;
 		killFeedIndex = 19;
@@ -104,7 +104,7 @@ public class MechStompWeapon : Weapon {
 
 public class MechKangarooStompWeapon : Weapon {
 	public MechKangarooStompWeapon(Player player) : base() {
-		damager = new Damager(player, 2, Global.defFlinch, 0.75f);
+		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
 		ammo = 0;
 		index = (int)WeaponIds.MechKangarooStomp;
 		killFeedIndex = 58;
@@ -113,7 +113,7 @@ public class MechKangarooStompWeapon : Weapon {
 
 public class MechFrogStompWeapon : Weapon {
 	public MechFrogStompWeapon(Player player) : base() {
-		damager = new Damager(player, 1.5f, Global.defFlinch, 0.5f);
+		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 		ammo = 0;
 		index = (int)WeaponIds.MechFrogStomp;
 		killFeedIndex = 51;
@@ -129,7 +129,6 @@ public class MechFrogStompShockwave : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-		genericShader = player.predatorcloakShader;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -208,7 +207,7 @@ public class MechMissileProj : Projectile, IDamagable {
 	public float smokeTime = 0;
 	public bool isDown;
 	public MechMissileProj(Weapon weapon, Point pos, int xDir, bool isDown, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 400, 2, player, "hawk_missile", 10, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 2, player, "hawk_missile", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MechMissile;
 		maxTime = 0.5f;
 		fadeOnAutoDestroy = true;
@@ -240,7 +239,7 @@ public class MechMissileProj : Projectile, IDamagable {
 		}
 	}
 
-	public void applyDamage(Player owner, int? weaponIndex, float damage, int? projId) {
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (damage > 0) {
 			destroySelf();
 		}

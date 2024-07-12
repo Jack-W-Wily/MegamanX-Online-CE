@@ -22,27 +22,10 @@ public class Tornado : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.ownedByLocalPlayer) {
-			
-
-			if (player.character is MegamanX mmx && !mmx.hasExpandedMoveset()){
-				if (chargeLevel < 3) {
-				new TornadoProj(this, pos, xDir, false, player, netProjId);
-				} else {
-				new TornadoProjCharged(this, pos, xDir, player, netProjId);
-				}
-			} else {
-				if (chargeLevel == 0) {
-				new TornadoProj(this, pos, xDir, false, player, netProjId);
-				}
-				if (chargeLevel >= 3) {
-				new TornadoProjCharged(this, pos, xDir, player, netProjId);
-				}
-				if (chargeLevel >= 2 && chargeLevel < 3 ) {
-		 		new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare),
-				pos, xDir, player, player.getNextActorNetId(), sendRpc: true);
-				}
-			}
+		if (chargeLevel < 3) {
+			new TornadoProj(this, pos, xDir, false, player, netProjId);
+		} else {
+			new TornadoProjCharged(this, pos, xDir, player, netProjId);
 		}
 	}
 }
@@ -63,11 +46,6 @@ public class TornadoProj : Projectile {
 		if (isStormE) {
 			blowModifier = 1;
 			damager.hitCooldown = 0.5f;
-		}
-		if (isStormE && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) ){
-			destroySelf();
-			
-			new StraightNightmareProj(new VileLaser(VileLaserType.StraightNightmare), pos, xDir, damager.owner, Global.level.mainPlayer.getNextActorNetId(), sendRpc: true);
 		}
 		maxTime = 2;
 		sprite.visible = false;
@@ -158,11 +136,9 @@ public class TornadoProjCharged : Projectile {
 	public float growTime = 0;
 	public float maxLengthTime = 0;
 
-	public TornadoProjCharged(Weapon weapon,
-	 Point pos, int xDir, Player player,  ushort netProjId) 
-	 : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", 0, 2f, netProjId, player.ownedByLocalPlayer) {
+	public TornadoProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", Global.defFlinch, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TornadoCharged;
-		sprite.visible = true;
+		sprite.visible = false;
 		spriteStart = Global.sprites["tornado_charge"].clone();
 		for (var i = 0; i < maxLength; i++) {
 			var midSprite = Global.sprites["tornado_charge"].clone();
@@ -221,13 +197,11 @@ public class TornadoProjCharged : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
-		if (damagable is Character chr && chr.charState is not LaunchedState) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+		/*
+		character.move(new Point(this.speed * 0.9 * this.xDir, 0));
+		if(character.isClimbingLadder()) {
+		  character.setFall();
 		}
+		*/
 	}
 }

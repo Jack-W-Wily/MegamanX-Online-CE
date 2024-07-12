@@ -23,8 +23,6 @@ public class GravityBeetle : Maverick {
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
 
-		//isHeavy = true;
-		canClimbWall = true;
 		awardWeaponId = WeaponIds.GravityWell;
 		weakWeaponId = WeaponIds.RaySplasher;
 		weakMaverickWeaponId = WeaponIds.NeonTGeneric;
@@ -46,7 +44,7 @@ public class GravityBeetle : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MJump || state is MFall || state is MRun) {
+			if (state is MIdle || state is MRun) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new GBeetleShoot(false));
 				} else if (input.isPressed(Control.Special1, player) && well == null) {
@@ -60,7 +58,7 @@ public class GravityBeetle : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 95;
+		return 80;
 	}
 
 	public override string getMaverickPrefix() {
@@ -95,7 +93,7 @@ public class GravityBeetle : Maverick {
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
 			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleStomp, player, damage: 2 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
 			}
 		}
 		return null;
@@ -135,11 +133,6 @@ public class GBeetleBallProj : Projectile {
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref hitWallCooldown);
-
-		if (owner.character != null && owner.input.isPressed(Control.Down, owner)){	
-		new GBeetleGravityWellProj(owner.weapon, pos, owner.character.xDir, 0, owner, owner.getNextActorNetId(), sendRpc: true);
-		destroySelf();
-		}
 	}
 
 	public void increaseSize() {
@@ -184,25 +177,6 @@ public class GBeetleBallProj : Projectile {
 			//hitWallCooldown += 0.1f;
 		}
 	}
-
-	
-	public override void onHitDamagable(IDamagable damagable)
-	{
-		base.onHitDamagable(damagable);
-		Actor actor = damagable.actor();
-		Character chr = actor as Character;
-		if ((chr == null || !chr.isCCImmune()) && (actor is Character || actor is RideArmor || actor is Maverick) && (chr == null || (!(chr.charState is DeadLiftGrabbed) && !(chr.charState is BeetleGrabbedState))))
-		{
-			float mag = 100f;
-			if (!actor.grounded)
-			{
-				actor.vel.y = 0f;
-			}
-			Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
-			actor.move(velVector);
-		}
-	}
-
 }
 
 public class GBeetleShoot : MaverickState {
@@ -236,7 +210,6 @@ public class GBeetleDashState : MaverickState {
 	float soundTime;
 	float dustTime;
 	float partTime;
-	public Character grabbedChar;
 	public GBeetleDashState() : base("dash", "dash_start") {
 	}
 
@@ -298,8 +271,7 @@ public class GBeetleDashState : MaverickState {
 				return;
 			}
 		}
-		maverick.changeState(new GBeetleLiftState(grabbedChar), true);
-		//maverick.changeState(new MIdle("dash_end"));
+		maverick.changeState(new MIdle("dash_end"));
 	}
 
 	public override bool trySetGrabVictim(Character grabbed) {
@@ -381,21 +353,12 @@ public class BeetleGrabbedState : GenericGrabbedState {
 
 public class GBeetleGravityWellProj : Projectile {
 	public int state;
-
 	public float drawRadius;
-
-	private const float riseSpeed = 150f;
-
+	const float riseSpeed = 150;
 	public float radiusFactor;
-
-	private float randPartTime;
-
-	public float maxRadius = 50f;
-
-	public float timer;
-
-	private float ttl = 4f;
-
+	float randPartTime;
+	public float maxRadius = 50;
+	float ttl = 4;
 	public GBeetleGravityWellProj(Weapon weapon, Point pos, int xDir, float chargeTime, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.GBeetleGravityWell;
@@ -410,86 +373,67 @@ public class GBeetleGravityWellProj : Projectile {
 		canBeLocal = false;
 	}
 
-	public override void update()
-	{
+	public override void update() {
 		base.update();
-		timer += Global.spf;
-		if (timer > 4) destroySelf();
+
 		drawRadius = radiusFactor * maxRadius;
-		if (radiusFactor > 0f)
-		{
-			base.globalCollider = new Collider(new Rect(0f, 0f, 24f + radiusFactor * maxRadius, 24f + radiusFactor * maxRadius).getPoints(), isTrigger: true, this, isClimbable: false, isStatic: false, HitboxFlag.Hitbox, Point.zero);
+		if (radiusFactor > 0) {
+			globalCollider = new Collider(new Rect(0, 0, 24 + (radiusFactor * maxRadius), 24 + (radiusFactor * maxRadius)).getPoints(), true, this, false, false, 0, Point.zero);
 		}
-		if (!ownedByLocalPlayer)
-		{
-			return;
-		}
-		if (state == 0)
-		{
-			move(new Point(0f, -150f));
-			moveDistance += 150f * Global.spf;
-			CollideData hit = checkCollision(0f, -1f);
-			if (moveDistance > 175f || (hit != null && hit.isCeilingHit()))
-			{
+
+		if (!ownedByLocalPlayer) return;
+
+		if (state == 0) {
+			move(new Point(0, -riseSpeed));
+			moveDistance += riseSpeed * Global.spf;
+			var hit = checkCollision(0, -1);
+			if (moveDistance > 175 || hit?.isCeilingHit() == true) {
 				state = 1;
-				playSound("gbeetleWell", forcePlay: false, sendRpc: true);
+				playSound("gbeetleWell", sendRpc: true);
 			}
-		}
-		else if (state == 1)
-		{
+		} else if (state == 1) {
 			radiusFactor += Global.spf * 1.5f;
-			if (radiusFactor >= 1f)
-			{
+			if (radiusFactor >= 1) {
 				state = 2;
 				maxTime = ttl;
-				time = 0f;
+				time = 0;
 			}
-		}
-		else if (state == 2)
-		{
+		} else if (state == 2) {
 			randPartTime += Global.spf;
-			if (randPartTime > 0.025f)
-			{
-				randPartTime = 0f;
-				int partSpawnAngle = Helpers.randomRange(0, 360);
+			if (randPartTime > 0.025f) {
+				randPartTime = 0;
+				var partSpawnAngle = Helpers.randomRange(0, 360);
 				float spawnRadius = maxRadius;
-				float spawnSpeed = 300f;
-				Point partSpawnPos = pos.addxy(Helpers.cosd(partSpawnAngle) * spawnRadius, Helpers.sind(partSpawnAngle) * spawnRadius);
-				Point partVel = partSpawnPos.directionToNorm(pos).times(spawnSpeed);
-				string partSprite = "gbeetle_proj_flare" + ((Helpers.randomRange(0, 1) == 0) ? "2" : "");
-				new Anim(partSpawnPos, partSprite, 1, base.owner.getNextActorNetId(), destroyOnEnd: false, sendRpc: true)
-				{
+				float spawnSpeed = 300;
+				var partSpawnPos = pos.addxy(Helpers.cosd(partSpawnAngle) * spawnRadius, Helpers.sind(partSpawnAngle) * spawnRadius);
+				var partVel = partSpawnPos.directionToNorm(pos).times(spawnSpeed);
+				var partSprite = "gbeetle_proj_flare" + (Helpers.randomRange(0, 1) == 0 ? "2" : "");
+				new Anim(partSpawnPos, partSprite, 1, owner.getNextActorNetId(), false, sendRpc: true) {
 					vel = partVel,
-					ttl = (spawnRadius - 10f) / spawnSpeed
+					ttl = ((spawnRadius - 10) / spawnSpeed),
 				};
 			}
 		}
-       
 	}
 
-	public override void onHitDamagable(IDamagable damagable)
-	{
+	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		Actor actor = damagable.actor();
+		var actor = damagable.actor();
 		Character chr = actor as Character;
-		if ((chr == null || !chr.isCCImmune()) && (actor is Character || actor is RideArmor || actor is Maverick) && (chr == null || (!(chr.charState is DeadLiftGrabbed) && !(chr.charState is BeetleGrabbedState))))
-		{
-			float mag = 100f;
-			if (!actor.grounded)
-			{
-				actor.vel.y = 0f;
-			}
-			Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
-			actor.move(velVector);
-		}
+		if (chr != null && chr.isCCImmune()) return;
+		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
+		if (chr != null && (chr.charState is DeadLiftGrabbed || chr.charState is BeetleGrabbedState)) return;
+
+		float mag = 100;
+		if (!actor.grounded) actor.vel.y = 0;
+		Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
+		actor.move(velVector, true);
 	}
 
-	public override void render(float x, float y)
-	{
+	public override void render(float x, float y) {
 		base.render(x, y);
-		if (state >= 1)
-		{
-			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, drawRadius, filled: true, Color.Black, 1f, -2999990L);
+		if (state >= 1) {
+			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, drawRadius, true, Color.Black, 1, ZIndex.Background + 10);
 		}
 	}
 
@@ -538,14 +482,9 @@ public class GBeetleGravityWellState : MaverickState {
 			}
 		} else if (state == 1) {
 			Point? shootPos = maverick.getFirstPOI();
-			if (!once && shootPos != null && !player.input.isHeld(Control.Special2, player)) {
+			if (!once && shootPos != null) {
 				once = true;
 				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, chargeTime, player, player.getNextActorNetId(), sendRpc: true);
-			}
-			if (!once && shootPos != null && player.input.isHeld(Control.Special2, player) && player.currency > 5) {
-				once = true;
-				player.currency -= 6;
-				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, 12, player, player.getNextActorNetId(), sendRpc: true);
 			}
 			if (maverick.isAnimOver()) {
 				maverick.changeToIdleOrFall();

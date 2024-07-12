@@ -55,7 +55,7 @@ public class ShotgunIceProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId,
 		(int x, int y)? velOverride = null, Character? hitChar = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 2, player, "shotgun_ice", 3, 0.01f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 400, 2, player, "shotgun_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.ShotgunIce;
 		maxTime = 0.4f;
@@ -133,6 +133,7 @@ public class ShotgunIceProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		if (ownedByLocalPlayer) onHit();
+		playSound("shotgunicehitX1", forcePlay: false, sendRpc: true);
 		base.onHitDamagable(damagable);
 	}
 
@@ -153,6 +154,11 @@ public class ShotgunIceProjCharged : Projectile {
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
+		}
+
+		isOwnerLinked = true;
+		if (player.character != null) {
+			owningActor = player.character;
 		}
 	}
 

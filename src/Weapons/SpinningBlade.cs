@@ -7,7 +7,7 @@ namespace MMXOnline;
 
 public class SpinningBlade : Weapon {
 	public SpinningBlade() : base() {
-		shootSounds = new string[] { "spinningBlade", "spinningBlade", "spinningBlade", "spinningBladeCharged" };
+		shootSounds = new string[] { "", "", "", "spinningBladeCharged" };
 		rateOfFire = 1.25f;
 		index = (int)WeaponIds.SpinningBlade;
 		weaponBarBaseIndex = 20;
@@ -17,32 +17,17 @@ public class SpinningBlade : Weapon {
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 	}
 
-private bool GBDdisk;
-
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		
-		if (player?.character is MegamanX mmx){
-			if (chargeLevel < 3) {
+		if (chargeLevel < 3) {
 			player.setNextActorNetId(netProjId);
 			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true));
 			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true));
-			} else  {
-				var csb = new SpinningBladeProjCharged(this, pos, xDir, player, netProjId);
-				if (mmx.ownedByLocalPlayer) {
+		} else if (player?.character is MegamanX mmx) {
+			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, netProjId);
+			if (mmx.ownedByLocalPlayer) {
 				mmx.chargedSpinningBlade = csb;
-				}
 			}
 		}
-		if (player?.character != null && player.isGBD){
-	
-		player.setNextActorNetId(netProjId);
-			
-		if (!player.input.isHeld(Control.Down, player))	new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true));
-		if (player.input.isHeld(Control.Down, player))new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true));
-		
-		}
-
-
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -60,7 +45,7 @@ public class SpinningBladeProj : Projectile {
 		maxTime = 2f;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
-		fadeSound = "crush";
+		fadeSound = "explosion";
 		/*try {
 			spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
 			spinSound.Volume = 50f;
@@ -83,50 +68,42 @@ public class SpinningBladeProj : Projectile {
 		}
 	}
 
-	public override void update()
-	{
+	public override void update() {
 		base.update();
-		if (!once && time > 0.1f && spinSound != null)
-		{
+		if (!once && time > 0.1f && spinSound != null) {
 			spinSound.Play();
 			once = true;
-			
 		}
-		if (spinSound != null)
-		{
+		if (spinSound != null) {
 			spinSound.Volume = getSoundVolume() * 0.5f;
+			if (spinSound.Volume < 0.1) {
+				spinSound.Stop();
+				spinSound.Dispose();
+				spinSound = null;
+			}
 		}
-		if (ownedByLocalPlayer && MathF.Abs(vel.x) < 400f)
-		{
-			vel.x -= Global.spf * 450f * (float)xDir;
+		if (MathF.Abs(vel.x) < 400) {
+			vel.x -= Global.spf * 450 * xDir;
 		}
-		if (time >= 1) damager.damage = 3;
-		if (time >= 1) damager.flinch = 4;
-		
 	}
 
-	public override void onDestroy()
-	{
+	public override void onDestroy() {
 		base.onDestroy();
 		spinSound?.Stop();
 		spinSound?.Dispose();
 		spinSound = null;
+		//int randFlipX = Helpers.randomRange(0, 1) == 0 ? -1 : 1;
 		float randFlipX = Helpers.randomRange(0.75f, 1.5f);
-		new Anim(pos, "spinningblade_piece1", xDir, null, destroyOnEnd: false)
-		{
-			useGravity = true,
-			vel = new Point((float)(-100 * xDir) * randFlipX, Helpers.randomRange(-100, -50)),
-			ttl = 2f
-		};
-		new Anim(pos, "spinningblade_piece2", xDir, null, destroyOnEnd: false)
-		{
-			useGravity = true,
-			vel = new Point((float)(100 * xDir) * randFlipX, Helpers.randomRange(-100, -50)),
-			ttl = 2f
-		};
+		new Anim(pos, "spinningblade_piece1", xDir, null, false) { useGravity = true, vel = new Point(-100 * xDir * randFlipX, Helpers.randomRange(-100, -50)), ttl = 2 };
+		new Anim(pos, "spinningblade_piece2", xDir, null, false) { useGravity = true, vel = new Point(100 * xDir * randFlipX, Helpers.randomRange(-100, -50)), ttl = 2 };
+	}
+
+	public override void onStart() {
+		base.onStart();
+		spinSound = new Sound(Global.soundBuffers["spinningblade"].soundBuffer);
+		spinSound.Volume = 50f;
 	}
 }
-  
 
 public class SpinningBladeProjCharged : Projectile {
 	public MegamanX? character;

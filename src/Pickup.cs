@@ -47,14 +47,10 @@ public class Pickup : Actor {
 				chr.addHealth(healAmount);
 				destroySelf(doRpcEvenIfNotOwned: true);
 			} else if (pickupType == PickupType.Ammo) {
-				//if (!chr.player.isZero && !chr.player.isVile && !chr.player.isSigma && 
-				//(chr.player.weapon == null || chr.player.weapon.ammo >= chr.player.weapon.maxAmmo)) return;
-				//if (chr.player.isVile && chr.player.vileAmmo >= chr.player.vileMaxAmmo) return;
-				//if (chr.isHyperSigmaBS.getValue()) return;
-
-				//if (chr.player.isSigma && chr.player.sigmaAmmo >= chr.player.sigmaMaxAmmo) return;
-				chr.addAmmo(healAmount);
-				destroySelf(doRpcEvenIfNotOwned: true);
+				if (chr.canAddAmmo()) {
+					chr.addPercentAmmo(healAmount);
+					destroySelf(doRpcEvenIfNotOwned: true);
+				}
 			}
 		} else if (other.gameObject is RideArmor rideArmor) {
 			if (!rideArmor.ownedByLocalPlayer) return;

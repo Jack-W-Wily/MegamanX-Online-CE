@@ -21,12 +21,10 @@ public class SpinWheel : Weapon {
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
-		if (player.character.ownedByLocalPlayer){
 		if (chargeLevel < 3) {
 			new SpinWheelProj(this, pos, xDir, player, netProjId);
 		} else {
 			new SpinWheelProjChargedStart(this, pos, xDir, player, netProjId);
-		}
 		}
 	}
 }
@@ -41,8 +39,8 @@ public class SpinWheelProj : Projectile {
 	const float hitCooldown = 0.2f;
 	float maxTimeProj = 2.5f;
 
-	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = true) :
-		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 1, hitCooldown, netProjId, player.ownedByLocalPlayer) {
+	public SpinWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, xDir, 0, 1, player, "spinwheel_start", 0, hitCooldown, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -53,8 +51,6 @@ public class SpinWheelProj : Projectile {
 	}
 
 	public override void update() {
-
-
 		base.update();
 		if (ownedByLocalPlayer && time >= maxTimeProj) {
 			destroySelf();

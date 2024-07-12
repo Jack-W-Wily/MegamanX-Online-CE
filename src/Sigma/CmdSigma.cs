@@ -20,17 +20,6 @@ public class CmdSigma : BaseSigma {
 	public override void update() {
 		base.update();
 
-
-		// Micr dash Tech
-		if (charState.canAttack()){
-			if (charState is Dash && (player.input.isPressed(Control.Special1, player)
-			|| player.input.isPressed(Control.Shoot, player)
-			|| player.input.isPressed(Control.WeaponLeft, player)
-			|| player.input.isPressed(Control.WeaponRight, player)
-			) ){
-			slideVel = xDir * getDashSpeed();			
-			}
-		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -75,10 +64,8 @@ public class CmdSigma : BaseSigma {
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
-		if (!player.input.isHeld("down", player) &&
-		lenientAttackPressed && saberCooldown == 0
-		 && charState is not SwordBlock) {
-			//saberCooldown = sigmaSaberMaxCooldown;
+		if (lenientAttackPressed && saberCooldown == 0) {
+			saberCooldown = sigmaSaberMaxCooldown;
 
 			if (charState is WallSlide or LadderClimb) {
 				if (charState is LadderClimb) {
@@ -96,7 +83,7 @@ public class CmdSigma : BaseSigma {
 		}
 		if (charState is Dash dashState) {
 			if (!dashState.stop && player.isSigma &&
-				player.input.isHeld(Control.Up, player) &&
+				player.input.isPressed(Control.Special1, player) &&
 				flag == null && leapSlashCooldown == 0
 			) {
 				changeState(new SigmaWallDashState(-1, true), true);

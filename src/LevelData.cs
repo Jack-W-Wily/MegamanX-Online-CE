@@ -224,9 +224,7 @@ public class LevelData {
 		} else {
 			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
-			supportedGameModesSet.Add(GameMode.Nightmare);
 			supportedGameModesSet.Add(GameMode.TeamDeathmatch);
-			
 		}
 		if (levelJson.supportsCTF == true) {
 			supportedGameModesSet.Add(GameMode.CTF);
@@ -364,7 +362,7 @@ public class LevelData {
 		return Global.levelDatas[level].customMapUrl;
 	}
 
-	public List<string> gameModeSortOrder = new List<string> { GameMode.Deathmatch, GameMode.TeamDeathmatch, GameMode.CTF, GameMode.KingOfTheHill, GameMode.ControlPoint, GameMode.Elimination, GameMode.TeamElimination, GameMode.Race, GameMode.Nightmare };
+	public List<string> gameModeSortOrder = new List<string> { GameMode.Deathmatch, GameMode.TeamDeathmatch, GameMode.CTF, GameMode.KingOfTheHill, GameMode.ControlPoint, GameMode.Elimination, GameMode.TeamElimination, GameMode.Race };
 	public int gameModeSortFunc(string a, string b) {
 		int aIndex = gameModeSortOrder.IndexOf(a);
 		int bIndex = gameModeSortOrder.IndexOf(b);
@@ -511,139 +509,112 @@ public class LevelData {
 		return name.EndsWith("_md");
 	}
 
-	public bool isRaceMap() {
-		return raceOnly;
-	}
+	// TODO: Add this info to the level format themsleves
+	public static Dictionary<string, string> stageSongs = new Dictionary<string, string>() {
+		// X1 stuff.
+		{ "airport", "stormEagle" },
+		{ "bossroom", "boss_X1" },
+		{ "factory", "flameMammoth" },
+		{ "gallery", "armoredArmadillo" },
+		{ "forest", "stingChameleon" },
+		{ "forest2", "stingChameleon" },
+		{ "highway", "centralHighway" },
+		{ "highway2", "castRoll_X1" },
+		{ "mountain", "chillPenguin" },
+		{ "ocean", "launchOctopus" },
+		{ "powerplant", "sparkMandrill" },
+		{ "sigma1", "sigmaFortress" },
+		{ "sigma2", "sigmaFortress2" },
+		{ "sigma3", "sigmaFortress3" },
+		{ "tower", "boomerangKuwanger" },
+		// X2 stuff.
+		{ "centralcomputer", "magnetCentipede" },
+		{ "crystalmine", "crystalSnail" },
+		{ "deepseabase", "bubbleCrab" },
+		{ "desertbase", "overdriveOstrich" },
+		{ "desertbase2", "overdriveOstrich" },
+		{ "dinosaurtank", "wheelGator" },
+		{ "maverickfactory", "maverickFactory" },
+		{ "robotjunkyard", "morphMoth" },
+		{ "volcaniczone", "flameStag" },
+		{ "weathercontrol", "wireSponge" },
+		{ "xhunter1", "counterHunter2" },
+		{ "xhunter2", "counterHunter1" },
+		// X3 stuff.
+		{ "aircraftcarrier", "gravityBeetle" },
+		{ "dopplerlab", "dopplerStage" },
+		{ "frozentown", "blizzardBuffalo" },
+		{ "giantdam", "toxicSeahorse" },
+		{ "giantdam2", "toxicSeahorse" },
+		{ "hunterbase", "hunterBase" },
+		{ "hunterbase2", "credits_X3" },
+		{ "powercenter", "voltCatfish" },
+		{ "quarry", "tunnelRhino" },
+		{ "safaripark", "neonTiger" },
+		{ "shipyard", "crushCrawfish" },
+		{ "weaponsfactory", "blastHornet" },
+
+		// Alt music.
+		{ "dopplerlab_1v1", "fortressBoss_X3" },
+		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
+		{ "centralcomputer_1v1", "boss_X2" },
+		{ "sigma4_1v1", "boss_X1" },
+
+		// Others.
+		{ "japetribute", "variableX" },
+		{ "nodetest", "credits_X1" },
+		{ "training", "training_vodaz" },
+	};
 
 	public string getMusicKey(List<Player> players) {
-
-		if (Global.level.gameMode is Nightmare) {
-			return "theplace";
-		}
-		// X themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isX) {
-		if (Global.level.mainPlayer.loadout.xLoadout.melee == 0){
-		if (Helpers.randomRange(0,1) == 0)	return "x5";
-		if (Helpers.randomRange(0,1) == 1)	return "x4";
-		}
-		if (Global.level.mainPlayer.loadout.xLoadout.melee == 1){
-		return "absolutezero";
-		}
-		if (Global.level.mainPlayer.loadout.xLoadout.melee == 2){
-		return "goliath";
-		}
-		}
-		//Zero Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isZero) {
-			return "awakeroadagain";
-		}
-		//Vile Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isVile) {
-		if (Helpers.randomRange(0,3) == 0)	return "mhxvava";
-		if (Helpers.randomRange(0,3) == 1)	return "DivineHate";
-		if (Helpers.randomRange(0,3) == 2)	return "EndlessDespair";
-		if (Helpers.randomRange(0,3) == 3)	return "CrisisReverted";
-		}
-		// AXL Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isAxl) {
-		 return "axlx7";
-		}
-		//Sigma Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isSigma) {
-		if (Helpers.randomRange(0,3) == 0)	return "sigmax4x5";
-		if (Helpers.randomRange(0,3) == 1)	return "sigmax8";
-		if (Helpers.randomRange(0,3) == 2)	return "sigmax6";
-		if (Helpers.randomRange(0,3) == 3)	return "sigmax4final";
-		}
-		//Dynamo Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isDynamo) {
-		if (Helpers.randomRange(0,2) == 0)	return "tastetheblood";
-		if (Helpers.randomRange(0,2) == 1)	return "dynamo";
-		if (Helpers.randomRange(0,2) == 2)	return "Monkey";
-		}
-		// GBD Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isGBD) {	
-		if (Helpers.randomRange(0,1) == 0)	return "x2opening";
-		if (Helpers.randomRange(0,1) == 1)	return "BlueWaterBlueSky";
-		}
-		// Iris Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isIris) {
-		if (Helpers.randomRange(0,1) == 0)	return "iris";
-		if (Helpers.randomRange(0,1) == 1)	return "MakenaiAiGaKittoAru";
-		}
-		// Zain Themes
-		if (!isCustomMap && !is1v1() && Global.level.mainPlayer.isZain) {
-			return "RequiemNitanchouDiesIrae";
-		
-		}
-
-
-
-		if (name == "japetribute_1v1") {
-			return "japetribute_1v1";
-		}
-		if (name == "dopplerlab_1v1") {
-			return "goliath";
-		}
-		if (name == "zerovirus_1v1") {
-			return "x_vs_zero_x5";
-		} else if (players.Count == 2 && is1v1() && ((players[0].isZero && players[1].isX) || (players[0].isX && players[1].isZero))) {
-			return "x_vs_zero_x5";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickFakeZero() || players[1].is1v1MaverickFakeZero())) {
-			return "x_vs_zero";
-		} else if (players.Count == 2 && is1v1() && (players[0].isNon1v1MaverickSigma() || players[1].isNon1v1MaverickSigma())) {
-			if (players[0].isSigma1AndSigma() || players[1].isSigma1AndSigma()) return "sigmabattle";
-			else if (players[0].isSigma2AndSigma() || players[1].isSigma2AndSigma()) return "sigmabattle2";
-			else return "sigmabattle3";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX1() || players[1].is1v1MaverickX1())) {
-			return "bossroom";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX2() || players[1].is1v1MaverickX2())) {
-			return "boss2";
-		} else if (players.Count == 2 && is1v1() && (players[0].is1v1MaverickX3() || players[1].is1v1MaverickX3())) {
-			return "boss3";
-		} else if (players.Count == 2 && name == "highway_1v1" && (players[0].isVile || players[1].isVile)) {
-			return "vile";
-		} else {
-			if (name == "centralcomputer_1v1") return "boss2";
-			if (name == "forest2" || name == "forest3") return "forest";
-			if (name == "powerplant2") return "powerplant";
-			if (name == "giantdam2") return "giantdam";
-			if (name.Contains("sigma4")) return "bossroom";
-			return Helpers.removeMapSuffix(name);
-		}
 		if (isCustomMap) {
 			return name;
 		}
-	}
-
-
-	public string getMusicKey2(List<Player> players) {
-
-		if (Helpers.randomRange(0,3) == 0) {
-			return "awakeroadagain";
+		if (stageSongs.ContainsKey(name)) {
+			return stageSongs[name];
 		}
-		if (Helpers.randomRange(0,3) == 1) {
-			return "bossroom";
+		if (stageSongs.ContainsKey(Helpers.removeMapSuffix(name))) {
+			return stageSongs[Helpers.removeMapSuffix(name)];
 		}
-		if (Helpers.randomRange(0,3) == 2) {
-			return "claudio";
-		}
-		if (Helpers.randomRange(0,3) == 3) {
-			return "vilemk2";
-		}
-		return "bossroom";
-		
+		return Helpers.removeMapSuffix(name);
 	}
 
 	public string getWinTheme() {
-		if (name.Contains("xhunter1") || name.Contains("deepseabase") || name.Contains("maverickfactory") || name.Contains("robotjunkyard") || name.Contains("volcaniczone") || name.Contains("dinosaurtank") || name.Contains("centralcomputer")
-			|| name.Contains("crystalmine") || name.Contains("desertbase") || name.Contains("weathercontrol")) {
-			return "win_x2";
+		if (name.Contains("xhunter1") ||
+			name.Contains("deepseabase") ||
+			name.Contains("maverickfactory") ||
+			name.Contains("robotjunkyard") ||
+			name.Contains("volcaniczone") ||
+			name.Contains("dinosaurtank") ||
+			name.Contains("centralcomputer") ||
+			name.Contains("crystalmine") ||
+			name.Contains("desertbase") ||
+			name.Contains("weathercontrol")
+		) {
+			return "stageClear_X2";
 		}
-		if (name.Contains("hunterbase") || name.Contains("giantdam") || name.Contains("weaponsfactory") || name.Contains("frozentown") || name.Contains("aircraftcarrier") || name.Contains("powercenter") || name.Contains("shipyard") || name.Contains("quarry") || name.Contains("safaripark") || name.Contains("dopplerlab")) {
-			return "win_x3";
+		if (name.Contains("hunterbase") ||
+			name.Contains("giantdam") ||
+			name.Contains("weaponsfactory") ||
+			name.Contains("frozentown") ||
+			name.Contains("aircraftcarrier") ||
+			name.Contains("powercenter") ||
+			name.Contains("shipyard") ||
+			name.Contains("quarry") ||
+			name.Contains("safaripark") ||
+			name.Contains("dopplerlab")
+		) {
+			return "stageClear_X3";
 		}
-		return "win";
+		if (isCustomMap) {
+			return Helpers.randomRange(0, 2) switch {
+				1 => "stageClear_X2",
+				2 => "stageClear_X3",
+				_ => "stageClear_X1"
+			};
+		}
+
+		return "stageClear_X1";
 	}
 
 	public Texture getMapThumbnail() {

@@ -9,8 +9,8 @@ public class Projectile : Actor {
 	public Player owner {
 		get { return damager.owner; }
 	}
-	public string fadeSprite;
-	public string fadeSound;
+	public string fadeSprite = "";
+	public string fadeSound = "";
 	public float time = 0;
 	public float maxTime = float.MaxValue;
 	public bool fadeOnAutoDestroy;
@@ -30,19 +30,47 @@ public class Projectile : Actor {
 	public float speed;
 	public int healAmount;
 	public bool isShield;
-	
 	public bool isReflectShield;
 	public bool isDeflectShield;
 	public bool shouldVortexSuck = true;
 	bool damagedOnce;
-	public ShaderWrapper nightmareZeroShader;
 	//public int? destroyFrames;
 	public Player ownerPlayer;
-	public Actor hitboxActor;
+	public Actor? hitboxActor;
 
 	public bool isMelee;
 	public int meleeId = -1;
-	public Actor owningActor;
+	public bool isOwnerLinked;
+	public Actor? owningActor;
+
+	const float leeway = 500;
+
+	public float wallCrawlSpeed = 250;
+	public bool wallCrawlUpdateAngle;
+
+	bool clangedOnce;
+	bool acidFadeOnce;
+	
+	public float shieldBounceTimeX = 0;
+	public float shieldBounceTimeY = 0;
+	public float shieldBounceMaxTime = 0.25f;
+	public float halfShieldBounceMaxTime => (shieldBounceMaxTime / 2f);
+	
+	// Wall crawl.
+	public struct WallPathNodeData {
+		public WallPathNode bestStartNode;
+		public Point? bestPointOnLine;
+		public float minDist;
+	}
+	int wallCrawlDir = 1;
+	WallPathNode? currentNode;
+	// Legacy wall crawl stuff.
+	bool useLegacyWallCrawl;
+	GameObject? currentWall;
+	List<Point> dests = new();
+	int? destIndex;
+	float initWallCooldown;
+	
 
 	public Projectile(
 		Weapon weapon, Point pos, int xDir, float speed, float damage,
@@ -75,61 +103,12 @@ public class Projectile : Actor {
 		}
 		this.ownerPlayer = player;
 		canBeLocal = true;
-		ishyorogaproj();
-		isGaeaproj();
 	}
 
 	public void setIndestructableProperties() {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		shouldShieldBlock = false;
-	}
-
-
-	public  void ishyorogaproj() {
-		if (ownerPlayer.character != null && ownerPlayer.character.sprite.name.Contains("hyoroga") == true) {
-			xDir = 1;
-			angle = 90;
-			incPos(new Point(0, 10));
-			vel.y = Math.Abs(vel.x);
-			vel.x = 0;
-		}
-		if (ownerPlayer.character != null && ownerPlayer.character.sprite.name.Contains("ex_bladesword") == true) {
-		
-			vel.y = -10;
-			vel.x = 10 + ownerPlayer.character.xDir;
-			maxTime = 0.20f;
-			damager.hitCooldown = 0.5f;
-			damager.flinch = 12;
-			damager.damage = 3;
-		}
-
-		if (ownerPlayer.HasFullFalcon() && ownerPlayer.character != null && ownerPlayer.character.sprite.name.Contains("giga") == true) {
-		
-			if (Helpers.randomRange(0,1) == 0){
-			xDir = 1;
-			angle = 90;
-			incPos(new Point(0, 10));
-			vel.y = 300;
-			vel.x = 0;
-			}
-			if (Helpers.randomRange(0,1) == 1){
-			xDir = -1;
-			angle = 90;
-			incPos(new Point(0, 10));
-			vel.y = -300;
-			vel.x = 0;
-			}
-		}
-	}
-		
-	
-
-
-public  void isGaeaproj() {
-		if (ownerPlayer.character != null && ownerPlayer.character.isGaeaArmorXBS.getValue()) {
-			maxTime /= 2f;
-		}
 	}
 
 	public float getSpeed() {
@@ -141,7 +120,6 @@ public  void isGaeaproj() {
 		return (int)(Helpers.to360(angle.Value) * 0.5f);
 	}
 
-	const float leeway = 500;
 	public override void update() {
 		base.update();
 
@@ -200,14 +178,8 @@ public  void isGaeaproj() {
 		*/
 	}
 
-	public override List<ShaderWrapper> getShaders() {
+	public override List<ShaderWrapper>? getShaders() {
 		var shaders = new List<ShaderWrapper>();
-		if (owner?.character?.isNightmareZeroBS.getValue() == true && Global.shaders.ContainsKey("nightmareZero")) {
-			if (nightmareZeroShader == null) {
-				nightmareZeroShader = ownerPlayer.nightmareZeroShader;
-			}
-			shaders.Add(nightmareZeroShader);
-		}
 		if (shaders.Count > 0) {
 			return shaders;
 		} else {
@@ -364,10 +336,9 @@ public  void isGaeaproj() {
 	public static bool charsCanClang(Character attacker, Character defender) {
 		if (attacker == null || defender == null) return false;
 		if (attacker.player.alliance == defender.player.alliance) return false;
-		if (!defender.sprite.name.Contains("attack") 
-		&& !defender.sprite.name.Contains("block")) return false;
+		if (!defender.sprite.name.Contains("attack") && !defender.sprite.name.Contains("block")) return false;
 		if (defender.sprite.name.Contains("sigma2")) return false;
-		if ((attacker as Zero)?.isHyperZero() == true) return false;
+		if ((attacker as Zero)?.hypermodeActive() == true) return false;
 
 		// Not facing each other
 		if (attacker.pos.x >= defender.pos.x && (attacker.xDir != -1 || defender.xDir != 1)) return false;
@@ -384,7 +355,6 @@ public  void isGaeaproj() {
 		return (this is GenericMeleeProj || this is SigmaSlashProj);
 	}
 
-	bool clangedOnce;
 	public override void onCollision(CollideData other) {
 		if (weapon == null) return;
 		//if (destroyed) return;    // If this causes issues use the destroyFrames system instead
@@ -402,9 +372,8 @@ public  void isGaeaproj() {
 		}
 
 		var gmp = this as GenericMeleeProj;
-		var isSaber = gmp != null && (weapon is ZSaber
-		|| weapon is RakukojinWeapon || weapon is XUPPunch || weapon is RisingWeapon);
-		if (isSaber && owner.character?.isCCImmune() != true && gmp != null) {
+		var isSaber = gmp != null && gmp.isZSaber();
+		if (isSaber && owner.character?.isCCImmune() != true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && otherProj != null && otherProj.owner.alliance != owner.alliance) {
 				if ((otherProj.canClangChar() && charsCanClang(owner.character, otherProj.owner.character)) || otherProj.isShield) {
@@ -412,7 +381,7 @@ public  void isGaeaproj() {
 					else return;
 
 					owner.character.changeState(new ZeroClang(-owner.character.xDir), true);
-					owner.character.playSound("ding", sendRpc: true);
+					owner.character.playSound("m10ding", sendRpc: true);
 
 					if (other.hitData.hitPoint != null) {
 						new Anim(other.hitData.hitPoint.Value, "zsaber_shot_fade", 1, owner.getNextActorNetId(), true, sendRpc: true);
@@ -486,7 +455,7 @@ public  void isGaeaproj() {
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
 					reflect(otherProj.owner, sendRpc: true);
-					playSound("ding", sendRpc: true);
+					playSound("m10ding", sendRpc: true);
 				}
 			}
 
@@ -494,8 +463,8 @@ public  void isGaeaproj() {
 				damager.owner.alliance != otherProj.damager.owner.alliance
 			) {
 				if (deltaPos.x != 0 && Math.Sign(deltaPos.x) != otherProj.xDir) {
-					deflect(otherProj.owner,sendRpc: true);
-					playSound("ding", sendRpc: true);
+					deflect(otherProj.owner, sendRpc: true);
+					playSound("sigmaSaberBlock", forcePlay: false, sendRpc: true);
 				}
 			}
 
@@ -507,7 +476,7 @@ public  void isGaeaproj() {
 					bool isDestroyable = otherProj is IDamagable;
 					if (shouldShieldBlock && !isDestroyable) {
 						destroySelf(fadeSprite, fadeSound);
-						playSound("ding", sendRpc: true);
+						playSound("m10ding", sendRpc: true);
 						return;
 					}
 				}
@@ -572,10 +541,8 @@ public  void isGaeaproj() {
 					weakness = true;
 				}
 
-				if (owner.character is Axl axl && 
-				owner.ownedByLocalPlayer && projId == (int)ProjIds.CopyShot && character != null) {
+				if (owner.ownedByLocalPlayer && projId == (int)ProjIds.CopyShot && character != null) {
 					owner.copyShotDamageEvents.Add(new CopyShotDamageEvent(character));
-					axl.addDNACore(character);
 				}
 
 				if (shouldDealDamage(damagable)) {
@@ -632,18 +599,6 @@ public  void isGaeaproj() {
 			damagedOnce = true;
 			destroySelf(fadeSprite, fadeSound, favorDefenderProjDestroy: isDefenderFavoredAndOwner());
 		}
-
-	
-		if (owner.isAxl && !owner.character.sprite.name.Contains("block")){
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 0 * modifier, -300));
-		}
-		}
-	
 	}
 
 	// Can be used in lieu of the on<PROJ>Damage() method in damager method with caveat that this causes issues where the actor isn't created yet leading to point blank shots under lag not running this
@@ -734,7 +689,6 @@ public  void isGaeaproj() {
 		rpcCreateHelper(pos, player, netProjId, byteAngle, true, extraData);
 	}
 
-	bool acidFadeOnce;
 	public void acidFadeEffect() {
 		if (!acidFadeOnce) acidFadeOnce = true;
 		else return;
@@ -782,11 +736,6 @@ public  void isGaeaproj() {
 		}
 	}
 
-	public float shieldBounceTimeX = 0;
-	public float shieldBounceTimeY = 0;
-	public float shieldBounceMaxTime = 0.25f;
-	public float halfShieldBounceMaxTime { get { return shieldBounceMaxTime / 2f; } }
-
 	public void updateBubbleBounce() {
 		if (shieldBounceTimeY > 0) {
 			shieldBounceTimeY += Global.spf;
@@ -831,12 +780,6 @@ public  void isGaeaproj() {
 		}
 	}
 
-	public float wallCrawlSpeed = 250;
-	public bool wallCrawlUpdateAngle;
-
-	int wallCrawlDir = 1;
-	WallPathNode currentNode;
-	bool useLegacyWallCrawl;
 
 	public void setupWallCrawl(Point initialMoveDir) {
 		useLegacyWallCrawl = Global.level.levelData.wallPathNodes.Count == 0;
@@ -855,12 +798,6 @@ public  void isGaeaproj() {
 		} else {
 			updateModernWallCrawl();
 		}
-	}
-
-	public struct WallPathNodeData {
-		public WallPathNode bestStartNode;
-		public Point? bestPointOnLine;
-		public float minDist;
 	}
 
 	public WallPathNodeData getBestWallPath(List<WallPathNode> wallPaths) {
@@ -939,10 +876,6 @@ public  void isGaeaproj() {
 	}
 
 	#region legacy wall crawl code, still needed for maps without wall paths
-	GameObject currentWall;
-	List<Point> dests;
-	int? destIndex;
-	float initWallCooldown;
 
 	public void setupLegacyWallCrawl() {
 		var wallCollideDatas = Global.level.getTriggerList(this, 0, 0, null, typeof(Wall));
