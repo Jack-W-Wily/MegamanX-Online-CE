@@ -177,6 +177,27 @@ public partial class Character : Actor, IDamagable {
 	// Ctrl data
 	public int altCtrlsLength = 1;
 
+	// WCUT Control Stuff
+	public bool CanOnhitCancel;
+	public float inputdecreasedCD;
+	public int DOWNpressedtimes = 0;
+	public int UPpressedtimes = 0;
+	public int LEFTpressedtimes = 0;
+	public int RIGHTpressedtimes = 0;
+	public float noBlockTime = 0;
+	public float xSaberCooldown;
+	public float useGrabCooldown;
+	public float grabtimeout;
+	public float stockedChargeFlashTime;
+	public float BurstCooldown;
+	public float JumpCancelTime;
+	public float parryCooldown;
+
+	// WCUT Kills Stuff
+	
+	public float KillingSpree = 0;
+
+
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -239,6 +260,10 @@ public partial class Character : Actor, IDamagable {
 	public override void onStart() {
 		base.onStart();
 	}
+
+
+
+	
 
 	public void addVaccineTime(float time) {
 		if (!ownedByLocalPlayer) return;
@@ -832,6 +857,63 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void update() {
+
+
+
+		//Burst System (WCUT)
+		Helpers.decrementTime(ref BurstCooldown);
+		if (player.input.isPressed(Control.WeaponLeft, player) &&
+			player.input.isPressed(Control.WeaponRight, player) &&
+			BurstCooldown == 0 && player.currency > 1 &&
+				(sprite.name.Contains("grabbed") || 
+				sprite.name.Contains("hurt") || 
+				sprite.name.Contains("lose") || 
+				sprite.name.Contains("frozen") ||
+				sprite.name.Contains("freeze") || 
+				sprite.name.Contains("stunned") ||  
+				sprite.name.Contains("knocked")
+				)
+			){
+		playSound("gigaCrushLate", forcePlay: false, sendRpc: true);
+		player.currency -= 2;
+		BurstCooldown = 10;
+		invulnTime = 2;
+		changeToIdleOrFall(); 
+		new MechFrogStompShockwave(new MechFrogStompWeapon(player), pos.addxy(-10 * xDir, 0f), xDir, player, player.getNextActorNetId(), rpc: true);
+			}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// New Presing system (WCUT)
+		Helpers.decrementTime(ref inputdecreasedCD);
+				if (player.input.isPressed(Control.Up, player)){
+				UPpressedtimes += 1;
+				inputdecreasedCD = 0.5f;}
+				if (player.input.isPressed(Control.Down, player)){
+				DOWNpressedtimes += 1;
+				inputdecreasedCD = 0.5f;}
+				if (player.input.isPressed(Control.Left, player)){
+				LEFTpressedtimes += 1;
+				inputdecreasedCD = 0.5f;}
+				if (player.input.isPressed(Control.Right, player)){
+				RIGHTpressedtimes += 1;
+				inputdecreasedCD = 0.5f;}
+
+		if (inputdecreasedCD == 0){
+		DOWNpressedtimes = 0;
+		LEFTpressedtimes = 0;
+		UPpressedtimes = 0;
+		RIGHTpressedtimes = 0;
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>
+		// Generalized Cooldown (WCUT)
+			Helpers.decrementTime(ref noBlockTime);
+			Helpers.decrementTime(ref useGrabCooldown);
+			Helpers.decrementTime(ref grabtimeout);
+			Helpers.decrementTime(ref xSaberCooldown);
+			Helpers.decrementTime(ref parryCooldown);
+			Helpers.decrementTime(ref JumpCancelTime);
+			Helpers.decrementTime(ref noBlockTime);
+		//>>>>>>>>>>>>>>>>>>>
+
 		if (charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}

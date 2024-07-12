@@ -170,6 +170,12 @@ public class DynamoBoomerangProj : Projectile {
 	}
 }
 
+
+
+
+
+
+
 public class DynamoBoomerangState : CharState {
 	bool shot = false;
 	DynamoBoomerangProj proj;
@@ -1337,10 +1343,7 @@ public class DynamoShoot : CharState {
 
 		if (character.frameIndex >= 0 && !fired) {
 			fired = true;
-			character.playSound("buster3", sendRpc: true);
-			new ZBuster2Proj(
-					new ZeroBuster(), character.getShootPos(), character.xDir, 0, player, player.getNextActorNetId(), rpc: true
-				);
+
 		}
 
 		if (character.isAnimOver()) {

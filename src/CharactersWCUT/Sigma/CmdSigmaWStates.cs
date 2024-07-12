@@ -87,7 +87,7 @@ public class SigmaSlashProjW : Projectile {
 
 public class SigmaBallWeaponW : Weapon {
 	public SigmaBallWeaponW() : base() {
-		index = (int)WeaponIds.SigmaBallW;
+		index = (int)WeaponIds.SigmaBall;
 		killFeedIndex = 103;
 	}
 }
@@ -100,7 +100,7 @@ public class SigmaBallProjW : Projectile {
 		weapon, pos, xDir, 400, 1, player, "sigma_proj_ball",
 		3, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.SigmaBallW;
+		projId = (int)ProjIds.SigmaBall;
 		maxTime = 0.5f;
 		destroyOnHit = true;
 		if (vel != null) {
@@ -115,7 +115,7 @@ public class SigmaBallProjW : Projectile {
 
 public class SigmaBallShootW : CharState {
 	bool shot;
-	public CmdSigma sigma;
+	public CmdSigmaW sigma;
 
 	public SigmaBallShootW(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
 	}
@@ -193,7 +193,7 @@ public class SigmaWallDashStateW : CharState {
 	int yDir;
 	Point vel;
 	bool fromGround;
-	public CmdSigma sigma;
+	public CmdSigmaW sigma;
 
 	public SigmaWallDashStateW(int yDir, bool fromGround) : base("wall_dash", "", "", "") {
 		this.yDir = yDir;

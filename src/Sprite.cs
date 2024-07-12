@@ -282,7 +282,8 @@ public class Sprite {
 		bool isUltX = false;
 		Character character = actor as Character;
 		if (character != null) {
-			if (character.isInvisibleBS.getValue() && !Global.shaderWrappers.ContainsKey("invisible")) {
+			if (character.isInvisible()//isInvisibleBS.getValue()
+			 && !Global.shaderWrappers.ContainsKey("invisible")) {
 				alpha = 0.25f;
 			}
 			if (character.player.isX) {
@@ -294,8 +295,9 @@ public class Sprite {
 			if (character.player.isAxl && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
-			isUPX = character.player.isX && (character.isHyperXBS.getValue() || (character.sprite.name == "mmx_revive" && character.frameIndex > 3));
-			isUltX = character.player.isX && character.hasUltimateArmorBS.getValue();
+			isUPX = character.player.isX && ((character as MegamanX).isHyperX //isHyperXBS.getValue()
+			 || (character.sprite.name == "mmx_revive" && character.frameIndex > 3));
+			isUltX = character.player.isX && character.player.hasUltimateArmor();//hasUltimateArmorBS.getValue();
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;

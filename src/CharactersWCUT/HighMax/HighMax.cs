@@ -175,25 +175,25 @@ public class HighMax : Character {
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
-			return new GenericMeleeProj(
-				new RisingWeapon(player), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
-			);
+	//		return new GenericMeleeProj(
+	//			new RisingWeapon(player), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
+	//		);
 		}
 		 if (  sprite.name.Contains("idle_punch"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
 		}
 		 if (  sprite.name.Contains("land"))
 		{
-			return new GenericMeleeProj(new RakukojinWeapon(player), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 2f);
+	//		return new GenericMeleeProj(new RakukojinWeapon(player), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 2f);
 		}
 		 if (  sprite.name.Contains("crouch_punch"))
 		{
-			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0);
+	//		return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0);
 		}
 		 if ( sprite.name.Contains("dash_punch"))
 		{
-			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.HoutenjinF, player, 5f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
+	//		return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.HoutenjinF, player, 5f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		return proj;
 	}

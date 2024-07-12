@@ -74,12 +74,12 @@ public override bool normalCtrl() {
 		if (charState.canAttack()  &&
 		 player.input.isPressed("shoot", player))
 		{	
-       		changeState(new ZSaberProjSwingState(grounded, shootProj: false), forceChange: true);
+       	//	changeState(new ZSaberProjSwingState(grounded, shootProj: false), forceChange: true);
 		}
 		if (charState.canAttack()  && grounded && ZainCounters > 3 &&
 		 player.input.isPressed(Control.Special2, player))
 		{	
-			changeState(new ZSaberProjSwingState(grounded, shootProj: true), forceChange: true);
+		//	changeState(new ZSaberProjSwingState(grounded, shootProj: true), forceChange: true);
 			ZainCounters -= 4;
 			CounterTimer = 4;
        }

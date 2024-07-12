@@ -63,11 +63,11 @@ public class Dynamo : Character {
 
 
 		// Dark Hold Activation Dynamo
-		if (downpressedtimes >= 2 && player.input.isPressed(Control.Taunt, player)) 
+		if (DOWNpressedtimes >= 2 && player.input.isPressed(Control.Taunt, player)) 
 				if (player.currency > 2) {
 					player.currency -= 3;
 					int darkholdcd = 2;
-					changeState(new DarkHoldS(new DarkHoldWeapon()), true);					
+				//	changeState(new DarkHoldS(new DarkHoldWeapon()), true);					
 		}
 	
 		if (charState is Dash || charState is AirDash) {
@@ -116,7 +116,7 @@ public class Dynamo : Character {
 		if (xSaberCooldown == 0f && !grounded && charState.canAttack() && player.input.isHeld("shoot", player))
 					{
 				xSaberCooldown = 1f;
-			changeState(new ZSaberProjSwingState(grounded, shootProj: false), forceChange: true);
+		//	changeState(new DynamoSwingState(grounded, shootProj: false), forceChange: true);
 					}
 		}
 		// Dynamo STance 2
@@ -130,7 +130,7 @@ public class Dynamo : Character {
 		if (DynamoSlashCD == 0f && !grounded && charState.canAttack() && player.input.isHeld("shoot", player))
 				{
 		DynamoSlashCD = 1f;
-		changeState(new ZSaberProjSwingState(grounded, shootProj: false), forceChange: true);
+		//changeState(new DynamoSwingState(grounded, shootProj: false), forceChange: true);
 				}
 		if (DynamoBoomerangCD == 0 && 
 		charState.canAttack() && player.input.isPressed("special1", player))
@@ -205,19 +205,19 @@ public class Dynamo : Character {
 		}
 		 if ( sprite.name.Contains("_projswing") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
+	//		return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 15, 0.9f, null, isShield: false, isDeflectShield: true);
 		}
 		 if ( sprite.name.Contains("_string") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.Rising, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
+	//		return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.Rising, player, 2f, 15, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		 if ( sprite.name.Contains("_nova_strike") && !collider.isHurtBox())
 		{
-			return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.HoutenjinF, player, 2f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
+	//		return new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.HoutenjinF, player, 2f, 0, 0.15f, null, isShield: true, isDeflectShield: true);
 		}
 		if ( sprite.name.Contains("chargegp"))
 		{
-			return new GenericMeleeProj(new HoutenjinWeaponF(player), centerPoint, ProjIds.HoutenjinF, player, 1f, 0, 3f, null, isShield: true, isDeflectShield: true);
+	//		return new GenericMeleeProj(new HoutenjinWeaponF(player), centerPoint, ProjIds.HoutenjinF, player, 1f, 0, 3f, null, isShield: true, isDeflectShield: true);
 		}
 		return null;
 	}

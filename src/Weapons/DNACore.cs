@@ -46,9 +46,9 @@ public class DNACore : AxlWeapon {
 		name = character.player.name;
 		alliance = character.player.alliance;
 		armorFlag = character.player.armorFlag;
-		frozenCastle = character.isFrozenCastleActiveBS.getValue();
-		speedDevil = character.isSpeedDevilActiveBS.getValue();
-		ultimateArmor = character.hasUltimateArmorBS.getValue();
+		frozenCastle = character.player.frozenCastle;//isFrozenCastleActiveBS.getValue();
+		speedDevil = character.player.speedDevil;//isSpeedDevilActiveBS.getValue();
+		ultimateArmor = character.player.hasUltimateArmor();//hasUltimateArmorBS.getValue();
 		if (charNum == 0) weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
 		if (charNum == 1 && character is Zero zero) {
 			rakuhouhaAmmo = zero.gigaAttack.ammo;
