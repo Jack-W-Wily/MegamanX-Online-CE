@@ -87,7 +87,7 @@ public override bool normalCtrl() {
 		 player.input.isPressed("special1", player))
 					{
 			xSaberCooldown = 1f;     
-			changeState(new KKnuckleParryStartState(), true);
+		//	changeState(new KKnuckleParryStartState(), true);
 		}
 		
 		
@@ -107,23 +107,23 @@ public override bool normalCtrl() {
 		
 		if (  sprite.name.Contains("rising"))
 		{
-			return new GenericMeleeProj(new HoutenjinWeapon(player), centerPoint, ProjIds.BlockableLaunch, player, 2f, 0, 1f, null, isShield: true, isDeflectShield: true);
+	//		return new GenericMeleeProj(new HoutenjinWeapon(player), centerPoint, ProjIds.BlockableLaunch, player, 2f, 0, 1f, null, isShield: true, isDeflectShield: true);
 		}
 		if (  sprite.name.Contains("spinslash"))
 		{
-			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2f, 10, 0.5f);
+	//		return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2f, 10, 0.5f);
 		}
 		if (  sprite.name.Contains("projswing"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 5f, 30, 0.15f);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 5f, 30, 0.15f);
 		}
 		if (  sprite.name.Contains("parry"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.MechFrogStompShockwave, player, 5f, 30, 0.15f);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.MechFrogStompShockwave, player, 5f, 30, 0.15f);
 		}
 		if (  sprite.name.Contains("thrust"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.Raijingeki, player, 2f, 0, 0.15f);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.Raijingeki, player, 2f, 0, 0.15f);
 		}
 		return null;
 	}

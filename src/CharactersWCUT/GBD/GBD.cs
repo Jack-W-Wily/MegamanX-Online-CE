@@ -46,11 +46,11 @@ public override bool normalCtrl() {
 				);
 		}
 		//KillingSpreeThemes
-		if (KillingSpree == 5){
-				if (musicSource == null) {
-					addMusicSource("boss2", getCenterPos(), true);
-				}
-		} 
+	//	if (KillingSpree == 5){
+	//			if (musicSource == null) {
+	//				addMusicSource("boss2", getCenterPos(), true);
+	//			}
+	//	} 
 
 
 		if (charState.canAttack() && shiningSparkStacks > 10){
@@ -148,7 +148,7 @@ public override bool normalCtrl() {
 			}
 			
 		}
-		if (charState.canAttack() && xSaberCooldown == 0f &&
+		if (charState.canAttack() && 
 		 player.input.isPressed("special1", player))
 					{
 				xSaberCooldown = 1f;
@@ -194,39 +194,39 @@ public override bool normalCtrl() {
 		}
 			else if (sprite.name.Contains("dash") && (isOnBike || shiningSparkStacks > 10 ))
 		{
-			return  new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 8, 0.5f, null, isShield: false, isDeflectShield: true);;
+	//		return  new GenericMeleeProj(player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSwordBlock, player, 2f, 8, 0.5f, null, isShield: false, isDeflectShield: true);;
 		}
 		else if (sprite.name.Contains("jump") && player.input.isPressed("jump", player))
 		{
-			return new GenericMeleeProj(new GBDKick(), centerPoint, ProjIds.GBDKick, player, 0f, 0, 0f);
+	//		return new GenericMeleeProj(new GBDKick(), centerPoint, ProjIds.GBDKick, player, 0f, 0, 0f);
 		}
 		else if (!isOnBike &&  sprite.name.Contains("fall") && player.input.isPressed("jump", player))
 		{
-			return new GenericMeleeProj(new GBDKick(), centerPoint, ProjIds.GBDKick, player, 0f, 0, 0f);
+	//		return new GenericMeleeProj(new GBDKick(), centerPoint, ProjIds.GBDKick, player, 0f, 0, 0f);
 		}
 		else if (  sprite.name.Contains("wall_kick") && shiningSparkStacks < 20)
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 2f, 12);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 2f, 12);
 		}
 		else if (  sprite.name.Contains("wall_kick") && shiningSparkStacks >= 20)
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 3f, 30);
 		}
 		if (  sprite.name.Contains("spear_1"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 2f, 30);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 2f, 30);
 		}
 		if (  sprite.name.Contains("spear_up"))
 		{
-			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2f, 30);
+	//		return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2f, 30);
 		}
 		if (  sprite.name.Contains("spear_rising"))
 		{
-			return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2f, 30);
+	//		return new GenericMeleeProj(new RisingWeapon(player), centerPoint, ProjIds.Rising, player, 2f, 30);
 		}
 		if (  sprite.name.Contains("spear_spin"))
 		{
-			return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 1f, 10, 0.15f);
+	//		return new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, 1f, 10, 0.15f);
 		}
 		return null;
 	}
