@@ -707,6 +707,8 @@ public class GameMode {
 				drawWeaponSwitchHUD(drawPlayer);
 			} else if (drawPlayer.weapons.Count == 1 && drawPlayer.weapons[0] is MechMenuWeapon mmw) {
 				drawWeaponSwitchHUD(drawPlayer);
+			} else if (drawPlayer.character is Vile vileR && vileR.rideMenuWeapon.isMenuOpened) {
+				drawRideArmorIcons();
 			}
 		}
 
@@ -1480,11 +1482,7 @@ public class GameMode {
 				}
 				if (i < floorOrCeiling) {
 					int spriteIndex = weapon.weaponBarIndex;
-					if ((weapon is RakuhouhaWeapon && weapon.ammo < 16) ||
-						(weapon is RekkohaWeapon && weapon.ammo < 32) ||
-						(weapon is CFlasher && weapon.ammo < 8) ||
-						(weapon is ShinMessenkou && weapon.ammo < 16) ||
-						(weapon is DarkHoldWeapon && weapon.ammo < 16) ||
+					if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
 						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
 						(weapon is NovaStrike && !weapon.canShoot(0, player)) ||
 						(weapon is HyperBuster hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
@@ -1736,20 +1734,20 @@ public class GameMode {
 			drawRideArmorIcons();
 		}
 
-		if (player.isVile && player.character != null &&
-			player.character.rideArmor != null &&
-			player.character.rideArmor == player.character.startRideArmor
-			&& player.character.rideArmor.raNum == 2
+		if (player.character is Vile vilePilot &&
+			vilePilot.rideArmor != null &&
+			vilePilot.rideArmor == vilePilot.startRideArmor
+			&& vilePilot.rideArmor.raNum == 2
 		) {
 			int x = 10, y = 155;
 			int napalmNum = player.loadout.vileLoadout.napalm;
 			if (napalmNum < 0) napalmNum = 0;
 			if (napalmNum > 2) napalmNum = 0;
 			Global.sprites["hud_hawk_bombs"].drawToHUD(
-				napalmNum, x, y, alpha: player.vileNapalmWeapon.shootTime == 0 ? 1 : 0.5f
+				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootTime == 0 ? 1 : 0.5f
 			);
 			Fonts.drawText(
-				FontType.Grey, "x" + player.character.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
+				FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
 			);
 		}
 
@@ -2355,9 +2353,13 @@ public class GameMode {
 	public void drawRideArmorIcons() {
 		int raIndex = mainPlayer.weapons.FindIndex(w => w is MechMenuWeapon);
 
+
 		float startX = 168;
 		if (raIndex == 0) startX = 148;
 		if (raIndex == 1) startX = 158;
+		if (raIndex == -1) {
+			startX = 11;
+		}
 
 		float startY = Global.screenH - 12;
 		float height = 15;
@@ -2874,13 +2876,11 @@ public class GameMode {
 					FontType.BlueMenu, respawnStr,
 					Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
 				);
-				string hyperType = "Wolf";
-				if (level.mainPlayer.isSigma2()) hyperType = "Viral";
-				if (level.mainPlayer.isSigma3()) hyperType = "Kaiser";
-				string reviveText = Helpers.controlText(
-					$"[D]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins}"
+				string hyperType = "Kaiser";
+				string reviveText = (
+					$"[CMD]: Revive as {hyperType} Sigma ({Player.reviveSigmaCost.ToString()} {Global.nameCoins})"
 				);
-				Fonts.drawText(
+				Fonts.drawTextEX(
 					FontType.Green, reviveText,
 					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);
@@ -2915,7 +2915,7 @@ public class GameMode {
 		if (level.mainPlayer != null && playerWon(level.mainPlayer)) {
 			Global.changeMusic(Global.level.levelData.getWinTheme());
 		} else if (level.mainPlayer != null && !playerWon(level.mainPlayer)) {
-			Global.changeMusic("lose");
+			Global.changeMusic(Global.level.levelData.getLooseTheme());
 		}
 		if (Menu.inMenu) {
 			Menu.exit();

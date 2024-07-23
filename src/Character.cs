@@ -94,7 +94,7 @@ public partial class Character : Actor, IDamagable {
 	public float limboRACheckCooldown;
 	public RideArmor? rideArmor;
 	public RideChaser? rideChaser;
-	public Player? lastGravityWellDamager;
+	public Player lastGravityWellDamager;
 
 	// Some things previously in other char files used by multiple characters.
 	public int lastShootPressed;
@@ -149,7 +149,7 @@ public partial class Character : Actor, IDamagable {
 	public float oilTime;
 	// Burn
 	public Damager? burnDamager;
-	public Weapon? burnWeapon;
+	public Weapon burnWeapon = FireWave.netWeapon;
 	public float burnTime;
 	public float burnEffectTime;
 	public float burnHurtCooldown;
@@ -211,7 +211,11 @@ public partial class Character : Actor, IDamagable {
 
 		isDashing = false;
 		splashable = true;
+		// Intialize state as soon as posible.
+		charState = new NetLimbo();
+		charState.character = this;
 
+		// Starting state.
 		CharState initialCharState;
 
 		if (ownedByLocalPlayer) {
@@ -255,6 +259,7 @@ public partial class Character : Actor, IDamagable {
 		Global.level.addGameObject(this);
 
 		chargeEffect = new ChargeEffect();
+		lastGravityWellDamager = player;
 	}
 
 	public override void onStart() {
@@ -317,10 +322,10 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Reset timer if it's 0.
 		if (acidTime == 0) {
-			acidHurtCooldown = 1;
+			acidHurtCooldown = 0;
 		}
 		// Apply time if we do not go over 8.
-		if (acidTime + time >= 8) {
+		if (acidTime + time <= 8) {
 			acidTime += time;
 		}
 	}
@@ -371,10 +376,10 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Reset timer if it's 0.
 		if (burnTime == 0) {
-			burnHurtCooldown = 1;
+			burnHurtCooldown = 0;
 		}
 		// Apply time if we do not go over 8.
-		if (burnTime + time >= 8) {
+		if (burnTime + time <= 8) {
 			burnTime += time;
 		}
 		// Oil explosion.
@@ -387,7 +392,7 @@ public partial class Character : Actor, IDamagable {
 			// Apply burn damage instantly.
 			burnTime += oilTime;
 			oilTime = 0;
-			burnHurtCooldown = 1;
+			burnHurtCooldown = 0;
 			// Double check again in case oil increased over 8.
 			if (burnTime >= 8) {
 				burnTime = 8;
@@ -632,16 +637,13 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public bool canPickupFlag() {
+	public virtual bool canPickupFlag() {
 		if (player.isPossessed()) return false;
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
 		if (player.isDisguisedAxl) return false;
 		if (isCCImmuneHyperMode()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
-		if (charState is WolfSigmaRevive || charState is WolfSigmaHeadState || sprite.name.StartsWith("sigma_head")) return false;
-		if (charState is ViralSigmaRevive || charState is ViralSigmaIdle || sprite.name.StartsWith("sigma2_viral")) return false;
-		if (charState is KaiserSigmaRevive || Helpers.isOfClass(charState, typeof(KaiserSigmaBaseState)) || sprite.name.StartsWith("sigma3_kaiser")) return false;
 		if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
 		return true;
@@ -747,7 +749,7 @@ public partial class Character : Actor, IDamagable {
 		);
 	}
 
-	public override Collider getGlobalCollider() {
+	public override Collider? getGlobalCollider() {
 		var rect = new Rect(0, 0, 18, 34);
 		if (sprite.name.Contains("_ra_")) {
 			rect.y2 = 20;
@@ -1011,9 +1013,12 @@ public partial class Character : Actor, IDamagable {
 
 		if (acidTime > 0) {
 			acidTime -= Global.spf;
-			acidHurtCooldown += Global.spf;
-			if (acidHurtCooldown > 1) {
-				acidHurtCooldown = 0;
+			acidHurtCooldown += Global.speedMul;
+			if (acidHurtCooldown >= 60) {
+				acidHurtCooldown -= 60;
+				if (acidHurtCooldown <= 0) {
+					acidHurtCooldown = 0;
+				}
 				acidDamager?.applyDamage(
 					this, player.weapon is TunnelFang,
 					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
@@ -1035,11 +1040,10 @@ public partial class Character : Actor, IDamagable {
 
 		if (burnTime > 0) {
 			burnTime -= Global.spf;
-			burnHurtCooldown += Global.spf;
-			burnEffectTime += Global.spf;
-			if (burnEffectTime > 0.1f) {
+			burnHurtCooldown += Global.speedMul;
+			burnEffectTime += Global.speedMul;
+			if (burnEffectTime >= 6) {
 				burnEffectTime = 0;
-
 				Point burnPos = pos.addxy(0, -10);
 				bool hiding = false;
 				if (charState is InRideArmor inRideArmor) {
@@ -1048,7 +1052,6 @@ public partial class Character : Actor, IDamagable {
 						hiding = true;
 					}
 				}
-
 				var f1 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
 				if (hiding) f1.setzIndex(zIndex - 100);
 
@@ -1065,8 +1068,11 @@ public partial class Character : Actor, IDamagable {
 					if (hiding) f4.setzIndex(zIndex - 100);
 				}
 			}
-			if (burnHurtCooldown > 1) {
-				burnHurtCooldown = 0;
+			if (burnHurtCooldown >= 60) {
+				burnHurtCooldown -= 60;
+				if (burnHurtCooldown <= 0) {
+					burnHurtCooldown = 0;
+				}
 				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f);
 			}
 			if (isUnderwater() || charState.invincible || isCCImmune()) {
@@ -1169,12 +1175,6 @@ public partial class Character : Actor, IDamagable {
 
 			return;
 		}
-
-		if (player.isVile && !player.isAI && !player.isDisguisedAxl && player.getVileWeightActive() > VileLoadout.maxWeight && charState is not WarpIn && charState is not Die) {
-			applyDamage(Damager.envKillDamage, player, this, null, null);
-			return;
-		}
-
 		updateParasite();
 
 		if (stingChargeTime > 0) {
@@ -1458,11 +1458,15 @@ public partial class Character : Actor, IDamagable {
 				// UNTIL you start falling OR you move away and jump into it
 				int dpadXDir = player.input.getXDir(player);
 
-				if (dpadXDir == -1 && velYRequirementMet && charState.lastLeftWall != null) {
+				if (dpadXDir == -1 && velYRequirementMet && charState.lastLeftWall != null
+					&& charState.lastLeftWallCollider != null
+				) {
 					changeState(new WallSlide(-1, charState.lastLeftWallCollider));
 					return true;
 				}
-				if (dpadXDir == 1 && velYRequirementMet && charState.lastRightWall != null) {
+				if (dpadXDir == 1 && velYRequirementMet && charState.lastRightWall != null
+					&& charState.lastRightWallCollider != null
+				) {
 					changeState(new WallSlide(1, charState.lastRightWallCollider));
 					return true;
 				}
@@ -1556,10 +1560,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void changeSprite(string spriteName, bool resetFrame) {
-		if (!isHeadbuttSprite(sprite?.name) && isHeadbuttSprite(spriteName)) {
+		if (!isHeadbuttSprite(sprite.name) && isHeadbuttSprite(spriteName)) {
 			headbuttAirTime = Global.spf;
 		}
-		if (isHeadbuttSprite(sprite?.name) && !isHeadbuttSprite(spriteName)) {
+		if (isHeadbuttSprite(sprite.name) && !isHeadbuttSprite(spriteName)) {
 			headbuttAirTime = 0;
 		}
 		List<Trail>? trails = sprite?.lastFiveTrailDraws;
@@ -1569,10 +1573,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public bool isHeadbuttSprite(string? sprite) {
-		if (sprite == null) {
-			return false;
-		}
+	public bool isHeadbuttSprite(string sprite) {
 		return sprite.EndsWith("jump") || sprite.EndsWith("up_dash") || sprite.EndsWith("wall_kick");
 	}
 
@@ -1765,10 +1766,8 @@ public partial class Character : Actor, IDamagable {
 
 	public Point getDashDustEffectPos(int xDir) {
 		float dashXPos = -24;
-		if (player.isVile) dashXPos = -30;
-		if (player.isSigma1AndSigma()) dashXPos = -35;
-		if (player.isSigma2AndSigma()) dashXPos = -35;
-		if (player.isSigma3AndSigma()) dashXPos = -35;
+		if (this is Vile) dashXPos = -30;
+		if (this is BaseSigma) dashXPos = -35;
 		return pos.addxy(dashXPos * xDir + (5 * xDir), -4);
 	}
 
@@ -1848,13 +1847,13 @@ public partial class Character : Actor, IDamagable {
 			}
 
 			if (player.isKaiserSigma()) {
-				if (sprite.name.StartsWith("sigma3_kaiser_virus")) return pos.addxy(camOffsetX, -12);
+				if (sprite.name.StartsWith("kaisersigma_virus")) return pos.addxy(camOffsetX, -12);
 				return pos.round().addxy(camOffsetX, -55);
 			}
 
 			if (player.weapon is WolfSigmaHandWeapon handWeapon && handWeapon.hand.isControlling) {
 				var hand = handWeapon.hand;
-				Point camCenter = sigmaHeadGroundCamCenterPos.Value;
+				Point camCenter = sigmaHeadGroundCamCenterPos ?? getCenterPos();
 				if (hand.pos.x > camCenter.x + Global.halfScreenW || hand.pos.x < camCenter.x - Global.halfScreenW || hand.pos.y > camCenter.y + Global.halfScreenH || hand.pos.y < camCenter.y - Global.halfScreenH) {
 					float overFactorX = MathF.Abs(hand.pos.x - camCenter.x) - Global.halfScreenW;
 					if (overFactorX > 0) {
@@ -1881,8 +1880,8 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		if (rideArmor != null) {
-			if (ownedByLocalPlayer && rideArmor.rideArmorState is RADropIn) {
-				return (rideArmor.rideArmorState as RADropIn).spawnPos.addxy(0, -24);
+			if (ownedByLocalPlayer && rideArmor.rideArmorState is RADropIn rADropInState) {
+				return rADropInState.spawnPos.addxy(0, -24);
 			}
 			return rideArmor.pos.round().addxy(camOffsetX, -24);
 		}
@@ -1895,7 +1894,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public Rect getHeadRect() {
-		Point headPos = getHeadPos().Value;
+		Point headPos = getHeadPos() ?? pos;
 		float topY = float.MaxValue;
 		float leftX = float.MaxValue;
 		float rightX = float.MinValue;
@@ -2038,7 +2037,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		if (!forceChange &&
-			(charState?.GetType() == newState.GetType() || changedStateInFrame)
+			(charState.GetType() == newState.GetType() || changedStateInFrame)
 		) {
 			return;
 		}
@@ -2060,7 +2059,7 @@ public partial class Character : Actor, IDamagable {
 				return;
 			}
 		}
-		if (charState?.canExit(this, newState) == false) {
+		if (charState.canExit(this, newState) == false) {
 			return; 
 		}
 		if (!newState.canEnter(this)) {
@@ -2070,10 +2069,10 @@ public partial class Character : Actor, IDamagable {
 		if (shootAnimTime > 0 && newState.canShoot() == true) {
 			changeSprite(getSprite(newState.shootSprite), true);
 		} else {
-			string spriteName = sprite?.name ?? "";
+			string spriteName = sprite.name ?? "";
 			changeSprite(getSprite(newState.sprite), true);
 
-			if (sprite != null && spriteName == sprite.name && this is not MegamanX) {
+			if (spriteName == sprite.name && this is not MegamanX) {
 				sprite.frameIndex = 0;
 				sprite.frameTime = 0;
 				sprite.time = 0;
@@ -2082,8 +2081,8 @@ public partial class Character : Actor, IDamagable {
 				sprite.visible = true;
 			}
 		}
-		CharState? oldState = charState;
-		oldState?.onExit(newState);
+		CharState oldState = charState;
+		oldState.onExit(newState);
 
 		charState = newState;
 		newState.onEnter(oldState);
@@ -2118,21 +2117,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		currentLabelY = -getLabelOffY();
 
-		if (player.isSigma && visible) {
-			string kaiserBodySprite = "";
-			if (sprite.name.EndsWith("kaiser_idle")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_hover")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_fall")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_shoot")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_shoot2")) kaiserBodySprite = sprite.name + "_body";
-			if (sprite.name.EndsWith("kaiser_taunt")) kaiserBodySprite = sprite.name + "_body";
-			if (kaiserBodySprite != "") {
-				Global.sprites[kaiserBodySprite].draw(
-					0, pos.x + x, pos.y + y, xDir, 1, null, 1, 1, 1, zIndex - 10
-				);
-			}
-		}
-
+		
 		if (rideArmor == null && rideChaser == null && rideArmorPlatform == null) {
 			base.render(x, y);
 		} else if (rideArmorPlatform != null) {
@@ -2190,7 +2175,7 @@ public partial class Character : Actor, IDamagable {
 
 		bool shouldDrawName = false;
 		bool shouldDrawHealthBar = false;
-		string overrideName = null;
+		string overrideName = "";
 		FontType? overrideColor = null;
 
 		if (!hideHealthAndName()) {
@@ -2203,7 +2188,9 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 			// Special case: labeling the own player's disguised Axl
-			else if (player.isMainPlayer && player.isDisguisedAxl && Global.level.gameMode.isTeamMode) {
+			else if (player.isMainPlayer && player.isDisguisedAxl && 
+				Global.level.gameMode.isTeamMode && player.disguise != null
+			) {
 				overrideName = player.disguise.targetName;
 				shouldDrawName = true;
 			}
@@ -2211,7 +2198,8 @@ public partial class Character : Actor, IDamagable {
 			else if (
 				!player.isMainPlayer && player.isDisguisedAxl &&
 				Global.level.gameMode.isTeamMode &&
-				player.alliance != Global.level.mainPlayer.alliance
+				player.alliance != Global.level.mainPlayer.alliance &&
+				player.disguise != null
 			) {
 				overrideName = player.disguise.targetName;
 				overrideColor = Global.level.gameMode.teamFonts[Global.level.mainPlayer.alliance];
@@ -2258,7 +2246,7 @@ public partial class Character : Actor, IDamagable {
 		if (shouldDrawHealthBar || Global.overrideDrawHealth) {
 			drawHealthBar();
 		}
-		if (shouldDrawName || Global.overrideDrawName) {
+		if (shouldDrawName || Global.overrideDrawName && overrideName != "") {
 			drawName(overrideName, overrideColor);
 		}
 
@@ -2881,17 +2869,32 @@ public partial class Character : Actor, IDamagable {
 			addDamageTextHelper(attacker, (float)damage, player.maxHealth, true);
 		}
 		if (player.health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
-			decimal modifier = (decimal)player.maxHealth > 0 ? (16 / (decimal)player.maxHealth) : 1;
-			decimal gigaDamage = (decimal)damage;
+			decimal modifier = (32 / (decimal)player.maxHealth);
+			decimal gigaDamage = damage;
 			if (originalDamage > damage) {
 				gigaDamage = originalDamage;
 			}
-			float gigaAmmoToAdd = (float)(1 + (gigaDamage * 2 * modifier));
+			float gigaAmmoToAdd = (float)(gigaDamage * modifier);
+	
 			if (this is Zero zero) {
+				float currentAmmo = zero.gigaAttack.ammo;
 				zero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, zero.gigaAttack.ammo,
+						zero.gigaAttack.getAmmoUsage(0), zero.gigaAttack.maxAmmo
+					);
+				}
 			}
 			if (this is PunchyZero punchyZero) {
+				float currentAmmo = punchyZero.gigaAttack.ammo;
 				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, punchyZero.gigaAttack.ammo,
+						punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
+					);
+				}
 			}
 			if (this is MegamanX) {
 				var gigaCrush = player.weapons.FirstOrDefault(w => w is GigaCrush);
@@ -2957,7 +2960,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public void killPlayer(Player killer, Player assister, int? weaponIndex, int? projId) {
+	public void killPlayer(Player? killer, Player? assister, int? weaponIndex, int? projId) {
 		player.health = 0;
 		int? assisterProjId = null;
 		int? assisterWeaponId = null;
@@ -3610,8 +3613,6 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Add the final value of the bool mask.
 		customData[boolMaskPos] = Helpers.boolArrayToByte(boolMask);
-
-
 
 		// Add the total arguments size.
 		customData[0] = (byte)customData.Count;

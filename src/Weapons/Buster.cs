@@ -131,7 +131,7 @@ public class Buster : Weapon {
 			}
 			return;
 		}
-		bool hasUltArmor = player.hasUltimateArmor();//character.hasUltimateArmorBS.getValue();
+		bool hasUltArmor = ((player.character as MegamanX)?.hasUltimateArmor == true);
 		bool isHyperX = ((player.character as MegamanX)?.isHyperX == true);
 
 		if (isHyperX && chargeLevel > 0) {
@@ -541,7 +541,7 @@ public class X2ChargeShot : CharState {
 		if (newState is not AirDash && newState is not WallSlide) {
 			character.shootAnimTime = 0;
 		} else {
-			character.shootAnimTime = 0.334f - character.animTime;
+			character.shootAnimTime = 0.334f - character.animSeconds;
 		}
 		base.onExit(newState);
 	}

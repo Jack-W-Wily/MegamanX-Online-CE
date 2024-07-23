@@ -83,12 +83,16 @@ public class RideArmor : Actor, IDamagable {
 		spriteToCollider["deact*"] = getLowCollider();
 		spriteToCollider["warp_beam"] = null;
 
-		if (ownedByLocalPlayer && raNum == 2) {
-			if (owner.vileNapalmWeapon.type == 1) maxHawkBombCount = 2;
-			else if (owner.vileNapalmWeapon.type == 2) maxHawkBombCount = 2;
-			else maxHawkBombCount = 3;
-			hawkBombCount = maxHawkBombCount;
+		maxHawkBombCount = 3;
+
+		if (ownedByLocalPlayer && raNum == 2 && owner.character is Vile vile) {
+			if (vile.napalmWeapon.type == 1) {
+				maxHawkBombCount = 2;
+			} else if (vile.napalmWeapon.type == 2) {
+				maxHawkBombCount = 2;
+			} 
 		}
+		hawkBombCount = maxHawkBombCount;
 
 		netActorCreateId = NetActorCreateId.RideArmor;
 		if (sendRpc) {
@@ -411,18 +415,19 @@ public class RideArmor : Actor, IDamagable {
 							new MechMissileProj(new MechMissileWeapon(player), shootPos, xDir, sprite.name.Contains("down"), player, player.getNextActorNetId(), rpc: true);
 							new Anim(shootPos, "dust", 1, player.getNextActorNetId(), true, true, true) { vel = new Point(0, -100) };
 						} else {
-							int xDirMod = -1;
-							if (i == 1) xDirMod = 1;
-							Projectile grenade;
-							if (player.vileNapalmWeapon.type == (int)NapalmType.SplashHit) {
-								grenade = new SplashHitGrenadeProj(player.vileNapalmWeapon, shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
-							} else if (player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade) {
-								grenade = new MK2NapalmGrenadeProj(player.vileNapalmWeapon, shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
-							} else {
-								grenade = new NapalmGrenadeProj(new Napalm(NapalmType.RumblingBang), shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+							if (character is Vile vile) {
+								int xDirMod = -1;
+								if (i == 1) xDirMod = 1;
+								Projectile grenade;
+								if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
+									grenade = new SplashHitGrenadeProj(vile.napalmWeapon, shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+								} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
+									grenade = new MK2NapalmGrenadeProj(vile.napalmWeapon, shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+								} else {
+									grenade = new NapalmGrenadeProj(new Napalm(NapalmType.RumblingBang), shootPos, xDir * xDirMod, player, player.getNextActorNetId(), rpc: true);
+								}
+								grenade.vel = new Point();
 							}
-
-							grenade.vel = new Point();
 						}
 					}
 				}
@@ -460,20 +465,20 @@ public class RideArmor : Actor, IDamagable {
 		} else if (
 			hawkBombCount > 0 &&
 			canAttack() &&
-			player.isVile &&
+			character is Vile vile &&
 			punchCooldown == 0 &&
 			raNum == 2 &&
-			player.vileNapalmWeapon.shootTime == 0 &&
+			vile.napalmWeapon.shootTime == 0 &&
 			player.input.isPressed(Control.Special1, player) &&
 			player.input.isHeld(Control.Down, player) &&
 			!rideArmorState.inTransition()
 		) {
 			hawkBombCount--;
-			var targetCooldownWeapon = player.vileNapalmWeapon;
+			var targetCooldownWeapon = vile.napalmWeapon;
 			if (targetCooldownWeapon.type == (int)NapalmType.NoneFlamethrower || targetCooldownWeapon.type == (int)NapalmType.NoneBall) {
 				targetCooldownWeapon = new Napalm(NapalmType.RumblingBang);
 			}
-			(character as Vile).setVileShootTime(player.vileNapalmWeapon, 2, targetCooldownWeapon);
+			vile.setVileShootTime(vile.napalmWeapon, 2, targetCooldownWeapon);
 			punchCooldown = 0.56f;
 			changeSprite("hawk_attack_air_down2", false);
 		}
@@ -607,22 +612,31 @@ public class RideArmor : Actor, IDamagable {
 		}
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (hitbox == null || player == null || sprite?.name == null) {
 			return null;
 		}
-
-		Projectile proj = null;
+		// whats the center point value?
+		Projectile? proj = null;
 
 		if (sprite.name.Contains("attack")) {
-			if (raNum == 0) {
-				proj = new GenericMeleeProj(new MechPunchWeapon(player), centerPoint, ProjIds.MechPunch, player);
-			} else if (raNum == 1) {
-				proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player), centerPoint, ProjIds.MechKangarooPunch, player);
-			} else if (raNum == 4) {
-				proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player), centerPoint, ProjIds.MechGoliathPunch, player);
-			} else if (raNum == 5) {
-				proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player), centerPoint, ProjIds.MechDevilBearPunch, player);
+			switch (raNum) {
+				case 0:
+					proj = new GenericMeleeProj(new MechPunchWeapon(player),
+					 centerPoint, ProjIds.MechPunch, player);
+					break;
+				case 1:
+					proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player),
+					 centerPoint, ProjIds.MechKangarooPunch, player);
+					break;
+				case 4:
+					proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player),
+					 centerPoint, ProjIds.MechGoliathPunch, player);
+					break;
+				case 5:
+					proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player),
+					 centerPoint, ProjIds.MechDevilBearPunch, player);
+					break;
 			}
 		}
 		else if (sprite.name.Contains("charge")) {
@@ -633,12 +647,32 @@ public class RideArmor : Actor, IDamagable {
 			float? overrideDamage = sprite.name.EndsWith("groundpound") ? 4 : null;
 			if (!canDamage) overrideDamage = 0;
 			ProjIds overrideProjId = sprite.name.EndsWith("groundpound") ? ProjIds.MechFrogGroundPound : ProjIds.MechStomp;
-			if (raNum == 0) proj = new GenericMeleeProj(new MechStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 1) proj = new GenericMeleeProj(new MechKangarooStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 2) proj = new GenericMeleeProj(new MechHawkStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 3) proj = new GenericMeleeProj(new MechFrogStompWeapon(player), centerPoint, overrideProjId, player, damage: overrideDamage);
-			if (raNum == 4) proj = new GenericMeleeProj(new MechGoliathStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
-			if (raNum == 5) proj = new GenericMeleeProj(new MechDevilBearStompWeapon(player), centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+			switch (raNum) {
+				case 0:
+					proj = new GenericMeleeProj(new MechStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 1:
+					proj = new GenericMeleeProj(new MechKangarooStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 2:
+					proj = new GenericMeleeProj(new MechHawkStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 3:
+					proj = new GenericMeleeProj(new MechFrogStompWeapon(player),
+					 centerPoint, overrideProjId, player, damage: overrideDamage);
+					break;
+				case 4:
+					proj = new GenericMeleeProj(new MechGoliathStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+				case 5:
+					proj = new GenericMeleeProj(new MechDevilBearStompWeapon(player),
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					break;
+			}
 		}
 
 		return proj;
@@ -947,16 +981,8 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (character != null && !(character.charState is Die)) {
-			if (character.player.weapon is MechMenuWeapon) {
-				player.changeWeaponSlot(0);
-			}
-			if (character.alreadySummonedNewMech) {
-				player.weapons.RemoveAll(w => w is MechMenuWeapon);
-			}
-
 			if (!ownedByMK5) {
 				character.changeState(new Fall(), true);
-				character.player.vileBallWeapon.shootTime = 1;
 				character.changePos(pos.addxy(0, -10));
 			}
 
@@ -2142,23 +2168,23 @@ public class InRideArmor : CharState {
 
 	public void tossGrenade(Vile vile) {
 		Projectile grenade = null;
-		if (player.vileNapalmWeapon.shootTime > 0) {
+		if (vile.napalmWeapon.shootTime > 0) {
 			return;
 		}
-		if (player.vileNapalmWeapon.type == (int)NapalmType.SplashHit) {
-			vile.setVileShootTime(player.vileNapalmWeapon);
+		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
+			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new SplashHitGrenadeProj(
-				player.vileNapalmWeapon, character.pos.addxy(0, -3),
+				vile.napalmWeapon, character.pos.addxy(0, -3),
 				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true
 			);
-		} else if (player.vileNapalmWeapon.type == (int)NapalmType.FireGrenade) {
-			vile.setVileShootTime(player.vileNapalmWeapon);
+		} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
+			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new MK2NapalmGrenadeProj(
-				player.vileNapalmWeapon, character.pos.addxy(0, -3), character.xDir,
+				vile.napalmWeapon, character.pos.addxy(0, -3), character.xDir,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		} else {
-			vile.setVileShootTime(player.vileNapalmWeapon, targetCooldownWeapon: new Napalm(NapalmType.RumblingBang));
+			vile.setVileShootTime(vile.napalmWeapon, targetCooldownWeapon: new Napalm(NapalmType.RumblingBang));
 			grenade = new NapalmGrenadeProj(
 				new Napalm(NapalmType.RumblingBang), character.pos.addxy(0, -3),
 				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true

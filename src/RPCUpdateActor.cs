@@ -12,7 +12,7 @@ public partial class Actor {
 	public virtual void updateCustomActorNetData(byte[] data) { }
 
 	public virtual void sendActorNetData() {
-		byte[] networkIdBytes = Helpers.convertToBytes((ushort)netId);
+		byte[] networkIdBytes = Helpers.convertToBytes(netId ?? ushort.MaxValue);
 		if ((netId == 10 || netId == 11) && this is not Flag) {
 			//string msg = string.Format(
 			//"NetId {0} was not flag. Was {1}", netId.Value.ToString(), this.GetType().ToString()
@@ -192,7 +192,7 @@ public class RPCUpdateActor : RPC {
 
 		if (actor != null) {
 			// We send custom data here.
-			if (i >= arguments.Length - 1) {
+			if (i < arguments.Length) {
 				actor.updateCustomActorNetData(arguments[i..]);
 			}
 		}

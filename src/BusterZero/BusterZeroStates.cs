@@ -48,7 +48,7 @@ public class BusterZeroMelee : CharState {
 
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
-		zero.zSaberCooldown = 36f / 60f;
+		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -206,7 +206,7 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
-		zero.zSaberCooldown = 36f / 60f;
+		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -248,7 +248,7 @@ public class BusterZeroHadangekiWall : CharState {
 	public override void onExit(CharState oldState) {
 		base.onExit(oldState);
 		useGravity = true;
-		zero.zSaberCooldown = 36f / 60f;
+		zero.zSaberCooldown = 36;
 	}
 }
 
@@ -277,7 +277,7 @@ public class HyperBusterZeroStart : CharState {
 		} else {
 			time += Global.spf;
 			if (time >= 1) {
-				character.changeState(new Idle(), true);
+				character.changeToLandingOrFall();
 			}
 		}
 	}
@@ -297,7 +297,7 @@ public class HyperBusterZeroStart : CharState {
 				destroyOnEnd: false, sendRpc: true
 			);
 		LightX3.fadeIn = true;
-		character.player.currency -= 10;
+		character.player.currency -= Player.zBusterZeroHyperCost;
 		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
 

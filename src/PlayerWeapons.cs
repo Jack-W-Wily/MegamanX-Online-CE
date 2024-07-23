@@ -98,17 +98,6 @@ public partial class Player {
 	public SigmaShieldWeapon sigmaShieldWeapon;
 	public Sigma3FireWeapon sigmaFireWeapon;
 
-	public VileCannon vileCannonWeapon;
-	public Vulcan vileVulcanWeapon;
-	public VileMissile vileStunShotWeapon;  // Intentionally separate from below
-	public VileMissile vileMissileWeapon;
-	public RocketPunch vileRocketPunchWeapon;
-	public Napalm vileNapalmWeapon;
-	public VileBall vileBallWeapon;
-	public VileCutter vileCutterWeapon;
-	public VileFlamethrower vileFlamethrowerWeapon;
-	public VileLaser vileLaserWeapon;
-
 	public Maverick? currentMaverick {
 		get {
 			var mw = weapons.FirstOrDefault(
@@ -538,17 +527,6 @@ label:
 
 		hadoukenWeapon = new HadoukenWeapon(this);
 		shoryukenWeapon = new ShoryukenWeapon(this);
-		vileStunShotWeapon = new VileMissile(VileMissileType.ElectricShock);
-		vileCannonWeapon = new VileCannon((VileCannonType)loadout.vileLoadout.cannon);
-		vileVulcanWeapon = new Vulcan((VulcanType)loadout.vileLoadout.vulcan);
-		vileMissileWeapon = new VileMissile((VileMissileType)loadout.vileLoadout.missile);
-		vileRocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.vileLoadout.rocketPunch);
-		vileNapalmWeapon = new Napalm((NapalmType)loadout.vileLoadout.napalm);
-		vileBallWeapon = new VileBall((VileBallType)loadout.vileLoadout.ball);
-		vileCutterWeapon = new VileCutter((VileCutterType)loadout.vileLoadout.cutter);
-		vileFlamethrowerWeapon = new VileFlamethrower((VileFlamethrowerType)loadout.vileLoadout.flamethrower);
-		vileLaserWeapon = new VileLaser((VileLaserType)loadout.vileLoadout.laser);
-
 		axlHyperMode = loadout.axlLoadout.hyperMode;
 
 		sigmaBallWeapon = new SigmaBallWeapon();

@@ -20,7 +20,7 @@ public class HyperAxlStart : CharState {
 
 		if (character.loopCount > 8) {
 			axl.whiteAxlTime = axl.maxHyperAxlTime;
-			RPC.setHyperZeroTime.sendRpc(character.player.id, axl.whiteAxlTime, 1);
+			RPC.setHyperAxlTime.sendRpc(character.player.id, axl.whiteAxlTime, 1);
 			axl.playSound("ching");
 			if (player.input.isHeld(Control.Jump, player)) {
 				axl.changeState(new Hover(), true);
@@ -138,7 +138,7 @@ public class DodgeRoll : CharState {
 		base.onEnter(oldState);
 		axl = character as Axl;
 		character.isDashing = true;
-		character.burnTime -= 2;
+		character.burnTime -= 1;
 		if (character.burnTime < 0) {
 			character.burnTime = 0;
 		}

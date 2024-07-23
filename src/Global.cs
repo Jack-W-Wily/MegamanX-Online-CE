@@ -86,7 +86,7 @@ public partial class Global {
 	public static int? quickStartMechNum = 0;
 	public static bool? quickStartVileMK2 = false;
 	public static bool? quickStartVileMK5 = false;
-	public static string overrideSpawnPoint = null;//"Spawn Point3";
+	public static string? overrideSpawnPoint = null;//"Spawn Point3";
 
 	// Online quickstart
 	public static bool quickStartOnline = false;
@@ -223,7 +223,7 @@ public partial class Global {
 			//Global.showAIDebug = !Global.showAIDebug;
 		}
 		if (Global.input.isPressed(Key.F4)) {
-			Global.level?.mainPlayer?.forceKill();
+			Global.level.mainPlayer?.forceKill();
 			//Global.level?.mainPlayer?.character?.setHurt(1, Global.defFlinch);
 		}
 		if (Global.input.isPressed(Key.F5)) {
@@ -414,8 +414,8 @@ public partial class Global {
 
 			{ "drdoppler_jump", "drdoppler_exit" },
 
-			{ "sigma3_kaiser_idle_body", "sigma3_kaiser_taunt_body" },
-			{ "sigma3_kaiser_empty", "sigma3_kaiser_empty_fadeout" }
+			{ "kaisersigma_idle_body", "kaisersigma_taunt_body" },
+			{ "kaisersigma_empty", "kaisersigma_empty_fadeout" }
 		};
 
 	private static MatchmakingQuerier _matchmakingQuerier;
@@ -527,11 +527,11 @@ public partial class Global {
 
 	public static int defaultThresholdPing = 200;
 	public static Level level;
-	public static ServerClient serverClient;
-	public static Server localServer;
+	public static ServerClient? serverClient;
+	public static Server? localServer;
 	public static bool isOffline { get { return serverClient == null; } }
 	public static bool isHost { get { return level != null && level.isHost; } }
-	public static LeaveMatchSignal leaveMatchSignal;
+	public static LeaveMatchSignal? leaveMatchSignal;
 	public const int basePort = 14242;
 	public const int clientPort = 14240;
 	public static bool firstTimeVersionCheck = false;
