@@ -209,6 +209,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.ZeroZ, new List<SubTank>() },
 	};
 	// Heart tanks
 	public Dictionary<int, int> charHeartTanks = new Dictionary<int, int>(){
@@ -220,6 +221,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, 0 },
 		{ (int)CharIds.BusterZero, 0 },
 		{ (int)CharIds.Rock, 0 },
+		{ (int)CharIds.ZeroZ, 0 },
 	};
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -232,7 +234,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 10;
+	public const int maxCharCurrencyId = 30;
 	public static int curMul = Helpers.randomRange(2, 8);
 	public int[] charCurrencyBackup = new int[maxCharCurrencyId];
 	public int[] charCurrency = new int[maxCharCurrencyId];
@@ -1090,7 +1092,19 @@ public partial class Player {
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer
 				);
-			} else {
+			} 
+
+			// MMZO Chars Start on Player.CS
+			 else if (charNum == (int)CharIds.ZeroZ) {
+				character = new ZeroZ(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			}
+			
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+			
+			else {
 				throw new Exception("Error: Non-valid char ID: " + charNum);
 			}
 			// Hyper mode overrides (POST)
