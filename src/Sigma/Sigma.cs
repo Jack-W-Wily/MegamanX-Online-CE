@@ -4,7 +4,7 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
-public abstract class BaseSigma : Character {
+public class BaseSigma : Character {
 	public const float sigmaHeight = 50;
 	public float sigmaSaberMaxCooldown = 1f;
 	public float noBlockTime = 0;
@@ -12,13 +12,9 @@ public abstract class BaseSigma : Character {
 	public const float maxLeapSlashCooldown = 2;
 	public float tagTeamSwapProgress;
 	public int tagTeamSwapCase;
-	public float sigmaAmmoRechargeCooldown = 0.5f;
-	public float sigmaAmmoRechargeTime;
 	public float maxSigma3FireballCooldown = 0.39f;
 	public float sigma3ShieldCooldown;
 	public float maxSigma3ShieldCooldown = 1.125f;
-	public float sigmaHeadBeamRechargePeriod = 0.05f;
-	public float sigmaHeadBeamTimeBeforeRecharge = 0.33f;
 
 	public float viralSigmaTackleCooldown;
 	public float viralSigmaTackleMaxCooldown = 1;
@@ -553,7 +549,11 @@ public abstract class BaseSigma : Character {
 	}
 
 	public override Collider getTerrainCollider() {
-		if (physicsCollider == null || isHyperSigma) {
+		Collider? overrideGlobalCollider = null;
+		if (spriteToColliderMatch(sprite.name, out overrideGlobalCollider)) {
+			return overrideGlobalCollider;
+		}
+		if (physicsCollider == null) {
 			return null;
 		}
 		float hSize = 40;

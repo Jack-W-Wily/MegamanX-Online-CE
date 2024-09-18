@@ -206,6 +206,9 @@ public class Damager {
 
 		if (damagable.isInvincible(owner, projId) && damage > 0) {
 			victim.playSound("m10ding");
+			if (Helpers.randomRange(0, 50) == 10) {
+				victim.addDamageText("Bloqueo! Por 48 horas!", 1);
+			}
 			return true;
 		}
 
@@ -345,8 +348,7 @@ public class Damager {
 				damage *= 1.5f;
 				playHurtSound = true;
 			}
-
-			if (character.ownedByLocalPlayer && character.charState.superArmor && projId != (int)ProjIds.PlasmaGun) {
+			if (character.ownedByLocalPlayer && character.charState.superArmor) {
 				flinch = 0;
 			}
 			if ((owner?.character as Zero)?.isViral == true) {
@@ -463,9 +465,14 @@ public class Damager {
 					break;
 				//Other effects
 				case (int)ProjIds.PlasmaGun:
-					if (mmx != null) {
-						mmx.barrierCooldown = 3;
-						mmx.barrierTime = 0;
+					if (mmx != null && mmx.player.hasBodyArmor(3)) {
+						//The main shot fires an EMP burst that causes a full flinch and 
+						//destroys Rolling Shields as well as temporarily disabling X3 barriers
+						//He literally made an INFINITE DEACTIVATION
+						//I am putting this to 3, as i suppose is what he meant to 
+						//mmx.barrierCooldown = 3;
+						mmx.barrierTime = 3;
+						victim?.playSound("weakness");
 					}
 					break;	
 				case (int)ProjIds.SplashLaser:
@@ -538,7 +545,9 @@ public class Damager {
 				}
 			}
 
-			if (!isDot(projId) && (
+			if (!character.charState.superArmor &&
+				!character.isInvulnerable(true, true) &&
+				!isDot(projId) && (
 				owner?.character is Zero zero && zero.isBlack ||
 				owner?.character is PunchyZero pzero && pzero.isBlack
 			)) {
@@ -763,9 +772,9 @@ public class Damager {
 						if (owner.ownedByLocalPlayer &&
 							owner.character is Zero zero &&
 							!zero.hypermodeActive()
-						) {
-							if (projId == (int)ProjIds.ZSaber || projId == (int)ProjIds.ZSaber1 ||
-								projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3
+						) {		 //What in the..
+							if ( /*projId == (int)ProjIds.ZSaber */ 
+								GenericMeleeProj.isZSaberClang(projId)
 							) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}

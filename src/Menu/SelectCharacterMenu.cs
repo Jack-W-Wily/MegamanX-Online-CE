@@ -37,6 +37,8 @@ public enum CharIds {
 	KaiserSigma,
 	// Non-vanilla chars start here.
 	Rock = 10,
+	// MMZO Characters
+	ZeroZ = 11,
 	RMX,
 	AXLWcut,
 	ZeroEND,
@@ -66,6 +68,11 @@ public class CharSelection {
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
 	public static CharSelection[] selections => [
+		new CharSelection("Zero", 11, 1, 0, "zeroz_idle", 0),
+	
+
+
+
 		new CharSelection("X", 0, 1, 0, "menu_megaman", 0),
 		new CharSelection("Zero", 1, 1, 0, "menu_zero", 0),
 		new CharSelection("Kaiser Knuckle", 5, 1, 0, "zero_megapunch", 5) {

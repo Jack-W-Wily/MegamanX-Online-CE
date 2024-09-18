@@ -73,7 +73,11 @@ public class PunchyZero : Character {
 			updateAwakenedAura();
 		}
 		if (!Global.level.isHyper1v1()) {
-			if (isAwakened && ownedByLocalPlayer) {
+			if (isBlack) {
+				if (musicSource == null) {
+					addMusicSource("zero_X1", getCenterPos(), true);
+				}
+			} else if (isAwakened) {
 				if (musicSource == null) {
 					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 				}
@@ -361,13 +365,19 @@ public class PunchyZero : Character {
 	}
 
 
-	public override void changeState(CharState newState, bool forceChange = false) {
-		CharState? oldState = charState;
-		base.changeState(newState, forceChange);
-		if (!newState.attackCtrl || newState.attackCtrl != oldState?.attackCtrl) {
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		// Save old state.
+		CharState oldState = charState;
+		// Base function call.
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
+		}
+		if (!newState.attackCtrl || newState.attackCtrl != oldState.attackCtrl) {
 			shootPressTime = 0;
 			specialPressTime = 0;
 		}
+		return true;
 	}
 
 	public override bool altCtrl(bool[] ctrls) {
@@ -450,6 +460,10 @@ public class PunchyZero : Character {
 
 	public override string getSprite(string spriteName) {
 		return "zero_" + spriteName;
+	}
+
+	public override bool isToughGuyHyperMode() {
+		return isBlack || isGenmuZero;
 	}
 
 	public override List<ShaderWrapper> getShaders() {

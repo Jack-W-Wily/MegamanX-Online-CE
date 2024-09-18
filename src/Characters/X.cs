@@ -453,7 +453,7 @@ public partial class MegamanX : Character {
 				shootPressed ||
 				(framesSinceLastShootPressed < Global.normalizeFrames(6) &&
 				framesSinceLastShootReleased > Global.normalizeFrames(30)) ||
-				(shootHeld && player.weapon.isStream && chargeTime < charge1Time)
+				(shootHeld && player.weapon.isStream && chargeTime < charge2Time)
 			);
 			if (!fgMotion && offCooldown && shootCondition) {
 				shoot(false);
@@ -556,7 +556,7 @@ public partial class MegamanX : Character {
 
 	public override bool normalCtrl() {
 		if (!grounded) {
-			if (player.dashPressed(out string dashControl) && canAirDash() && canDash()) {
+			if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
 				CharState dashState;
 				if (player.input.isHeld(Control.Up, player) && player.hasBootsArmor(3)) {
 					dashState = new UpDash(Control.Dash);
@@ -1181,18 +1181,15 @@ public partial class MegamanX : Character {
 		return jumpModifier * base.getJumpModifier();
 	} */
 
-	public override void changeState(CharState newState, bool forceChange = false) {
-		if (!forceChange && charState != null &&
-			charState.GetType() == newState.GetType() ||
-			 !forceChange && changedStateInFrame
-		) {
-			return;
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
 		}
-		base.changeState(newState, forceChange);
-
 		if (hasBusterProj() && string.IsNullOrEmpty(newState.shootSprite) && newState is not Hurt) {
 			destroyBusterProjs();
 		}
+		return true;
 	}
 
 	public void drawHyperCharge(float x, float y) {
@@ -1274,7 +1271,6 @@ public partial class MegamanX : Character {
 
 
 	public bool canHeadbutt() {
-		if (!player.isX) return false;
 		if (!player.hasHelmetArmor(1)) return false;
 		if (stingActive) return false;
 		if (isInvulnerableAttack()) return false;

@@ -656,20 +656,20 @@ public class GameMode {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
-				if (zero.saberCooldown > 0 && zero.awakenedPhase >= 2 || zero.genmuCooldown > 0) {
-					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 2);
-					if (zero.saberCooldown > zero.genmuCooldown) {
-						cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
+				if (zero.swingCooldown > 0 && zero.isGenmuZero || zero.genmuCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 120);
+					if (zero.swingCooldown > zero.genmuCooldown) {
+						cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
 					}
 					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
-				if (zero.saberCooldown > 0 || zero.genmuCooldown > 1) {
-					float cooldown = 1 - Helpers.progress(zero.saberCooldown, 1);
-					if (zero.genmuCooldown - 1 > zero.saberCooldown) {
-						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 1, 1);
+				if (zero.swingCooldown > 0 || zero.genmuCooldown > 60) {
+					float cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
+					if (zero.genmuCooldown - 1 > zero.swingCooldown) {
+						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 60, 1);
 					}
-					drawGigaWeaponCooldown(zero.awakenedPhase >= 2 ? 48 : 102, cooldown, xStart, yStart);
+					drawGigaWeaponCooldown(zero.isGenmuZero ? 48 : 102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
 			}
@@ -1256,7 +1256,7 @@ public class GameMode {
 		float baseY = hudHealthPosition.y;
 
 		float twoLayerHealth = 0;
-		if (isMech && player.character?.rideArmor != null) {
+		if (isMech && player.character?.rideArmor != null && player.character.rideArmor.raNum != 5) {
 			spriteName = "hud_health_base_mech";
 			health = player.character.rideArmor.health;
 			maxHealth = player.character.rideArmor.maxHealth;
@@ -1415,7 +1415,7 @@ public class GameMode {
 			}
 			if (player.character is ViralSigma) {
 				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
-			} else if (player.isMainPlayer && player.currentMaverick == null) {
+			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
@@ -2044,7 +2044,7 @@ public class GameMode {
 		}*/
 
 		if (weapon is AxlWeapon && Options.main.axlLoadout.altFireArray[Weapon.wiToFi(weapon.index)] == 1) {
-			Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "B");
+			//Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "²");
 		}
 
 		if (weapon is SigmaMenuWeapon) {

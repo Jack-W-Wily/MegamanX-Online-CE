@@ -39,7 +39,7 @@ public class TunnelRhino : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new TunnelRShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -221,7 +221,7 @@ public class TunnelRTornadoFangDiag : Projectile {
 		weapon, pos, xDir, 0, 3, player, "tunnelr_proj_drill", Global.halfFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 1.5f;
-		projId = (int)ProjIds.TunnelRTornadoFang;
+		projId = (int)ProjIds.TunnelRTornadoFangDiag;
 		destroyOnHit = false;
 		vel = new Point(xDir * 150, -150);
 

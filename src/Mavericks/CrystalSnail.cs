@@ -18,9 +18,9 @@ public class CrystalSnail : Maverick {
 	) {
 		stateCooldowns.Add(typeof(CSnailShootState), new MaverickStateCooldown(false, false, 0.75f));
 
-		spriteToCollider.Add("shell", getShellCollider());
-		spriteToCollider.Add("shell_spin", getShellCollider());
-		spriteToCollider.Add("shell_dash", getShellCollider());
+		spriteToCollider["shell"] = getShellCollider();
+		spriteToCollider["shell_spin"] = getShellCollider();
+		spriteToCollider["shell_dash"] = getShellCollider();
 
 		weapon = getWeapon();
 
@@ -74,7 +74,7 @@ public class CrystalSnail : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if ((state is MIdle || state is MRun)) {
+			if ((state is MIdle or MRun or MLand)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CSnailShootState());
 				} else if (input.isPressed(Control.Dash, player)) {

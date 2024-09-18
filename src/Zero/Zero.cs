@@ -101,7 +101,11 @@ public class Zero : Character {
 		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
-			if (isAwakened && ownedByLocalPlayer) {
+			if (isBlack) {
+				if (musicSource == null) {
+					addMusicSource("zero_X1", getCenterPos(), true);
+				}
+			} else if (isAwakened) {
 				if (musicSource == null) {
 					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 				}
@@ -425,7 +429,7 @@ public class Zero : Character {
 			}
 			if (grounded && vel.y >= 0 && isGenmuZero) {
 				if (genmuCooldown == 0) {
-					genmuCooldown = 2;
+					genmuCooldown = 120;
 					changeState(new GenmuState(), true);
 					return true;
 				}
@@ -477,7 +481,7 @@ public class Zero : Character {
 			if (dashAttackCooldown > 0) {
 				return false;
 			}
-			dashAttackCooldown = 1;
+			dashAttackCooldown = 60;
 			slideVel = xDir * getDashSpeed();
 			if (specialPressTime > shootPressTime) {
 				changeState(new ZeroShippuugaState(), true);
@@ -505,7 +509,7 @@ public class Zero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
-		if (yDir == -1 && canAirDash() && airRisingUses == 0 && (
+		if (yDir == -1 && canAirDash() && airRisingUses == 0 && flag == null && (
 			(uppercutA.type == (int)RisingType.RisingFang && shootPressed) ||
 			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
 		)) {
@@ -551,13 +555,19 @@ public class Zero : Character {
 	// This is to prevent accidental combo activation between attacks.
 
 	// This is to prevent accidental combo activation between attacks.
-	public override void changeState(CharState newState, bool forceChange = false) {
-		CharState? oldState = charState;
-		base.changeState(newState, forceChange);
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		// Save old state.
+		CharState oldState = charState;
+		// Base function call.
+		bool hasChanged = base.changeState(newState, forceChange);
+		if (!hasChanged) {
+			return false;
+		}
 		if (!newState.attackCtrl || newState.attackCtrl != oldState.attackCtrl) {
 			shootPressTime = 0;
 			specialPressTime = 0;
 		}
+		return true;
 	}
 
 	// Movement and stuff.
@@ -590,6 +600,10 @@ public class Zero : Character {
 
 	public override bool canAddAmmo() {
 		return (gigaAttack.ammo < gigaAttack.maxAmmo);
+	}
+
+	public override bool isToughGuyHyperMode() {
+		return isBlack || isGenmuZero;
 	}
 
 	// Melee projectiles.
@@ -762,7 +776,7 @@ public class Zero : Character {
 				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 0.5f
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
-				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 0, 0.5f
+				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 0.5f
 			),
 			// Others
 			(int)MeleeIds.LadderSlash => new GenericMeleeProj(

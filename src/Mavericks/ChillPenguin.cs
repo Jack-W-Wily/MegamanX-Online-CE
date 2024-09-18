@@ -22,7 +22,7 @@ public class ChillPenguin : Maverick {
 		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
 		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		spriteToCollider.Add("slide", getDashCollider());
+		spriteToCollider["slide"] = getDashCollider();
 
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);
 
@@ -60,7 +60,7 @@ public class ChillPenguin : Maverick {
 					}
 				}
 			}
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {
@@ -205,7 +205,7 @@ public class ChillPIceProj : Projectile {
 		}
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 	}
 

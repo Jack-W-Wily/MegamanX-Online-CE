@@ -14,7 +14,7 @@ public class MorphMoth : Maverick {
 		stateCooldowns.Add(typeof(MorphMShootAir), new MaverickStateCooldown(true, false, 0.5f));
 
 		weapon = getWeapon();
-		spriteToCollider.Add("sweep", getDashCollider());
+		spriteToCollider["sweep"] = getDashCollider();
 
 		canFly = true;
 
@@ -51,7 +51,7 @@ public class MorphMoth : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle || state is MRun) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new MorphMShoot());
 				}

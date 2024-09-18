@@ -176,7 +176,7 @@ public class CharState {
 	public bool inTransition() {
 		return (!string.IsNullOrEmpty(transitionSprite) &&
 			sprite == transitionSprite &&
-			character?.sprite?.name != null &&
+			character.sprite.name != null &&
 			character.sprite.name.Contains(transitionSprite)
 		);
 	}
@@ -740,7 +740,7 @@ public class Jump : CharState {
 	public override void update() {
 		base.update();
 		if (character.vel.y > 0) {
-			if (character.sprite?.name?.EndsWith("cannon_air") == false) {
+			if (character.sprite.name.EndsWith("cannon_air") == false) {
 				character.changeState(new Fall());
 			}
 			return;
@@ -1587,11 +1587,12 @@ public class GenericGrabbedState : CharState {
 
 	public override void update() {
 		base.update();
+		if (!character.ownedByLocalPlayer) { return; }
 		if (customUpdate) return;
 
-		if (grabber.sprite?.name.EndsWith(grabSpriteSuffix) == true || (
+		if (grabber.sprite.name.EndsWith(grabSpriteSuffix) == true || (
 				!string.IsNullOrEmpty(additionalGrabSprite) &&
-				grabber.sprite?.name.EndsWith(additionalGrabSprite) == true
+				grabber.sprite.name.EndsWith(additionalGrabSprite) == true
 			)
 		) {
 			bool didNotHitWall = trySnapToGrabPoint(lerp);
@@ -1657,7 +1658,7 @@ public class GenericGrabbedState : CharState {
 }
 
 public class NetLimbo : CharState {
-	public NetLimbo() : base("idle", "", "", "") {
+	public NetLimbo() : base("not_a_real_sprite") {
 
 	}
 }

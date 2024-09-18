@@ -133,8 +133,8 @@ public class Maverick : Actor, IDamagable {
 		this.player = player;
 		this.xDir = xDir;
 
-		spriteToCollider.Add("enter", null);
-		spriteToCollider.Add("exit", null);
+		spriteToCollider["enter"] = null;
+		spriteToCollider["exit"] = null;
 
 		Rect idleRect = Global.sprites[getMaverickPrefix() + "_idle"].frames[0].rect;
 		width = Math.Min(idleRect.w() - 20, maxWidth);
@@ -416,7 +416,7 @@ public class Maverick : Actor, IDamagable {
 			target = mmc.getHealTarget();
 		}
 
-		bool isAIState = (state is MIdle || state is MRun);
+		bool isAIState = (state is MIdle or MRun or MLand);
 		if (canFly) isAIState = isAIState || state is MFly;
 
 		if (target != null && (isAIState || state is MShoot)) {
@@ -527,6 +527,9 @@ public class Maverick : Actor, IDamagable {
 
 	// For terrain collision.
 	public override Collider getTerrainCollider() {
+		if (physicsCollider == null) {
+			return null;
+		}
 		float hSize = Math.Min(height, 30);
 		float wSize = width;
 		Rect? physicsRect = physicsCollider?.shape.getRect();

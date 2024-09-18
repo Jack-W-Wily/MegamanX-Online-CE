@@ -1685,7 +1685,10 @@ public class RPCCommandGrabPlayer : RPC {
 		netDeliveryMethod = NetDeliveryMethod.ReliableOrdered;
 	}
 
-	public void maverickGrabCode(Maverick grabber, Character victimChar, CharState grabbedState, bool isDefenderFavored, MaverickState? optionalGrabberState = null) {
+	public void maverickGrabCode(
+		Maverick grabber, Character victimChar,
+		CharState grabbedState, bool isDefenderFavored, MaverickState? optionalGrabberState = null
+	) {
 		if (grabber == null || victimChar == null) return;
 		if (!victimChar.canBeGrabbed()) return;
 
@@ -2058,6 +2061,7 @@ public class RPCBroadcastLoadout : RPC {
 
 		player.loadout = loadout;
 		player.configureStaticWeapons();
+		player.loadoutSet = true;
 	}
 
 	public void sendRpc(Player player) {
