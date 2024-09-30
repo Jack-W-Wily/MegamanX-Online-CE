@@ -656,18 +656,18 @@ public class GameMode {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
-				if (zero.swingCooldown > 0 && zero.isGenmuZero || zero.genmuCooldown > 0) {
-					float cooldown = 1 - Helpers.progress(zero.genmuCooldown, 120);
-					if (zero.swingCooldown > zero.genmuCooldown) {
-						cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
+				if (zero.hadangekiCooldown > 0 && zero.isGenmuZero || zero.genmureiCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(zero.genmureiCooldown, 120);
+					if (zero.hadangekiCooldown > zero.genmureiCooldown) {
+						cooldown = 1 - Helpers.progress(zero.hadangekiCooldown, 60);
 					}
 					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
-				if (zero.swingCooldown > 0 || zero.genmuCooldown > 60) {
-					float cooldown = 1 - Helpers.progress(zero.swingCooldown, 60);
-					if (zero.genmuCooldown - 1 > zero.swingCooldown) {
-						cooldown = 1 - Helpers.progress(zero.genmuCooldown - 60, 1);
+				if (zero.hadangekiCooldown > 0 || zero.genmureiCooldown > 60) {
+					float cooldown = 1 - Helpers.progress(zero.hadangekiCooldown, 60);
+					if (zero.genmureiCooldown - 1 > zero.hadangekiCooldown) {
+						cooldown = 1 - Helpers.progress(zero.genmureiCooldown - 60, 1);
 					}
 					drawGigaWeaponCooldown(zero.isGenmuZero ? 48 : 102, cooldown, xStart, yStart);
 					xStart += 15;
@@ -688,8 +688,8 @@ public class GameMode {
 					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
 					xStart += 15;
 				}
-				if (punchyZero.swingCooldown > 0) {
-					float cooldown = 1 - Helpers.progress(punchyZero.swingCooldown, 60);
+				if (punchyZero.hadangekiCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(punchyZero.hadangekiCooldown, 60);
 					drawGigaWeaponCooldown(102, cooldown, xStart, yStart);
 					xStart += 15;
 				}
@@ -757,10 +757,10 @@ public class GameMode {
 				FontType.RedishOrange, Helpers.controlText("Connectivity issues detected."),
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer?.character is BaseSigma sigma && sigma.possessTarget != null) {
+		} else if (mainPlayer?.character is ViralSigma viralSigma && viralSigma.possessTarget != null) {
 			Fonts.drawText(
 				FontType.BlueMenu, Helpers.controlText(
-				$"Hold [JUMP] to possess {sigma.possessTarget.player.name}"),
+				$"Hold [JUMP] to possess {viralSigma.possessTarget.player.name}"),
 				Global.halfScreenW, 50, Alignment.Center
 			);
 		} else if (hudErrorMsgTime > 0) {
@@ -1488,7 +1488,7 @@ public class GameMode {
 						(weapon is HyperBuster hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
 						spriteIndex = grayAmmoIndex;
 					}
-					if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Count) {
+					if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
 						spriteIndex = 0;
 					}
 					Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);
@@ -1582,7 +1582,7 @@ public class GameMode {
 				);
 				int weaponIndex = killFeed.weaponIndex ?? 0;
 				weaponIndex = (
-					weaponIndex < Global.sprites["hud_killfeed_weapon"].frames.Count ? weaponIndex : 0
+					weaponIndex < Global.sprites["hud_killfeed_weapon"].frames.Length ? weaponIndex : 0
 				);
 				Global.sprites["hud_killfeed_weapon"].drawToHUD(
 					weaponIndex, fromRight - nameLen - 14, fromTop + (i * yDist) - 2
@@ -1691,11 +1691,15 @@ public class GameMode {
 
 			Fonts.drawText(
 				FontType.Grey,
-				"Start GridItem Count: " + level.startGridCount, topLeftX, topLeftY + (currentLineH += lineHeight)
+				"GridItem Count: " +
+				level.startGridCount + "-" + level.getGridCount(),
+				topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
 			Fonts.drawText(
 				FontType.Grey,
-				"Current GridItem Count: " + level.getGridCount(), topLeftX, topLeftY + (currentLineH += lineHeight)
+				"TGridItem Count: " +
+				level.startTGridCount + "-" + level.getTGridCount(),
+				topLeftX, topLeftY + (currentLineH += lineHeight)
 			);
 
 			Fonts.drawText(
@@ -2079,8 +2083,8 @@ public class GameMode {
 		if (weapon is AbsorbWeapon aw) {
 			var sprite = Global.sprites[aw.absorbedProj.sprite.name];
 
-			float w = sprite.getCurrentFrame().rect.w();
-			float h = sprite.getCurrentFrame().rect.h();
+			float w = sprite.frames[0].rect.w();
+			float h = sprite.frames[0].rect.h();
 
 			float scaleX = Helpers.clampMax(10f / w, 1);
 			float scaleY = Helpers.clampMax(10f / h, 1);

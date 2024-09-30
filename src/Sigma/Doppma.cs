@@ -4,7 +4,11 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Doppma : BaseSigma {
-	public float sigma3FireballCooldown;
+	public float fireballCooldown;
+	public Weapon fireballWeapon = new Sigma3FireWeapon();
+	public float maxFireballCooldown = 0.39f;
+	public float shieldCooldown;
+	public float maxShieldCooldown = 1.125f;
 
 	public Doppma(
 		Player player, float x, float y, int xDir,
@@ -22,9 +26,9 @@ public class Doppma : BaseSigma {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		player.sigmaFireWeapon.update();
-		Helpers.decrementTime(ref sigma3FireballCooldown);
-		Helpers.decrementTime(ref sigma3ShieldCooldown);
+		fireballWeapon.update();
+		Helpers.decrementTime(ref fireballCooldown);
+		Helpers.decrementTime(ref shieldCooldown);
 		// For ladder and slide shoot.
 		if (charState is WallSlide or LadderClimb &&
 			!string.IsNullOrEmpty(charState?.shootSprite) &&
@@ -34,8 +38,8 @@ public class Doppma : BaseSigma {
 				changeSpriteFromName(charState.sprite, true);
 			} else {
 				var shootPOI = getFirstPOI();
-				if (shootPOI != null && player.sigmaFireWeapon.shootTime == 0) {
-					player.sigmaFireWeapon.shootTime = 0.15f;
+				if (shootPOI != null && fireballWeapon.shootTime == 0) {
+					fireballWeapon.shootTime = 0.15f;
 					int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 					float ang = getShootXDir() == 1 ? 0 : 180;
 					if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
@@ -49,8 +53,8 @@ public class Doppma : BaseSigma {
 					}
 					playSound("sigma3shoot", sendRpc: true);
 					new Sigma3FireProj(
-						player.sigmaFireWeapon, shootPOI.Value,
-						ang, upDownDir, player, player.getNextActorNetId(), sendRpc: true
+						shootPOI.Value, ang, upDownDir,
+						player, player.getNextActorNetId(), sendRpc: true
 					);
 				}
 			}
@@ -86,20 +90,20 @@ public class Doppma : BaseSigma {
 				}
 			}
 
-			if (player.sigmaFireWeapon.shootTime == 0 && sigma3FireballCooldown == 0) {
+			if (fireballWeapon.shootTime == 0 && fireballCooldown == 0) {
 				if (charState is WallSlide or LadderClimb) {
 					changeSpriteFromName(charState.shootSprite, true);
 				} else {
 					changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
 				}
-				sigma3FireballCooldown = maxSigma3FireballCooldown;
+				fireballCooldown = maxFireballCooldown;
 				return true;
 			}
 		}
 		if (grounded && player.input.isPressed(Control.Special1, player) &&
-			charState is not SigmaThrowShieldState && sigma3ShieldCooldown == 0
+			charState is not SigmaThrowShieldState && shieldCooldown == 0
 		) {
-			sigma3ShieldCooldown = maxSigma3ShieldCooldown;
+			shieldCooldown = maxShieldCooldown;
 			changeState(new SigmaThrowShieldState(), true);
 			return true;
 		}

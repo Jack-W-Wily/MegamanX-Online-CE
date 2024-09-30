@@ -171,7 +171,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Napalm:
-				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, arguments[extraDataIndex] != 0, 0);
+				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
 				break;
 			case (int)ProjIds.NapalmGrenade2:
 				proj = new MK2NapalmGrenadeProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
@@ -632,10 +632,10 @@ public partial class RPCCreateProj : RPC {
 				);
 				break;
 			case (int)ProjIds.Sigma3Shield:
-				proj = new SigmaShieldProj(player.sigmaShieldWeapon, pos, xDir, player, netProjByte);
+				proj = new SigmaShieldProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma3Fire:
-				proj = new Sigma3FireProj(player.sigmaFireWeapon, pos, 0, 0, player, netProjByte);
+				proj = new Sigma3FireProj(pos, 0, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma3KaiserMine:
 				proj = new KaiserSigmaMineProj(new KaiserMineWeapon(), pos, xDir, 0, player, netProjByte);

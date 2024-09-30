@@ -29,11 +29,11 @@ public partial class Actor {
 		for (int i = 0; i < 8; i++) mask.Add(false);
 
 		// These masks are for whether to send the following fields or not.
-		mask[0] = !isStatic;                    // pos x
-		mask[1] = !isStatic;                    // pos y
-		mask[2] = syncScale;                    // scale data
-		mask[3] = (sprite.frames.Count > 1);    // frame index data
-		mask[4] = byteAngle != null;                // angle
+		mask[0] = !isStatic;                            // pos x
+		mask[1] = !isStatic;                            // pos y
+		mask[2] = syncScale;                            // scale data
+		mask[3] = (sprite.totalFrameNum != 0); // frame index data
+		mask[4] = byteAngle != null;                    // angle
 
 		// The rest are just always sent and contain actual bool data
 		mask[5] = visible;                      // visibility
@@ -156,7 +156,7 @@ public class RPCUpdateActor : RPC {
 			int? playerId = Player.getPlayerIdFromCharNetId(netId);
 			if (playerId != null) {
 				var player = Global.level.getPlayerById(playerId.Value);
-				if (player != null) {
+				if (player != null && netId == player.getStartNetId()) {
 					Global.level.addFailedSpawn(
 						playerId.Value, new Point(xPos ?? 0, yPos ?? 0), xDir ?? 1, netId
 					);

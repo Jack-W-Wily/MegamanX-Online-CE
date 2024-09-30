@@ -102,7 +102,7 @@ public class Server {
 	public const byte getServersQueryByte = 0;
 	public const byte getServerQueryByte = 1;
 
-	public const int maxPlayerCap = 24;
+	public const int maxPlayerCap = 25;
 
 	public Server(
 		decimal gameVersion, Region? region,
@@ -424,7 +424,7 @@ public class Server {
 			}
 			if (isP2P && uniqueID != 0) {
 				// If we are a P2P server we cannot use a public IP as the masterserver handles that.
-				ip = "";
+				ip = LANIPHelper.GetLocalIPAddress();
 				// Send our info to masterserver to say that we are open now.
 				IPEndPoint? masterServerLocation = NetUtility.Resolve(
 					MasterServerData.serverIp, MasterServerData.serverPort
@@ -433,7 +433,10 @@ public class Server {
 				NetOutgoingMessage basicInfoMsg = s_server.CreateMessage();
 				basicInfoMsg.Write((byte)MasterServerMsg.RegisterHost);
 				basicInfoMsg.Write(uniqueID);
-				basicInfoMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), s_server.Port));
+				basicInfoMsg.Write(IPEndPoint.Parse(ip + ":" + s_server.Port));
+				if (Global.radminIP != "") {
+					basicInfoMsg.Write(IPEndPoint.Parse(Global.radminIP + ":" + s_server.Port));
+				}
 
 				// Second. The match list info.
 				NetOutgoingMessage listInfoMsg = s_server.CreateMessage();
@@ -568,7 +571,13 @@ public class Server {
 				}
 			} else if (im.MessageType == NetIncomingMessageType.Data) {
 				byte rpcIndexByte = im.ReadByte();
-				RPC rpcTemplate = RPC.templates[rpcIndexByte];
+				RPC rpcTemplate;
+				if (rpcIndexByte >= RPC.templates.Length) {
+					rpcTemplate = new RPCUnknown();
+					rpcTemplate.index = rpcIndexByte;
+				} else {
+					rpcTemplate = RPC.templates[rpcIndexByte];
+				}
 				if (rpcTemplate.isServerMessage) {
 					processServerMessage(im, rpcTemplate);
 				} else {
@@ -879,9 +888,20 @@ public class Server {
 
 			om.Write(rpcIndexByte);
 			om.Write(argCount);
+			byte[] bytes;
 
-			var bytes = im.ReadBytes(argCount);
-			foreach (var b in bytes) {
+			// Safetly for Unknown RPCs.
+			if (rpcTemplate is RPCUnknown) {
+				bytes = new byte[argCount];
+				if (!im.TryReadBytes(bytes)) {
+					return;
+				}
+			}
+			// For know ones we just can and should crash.
+			else {
+				bytes = im.ReadBytes(argCount);
+			}
+			foreach (byte b in bytes) {
 				om.Write(b);
 			}
 

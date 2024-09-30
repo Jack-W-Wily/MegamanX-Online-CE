@@ -12,7 +12,11 @@ public class SonicSlicer : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 13;
 		killFeedIndex = 24;
-		weaknessIndex = 9;
+		weaknessIndex = (int)WeaponIds.CrystalHunter;
+		damage = "2/4";
+		effect = "Bounces on Wall. Breaks W.Sponge Shield.";
+		hitcooldown = "0/0.25";
+		Flinch = "0/26";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -61,7 +65,7 @@ public class SonicSlicerProj : Projectile {
 		collider.wallOnly = true;
 		projId = (int)ProjIds.SonicSlicer;
 
-		twin = Global.sprites["sonicslicer_twin"].clone();
+		twin = new Sprite("sonicslicer_twin");
 
 		vel.y = 50;
 		if (type == 1) {
@@ -82,7 +86,7 @@ public class SonicSlicerProj : Projectile {
 		if (type == 0) vel.y -= Global.spf * 100;
 		else vel.y -= Global.spf * 50;
 
-		var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+		var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
 		if (collideData != null && collideData.hitData != null) {
 			playSound("dingX2");
 			xDir *= -1;
@@ -93,7 +97,7 @@ public class SonicSlicerProj : Projectile {
 
 		int velYSign = MathF.Sign(vel.y);
 		if (velYSign != 0) {
-			collideData = Global.level.checkCollisionActor(this, 0, velYSign, vel);
+			collideData = Global.level.checkTerrainCollisionOnce(this, 0, velYSign, vel);
 			if (collideData != null && collideData.hitData != null) {
 				playSound("dingX2");
 				vel.y *= -1;

@@ -9,7 +9,7 @@ public class IssueGlobalCommand : CharState {
 		base.update();
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -49,7 +49,7 @@ public class CallDownMaverick : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -66,14 +66,13 @@ public class CallDownMaverick : CharState {
 }
 
 public class SigmaBlock : CharState {
-	public BaseSigma sigma;
-
 	public SigmaBlock() : base("block") {
 		immuneToWind = true;
 		superArmor = true;
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		stunResistant = true;
 	}
 
 	public override void update() {
@@ -88,7 +87,7 @@ public class SigmaBlock : CharState {
 			else if (rightGuard) character.xDir = 1;
 		}
 		if (!isHoldingGuard) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 			return;
 		}
 		if (Global.level.gameMode.isOver) {

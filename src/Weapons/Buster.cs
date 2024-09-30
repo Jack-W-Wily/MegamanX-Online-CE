@@ -19,6 +19,11 @@ public class Buster : Weapon {
 		canHealAmmo = false;
 		drawAmmo = false;
 		drawCooldown = false;
+		effect = "You only need this to win any match.";
+		hitcooldown = "0/0/0/1";
+		damage = "1/2/3/4";
+		Flinch = "0/0/13/26";
+		FlinchCD = "0";
 	}
 
 	public void setUnpoBuster(MegamanX mmx) {
@@ -333,7 +338,7 @@ public class Buster3Proj : Projectile {
 			changeSprite("buster4_x2", true);
 			fadeSprite = "buster4_x2_fade";
 			for (int i = 0; i < 6; i++) {
-				var midSprite = Global.sprites["buster4_x2_orbit"].clone();
+				var midSprite = new Sprite("buster4_x2_orbit");
 				spriteMids.Add(midSprite);
 			}
 			projId = (int)ProjIds.Buster4;
@@ -618,8 +623,7 @@ public class X3ChargeShot : CharState {
 			if (state == 0 && pressFire) {
 				if (hyperBusterWeapon != null) {
 					if (hyperBusterWeapon.ammo < hyperBusterWeapon.getChipFactoredAmmoUsage(player)) {
-						if (character.grounded) character.changeState(new Idle(), true);
-						else character.changeState(new Fall(), true);
+						character.changeToIdleOrFall();
 						return;
 					}
 				} else {

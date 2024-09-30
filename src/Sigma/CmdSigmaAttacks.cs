@@ -1,6 +1,8 @@
 namespace MMXOnline;
 
 public class SigmaSlashWeapon : Weapon {
+	public static SigmaSlashWeapon netWeapon = new();
+
 	public SigmaSlashWeapon() : base() {
 		index = (int)WeaponIds.SigmaSlash;
 		killFeedIndex = 9;
@@ -45,14 +47,13 @@ public class SigmaSlashState : CharState {
 			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new SigmaSlashProj(
-				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
 				character.xDir, player, player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true
 			);
 		}
 
 		if (character.isAnimOver()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -91,6 +92,8 @@ public class SigmaSlashProj : Projectile {
 }
 
 public class SigmaBallWeapon : Weapon {
+	public static SigmaBallWeapon netWeapon = new();
+
 	public SigmaBallWeapon() : base() {
 		index = (int)WeaponIds.SigmaBall;
 		killFeedIndex = 103;
@@ -129,7 +132,7 @@ public class SigmaBallShoot : CharState {
 		base.update();
 
 		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
@@ -172,7 +175,7 @@ public class SigmaBallShoot : CharState {
 			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);
 			new SigmaBallProj(
-				player.sigmaBallWeapon, poi, character.xDir, player,
+				SigmaBallWeapon.netWeapon, poi, character.xDir, player,
 				player.getNextActorNetId(), vel.normalize(), rpc: true
 			);
 			new Anim(
@@ -182,7 +185,7 @@ public class SigmaBallShoot : CharState {
 		}
 
 		if (character.sprite.loopCount > 5 || player.sigmaAmmo <= 0) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -233,17 +236,17 @@ public class SigmaWallDashState : CharState {
 	public override void update() {
 		base.update();
 
-		var collideData = Global.level.checkCollisionActor(character, vel.x * Global.spf, vel.y * Global.spf);
+		var collideData = Global.level.checkTerrainCollisionOnce(character, vel.x * Global.spf, vel.y * Global.spf);
 		if (collideData?.gameObject is Wall wall) {
-			var collideData2 = Global.level.checkCollisionActor(character, vel.x * Global.spf, 0);
+			var collideData2 = Global.level.checkTerrainCollisionOnce(character, vel.x * Global.spf, 0);
 			if (collideData2?.gameObject is Wall wall2 && wall2.collider.isClimbable) {
 				character.changeState(new WallSlide(character.xDir, wall2.collider), true);
 			} else {
-				if (vel.y > 0) character.changeState(new Idle(), true);
-				else {
-					//vel.y *= -1;
+				if (vel.y > 0) {
+					character.changeToIdleOrFall();
+				} else {
 					character.isDashing = true;
-					character.changeState(new Fall(), true);
+					character.changeToIdleOrFall();
 				}
 			}
 		}
@@ -270,7 +273,7 @@ public class SigmaWallDashState : CharState {
 
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
-				player.sigmaSlashWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
 				character.xDir, player, player.getNextActorNetId(), damage: 4, rpc: true
 			);
 		}

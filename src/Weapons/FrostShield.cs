@@ -13,6 +13,9 @@ public class FrostShield : Weapon {
 		weaponSlotIndex = 23;
 		killFeedIndex = 46;
 		weaknessIndex = (int)WeaponIds.ParasiticBomb;
+		damage = "2+2/3+3";
+		hitcooldown = "0-0.5/1";
+		Flinch = "0/26-26";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -115,7 +118,7 @@ public class FrostShieldProjAir : Projectile {
 
 	public override void update() {
 		base.update();
-		var wall = Global.level.checkCollisionActor(this, vel.x * Global.spf, vel.y * Global.spf, vel);
+		var wall = Global.level.checkTerrainCollisionOnce(this, vel.x * Global.spf, vel.y * Global.spf, vel);
 		if (wall != null && wall.gameObject is Wall) {
 			vel.x *= -1;
 		}

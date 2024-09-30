@@ -12,9 +12,13 @@ public class ShotgunIce : Weapon {
 		weaponBarBaseIndex = 8;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 8;
-		weaknessIndex = 4;
+		weaknessIndex = (int)WeaponIds.FireWave;
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
 		rateOfFire = 0.5f;
+		damage = "2/1-2";
+		effect = "Insta Freeze enemies. Ice sled up to 12 DMG.";
+		hitcooldown = "0.01/0.5";
+		Flinch = "0";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -212,7 +216,7 @@ public class ShotgunIceProjSled : Projectile {
 
 		if (!ownedByLocalPlayer) return;
 
-		if (sprite.frameIndex == sprite.frames.Count - 1) {
+		if (sprite.frameIndex == sprite.totalFrameNum - 1) {
 			damager.flinch = Global.defFlinch;
 			useGravity = true;
 		}

@@ -12,7 +12,9 @@ public class BusterZeroMelee : CharState {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
 		airMove = true;
-		superArmor = true;
+		//superArmor = true;
+		canJump = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
@@ -23,17 +25,6 @@ public class BusterZeroMelee : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
-		} else {
-			if ((character.grounded || character.canAirJump() && character.flag == null) &&
-				player.input.isPressed(Control.Jump, player)
-			) {
-				if (!character.grounded) {
-					character.dashedInAir++;
-				}
-				character.vel.y = -character.getJumpPower();
-				sprite = "projswing_air";
-				character.changeSpriteFromName(sprite, false);
-			}
 		}
 	}
 
@@ -236,7 +227,7 @@ public class BusterZeroHadangekiWall : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeState(new WallSlide(wallDir, wallCollider));
-			character.sprite.frameIndex = character.sprite.frames.Count - 1;
+			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
 

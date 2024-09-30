@@ -16,8 +16,13 @@ public class Flag : Actor {
 	public bool nonOwnerHasUpdraft;
 	public List<UpdraftParticle> particles = new List<UpdraftParticle>();
 	public float pickupCooldown;
+	public bool isPickedUpNet;
 
-	public Flag(int alliance, Point pos, ushort? netId, bool ownedByLocalPlayer) : base(alliance == GameMode.blueAlliance ? "blue_flag" : "red_flag", pos, netId, ownedByLocalPlayer, false) {
+	public Flag(
+		int alliance, Point pos, ushort? netId, bool ownedByLocalPlayer
+	) : base(
+		alliance == GameMode.blueAlliance ? "blue_flag" : "red_flag", pos, netId, ownedByLocalPlayer, false
+	) {
 		this.alliance = alliance;
 		collider.wallOnly = true;
 		setzIndex(ZIndex.Character - 2);
@@ -87,7 +92,7 @@ public class Flag : Actor {
 		if (pos.y > Math.Min(Global.level.killY, Global.level.height)) {
 			return Global.level.killY - 175;
 		}
-		var hitKillZones = Global.level.getTriggerList(this, 0, 0, null, new Type[] { typeof(KillZone) });
+		var hitKillZones = Global.level.getTerrainTriggerList(this, new Point(0, 0), typeof(KillZone));
 		if (hitKillZones.Count > 0 && hitKillZones[0].otherCollider != null && hitKillZones[0].gameObject is KillZone kz && kz.killInvuln) {
 			return hitKillZones[0].otherCollider.shape.minY - 175;
 		}
@@ -130,7 +135,9 @@ public class Flag : Actor {
 		this.chr = chr;
 		useGravity = false;
 		pickedUpOnce = true;
-		Global.level.gameMode.addKillFeedEntry(new KillFeedEntry(chr.player.name + " took flag", chr.player.alliance, chr.player), true);
+		Global.level.gameMode.addKillFeedEntry(
+			new KillFeedEntry(chr.player.name + " took flag", chr.player.alliance, chr.player), true
+		);
 
 		if (chr.ai != null && chr.ai.aiState is FindPlayer) {
 			(chr.ai.aiState as FindPlayer).setDestNodePos();
@@ -250,21 +257,24 @@ public class Flag : Actor {
 		pickedUpOnce = data[3] == 1;
 		timeDropped = data[4] / 8f;
 
+		bool wasActive = isPickedUpNet;
+
 		Character? chara = null;
 		if (chrNetId != ushort.MaxValue) {
-			chara = Global.level.getActorByNetId(chrNetId) as Character;
-		}
-		if (chrNetId == ushort.MaxValue || chara == null) {
+			chara = Global.level.getActorByNetId(chrNetId, true) as Character;
+
 			if (chara != null && chara.flag == null) {
 				chara.onFlagPickup(this);
 			}
-		} else {
+		}
+		else if (wasActive) {
 			foreach (Player player in Global.level.players) {
 				if (player?.character != null && player.character.flag == this) {
 					player.character.flag = null;
 				}
 			}
 		}
+		isPickedUpNet = chara != null;
 	}
 }
 

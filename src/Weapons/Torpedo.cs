@@ -10,9 +10,13 @@ public class Torpedo : Weapon {
 		weaponBarBaseIndex = 1;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;
-		weaknessIndex = 3;
+		weaknessIndex = (int)WeaponIds.RollingShield;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" };
 		rateOfFire = 0.625f;
+		damage = "2/1";
+		effect = "A Homing Torpedo.. yeah.";
+		hitcooldown = "0/0";
+		Flinch = "0/13";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

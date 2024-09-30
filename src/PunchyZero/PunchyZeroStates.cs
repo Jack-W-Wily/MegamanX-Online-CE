@@ -150,11 +150,12 @@ public class PZeroSpinKick : CharState {
 	}
 }
 
-public class PZeroDropKickState : CharState {
+public class PZeroDiveKickState : CharState {
 	float stuckTime;
+	float diveTime;
 	PunchyZero zero = null!;
 
-	public PZeroDropKickState() : base("dropkick") {
+	public PZeroDiveKickState() : base("dropkick") {
 	}
 
 	public override void update() {
@@ -165,8 +166,14 @@ public class PZeroDropKickState : CharState {
 			once = true;
 		}
 		base.update();
-
-		CollideData hit = Global.level.checkCollisionActor(
+		if (!once) {
+			return;
+		}
+		if (character.vel.y < 100) {
+			character.changeToLandingOrFall();
+			return;
+		}
+		CollideData hit = Global.level.checkTerrainCollisionOnce(
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
 		if (hit?.isSideWallHit() == true) {
@@ -175,13 +182,15 @@ public class PZeroDropKickState : CharState {
 		} else if (hit != null) {
 			stuckTime += Global.speedMul;
 			if (stuckTime >= 6) {
-				character.changeState(new Fall(), true);
+				character.changeToLandingOrFall();
 				return;
 			}
 		}
-		if (character.grounded) {
-			character.landingCode();
+		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
+			character.changeToLandingOrFall();
+			return;
 		}
+		diveTime += Global.spf;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -201,7 +210,6 @@ public class PZeroDropKickState : CharState {
 
 
 public class ZeroDropkickLand : CharState {
-	int type;
 	public ZeroDropkickLand() : base("land") {
 		exitOnAirborne = true;
 	}
@@ -237,7 +245,6 @@ public class PZeroParry : CharState {
 	}
 
 	public void counterAttack(Player damagingPlayer, Actor? damagingActor) {
-		zero.parryCooldown = 0;
 		Actor? counterAttackTarget = null;
 		bool isMelee = false;
 		if (damagingActor is Projectile proj) {
@@ -276,7 +283,7 @@ public class PZeroParry : CharState {
 	public override void onExit(CharState newState) {
 		character.specialState = (int)SpecialStateIds.None;
 		base.onExit(newState);
-		zero.parryCooldown = 30;
+		zero.parryCooldown = 60;
 	}
 
 	public bool canParry(Actor? actor, int projId) {
@@ -398,7 +405,7 @@ public class PZeroShoryuken : CharState {
 			}
 		}
 
-		var wallAbove = Global.level.checkCollisionActor(character, 0, -10);
+		var wallAbove = Global.level.checkTerrainCollisionOnce(character, 0, -10);
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.speedMul;
 			if (timeInWall >= 6) {
@@ -411,7 +418,7 @@ public class PZeroShoryuken : CharState {
 			(zero.shootPressTime > 0 || zero.specialPressTime > 0) &&
 			player.input.getYDir(player) == 1
 		) {
-			character.changeState(new PZeroDropKickState(), true);
+			character.changeState(new PZeroDiveKickState(), true);
 			return;
 		}
 
@@ -423,7 +430,7 @@ public class PZeroShoryuken : CharState {
 	public bool canDownSpecial() {
 		return (
 			zero.diveKickCooldown == 0 &&
-			character.sprite.frameIndex >= character.sprite.frames.Count - 3
+			character.sprite.frameIndex >= character.sprite.totalFrameNum- 3
 		);
 	}
 
@@ -677,7 +684,7 @@ public class PunchyZeroHadangekiWall : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeState(new WallSlide(wallDir, wallCollider));
-			character.sprite.frameIndex = character.sprite.frames.Count - 1;
+			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}
 

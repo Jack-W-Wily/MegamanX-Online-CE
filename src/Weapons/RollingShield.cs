@@ -12,6 +12,9 @@ public class RollingShield : Weapon {
 		weaknessIndex = 6;
 		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "" };
 		rateOfFire = 0.75f;
+		damage = "2/1";
+		effect = "Mobile Shield That Deletes Projectiles.";
+		hitcooldown = "0/0.33";	
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -45,8 +48,8 @@ public class RollingShieldProj : Projectile {
 		}
 
 		move(new Point(xDir * 200, 0));
-		if (Global.level.checkCollisionActor(this, 0, -1) == null) {
-			var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+		if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
+			var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
 			if (collideData?.hitData?.normal != null && !(collideData.hitData.normal.Value.isAngled())) {
 				xDir *= -1;
 			}

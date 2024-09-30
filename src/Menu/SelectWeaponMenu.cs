@@ -316,36 +316,65 @@ public class SelectWeaponMenu : IMainMenu {
 			int weakAgainstIndex = weapon.weaknessIndex;
 			int[] strongAgainstMaverickIndices = getStrongAgainstMaverickFrameIndex(wi);
 			int weakAgainstMaverickIndex = getWeakAgainstMaverickFrameIndex(wi);
+			string damage = weapon.damage;
+			string rateOfFire = weapon.rateOfFire.ToString();
+			string ammousage = weapon.ammousage.ToString();
+			string effect = weapon.effect;
+			string hitcooldown = weapon.hitcooldown;
+			string Flinch = weapon.Flinch;
+			string FlinchCD = weapon.FlinchCD;
+
 
 			Fonts.drawText(
-				FontType.Purple, "Slot " + (selCursorIndex + 1).ToString() + " weapon",
-				Global.halfScreenW, 126, Alignment.Center
+				FontType.Purple, "Slot " + (selCursorIndex + 1).ToString() + " Weapon :",
+				Global.halfScreenW, 126, Alignment.Right
 			);
 			Fonts.drawText(
 				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
-				Global.halfScreenW, 146, Alignment.Center
+				Global.halfScreenW + 10, 126, Alignment.Left
 			);
 			//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
-			Fonts.drawText(FontType.Green, "Strong against: ", 200, wsy + 2, Alignment.Right);
+			Fonts.drawText(FontType.Green, "Counters: ", 86, wsy - 17, Alignment.Right);
 			if (strongAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 210, wsy + 5);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 89, wsy - 13);
 			} else {
-				Fonts.drawText(FontType.Grey, "Nothing", 202, wsy + 2);
+				Fonts.drawText(FontType.Grey, "None", 86, wsy - 17);
 			}
 			if (strongAgainstMaverickIndices.Length > 0 && strongAgainstMaverickIndices[0] > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[0], 228, wsy + 5);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[0], 107, wsy - 13);
 			}
 			if (strongAgainstMaverickIndices.Length > 1 && strongAgainstMaverickIndices[1] > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[1], 246, wsy + 5);
+				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstMaverickIndices[1], 118, wsy - 13);
 			}
-			Fonts.drawText(FontType.Green, "Weak against: ", 200, wsy + 17, Alignment.Right);
+			Fonts.drawText(FontType.Green, "Weakness: ", 86, wsy, Alignment.Right);
 			if (weakAgainstIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 210, wsy + 20);
+				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstIndex, 89, wsy + 4);
 			} else {
-				Fonts.drawText(FontType.Grey, "Nothing", 202, wsy + 17);
+				Fonts.drawText(FontType.Grey, "None", 86, wsy);
 			}
 			if (weakAgainstMaverickIndex > 0) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 228, wsy + 20);
+				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 107, wsy + 4);
+			}
+			Fonts.drawText(FontType.Red, "Damage:", 128, wsy - 17);
+			Fonts.drawText(FontType.Red, "Ammo Usage:", 128, wsy - 5);
+			Fonts.drawText(FontType.Red, "Fire Rate:", 127, wsy + 7);
+			Fonts.drawText(FontType.RedishOrange, "Hit CD:", 232, wsy - 17);
+			Fonts.drawText(FontType.RedishOrange, "Flinch CD:", 231, wsy + 7);
+			Fonts.drawText(FontType.RedishOrange, "Flinch:", 231, wsy - 5);
+			Fonts.drawText(FontType.DarkPurple, "Effects:", 25, wsy + 20);
+			Fonts.drawText(FontType.Red, damage, 172, wsy - 17);
+			Fonts.drawText(FontType.Red, rateOfFire, 190, wsy + 7);
+			Fonts.drawText(FontType.Red, ammousage, 200, wsy - 5);
+			Fonts.drawText(FontType.RedishOrange, hitcooldown, 279, wsy -17);
+			Fonts.drawText(FontType.RedishOrange, Flinch, 274, wsy + -5);
+			Fonts.drawText(FontType.RedishOrange, FlinchCD, 297, wsy +7);
+			Fonts.drawText(FontType.DarkPurple, effect, 74, wsy + 20);
+			if (weapon is FrostShield) {
+				if (Global.frameCount % 600 < 120) {
+					effect = "Missile,Mine,Shield,'Unbreakable' you name it."; } 
+				else { effect = "Blocks, Leaves Spikes. C:Tackle or Shoot it.";}	
+				Fonts.drawText(FontType.DarkPurple, 
+				effect, 74, wsy + 20);
 			}
 		}
 
@@ -373,34 +402,58 @@ public class SelectWeaponMenu : IMainMenu {
 	}
 
 	private int getWeakAgainstMaverickFrameIndex(int wi) {
-		if (wi == (int)WeaponIds.Torpedo) return new ArmoredArmadilloWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.Sting) return new BoomerangKuwangerWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.RollingShield) return new SparkMandrillWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.FireWave) return new StormEagleWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.Tornado) return new StingChameleonWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.ElectricSpark) return new ChillPenguinWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.Boomerang) return new LaunchOctopusWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.ShotgunIce) return new FlameMammothWeapon(null).weaponSlotIndex;
-
-		if (wi == (int)WeaponIds.StrikeChain) return new OverdriveOstrichWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.SpinWheel) return new WireSpongeWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.BubbleSplash) return new WheelGatorWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.SpeedBurner) return new BubbleCrabWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.SilkShot) return new FlameStagWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.MagnetMine) return new MorphMothWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.CrystalHunter) return new MagnaCentipedeWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.SonicSlicer) return new CrystalSnailWeapon(null).weaponSlotIndex;
-
-		if (wi == (int)WeaponIds.AcidBurst) return new BlizzardBuffaloWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.ParasiticBomb) return new GravityBeetleWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.TriadThunder) return new TunnelRhinoWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.SpinningBlade) return new VoltCatfishWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.RaySplasher) return new CrushCrawfishWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.GravityWell) return new NeonTigerWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.FrostShield) return new BlastHornetWeapon(null).weaponSlotIndex;
-		if (wi == (int)WeaponIds.TunnelFang) return new ToxicSeahorseWeapon(null).weaponSlotIndex;
-
-		return 0;
+		switch (wi) {
+			case (int)WeaponIds.Torpedo:
+				return new ArmoredArmadilloWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.Sting:
+				return new BoomerangKuwangerWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.RollingShield:
+				return new SparkMandrillWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.FireWave:
+				return new StormEagleWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.Tornado:
+				return new StingChameleonWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.ElectricSpark:
+				return new ChillPenguinWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.Boomerang:
+				return new LaunchOctopusWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.ShotgunIce:
+				return new FlameMammothWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.StrikeChain:
+				return new OverdriveOstrichWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.SpinWheel:
+				return new WireSpongeWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.BubbleSplash:
+				return new WheelGatorWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.SpeedBurner:
+				return new BubbleCrabWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.SilkShot:
+				return new FlameStagWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.MagnetMine:
+				return new MorphMothWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.CrystalHunter:
+				return new MagnaCentipedeWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.SonicSlicer:
+				return new CrystalSnailWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.AcidBurst:
+				return new BlizzardBuffaloWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.ParasiticBomb:
+				return new GravityBeetleWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.TriadThunder:
+				return new TunnelRhinoWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.SpinningBlade:
+				return new VoltCatfishWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.RaySplasher:
+				return new CrushCrawfishWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.GravityWell:
+				return new NeonTigerWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.FrostShield:
+				return new BlastHornetWeapon(null).weaponSlotIndex;
+			case (int)WeaponIds.TunnelFang:
+				return new ToxicSeahorseWeapon(null).weaponSlotIndex;
+			default:
+				return 0;
+		}
 	}
 
 	private int[] getStrongAgainstMaverickFrameIndex(int weaponIndex) {

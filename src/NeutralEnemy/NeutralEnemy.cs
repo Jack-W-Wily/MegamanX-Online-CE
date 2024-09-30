@@ -9,19 +9,19 @@ public class NeutralEnemy : Actor, IDamagable {
 	public decimal maxHealth = 8;
 	public bool invincibleFlag;
 	public int enemyId;
-	public float wSize = 18;
-	public float hSize = 30;
+	public float wSize = 12;
+	public float hSize = 12;
 	public Action<Point>[] killDrops = new Action<Point>[0];
 
 	public NeutralEnemyState state;
 
 	public NeutralEnemy(
-		Point pos, ushort netId, bool isLocal, bool addToLevel = true
+		Point pos, ushort netId, bool isLocal, int alliance = 150, bool addToLevel = true
 	) : base(
 		null!, pos, netId, isLocal, !addToLevel
 	) {
 		// Forcefull change sprite to something before we crash.
-		sprite = Global.sprites["empty"].clone();
+		sprite = new Sprite("empty");
 		// We do this to manually call the state change.
 		// As oldState cannot be null because we do not want null crashes.
 		state = new NeutralEnemyState("empty");
@@ -31,6 +31,8 @@ public class NeutralEnemy : Actor, IDamagable {
 		if (ownedByLocalPlayer) {
 			changeState(new NeIdle());
 		}
+
+		this.alliance = alliance;
 	}
 
 	// For state update.
@@ -69,13 +71,22 @@ public class NeutralEnemy : Actor, IDamagable {
 		newState.onEnter(oldState);
 	}
 
+	// For normal collision.
+	public override Collider? getGlobalCollider() {
+		return new Collider(
+			new Rect(0, 0, wSize, hSize).getPoints(),
+			false, this, false, false,
+			HitboxFlag.Hurtbox, Point.zero
+		);
+	}
+
 	// For terrain collision.
 	public override Collider? getTerrainCollider() {
 		if (physicsCollider == null) {
 			return null;
 		}
 		return new Collider(
-			new Rect(0f, 0f, wSize, hSize).getPoints(),
+			new Rect(0, 0, wSize, hSize).getPoints(),
 			false, this, false, false,
 			HitboxFlag.Hurtbox, Point.zero
 		);

@@ -98,10 +98,11 @@ public class ServerClient {
 	}
 
 	public static ServerClient CreateHolePunch(
-		NetClient client, long serverId, IPEndPoint serverIP, ServerPlayer inputServerPlayer,
+		NetClient client, long serverId, IPEndPoint serverIP, IPEndPoint? radminIP, ServerPlayer inputServerPlayer,
 		out JoinServerResponse joinServerResponse, out string log
 	) {
 		// Enable autoflush temporally.
+		string localAdress = LANIPHelper.GetLocalIPAddress() + ":" + client.Port;
 		client.Configuration.AutoFlushSendQueue = true;
 		client.FlushSendQueue();
 		log = null;
@@ -109,13 +110,14 @@ public class ServerClient {
 		NetOutgoingMessage regMsg = client.CreateMessage();
 		regMsg.Write((byte)MasterServerMsg.ConnectPeersShort);
 		regMsg.Write(serverId);
-		regMsg.Write(new IPEndPoint(NetUtility.GetMyAddress(out _), client.Port));
+		regMsg.Write(IPEndPoint.Parse(localAdress));
 		IPEndPoint masterServerLocation = NetUtility.Resolve(MasterServerData.serverIp, MasterServerData.serverPort);
 		client.SendUnconnectedMessage(regMsg, masterServerLocation);
 		client.FlushSendQueue();
 		NetOutgoingMessage hail = client.CreateMessage(JsonConvert.SerializeObject(inputServerPlayer));
 		// Wait for hole punching to happen.
-		log += "\nSent HolePunch message...";
+		log += "\nSent connection message...";
+		log += "\nLAN IP: " + localAdress;
 		int count = 0;
 		bool connected = false;
 		NetIncomingMessage msg;
@@ -136,35 +138,69 @@ public class ServerClient {
 			client.FlushSendQueue();
 			Thread.Sleep(100);
 		}
+
 		// Do this if hole punch fails.
-		log += "\nFailed to holepunch, resorting to direct connection anyway.";
+		log += "\nFailed to holepunch, trying direct connection anyway...";
 		client.Connect(serverIP, hail);
 		count = 0;
 		while (count < 20 && !connected) {
 			if (client.ConnectionsCount != 0) {
-				log += "\nConections active: " + client.Connections.Count;
+				log += "\nDirect connection approved.";
 				connected = true;
+				goto exitLoop;
 			}
 			count++;
 			client.FlushSendQueue();
 			Thread.Sleep(100);
 		}
-		// Ok. We failed 2 times so we give up.
+
+		// Try Radmin.
+		if (client.ConnectionsCount == 0 &&
+			Global.radminIP != null &&
+			radminIP != null
+		) {
+			log += "\nFailed direct connection, using radmin...";
+			log += "\nRadmin IP: " + Global.radminIP +
+				"\nSever Radmin IP:" + radminIP.ToString();
+
+			NetPeerConfiguration oldConfig = client.Configuration;
+			client.Shutdown("Error");
+			Thread.Sleep(50);
+			client = new NetClient(oldConfig);
+			client.Start();
+			client.Connect(radminIP, hail);
+
+			count = 0;
+			while (count < 20 && !connected) {
+				if (client.ConnectionsCount != 0) {
+					log += "\nRadmin connection approved.";
+					connected = true;
+					goto exitLoop;
+				}
+				count++;
+				client.FlushSendQueue();
+				Thread.Sleep(100);
+			}
+		} else {
+			log += "\nRadmin not avaliable, skipping.";
+		}
+		// Ok. We failed 3 times so we give up.
 		if (client.ConnectionsCount != 0) {
 			log += "\nFailed to connect.";
 			joinServerResponse = null;
 			client.Configuration.AutoFlushSendQueue = false;
 			return null;
 		}
-exitLoop:
-// If it works, continue.
+		exitLoop:
+		// If it works, continue.
 		log += "\nStarting Serverclient.";
-		log += "\nConections active: " + client.Connections.Count;
+		log += "\nConections active: " + client.Connections.Count + " / " + client.ConnectionsCount;
 		var serverClient = new ServerClient(client, inputServerPlayer.isHost);
 		serverClient.serverId = serverId;
+		client.FlushSendQueue();
 		// Now try to connect to get server connect response after conection.
 		count = 0;
-		while (count < 20) {
+		while (count <= 40) {
 			serverClient.getMessages(out var messages, false);
 			foreach (var message in messages) {
 				if (message.StartsWith("joinservertargetedresponse:")) {
@@ -370,7 +406,7 @@ exitLoop:
 					byte rpcIndexByte = im.ReadByte();
 					RPC rpcTemplate;
 					if (rpcIndexByte >= RPC.templates.Length) {
-						rpcTemplate = RPC.unknown;
+						rpcTemplate = new RPCUnknown();
 					} else {
 						rpcTemplate = RPC.templates[rpcIndexByte];
 					}
@@ -384,16 +420,12 @@ exitLoop:
 						ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
 						var bytes = im.ReadBytes(argCount);
 						if (invokeRpcs) {
-							Helpers.tryWrap(() => { rpcTemplate.invoke(bytes); }, false);
+							rpcTemplate.invoke(bytes);
 						}
 					} else {
 						var message = im.ReadString();
 						if (invokeRpcs) {
-							if (rpcTemplate is RPCJoinLateResponse) {
-								rpcTemplate.invoke(message);
-							} else {
-								Helpers.tryWrap(() => { rpcTemplate.invoke(message); }, false);
-							}
+							rpcTemplate.invoke(message);
 						}
 						stringMessages.Add(message);
 					}

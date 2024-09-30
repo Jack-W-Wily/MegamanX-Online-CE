@@ -17,6 +17,9 @@ public class RaySplasher : Weapon {
 		weaponSlotIndex = 21;
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
+		damage = "1/1";
+		effect = "Charged: Grants Super Armor.";
+		hitcooldown = "0.075";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -158,7 +161,7 @@ public class RaySplasherTurret : Actor, IDamagable {
 		}
 
 		if (state == 0) {
-			var hits = Global.level.getTriggerList(this, 0, velY * Global.spf, null, typeof(Wall));
+			var hits = Global.level.getTerrainTriggerList(this, new Point(0, velY * Global.spf), typeof(Wall));
 			if (hits.Count == 0) {
 				move(new Point(0, velY));
 			}
@@ -296,7 +299,7 @@ public class RaySplasherChargedState : CharState {
 		}
 
 		if (stateTime > 0.5f) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 

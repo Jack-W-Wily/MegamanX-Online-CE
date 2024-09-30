@@ -302,7 +302,6 @@ public class SelectCharacterMenu : IMainMenu {
 		}
 
 		// Draw character + box
-
 		var charPosX1 = Global.halfScreenW;
 		var charPosY1 = 85;
 		Global.sprites["playerbox"].drawToHUD(0, charPosX1, charPosY1);

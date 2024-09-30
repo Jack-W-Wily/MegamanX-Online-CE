@@ -58,7 +58,7 @@ public class GigaCrushProj : Projectile {
 
 	public override void update() {
 		base.update();
-		foreach (var gameObject in Global.level.getGameObjectArray()) {
+		foreach (var gameObject in getCloseActors(MathInt.Ceiling(radius + 50))) {
 			if (gameObject is Actor actor &&
 				actor.ownedByLocalPlayer &&
 				gameObject is IDamagable damagable &&
@@ -157,8 +157,8 @@ public class GigaCrushCharState : CharState {
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
-		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
 		}
 
 		if (stateTime <= 1.6) {

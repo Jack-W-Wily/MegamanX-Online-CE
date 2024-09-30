@@ -27,9 +27,13 @@ public class RakuhouhaWeapon : Weapon {
 		weaponSlotIndex = 51;
 		type = (int)ZeroGigaType.Rakuhouha;
 		displayName = "Rakuhouha";
-		description = new string[] { "Channels stored energy in one blast.", "Energy cost: 16" };
+		description = new string[] { "Channels stored energy in one blast. Energy cost: 14." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "4";
+		hitcooldown = "1";
+		Flinch = "26";
+		effect = "42 Frames of Invincibility.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -61,9 +65,13 @@ public class RekkohaWeapon : Weapon {
 		weaponSlotIndex = 63;
 		type = (int)ZeroGigaType.Rekkoha;
 		displayName = "Rekkoha";
-		description = new string[] { "Summon down pillars of light energy.", "Energy cost: 32" };
+		description = new string[] { "Summon down pillars of light energy. Energy cost: 28." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "3";
+		hitcooldown = "0.5";
+		Flinch = "26";
+		effect = "79 Frames of Invincibility.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -86,9 +94,13 @@ public class CFlasher : Weapon {
 		weaponSlotIndex = 64;
 		type = (int)ZeroGigaType.CFlasher;
 		displayName = "Messenkou";
-		description = new string[] { "A less damaging blast that can pierce enemies.", "Energy cost: 8" };
+		description = new string[] { "A weak blast that can pierce enemies. Energy cost: 7." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "2";
+		hitcooldown = "0.5";
+		Flinch = "0";
+		effect = "42 Frames of Invincibility. Ignores Defense.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -110,6 +122,10 @@ public class ShinMessenkou : Weapon {
 		weaponSlotIndex = 64;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		damage = "4";
+		hitcooldown = "1";
+		Flinch = "26";
+		effect = "42 Frames of Invincibility";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -119,7 +135,6 @@ public class ShinMessenkou : Weapon {
 
 public class Rakuhouha : CharState {
 	public Weapon weapon;
-	Anim? rakuanim;
 	ZeroGigaType type { get { return (ZeroGigaType)weapon.type; } }
 	bool fired = false;
 	bool fired2 = false;
@@ -219,7 +234,7 @@ public class Rakuhouha : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -367,7 +382,7 @@ public class Rekkoha : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -603,7 +618,7 @@ public class DarkHoldProj : Projectile {
 		updateShader();
 
 		if (timeInFrames  <= 30) {
-			foreach (var gameObject in Global.level.getGameObjectArray()) {
+			foreach (GameObject gameObject in getCloseActors(MathInt.Ceiling(radius + 50))) {
 				if (gameObject != this && gameObject is Actor actor && actor.locallyControlled && inRange(actor)) {
 					// For characters.
 					if (actor is Character chara && chara.darkHoldInvulnTime <= 0) {

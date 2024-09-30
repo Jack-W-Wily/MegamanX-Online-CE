@@ -278,10 +278,10 @@ public class TSeahorseTeleportState : MaverickState {
 		base.update();
 
 		if (state == 0) {
-			if (maverick.frameIndex == maverick.sprite.frames.Count - 1) {
+			if (maverick.frameIndex == maverick.sprite.totalFrameNum - 1) {
 				state = 1;
 				stateTime = 0;
-				maverick.frameIndex = maverick.sprite.frames.Count - 1;
+				maverick.frameIndex = maverick.sprite.totalFrameNum - 1;
 				maverick.frameSpeed = 0;
 			}
 		} else if (state == 1) {
@@ -291,7 +291,7 @@ public class TSeahorseTeleportState : MaverickState {
 			maverick.turnToInput(input, player);
 			if (dir.x != 0) {
 				var move = new Point(100 * dir.x, 0);
-				var hitGroundMove = Global.level.checkCollisionActor(maverick, dir.x * 20, 20);
+				var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir.x * 20, 20);
 				if (hitGroundMove == null) {
 				} else {
 					maverick.move(move);

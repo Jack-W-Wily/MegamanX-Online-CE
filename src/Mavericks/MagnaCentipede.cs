@@ -89,7 +89,7 @@ public class MagnaCentipede : Maverick {
 					}
 
 					for (int i = 1; i <= 4; i++) {
-						CollideData collideData = Global.level.checkCollisionActor(this, 0, -10 * i * getYMod(), autoVel: true);
+						CollideData collideData = Global.level.checkTerrainCollisionOnce(this, 0, -10 * i * getYMod(), autoVel: true);
 						if (collideData != null && collideData.gameObject is Wall wall && !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 							changeState(new MagnaCCeilingStartState());
 							return;
@@ -564,8 +564,8 @@ public class MagnaCTeleportState : MaverickState {
 
 	public bool canChangePos() {
 		float yDir = inverted ? -5 : 5;
-		if (Global.level.checkCollisionActor(clone, 0, yDir) == null) return false;
-		var hits = Global.level.getTriggerList(clone, 0, yDir, null, new Type[] { typeof(KillZone) });
+		if (Global.level.checkTerrainCollisionOnce(clone, 0, yDir) == null) return false;
+		var hits = Global.level.getTerrainTriggerList(clone, new Point(0, yDir), typeof(KillZone));
 		if (hits.Count > 0) return false;
 		return true;
 	}
@@ -611,7 +611,7 @@ public class MagnaCMagnetPullProj : Projectile {
 
 	public override void update() {
 		base.update();
-		foreach (var go in Global.level.getGameObjectArray()) {
+		foreach (GameObject go in getCloseActors(MathInt.Ceiling(radius + 50))) {
 			var chr = go as Character;
 			if (chr == null || !chr.ownedByLocalPlayer || chr.isImmuneToKnockback()) continue;
 			var damagable = go as IDamagable;

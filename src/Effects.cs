@@ -21,6 +21,7 @@ public class ChargeEffect {
 	public List<Point> origPoints;
 	public List<ChargeParticle> chargeParts;
 	public bool active = false;
+	string? chargePart;
 
 	public ChargeEffect() {
 		chargeParts = new List<ChargeParticle>();
@@ -75,9 +76,10 @@ public class ChargeEffect {
 				part.pos.x = Helpers.moveTo(part.pos.x, 0, Global.spf * 70);
 				part.pos.y = Helpers.moveTo(part.pos.y, 0, Global.spf * 70);
 			}
-			var chargePart = "charge_part_" + chargeLevel.ToString();
-			if (chargeType != 1 && chargeLevel >= 4) {
-				chargePart = "hypercharge_part_1";
+			if (chargeType == 3 && chargeLevel >= 3) {
+				chargePart = "charge_part_4";
+			} else {
+				chargePart = "charge_part_" + chargeLevel.ToString();
 			}
 			part.changeSprite(chargePart, true);
 			part.time += Global.spf * 20;
@@ -162,7 +164,7 @@ public class DieEffectParticles {
 			var rect = new Rect(x - halfWidth, y - halfWidth, x + halfWidth, y + halfWidth);
 			var camRect = new Rect(Global.level.camX, Global.level.camY, Global.level.camX + Global.viewScreenW, Global.level.camY + Global.viewScreenH);
 			if (rect.overlaps(camRect)) {
-				int frameIndex = (int)MathF.Round(time * 20) % diePart.sprite.frames.Count;
+				int frameIndex = (int)MathF.Round(time * 20) % diePart.sprite.totalFrameNum;
 				diePart.sprite.draw(frameIndex, x + offsetX, y + offsetY, 1, 1, null, alpha, 1, 1, ZIndex.Foreground);
 			}
 
@@ -230,7 +232,7 @@ public class ExplodeDieEffect : Effect {
 
 		exploder = new Anim(animPos, spriteName, xDir, owner.getNextActorNetId(), false, sendRpc: true);
 		exploder.zIndex = zIndex;
-		exploder.sprite.frameIndex = exploder.sprite.frames.Count - 1;
+		exploder.sprite.frameIndex = exploder.sprite.totalFrameNum - 1;
 		exploder.visible = isExploderVisible;
 		exploder.maverickFade = isMaverick;
 	}

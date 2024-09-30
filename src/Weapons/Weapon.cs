@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Weapon {
-	public string[] shootSounds = { "" };
+	public string[] shootSounds = { "", "", "", ""};
 	public float ammo;
 	public float maxAmmo;
 	public float rateOfFire;
@@ -55,11 +55,23 @@ public class Weapon {
 	public bool drawAmmo = true;
 	public bool drawRoundedDown = false;
 	public bool drawGrayOnLowAmmo = false;
+	public string damage = "";
+	public string hitcooldown= "";
+	public double ammousage;
+	public string effect = "";
+	public string Flinch = "";
+	public string FlinchCD = "";
 
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;
 		rateOfFire = 0.15f;
+		effect = "";
+		damage = "0";
+		hitcooldown = "0";
+		Flinch = "0";
+		FlinchCD = "0";
+		ammousage = getAmmoUsage(0);
 	}
 
 	public Weapon(WeaponIds index, int killFeedIndex, Damager? damager = null) {
@@ -348,7 +360,11 @@ public class Weapon {
 			if (weaponHealCount >= 1) {
 				weaponHealCount = 0;
 				if (isAlwaysOn || character.player.weapon == this) {
-					character.playSound("heal", forcePlay: true);
+					if (character.player.hasArmArmor(3)) {
+						character.playSound("healX3", forcePlay: true);
+					} else {
+						character.playSound("heal", forcePlay: true);
+					}
 				}
 			}
 		}

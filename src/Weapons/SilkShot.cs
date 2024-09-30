@@ -14,7 +14,10 @@ public class SilkShot : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 11;
 		killFeedIndex = 20 + (index - 9);
-		weaknessIndex = 16;
+		weaknessIndex = (int)WeaponIds.SpeedBurner;
+		damage = "2+1/4+1";
+		effect = "Capable to heal allies, rewards scraps too.";
+		Flinch = "0/26";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -52,7 +55,7 @@ public class SilkShotProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		frameSpeed = 0;
-		frameIndex = Helpers.randomRange(0, sprite.frames.Count - 1);
+		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
 
 	}
 

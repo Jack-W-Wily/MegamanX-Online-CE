@@ -35,6 +35,7 @@ public class AI {
 	public static int targetUpdateCounter;
 	public int projId;
 	public bool isWildDance;
+	public float blocktime = 0;
 
 	public AI(Character character) {
 		this.character = character;
@@ -48,7 +49,7 @@ public class AI {
 		if (Global.level.isTraining()) mashType = 0;
 		targetUpdateFrame = targetUpdateCounter;
 		targetUpdateCounter++;
-		if (targetUpdateCounter >= Server.maxPlayerCap / 2) {
+		if (targetUpdateCounter >= 60) {
 			targetUpdateCounter = 0;
 		}
 	}
@@ -194,16 +195,16 @@ public class AI {
 				return;
 			}
 			if (trainingBehavior == AITrainingBehavior.Guard) {
-				player.press(Control.WeaponLeft);
+				if (character is BaseSigma) {
+					player.press(Control.Down);
+				}
+				else if (character is Zero) {
+					player.press(Control.WeaponLeft);
+				}
 				return;
 			}
 			if (trainingBehavior == AITrainingBehavior.Crouch) {
-				if (player.isSigma) {
-					character?.changeState(new SigmaBlock(), true);
-					player.press(Control.Down);
-				} else {
-					player.press(Control.Down);
-				}
+				player.press(Control.Down);
 				return;
 			}
 		}
@@ -261,7 +262,7 @@ public class AI {
 		if (target != null && target.destroyed) {
 			target = null;
 		}
-		if (!Global.isSkippingFrames && Global.level.nonSkippedframeCount % 60 == targetUpdateFrame) {
+		if (Global.level.frameCount % 60 == targetUpdateFrame) {
 			if (target != null && (
 					target.destroyed ||
 					character.pos.distanceTo(target.pos) > 400 ||
@@ -427,7 +428,6 @@ public class AI {
 					busterZeroAIAttack(zero);
 				} else if (character is PunchyZero pzero) {
 					KnuckleZeroAIAttack(pzero);
-					return;
 				}
 
 				// is Facing the target?
@@ -442,17 +442,17 @@ public class AI {
 				}
 			}
 			// The amount of actions the AI will do, the lower the number, the higher the actions
-			// At 0.01 is Kaizo Level
+			// Before the AI did an actions in 5 frames (0.08 seconds), now it will do an action in 24 frames
 			shootTime += Global.spf;
-			if (shootTime > 0.08) {
+			if (shootTime > 18f/60f) {
 				shootTime = 0;
 			}
 		}
 		//End of AI should attack
 
 		//The AI should dodge if a projectile is close to him
-		/*
-		if (aiState.shouldDodge && target != null) {
+		
+		if (aiState.shouldDodge && target != null && shootTime == 0) {
 			if (character is Zero zero3) {
 				zeroAIDodge(zero3);
 			}
@@ -472,11 +472,11 @@ public class AI {
 				busterzeroAIDodge(bzero);
 			}
 		}
-		*/
+		
 		//End of The AI Dodging
 
 		//The AI should randomly charge weapon?
-		if (aiState.randomlyChargeWeapon 
+		if (aiState.randomlyChargeWeapon
 			&& character is MegamanX or Axl or BusterZero
 			&& framesChargeHeld == 0 && player.character?.canCharge() == true
 		) {
@@ -521,14 +521,14 @@ public class AI {
 
 		}	
 		//Randomly Jump
-		if (aiState.randomlyJump && !inNodeTransition && stuckTime == 0) {
+		if (aiState.randomlyJump && !inNodeTransition && stuckTime == 0 && shootTime == 0 ) {
 			if (Helpers.randomRange(0, 650) < 3) {
 				jumpTime = Helpers.randomRange(0.25f, 0.75f);
 			}
 		}
 		//Randomly Change Weapon
 		if (aiState.randomlyChangeWeapon &&
-			(player.isX || player.isAxl || player.isVile) &&
+			(player.isX || player.isAxl) &&
 			!player.lockWeapon && player.character?.isStealthy(-1) != null &&
 			(character as MegamanX)?.chargedRollingShieldProj == null
 		) {
@@ -547,9 +547,9 @@ public class AI {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
 
-		if (player.vileAmmo <= 0 && player.weapon is not VileCannon) {
-			player.changeWeaponSlot(getRandomWeaponIndex());
-		}
+		//if (player.vileAmmo <= 0 && player.weapon is not VileCannon) {
+		//	player.changeWeaponSlot(getRandomWeaponIndex());
+		//}
 
 		aiState.update();
 
@@ -967,14 +967,14 @@ public class AI {
 		// X:
 		if (character is MegamanX mmx) {
 
-			/*if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
+			if (player.canUpgradeUltimateX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtUltimateArmorOnce) {
 					player.currency -= Player.ultimateArmorCost;
 					mmx.boughtUltimateArmorOnce = true;
 				}
 				player.setUltimateArmor(true);
 				return;
-			} Deactivated until fixed */ 
+			}
 
 			if (player.hasAllX3Armor() && player.canUpgradeGoldenX() && player.health >= player.maxHealth) {
 				if (!mmx.boughtGoldenArmorOnce) {
@@ -1004,43 +1004,32 @@ public class AI {
 	public void mmxAIDodge(Character mmx) {
 		int RollingShield = player.weapons.FindIndex(w => w is RollingShield);
 		foreach (GameObject gameObject in mmx.getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					//Start of X
-					//Putting X 
-					if (player.character is MegamanX X) {
-						if (character != null && proj.isFacing(character) &&
-						character.withinX(proj, 60) && character.withinY(proj, 30)) {
-
-							if (player.hasArmor() || !player.hasArmor() && !X.isHyperX) {
-								if (X.player.weapon.ammo > 0) {
-									player.changeWeaponSlot(RollingShield);
-									player.press(Control.Shoot);
-									player.release(Control.Shoot);
-								}
-							}
-
-							int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
-							if (player.hasUltimateArmor()) {
-								X.player.changeWeaponSlot(novaStrikeSlot);
-								if (X.player.weapon.ammo >= 16) {
-									X.player.press(Control.Shoot);
-								} else { X.player.changeWeaponSlot(getRandomWeaponIndex()); }
-							}
-
-							if (X.isHyperX) {
-								if (X.unpoAbsorbedProj != null) {
-									X.changeState(new XUPParryProjState(X.unpoAbsorbedProj, true, false), true);
-									player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
-									X.unpoAbsorbedProj = null;
-									return;
-								} else {
-									X.changeState(new XUPParryStartState(), true); player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
-								}
-							}
-						}
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance
+			&& player.character is MegamanX X) {
+				if (player.hasArmor() || !player.hasArmor() && !X.isHyperX) {
+					if (X.player.weapon.ammo > 0) {
+						player.changeWeaponSlot(RollingShield);
+						player.press(Control.Shoot);
+						player.release(Control.Shoot);
 					}
 				}
+				int novaStrikeSlot = player.weapons.FindIndex(w => w is NovaStrike);
+				if (player.hasUltimateArmor()) {
+					X.player.changeWeaponSlot(novaStrikeSlot);
+					if (X.player.weapon.ammo >= 16) {
+						X.player.press(Control.Shoot);
+					} else { X.player.changeWeaponSlot(getRandomWeaponIndex()); }
+				}
+				if (X.isHyperX) {
+					if (X.unpoAbsorbedProj != null) {
+						X.changeState(new XUPParryProjState(X.unpoAbsorbedProj, true, false), true);
+						player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
+						X.unpoAbsorbedProj = null;
+						return;
+					} else {
+						X.changeState(new XUPParryStartState(), true); player.press(Control.WeaponLeft); player.release(Control.WeaponLeft);
+					}								
+				}	
 			}
 		}
 	}
@@ -1051,7 +1040,7 @@ public class AI {
 		bool isTargetInAir = target?.pos.y < character.pos.y - 50;
 		// Go hypermode 
 		if (player.currency >= Player.zeroHyperCost && !zero.isSpriteInvulnerable() && !zero.isInvulnerable() &&
-		   zero.charState is not (HyperZeroStart or LadderClimb) && !zero.hypermodeActive()
+		   zero.charState is not (HyperZeroStart or LadderClimb) && !zero.hypermodeActive() && !player.isMainPlayer
 		) {
 			zero.changeState(new HyperZeroStart(), true);
 		}
@@ -1119,7 +1108,7 @@ public class AI {
 						zero.changeState(new Rakuhouha(zero.gigaAttack), true);
 						break;
 					case 1 when zero.isAwakened: // i would like to every hyper do Genmu, but okay
-						zero.changeState(new GenmuState(), true);
+						zero.changeState(new GenmureiState(), true);
 						break;
 					case 2 when zero.isAwakened:
 						zero.changeState(new AwakenedZeroHadangeki(), true);
@@ -1310,36 +1299,49 @@ public class AI {
 			}
 		}
 	}
-	public void zeroAIDodge(Character zero3, GameObject go) {
-		var proj = go as Projectile;
-				if (proj != null && proj.damager.owner.alliance != player.alliance) {
-					if (player.character is Zero zero) {
-						//Projectile is not 
-						if (!(projId == (int)ProjIds.RollingShieldCharged || projId == (int)ProjIds.RollingShield
-							|| projId == (int)ProjIds.MagnetMine || projId == (int)ProjIds.FrostShield
-							|| projId == (int)ProjIds.FrostShieldAir || projId == (int)ProjIds.FrostShieldChargedPlatform)	
-							) {
-							// If a projectile is close to Zero
-							if (character != null && proj.isFacing(character) &&
-								character.withinX(proj, 100) && character.withinY(proj, 30) && 
-								!player.isDead && zero.charState.canAttack() && zero.sprite.name != null &&
-								(zero.charState is not HyperZeroStart or LadderClimb or DarkHoldState or Hurt
-								 or GenericStun or Die or WarpIn or WarpOut or WallSlide or WallKick or SwordBlock)
-							) {
-								//Do i have giga attack ammo available?
-								if (zero.gigaAttack.ammo >= 8f && zero.grounded) {
-									//RAKUHOUHA!
-									player.press(Control.Special1);
-									player.press(Control.Down);
-								} else if (!(projId == (int)ProjIds.SwordBlock) && zero.grounded) {
-									//If he hasn't do "Block"						
-									zero.turnToInput(player.input, player);
-									zero.changeState(new SwordBlock());
-								}
-							}
+	public void zeroAIDodge(Character zero3) {
+		Helpers.decrementTime(ref blocktime);
+		foreach (GameObject gameObject in zero3.getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && player.character is Zero zero
+			&& proj.damager.owner.alliance != player.alliance && zero.charState.attackCtrl) { 					
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform)	
+				){					
+					if (zero.gigaAttack.shootTime <= 0 && zero.grounded) {
+						switch (zero.gigaAttack) {
+							case RekkohaWeapon when zero.gigaAttack.ammo >= 28:
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rekkoha(zero.gigaAttack), true);
+								break;
+							case CFlasher when zero.gigaAttack.ammo >= 7:
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rakuhouha(new CFlasher()), true);
+								break;
+							case RakuhouhaWeapon when zero.gigaAttack.ammo >= 14:
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+								break;
+							case DarkHoldWeapon when zero.gigaAttack.ammo >= 14 && zero.isViral:
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rakuhouha(new DarkHoldWeapon()), true);
+								break;
+							case ShinMessenkou when zero.gigaAttack.ammo >= 14 && zero.isAwakened:
+								zero.gigaAttack.addAmmo(-zero.gigaAttack.getAmmoUsage(0), player);
+								zero.changeState(new Rakuhouha(new ShinMessenkou()), true);
+								break;
 						}
-					}
-				}	
+					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && zero.grounded
+					&& blocktime <= 0) {
+						//If he hasn't do "Block"						
+						zero.turnToInput(player.input, player);
+						zero.changeState(new SwordBlock(), true);
+						blocktime = 13;
+					}											
+				}
+			}
+		}
 	}
 	//End of Saber Zero
 	//Start of Punchy Zero
@@ -1379,7 +1381,7 @@ public class AI {
 				break;
 			// If the character is on fall state, Drop Kick.
 			case 5 when pzero.charState is Fall:
-				pzero.changeState(new PZeroDropKickState(), true);
+				pzero.changeState(new PZeroDiveKickState(), true);
 				break;
 			// if the character is on Jump or Fall, Air Kick.
 			case 6 when pzero.charState is Jump or Fall:
@@ -1394,21 +1396,36 @@ public class AI {
 	}
 	public void knuckleZeroAIDodge(PunchyZero pzero) {
 		foreach (GameObject gameObject in pzero.getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					if (player.character is PunchyZero pzero1 &&
-						!pzero1.isInvulnerable() && pzero.parryCooldown == 0 && pzero.charState.canAttack()) {
-						if (character != null && proj.isFacing(character) && character.withinX(proj, 100) && character.withinY(proj, 30)) {
-							if (pzero.gigaAttack.ammo >= 16 && pzero.grounded) {
-								player.press(Control.Special1);
-								player.press(Control.Down);
-							} else {
-								pzero1.turnToInput(player.input, player);
-								pzero1.changeState(new PZeroParry(), true);
-							}
-						}
+			if (gameObject is Projectile proj && player.character is PunchyZero pzero1
+			&& proj.damager.owner.alliance != player.alliance && pzero.charState.attackCtrl) { 									
+				if (pzero1.gigaAttack.shootTime <= 0 && pzero1.grounded) {
+					switch (pzero1.gigaAttack) {
+						case RekkohaWeapon when pzero1.gigaAttack.ammo >= 28:
+							pzero1.gigaAttack.addAmmo(-pzero1.gigaAttack.getAmmoUsage(0), player);
+							pzero1.changeState(new Rekkoha(pzero1.gigaAttack), true);
+							break;
+						case CFlasher when pzero1.gigaAttack.ammo >= 7:
+							pzero1.gigaAttack.addAmmo(-pzero1.gigaAttack.getAmmoUsage(0), player);
+							pzero1.changeState(new Rakuhouha(new CFlasher()), true);
+							break;
+						case RakuhouhaWeapon when pzero1.gigaAttack.ammo >= 14:
+							pzero1.gigaAttack.addAmmo(-pzero1.gigaAttack.getAmmoUsage(0), player);
+							pzero1.changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+							break;
+						case DarkHoldWeapon when pzero1.gigaAttack.ammo >= 14 && pzero1.isViral:
+							pzero1.gigaAttack.addAmmo(-pzero1.gigaAttack.getAmmoUsage(0), player);
+							pzero1.changeState(new Rakuhouha(new DarkHoldWeapon()), true);
+							break;
+						case ShinMessenkou when pzero1.gigaAttack.ammo >= 14 && pzero1.isAwakened:
+							pzero1.gigaAttack.addAmmo(-pzero1.gigaAttack.getAmmoUsage(0), player);
+							pzero1.changeState(new Rakuhouha(new ShinMessenkou()), true);
+							break;
 					}
-				}
+				} else if (!(proj.projId == (int)ProjIds.SwordBlock)) {
+					//If he hasn't do "Block"						
+					pzero1.turnToInput(player.input, player);
+					pzero1.changeState(new PZeroParry(), true); 
+				}														
 			}
 		}
 	}
@@ -1463,22 +1480,22 @@ public class AI {
 	}
 	public void busterzeroAIDodge(BusterZero bzero) {
 		foreach (GameObject gameObject in bzero.getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					if (gameObject is not FrostShieldProj or FrostShieldProjAir
-						or FrostShieldProjCharged or FrostShieldProjGround or FrostShieldProjPlatform //HOW MANY OF U EXIST
-						) {
-						if (player.character is BusterZero bzero1) {
-							if (character != null && !bzero1.isInvulnerable() && proj.isFacing(character) &&
-								character.withinX(proj, 100) && character.withinY(proj, 30)) {
-								player.press(Control.Special1);
-							}
-						}
-					}
+			if (gameObject is Projectile proj && player.character is BusterZero bzero1
+			&& proj.damager.owner.alliance != player.alliance && bzero1.charState.attackCtrl) { 					
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform)	
+				){									
+					if (bzero1.zSaberCooldown == 0) {
+						bzero1.turnToInput(player.input, player);
+						bzero1.changeState(new BusterZeroMelee(), true);
+						bzero1.zSaberCooldown = 36;
+					}											
 				}
 			}
 		}
 	}
+
 	//End of Buster Zero
 	//Start of Sigma
 	public void sigmaAIAttack(Character sigma2) {
@@ -1602,14 +1619,14 @@ public class AI {
 				   !DoppmaSigma.isInvulnerable() && DoppmaSigma.charState.canAttack()
 				   && !(DoppmaSigma.charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
 					switch (DoppmaSigmaAttack) {
-						case 0 when DoppmaSigma.sigma3FireballCooldown == 0:
+						case 0 when DoppmaSigma.fireballCooldown == 0:
 							DoppmaSigma.changeState(new Sigma3Shoot(player.input.getInputDir(player)), true);
-							DoppmaSigma.sigma3FireballCooldown = DoppmaSigma.maxSigma3FireballCooldown;
+							DoppmaSigma.fireballCooldown = DoppmaSigma.maxFireballCooldown;
 							break;
-						case 1 when DoppmaSigma.sigma3ShieldCooldown == 0:
+						case 1 when DoppmaSigma.shieldCooldown == 0:
 							if (DoppmaSigma.grounded) {
 								DoppmaSigma.changeState(new SigmaThrowShieldState(), true);
-								DoppmaSigma.sigma3ShieldCooldown = DoppmaSigma.maxSigma3ShieldCooldown;
+								DoppmaSigma.shieldCooldown = DoppmaSigma.maxShieldCooldown;
 							}
 							break;
 						case 2:
@@ -1648,55 +1665,33 @@ public class AI {
 		//}	
 	}
 	public void sigmaAIDodge(Character sigma3) {
+		Helpers.decrementTime(ref blocktime);
 		foreach (GameObject gameObject in sigma3.getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					//Start Of Sigma
-					//Putting Sigma here
-					if (player.character is BaseSigma baseSigma) {
-						//If a projectile is close to Sigma
-						if (character != null && proj.isFacing(character) &&
-							character.withinX(proj, 150) && character.withinY(proj, 30)
-						) {
-							//Commander Sigma
-							if (character is CmdSigma cmdSigma) {
-								if (gameObject is not GenericMeleeProj) {
-									//Do Block
-									player.press(Control.Down);
-								}
-							}
-							//Neo Sigma
-							if (character is NeoSigma neoSigma) {
-								// If Neo Sigma giga attack ammo is the same and higher than 16 but less than 24
-								if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24) {
-									if (Global.time > 0.3f) {
-										//Do "Better C-Flasher" 
-										//Original name: 5 Bullet Shot (弾5発射 Dan 5 Hassha)
-										player.press(Control.Special1);
-									}
-								}
-								// If Neo Sigma giga attack ammo is 32
-								else if (player.sigmaAmmo == 32) {
-									if (Global.time > 0.3f) {
-										//Do "I-Frames E-Spark move"
-										//Original name: Electromagnetic Wave (電磁波 Denjiha) - Nightshade Electric Spark
-										player.press(Control.Special1);
-									}
-								}
-								// If Neo Sigma has giga attack ammo less than 16
-								else if (player.sigmaAmmo < 16) {
-									if (gameObject is not GenericMeleeProj) {
-										//Do "Block"
-										player.press(Control.Down);
-									}
-								}
-							}
-						}
-					}
-					//Doppma shouldn't get an AI to block something
-					//dude literally holds the best shield.
-					//End of Sigma
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {				
+				if (character is CmdSigma cmdSigma) {
+					if (!(proj.projId == (int)ProjIds.SwordBlock)
+					&& blocktime <= 0) {
+						cmdSigma.changeState(new SigmaBlock(), true);
+						blocktime = 13;
+					}		
 				}
+				if (character is NeoSigma neoSigma) {
+					if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24) {						
+						player.sigmaAmmo -= 16;
+						neoSigma.changeState(new SigmaElectricBallState(), true);								
+					} else if (player.sigmaAmmo == 32) {
+						player.sigmaAmmo = 0;
+						neoSigma.changeState(new SigmaElectricBall2State(), true);
+					}													
+				}
+				if (character is Doppma doppma && blocktime <= 0) {
+					if (!(proj.projId == (int)ProjIds.SwordBlock) ||
+						(proj.projId == (int)ProjIds.GigaCrush) ||
+						(proj.projId == (int)ProjIds.Rekkoha)) { 
+							doppma.changeState(new SigmaBlock(), true);
+							blocktime = 13;
+					}		
+				}						
 			}
 		}
 	}
@@ -1790,11 +1785,11 @@ public class AI {
 	public void axlAIAttack(Character axl2) {
 		//Axl Start
 		if (character is Axl axl) {
-			if (player.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
+			if (axl.axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isWhiteAxl()
 				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
 				axl.changeState(new HyperAxlStart(axl.grounded), true);
 			}
-			if (player.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
+			if (axl.axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !axl.isSpriteInvulnerable() && !axl.isInvulnerable() && !axl.isStealthMode()
 				&& !(axl.charState is Hurt or Die or GenericStun or WarpIn or HyperAxlStart or WallSlide or WallKick or DodgeRoll)) {
 				axl.stingChargeTime = 12;
 			}
@@ -1830,33 +1825,22 @@ public class AI {
 	}
 	public void axlAIDodge(Character axl3) {
 		foreach (GameObject gameObject in axl3.getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj) {
-				if (proj.damager.owner.alliance != player.alliance) {
-					//Start of Axl
-					//Putting Axl
-					if (player.character is Axl axl) {
-						if (character != null && proj.isFacing(character) &&
-							character.withinX(proj, 150) && character.withinY(proj, 30)) {
-							//Dodge Roll if your DodgeRollCooldown is on 0 and you are not in Dodgeroll State, also if you are on ground and can dash.
-							//and we count that you are not on hurt, die, frozen, crystalized, stunned, or grabbed state.. :skull:
-							if (axl.grounded && axl.canDash() && axl.charState is not DodgeRoll && axl.dodgeRollCooldown == 0 &&
-								(axl.player.axlWeapon?.isTwoHanded(true) == true || axl.isZooming())
-								&& axl.charState.normalCtrl &&
-								axl?.charState?.isGrabbedState == false
-							) {
-								axl.changeState(new DodgeRoll());
-							}
-							//Use Airblast If Axl has flameburner as his weapon and has air blast as its alt, as the projectile is not Melee and is reflectable by airblast (why this exists?), which its ammo should be higher than 0
-							else if (axl?.player.weapon is FlameBurner && axl.player.axlLoadout.flameBurnerAlt == 1 && (gameObject is not GenericMeleeProj || (proj.reflectableFBurner == true)) && axl.player.weapon.ammo > 0) {
-								player.press(Control.Special1);
-							} else {
-								doJump(0.75f);
-							}
-							//Or just Jump
-						}
-					}
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance
+			&& player.character is Axl axl) {									
+				if (axl.grounded && axl.canDash() && axl.charState is not DodgeRoll && 
+					axl.dodgeRollCooldown == 0 && axl.charState.normalCtrl 
+				) {
+					axl.changeState(new DodgeRoll());
+					axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
 				}
-			}
+				else if (axl?.player.weapon is FlameBurner && axl.player.axlLoadout.flameBurnerAlt == 1 && 
+				(proj is not GenericMeleeProj || (proj.reflectableFBurner == true)) && axl.player.weapon.ammo > 0
+				) {
+					player.press(Control.Special1);
+				} else {
+					doJump(0.75f);
+				}
+			}			
 		}
 	}
 	//End of Axl

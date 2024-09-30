@@ -12,7 +12,11 @@ public class SpinWheel : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 12;
 		killFeedIndex = 20 + (index - 9);
-		weaknessIndex = 14;
+		weaknessIndex = (int)WeaponIds.StrikeChain;
+		damage = "1/1";
+		effect = "Inflicts Wince. Doesn't destroy on hit.";
+		hitcooldown = "0.2/0";
+		Flinch = "0/26";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -80,8 +84,8 @@ public class SpinWheelProj : Projectile {
 			vel.x = xDir * 250;
 			if (lastHitTime > 0) vel.x = xDir * 4;
 			Helpers.decrementTime(ref lastHitTime);
-			if (Global.level.checkCollisionActor(this, 0, -1) == null) {
-				var collideData = Global.level.checkCollisionActor(this, xDir, 0, vel);
+			if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
+				var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
 				if (collideData != null && collideData.hitData != null &&
 					collideData.hitData.normal != null && !((Point)collideData.hitData.normal).isAngled()
 				) {

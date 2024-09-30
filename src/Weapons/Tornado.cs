@@ -10,10 +10,15 @@ public class Tornado : Weapon {
 		weaponBarBaseIndex = 5;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
-		weaknessIndex = 2;
+		weaknessIndex = (int)WeaponIds.Sting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
 		rateOfFire = 2f;
 		switchCooldown = 0.5f;
+		damage = "1/4";
+		effect = "Weak push. Extinguishes Fire. Ignores Shields.";
+		hitcooldown = "0.25/0.33";
+		Flinch = "0/26";
+		FlinchCD = "0/1";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -49,13 +54,13 @@ public class TornadoProj : Projectile {
 		}
 		maxTime = 2;
 		sprite.visible = false;
-		spriteStart = Global.sprites["tornado_start"].clone();
+		spriteStart = new Sprite("tornado_start");
 		for (var i = 0; i < 6; i++) {
-			var midSprite = Global.sprites["tornado_mid"].clone();
+			var midSprite = new Sprite("tornado_mid");
 			midSprite.visible = false;
 			spriteMids.Add(midSprite);
 		}
-		spriteEnd = Global.sprites["tornado_end"].clone();
+		spriteEnd = new Sprite("tornado_end");
 		vel.x = 0;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
@@ -139,9 +144,9 @@ public class TornadoProjCharged : Projectile {
 	public TornadoProjCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId) : base(weapon, pos, xDir, 0, 2, player, "tornado_charge", Global.defFlinch, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TornadoCharged;
 		sprite.visible = false;
-		spriteStart = Global.sprites["tornado_charge"].clone();
+		spriteStart = new Sprite("tornado_charge");
 		for (var i = 0; i < maxLength; i++) {
-			var midSprite = Global.sprites["tornado_charge"].clone();
+			var midSprite = new Sprite("tornado_charge");
 			midSprite.visible = false;
 			bodySprites.Add(midSprite);
 		}

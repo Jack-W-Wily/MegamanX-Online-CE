@@ -61,7 +61,7 @@ public class StingChameleon : Maverick {
 				drainAmmo(4);
 				if (ammo <= 0) {
 					uncloakTransitionTime = 1;
-					playSound("stingcCloak", sendRpc: true);
+					playSound("76stingcCloak", sendRpc: true);
 				}
 			} else {
 				rechargeAmmo(1);
@@ -447,7 +447,7 @@ public class StingCHangState : MaverickState {
 
 	public override bool canEnter(Maverick maverick) {
 		Point incPos = getTargetPos(maverick).subtract(maverick.pos);
-		if (Global.level.checkCollisionActor(maverick, incPos.x, incPos.y) != null) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, incPos.x, incPos.y) != null) {
 			return false;
 		}
 		return base.canEnter(maverick);

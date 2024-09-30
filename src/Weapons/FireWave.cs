@@ -12,11 +12,15 @@ public class FireWave : Weapon {
 		weaponBarBaseIndex = 4;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 4;
-		weaknessIndex = 5;
+		weaknessIndex = (int)WeaponIds.Tornado;
 		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" };
 		rateOfFire = 0.06f;
 		isStream = true;
 		switchCooldown = 0.25f;
+		damage = "1/1";
+		ammousage = 0.5;
+		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.";
+		hitcooldown = "0.2/0.33";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
@@ -91,9 +95,9 @@ public class FireWaveProjCharged : Projectile {
 	float soundCooldown;
 	public FireWaveProjCharged(Weapon weapon, Point pos, int xDir, Player player, float parentTime, ushort netProjId, int timesReversed, bool rpc = false) : base(weapon, pos, xDir, 0, 1, player, "fire_wave_charge", 0, 0.33f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FireWaveCharged;
-		spriteMid = Global.sprites["fire_wave_charge"].clone();
+		spriteMid = new Sprite("fire_wave_charge");
 		spriteMid.visible = false;
-		spriteTop = Global.sprites["fire_wave_charge"].clone();
+		spriteTop = new Sprite("fire_wave_charge");
 		spriteTop.visible = false;
 		useGravity = true;
 		collider.wallOnly = true;
@@ -112,8 +116,8 @@ public class FireWaveProjCharged : Projectile {
 
 	public override void render(float x, float y) {
 		sprite.draw(frameIndex, pos.x + x, pos.y + y - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
-		spriteMid.draw((int)MathF.Round(frameIndex + (sprite.frames.Count / 3)) % sprite.frames.Count, pos.x + x, pos.y + y - 6 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
-		spriteTop.draw((int)MathF.Round(frameIndex + (sprite.frames.Count / 2)) % sprite.frames.Count, pos.x + x, pos.y + y - 12 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+		spriteMid.draw((int)MathF.Round(frameIndex + (sprite.totalFrameNum / 3)) % sprite.totalFrameNum, pos.x + x, pos.y + y - 6 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+		spriteTop.draw((int)MathF.Round(frameIndex + (sprite.totalFrameNum / 2)) % sprite.totalFrameNum, pos.x + x, pos.y + y - 12 - riseY, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
 	}
 
 	public override void update() {
@@ -138,7 +142,7 @@ public class FireWaveProjCharged : Projectile {
 			}
 
 			if (ownedByLocalPlayer) {
-				var wall = Global.level.checkCollisionActor(this, 16 * xDir, -4);
+				var wall = Global.level.checkTerrainCollisionOnce(this, 16 * xDir, -4);
 				var sign = 1;
 				if (wall != null && wall.gameObject is Wall && wall.hitData.normal != null && !wall.hitData.normal.Value.isAngled()) {
 					sign = -1;

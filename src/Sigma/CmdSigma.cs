@@ -45,7 +45,7 @@ public class CmdSigma : BaseSigma {
 			if (isAnimOver() && charState != null && charState is not SigmaSlashState) {
 				changeSprite(getSprite(charState.defaultSprite), true);
 				if (charState is WallSlide && sprite != null) {
-					frameIndex = sprite.frames.Count - 1;
+					frameIndex = sprite.totalFrameNum - 1;
 				}
 			} else if (grounded && sprite.name != "sigma_attack") {
 				changeSprite("sigma_attack", false);
@@ -119,11 +119,11 @@ public class CmdSigma : BaseSigma {
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
 		Projectile? proj = sprite.name switch {
 			"sigma_ladder_attack" => new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
 				3, 0, 0.25f
 			),
 			"sigma_wall_slide_attack" => new GenericMeleeProj(
-				player.sigmaSlashWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
 				3, 0, 0.25f
 			),
 			_ => null

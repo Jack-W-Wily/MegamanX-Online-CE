@@ -17,11 +17,11 @@ public class FlameStag : Maverick {
 		canClimbWall = true;
 		width = 20;
 
-		antler = Global.sprites["fstag_antler"].clone();
-		antlerDown = Global.sprites["fstag_antler_down"].clone();
-		antlerSide = Global.sprites["fstag_antler_side"].clone();
-		//spriteFrameToSounds["fstag_run/2"] = "run";
-		//spriteFrameToSounds["fstag_run/6"] = "run";
+		antler = new Sprite("fstag_antler");
+		antlerDown = new Sprite("fstag_antler_down");
+		antlerSide = new Sprite("fstag_antler_side");
+		spriteFrameToSounds["fstag_run/2"] = "run";
+		spriteFrameToSounds["fstag_run/6"] = "run";
 
 		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
 		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
@@ -109,8 +109,8 @@ public class FlameStag : Maverick {
 
 	public Point? getAntlerPOI(out string tag) {
 		tag = "";
-		if (sprite?.getCurrentFrame()?.POIs?.Count > 0) {
-			for (int i = 0; i < sprite.getCurrentFrame().POITags.Count; i++) {
+		if (sprite.getCurrentFrame().POIs.Length > 0) {
+			for (int i = 0; i < sprite.getCurrentFrame().POITags.Length; i++) {
 				tag = sprite.getCurrentFrame().POITags[i];
 				if (tag == "antler" || tag == "antler_side" || tag == "antler_down") {
 					return getFirstPOIOffsetOnly(i);
@@ -129,7 +129,7 @@ public class FlameStag : Maverick {
 	}
 
 	public Point? getAttackPOI() {
-		if (sprite?.getCurrentFrame()?.POIs?.Count > 0) {
+		if (sprite.getCurrentFrame().POIs.Length > 0) {
 			int poiIndex = sprite.getCurrentFrame().POITags.FindIndex(tag => tag != "antler" && tag != "antler_side" && tag != "antler_down");
 			if (poiIndex >= 0) return getFirstPOIOrDefault(poiIndex);
 		}
@@ -617,7 +617,7 @@ public class FStagWallDashState : MaverickState {
 
 		wallClimbCode();
 
-		if (Global.level.checkCollisionActor(maverick, 0, -1) != null && maverick.vel.y < 0) {
+		if (Global.level.checkTerrainCollisionOnce(maverick, 0, -1) != null && maverick.vel.y < 0) {
 			maverick.vel.y = 0;
 		}
 

@@ -16,11 +16,16 @@ public class ParasiticBomb : Weapon {
 		weaponSlotIndex = 18;
 		killFeedIndex = 41;
 		weaknessIndex = (int)WeaponIds.GravityWell;
+		damage = "4/4";
+		effect = "Inflicts Wince. Can carry enemies. Homing bees.";
+		hitcooldown = "0/0.5";
+		Flinch = "26-CarryT/26";
+		FlinchCD = "iwish";
 	}
 
 	public override void getProjectile(Point pos, int xDir, Player player, float chargeLevel, ushort netProjId) {
 		if (chargeLevel < 3) {
-			player.character.playSound("buster");
+			player.character.playSound("busterX3");
 			new ParasiticBombProj(this, pos, xDir, player, netProjId);
 		} else {
 			if (player.character.ownedByLocalPlayer && player.character is MegamanX mmx && mmx.beeSwarm == null) {
@@ -70,6 +75,8 @@ public class ParasiteCarry : CharState {
 		if (!character.ownedByLocalPlayer) return false;
 		if (!base.canEnter(character)) return false;
 		if (character.isCCImmune()) return false;
+		if (character.isInvulnerable()) return false;
+		if (character.charState.superArmor) return false;
 		return !character.charState.invincible;
 	}
 
@@ -96,7 +103,7 @@ public class ParasiteCarry : CharState {
 
 		if (!character.hasParasite || character.parasiteDamager == null) {
 			isDone = true;
-			character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 

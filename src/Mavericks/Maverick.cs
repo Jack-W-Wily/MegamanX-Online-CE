@@ -101,6 +101,11 @@ public class Maverick : Actor, IDamagable {
 	public WeaponIds weakWeaponId;
 	public WeaponIds weakMaverickWeaponId;
 
+	// For sprite draw.
+	public Sprite subtankSprite = new Sprite("menu_subtank");
+	public Sprite subtankBarSprite = new Sprite("menu_subtank_bar");
+	public Sprite cursorSprite = new Sprite("cursorchar");
+
 	private Input _input;
 	public Input input {
 		get {
@@ -410,10 +415,13 @@ public class Maverick : Actor, IDamagable {
 				target = Global.level.getClosestTarget(getCenterPos(), player.alliance, true, isRequesterAI: true);
 				doppler.ballType = 0;
 			}
-		} else if (!isSummonerCocoon && !isStrikerCocoon) {
-			target = Global.level.getClosestTarget(getCenterPos(), player.alliance, true, isRequesterAI: true);
-		} else {
+		} else if (isSummonerCocoon || isStrikerCocoon) {
 			target = mmc.getHealTarget();
+		} else if (!player.isPuppeteer() && !player.isTagTeam()) {
+			target = Global.level.getClosestTarget(
+				getCenterPos(), player.alliance, true, isRequesterAI: true,
+				aMaxDist: 300
+			);
 		}
 
 		bool isAIState = (state is MIdle or MRun or MLand);
@@ -1016,8 +1024,8 @@ public class Maverick : Actor, IDamagable {
 		Point topLeftBar = new Point(pos.x - 2, topLeft.y + 1);
 		Point botRightBar = new Point(pos.x + 2, topLeft.y + 15);
 
-		Global.sprites["menu_subtank"].draw(1, topLeft.x, topLeft.y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-		Global.sprites["menu_subtank_bar"].draw(0, topLeftBar.x, topLeftBar.y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+		subtankSprite.draw(1, topLeft.x, topLeft.y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+		subtankBarSprite.draw(0, topLeftBar.x, topLeftBar.y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 		float yPos = 14 * (health / SubTank.maxHealth);
 		DrawWrappers.DrawRect(topLeftBar.x, topLeftBar.y, botRightBar.x, botRightBar.y - yPos, true, Color.Black, 1, ZIndex.HUD);
 
@@ -1042,7 +1050,7 @@ public class Maverick : Actor, IDamagable {
 		renderDamageText(35);
 
 		if (showCursor()) {
-			Global.sprites["cursorchar"].draw(0, pos.x + x, pos.y + y + currentLabelY, 1, 1, null, 1, 1, 1, zIndex + 1);
+			cursorSprite.draw(0, pos.x + x, pos.y + y + currentLabelY, 1, 1, null, 1, 1, 1, zIndex + 1);
 			deductLabelY(labelCursorOffY);
 		}
 	}

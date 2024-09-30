@@ -99,7 +99,7 @@ public class RisingSpecterState : CharState {
 		}
 
 		if (stateTime > 0.5f) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -223,7 +223,7 @@ public class NecroBurstAttack : CharState {
 		}
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -265,7 +265,7 @@ public class NecroBurstProj : Projectile {
 	public override void update() {
 		base.update();
 		if (isRunByLocalPlayer()) {
-			foreach (var go in Global.level.getGameObjectArray()) {
+			foreach (var go in getCloseActors(MathInt.Ceiling(radius + 50))) {
 				var chr = go as Character;
 				bool isHurtSelf = chr?.player == damager.owner;
 				if (go is not Actor actor) continue;
@@ -339,7 +339,7 @@ public class StraightNightmareAttack : CharState {
 		}
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -366,7 +366,7 @@ public class StraightNightmareProj : Projectile {
 		maxTime = 2;
 		sprite.visible = false;
 		for (var i = 0; i < maxLen; i++) {
-			var midSprite = Global.sprites["straightnightmare_proj"].clone();
+			var midSprite = new Sprite("straightnightmare_proj");
 			midSprite.visible = false;
 			spriteMids.Add(midSprite);
 		}

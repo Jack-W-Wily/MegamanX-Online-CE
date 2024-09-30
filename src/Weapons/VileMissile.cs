@@ -53,7 +53,7 @@ public class VileMissile : Weapon {
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		Player player = vile.player;
-		if (shootTime > 0 || !player.cannonWeapon.isCooldownPercentDone(0.5f)) return;
+		if (shootTime > 0) return;
 
 		if (vile.charState is Idle || vile.charState is Run || vile.charState is Crouch) {
 			if (vile.tryUseVileAmmo(vileAmmo)) {
@@ -248,7 +248,7 @@ public class MissileAttack : CharState {
 		groundCodeWithMove();
 
 		if (character.sprite.isAnimOver()) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 		}
 	}
 

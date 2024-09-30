@@ -34,10 +34,10 @@ public class Shoryuken : CharState {
 		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
-			character.vel.y = -character.getJumpPower() * 4.75f;
+			character.vel.y = -character.getJumpPower() * 1.55f;
 			character.playSound("shoryukenV", sendRpc: true);
 		}
-		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Count > 0) {
+		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Length > 0) {
 			character.move(new Point(character.xDir * 165, 0));
 			Point poi = character.currentFrame.POIs[0];
 			Point firePos = character.pos.addxy(poi.x * character.xDir, poi.y);
@@ -62,7 +62,7 @@ public class Shoryuken : CharState {
 			}
 		}
 
-		var wallAbove = Global.level.checkCollisionActor(character, 0, -10);
+		var wallAbove = Global.level.checkTerrainCollisionOnce(character, 0, -10);
 		if (wallAbove != null && wallAbove.gameObject is Wall) {
 			timeInWall += Global.spf;
 			if (timeInWall > 0.1f) {

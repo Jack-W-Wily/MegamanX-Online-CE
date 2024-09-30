@@ -80,6 +80,15 @@ public partial class MegamanX : Character {
 	public bool stingActive;
 	public bool isHyperChargeActive;
 
+	public Sprite hyperChargePartSprite =  new Sprite("hypercharge_part_1");
+	public Sprite hyperChargePart2Sprite =  new Sprite("hypercharge_part_1");
+
+	public bool isShootingSpecialBuster;
+
+	public Buster staticBusterWeapon = new();
+	public Buster specialBuster => (player.weapons.OfType<Buster>().FirstOrDefault() ?? staticBusterWeapon);
+	public float WeaknessT;
+
 	public MegamanX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -181,6 +190,7 @@ public partial class MegamanX : Character {
 		Helpers.decrementTime(ref hadoukenCooldownTime);
 		Helpers.decrementTime(ref shoryukenCooldownTime);
 		Helpers.decrementTime(ref streamCooldown);
+		Helpers.decrementTime(ref WeaknessT);
 
 		if (player.weapon.ammo >= player.weapon.maxAmmo) {
 			weaponHealAmount = 0;
@@ -206,7 +216,7 @@ public partial class MegamanX : Character {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.sprite, false);
 				if (charState is WallSlide) {
-					frameIndex = sprite.frames.Count - 1;
+					frameIndex = sprite.totalFrameNum - 1;
 				}
 			}
 		}
@@ -278,7 +288,7 @@ public partial class MegamanX : Character {
 
 		if (charState is not Die &&
 			player.input.isPressed(Control.Special1, player) &&
-			player.hasAllX3Armor() && !player.hasGoldenArmor()) {
+			player.hasAllX3Armor() && !player.hasGoldenArmor() && !player.hasUltimateArmor()) {
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
 				Global.level.gameMode.setHUDErrorMessage(
@@ -389,7 +399,7 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		player.busterWeapon.update();
+		staticBusterWeapon.update();
 
 		var oldWeapon = player.weapon;
 		if (canShootSpecialBuster()) {
@@ -402,14 +412,14 @@ public partial class MegamanX : Character {
 				}
 			} else {
 				if (lastFrameSpecialHeld) {
-					player.isShootingSpecialBuster = true;
+					isShootingSpecialBuster = true;
 				}
 				lastFrameSpecialHeld = false;
 			}
 		} else {
 			lastFrameSpecialHeld = false;
 			lastShotWasSpecialBuster = false;
-			player.isShootingSpecialBuster = false;
+			isShootingSpecialBuster = false;
 		}
 
 		if (charState.canShoot()) {
@@ -442,10 +452,10 @@ public partial class MegamanX : Character {
 			int framesSinceLastShootReleased = Global.frameCount - lastShootReleased;
 			var shootHeld = player.input.isHeld(Control.Shoot, player);
 
-			if (lastShotWasSpecialBuster) player.isShootingSpecialBuster = true;
+			if (lastShotWasSpecialBuster) isShootingSpecialBuster = true;
 
 			bool offCooldown = oldWeapon.shootTime == 0 && shootTime == 0;
-			if (player.isShootingSpecialBuster) {
+			if (isShootingSpecialBuster) {
 				offCooldown = oldWeapon.shootTime < oldWeapon.rateOfFire * 0.5f && shootTime == 0;
 			}
 
@@ -474,7 +484,7 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		player.isShootingSpecialBuster = false;
+		isShootingSpecialBuster = false;
 
 		if (chargedSpinningBlade != null || chargedFrostShield != null || chargedTunnelFang != null) {
 			changeSprite("mmx_" + charState.shootSprite, true);
@@ -551,6 +561,34 @@ public partial class MegamanX : Character {
 					}
 				}
 			}
+		}
+	}
+	public override void chargeGfx() {
+		if (ownedByLocalPlayer) {
+			chargeEffect.stop();
+		}
+		if (isCharging()) {
+			chargeSound.play();
+			int chargeType = 2;
+			if (player.hasArmArmor(3) && !player.hasGoldenArmor()) {
+				chargeType = 1;
+			}
+			if (player.hasGoldenArmor()) {
+				chargeType = 3;
+			}
+			
+			int level = getChargeLevel();
+			var renderGfx = RenderEffectType.ChargeBlue;
+			renderGfx = level switch {
+				1 => RenderEffectType.ChargeBlue,
+				2 => RenderEffectType.ChargeYellow,
+				3 when (chargeType == 1) => RenderEffectType.ChargeOrange,
+				3 when (chargeType == 3) => RenderEffectType.ChargeGreen,
+				3 => RenderEffectType.ChargePink,
+				_ => RenderEffectType.ChargeOrange
+			};
+			addRenderEffect(renderGfx, 0.033333f, 0.1f);			
+			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
 
@@ -1147,6 +1185,7 @@ public partial class MegamanX : Character {
 		if (isShootingRaySplasher) return false;
 		if (chargedFrostShield != null) return false;
 		if (chargedTunnelFang != null) return false;
+		if (invulnTime > 0) return false;
 
 		return base.canShoot();
 	}
@@ -1199,10 +1238,10 @@ public partial class MegamanX : Character {
 		float sx = pos.x + x;
 		float sy = pos.y + y - 18;
 
-		var sprite1 = Global.sprites["hypercharge_part_1"];
+		var sprite1 = hyperChargePartSprite;
 		float distFromCenter = 12;
 		float posOffset = hyperChargeAnimTime * 50;
-		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.frames.Count);
+		int hyperChargeAnimFrame = MathInt.Floor((hyperChargeAnimTime / maxHyperChargeAnimTime) * sprite1.totalFrameNum);
 		sprite1.draw(hyperChargeAnimFrame, sx + distFromCenter + posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
 		sprite1.draw(hyperChargeAnimFrame, sx - distFromCenter - posOffset, sy, 1, 1, null, 1, 1, 1, zIndex + 1);
 		sprite1.draw(hyperChargeAnimFrame, sx, sy + distFromCenter + posOffset, 1, 1, null, 1, 1, 1, zIndex + 1);
@@ -1210,11 +1249,11 @@ public partial class MegamanX : Character {
 
 		hyperChargeAnimTime2 += Global.spf;
 		if (hyperChargeAnimTime2 >= maxHyperChargeAnimTime) hyperChargeAnimTime2 = 0;
-		var sprite2 = Global.sprites["hypercharge_part_2"];
+		var sprite2 = hyperChargePart2Sprite;
 		float distFromCenter2 = 12;
 		float posOffset2 = hyperChargeAnimTime2 * 50;
 		int hyperChargeAnimFrame2 = MathInt.Floor(
-			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.frames.Count
+			(hyperChargeAnimTime2 / maxHyperChargeAnimTime) * sprite2.totalFrameNum
 		);
 		float xOff = Helpers.cosd(45) * (distFromCenter2 + posOffset2);
 		float yOff = Helpers.sind(45) * (distFromCenter2 + posOffset2);
@@ -1230,7 +1269,7 @@ public partial class MegamanX : Character {
 		}
 		if (isShootingRaySplasher) {
 			var shootPos = getShootPos();
-			var muzzleFrameCount = Global.sprites["raysplasher_muzzle"].frames.Count;
+			var muzzleFrameCount = Global.sprites["raysplasher_muzzle"].frames.Length;
 			Global.sprites["raysplasher_muzzle"].draw(
 				Global.frameCount % muzzleFrameCount,
 				shootPos.x + x + (3 * xDir), shootPos.y + y, 1, 1, null, 1, 1, 1, zIndex
@@ -1318,7 +1357,7 @@ public partial class MegamanX : Character {
 					flinch = Global.defFlinch;
 				}
 				Projectile proj = new GenericMeleeProj(
-					player.headbuttWeapon, centerPoint, ProjIds.Headbutt, player,
+					Headbutt.netWeapon, centerPoint, ProjIds.Headbutt, player,
 					damage, flinch, 0.5f
 				);
 				var rect = new Rect(0, 0, 14, 4);
@@ -1487,7 +1526,7 @@ public partial class MegamanX : Character {
 	}
 
 	public bool shouldShowHyperBusterCharge() {
-		return flag != null && player.weapon is HyperBuster hb && hb.canShootIncludeCooldown(player);
+		return player.weapon is HyperBuster hb && hb.canShootIncludeCooldown(player) || flag != null;
 	}
 
 	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {

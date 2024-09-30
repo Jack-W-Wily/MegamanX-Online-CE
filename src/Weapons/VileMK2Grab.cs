@@ -24,7 +24,7 @@ public class VileMK2GrabState : CharState {
 		leechTime += Global.spf;
 
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
@@ -53,12 +53,12 @@ public class VileMK2GrabState : CharState {
 		}
 
 		if (stateFrames >= 2 && player.input.isPressed(Control.Special1, player)) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
 		if (grabTime <= 0) {
-			character.changeState(new Idle(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 	}
@@ -68,6 +68,7 @@ public class VileMK2GrabState : CharState {
 		character.grabCooldown = 1;
 		if (newState is not VileMK2GrabState && victim != null) {
 			victim.grabInvulnTime = 2;
+			victim.stunInvulnTime = 1;
 			victim?.releaseGrab(character, true);
 		}
 	}

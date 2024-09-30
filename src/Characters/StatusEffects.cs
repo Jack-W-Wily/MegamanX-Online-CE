@@ -119,7 +119,11 @@ public class GenericStun : CharState {
 		}
 
 		if (changeAnim) {
+			string stunAnim = getStunAnim();
 			character.changeSpriteFromName(getStunAnim(), true);
+			if (stunAnim == "idle") {
+				character.sprite.frameSpeed = 0;
+			}
 		}
 
 		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0) {
@@ -185,7 +189,8 @@ public class GenericStun : CharState {
 		if (paralyzeAnim == null && character.paralyzedTime > 0) {
 			paralyzeAnim = new Anim(
 				character.getCenterPos(), "vile_stun_static",
-				1, character.player.getNextActorNetId(), false, sendRpc: true
+				1, character.player.getNextActorNetId(), false,
+				host: character, sendRpc: true
 			);
 			paralyzeAnim.setzIndex(character.zIndex + 100);
 		}
@@ -315,7 +320,7 @@ public class KnockedDown : CharState {
 		}
 
 		if (stateTime >= flinchTime) {
-			character.changeState(new Idle());
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -342,8 +347,7 @@ public class GoliathDragged : CharState {
 
 		var goliathDash = goliath.rideArmorState as RADash;
 		if (goliathDash == null || !goliath.isAttacking()) {
-			if (character.grounded) character.changeState(new Idle(), true);
-			else character.changeState(new Fall(), true);
+			character.changeToIdleOrFall();
 			return;
 		}
 
