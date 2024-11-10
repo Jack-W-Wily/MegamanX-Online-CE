@@ -57,7 +57,7 @@ public class FireWaveProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 400, 1, player, "fire_wave",
-		0, 0.2f, netProjId, player.ownedByLocalPlayer
+		1, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.FireWave;
 		fadeSprite = "fire_wave_fade";
@@ -140,8 +140,8 @@ public class FireWaveProjCharged : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player, 
 		float parentTime, ushort netProjId, int timesReversed, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "fire_wave_charge", 
-		0, 0.33f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 3, player, "fire_wave_charge", 
+		30, 1f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.FireWaveCharged;
 		spriteMid = new Sprite("fire_wave_charge");

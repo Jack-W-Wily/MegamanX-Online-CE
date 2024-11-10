@@ -16,9 +16,9 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "Revision 20";
-	public static string subVersionName = "Alpha 13 [RELEASE CANDIDATE 1]";
-	public static string subVersionShortName = "A13 RC1";
+	public static string versionName = "WILY CUT";
+	public static string subVersionName = "BETA 3";
+	public static string subVersionShortName = "TEST 3";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -27,14 +27,14 @@ public partial class Global {
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
-	public const string checksumPrefix = "[Community Edition]";
+	public const string checksumPrefix = "[Wily Cut]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
 	public const string checksumPrefix2 = "CE-A12-RC1-6-T2";
 	// Final checksum key.
 	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.
-	public static string shortForkName = "CE";
+	public static string shortForkName = "WCUT";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 

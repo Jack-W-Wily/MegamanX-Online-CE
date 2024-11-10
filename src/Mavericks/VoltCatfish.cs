@@ -65,6 +65,8 @@ public class VoltCatfish : Maverick {
 					} else if (ammo >= 8) {
 						changeState(new VoltCUpBeamState());
 					}
+				}else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 			}

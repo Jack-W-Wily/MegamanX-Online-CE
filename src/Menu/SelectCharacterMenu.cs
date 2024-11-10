@@ -47,23 +47,22 @@ public class CharSelection {
 	public int mappedCharMaverick;
 	public string sprite;
 	public int frameIndex;
-	public Point offset = new Point(0, 45);
+	public Point offset = new Point(0, 20);
 
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
 	public static CharSelection[] selections => [
-		new CharSelection("X", 0, 1, 0, "menu_mmx", 0),
-		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
-		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
+		new CharSelection("X", 0, 1, 0, "smenu_x", 0),
+		
+		new CharSelection("Zero (Early)", 5, 1, 0, "smenu_zero", 0) {
 		},
-		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
-			offset = new Point(2, 45)
-		},
-		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
-		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
-			offset = new Point(1, 45)
-		},
-		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
+		new CharSelection("Zero (Mid)", 1, 1, 0, "smenu_zero_2", 0),
+		//new CharSelection("Zero (End)", 6, 1, 0, "menu_bzero", 0) {
+		//	offset = new Point(2, 45)
+		//},
+		new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
+		//new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
+		new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
 

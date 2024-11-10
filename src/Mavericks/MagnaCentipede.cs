@@ -80,6 +80,8 @@ public class MagnaCentipede : Maverick {
 				} else if (input.isPressed(Control.Dash, player) && ammo >= 8 && teleportCooldown == 0) {
 					deductAmmo(8);
 					changeState(new MagnaCTeleportState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Special1, player)) {

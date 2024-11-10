@@ -241,6 +241,7 @@ public class PZeroParry : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
+			zero.parryCooldown = 60;
 		}
 	}
 
@@ -271,6 +272,7 @@ public class PZeroParry : CharState {
 		} else {
 			character.playSound("zeroParry2", forcePlay: false, sendRpc: true);
 		}
+		zero.freeBusterShots += 1;
 		character.changeState(new PZeroParryCounter(counterAttackTarget, isMelee), true);
 	}
 
@@ -283,7 +285,7 @@ public class PZeroParry : CharState {
 	public override void onExit(CharState newState) {
 		character.specialState = (int)SpecialStateIds.None;
 		base.onExit(newState);
-		zero.parryCooldown = 60;
+		
 	}
 
 	public bool canParry(Actor? actor, int projId) {
@@ -605,6 +607,98 @@ public class HyperPunchyZeroStart : CharState {
 		}
 	}
 }
+
+
+
+
+
+public class PZeroDoubleBuster : CharState {
+	public bool fired1;
+	public bool fired2;
+	public bool isSecond;
+	public bool shootPressedAgain;
+	public bool isPinkCharge;
+	PunchyZero zero = null!;
+
+	public PZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster") {
+		this.isSecond = isSecond;
+		this.isPinkCharge = isPinkCharge;
+		airMove = true;
+		superArmor = true;
+		canStopJump = true;
+		canJump = true;
+		landSprite = "doublebuster";
+		airSprite = "doublebuster_air";
+	}
+
+	public override void update() {
+		base.update();
+		if (player.input.isPressed(Control.Shoot, player)) {
+			shootPressedAgain = true;
+		}
+		if (!fired1 && character.frameIndex == 3) {
+			fired1 = true;
+			character.playSound("buster3X3", sendRpc: true);
+			new DZBuster3Proj(
+				character.getShootPos(), character.getShootXDir(),
+				player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (!fired2 && character.frameIndex == 7) {
+			fired2 = true;
+				zero.stockedBusterLv = 0;
+				character.playSound("buster3X3", sendRpc: true);
+				new DZBuster3Proj(
+					character.getShootPos(), character.getShootXDir(),
+					player, player.getNextActorNetId(), rpc: true
+				);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		} else if (!isSecond && character.frameIndex >= 4 && !shootPressedAgain) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as PunchyZero ?? throw new NullReferenceException();
+		// Non-full charge.
+		if (isPinkCharge) {
+			zero.stockedBusterLv = 1;
+		}
+		// Full charge.
+		else {
+			// We add Z-Saber charge if we fire the full charge and we were at 0 charge before.
+			if (zero.stockedBusterLv != 2 || !isSecond) {
+				zero.stockedSaber = true;
+			}
+			zero.stockedBusterLv = 2;
+		}
+		if (!character.grounded || character.vel.y < 0) {
+			sprite = "doublebuster_air";
+			character.changeSpriteFromName(sprite, true);
+		}
+		if (isSecond) {
+			character.frameIndex = 4;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		// We check if we fired the second shot. If not we add the stocked charge.
+		if (!fired2) {
+			if (isPinkCharge) {
+				zero.stockedBusterLv = 1;
+			} else {
+				zero.stockedBusterLv = 2;
+				zero.stockedSaber = true;
+			}
+		}
+	}
+}
+
+
 
 public class PunchyZeroHadangeki : CharState {
 	bool fired;

@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+
+
 namespace MMXOnline;
 
 public class SigmaSlashWeapon : Weapon {
@@ -8,6 +12,108 @@ public class SigmaSlashWeapon : Weapon {
 		killFeedIndex = 9;
 	}
 }
+
+
+
+
+public class VirusSlash1 : CharState {
+	bool fired = false;
+	
+
+	public VirusSlash1() : base("slash_1", "", "", "") {
+	superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class VirusSlash2 : CharState {
+	bool fired = false;
+	
+
+	public VirusSlash2() : base("slash_2", "", "", "") {
+	superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded){
+			if (player.input.isPressed(Control.Shoot, player) 
+				&& player.input.isHeld (Control.Down,player)
+			&& stateTime > 0.1 && player.currency > 0){
+			character.changeState(new VirusSlash3(), true);
+			player.currency -= 1;
+			}
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class VirusSlash3 : CharState {
+	bool fired = false;
+	
+
+	public VirusSlash3() : base("slash_3", "", "", "") {
+	superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded){
+			if (player.input.isPressed(Control.Shoot, player) 
+			&& player.input.isHeld (Control.Down,player)
+			&& stateTime > 0.1 && player.currency > 0){
+			character.changeState(new VirusSlash1(), true);
+			player.currency -= 1;
+			}
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
 
 public class SigmaSlashState : CharState {
 	CharState prevCharState;
@@ -24,7 +130,14 @@ public class SigmaSlashState : CharState {
 
 	public override void update() {
 		base.update();
-
+		if (character.grounded){
+			if (player.input.isPressed(Control.Shoot, player) 
+			&& player.input.isHeld (Control.Down,player)
+			&& stateTime > 0.1 && character.frameIndex >= 2 && player.currency > 0){
+			character.changeState(new VirusSlash2(), true);
+			player.currency -= 1;
+			}
+		}
 		if (!character.grounded) {
 			landSprite = "attack";
 		}
@@ -63,7 +176,7 @@ public class SigmaSlashState : CharState {
 public class SigmaSlashProj : Projectile {
 	public SigmaSlashProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId,
-		float damage = 6, int flinch = 26, bool rpc = false
+		float damage = 4, int flinch = 26, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, damage, player, "sigma_proj_slash", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
@@ -89,6 +202,8 @@ public class SigmaSlashProj : Projectile {
 			incPos(owner.character.deltaPos);
 		}
 	}
+
+	
 }
 
 public class SigmaBallWeapon : Weapon {
@@ -105,8 +220,8 @@ public class SigmaBallProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player,
 		ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 2, player, "sigma_proj_ball",
-		0, 0.2f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 400, 1, player, "sigma_proj_ball",
+		8, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.SigmaBall;
 		maxTime = 0.5f;

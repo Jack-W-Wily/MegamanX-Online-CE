@@ -697,14 +697,14 @@ public class InRideChaser : CharState {
 			return;
 		}
 
-		if (!Global.level.isRace()) {
+		//if (!Global.level.isRace()) {
 			bool ejectInput = character.player.input.isHeld(Control.Up, player) && character.player.input.isPressed(Control.Jump, player);
 			if (ejectInput && !character.rideChaser.isTurning) {
 				character.vel.y = -character.getJumpPower();
 				character.incPos(new Point(0, -5));
 				character.changeState(new Jump(), true);
 			}
-		}
+		//}
 
 		if (Global.level.gameMode.isOver) {
 			character.changeToIdleOrFall();

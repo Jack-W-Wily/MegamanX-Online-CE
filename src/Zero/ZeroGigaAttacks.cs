@@ -10,6 +10,7 @@ public enum ZeroGigaType {
 	Rekkoha,
 	ShinMessenkou,
 	DarkHold,
+	Rocks,
 }
 
 public class RakuhouhaWeapon : Weapon {
@@ -46,6 +47,7 @@ public class RakuhouhaWeapon : Weapon {
 			(int)ZeroGigaType.Rakuhouha => new RakuhouhaWeapon(),
 			(int)ZeroGigaType.CFlasher => new CFlasher(),
 			(int)ZeroGigaType.Rekkoha => new RekkohaWeapon(),
+			(int)ZeroGigaType.Rocks => new FakeZeroWeapon(null),
 			_ => throw new Exception("Invalid Zero hyouretsuzan weapon index!")
 		};
 	}
@@ -111,6 +113,10 @@ public class CFlasher : Weapon {
 	}
 }
 
+
+
+
+
 public class ShinMessenkou : Weapon {
 	public ShinMessenkou() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -162,6 +168,7 @@ public class Rakuhouha : CharState {
 		bool isRakuhouha = type == ZeroGigaType.Rakuhouha;
 		bool isShinMessenkou = type == ZeroGigaType.ShinMessenkou;
 		bool isDarkHold = type == ZeroGigaType.DarkHold;
+		bool isRocks = type == ZeroGigaType.Rocks;
 		if (character.frameIndex == 5 && !once && !isDarkHold) {
 			once = true;
 			/*rakuanim = new Anim(
@@ -175,6 +182,7 @@ public class Rakuhouha : CharState {
 		float y = character.pos.y;
 		if (character.frameIndex > 7 && !fired) {
 			fired = true;
+			
 			if (isShinMessenkou) {
 				character.playSound("zeroshinmessenkoubullet", forcePlay: false, sendRpc: true);
 				new ShinMessenkouProj(
@@ -189,7 +197,8 @@ public class Rakuhouha : CharState {
 				darkHoldProj = new DarkHoldProj(
 					weapon, new Point(x, y - 20), character.xDir, player, player.getNextActorNetId(), rpc: true
 				);
-			} else {
+			} else	
+			{
 				for (int i = 256; i >= 128; i -= 16) {
 					new RakuhouhaProj(
 						weapon, new Point(x, y), isCFlasher, i,
@@ -235,7 +244,84 @@ public class Rakuhouha : CharState {
 				weapon, new Point(x + shinMessenkouWidth * 3, y),
 				character.xDir, player, player.getNextActorNetId(), rpc: true
 			);
+		
 		}
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		weapon.shootTime = weapon.rateOfFire;
+		base.onExit(newState);
+	}
+}
+
+
+
+public class ZeroRocks : CharState {
+	public Weapon weapon;
+	ZeroGigaType type { get { return (ZeroGigaType)weapon.type; } }
+	bool fired = false;
+	bool fired2 = false;
+	bool fired3 = false;
+	const float shinMessenkouWidth = 40;
+	public DarkHoldProj? darkHoldProj;
+	public ZeroRocks(
+		Weapon weapon
+	) : base(
+		(weapon.type == (int)ZeroGigaType.DarkHold) ? "cflasher" : 
+		weapon.type == (int)ZeroGigaType.CFlasher ||
+		weapon.type == (int)ZeroGigaType.DarkHold ? "cflasher" : "cflasher"
+	) {
+		this.weapon = weapon;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		bool isCFlasher = type == ZeroGigaType.CFlasher;
+		bool isRakuhouha = type == ZeroGigaType.Rakuhouha;
+		bool isShinMessenkou = type == ZeroGigaType.ShinMessenkou;
+		bool isDarkHold = type == ZeroGigaType.DarkHold;
+		bool isRocks = type == ZeroGigaType.Rocks;
+		if (character.frameIndex == 5 && !once && !isDarkHold) {
+			once = true;
+			/*rakuanim = new Anim(
+				character.pos.addxy(character.xDir, 0),
+				"zero_rakuanim", character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);*/
+		}
+		float x = character.pos.x;
+		float y = character.pos.y;
+		if (character.frameIndex > 7 && !fired) {
+			fired = true;
+			
+			
+			character.playSound("crashX2", forcePlay: false, sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			
+			Weapon w = player.weapon;
+			new FakeZeroRockProj(w, character.pos.addxy(-15, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new FakeZeroRockProj(w, character.pos.addxy(15, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new FakeZeroRockProj(w, character.pos.addxy(-35, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, character.pos.addxy(35, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			}, 0.075f));
+
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new FakeZeroRockProj(w, character.pos.addxy(-55, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, character.pos.addxy(55, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			}, 0.15f));
+
+			} 
+	
+
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -254,8 +340,8 @@ public class RakuhouhaProj : Projectile {
 		Weapon weapon, Point pos, bool isCFlasher, float byteAngle,
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 300, 4, player, isCFlasher ? "cflasher" : "rakuhouha",
-		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 300, 1, player, isCFlasher ? "cflasher" : "rakuhouha",
+		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		this.isCFlasher = isCFlasher;
 		byteAngle = byteAngle % 256;

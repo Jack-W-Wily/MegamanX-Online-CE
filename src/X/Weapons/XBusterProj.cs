@@ -51,7 +51,7 @@ public class Buster2Proj : Projectile {
 		bool rpc = false
 	) : base(
 		weapon, pos, xDir, 350, 2, 
-		player, "buster2", 0, 0, netProjId, 
+		player, "buster2", 4, 0, netProjId, 
 		player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster2_fade";

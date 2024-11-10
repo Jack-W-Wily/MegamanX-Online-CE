@@ -36,7 +36,10 @@ public class FlameMammoth : Maverick {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {
 					changeState(new FlameMOilState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
+				
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Dash, player) && getDistFromGround() > 75) {
 					changeState(new FlameMJumpPressState());

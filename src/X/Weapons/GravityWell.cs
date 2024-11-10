@@ -64,15 +64,15 @@ public class GravityWellProj : Projectile, IDamagable {
 	float activeTime;
 	float maxActiveTime;
 	public Anim? wellAnim;
-	float health = 2;
+	float health = 1;
 	float velX;
 
 	public GravityWellProj(
 		Weapon weapon, Point pos, int xDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "gravitywell_start", 
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 1, player, "gravitywell_start", 
+		1, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxActiveTime = 2;
 		maxTime = maxActiveTime + 5;
@@ -240,8 +240,8 @@ public class GravityWellProj : Projectile, IDamagable {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		var actor = damagable.actor();
-		if (actor is Character chr && chr.isCCImmune()) return;
-		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
+		//if (actor is Character chr && chr.isCCImmune()) return;
+		//if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
 
 		float mag = 100;
 		if (!actor.grounded) actor.vel.y = 0;
@@ -257,7 +257,7 @@ public class GravityWellProj : Projectile, IDamagable {
 }
 
 public class GravityWellProjCharged : Projectile, IDamagable {
-	float health = 4;
+	float health = 6;
 	public bool started;
 	float velY = -300;
 	public GravityWellProjCharged(
@@ -290,6 +290,13 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		base.update();
 		updateProjectileCooldown();
 
+
+		if (owner.input.isPressed(Control.Down, owner)){
+		yDir = 1;
+		}
+		if (owner.input.isPressed(Control.Up, owner)){
+		yDir = -1;
+		}
 		var ceilHits = Global.level.getTriggerList(this, 0, velY * Global.spf, null, typeof(Wall));
 		if (ceilHits.Count == 0) {
 			move(new Point(0, velY));

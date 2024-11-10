@@ -65,7 +65,10 @@ public class FlameStag : Maverick {
 					changeState(new FStagGrabState(false));
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new FStagDashChargeState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
+				
 			} else if (state is MJump || state is MFall) {
 				var inputDir = input.getInputDir(player);
 				if (inputDir.x != 0) {

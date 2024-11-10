@@ -49,6 +49,126 @@ public class CallDownMech : CharState {
 	}
 }
 
+
+public class VileDodge : CharState {
+	public float dashTime = 0;
+	public int initialDashDir;
+	Vile vile;
+
+	public VileDodge() : base("roll", "", "") {
+		attackCtrl = true;
+		normalCtrl = true;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile;
+		character.isDashing = true;
+		character.burnTime -= 1;
+		if (character.burnTime < 0) {
+			character.burnTime = 0;
+		}
+
+		initialDashDir = character.xDir;
+		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
+		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
+		character.specialState = (int)SpecialStateIds.AxlRoll;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		vile.dodgeRollCooldown = 0.5f;
+		character.specialState = (int)SpecialStateIds.None;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+		if (character.frameIndex >= 4) return;
+
+		dashTime += Global.spf;
+
+		var move = new Point(0, 0);
+		move.x = character.getDashSpeed() * initialDashDir;
+		character.move(move);
+		if (stateTime > 0.1) {
+			stateTime = 0;
+			//new Anim(this.character.pos.addxy(0, -4), "dust", this.character.xDir, null, true);
+		}
+	}
+}
+
+
+
+public class VileDashChargeState : CharState {
+	
+	public VileDashChargeState() : base("hyperdash_start", "") {
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+	character.turnToInput(player.input, player);
+
+	
+		 if ((!player.input.isHeld(Control.Dash, player) && stateTime > 0.2f)) {
+			character.changeState(new VileDashState(stateTime));
+				character.playSound("vilehyperdashattack", true);
+	
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+public class VileDashState : CharState {
+	float trailTime;
+	float chargeTime;
+	public VileDashState(float chargeTime) : base("hyperdash_attack", "") {
+		this.chargeTime = chargeTime;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+	//	if (player.input.isPressed(Control.Special1, player)) {
+	//		character.changeState(new FStagGrabState(true));
+	//		return;
+	//	}
+
+		character.move(new Point(character.xDir * 400, 0));
+
+	if (player.input.isPressed(Control.Dash, player) || stateTime > chargeTime) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
 public class VileRevive : CharState {
 	public float radius = 200;
 	Anim drDopplerAnim;
@@ -288,3 +408,120 @@ public class VileHover : CharState {
 
 	}
 }
+
+
+
+
+public class VileChainGrabState : CharState {
+	bool fired = false;
+	
+
+	public VileChainGrabState() : base("spring_grab", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+public class VileKick1 : CharState {
+	bool fired = false;
+	
+
+	public VileKick1() : base("kick", "", "", "") {
+	
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class VileSuperKickState : CharState {
+	bool fired = false;
+	
+
+	public VileSuperKickState() : base("superkick", "", "", "") {
+	
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+public class VilePunch1 : CharState {
+	bool fired = false;
+	
+
+	public VilePunch1() : base("punch_1", "", "", "") {
+	
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+

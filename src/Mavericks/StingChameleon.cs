@@ -91,6 +91,8 @@ public class StingChameleon : Maverick {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Dash, player)) {
 					cloakOrUncloak();
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Special1, player) && !isInvisible) {

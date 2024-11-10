@@ -55,6 +55,8 @@ public class BlastHornet : Maverick {
 					if (cursor == null) {
 						changeState(new BHornetShootCursorState(true));
 					}
+				}else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall || state is MFly) {
 				if (input.isPressed(Control.Shoot, player)) {

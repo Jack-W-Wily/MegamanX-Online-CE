@@ -54,6 +54,8 @@ public class MorphMoth : Maverick {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new MorphMShoot());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MFly) {
 				if (input.isPressed(Control.Dash, player)) {

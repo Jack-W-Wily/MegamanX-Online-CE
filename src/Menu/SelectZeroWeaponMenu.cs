@@ -200,7 +200,7 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(87, wepPosX, hyperModeYPos + 3, alpha);
 		} else if (cursors[7].index == 2) {
 			Fonts.drawText(
-				FontType.DarkPurple, "Viral Zero", wepTextX, hyperModeYPos,
+				FontType.DarkPurple, "Sougenmu", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 7
 			);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(173, wepPosX, hyperModeYPos + 3, alpha);

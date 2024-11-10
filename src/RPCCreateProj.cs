@@ -132,6 +132,8 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.Hadouken:
 				proj = new HadoukenProj(new HadoukenWeapon(player), pos, xDir, player, netProjByte);
 				break;
+
+			// Vile RPCS
 			case (int)ProjIds.ElectricShock:
 				proj = new StunShotProj(new VileMissile(VileMissileType.ElectricShock), pos, xDir, 0, player, netProjByte);
 				break;
@@ -201,6 +203,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.BuckshotDance:
 				proj = new VulcanProj(new Vulcan(VulcanType.BuckshotDance), pos, xDir, player, netProjByte);
 				break;
+
+
+			
 			case (int)ProjIds.SilkShotShrapnel:
 				proj = new SilkShotProjShrapnel(
 					SilkShot.netWeapon, pos, xDir, player, extraData[1], extraData[0], netProjByte

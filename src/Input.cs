@@ -143,6 +143,15 @@ public class Input {
 		return false;
 	}
 
+	public bool checkReppu(Player player, int xDir, string triggerBtn) {
+		if (xDir == 1) {
+			return checkReppuHelper("right", player, triggerBtn);
+		} else if (xDir == -1) {
+			return checkReppuHelper("left", player, triggerBtn);
+		}
+		return false;
+	}
+
 	public bool checkShoryuken(Player player, int xDir, string triggerBtn) {
 		if (xDir == 1) {
 			return checkShoryukenHelper("right", player, triggerBtn);
@@ -188,6 +197,43 @@ public class Input {
 			}
 		}
 		if (isHeld("down", player) && !isHeld(forwardDir, player)) {
+			command[0] = time;
+		}
+
+		return completed;
+	}
+
+
+	private bool checkReppuHelper(string forwardDir, Player player, string triggerBtn) {
+		int[] command = commandList[0];
+		int time = 30;
+		bool completed = false;
+
+		if (command[2] > 0) {
+			if (isPressed(triggerBtn, player)) {
+				command[2] = 0;
+				completed = true;
+			} else {
+				command[2]--;
+			}
+		}
+		if (command[1] > 0) {
+			if (!isHeld("up", player) && isHeld(forwardDir, player)) {
+				command[2] = command[1];
+				command[1] = 0;
+			} else {
+				command[1]--;
+			}
+		}
+		if (command[0] > 0) {
+			if (isHeld("up", player) && isHeld(forwardDir, player)) {
+				command[1] = command[0];
+				command[0] = 0;
+			} else {
+				command[0]--;
+			}
+		}
+		if (isHeld("up", player) && !isHeld(forwardDir, player)) {
 			command[0] = time;
 		}
 

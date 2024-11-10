@@ -62,7 +62,7 @@ public class FakeZero : Maverick {
 
 		if (!ownedByLocalPlayer) return;
 
-		rechargeAmmo(1);
+		rechargeAmmo(2);
 
 		if (lastDirX != xDir) {
 			accSpeed = 0;
@@ -357,7 +357,7 @@ public class FakeZeroMeleeState : MaverickState {
 
 public class FakeZeroRockProj : Projectile {
 	public FakeZeroRockProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "fakezero_rock", Global.halfFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1.5f, player, "fakezero_rock", Global.halfFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FakeZeroGroundPunch;
 		maxTime = 1.25f;
 		useGravity = true;

@@ -71,7 +71,7 @@ public class CmdSigma : BaseSigma {
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		if (lenientAttackPressed && saberCooldown == 0) {
-			saberCooldown = sigmaSaberMaxCooldown;
+			//saberCooldown = sigmaSaberMaxCooldown;
 
 			if (charState is WallSlide or LadderClimb) {
 				if (charState is LadderClimb) {
@@ -84,15 +84,26 @@ public class CmdSigma : BaseSigma {
 				playSound("sigmaSaber", sendRpc: true);
 				return true;
 			}
+			if (!player.input.isHeld(Control.Up, player) &&
+			!player.input.isHeld(Control.Down, player) )
 			changeState(new SigmaSlashState(charState), true);
 			return true;
 		}
 		if (charState is Dash dashState) {
 			if (!dashState.stop && player.isSigma &&
 				player.input.isPressed(Control.Special1, player) &&
-				flag == null && leapSlashCooldown == 0
+				flag == null// && leapSlashCooldown == 0
 			) {
 				changeState(new SigmaWallDashState(-1, true), true);
+				return true;
+			}
+		}
+		if (charState is AirDash) {
+			if (player.isSigma &&
+				player.input.isPressed(Control.Special1, player) &&
+				flag == null// && leapSlashCooldown == 0
+			) {
+				changeState(new SigmaWallDashState(1, true), true);
 				return true;
 			}
 		}
@@ -120,11 +131,31 @@ public class CmdSigma : BaseSigma {
 		Projectile? proj = sprite.name switch {
 			"sigma_ladder_attack" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 0, 0.25f
+				3, 30, 0.25f
 			),
 			"sigma_wall_slide_attack" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 0, 0.25f
+				3, 30, 0.25f
+			),
+				"sigma_wall_dash" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				1, 30, 0.25f
+			),
+				"sigma_dash" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				1, 30, 0.25f
+			),
+				"sigma_slash_1" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
+				3, 30, 0.15f
+			),
+				"sigma_slash_2" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
+				2, 30, 0.15f
+			),
+				"sigma_slash_3" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
+				3, 30, 0.15f
 			),
 			_ => null
 		};

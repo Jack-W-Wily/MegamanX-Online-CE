@@ -89,7 +89,8 @@ public class MorphMothCocoon : Maverick {
 			angle = 0;
 		}
 
-		if ((health < maxHealth * 0.5f && health > 0) || scrapAbsorbed >= 32) {
+		if ((health < maxHealth * 0.5f && health > 0) || scrapAbsorbed >= 32 
+		|| player.input.isHeld(Control.Down,player) && player.input.isPressed(Control.Taunt, player)) {
 			if (selfDestructTime == 0) {
 				selfDestructTime = 0.1f;
 				playSound("morphmMorph", sendRpc: true);
@@ -143,6 +144,8 @@ public class MorphMothCocoon : Maverick {
 					changeState(new MorphMCThreadState());
 				} else if (input.isPressed(Control.Dash, player) || input.isPressed(Control.Shoot, player)) {
 					changeState(new MorphMCSpinState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Dash, player) || input.isPressed(Control.Shoot, player)) {

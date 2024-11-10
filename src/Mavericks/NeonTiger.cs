@@ -39,6 +39,8 @@ public class NeonTiger : Maverick {
 						changeState(new NeonTDashState());
 				} else if (input.isHeld(Control.Shoot, player)) {
 					changeState(new NeonTClawState(false));
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall || state is MWallKick || state is NeonTPounceState) {
 				if (input.isPressed(Control.Shoot, player)) {

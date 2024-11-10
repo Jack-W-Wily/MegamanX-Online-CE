@@ -41,7 +41,7 @@ public class AcidBurstProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 300, 0, player, "acidburst_proj", 
-		0, 0f, netProjId, player.ownedByLocalPlayer
+		10, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		useGravity = true;
 		maxTime = 1.5f;

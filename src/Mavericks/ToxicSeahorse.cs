@@ -55,6 +55,8 @@ public class ToxicSeahorse : Maverick {
 						changeState(new TSeahorseTeleportState());
 					}
 				}
+			} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 			}
 		}
 	}

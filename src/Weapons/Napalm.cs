@@ -271,7 +271,8 @@ public class NapalmAttack : CharState {
 					} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
 						character.playSound("FireNappalmMK2", forcePlay: false, sendRpc: true);
 						proj = new MK2NapalmGrenadeProj(vile.napalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-					} else if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
+					}	
+					else if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
 						proj = new SplashHitGrenadeProj(vile.napalmWeapon, character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 					}
 				}
@@ -392,7 +393,7 @@ public class MK2NapalmGrenadeProj : Projectile {
 public class MK2NapalmProj : Projectile {
 	float flameCreateTime = 1;
 	public MK2NapalmProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 1f, player, "napalm2_proj", 0, 1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 100, 1f, player, "napalm2_proj", 30, 1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 2;
 		projId = (int)ProjIds.Napalm2;
 		useGravity = true;
@@ -426,6 +427,63 @@ public class MK2NapalmProj : Projectile {
 }
 
 
+public class SplashHitState : CharState {
+	bool shot;
+	
+	float shootTime;
+	int shootCount;
+
+		Vile vile = null!;
+	Point counterAttackPos;
+	NapalmAttackType napalmAttackType;
+
+	public SplashHitState(string transitionSprite = "") :
+		base(getSprite(), "", "", transitionSprite) {
+		this.napalmAttackType = napalmAttackType;
+	}
+
+	public static string getSprite() {
+		return"kick_3";
+	}
+
+	public override void update() {
+		base.update();
+
+	
+		
+		character.slideVel = character.xDir * character.getDashSpeed();	
+		
+		if (napalmAttackType == NapalmAttackType.Napalm) {
+			if (!shot && character.sprite.frameIndex == 4) {
+				shot = true;
+				//vile.setVileShootTime(vile.vileNapalmWeapon);
+				var poi = character.sprite.getCurrentFrame().POIs[0];
+				poi.x *= character.xDir;
+
+				Projectile proj;
+					proj = new SplashHitProj(new Napalm(NapalmType.SplashHit)
+				, character.pos, character.xDir,
+				player, player.getNextActorNetId(), sendRpc: true
+			);
+				
+			}
+		} 
+		if (character.isAnimOver()) {
+			character.changeState(new Crouch(""), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
 public class MK2NapalmFlame : Projectile {
 	public MK2NapalmFlame(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "napalm2_flame", 0, 1f, netProjId, player.ownedByLocalPlayer) {
@@ -451,9 +509,19 @@ public class MK2NapalmFlame : Projectile {
 			return;
 		}
 	}
+	
+	
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -200));
+		}
 	}
+
 }
 
 public class MK2NapalmWallProj : Projectile {
@@ -473,6 +541,17 @@ public class MK2NapalmWallProj : Projectile {
 		base.update();
 		if (isUnderwater()) {
 			destroySelf(disableRpc: true);
+		}
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
 		}
 	}
 }
@@ -528,11 +607,11 @@ public class SplashHitProj : Projectile {
 	Player player;
 	public SplashHitProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, 1, 0, 1, player, "napalm_sh_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.NapalmSplashHit;
+	projId = (int)ProjIds.NapalmSplashHit;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		destroyOnHit = false;
-		maxTime = 1.5f;
+		maxTime = 0.7f;
 		this.player = player;
 
 		if (sendRpc) {
@@ -558,7 +637,7 @@ public class SplashHitProj : Projectile {
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, 0));
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
 		}
 	}
 }

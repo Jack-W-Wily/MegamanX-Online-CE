@@ -643,14 +643,14 @@ public class GameMode {
 			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
-				if (zero.isViral) {
+				//if (zero.isViral) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
 						FontType.Grey,
 						"x" + zero.freeBusterShots, 16, 152, Alignment.Left
 					);
 					yStart += 12;
-				}
+				//}
 				int xStart = 11;
 				if (zero.gigaAttack.shootCooldown > 0) {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
@@ -676,15 +676,15 @@ public class GameMode {
 			if (drawPlayer.character is PunchyZero punchyZero) {
 				int xStart = 11;
 				int yStart = 159;
-				if (punchyZero.isViral) {
+				//if (punchyZero.isViral) {
 					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
 					Fonts.drawText(
 						FontType.Grey,
 						"x" + punchyZero.freeBusterShots, 16, 152, Alignment.Left
 					);
 					yStart += 12;
-				}
-				if (punchyZero.gigaAttack.shootCooldown > 0) {
+			//	}
+				if (punchyZero.gigaAttack.shootTime > 0) {
 					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
 					xStart += 15;
 				}

@@ -69,7 +69,7 @@ public class SuiretsusenProj : Projectile {
 	public SuiretsusenProj(
 		Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
-		SuiretsusenWeapon.staticWeapon, pos, xDir, 200, 6, player, "spear_proj",
+		SuiretsusenWeapon.staticWeapon, pos, xDir, 200, 2, player, "spear_proj",
 		Global.defFlinch, 0.75f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.SuiretsusanProj;

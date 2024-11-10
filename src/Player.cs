@@ -119,10 +119,10 @@ public partial class Player {
 	public bool lastDeathWasVileMK5;
 	public bool lastDeathWasSigmaHyper;
 	public bool lastDeathWasXHyper;
-	public const int zeroHyperCost = 10;
-	public const int zBusterZeroHyperCost = 8;
+	public const int zeroHyperCost = 5;
+	public const int zBusterZeroHyperCost = 5;
 	public const int AxlHyperCost = 10;
-	public const int reviveVileCost = 5;
+	public const int reviveVileCost = 1;
 	public const int reviveSigmaCost = 10;
 	public const int reviveXCost = 10;
 	public const int goldenArmorCost = 5;
@@ -140,6 +140,7 @@ public partial class Player {
 
 	public bool isX { get { return charNum == (int)CharIds.X; } }
 	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
+	public bool isX1Zero { get { return charNum == (int)CharIds.PunchyZero; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
@@ -691,8 +692,20 @@ public partial class Player {
 			return getModifiedHealth(28);
 		}
 		int bonus = 0;
-		if (isSigma && isPuppeteer()) {
+		if (isX) {
+			bonus = 12;
+		}
+		if (isVile) {
 			bonus = 4;
+		}
+		if (isZero) {
+			bonus = 12;
+		}
+		if (isSigma) {
+			bonus = 12;
+		}
+		if (isX1Zero) {
+			bonus = 14;
 		}
 		return MathF.Ceiling(
 			getModifiedHealth(16 + bonus) + (heartTanks * getHeartTankModifier())
@@ -1870,12 +1883,14 @@ public partial class Player {
 		} else {
 			fillSubtank(4);
 		}
-		if (character is Zero zero && zero.isViral) {
+		if (character is Zero zero && zero.isBlack) {
 			zero.freeBusterShots++;
+			currency++;
 			return;
 		}
-		if (character is PunchyZero pzero && pzero.isViral) {
+		if (character is PunchyZero pzero) {
 			pzero.freeBusterShots++;
+			currency++;
 			return;
 		}
 		// Check for stuff that cannot gain scraps.
@@ -1905,14 +1920,14 @@ public partial class Player {
 		if (Global.level?.server?.customMatchSettings != null) {
 			return Global.level.server.customMatchSettings.respawnTime;
 		} else {
-			if (Global.level?.gameMode is ControlPoints && alliance == GameMode.redAlliance) {
-				return 8;
+			if (Global.level?.gameMode is ControlPoints && alliance != GameMode.redAlliance) {
+				return 5;
 			}
 			if (Global.level?.gameMode is KingOfTheHill) {
-				return 7;
+				return 5;
 			}
 		}
-		return 5;
+		return 2;
 	}
 
 	public bool canReviveVile() {

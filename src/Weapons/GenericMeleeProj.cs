@@ -1,10 +1,17 @@
-﻿namespace MMXOnline;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace MMXOnline;
+
 
 public class GenericMeleeProj : Projectile {
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
-		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
+		Actor? owningActor = null, bool isShield = false,
+		 bool isDeflectShield = false, bool isReflectShield = false, 
+		 bool isJuggleProjectile = false, bool ShouldClang = false,
 		bool addToLevel = true
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.25f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
@@ -24,8 +31,13 @@ public class GenericMeleeProj : Projectile {
 		this.isShield = isShield;
 		this.isDeflectShield = isDeflectShield;
 		this.isReflectShield = isReflectShield;
+		this.isJuggleProjectile = isJuggleProjectile;
+		this.ShouldClang = ShouldClang;
 		isMelee = true;
 	}
+
+
+
 
 	public override void update() {
 		base.update();
@@ -82,12 +94,14 @@ public class GenericMeleeProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 
-		if (projId == (int)ProjIds.QuakeBlazer) {
-			if (owner.character?.charState is ZeroDownthrust hyouretsuzanState) {
-				hyouretsuzanState.quakeBlazerExplode(false);
-			}
+		if (isJuggleProjectile && damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 0 * modifier, -200));
 		}
-
+	
 		// Command grab section
 		Character? grabberChar = owner.character;
 		Character? grabbedChar = damagable as Character;
@@ -166,17 +180,19 @@ public class GenericMeleeProj : Projectile {
 		/*projId == (int)ProjIds.ZSaberAir || */ projId == (int)ProjIds.RisingFang /*|| projId == (int)ProjIds.ZSaberRollingSlash*/;
 	}
 	public static bool isZSaberClang(int projId) {
- 		// Turns out that, isZSaber bool (now, isZSaberEffect) is used on clanging, and i modified it to match with the fancy looks
+		
+		// Turns out that, isZSaber bool (now, isZSaberEffect) is used on clanging, and i modified it to match with the fancy looks
 		// This one will be used for clanging purpose, also, original bool literally missed ZSaber2 and many others..
 		// how do you.. clang on Ladder? or.. Wall slash???.
-		return projId == (int)ProjIds.ZSaber1 || projId == (int)ProjIds.ZSaber2 || projId == (int)ProjIds.ZSaber3 ||
-		 	   projId == (int)ProjIds.ZSaberAir || projId == (int)ProjIds.ZSaberCrouch || projId == (int)ProjIds.ZSaberDash || 
-			   projId == (int)ProjIds.ZSaberLadder || projId == (int)ProjIds.ZSaberslide || projId == (int)ProjIds.ZSaberProjSwing ||
-			   projId == (int)ProjIds.ZSaberRollingSlash || projId == (int)ProjIds.DZMelee; 
-			   //i wonder if Shippuga could count as Z-Saber or Rising too, but this last wouldn't make sense as is an uppercut
+
+		return true;
+		
+		  //i wonder if Shippuga could count as Z-Saber or Rising too, but this last wouldn't make sense as is an uppercut
 	}
 
 	public override void onDestroy() {
 		base.onDestroy();
 	}
+
+
 }

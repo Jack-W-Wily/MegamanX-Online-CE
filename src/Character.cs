@@ -80,6 +80,7 @@ public partial class Character : Actor, IDamagable {
 	public Anim? warpBeam;
 	public float flattenedTime;
 	public float saberCooldown;
+	public float ComboTimer;
 
 	public const float maxLastAttackerTime = 5;
 
@@ -611,7 +612,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isDisguisedAxl) return false;
 		if (isCCImmuneHyperMode()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
-		if (player.currentMaverick != null && player.isTagTeam()) return false;
+		//if (player.currentMaverick != null && player.isTagTeam()) return false;
 		if (isWarpOut()) return false;
 		if (Global.serverClient?.isLagging() == true) return false;
 		if (charState is KaiserSigmaRevive || charState is WolfSigmaRevive || charState is ViralSigmaRevive) return false;
@@ -832,8 +833,17 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void update() {
-		if (charState is not InRideChaser) {
+
+
+		Helpers.decrementFrames(ref ComboTimer);
+	
+		if (charState is not InRideChaser && charState is VileDashState) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
+		}
+
+
+		if (!player.input.isWeaponLeftOrRightHeld(player)){
+			getCamCenterPos();
 		}
 
 		Helpers.decrementTime(ref limboRACheckCooldown);
@@ -2618,10 +2628,10 @@ public partial class Character : Actor, IDamagable {
 		if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
-		if (Global.level.isRace()) {
-			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
-			if (!isAxlSelfDamage) return false;
-		}
+	//	if (Global.level.isRace()) {
+	//		bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
+	//		if (!isAxlSelfDamage) return false;
+	//	}
 
 		// Self damaging projIds can go thru alliance check
 		bool isSelfDamaging =
@@ -2711,7 +2721,7 @@ public partial class Character : Actor, IDamagable {
 		// Damage increase/reduction section
 		if (!isArmorPiercing) {
 			if (charState is SwordBlock) {
-				damageSavings += (originalDamage * 0.25m);
+				damageSavings += (originalDamage * 0.5m);
 			}
 			if (charState is SigmaBlock) {
 				damageSavings += (originalDamage * 0.5m);
@@ -3037,7 +3047,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (player.isSigma || isToughGuyHyperMode()) {
+		if (player.isSigma && isAttacking() || isToughGuyHyperMode()) {
 			flinchFrames = 6;
 		}
 		if (charState is GenericStun genericStunState) {

@@ -58,7 +58,7 @@ public class FrostShieldProj : Projectile {
 	public FrostShieldProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 3, 2, player, "frostshield_start", 0, 0, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 3, 1, player, "frostshield_start", 4, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 3;
 		projId = (int)ProjIds.FrostShield;
@@ -157,7 +157,7 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 	public FrostShieldProjGround(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "frostshield_ground_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 2, player, "frostshield_ground_start", 10, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldGround;

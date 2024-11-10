@@ -53,6 +53,7 @@ public class ZeroSlash1State : ZeroGenericMeleeState {
 	}
 
 
+
 	public override bool altCtrlUpdate(bool[] ctrls) {
 		if (zero.specialPressed &&
 			zero.specialPressTime > zero.shootPressTime &&
@@ -75,6 +76,18 @@ public class ZeroSlash2State : ZeroGenericMeleeState {
 		sound = "saber2";
 		soundFrame = 1;
 		comboFrame = 3;
+	}
+
+
+	public override void update() {
+		base.update();
+		if (character.ComboTimer > 0 && 
+		(player.input.isPressed(Control.Dash,player))
+		|| player.input.isPressed(Control.Up,player)
+		|| player.input.isPressed(Control.Down,player)
+		) {
+			character.changeToIdleOrFall();
+		}
 	}
 
 	public override bool altCtrlUpdate(bool[] ctrls) {
@@ -100,6 +113,17 @@ public class ZeroSlash3State : ZeroGenericMeleeState {
 		soundFrame = 1;
 	}
 
+	public override void update() {
+		base.update();
+		if (character.ComboTimer > 0 && 
+		(player.input.isPressed(Control.Dash,player))
+		|| player.input.isPressed(Control.Up,player)
+		|| player.input.isPressed(Control.Down,player)
+		) {
+			character.changeToIdleOrFall();
+		}
+	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zeroTripleSlashEndTime = Global.time;
@@ -121,8 +145,12 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (character.sprite.frameIndex >= comboFrame) {
-			attackCtrl = true;
+		if (character.sprite.frameIndex >= comboFrame || character.ComboTimer > 0 && 
+		(player.input.isPressed(Control.Dash,player))
+		|| player.input.isPressed(Control.Up,player)
+		|| player.input.isPressed(Control.Down,player)
+		) {
+			character.changeToIdleOrFall();
 		}
 	}
 }
@@ -142,10 +170,54 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
+
 		if (zero.sprite.loopCount >= 1) {
 			character.changeToIdleOrFall();
 			return;
 		}
+	
+		if (character.ComboTimer > 0 && 
+		(player.input.isPressed(Control.Dash,player))
+		|| player.input.isPressed(Control.Up,player)
+		|| player.input.isPressed(Control.Down,player)
+		) {
+			character.changeToIdleOrFall();
+		}
+	
+	}
+}
+
+
+
+public class CMoonState : ZeroGenericMeleeState {
+	public CMoonState() : base("cmoon") {
+		sound = "saber1";
+		soundFrame = 1;
+		comboFrame = 7;
+
+		airMove = true;
+		canJump = true;
+		exitOnLanding = true;
+		useDashJumpSpeed = true;
+		canStopJump = true;
+	}
+
+	public override void update() {
+		base.update();
+		
+		if (zero.sprite.loopCount >= 1) {
+			character.changeToIdleOrFall();
+			return;
+		}
+	
+		if (character.ComboTimer > 0 && 
+		(player.input.isPressed(Control.Dash,player))
+		|| player.input.isPressed(Control.Up,player)
+		|| player.input.isPressed(Control.Down,player)
+		) {
+			character.changeToIdleOrFall();
+		}
+	
 	}
 }
 
@@ -160,6 +232,25 @@ public class ZeroDashSlashState : ZeroGenericMeleeState {
 	public ZeroDashSlashState() : base("attack_dash") {
 		sound = "saber1";
 		soundFrame = 1;
+	}
+
+	
+	public override void update() {
+		base.update();
+
+	
+		if (character.ComboTimer > 0 && 
+		(player.input.isPressed(Control.Dash,player))
+		|| player.input.isPressed(Control.Up,player)
+		|| player.input.isPressed(Control.Down,player)
+		) {
+			character.changeToIdleOrFall();
+		}
+	
+
+		if (player.input.isPressed(Control.Special1, player)){
+		character.changeState(new Raijingeki(true), true);
+		}
 	}
 }
 

@@ -347,6 +347,19 @@ public class XUPPunchState : CharState {
 		if (character.isAnimOver() || (!isGrounded && character.grounded)) {
 			character.changeToIdleOrFall();
 		}
+
+		if (!player.input.isHeld(Control.Down, player) 
+			&& player.input.isPressed(Control.Shoot, player)
+			 && stateTime > 0.1f && !character.sprite.name.Contains("unpo_punch_2")){
+			character.changeSpriteFromName("unpo_punch_2", true);		
+			}
+		if (player.input.isHeld(Control.Down, player) 
+			&& player.input.isPressed(Control.Shoot, player)
+			 && stateTime > 0.1f){
+			character.changeState(new XUPParryMeleeState(null, 3), true);
+	
+			}
+
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -418,10 +431,18 @@ public class XUPGrabState : CharState {
 
 		if (leechTime > 0.33f) {
 			leechTime = 0;
-			character.addHealth(1);
+	if (character is MegamanX mx && mx.isHyperX){		
+		character.addHealth(1);
+	}
 			var damager = new Damager(player, 1, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}
+
+		if (player.input.isPressed(Control.Shoot, player)
+			 && stateTime > 0.1f){
+			character.changeState(new XUPParryMeleeState(null, 3), true);
+	
+			}
 
 		if (player.input.isPressed(Control.Special1, player)) {
 			character.changeToIdleOrFall();

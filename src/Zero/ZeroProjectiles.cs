@@ -42,7 +42,7 @@ public class ZBuster3Proj : Projectile {
 	public ZBuster3Proj(
 		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 4, player, "zbuster3",
+		ZeroBuster.netWeapon, pos, xDir, 350, 3, player, "zbuster3",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeOnAutoDestroy = true;
@@ -68,7 +68,7 @@ public class ZBuster4Proj : Projectile {
 	public ZBuster4Proj(
 		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 6, player, "zbuster4",
+		ZeroBuster.netWeapon, pos, xDir, 350, 4, player, "zbuster4",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeOnAutoDestroy = true;
@@ -109,7 +109,7 @@ public class ZSaberProj : Projectile {
 		Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
 		ZSaber.staticWeapon, pos, xDir, 300, 3, player, "zsaber_shot",
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		10, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "zsaber_shot_fade";
 		reflectable = true;

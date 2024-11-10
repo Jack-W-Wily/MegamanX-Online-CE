@@ -126,7 +126,7 @@ public class VileCannonProj : Projectile {
 		VileCannon weapon, Point pos, float byteAngle, Player player,
 		ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 300, 3, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 300, 2, player, weapon.projSprite, 12, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)ProjIds.FrontRunner;
@@ -237,8 +237,91 @@ public class CannonAttack : CharState {
 			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
 		}
 
+				new StunShotProj(new VileMissile(VileMissileType.ElectricShock), vile.pos.addxy(15 * vile.xDir, -10), vile.getShootXDir(), 0, player, player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+		shootLogic(vile);
+		character.useGravity = false;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		vile.isShootingLongshotGizmo = false;
+		character.useGravity = true;
+		if (isGizmo) {
+			vile.gizmoCooldown = 0.5f;
+		}
+	}
+}
+
+
+
+public class CannonAttackFrunner : CharState {
+	bool isGizmo;
+	bool once;
+	private Vile vile = null!;
+
+	public CannonAttackFrunner(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
+		this.isGizmo = isGizmo;
+	}
+
+	public static string getSprite(bool isGizmo, bool grounded) {
+		if (isGizmo) {
+			return grounded ? "idle_gizmo" : "cannon_gizmo_air";
+		}
+		return grounded ? "idle_shoot" : "cannon_air";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.grounded){
+		if (character.frameIndex == 3 && !once){
+			shootLogic(vile);
+			once = true;
+		}
+		}
+	
+
+		//groundCodeWithMove();
+
+		if (character.sprite.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public static void shootLogic(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
+			return;
+		}
+		Point shootVel = vile.getVileShootVel(true);
+
+		var player = vile.player;
+		vile.playSound("frontrunner", sendRpc: true);
+
+		string muzzleSprite = "cannon_muzzle";
+		if (vile.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
+		if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_lg";
+
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.sprite.name.EndsWith("_grab")) {
+			shootPos = vile.getFirstPOIOrDefault("s");
+		}
+
+		var muzzle = new Anim(
+			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
+		);
+		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+
 		new VileCannonProj(
-			vile.cannonWeapon,
+			new VileCannon(VileCannonType.FrontRunner),
 			shootPos, MathF.Round(shootVel.byteAngle), //vile.longshotGizmoCount,
 			player, player.getNextActorNetId(), rpc: true
 		);
@@ -247,7 +330,92 @@ public class CannonAttack : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
-		shootLogic(vile);
+		if (!character.grounded){shootLogic(vile);}
+		character.useGravity = false;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		vile.isShootingLongshotGizmo = false;
+		character.useGravity = true;
+		if (isGizmo) {
+			vile.gizmoCooldown = 0.5f;
+		}
+	}
+}
+
+
+
+
+
+public class CannonAttackFatBoy : CharState {
+	bool isGizmo;
+	bool once;
+	private Vile vile = null!;
+
+	public CannonAttackFatBoy(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
+		this.isGizmo = false;
+	}
+
+	public static string getSprite(bool isGizmo, bool grounded) {
+		if (isGizmo) {
+			return grounded ? "idle_gizmo" : "cannon_gizmo_air";
+		}
+		return grounded ? "fatboy" : "fatboy";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex == 7 && !once){
+			shootLogic(vile);
+			once = true;
+		}
+	
+		//groundCodeWithMove();
+
+		if (character.sprite.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public static void shootLogic(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
+			return;
+		}
+		Point shootVel = vile.getVileShootVel(true);
+
+		var player = vile.player;
+		vile.playSound("frontrunner", sendRpc: true);
+
+		string muzzleSprite = "cannon_muzzle";
+		if (vile.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
+		if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_lg";
+
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.sprite.name.EndsWith("_grab")) {
+			shootPos = vile.getFirstPOIOrDefault("s");
+		}
+
+		var muzzle = new Anim(
+			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
+		);
+		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+
+		new VileCannonProj(
+			new VileCannon(VileCannonType.FatBoy),
+			shootPos, MathF.Round(shootVel.byteAngle), //vile.longshotGizmoCount,
+			player, player.getNextActorNetId(), rpc: true
+		);
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+		
 		character.useGravity = false;
 		character.stopMoving();
 	}

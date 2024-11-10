@@ -260,7 +260,47 @@ public partial class MegamanX : Character {
 			}
 		}
 
-		//UPX HP Decay.
+		Helpers.decrementTime(ref upPunchCooldown);
+
+			if (charState.attackCtrl && player.input.isPressed(Control.Special1, player)
+			&& !player.input.isHeld(Control.Down, player) && !player.input.isHeld(Control.Up, player)) {
+				if (unpoShotCount <= 0) {
+					upPunchCooldown = 0.5f;
+					changeState(new XUPPunchState(grounded), true);
+					return;
+				}
+			} 
+			if (player.input.isPressed(Control.Special1, player) && !isInvisible() &&
+				  (charState is Dash || charState is AirDash)) {
+				charState.isGrabbing = true;
+				changeSpriteFromName("unpo_grab_dash", true);
+			} 
+			if (charState.attackCtrl && parryCooldown == 0 && player.input.isPressed(Control.Special1, player) 
+				 && player.input.isHeld(Control.Down, player)) {
+				if (unpoAbsorbedProj != null) {
+					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
+					unpoAbsorbedProj = null;
+					return;
+				} else {
+					changeState(new XUPParryStartState(), true);
+				}
+			}
+		
+
+		if (charState.attackCtrl &&
+			(isSpecialSaber() || isHyperX) && canShoot() &&
+			canChangeWeapons() && player.armorFlag == 0 &&
+			player.input.isPressed(Control.Special1, player) &&
+			!isAttacking() && !isInvisible() &&
+			!charState.isGrabbing
+		) {
+			if (xSaberCooldown == 0) {
+				xSaberCooldown = 1f;
+				changeState(new X6SaberState(grounded), true);
+				return;
+			}
+		}
+
 		if (isHyperX) {
 			if (charState is not XUPGrabState
 				and not XUPParryMeleeState
@@ -401,6 +441,15 @@ public partial class MegamanX : Character {
 	}
 
 	public override bool normalCtrl() {
+
+		if (charState.attackCtrl && charState is not Dash && grounded && 
+				player.input.isHeld(Control.Up, player) )
+			 {
+			turnToInput(player.input, player);
+			changeState(new SwordBlock());
+			return true;
+		}
+
 		if (!grounded) {
 			if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
 				CharState dashState;
@@ -1081,6 +1130,41 @@ public partial class MegamanX : Character {
 			_ => null
 		};
 	}
+
+	/* public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile? proj = null;
+
+		if (sprite.name.Contains("beam_saber") && sprite.name.Contains("2")) {
+			float overrideDamage = 3;
+			if (!grounded) overrideDamage = 2;
+			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.X6Saber, player, damage: overrideDamage, flinch: 20);
+		} else if (sprite.name.Contains("beam_saber")) {
+			proj = new GenericMeleeProj(new XSaber(player), centerPoint, ProjIds.XSaber, player);
+		} else if (sprite.name.Contains("nova_strike")) {
+			proj = new GenericMeleeProj(new NovaStrike(player), centerPoint, ProjIds.NovaStrike, player);
+		} else if (sprite.name.Contains("speedburner")) {
+			proj = new GenericMeleeProj(new SpeedBurner(player), centerPoint, ProjIds.SpeedBurnerCharged, player);
+		} else if (sprite.name.Contains("shoryuken")) {
+			proj = new GenericMeleeProj(new ShoryukenWeapon(player), centerPoint, ProjIds.Shoryuken, player);
+		} else if (sprite.name.Contains("unpo_grab_dash")) {
+			proj = new GenericMeleeProj(new XUPGrab(), centerPoint, ProjIds.UPGrab, player, 0, 0, 0);
+		} else if (sprite.name.Contains("unpo_punch")) {
+			proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player,  2, 20, 0.15f);
+		} else if (sprite.name.Contains("unpo_air_punch")) {
+			proj = new GenericMeleeProj(new XUPPunch(player), centerPoint, ProjIds.UPPunch, player, damage: 3, flinch: Global.halfFlinch);
+		} else if (sprite.name.Contains("unpo_parry_start")) {
+			proj = new GenericMeleeProj(new XUPParry(), centerPoint, ProjIds.UPParryBlock, player, 0, 0, 0);
+		}
+
+			if (sprite.name.Contains("block")) {
+			proj = new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isDeflectShield: true
+			);
+		}
+
+		return proj;
+	} */
 
 	public void popAllBubbles() {
 		for (int i = chargedBubbles.Count - 1; i >= 0; i--) {

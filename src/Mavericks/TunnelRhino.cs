@@ -47,7 +47,10 @@ public class TunnelRhino : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new TunnelRDashState());
 				}
-			}
+				else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
+				}
+			} 
 		}
 	}
 

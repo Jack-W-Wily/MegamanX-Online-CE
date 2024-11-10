@@ -668,7 +668,7 @@ public class Maverick : Actor, IDamagable {
 		if (this is FakeZero fz && fz.state is FakeZeroGuardState) {
 			ammo += damage;
 			if (ammo > 32) ammo = 32;
-			damage *= 0.75f;
+			damage *= 0.15f;
 		}
 
 		health -= damage;
@@ -886,7 +886,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
-		if (Global.level.isRace()) return false;
+	//	if (Global.level.isRace()) return false;
 
 		if (this is BoomerangKuwanger bk && bk.sprite.name.Contains("teleport")) {
 			return false;

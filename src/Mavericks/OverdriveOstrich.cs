@@ -74,6 +74,8 @@ public class OverdriveOstrich : Maverick {
 					changeState(new OverdriveOShoot2State());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new OverdriveOJumpKickState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Shoot, player)) {

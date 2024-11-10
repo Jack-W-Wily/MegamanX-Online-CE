@@ -67,6 +67,8 @@ public class ChillPenguin : Maverick {
 					changeState(new ChillPIceBlowState());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new ChillPSlideState(false));
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Special1, player)) {

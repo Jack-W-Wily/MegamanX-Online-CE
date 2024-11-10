@@ -531,7 +531,7 @@ public class Idle : CharState {
 				}
 			}
 		}
-		if ((character is PunchyZero)) {
+	/*	if ((character is PunchyZero)) {
 			if (player.health < 4) {
 				defaultSprite = "pweak";
 			} else {
@@ -541,9 +541,17 @@ public class Idle : CharState {
 				sprite = defaultSprite;
 				character.changeSpriteFromName(sprite, true);
 			}
-		} 
+		} */
 		if (character is Zero) {
-			if (player.health <= 4) {
+			if (player.health <= 8) {
+				sprite = "weak";
+			} else {
+				sprite = "idle";
+			}
+			character.changeSpriteFromName(sprite, true);				
+		}
+		if (character is Vile) {
+			if (player.health <= 8) {
 				sprite = "weak";
 			} else {
 				sprite = "idle";
@@ -555,6 +563,7 @@ public class Idle : CharState {
 
 	public override void update() {
 		base.update();
+		
 
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			if (!character.isAttacking() && !character.isSoftLocked() && character.canTurn()) {
@@ -655,7 +664,7 @@ public class Crouch : CharState {
 public class SwordBlock : CharState {
 	public SwordBlock() : base("block") {
 		immuneToWind = true;
-		superArmor = true;
+	//	superArmor = true;
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
@@ -666,8 +675,8 @@ public class SwordBlock : CharState {
 		base.update();
 
 		bool isHoldingGuard = (
-			player.input.isHeld(Control.WeaponLeft, player) ||
-			player.input.isHeld(Control.WeaponRight, player)
+			player.input.isHeld(Control.Up, player)
+		
 		);
 		if (!isHoldingGuard) {
 			character.changeToIdleOrFall();
@@ -803,10 +812,10 @@ public class Dash : CharState {
 		base.onEnter(oldState);
 
 		initialDashDir = character.xDir;
-		if (player.isAxl && player.axlWeapon?.isTwoHanded(false) == true) {
+		//if (player.isAxl && player.axlWeapon?.isTwoHanded(false) == true) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 			else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
-		}
+		//}
 
 		character.isDashing = true;
 		character.globalCollider = character.getDashingCollider();
@@ -825,7 +834,7 @@ public class Dash : CharState {
 	}
 
 	public static void dashBackwardsCode(Character character, int initialDashDir) {
-		if (character.player.isAxl) {
+		//if (character.player.isAxl ) {
 			if (character.xDir != initialDashDir) {
 				if (!character.sprite.name.EndsWith("backwards")) {
 					character.changeSpriteFromName("dash_backwards", false);
@@ -835,7 +844,7 @@ public class Dash : CharState {
 					character.changeSpriteFromName("dash", false);
 				}
 			}
-		}
+		//}
 	}
 
 	public override void update() {
@@ -846,9 +855,23 @@ public class Dash : CharState {
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
+
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) ) {
+			stop = true;
+		}
+
 		float speedModifier = 1;
 		float distanceModifier = 1;
 		float inputXDir = player.input.getInputDir(player).x;
+
+		if (player.isVile) {
+
+		
+			if (player.isVile && player.speedDevil)speedModifier = 1.15f;
+			distanceModifier = 99;
+		}
+
+
 		if (player.isX && player.hasBootsArmor(1)) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
@@ -926,8 +949,21 @@ public class AirDash : CharState {
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
+
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) ) {
+			stop = true;
+		}
+
 		float speedModifier = 1;
 		float distanceModifier = 1;
+		float inputXDir = player.input.getInputDir(player).x;
+
+		if (player.isVile) {
+			if (player.isVile && player.speedDevil)speedModifier = 1.15f;
+			distanceModifier = 99;
+		}
+
+
 		if (player.isX && player.hasBootsArmor(2)) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
@@ -1679,7 +1715,7 @@ public class GenericGrabbedState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabInvulnTime = 2;
+		character.grabInvulnTime = 1;
 		if (this is VileMK2Grabbed) {
 			character.stunInvulnTime = 1;
 		}

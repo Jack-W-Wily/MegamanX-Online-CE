@@ -76,6 +76,7 @@ public class CutterAttackState : CharState {
 	public CutterAttackState(bool grounded) : base(getSprite(grounded), "", "", "") {
 		exitOnAirborne = true;
 		normalCtrl = true;
+
 	}
 	public static string getSprite(bool grounded) {
 		return grounded ? "idle_shoot" : "cannon_air";
@@ -135,7 +136,8 @@ public class VileCutterProj : Projectile {
 		base(weapon, pos, xDir, 350, 2, player, weapon.projSprite, 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = weapon.fadeSprite;
 		projId = (int)weapon.projId;
-		destroyOnHit = true;
+		destroyOnHit = false;
+		isJuggleProjectile = true;
 		vileCutterType = (VileCutterType)weapon.type;
 		if (vileCutterType == VileCutterType.ParasiteSword) {
 			destroyOnHit = false;

@@ -47,24 +47,30 @@ public class VileLaser : Weapon {
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (type == (int)VileLaserType.NecroBurst) {
-			return 32;
+			return 0;
 		} else {
-			return 24;
+			return 0;
 		}
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (type == (int)VileLaserType.NecroBurst && vile.charState is InRideArmor inRideArmor) {
+		if ( type == (int)VileLaserType.NecroBurst && vile.charState is InRideArmor inRideArmor) {
 			NecroBurstAttack.shoot(vile);
 			vile.rideArmor?.explode(shrapnel: inRideArmor.isHiding);
 		} else {
-			if (type == (int)VileLaserType.NecroBurst) {
+			if (vile.player.input.isHeld(Control.Down, vile.player)) {
 				vile.changeState(new NecroBurstAttack(vile.grounded), true);
-			} else if (type == (int)VileLaserType.RisingSpecter) {
+			} 
+			if (vile.player.input.isHeld(Control.Up, vile.player)) {
 				vile.changeState(new RisingSpecterState(vile.grounded), true);
-			} else if (type == (int)VileLaserType.StraightNightmare) {
+			} 
+			if (vile.player.input.isHeld(Control.Left, vile.player)
+			|| vile.player.input.isHeld(Control.Right, vile.player)) {
 				vile.changeState(new StraightNightmareAttack(vile.grounded), true);
 			}
+		
+		vile.player.vileAmmo = 0;
+			
 		}
 	}
 }

@@ -64,12 +64,19 @@ public class BoomerangKuwanger : Maverick {
 						xDir = 1;
 						changeState(new BoomerKDashState(Control.Right));
 						return;
+					} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 					}
 				}
 				if (shootPressed() && !bald) {
 					changeState(getShootState());
-				} else if (specialPressed() && !bald) {
+				} else if (specialPressed()) {
+					if (!player.input.isHeld(Control.Up,player)){
 					changeState(new BoomerKDeadLiftState());
+					}
+					if (player.input.isHeld(Control.Up,player)){
+					changeState(new BoomerKPunchState());
+					}
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
 						deductAmmo(8);
@@ -105,7 +112,7 @@ public class BoomerangKuwanger : Maverick {
 
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
-			bald = true;
+		//	bald = true;
 			playSound("boomerkBoomerang", sendRpc: true);
 			float inputAngle = 25;
 			var inputDir = input.getInputDir(player);
@@ -136,8 +143,17 @@ public class BoomerangKuwanger : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("boomerk_deadlift")) {
-			return new GenericMeleeProj(deadLiftWeapon, centerPoint, ProjIds.BoomerangKDeadLift, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
+			return new GenericMeleeProj(deadLiftWeapon, centerPoint, ProjIds.BoomerangKDeadLift, player, damage: 0, flinch: 0, hitCooldown: 0, this);
 		}
+		if (sprite.name.Contains("boomerk_orara")) {
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 1, flinch: Global.halfFlinch, hitCooldown: 0.1f, owningActor: this);
+		}
+		if (sprite.name.Contains("boomerk_fall")) {
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
+		}
+
+
+
 		return null;
 	}
 
@@ -206,7 +222,7 @@ public class BoomerangKBoomerangProj : Projectile {
 			if (pickup != null) {
 				pickup.changePos(bk.pos);
 			}
-			bk.bald = false;
+			//bk.bald = false;
 			bk.changeSpriteFromName("catch", true);
 			destroySelf();
 		}
@@ -434,6 +450,39 @@ public class BoomerKDeadLiftState : MaverickState {
 		if (grabbedChar != null && grabbedChar.sprite.name.EndsWith("_grabbed")) {
 			grabbedOnce = true;
 		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+	public override bool trySetGrabVictim(Character grabbed) {
+		if (grabbedChar == null) {
+			grabbedChar = grabbed;
+			return true;
+		}
+		return false;
+	}
+}
+
+
+
+public class BoomerKPunchState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	public BoomerKPunchState() : base("orara") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
 
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new MIdle());

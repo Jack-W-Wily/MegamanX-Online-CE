@@ -60,8 +60,19 @@ public class WheelGator : Maverick {
 					changeState(new WheelGShootState());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new WheelGSpinState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
+
 			} else if (state is MJump || state is MFall) {
+				if (input.isPressed(Control.Dash, player)) {
+					changeState(new WheelGSpinState());
+				}
+				if (input.isPressed(Control.Shoot, player)) {
+					if (input.isHeld(Control.Up, player)) {
+						changeState(new WheelGUpBiteState());
+					}
+				}
 			}
 		}
 	}
@@ -441,7 +452,7 @@ public class WheelGUpBiteState : MaverickState {
 
 	public override void update() {
 		base.update();
-
+			airCode();
 		if (input.isHeld(Control.Shoot, player) && !shootReleased) {
 			shootFramesHeld++;
 		} else {
@@ -518,7 +529,7 @@ public class WheelGGrabbed : GenericGrabbedState {
 		}
 		lastGrabberSpriteName = grabberSpriteName;
 
-		grabTime -= player.mashValue();
+		//grabTime -= player.mashValue();
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
 		}

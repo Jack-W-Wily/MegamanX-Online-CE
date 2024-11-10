@@ -76,11 +76,11 @@ public class Zero : Character {
 		// Loadout stuff.
 		ZeroLoadout zeroLoadout = player.loadout.zeroLoadout;
 
-		groundSpecial = RaijingekiWeapon.getWeaponFromIndex(zeroLoadout.groundSpecial);
+		groundSpecial = new RaijingekiWeapon();
 		airSpecial = KuuenzanWeapon.getWeaponFromIndex(zeroLoadout.airSpecial);
 		uppercutA = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutA);
 		uppercutS = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutS);
-		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
+		downThrustA =  HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
 		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustS);
 
 		gigaAttackSelected = zeroLoadout.gigaAttack;
@@ -104,7 +104,35 @@ public class Zero : Character {
 	}
 
 	public override void update() {
+
+
+		if (isViral && flag == null && (
+			 charState is AirDash)) {
+			changeState(new FSplasherState(), true);
+			
+		}
+
+
+		if (charState is Crouch){
+				if (gigaAttack.ammo >= 28 &&
+				player.input.isPressed(Control.WeaponRight, player) ) {
+					gigaAttack.addAmmo(-28, player);
+
+					if (isViral){
+					changeState(new Rakuhouha(new DarkHoldWeapon()), true);	
+					} else {
+						changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+					}
+				
+				} 
+		}
+
+
+
 		// Hypermode effects.
+
+
+
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
@@ -112,7 +140,7 @@ public class Zero : Character {
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("zero_X1", getCenterPos(), true);
+					addMusicSource("zero_X3", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
@@ -174,7 +202,7 @@ public class Zero : Character {
 			if (scrapDrainCounter > 0) {
 				scrapDrainCounter--;
 			} else {
-				scrapDrainCounter = 120;
+				scrapDrainCounter = 320;
 				player.currency--;
 				if (player.currency < 0) {
 					player.currency = 0;
@@ -224,13 +252,19 @@ public class Zero : Character {
 	public override bool canCharge() {
 		return ( !isInvulnerable
 			(charState.attackCtrl || getChargeLevel() > 0) &&
-			(player.currency > 0 || freeBusterShots > 0) &&
+			(gigaAttack.ammo >= 6 || freeBusterShots > 0) &&
 			donutsPending == 0
 		);
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isHeld(Control.Shoot, player)
+		||  player.input.isHeld(Control.Special1, player)
+		|| player.input.isHeld(Control.WeaponRight, player)
+		||  player.input.isHeld(Control.WeaponLeft, player)
+		
+		
+		;
 	}
 
 	public void shoot(int chargeLevel) {
@@ -261,17 +295,29 @@ public class Zero : Character {
 				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 			);
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
-			currencyUse = 1;
-			playSound("buster4", sendRpc: true);
-			new ZBuster4Proj(
+
+			if (!player.input.isHeld(Control.Down, player)){
+				currencyUse = 1;
+
+				if (!isBlack){
+				playSound("buster4", sendRpc: true);
+				new ZBuster4Proj(
 				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
-			);
+				);
+				} else {
+				changeState(new ZeroDoubleBuster(false, false), true);
+		
+				}
+				} else {
+			changeState(new TBreakerState(false), true);
+			}
 		}
 		if (currencyUse > 0) {
 			if (freeBusterShots > 0) {
 				freeBusterShots--;
 			} else if (player.currency > 0) {
-				player.currency--;
+				gigaAttack.ammo -= 6;
+				//player.currency--;
 			}
 		}
 	}
@@ -405,37 +451,23 @@ public class Zero : Character {
 			return true;
 		}
 		// Guard! (You can thank Axl for this mess)
-		if (charState.attackCtrl && charState is not Dash && grounded && (
-				player.input.isHeld(Control.WeaponLeft, player) ||
-				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
-			) && (
-				!player.isDisguisedAxl ||
-				player.input.isHeld(Control.Down, player)
-			)
-		) {
+		if (charState.attackCtrl && charState is not Dash && grounded && 
+				player.input.isHeld(Control.Up, player) )
+			 {
 			turnToInput(player.input, player);
 			changeState(new SwordBlock());
 			return true;
-		} else if (
-			charState.attackCtrl && !isDashing && (
-				player.input.isPressed(Control.WeaponLeft, player) ||
-				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
-			  ) && (
-				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
-			  )
-			) {
-			if (grounded && !isAttacking()) {
-				turnToInput(player.input, player);
-				changeState(new SwordBlock());
-			}
-			return true;
-		}
+		} 
+		
+		
 		return false;
 	}
 
 	public override bool attackCtrl() {
 		// To prevent XDiego skillcheck we check if we are shooting donuts.
 		// If we are doing so we do not attack.
+
+	
 		if (donutsPending != 0) {
 			return false;
 		}
@@ -469,30 +501,61 @@ public class Zero : Character {
 	public bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
-		if (yDir == 1 && specialPressed) {
-			if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
-				if (gigaAttack is RekkohaWeapon) {
-					gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-					changeState(new Rekkoha(gigaAttack), true);
+
+		if (yDir != 1 && yDir != -1){
+			if (gigaAttack.ammo >= 10 &&
+				player.input.isPressed(Control.WeaponRight, player) ) {
+					gigaAttack.addAmmo(-10, player);
+					changeState(new AwakenedZeroHadangeki(), true);
 					return true;
-				} else {
-					gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-					changeState(new Rakuhouha(gigaAttack), true);
+				} 
+		}
+
+
+		
+		if (yDir == 1) {
+				
+				 if (gigaAttack.shootTime <= 0 && gigaAttack.ammo >= 14 &&
+				player.input.isPressed(Control.Special1, player)) {
+					gigaAttack.addAmmo(-14, player);
+					
+					if (!isAwakened){
+					changeState(new Rakuhouha(new CFlasher()), true);
+					} else {
+					changeState(new Rakuhouha(new ShinMessenkou()), true);		
+					}
 					return true;
 				}
-			}
+				 if (gigaAttack.shootTime <= 0 && gigaAttack.ammo >= 10 &&
+				player.input.isPressed(Control.WeaponLeft, player)) {
+					gigaAttack.addAmmo(-10, player);
+					changeState(new ZeroRocks( new FakeZeroWeapon(player)), true);
+					return true;
+				}
+			
 			if (!shootPressed) {
 				return true;
 			}
 		}
 		// Uppercuts.
-		if (yDir == -1 && (shootPressed || specialPressed)) {
-			// Weapon type to use.
-			int weaponType = uppercutA.type;
-			// If special was pressed first.
-			if (specialPressTime > shootPressTime) {
-				weaponType = uppercutS.type;
-			}
+		if (yDir == -1 && (shootPressed)) {
+		
+			int weaponType = (int)RisingType.RisingFang;
+		
+			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
+			return true;
+		}
+		if (yDir == -1 && (specialPressed)) {
+		
+			int weaponType = (int)RisingType.Ryuenjin;
+		
+			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
+			return true;
+		}
+		if (yDir == -1 && (player.input.isPressed(Control.WeaponRight, player))) {
+		
+			int weaponType = (int)RisingType.Denjin;
+		
 			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
 			return true;
 		}
@@ -505,7 +568,12 @@ public class Zero : Character {
 			dashAttackCooldown = 60;
 			slideVel = xDir * getDashSpeed();
 			if (specialPressTime > shootPressTime) {
+				if (!isViral){
 				changeState(new ZeroShippuugaState(), true);
+				} else {
+				changeState(new SuiretsusanState(false), true);
+				 
+				}
 				return true;
 			}
 			changeState(new ZeroDashSlashState(), true);
@@ -530,31 +598,41 @@ public class Zero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
+
+
+
 		if (yDir == -1 && airRisingUses == 0 && flag == null && (
-			(uppercutA.type == (int)RisingType.RisingFang && shootPressed) ||
-			(uppercutS.type == (int)RisingType.RisingFang && specialPressed)
-		)) {
+			 shootPressed)) {
 			changeState(new ZeroUppercut(RisingType.RisingFang, isUnderwater()), true);
 			dashedInAir++;
 			return true;
 		}
+		
+
+
+
+		
 		if (yDir == 1 && (shootPressed || specialPressed)) {
 			// Weapon type to use.
-			int weaponType = downThrustA.type;
+			int weaponType = (int)ZeroDownthrustType.QuakeBlazer;
 			// If special was pressed first.
 			if (specialPressTime > shootPressTime) {
-				weaponType = downThrustS.type;
+				weaponType = (int)ZeroDownthrustType.Hyouretsuzan;
 			}
 			changeState(new ZeroDownthrust(weaponType), true);
 			return true;
 		}
 		// Air attack.
 		if (specialPressed) {
-			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
+
+			if (!isViral){
+			if (charState is not ZeroRollingSlashtate) {
 				changeState(new ZeroRollingSlashtate(), true);
 			}
-			if (airSpecial.type != 0) {
-				airSpecial.attack(this);
+			} else {
+			if (charState is not CMoonState){
+			changeState(new CMoonState(), true);
+			}
 			}
 			return true;
 		}
@@ -638,7 +716,7 @@ public class Zero : Character {
 	}
 
 	public override bool isToughGuyHyperMode() {
-		return isBlack || isGenmuZero;
+		return isGenmuZero;
 	}
 
 	// Melee projectiles.
@@ -722,6 +800,7 @@ public class Zero : Character {
 			// Air
 			"zero_attack_air" => MeleeIds.AirSlash,
 			"zero_attack_air2" => MeleeIds.RollingSlash,
+			"zero_cmoon" => MeleeIds.RollingSlash,
 			"zero_hyoroga_attack"  => MeleeIds.Hyoroga,
 			// Ground Speiclas
 			"zero_raijingeki" => MeleeIds.Raijingeki,
@@ -749,82 +828,96 @@ public class Zero : Character {
 		return id switch {
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber1, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber1, player, 1, 4, 0.25f, isReflectShield: true,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber2, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber2, player, 1, 10, 0.25f, isReflectShield: true,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
-				3, Global.defFlinch, 0.25f, isReflectShield: true,
+				2, Global.defFlinch, 0.25f, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 2, 4, 0.25f, isReflectShield: true,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 10, 0.25f, isReflectShield: true,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
 				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.halfFlinch, 0.25f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 0, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 4, 0.25f, isReflectShield: true,
+				isJuggleProjectile: true,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
-				1, 0, 0.125f, isDeflectShield: true,
+				1, 10, 0.125f, isDeflectShield: true,
+				isJuggleProjectile: true,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
 				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 0.25f,
+				
 				addToLevel: addToLevel
 			),
 			// Ground Specials
 			(int)MeleeIds.Raijingeki => new GenericMeleeProj(
-				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 2, Global.defFlinch, 0.06f,
+				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 1, Global.defFlinch, 0.06f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RaijingekiWeak => new GenericMeleeProj(
-				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 2, Global.defFlinch, 0.06f,
+				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 0.06f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Dairettsui => new GenericMeleeProj(
-				TBreakerWeapon.staticWeapon, projPos, ProjIds.TBreaker, player, 6, Global.defFlinch, 0.5f,
+				TBreakerWeapon.staticWeapon, projPos, ProjIds.TBreaker, player, 5, Global.defFlinch, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Suiretsusen => new GenericMeleeProj(
-				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 6, Global.defFlinch, 0.75f,
+				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 2, Global.defFlinch, 0.75f,
 				addToLevel: addToLevel
 			),
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
-				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 4, 0, 0.2f,
+				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 3, Global.defFlinch, 0.5f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
-				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 3, Global.defFlinch, 0.1f,
+				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, Global.defFlinch, 0.1f,
+				isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 0.5f,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 1, 20, 0.5f,
+				isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			// Down specials
 			(int)MeleeIds.Hyouretsuzan => new GenericMeleeProj(
-				HyouretsuzanWeapon.staticWeapon, projPos, ProjIds.Hyouretsuzan2, player, 4, 12, 0.5f,
+				HyouretsuzanWeapon.staticWeapon, projPos, ProjIds.Hyouretsuzan2, player, 1, 12, 0.5f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Danchien => new GenericMeleeProj(
-				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 0.5f,
+				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 10, 0.5f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(

@@ -62,6 +62,8 @@ public class SparkMandrill : Maverick {
 					changeState(new SparkMDashPunchState());
 				} else if (shootPressed()) {
 					changeState(new SparkMPunchState());
+				} else if (input.isHeld(Control.Down, player)) {
+					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Up, player)) {

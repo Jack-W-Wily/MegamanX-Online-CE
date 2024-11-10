@@ -31,6 +31,8 @@ public class Projectile : Actor {
 	public int healAmount;
 	public bool isShield;
 	public bool isReflectShield;
+	public bool isJuggleProjectile;
+	public bool ShouldClang;
 	public bool isDeflectShield;
 	public bool shouldVortexSuck = true;
 	bool damagedOnce;
@@ -373,8 +375,12 @@ public class Projectile : Actor {
 			}
 		}
 
-		var isSaber = GenericMeleeProj.isZSaberClang(projId);
-		if (isSaber && owner.character?.isCCImmune() != true) {
+		
+		
+		var isSaber = GenericMeleeProj.isZSaberClang(projId) || GenericMeleeProj.isSaberIrisClang(projId) ;
+		if (otherProj is GenericMeleeProj otherGmp1 &&
+		 isSaber && owner.character?.isCCImmune() != true
+		&& ShouldClang == true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
 				otherProj != null && otherProj.owner.alliance != owner.alliance
@@ -616,6 +622,17 @@ public class Projectile : Actor {
 	// it needs to be in the Damager class as a "on<PROJ>Damage() method"
 	// Also, this runs on every hit regardless of hit cooldown, so if hit cooldown must be factored, use onDamage
 	public virtual void onHitDamagable(IDamagable damagable) {
+
+	
+		if (isJuggleProjectile && damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 0 * modifier, -400));
+		}
+	
+
 		if (destroyOnHit) {
 			damagedOnce = true;
 			if (Global.level.server.isP2P && Global.level.server.favorHost) {

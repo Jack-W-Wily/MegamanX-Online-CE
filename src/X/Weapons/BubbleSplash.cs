@@ -104,7 +104,7 @@ public class BubbleSplashProj : Projectile {
 		bool rpc = false
 	) : base(
 		BubbleSplash.netWeapon, pos, xDir,
-		75, 1, player, "bubblesplash_proj_start", 0, 0f,
+		75, 0.5f, player, "bubblesplash_proj_start", 1, 0f,
 		netProjId, player.ownedByLocalPlayer
 	) {
 		// RNG shenanigans.

@@ -138,7 +138,7 @@ public class BaseSigma : Character {
 			}
 		}
 
-		if (player.currentMaverick == null && !isTagTeam) {
+		if (player.currentMaverick == null && !isTagTeam && player.mavericks.Count == 0) {
 			if (player.weapon is MaverickWeapon mw &&
 				(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
 			) {
@@ -326,6 +326,16 @@ public class BaseSigma : Character {
 		if (changedState || !charState.normalCtrl) {
 			return true;
 		}
+
+		if (charState.attackCtrl && charState is not Dash && grounded && 
+				player.input.isHeld(Control.Up, player))
+			 {
+			turnToInput(player.input, player);
+			changeState(new SwordBlock());
+			return true;
+		}
+
+		
 		if (grounded && player.isCrouchHeld() && canGuard() &&
 			!isAttacking() && noBlockTime == 0 &&
 			charState is not SigmaBlock
@@ -433,9 +443,9 @@ public class BaseSigma : Character {
 
 	public int getMaverickCost() {
 		if (player.isSummoner()) return 3;
-		if (player.isPuppeteer()) return 3;
+		if (player.isPuppeteer()) return 1;
 		if (player.isStriker()) return 0;
-		if (player.isTagTeam()) return 5;
+		if (player.isTagTeam()) return 0;
 		return 3;
 	}
 

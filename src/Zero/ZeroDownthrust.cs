@@ -114,13 +114,21 @@ public class ZeroDownthrust : CharState {
 				character.changeSpriteFromName(sprite, false);
 			}
 		}
-		if (type == ZeroDownthrustType.QuakeBlazer) {
+	//	if (type == ZeroDownthrustType.QuakeBlazer) {
 			int xDir = player.input.getXDir(player);
 			if (xDir != 0) {
 				character.xDir = xDir;
 				character.move(new Point(100 * xDir, 0));
 			}
+	//	}
+
+		if (character.dashedInAir == 0 && player.input.isPressed(Control.Jump, player)){
+				character.dashedInAir++;
+				character.vel.y = -character.getJumpPower();
+				character.changeState(new Jump(), true);
+
 		}
+
 		if (character.grounded) {
 			character.changeState(new ZeroDownthrustLand(type), true);
 			if (type == ZeroDownthrustType.QuakeBlazer) {
@@ -178,10 +186,16 @@ public class ZeroDownthrustLand : CharState {
 
 	public override void update() {
 		base.update();
+
+		if (player.input.isPressed(Control.Special1, player)){
+		character.changeState(new Raijingeki(true), true);
+		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}
+
+	
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
