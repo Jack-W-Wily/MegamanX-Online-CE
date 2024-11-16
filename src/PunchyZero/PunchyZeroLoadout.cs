@@ -150,17 +150,17 @@ public class SelectPunchyZeroWeaponMenu : IMainMenu {
 		} else {
 			menuTitle = "Hyper Mode";
 			weaponTitle = hyperMode switch {
-				0 => "Black Zero",
+				0 => "Absolute Zero",
 				1 => "Awakened Zero",
-				2 => "Viral Zero",
+				2 => "Black Zero",
 				_ => "ERROR"
 			};
 			weaponDescription = hyperMode switch {
-				0 => "Increases speed by 15%, increases damage by 50%" +
+				0 => "Increases speed by 15%, Allows you to fly" +
 					"\nand increases the flinch of all attacks.",
 				1 => "Gives a damaging contact aura and upgrades attacks." +
-					"\nHold [CMD] so after 20 seconds enters Genmu Zero",
-				2 => "Applies virus to enemies on hit\nand grants the Dark Hold giga attack.",
+					"\nHold [CMD] for phase 2",
+				2 => "Increases speed by 15%\nand Upgrades your buster.",
 				_ => "ERROR"
 			};
 			weaponSubDescription = hyperMode switch {

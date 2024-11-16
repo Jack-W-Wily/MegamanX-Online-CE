@@ -345,7 +345,7 @@ public class Weapon {
 	}
 
 	public bool isCmWeapon() {
-		return type > 0 && (this is AxlBullet || this is DoubleBullet);
+		return type > 0 && (this is AxlBullet); //|| this is DoubleBullet);
 	}
 	
 	public virtual void update() {

@@ -116,7 +116,8 @@ public class DrDoppler : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name == "drdoppler_dash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDash, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDash, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this
+			,isDeflectShield : true, isShield : true);
 		} else if (sprite.name == "drdoppler_dash_water") {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDashWater, player, damage: 2, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 		} else if (sprite.name == "drdoppler_absorb") {
@@ -144,11 +145,12 @@ public class DrDopplerBallProj : Projectile {
 		weapon, pos, xDir, 250, 3, player, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2",
 		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
+		isDeflectShield = true;
 		if (type == 0) {
 			projId = (int)ProjIds.DrDopplerBall;
 		} else {
 			projId = (int)ProjIds.DrDopplerBall2;
-			damager.damage = 0;
+			damager.damage = 1;
 			destroyOnHit = false;
 		}
 		maxTime = 0.75f;
@@ -182,6 +184,7 @@ public class DrDopplerDashState : MaverickState {
 	float soundTime;
 	public DrDopplerDashState() : base("dash", "dash_start") {
 		stopMovingOnEnter = true;
+		superArmor = true;
 	}
 
 	public override void update() {

@@ -61,7 +61,7 @@ public class CharSelection {
 		//	offset = new Point(2, 45)
 		//},
 		new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
-		//new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
+		new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
 		new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];

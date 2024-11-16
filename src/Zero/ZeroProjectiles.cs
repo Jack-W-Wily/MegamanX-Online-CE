@@ -68,8 +68,8 @@ public class ZBuster4Proj : Projectile {
 	public ZBuster4Proj(
 		Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 4, player, "zbuster4",
-		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+		ZeroBuster.netWeapon, pos, xDir, 350, 6, player, "zbuster5",
+		0, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";

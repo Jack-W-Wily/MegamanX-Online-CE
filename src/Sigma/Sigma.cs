@@ -138,7 +138,11 @@ public class BaseSigma : Character {
 			}
 		}
 
-		if (player.currentMaverick == null && !isTagTeam && player.mavericks.Count == 0) {
+		if (player.currentMaverick == null && !isTagTeam && 
+		(player.mavericks.Count == 0 && player.isSigma1() ||
+		player.isSigma2() || player.isSigma3())
+		
+		) {
 			if (player.weapon is MaverickWeapon mw &&
 				(!isStriker || mw.cooldown == 0) && (shootPressed || spcPressed)
 			) {

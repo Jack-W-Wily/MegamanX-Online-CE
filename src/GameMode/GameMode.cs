@@ -684,7 +684,7 @@ public class GameMode {
 					);
 					yStart += 12;
 			//	}
-				if (punchyZero.gigaAttack.shootTime > 0) {
+				if (punchyZero.gigaAttack.shootCooldown > 0) {
 					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
 					xStart += 15;
 				}
@@ -1796,7 +1796,8 @@ public class GameMode {
 			float cooldown = Helpers.progress(player.fgMoveAmmo, 1920f);
 			drawWeaponSlotCooldown(x, y, cooldown);
 		}
-
+// Disabling this on Wcut only bc it's not really needed
+/*
 		if (player.isAxl && player.weapons[0].type > 0) {
 			int x = 10, y = 156;
 			int index = 0;
@@ -1812,7 +1813,7 @@ public class GameMode {
 			Fonts.drawText(
 				FontType.Grey, totalAmmo.ToString(), x + 10, y - 4
 			);
-		}
+		}*/
 
 		if (player.isGridModeEnabled()) {
 			if (player.gridModeHeld == true) {

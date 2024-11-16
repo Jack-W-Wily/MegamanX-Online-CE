@@ -35,7 +35,13 @@ public class VirusSlash1 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	
+		
+		character.playSound("genmureix5", sendRpc: true);
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash,player)){
+			character.move(new Point( slideVel, 0));
+			
+		}
 	}
 
 	public override void onExit(CharState newState) {
@@ -58,9 +64,9 @@ public class VirusSlash2 : CharState {
 		if (character.grounded){
 			if (player.input.isPressed(Control.Shoot, player) 
 				&& player.input.isHeld (Control.Down,player)
-			&& stateTime > 0.1 && player.currency > 0){
+			&&  character.frameIndex > 2 && player.currency > 0){
 			character.changeState(new VirusSlash3(), true);
-			player.currency -= 1;
+			
 			}
 		}
 
@@ -71,7 +77,12 @@ public class VirusSlash2 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	
+			character.playSound("genmureix5", sendRpc: true);
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash,player)){
+			character.move(new Point( slideVel, 0));
+			
+		}
 	}
 
 	public override void onExit(CharState newState) {
@@ -94,9 +105,9 @@ public class VirusSlash3 : CharState {
 		if (character.grounded){
 			if (player.input.isPressed(Control.Shoot, player) 
 			&& player.input.isHeld (Control.Down,player)
-			&& stateTime > 0.1 && player.currency > 0){
+			&& character.frameIndex > 4 && player.currency > 0){
 			character.changeState(new VirusSlash1(), true);
-			player.currency -= 1;
+		
 			}
 		}
 		if (character.isAnimOver()) {
@@ -106,6 +117,12 @@ public class VirusSlash3 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.playSound("genmureix5", sendRpc: true);
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash,player)){
+			character.move(new Point( slideVel, 0));
+			
+		}
 	
 	}
 
@@ -239,8 +256,21 @@ public class SigmaBallProj : Projectile {
 public class SigmaBallShoot : CharState {
 	bool shot;
 	public CmdSigma sigma;
+	bool isSuperSigmaproj;
 
 	public SigmaBallShoot(string transitionSprite = "") : base("shoot", "", "", transitionSprite) {
+	}
+
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.input.isHeld(Control.Special2, player)
+		&& player.currency > 0){
+		isSuperSigmaproj = true;
+		player.currency -=1;
+		}
+		sigma = character as CmdSigma;
+		character.vel = new Point();
 	}
 
 	public override void update() {
@@ -289,10 +319,16 @@ public class SigmaBallShoot : CharState {
 			if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
 			sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
 			character.playSound("energyBall", sendRpc: true);
+
+			if (!isSuperSigmaproj){
 			new SigmaBallProj(
 				SigmaBallWeapon.netWeapon, poi, character.xDir, player,
 				player.getNextActorNetId(), vel.normalize(), rpc: true
-			);
+			);} 
+			if (isSuperSigmaproj){
+				new TorpedoProj(SigmaBallWeapon.netWeapon , poi, character.xDir, player, 5, player.getNextActorNetId(), 0, rpc: true);
+			
+			 }
 			new Anim(
 				poi, "sigma_proj_ball_muzzle", character.xDir,
 				player.getNextActorNetId(), true, sendRpc: true
@@ -304,11 +340,7 @@ public class SigmaBallShoot : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		sigma = character as CmdSigma;
-		character.vel = new Point();
-	}
+
 }
 
 public class SigmaWallDashState : CharState {

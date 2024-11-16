@@ -433,7 +433,7 @@ public class VoltCBarrierProj : Projectile {
 
 public class VoltCSparkleProj : Projectile {
 	public VoltCSparkleProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "voltc_proj_sparkle", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 2, player, "voltc_proj_sparkle", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.VoltCSparkle;
 		vel = new Point(Helpers.randomRange(-200, 200), Helpers.randomRange(-400, -200));
 		useGravity = true;

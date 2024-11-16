@@ -418,8 +418,12 @@ label:
 				weapons.Add(new IceGattling(axlLoadout.iceGattlingAlt));
 				weapons.Add(new FlameBurner(axlLoadout.flameBurnerAlt));
 			} else {
-				weapons = loadout.axlLoadout.getWeaponsFromLoadout();
-				weapons.Insert(0, getAxlBullet(axlBulletType));
+				weapons.Add(new DoubleBullet());
+				weapons.Add(new RayGun(axlLoadout.rayGunAlt));
+				weapons.Add(new BlastLauncher(axlLoadout.blastLauncherAlt));
+				
+			//	weapons = loadout.axlLoadout.getWeaponsFromLoadout();
+			//	weapons.Insert(0, getAxlBullet(axlBulletType));
 			}
 			if (ownedByLocalPlayer) {
 				foreach (var dnaCore in savedDNACoreWeapons) {

@@ -231,19 +231,19 @@ public class SelectZeroWeaponMenu : IMainMenu {
 			Fonts.drawText(FontType.Red, wep1.hitcooldown, 268, 186);
 		} else {
 			if (cursors[7].index == 0) {
-				Fonts.drawText(FontType.Green, "This HyperMode increases speed, damage and flinch.",
+				Fonts.drawText(FontType.Green, "Hold [CMD] TO ACTIVATE",
 				 Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Lasts 20 seconds.",
+				Fonts.drawText(FontType.DarkPurple, "Lasts 40 seconds.",
 				 Global.halfScreenW, wsy + 12, Alignment.Center);
 			} else if (cursors[7].index == 1) {
-				Fonts.drawText(FontType.Green, "This HyperMode grants powerful ranged attacks.",
+				Fonts.drawText(FontType.Green, "Hold [CMD] + UP TO ACTIVATE",
 				 Global.halfScreenW, wsy-6,Alignment.Center);
 				Fonts.drawText(FontType.DarkPurple, $"Lasts until  			  are depleted.",
 				 Global.halfScreenW, wsy+12,Alignment.Center);
 				Fonts.drawText(FontType.DarkPurple, $"{Global.nameCoins}",
 				 Global.halfScreenW-5, wsy+12,Alignment.Center);
 			} else if (cursors[7].index == 2) {
-				Fonts.drawText(FontType.Green, "This HyperMode infects and disrupts foes on each hit.",
+				Fonts.drawText(FontType.Green, "Hold [CMD] + DOWN TO ACTIVATE.",
 				  Global.halfScreenW, wsy-6,Alignment.Center);
 				Fonts.drawText(FontType.DarkPurple, "Lasts until death.",
 				  Global.halfScreenW, wsy+12,Alignment.Center);

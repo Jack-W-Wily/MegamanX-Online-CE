@@ -205,6 +205,58 @@ public class XUPParryMeleeState : CharState {
 	}
 }
 
+
+
+public class XUPParryMeleeStateBuxa : CharState {
+	Actor counterAttackTarget;
+	float damage;
+	public XUPParryMeleeStateBuxa(Actor counterAttackTarget, float damage) : base("unpo_parry_attack", "", "", "") {
+		this.counterAttackTarget = counterAttackTarget;
+		this.damage = damage;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (counterAttackTarget != null) {
+			character.turnToPos(counterAttackTarget.pos);
+
+			float dist = character.pos.distanceTo(counterAttackTarget.pos);
+			if (dist < 150) {
+				if (character.frameIndex >= 4 && !once) {
+					if (character.pos.distanceTo(counterAttackTarget.pos) > 10) {
+						character.moveToPos(counterAttackTarget.pos, 350);
+					}
+				}
+			}
+		}
+
+		Point? shootPos = character.getFirstPOI("melee");
+		if (!once && shootPos != null) {
+			once = true;
+			new UPParryMeleeProj(new XUPParry(), shootPos.Value, character.xDir, damage, player, player.getNextActorNetId(), rpc: true);
+			character.playSound("upParryAttack", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		//character.frameIndex = 2;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		if (character is MegamanX mmx) {
+			mmx.parryCooldown = mmx.maxParryCooldown;
+		}
+	}
+}
+
 public class AbsorbWeapon : Weapon {
 	public Projectile absorbedProj;
 	public AbsorbWeapon(Projectile otherProj) {
@@ -351,12 +403,13 @@ public class XUPPunchState : CharState {
 		if (!player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Shoot, player)
 			 && stateTime > 0.1f && !character.sprite.name.Contains("unpo_punch_2")){
-			character.changeSpriteFromName("unpo_punch_2", true);		
+			character.changeSpriteFromName("unpo_punch_2", true);	
+			character.playSound("punch2", true);	
 			}
 		if (player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Shoot, player)
 			 && stateTime > 0.1f){
-			character.changeState(new XUPParryMeleeState(null, 3), true);
+			character.changeState(new XUPParryMeleeStateBuxa(null, 3), true);
 	
 			}
 
@@ -367,6 +420,7 @@ public class XUPPunchState : CharState {
 		if (oldState is Dash) {
 			slideVelX = character.xDir * 250;
 		}
+		character.playSound("punch1", true);
 	}
 }
 

@@ -185,6 +185,7 @@ public enum WeaponIds {
 	AxlBullet,
 	BlastLauncher,
 	RayGun,
+	RayGunClassic,
 	DoubleBullet,
 	AssassinBullet,
 	Undisguise,
@@ -202,6 +203,7 @@ public enum WeaponIds {
 
 	SigmaSlash,
 	SigmaBall,
+	SigmaHeadProjectile,
 	SigmaWolfHead,
 	SigmaWolfHand,
 	SigmaWolfHandBeam,
@@ -482,6 +484,7 @@ public enum ProjIds {
 	DragonsWrath,
 
 	AxlBullet,
+	BlueBullet,
 	MetteurCrash,
 	BeastKiller,
 	MachineBullets,
@@ -524,6 +527,7 @@ public enum ProjIds {
 
 	SigmaSlash,
 	VirusSlash,
+	SigmaHeadProjectile,
 	SigmaSwordBlock,
 	SigmaBall,
 	SigmaWolfHeadFlameProj,
@@ -708,6 +712,9 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+
+	// Extras
+	BlockableLaunch,
 
 	// Special damage types.
 	SelfDmg = 30000,

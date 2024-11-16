@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using SFML.Graphics;
 
 namespace MMXOnline;
 
@@ -195,24 +198,28 @@ public class DoubleBullet : AxlWeapon {
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
+		if (player.ownedByLocalPlayer){
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		if (chargeLevel == 0) {
 			bullet = new AxlBulletProj(weapon, bulletPos, player, bulletDir, netId);
 
 		} else {
+			if (bullet == null){
 			bullet = new CopyShotProj(weapon, bulletPos, chargeLevel, player, bulletDir, netId);
+			}
 		}
 
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
 	}
+	}
 }
 
 public class AxlBulletProj : Projectile {
 	public AxlBulletProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, 1, 600, 1, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 0.25f, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBullet;
 		angle = bulletDir.angle;
@@ -220,12 +227,33 @@ public class AxlBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
+	
+
+		if (Helpers.randomRange(0,10)== 10){
+		changeSprite("axl_bullet_blue", true);
+		damager.damage = 1;
+		damager.flinch = 20;
+		}
+
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 		destroySelf();
 	}
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
+		}
+	}
+	
 }
 
 public class MettaurCrashProj : Projectile {
@@ -256,6 +284,9 @@ public class MettaurCrashProj : Projectile {
 	public override void render(float x, float y) {
 		DrawWrappers.DrawLine(pos.x, pos.y, pos.x + (deltaPos.normalize().x * 10), pos.y + (deltaPos.normalize().y * 10), SFML.Graphics.Color.Yellow, 2, 0, true);
 	}
+
+
+	
 }
 
 public class BeastKillerProj : Projectile {
@@ -381,9 +412,12 @@ public class CopyShotProj : Projectile {
 
 		xScale = 0.75f;
 		yScale = 0.75f;
+		isJuggleProjectile = true;
 
 		reflectable = true;
 		maxTime = 0.5f;
+
+	
 
 		/*
 		if (player?.character?.isWhiteAxl() == true)
@@ -393,29 +427,32 @@ public class CopyShotProj : Projectile {
 		*/
 
 		if (chargeLevel == 2) {
-			damager.damage = 3;
+			damager.damage = 1;
 			speed *= 1.5f;
 			maxTime /= 1.5f;
 			xScale = 1f;
 			yScale = 1f;
+			damager.flinch = 4;
 		}
 		if (chargeLevel >= 3) {
-			damager.damage = 4;
+			damager.damage = 2;
 			speed *= 2f;
 			maxTime /= 2f;
 			xScale = 1.25f;
 			yScale = 1.25f;
+			damager.flinch = 15;
 		}
-		/*
+		
 		if (chargeLevel == 4)
 		{
-			damager.damage = 5;
+			damager.damage = 3;
 			speed *= 2.5f;
 			maxTime /= 2.5f;
 			xScale = 1.5f;
 			yScale = 1.5f;
+			damager.flinch = 30;
 		}
-		*/
+		
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 	}

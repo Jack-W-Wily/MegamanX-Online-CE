@@ -377,7 +377,7 @@ public class Projectile : Actor {
 
 		
 		
-		var isSaber = GenericMeleeProj.isZSaberClang(projId) || GenericMeleeProj.isSaberIrisClang(projId) ;
+		var isSaber = GenericMeleeProj.isZSaberClang(projId)  ;
 		if (otherProj is GenericMeleeProj otherGmp1 &&
 		 isSaber && owner.character?.isCCImmune() != true
 		&& ShouldClang == true) {

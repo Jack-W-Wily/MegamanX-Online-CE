@@ -519,7 +519,7 @@ public class HyperPunchyZeroStart : CharState {
 		if (zero == null) {
 			throw new NullReferenceException();
 		}
-		character.player.currency -= 10;
+		character.player.currency -= 5;
 		if (zero.hyperMode == 2) {
 			zero.changeSpriteFromName("hyper_viral", true);
 			virusAnimName = "sigmavirushead";

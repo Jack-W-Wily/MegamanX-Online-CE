@@ -26,6 +26,7 @@ public class VileMK2GrabState : CharState {
 	float timeWaiting;
 	public VileMK2GrabState(Character? victim) : base("grab", "", "", "") {
 		this.victim = victim;
+		airMove = true;
 		grabTime = VileMK2Grabbed.maxGrabTime;
 	}
 
@@ -68,10 +69,10 @@ public class VileMK2GrabState : CharState {
 	public override void update() {
 		base.update();
 		grabTime -= Global.spf;
-		leechTime += Global.spf;
+		
 
 
-			if (vile.vileForm == 2){
+			//if (vile.vileForm == 2){
 				if (vile.vileHoverTime > vile.vileMaxHoverTime) {
 				vile.vileHoverTime = vile.vileMaxHoverTime;
 				character.changeToIdleOrFall();
@@ -91,7 +92,7 @@ public class VileMK2GrabState : CharState {
 
 
 				if (player.input.isHeld(Control.Jump, player)) {
-				Point moveAmount = new Point(character.xDir * 50, -300);
+				Point moveAmount = new Point(character.xDir * 50, -100);
 				character.move(moveAmount);
 				character.useGravity = false;
 				} else { character.useGravity = true; }
@@ -100,7 +101,7 @@ public class VileMK2GrabState : CharState {
 				sound = character.playSound("vileHover", forcePlay: false, sendRpc: true);
 				}
 			}
-		}
+		//}
 
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
 			character.changeToIdleOrFall();
@@ -124,6 +125,8 @@ public class VileMK2GrabState : CharState {
 			}
 		}
 
+
+		leechTime += Global.spf;
 		if (leechTime > 0.4f) {
 			leechTime = 0;
 			character.addHealth(1);
@@ -182,7 +185,7 @@ public class VileMK2GrabState : CharState {
 
 
 public class VileMK2Grabbed : GenericGrabbedState {
-	public const float maxGrabTime = 4;
+	public const float maxGrabTime = 6;
 	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
 	}
 }
@@ -190,7 +193,7 @@ public class VileMK2Grabbed : GenericGrabbedState {
 
 public class VileStomp : Weapon {
 	public VileStomp() : base() {
-		rateOfFire = 0.75f;
+		fireRate = 0.75f;
 		index = (int)WeaponIds.VileMK2Grab;
 		killFeedIndex = 63;
 	}
@@ -225,12 +228,6 @@ public class VileStompState : CharState {
 			if (timeWaiting > 1) {
 				victimWasGrabbedSpriteOnce = true;
 			}
-			if (character.isDefenderFavored()) {
-				if (leechTime > 0.33f) {
-					leechTime = 0;
-				}
-				return;
-			}
 		}
 
 		if (character.sprite.name.Contains("stomp")) {
@@ -246,11 +243,13 @@ public class VileStompState : CharState {
 
 		if (leechTime > 0.10f && character.frameIndex == 2) {
 			leechTime = 0;
+			character.addHealth(1);
 			character.shakeCamera(sendRpc: true);
 			var damager = new Damager(player, 1f, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}
-
+		
+		
 		if (player.input.isPressed(Control.Special1, player)) {
 			character.changeToIdleOrFall();
 			return;

@@ -60,6 +60,7 @@ public class Axl : Character {
 	public float whiteAxlTime;
 	public float dodgeRollCooldown;
 	public const float maxDodgeRollCooldown = 1.5f;
+	public float RainstormCooldown;
 	public bool hyperAxlUsed;
 	//public ShaderWrapper axlPaletteShader;
 	public float maxHyperAxlTime = 30;
@@ -369,6 +370,68 @@ public class Axl : Character {
 		player.changeWeaponControls();
 
 		updateAxlAim();
+
+		// AXl Attacks
+
+
+	if (player.weapon is AxlBullet || player.weapon is DoubleBullet){	
+		if (charState.canAttack() || ComboTimer > 0){
+			if (player.input.isPressed(Control.Special1, player) 
+			&& !player.input.isHeld(Control.Up, player) 
+			&& !player.input.isHeld(Control.Down, player)
+			&& !player.input.isLeftOrRightHeld(player)
+			&& charState is not EvasionBarrage
+			){
+				vel.y = -getJumpPower() * 2f;
+			changeState(new EvasionBarrage(), true);
+		if (charState is Crouch)invulnTime = 0.2f;
+			}
+			if (player.input.isPressed(Control.Special1, player) 
+			&& !player.input.isHeld(Control.Up, player) 
+			&& !player.input.isHeld(Control.Down, player)
+			&& player.input.isLeftOrRightHeld(player)
+			&& charState is not OcelotSpin
+			
+			){
+			changeState(new OcelotSpin(), true);
+		if (charState is Crouch)invulnTime = 0.2f;
+			}
+			if (player.input.isPressed(Control.Special1, player) 
+			&& !player.input.isHeld(Control.Up, player) 
+			&& player.input.isHeld(Control.Down, player)
+			&& !player.input.isLeftOrRightHeld(player)
+			&& charState is not RisingBarrage
+			){
+			changeState(new RisingBarrage(), true);
+		if (charState is Crouch)	invulnTime = 0.2f;
+			}
+			if (player.input.isPressed(Control.Special1, player) 
+			&& player.input.isHeld(Control.Up, player) 
+			&& !player.input.isHeld(Control.Down, player)
+			&& !player.input.isLeftOrRightHeld(player)
+			&& charState is not TailShot
+			){
+		changeState(new TailShot(), true);
+		if (charState is Crouch)	invulnTime = 0.25f;
+			}
+	
+		}
+		if ( RainstormCooldown == 0  && charState is not RainStorm 
+		 && player.canControl
+		 && !sprite.name.Contains("hurt")
+		 && !sprite.name.Contains("grabbed")) {
+			
+			if (player.input.checkShoryuken(player, xDir , Control.Special1)) {
+		changeState(new RainStorm(isUnderwater()), true);
+				invulnTime = 0.5f;
+				 RainstormCooldown = 1.5f;
+			}
+		 }
+	}
+
+
+		Helpers.decrementTime(ref RainstormCooldown);
+
 		//somehow you could do air dodge roll, added "grounded" to fix that "bug"
 		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
@@ -430,15 +493,15 @@ public class Axl : Character {
 
 		bool bothHeld = shootHeld && altShootHeld;
 
-		if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+	//	if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
 			(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
-		} else {
-			foreach (var weapon in player.weapons) {
-				if (weapon is AxlBullet || weapon is DoubleBullet) {
-					(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
-				}
-			}
-		}
+	//	} else {
+	//		foreach (var weapon in player.weapons) {
+	//			if (weapon is AxlBullet || weapon is DoubleBullet) {
+	//				(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
+	//			}
+	//		}
+	//	}
 
 		if (player.weapons.Count > 0 && player.weapons[0].type > 0) {
 			player.axlBulletTypeLastAmmo[player.weapons[0].type] = player.weapons[0].ammo;
@@ -1423,8 +1486,28 @@ public class Axl : Character {
 			}
 		} else if (charState is LadderEnd) ladderClimb = true;
 
-		return !(charState is HyperAxlStart || isWarpIn() || charState is Hurt || charState is Die || charState is GenericStun || charState is InRideArmor || charState is DodgeRoll || charState is VileMK2Grabbed || charState is KnockedDown
-			|| sprite.name.Contains("win") || sprite.name.Contains("lose") || ladderClimb || charState is DeadLiftGrabbed || charState is UPGrabbed || charState is WhirlpoolGrabbed || charState is InRideChaser);
+		return !(charState is HyperAxlStart 
+		|| isWarpIn() 
+		|| charState is Hurt 
+		|| charState is Die 
+		|| charState is GenericStun 
+		|| charState is InRideArmor 
+		|| charState is DodgeRoll 
+		|| charState is VileMK2Grabbed 
+		|| charState is KnockedDown
+		|| charState is Crouch
+		|| sprite.name.Contains("win") 
+		|| sprite.name.Contains("lose") 
+		|| ladderClimb 
+		|| charState is DeadLiftGrabbed 
+		|| charState is UPGrabbed 
+		|| charState is WhirlpoolGrabbed 
+		|| charState is RainStorm 
+		|| charState is EvasionBarrage 
+		|| charState is RisingBarrage 
+		|| charState is OcelotSpin 
+		|| charState is TailShot  
+		|| charState is InRideChaser);
 	}
 
 	public Point getAxlBulletDir() {
@@ -1866,4 +1949,44 @@ public class Axl : Character {
 
 		netAxlArmSpriteIndex = BitConverter.ToUInt16(data[5..7]);
 	}
-}
+
+
+
+
+	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		Projectile proj = null;
+
+		
+		if (sprite.name.Contains("_block")) {
+			return new GenericMeleeProj(
+				new DoubleBullet(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
+			);
+		}
+		if (sprite.name.Contains("fall") && player.input.isPressed("jump", player))
+		{
+			return new GenericMeleeProj(new DoubleBullet(), centerPoint, ProjIds.SigmaSwordBlock, player, 1f, 4, 0f);
+		}
+		 if (  sprite.name.Contains("evasionshot"))
+		{
+			return new GenericMeleeProj(new DoubleBullet(), centerPoint, ProjIds.MechFrogStompShockwave, player,1f, 0, 0.125f);
+		}
+		 if (  sprite.name.Contains("risingbarrage"))
+		{
+			return new GenericMeleeProj(new DoubleBullet(), centerPoint, ProjIds.BlockableLaunch, player,1f, 0, 0.125f);
+		}
+		 if (  sprite.name.Contains("tailshot"))
+		{
+			return new GenericMeleeProj(new DoubleBullet(), centerPoint, ProjIds.UPPunch, player, 3f, 30, 0.1f,
+			isJuggleProjectile : true);
+		}
+		 if (  sprite.name.Contains("ocelotspin"))
+		{
+			return new GenericMeleeProj(new DoubleBullet(), centerPoint, ProjIds.SigmaSwordBlock, player, 0.5f, 1, 0.125f, 
+			isDeflectShield: true,
+			isJuggleProjectile : true);
+		}
+		
+		return proj;
+		}
+	}
+	

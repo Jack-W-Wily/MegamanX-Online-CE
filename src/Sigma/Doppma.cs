@@ -100,7 +100,7 @@ public class Doppma : BaseSigma {
 				return true;
 			}
 		}
-		if (grounded && player.input.isPressed(Control.Special1, player) &&
+		if (player.input.isPressed(Control.Special1, player) &&
 			charState is not SigmaThrowShieldState && shieldCooldown == 0
 		) {
 			shieldCooldown = maxShieldCooldown;

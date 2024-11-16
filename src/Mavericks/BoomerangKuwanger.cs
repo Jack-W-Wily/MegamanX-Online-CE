@@ -54,7 +54,7 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or BoomerKDashState) {
+			if (state is MIdle or MRun or MLand or BoomerKDashState or FakeZeroGuardState) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;
@@ -69,13 +69,24 @@ public class BoomerangKuwanger : Maverick {
 					}
 				}
 				if (shootPressed() && !bald) {
+					if (!player.input.isHeld(Control.Special2,player)){
 					changeState(getShootState());
+					}
+					if (player.input.isHeld(Control.Special2,player)
+					&& player.currency > 0){
+					player.currency -= 1;
+					changeState(new BoomerKChargedRangState());
+					}
 				} else if (specialPressed()) {
-					if (!player.input.isHeld(Control.Up,player)){
+					if (!player.input.isHeld(Control.Up,player)
+					&& !player.input.isHeld(Control.Down,player)){
 					changeState(new BoomerKDeadLiftState());
 					}
 					if (player.input.isHeld(Control.Up,player)){
 					changeState(new BoomerKPunchState());
+					}
+					if (player.input.isHeld(Control.Down,player)){
+					changeState(new BoomerKKickState());
 					}
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
@@ -146,10 +157,16 @@ public class BoomerangKuwanger : Maverick {
 			return new GenericMeleeProj(deadLiftWeapon, centerPoint, ProjIds.BoomerangKDeadLift, player, damage: 0, flinch: 0, hitCooldown: 0, this);
 		}
 		if (sprite.name.Contains("boomerk_orara")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 1, flinch: Global.halfFlinch, hitCooldown: 0.1f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 1, flinch: Global.halfFlinch, hitCooldown: 0.1f, owningActor: this);
+		}
+		if (sprite.name.Contains("boomerk_dash")) {
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this);
+		}
+		if (sprite.name.Contains("boomerk_kick")) {
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.VileSuperKick, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this);
 		}
 		if (sprite.name.Contains("boomerk_fall")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
 		}
 
 
@@ -378,6 +395,20 @@ public class BoomerKTeleportState : MaverickState {
 		if (clone != null) {
 			clone.destroySelf();
 		}
+
+		new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), 
+		maverick.pos.addxy(-5,-32), 
+		 maverick.xDir, 
+		 player, player.
+		 getNextActorNetId());
+
+		 new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), 
+		maverick.pos.addxy(25,-32), 
+		 maverick.xDir, 
+		 player, player.
+		 getNextActorNetId());
+
+
 	}
 
 	public bool canChangePos() {
@@ -498,9 +529,89 @@ public class BoomerKPunchState : MaverickState {
 	}
 }
 
+
+
+public class BoomerKKickState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	public BoomerKKickState() : base("kick") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+	public override bool trySetGrabVictim(Character grabbed) {
+		if (grabbedChar == null) {
+			grabbedChar = grabbed;
+			return true;
+		}
+		return false;
+	}
+}
+
+
+
+public class BoomerKChargedRangState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	bool once;
+	public BoomerKChargedRangState() : base("doublethrow") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		if (maverick.frameIndex == 5 && !once){
+			once = true;
+			maverick.playSound("boomerang", true);
+			maverick.playSound("cutter", true);
+			maverick.playSound("buster4", true);
+			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(0, 5), null,maverick. xDir, player, 90, 1, player.getNextActorNetId(true), null, true);
+			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(5, 0), null, maverick.xDir, player, 0, 1, player.getNextActorNetId(true), null, true);
+			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(0, -5), null, maverick.xDir, player, -90, 1, player.getNextActorNetId(true), null, true);
+			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(-5, 0), null, maverick.xDir, player, -180, 1, player.getNextActorNetId(true), null, true);
+
+
+			
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+	public override bool trySetGrabVictim(Character grabbed) {
+		if (grabbedChar == null) {
+			grabbedChar = grabbed;
+			return true;
+		}
+		return false;
+	}
+}
+
 public class DeadLiftGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public bool launched;
+	bool once;
 	float launchTime;
 	public DeadLiftGrabbed(BoomerangKuwanger grabber) : base(grabber, 1, "") {
 		customUpdate = true;
@@ -516,10 +627,20 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-			if (character.stopCeiling()) {
-				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
-				character.playSound("crash", sendRpc: true);
-				character.shakeCamera(sendRpc: true);
+		for (int i = 1; i <= 4; i++) {
+				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
+				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
+					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+						if (!once){
+								once = true;
+							character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+						//	character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
+		
+						}
+							character.playSound("crash", sendRpc: true);
+							character.shakeCamera(sendRpc: true);
+							//return;
+						}
 			}
 			return;
 		}

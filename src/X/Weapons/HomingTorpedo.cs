@@ -69,12 +69,17 @@ public class TorpedoProj : Projectile, IDamagable {
 			projId = (int)ProjIds.LaunchOTorpedo;
 			changeSprite("launcho_proj_ht", true);
 		}
+		else if (type == 5) {
+			projId = (int)ProjIds.SigmaHeadProjectile;
+			changeSprite("sigma_proj_head", true);
+		}
+
 
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;
 		reflectableFBurner = true;
 		customAngleRendering = true;
-		if (type == 1 || type == 3) {
+		if (type == 1 || type == 3 || type == 5) {
 			damager.damage = (type == 1 ? 1 : 2);
 			damager.flinch = Global.halfFlinch;
 		} else if (type == 2) {

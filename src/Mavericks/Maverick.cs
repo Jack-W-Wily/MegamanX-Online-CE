@@ -665,10 +665,15 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
-		if (this is FakeZero fz && fz.state is FakeZeroGuardState) {
+		if (state is FakeZeroGuardState) {
 			ammo += damage;
 			if (ammo > 32) ammo = 32;
-			damage *= 0.15f;
+			if (damage < 4){
+				damage = 0;
+			} else{
+			damage *= 0.5f;
+			}
+			
 		}
 
 		health -= damage;

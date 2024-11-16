@@ -67,7 +67,7 @@ public partial class Player {
 	public List<Weapon> savedDNACoreWeapons = new List<Weapon>();
 	public int axlBulletType;
 	public List<bool> axlBulletTypeBought = new List<bool>() { true, false, false, false, false, false, false };
-	public List<float> axlBulletTypeAmmo = new List<float>() { 0, 0, 0, 0, 0, 0, 0 };
+	public List<float> axlBulletTypeAmmo = new List<float>() { 999999999, 99999999, 9999999, 9999999, 99999999, 99999999, 99999999 };
 	public List<float> axlBulletTypeLastAmmo = new List<float>() { 32, 32, 32, 32, 32, 32, 32 };
 	public int lastDNACoreIndex = 4;
 	public DNACore lastDNACore;
@@ -256,7 +256,8 @@ public partial class Player {
 				!=
 				charHeartTanks[isDisguisedAxl ? 3 : charNum] * curMul
 			) {
-				throw new OverflowException();
+			//	throw new OverflowException();.
+			return charHeartTanks[isDisguisedAxl ? 3 : charNum];
 			}
 			return charHeartTanks[isDisguisedAxl ? 3 : charNum];
 		}
@@ -695,6 +696,9 @@ public partial class Player {
 		if (isX) {
 			bonus = 12;
 		}
+		if (isAxl) {
+			bonus = 8;
+		}
 		if (isVile) {
 			bonus = 4;
 		}
@@ -947,7 +951,12 @@ public partial class Player {
 				Global.level.isHyper1v1() ||
 				Global.shouldAiAutoRevive)
 			) {
+				if (isSigma3()){
 				reviveSigma(2, spawnPoint);
+				}
+				if (!isSigma3()){
+				reviveSigma(1, spawnPoint);
+				}
 			}
 		} else if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
@@ -1657,7 +1666,7 @@ public partial class Player {
 		character.xDir = oldDir;
 		maxHealth = getMaxHealth();
 		health = Math.Min(health, maxHealth);
-		loadout = oldAxlLoadout;
+	//	loadout = oldAxlLoadout;
 		weapons = oldWeapons;
 		weaponSlot = 0;
 
@@ -1702,7 +1711,7 @@ public partial class Player {
 		charNum = 3;
 		maxHealth = getMaxHealth();;
 		health = 0;
-		loadout = oldAxlLoadout;
+		//loadout = oldAxlLoadout;
 		configureWeapons();
 		weaponSlot = 0;
 

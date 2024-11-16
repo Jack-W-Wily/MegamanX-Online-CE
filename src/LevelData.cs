@@ -598,6 +598,7 @@ public class LevelData {
 		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
 		{ "centralcomputer_1v1", "boss_X2" },
 		{ "sigma4_1v1", "boss_X1" },
+		{ "Cannonball_megasfc","MegaloVava" },
 
 		// Others.
 		{ "japetribute", "variableX" },
@@ -630,7 +631,7 @@ public class LevelData {
 			name.Contains("desertbase") ||
 			name.Contains("weathercontrol")
 		) {
-			return "stageClear_X2";
+			return "weaponGet_X2";
 		}
 		if (name.Contains("hunterbase") ||
 			name.Contains("giantdam") ||
@@ -643,17 +644,17 @@ public class LevelData {
 			name.Contains("safaripark") ||
 			name.Contains("dopplerlab")
 		) {
-			return "stageClear_X3";
+			return "weaponGet_X3";
 		}
 		if (isCustomMap) {
 			return Helpers.randomRange(0, 2) switch {
-				1 => "stageClear_X2",
-				2 => "stageClear_X3",
-				_ => "stageClear_X1"
+				1 => "weaponGet_X2",
+				2 => "weaponGet_X3",
+				_ => "weaponGet_X1"
 			};
 		}
 
-		return "stageClear_X1";
+		return "weaponGet_X1";
 	}
 
 	public Texture getMapThumbnail() {

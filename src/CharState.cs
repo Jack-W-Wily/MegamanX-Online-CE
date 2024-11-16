@@ -74,6 +74,9 @@ public class CharState {
 	}
 
 	public bool canAttack() {
+		if (player.isAxl && character.sprite.name.Contains("block")){
+		return false;
+		}
 		return !string.IsNullOrEmpty(attackSprite) && !character.isInvulnerableAttack() && character.saberCooldown == 0;
 	}
 
@@ -386,6 +389,12 @@ public class WarpIn : CharState {
 				character.pos.x = destX;
 				character.changeToIdleOrFall();
 			}
+			if (character.frameIndex > 2 && player.input.isLeftOrRightHeld(player)) {
+				character.grounded = true;
+				character.pos.y = destY;
+				character.pos.x = destX;
+				character.changeToIdleOrFall();
+			}
 			return;
 		}
 
@@ -641,6 +650,10 @@ public class Crouch : CharState {
 		var dpadXDir = player.input.getXDir(player);
 		if (dpadXDir != 0) {
 			character.xDir = dpadXDir;
+		}
+
+		if (character is Axl) {
+			character.changeSpriteFromName("block", true);
 		}
 
 		if (!character.grounded || !player.isCrouchHeld()) {

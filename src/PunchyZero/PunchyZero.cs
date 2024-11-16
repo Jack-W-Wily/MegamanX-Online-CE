@@ -78,7 +78,8 @@ public class PunchyZero : Character {
 
 	public override void update() {
 
-		if (stockedBusterLv > 0 && player.input.isPressed(Control.Shoot,player)){
+		if (stockedBusterLv > 0 && player.input.isPressed(Control.Shoot,player)
+		&& charState is not PZeroDoubleBuster){
 				changeState(new PZeroDoubleBuster(true, true), true);
 		}
 
@@ -97,21 +98,21 @@ public class PunchyZero : Character {
 		freeBusterShots = 3;
 		}
 
-		if (isAwakened) {
+		if (isAwakened || isBlack) {
 			updateAwakenedAura();
 		}
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("zero_X1", getCenterPos(), true);
+					addMusicSource("zero_X2", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
-					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
+					addMusicSource("CannonBall_megasfc", getCenterPos(), true);
 				}
 			} else if (isViral && ownedByLocalPlayer) {
 				if (musicSource == null) {
-					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
+					addMusicSource("zero_X1", getCenterPos(), true);
 				}
 			} else {
 				destroyMusicSource();
@@ -260,11 +261,15 @@ public class PunchyZero : Character {
 			);
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
 			currencyUse = 1;
-		//	playSound("buster4", sendRpc: true);
-		//	new ZBuster4Proj(
-		//		shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
-		//	);
-			changeState(new PZeroDoubleBuster(false, true), true);
+			if (!isViral){
+			playSound("buster4", sendRpc: true);
+			new ZBuster4Proj(
+				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+			);
+			}
+			if (isViral)changeState(new PZeroDoubleBuster(false, true), true);
+			
+			
 				
 		}
 		if (currencyUse > 0) {
@@ -499,13 +504,20 @@ public class PunchyZero : Character {
 			if (gigaAttack.shootCooldown > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
 				return false;
 			}
-		//	if (gigaAttack is RekkohaWeapon) {
-		//		gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-		//		changeState(new Rekkoha(gigaAttack), true);
-		//	} else {
+			if (!isAwakened){
+
+					if (isViral){
+						new FireWaveProjChargedStart(new FireWave(), pos, 1, player, 
+						player.getNextActorNetId(), true);
+						new FireWaveProjChargedStart(new FireWave(), pos, -1, player, 
+						player.getNextActorNetId(), true);
+					}
+					changeState(new ZeroRocks(new FakeZeroWeapon(player)), true);
+					} else {
+					changeState(new Rakuhouha(new ShinMessenkou()), true);		
+				}
 				gigaAttack.addAmmo(-10, player);
-				changeState(new ZeroRocks(new FakeZeroWeapon(player)), true);
-		//	}
+			
 			return true;
 		}
 		if (isDashing) {
@@ -516,7 +528,7 @@ public class PunchyZero : Character {
 	}
 
 	public override bool canAirJump() {
-		return dashedInAir == 0;
+		return dashedInAir == 0 || isBlack;
 	}
 
 	public override string getSprite(string spriteName) {
@@ -596,30 +608,37 @@ public class PunchyZero : Character {
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
 				2, Global.halfFlinch, 0.25f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 0.25f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, Global.halfFlinch, 0.25f,
+				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 2, Global.halfFlinch, 0.25f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
-				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch, 0.5f,
+				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 3, Global.defFlinch, 0.5f,
+				ShouldClang : true,
+				isJuggleProjectile : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, 0, 0.5f,
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 4, 0, 0.5f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch, 0.5f,
+				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 2, 40, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Parry => new GenericMeleeProj(
@@ -628,12 +647,13 @@ public class PunchyZero : Character {
 			),
 			(int)MeleeIds.ParryAttack => (new GenericMeleeProj(
 				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
 			(int)MeleeIds.AwakenedAura => (new GenericMeleeProj(
-				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 2, 0, 0.5f,
+				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 0, 0, 0.5f,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
@@ -752,9 +772,9 @@ public class PunchyZero : Character {
 
 	public override void render(float x, float y) {
 		if (isViral && visible) {
-			addRenderEffect(RenderEffectType.Trail);
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
-			removeRenderEffect(RenderEffectType.Trail);
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
 		float auraAlpha = 1;
 		if (isAwakened && visible && hypermodeBlink > 0) {
@@ -771,6 +791,36 @@ public class PunchyZero : Character {
 			string auraSprite = "zero_awakened_aura";
 			if (sprite.name.Contains("dash")) {
 				auraSprite = "zero_awakened_aura2";
+				auraXDir = xDir;
+				yOff = 8;
+			}
+			var shaders = new List<ShaderWrapper>();
+			if (isGenmuZero &&
+				Global.frameCount % Global.normalizeFrames(6) > Global.normalizeFrames(3) &&
+				Global.shaderWrappers.ContainsKey("awakened")
+			) {
+				shaders.Add(Global.shaderWrappers["awakened"]);
+			}
+			Global.sprites[auraSprite].draw(
+				awakenedAuraFrame,
+				pos.x + x + (xOff * auraXDir),
+				pos.y + y + yOff, auraXDir,
+				1, null, auraAlpha, 1, 1,
+				zIndex - 1, shaders: shaders
+			);
+		}
+		if (isBlack && visible) {
+			float xOff = 0;
+			int auraXDir = 1;
+			float yOff = 5;
+			string auraSprite = "zero_absolutewing3";
+			if (sprite.name.Contains("dash")) {
+				auraSprite = "zero_absolutewing2";
+				auraXDir = xDir;
+				yOff = 8;
+			}
+			if (!grounded) {
+				auraSprite = "zero_absolute_wing";
 				auraXDir = xDir;
 				yOff = 8;
 			}

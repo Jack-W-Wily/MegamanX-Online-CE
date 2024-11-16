@@ -13,7 +13,7 @@ public class Zero : Character {
 	public int hyperMode;
 
 	// Hypermode timers.
-	public static readonly float maxBlackZeroTime = 20 * 60;
+	public static readonly float maxBlackZeroTime = 40 * 60;
 	public float hyperModeTimer;
 	public float scrapDrainCounter = 120;
 	public bool hyperOvertimeActive;
@@ -118,14 +118,24 @@ public class Zero : Character {
 				player.input.isPressed(Control.WeaponRight, player) ) {
 					gigaAttack.addAmmo(-28, player);
 
+					if (isAwakened){
+					changeState(new GenmureiState(), true);	
+					}
+					if (isBlack){
+					changeState(new ZeroFinalStart(), true);	
+					}
+
 					if (isViral){
 					changeState(new Rakuhouha(new DarkHoldWeapon()), true);	
-					} else {
+					} 
+					if (!isViral && !isBlack && !isAwakened) {
 						changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
 					}
 				
 				} 
 		}
+
+	
 
 
 
@@ -301,8 +311,8 @@ public class Zero : Character {
 
 				if (!isBlack){
 				playSound("buster4", sendRpc: true);
-				new ZBuster4Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+				new DZBuster3Proj(
+				shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 				);
 				} else {
 				changeState(new ZeroDoubleBuster(false, false), true);
@@ -515,7 +525,7 @@ public class Zero : Character {
 		
 		if (yDir == 1) {
 				
-				 if (gigaAttack.shootTime <= 0 && gigaAttack.ammo >= 14 &&
+				 if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= 14 &&
 				player.input.isPressed(Control.Special1, player)) {
 					gigaAttack.addAmmo(-14, player);
 					
@@ -526,7 +536,7 @@ public class Zero : Character {
 					}
 					return true;
 				}
-				 if (gigaAttack.shootTime <= 0 && gigaAttack.ammo >= 10 &&
+				 if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= 10 &&
 				player.input.isPressed(Control.WeaponLeft, player)) {
 					gigaAttack.addAmmo(-10, player);
 					changeState(new ZeroRocks( new FakeZeroWeapon(player)), true);
@@ -682,7 +692,7 @@ public class Zero : Character {
 
 	public override float getRunSpeed() {
 		float runSpeed = Physics.WalkSpeed;
-		if (isBlack) {
+		if (isBlack || isViral) {
 			runSpeed *= 1.15f;
 		}
 		return runSpeed * getRunDebuffs();
@@ -693,7 +703,7 @@ public class Zero : Character {
 			return getRunSpeed();
 		}
 		float dashSpeed = 210;
-		if (isBlack) {
+		if (isBlack || isViral) {
 			dashSpeed *= 1.15f;
 		}
 		return dashSpeed * getRunDebuffs();
@@ -784,6 +794,7 @@ public class Zero : Character {
 		WallSlash,
 		Gokumonken,
 		Hadangeki,
+		ZeroFinal,
 		AwakenedAura
 	}
 
@@ -819,6 +830,8 @@ public class Zero : Character {
 			"zero_ladder_attack" => MeleeIds.LadderSlash,
 			"zero_wall_slide_attack" => MeleeIds.WallSlash,
 			"zero_block" => MeleeIds.Gokumonken,
+			"zero_final_start" => MeleeIds.ZeroFinal,
+			"zero_final_end" => MeleeIds.Dairettsui,
 			"zero_projswing" => MeleeIds.Hadangeki,
 			_ => MeleeIds.None
 		});
@@ -850,6 +863,11 @@ public class Zero : Character {
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 10, 0.25f, isReflectShield: true,
+				ShouldClang : true,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.ZeroFinal => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.VileAirRaidStart, player, 2, 20, 0.25f, isReflectShield: true,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
@@ -899,15 +917,18 @@ public class Zero : Character {
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
 				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 3, Global.defFlinch, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
 				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, Global.defFlinch, 0.1f,
+				ShouldClang : true,
 				isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
 				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 1, 20, 0.5f,
+				ShouldClang : true,
 				isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
@@ -918,10 +939,12 @@ public class Zero : Character {
 			),
 			(int)MeleeIds.Danchien => new GenericMeleeProj(
 				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 10, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
 				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 0.5f,
+				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			// Others
@@ -944,7 +967,7 @@ public class Zero : Character {
 			),
 			(int)MeleeIds.AwakenedAura => new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player,
-				2, 0, 0.5f,
+				0, 0, 0.5f,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -983,8 +1006,8 @@ public class Zero : Character {
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.AwakenedAura) {
 			if (isGenmuZero) {
-				proj.damager.damage = 4;
-				proj.damager.flinch = Global.defFlinch;
+				proj.damager.damage = 0;
+				proj.damager.flinch =0;// Global.defFlinch;
 			}
 		}
 	}
@@ -1031,6 +1054,11 @@ public class Zero : Character {
 			addRenderEffect(RenderEffectType.Trail);
 		} else {
 			removeRenderEffect(RenderEffectType.Trail);
+		}
+		if (isBlack && visible) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} else {
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
 		}
 		float auraAlpha = 1;
 		if (isAwakened && visible && hypermodeBlink > 0) {

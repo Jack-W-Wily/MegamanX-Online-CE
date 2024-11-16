@@ -43,6 +43,7 @@ public class Hurt : CharState {
 			sprite = "hurt2";
 			character.changeSpriteFromName("hurt2", true);
 		}
+		if (!character.grounded){
 		if (!spiked) {
 			character.vel.y = (-0.125f * (flinchTime - 1)) * 60f;
 			if (isCombo && character.pos.y < flinchYPos) {
@@ -50,6 +51,7 @@ public class Hurt : CharState {
 				// That said, we do not change base gravity.
 				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
+		}
 		}
 		if (!isCombo) {
 			flinchYPos = character.pos.y;
@@ -374,6 +376,57 @@ public class PushedOver : CharState {
 		if (stateTime >= flinchTime) {
 			character.changeState(new KnockedDown(-character.xDir), true);
 		}
+	}
+}
+
+
+
+
+public class LaunchedState : GenericGrabbedState {
+	public Character grabbedChar;
+	//private bool once;
+	public bool launched;
+	float launchTime;
+	bool once;
+	public LaunchedState(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+		superArmor = true;
+	}
+
+	
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+			for (int i = 1; i <= 4; i++) {
+				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
+				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
+					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+						if (!once){
+								once = true;
+							character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+						//	character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
+		
+						}
+							character.playSound("crash", sendRpc: true);
+							character.shakeCamera(sendRpc: true);
+							//return;
+						}
+			}
+	
+		}
+
+			if (!launched) {
+				launched = true;
+				character.unstickFromGround();
+				character.vel.y = -600;
+			}	 
 	}
 }
 

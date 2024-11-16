@@ -82,13 +82,88 @@ public class RayGun : AxlWeapon {
 	}
 }
 
+
+
+public class RayGunClassic : AxlWeapon {
+	public int laserChargeLevel;
+
+	public RayGunClassic(int altFire) : base(altFire) {
+		sprite = "axl_arm_raygun";
+		flashSprite = "axl_raygun_flash";
+		chargedFlashSprite = "axl_raygun_flash";
+		shootSounds = new string[] { "raygun", "raygun", "raygun", "splashLaser" };
+		index = (int)WeaponIds.RayGunClassic;
+		weaponBarBaseIndex = 30;
+		weaponBarIndex = 28;
+		weaponSlotIndex = 34;
+		killFeedIndex = 33;
+		fireRate = 6;
+
+		if (altFire == 1) {
+			shootSounds[3] = "";
+		}
+	}
+
+	public override float whiteAxlFireRateMod() {
+		return 1.5f;
+	}
+
+	public override float whiteAxlAmmoMod() {
+		return 1;
+	}
+
+	public override float getAmmoUsage(int chargeLevel) {
+		if (chargeLevel == 0) {
+			return 1f;
+		} else {
+			if (altFire == 1) {
+				if (laserChargeLevel == 0) return 0.1f;
+				else if (laserChargeLevel == 1) return 0.25f;
+				else return 1f;
+			} else {
+				return 0.5f;
+			}
+		}
+	}
+
+	public override void axlGetProjectile(
+	    Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
+		if (player.character is not Axl axl) {
+			return;
+		}
+		Point bulletDir = Point.createFromAngle(angle);
+		Projectile? bullet = null;
+
+		if (chargeLevel < 3) {
+			bullet = new BoundBlasterProj(weapon, bulletPos, angle, player, netId, rpc: true);
+		} else {
+			
+				if (axl.rayGunAltProj == null) {
+					axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
+				} else {
+					netId = axl.rayGunAltProj.netId.Value;
+				}
+				bullet = axl.rayGunAltProj;
+				laserChargeLevel = axl.rayGunAltProj.getChargeLevel();
+			
+		}
+
+		if (player.ownedByLocalPlayer) {
+			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		}
+	}
+}
+
+
 public class RayGunProj : Projectile {
 	float len = 0;
 	float lenDelay = 0;
 	//float lastAngle;
 	const float maxLen = 50;
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 0.25f, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		reflectable = true;
 		if ((player?.character as Axl)?.isWhiteAxl() == true) {
 			speed = 525;
@@ -114,6 +189,29 @@ public class RayGunProj : Projectile {
 			if (len > maxLen) len = maxLen;
 		}
 		lenDelay += Global.spf;
+
+
+
+		if (locallyControlled) {
+			bool reflected = false;
+			var wall = Global.level.checkCollisionPoint(pos.addxy(vel.x * Global.spf, 0), new List<GameObject>() { this });
+			if (wall?.gameObject is Wall) {
+				vel.x *= -1;
+				reflected = true;
+			}
+
+			wall = Global.level.checkCollisionPoint(pos.addxy(0, vel.y * Global.spf), new List<GameObject>() { this });
+			if (wall?.gameObject is Wall) {
+				vel.y *= -1;
+				reflected = true;
+			}
+
+			if (reflected) {
+				len = 0;
+				lenDelay = 0;
+				updateAngle();
+			}
+		}
 	}
 
 	public void reflectSide() {
@@ -122,6 +220,8 @@ public class RayGunProj : Projectile {
 		lenDelay = 0;
 		updateAngle();
 	}
+
+	
 
 	public override void onReflect() {
 		reflectSide();
@@ -134,6 +234,19 @@ public class RayGunProj : Projectile {
 		lenDelay = 0;
 		updateAngle();
 	}
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
+		}
+	}
+
 
 	public override void render(float x, float y) {
 		var normVel = vel.normalize();

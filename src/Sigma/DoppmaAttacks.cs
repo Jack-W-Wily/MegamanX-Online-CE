@@ -144,6 +144,7 @@ public class SigmaShieldProj : Projectile {
 public class SigmaThrowShieldState : CharState {
 	SigmaShieldProj? proj;
 	public SigmaThrowShieldState() : base("throw", "", "", "") {
+		airMove = true;
 	}
 
 	public override void update() {
@@ -188,7 +189,7 @@ public class Sigma3FireProj : Projectile {
 		int upDownDir, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
 		Sigma3FireWeapon.netWeapon, pos, 1, 0, 2, player,
-		"sigma3_proj_fire", 0, 0.01f, netProjId, player.ownedByLocalPlayer
+		"sigma3_proj_fire", 4, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Sigma3Fire;
 		maxTime = 0.75f;
@@ -290,12 +291,26 @@ public class Sigma3Shoot : CharState {
 			if (ang != 0 && ang != 180) {
 				upDownDir = 0;
 			}
-			character.playSound("sigma3shoot", sendRpc: true);
-			new Sigma3FireProj(
+
+				if (!player.character.grounded){
+				character.playSound("sigma3shoot", sendRpc: true);
+				new Sigma3FireProj(
 				shootPOI.Value, ang, upDownDir, player,
 				player.getNextActorNetId(), sendRpc: true
-			);
-		}
+				);
+				}
+				if (character.grounded && !player.input.isHeld(Control.Up,player)){
+				character.playSound("electricSpark", sendRpc: true);
+				new DrDopplerBallProj(player.weapon, shootPOI.Value, character.xDir, 0, player, player.getNextActorNetId(), sendRpc: true);
+	
+				}
+				if (character.grounded && player.input.isHeld(Control.Up,player)){
+				 character.playSound("busterX3", sendRpc: true); 
+				new DrDopplerBallProj(player.weapon, shootPOI.Value, character.xDir, 1, player, player.getNextActorNetId(), sendRpc: true);
+				}
+			}
+		
+		
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}

@@ -254,7 +254,7 @@ public class Rakuhouha : CharState {
 	}
 
 	public override void onExit(CharState newState) {
-		weapon.shootTime = weapon.rateOfFire;
+		weapon.shootCooldown = weapon.fireRate;
 		base.onExit(newState);
 	}
 }

@@ -3047,7 +3047,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (player.isSigma && isAttacking() || isToughGuyHyperMode()) {
+		if (player.isSigma && isAttacking() || isToughGuyHyperMode() || charState is VileMK2GrabState) {
 			flinchFrames = 6;
 		}
 		if (charState is GenericStun genericStunState) {

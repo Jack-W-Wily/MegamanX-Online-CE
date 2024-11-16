@@ -212,9 +212,22 @@ public class RideArmor : Actor, IDamagable {
 		changedStateInFrame = false;
 	}
 
+	public float regentime;
+
 	public override void update() {
 		base.update();
+		if (ownedByMK5 &&
+		health < 5){
+		changeState(new RADeactive(transitionSprite: ""));
+		}
 
+		
+		regentime += Global.spf;
+
+		if (rideArmorState is RADeactive && regentime > 0.5){
+		regentime = 0;
+		addHealth(1);
+		}
 		if (raNum == 5) {
 			if (!ownedByLocalPlayer) {
 				zIndex = ZIndex.Character - 100;

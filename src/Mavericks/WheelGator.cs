@@ -47,7 +47,7 @@ public class WheelGator : Maverick {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
-						changeState(new WheelGUpBiteState());
+						changeState(new WheelGSlashState());
 					} else {
 						if (damageEaten > 0) {
 							changeState(new WheelGSpitState(damageEaten));
@@ -64,7 +64,7 @@ public class WheelGator : Maverick {
 					changeState(new FakeZeroGuardState());
 				}
 
-			} else if (state is MJump || state is MFall) {
+			} else if (state is MJump || state is MFall || state is WheelGSlashState) {
 				if (input.isPressed(Control.Dash, player)) {
 					changeState(new WheelGSpinState());
 				}
@@ -113,15 +113,25 @@ public class WheelGator : Maverick {
 		if (sprite.name.Contains("grab_start") && deltaPos.y <= 0) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGGrab, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = 0;
-			if (deltaPos.y > 100 * Global.spf) damagePercent = 0.5f;
-			if (deltaPos.y > 200 * Global.spf) damagePercent = 0.75f;
-			if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 1);
-			}
+		if (sprite.name.Contains("slash") && deltaPos.y <= 0) {
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.VileSuperKick, player, damage: 2, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 		}
+		if (sprite.name.Contains("fall")) {
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.ZSaber1, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this
+			,isJuggleProjectile : true, isDeflectShield : true);
+		}
+		if (sprite.name.Contains("land")) {
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.MechFrogStompShockwave, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this);
+		}
+	//	if (sprite.name.Contains("fall")) {
+	//		float damagePercent = 0;
+	//		if (deltaPos.y > 100 * Global.spf) damagePercent = 0.5f;
+	//		if (deltaPos.y > 200 * Global.spf) damagePercent = 0.75f;
+	//		if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
+	//		if (damagePercent > 0) {
+	//			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 1);
+	//		}
+	//	}
 		return null;
 	}
 
@@ -311,6 +321,26 @@ public class WheelGBiteState : MaverickState {
 	}
 }
 
+
+public class WheelGSlashState : MaverickState {
+
+public WheelGSlashState() : base("slash"){
+}
+
+	public override void update(){
+	base.update();
+		if (maverick.isAnimOver()){
+		maverick.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	maverick.playSound("sigma2slash", sendRpc : true);
+	}
+
+}
+
 public class WheelGEatState : MaverickState {
 	float soundTime;
 	public WheelGEatState() : base("eat_loop") {
@@ -452,12 +482,19 @@ public class WheelGUpBiteState : MaverickState {
 
 	public override void update() {
 		base.update();
+		if (!maverick.grounded){
 			airCode();
+			if (victim != null && maverick.frameIndex > 1){
+			maverick.changeSpriteFromName("fall", true);
+		}
+		} 
 		if (input.isHeld(Control.Shoot, player) && !shootReleased) {
 			shootFramesHeld++;
 		} else {
 			shootReleased = true;
 		}
+
+		
 
 		if (state == 0) {
 			if (!inTransition()) {
@@ -467,7 +504,7 @@ public class WheelGUpBiteState : MaverickState {
 			}
 		} else if (state == 1) {
 			maverick.stopOnCeilingHit();
-			if (maverick.grounded) {
+			if (maverick.grounded && maverick.frameIndex > 1) {
 				landingCode();
 			}
 		}
@@ -497,6 +534,8 @@ public class WheelGUpBiteState : MaverickState {
 		base.onExit(newState);
 		if (getVictim() != null) {
 			victim?.releaseGrab(maverick);
+			//(maverick as WheelGator).upBiteWeapon.applyDamage(victim, false, maverick, (int)ProjIds.VileSuperKick, sendRpc: true);
+
 		}
 	}
 }
@@ -505,13 +544,14 @@ public class WheelGGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public float timeNotGrabbed;
 	string lastGrabberSpriteName;
-	public const float maxGrabTime = 4;
+	public const float maxGrabTime = 8;
 	public WheelGGrabbed(WheelGator grabber) : base(grabber, maxGrabTime, "grabbed") {
 	}
 
 	public override void update() {
 		string grabberSpriteName = grabber.sprite?.name ?? "";
-		if (grabberSpriteName.EndsWith("_grab_start") == true) {
+		if (grabberSpriteName.EndsWith("_grab_start") == true
+		|| grabberSpriteName.EndsWith("fall") == true) {
 			if (lastGrabberSpriteName != grabberSpriteName) {
 				if (!trySnapToGrabPoint(true)) {
 					character.changeToIdleOrFall();

@@ -455,7 +455,8 @@ public class ViralSigmaRevive : CharState {
 		base.update();
 
 		if (state == 0) {
-			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
+			if (explodeDieEffect == null || explodeDieEffect.destroyed
+			|| player.input.isHeld(Control.Up,player)) {
 				state = 1;
 				character.frameSpeed = 1;
 				character.addMusicSource("virusSigma", character.pos, true);

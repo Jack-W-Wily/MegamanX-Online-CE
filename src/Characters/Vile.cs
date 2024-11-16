@@ -355,7 +355,7 @@ public class Vile : Character {
 
 
 
-		if (cutterWeapon.shootTime < cutterWeapon.rateOfFire * 0.75f) 
+		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f) 
 				cannonWeapon.vileShoot(0, this);
 
 		return false;

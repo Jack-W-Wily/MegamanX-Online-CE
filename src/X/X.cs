@@ -515,7 +515,9 @@ public partial class MegamanX : Character {
 
 		if ( (isSpecialSaber() || isHyperX) && !hasBusterProj() &&
 			canChangeWeapons() && player.armorFlag == 0 &&
-			specialPressed && !stingActive
+			specialPressed && !stingActive && player.input.isHeld(Control.Up, player)
+			&& charState is not Dash && charState is not AirDash
+			
 		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 60;
@@ -1069,6 +1071,7 @@ public partial class MegamanX : Character {
 			"mmx_nova_strike_up" => MeleeIds.NovaStrike,
 			"mmx_unpo_grab_dash" => MeleeIds.UPGrab,
 			"mmx_unpo_punch" or
+			"mmx_unpo_punch_2" or
 			"mmx_unpo_air_punch" => MeleeIds.UPPunch,
 			"mmx_unpo_parry_start" => MeleeIds.UPParryBlock,
 

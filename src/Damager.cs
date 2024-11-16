@@ -340,8 +340,15 @@ public class Damager {
 				zerop.gigaAttack.addAmmo(1, owner);
 			}
 			
+			if (owner.health > 0){
+				
+			// ZeroFinal
+			if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart){
+			owner.character.changeState(new ZeroFinalEnd(character), true);
+			}
 
-			if (owner.isVile && owner.health > 0){
+
+			
 			// Vile stomp 
 			if (character.sprite.name.Contains("knocked_down") && projId == (int)ProjIds.VileStomp){
 			owner.character.changeState(new VileStompState(character), true);
@@ -361,8 +368,15 @@ public class Damager {
 			}
 			}
 
+
+			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		//Get Launched by Houtenjin
+		if ((projId == (int)ProjIds.BlockableLaunch && !victim.sprite.name.Contains("block"))) {		
+		character.changeState(new LaunchedState(owner.character), true);
+		}
+
 			//WCUT OP Block
-			if (character.sprite.name.Contains("block") 
+			if (character.sprite.name.Contains("block")
 			&& character.charState is not SigmaBlock ||
 			 character.charState is SwordBlock
 			 ) {
@@ -392,9 +406,9 @@ public class Damager {
 			//if ((owner?.character as Zero)?.isViral == true) {
 			//	character.addInfectedTime(owner, damage);
 			//}
-			if ((owner?.character as PunchyZero)?.isViral == true) {
-				character.addInfectedTime(owner, damage);
-			}
+			//if ((owner?.character as PunchyZero)?.isViral == true) {
+			//	character.addInfectedTime(owner, damage);
+			//}
 
 			switch (projId) {
 				//burn [to the ground] section
@@ -521,6 +535,7 @@ public class Damager {
 				case (int)ProjIds.MechFrogStompShockwave:
 				case (int)ProjIds.FlameMStompShockwave:
 				case (int)ProjIds.TBreakerProj:
+				case (int)ProjIds.ZBuster4:
 					if (character.ownedByLocalPlayer) {
 						character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 					}
@@ -547,8 +562,11 @@ public class Damager {
 				case (int)ProjIds.MagnaCTail:
 					character.addInfectedTime(owner, 4f);
 					break;	
+				case (int)ProjIds.SigmaHeadProjectile:
+					character.addInfectedTime(owner, 2f);
+					break;	
 				case (int)ProjIds.VirusSlash:
-					character.addInfectedTime(owner, 1f);
+					character.addInfectedTime(owner, 2f);
 					break;	
 				case (int)ProjIds.MechPunch:
 				case (int)ProjIds.MechDevilBearPunch:
@@ -598,7 +616,7 @@ public class Damager {
 				!character.isInvulnerable(true, true) &&
 				!isDot(projId) && (
 				owner?.character is Zero zero && zero.isBlack ||
-				owner?.character is PunchyZero pzero && pzero.isBlack
+				owner?.character is PunchyZero pzero && pzero.isViral
 			)) {
 				if (flinch <= 0) {
 					flinch = Global.halfFlinch;
@@ -610,24 +628,7 @@ public class Damager {
 				}
 			//	damage = MathF.Ceiling(damage * 1.5f);
 			}
-			if (!character.charState.superArmor && projId != (int)ProjIds.IrisSwordBlock  && 
-				!character.isInvulnerable(true, true) && (
-				owner?.character is Iris iris && iris.isHyperIris				
-			)) {
-				if (flinch <= 0) {
-					flinch = 6;
-					flinchCooldown = 2.5f;
-				} else if (flinch < Global.halfFlinch) {
-					flinch = Global.halfFlinch;
-				}
-				else if (flinch < Global.defFlinch) {
-					flinch = Global.defFlinch;
-				}
-				else {
-					flinch = Global.superFlinch;
-				}
-				damage = MathF.Ceiling(damage * 1.5f);
-			}
+		
 			// Disallow flinch stack for non-BZ.
 			else if (!Global.canFlinchCombo) {
 				if (character != null && character.charState is Hurt hurtState &&
