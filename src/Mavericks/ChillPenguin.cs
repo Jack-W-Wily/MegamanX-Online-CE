@@ -18,12 +18,12 @@ public class ChillPenguin : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		slideWeapon = new ChillPSlideWeapon(player);
-		stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
-		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
-		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
+	//	stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
+	//	stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
+	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		spriteToCollider["slide"] = getDashCollider();
-
+		canClimbWall = true;
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);
 
 		awardWeaponId = WeaponIds.ShotgunIce;

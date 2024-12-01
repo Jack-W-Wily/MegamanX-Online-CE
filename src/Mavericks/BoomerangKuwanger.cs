@@ -21,7 +21,7 @@ public class BoomerangKuwanger : Maverick {
 		gravityModifier = 1.25f;
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.BoomerangCutter;
 		weakWeaponId = WeaponIds.HomingTorpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;

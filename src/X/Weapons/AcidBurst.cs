@@ -7,7 +7,7 @@ public class AcidBurst : Weapon {
 	public static AcidBurst netWeapon = new();
 
 	public AcidBurst() : base() {
-		shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst" };
+		shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst", "" };
 		fireRate = 30;
 		index = (int)WeaponIds.AcidBurst;
 		weaponBarBaseIndex = 17;
@@ -31,6 +31,10 @@ public class AcidBurst : Weapon {
 			player.setNextActorNetId(player.getNextActorNetId());
 			new AcidBurstProjCharged(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
 			new AcidBurstProjCharged(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
+		if (chargeLevel == 4){
+			new AcidBurstProj(this, pos, -xDir, player, player.getNextActorNetId(), true);
+			new AcidBurstProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+		}
 		}
 	}
 }

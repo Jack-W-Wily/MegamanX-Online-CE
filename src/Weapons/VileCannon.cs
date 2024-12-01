@@ -182,7 +182,8 @@ public class CannonAttack : CharState {
 	private Vile vile = null!;
 
 	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
-		this.isGizmo = isGizmo;
+		this.isGizmo = false;
+		normalCtrl = true;
 	}
 
 	public static string getSprite(bool isGizmo, bool grounded) {
@@ -237,7 +238,7 @@ public class CannonAttack : CharState {
 			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
 		}
 
-				new StunShotProj(new VileMissile(VileMissileType.ElectricShock), vile.pos.addxy(15 * vile.xDir, -10), vile.getShootXDir(), 0, player, player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
+				new StunShotProj(new VileMissile(VileMissileType.ElectricShock), vile.pos.addxy(15 * vile.xDir, -25), vile.getShootXDir(), 0, player, player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
 
 	}
 
@@ -268,6 +269,8 @@ public class CannonAttackFrunner : CharState {
 
 	public CannonAttackFrunner(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
 		this.isGizmo = isGizmo;
+		airMove = true;
+		normalCtrl = true;
 	}
 
 	public static string getSprite(bool isGizmo, bool grounded) {
@@ -356,6 +359,7 @@ public class CannonAttackFatBoy : CharState {
 
 	public CannonAttackFatBoy(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
 		this.isGizmo = false;
+		normalCtrl = true;
 	}
 
 	public static string getSprite(bool isGizmo, bool grounded) {

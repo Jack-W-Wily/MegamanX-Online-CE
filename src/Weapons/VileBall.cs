@@ -184,6 +184,7 @@ public class PeaceOutRollerProj : Projectile {
 	}
 }
 
+
 public class AirBombAttack : CharState {
 	int bombNum;
 	bool isNapalm;
@@ -341,6 +342,196 @@ public class AirBombAttack : CharState {
 		character.useGravity = true;
 	}
 }
+
+public class ExplosiveRoundState : CharState {
+	int bombNum;
+	bool isNapalm;
+	Vile vile = null!;
+
+	public ExplosiveRoundState(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		this.isNapalm = isNapalm;
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
+			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+				character.changeState(new Fall(), true);
+				return;
+			}
+
+			var inputDir = player.input.getInputDir(player);
+			if (inputDir.x == 0) inputDir.x = character.xDir;
+			if (stateTime > 0f && bombNum == 0) {
+				bombNum++;
+				new VileBombProj(vile.grenadeWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+			if (stateTime > 0.23f && bombNum == 1) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeState(new Fall(), true);
+					return;
+				}
+				bombNum++;
+				new VileBombProj(vile.grenadeWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+			if (stateTime > 0.45f && bombNum == 2) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeState(new Fall(), true);
+					return;
+				}
+				bombNum++;
+				new VileBombProj(vile.grenadeWeapon, character.pos, (int)inputDir.x, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+
+			if (stateTime > 0.68f) {
+				character.changeToIdleOrFall();
+			}
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+public class PeaceOutRollerAttack : CharState {
+	int bombNum;
+	bool isNapalm;
+	Vile vile = null!;
+
+	public PeaceOutRollerAttack(string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+			if (stateTime > 0f && bombNum == 0) {
+				bombNum++;
+				new PeaceOutRollerProj(vile.grenadeWeapon, character.pos, character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
+			}
+
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+public class SpreadShotKnee : CharState {
+	int bombNum;
+	Vile vile = null!;
+
+	public SpreadShotKnee( string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+	var ebw = new VileElectricBomb();
+			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+			if (stateTime > 0f && bombNum == 0) {
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(150 * character.xDir, 0), rpc: true);
+			}
+			if (stateTime > 0.1f && bombNum == 1) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(133 * character.xDir, 75), rpc: true);
+			}
+			if (stateTime > 0.2f && bombNum == 2) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(75 * character.xDir, 133), rpc: true);
+			}
+			if (stateTime > 0.3f && bombNum == 3) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(0, 150), rpc: true);
+			}
+			if (stateTime > 0.4f && bombNum == 4) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-75 * character.xDir, 133), rpc: true);
+			}
+			if (stateTime > 0.5f && bombNum == 5) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-133 * character.xDir, 75), rpc: true);
+			}
+			if (stateTime > 0.6f && bombNum == 6) {
+				if (!vile.tryUseVileAmmo(vile.grenadeWeapon.getAmmoUsage(0))) {
+					character.changeToIdleOrFall();
+					return;
+				}
+				bombNum++;
+				new StunShotProj(ebw, character.pos, character.xDir, 1, character.player, character.player.getNextActorNetId(), new Point(-150 * character.xDir, 0), rpc: true);
+			}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
 
 public class VileElectricBomb : Weapon {
 	public VileElectricBomb() : base() {

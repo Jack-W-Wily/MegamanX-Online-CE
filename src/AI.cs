@@ -546,7 +546,10 @@ public class AI {
 		if (player.weapon != null && player.weapon.ammo <= 0 && player.weapon is not XBuster or AxlBullet) {
 			player.changeWeaponSlot(getRandomWeaponIndex());
 		}
-
+		
+		if (player.vileAmmo < 0){
+			player.vileAmmo = 0;
+		}
 		//if (player.vileAmmo <= 0 && player.weapon is not VileCannon) {
 		//	player.changeWeaponSlot(getRandomWeaponIndex());
 		//}

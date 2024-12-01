@@ -12,13 +12,13 @@ public class TunnelRhino : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(TunnelRShootState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(TunnelRShoot2State), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(TunnelRDashState), new MaverickStateCooldown(false, false, 1f));
+	//	stateCooldowns.Add(typeof(TunnelRShootState), new MaverickStateCooldown(true, false, 0.75f));
+	//	stateCooldowns.Add(typeof(TunnelRShoot2State), new MaverickStateCooldown(true, false, 0.75f));
+	//	stateCooldowns.Add(typeof(TunnelRDashState), new MaverickStateCooldown(false, false, 1f));
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
-
+		canClimbWall = true;
 		spriteFrameToSounds["tunnelr_run/3"] = "walkStomp";
 		spriteFrameToSounds["tunnelr_run/11"] = "walkStomp";
 

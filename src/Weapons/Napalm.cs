@@ -81,6 +81,48 @@ public class Napalm : Weapon {
 	}
 }
 
+
+
+public class AirSplashHitGranadeLaunch : CharState {
+	int bombNum;
+
+	Vile vile = null!;
+
+	public AirSplashHitGranadeLaunch(string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+			var poi = character.getFirstPOI();
+			if (!once && poi != null) {
+				once = true;
+				var proj = new SplashHitGrenadeProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				proj.vel = new Point(character.xDir * 100, 0);
+			}
+
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+		}
+
+	
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
 public class NapalmGrenadeProj : Projectile {
 	bool exploded;
 	public NapalmGrenadeProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
@@ -424,6 +466,20 @@ public class MK2NapalmProj : Projectile {
 			destroySelf();
 		}
 	}
+
+	
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		var actor = damagable.actor();
+		if (actor is Character chr && chr.isCCImmune()) return;
+		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
+
+		float mag = 100;
+		if (!actor.grounded) actor.vel.y = 0;
+		Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
+		actor.move(velVector, true);
+	}
+
 }
 
 

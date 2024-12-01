@@ -12,7 +12,7 @@ public class RollingShield : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 3;
 		weaknessIndex = 6;
-		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "" };
+		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "", "" };
 		fireRate = 45;
 		damage = "2/1";
 		effect = "Mobile Shield That Deletes Projectiles.";

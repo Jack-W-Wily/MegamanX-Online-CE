@@ -12,10 +12,10 @@ public partial class MegamanX : Character {
 	public bool isHyperX;
 	public bool hasUltimateArmor;
 
-	public const int headArmorCost = 2;
-	public const int bodyArmorCost = 3;
-	public const int armArmorCost = 3;
-	public const int bootsArmorCost = 2;
+	public const int headArmorCost = 1;
+	public const int bodyArmorCost = 1;
+	public const int armArmorCost = 1;
+	public const int bootsArmorCost = 1;
 
 	public RollingShieldProjCharged? chargedRollingShieldProj;
 	public List<BubbleSplashProjCharged> chargedBubbles = new List<BubbleSplashProjCharged>();
@@ -76,6 +76,7 @@ public partial class MegamanX : Character {
 	public float maxParryCooldown = 30;
 
 	public bool stingActive;
+	public bool UltrastingActive;
 	public bool isHyperChargeActive;
 
 	public Sprite hyperChargePartSprite =  new Sprite("hypercharge_part_1");
@@ -140,6 +141,12 @@ public partial class MegamanX : Character {
 			addRenderEffect(RenderEffectType.Invisible);
 		} else {
 			removeRenderEffect(RenderEffectType.Invisible);
+		}
+		UltrastingActive = UltraStingChargeTime > 0;
+		if (UltrastingActive) {
+			addRenderEffect(RenderEffectType.StealthModeBlue);
+		} else {
+			removeRenderEffect(RenderEffectType.StealthModeBlue);
 		}
 
 		if (isHyperX) {
@@ -295,7 +302,7 @@ public partial class MegamanX : Character {
 			!charState.isGrabbing
 		) {
 			if (xSaberCooldown == 0) {
-				xSaberCooldown = 1f;
+				//xSaberCooldown = 1f;
 				changeState(new X6SaberState(grounded), true);
 				return;
 			}
@@ -520,7 +527,7 @@ public partial class MegamanX : Character {
 			
 		) {
 			if (xSaberCooldown == 0) {
-				xSaberCooldown = 60;
+			//	xSaberCooldown = 60;
 				changeState(new X6SaberState(grounded), true);
 				return true;
 			}
@@ -1114,7 +1121,7 @@ public partial class MegamanX : Character {
 			),
 			(int)MeleeIds.X6Saber => new GenericMeleeProj(
 				new ZXSaber(player), projPos, ProjIds.X6Saber, player,
-				damage: grounded ? 3 : 2, flinch: 0
+				1, 4 , 0.1f, isDeflectShield : true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				new NovaStrike(player), projPos, ProjIds.NovaStrike, player
@@ -1565,18 +1572,18 @@ public partial class MegamanX : Character {
 		if (player.alliance != damagerAlliance && projId != null && Damager.isBoomerang(projId)) {
 			return damaged;
 		}
-		if (stingActive) {
+		if (stingActive || UltrastingActive) {
 			return false;
 		}
 		return damaged;
 	}
 
 	public override bool isStealthy(int alliance) {
-		return (player.alliance != alliance && stingActive);
+		return (player.alliance != alliance && (stingActive || UltrastingActive));
 	}
 
 	public override bool isCCImmuneHyperMode() {
-		return isHyperX;
+		return false;
 	}
 
 	public bool shouldShowHyperBusterCharge() {

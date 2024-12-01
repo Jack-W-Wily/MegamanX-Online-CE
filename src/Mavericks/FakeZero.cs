@@ -105,8 +105,8 @@ public class FakeZero : Maverick {
 					changeState(new FakeZeroShoot2State());
 				} else if (input.isPressed(Control.Dash, player)) {
 					if (input.isHeld(Control.Special2, player)
-					&& player.currency > 0) {
-						player.currency -= 1;
+					&& player.currency > 2) {
+						player.currency -= 3;
 					changeState(new WSpongeLightningState());
 					}
 					if (!input.isHeld(Control.Special2, player)
@@ -225,7 +225,7 @@ public class FakeZero : Maverick {
 
 public class FakeZeroBusterProj : Projectile {
 	public FakeZeroBusterProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 3, player, "fakezero_buster_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 2, player, "fakezero_buster_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FakeZeroBuster;
 		reflectable = true;
 		maxTime = 0.75f;
@@ -251,7 +251,7 @@ public class FakeZeroBuster2Proj : Projectile {
 
 public class FakeZeroSwordBeamProj : Projectile {
 	public FakeZeroSwordBeamProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 2, player, "fakezero_sword_proj", 40, 0.01f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 2, player, "fakezero_sword_proj", Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FakeZeroSwordBeam;
 		maxTime = 0.75f;
 

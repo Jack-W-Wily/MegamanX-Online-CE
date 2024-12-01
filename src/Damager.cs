@@ -91,7 +91,8 @@ public class Damager {
 				weakness = false;
 			}
 
-			if (chr.player.isAxl && newFlinch > 0) {
+			if (chr.isAttacking()
+			 && newFlinch > 0) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
 				}
@@ -332,6 +333,7 @@ public class Damager {
 			// Combotimer
 			owner.character.ComboTimer = 0.25f;;
 			}
+			
 
 			if (owner.character is Zero zeroz && owner.health > 0) {
 				zeroz.gigaAttack.addAmmo(1, owner);
@@ -348,14 +350,26 @@ public class Damager {
 			}
 
 
-			
+			// Vile Special interaction trigger
+			if (owner.isVile && character is PunchyZero){
+			owner.character.wasFightingZeroEarly = true;
+			character.wasFightingVile = true;
+			}
+			if (owner.isVile && character is MegamanX){
+			owner.character.wasFightingX = true;
+			character.wasFightingVile = true;
+			}
+			if (owner.isVile && character is CmdSigma){
+			owner.character.wasFightingSigma = true;
+			character.wasFightingVile = true;
+			}
 			// Vile stomp 
 			if (character.sprite.name.Contains("knocked_down") && projId == (int)ProjIds.VileStomp){
 			owner.character.changeState(new VileStompState(character), true);
 			character.changeState(new VileStomped(owner.character), true);
 			}
 			// Vile Air Raid 
-			if (owner.character.charState is SplashHitState && projId == (int)ProjIds.VileAirRaidStart){
+			if (owner.isVile && projId == (int)ProjIds.VileAirRaidStart){
 			owner.character.changeState(new VileAirRaid(character), true);
 			}
 			
@@ -370,10 +384,19 @@ public class Damager {
 
 
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		//Get Launched by Houtenjin
+		//Get Launched
 		if ((projId == (int)ProjIds.BlockableLaunch && !victim.sprite.name.Contains("block"))) {		
 		character.changeState(new LaunchedState(owner.character), true);
 		}
+
+
+			// Damage Scaling	
+			if (character != null){
+				character.DamageScaling += 1;
+				character.DamageScalingCD = 0.5f;
+			}
+		
+		
 
 			//WCUT OP Block
 			if (character.sprite.name.Contains("block")
@@ -485,6 +508,12 @@ public class Damager {
 					character.addIgFreezeProgress(2);
 					break;
 				case (int)ProjIds.IceGattlingHyper:
+					character.addIgFreezeProgress(2);
+					break;
+				case (int)ProjIds.ShotgunIce:
+					character.addIgFreezeProgress(2);
+					break;
+				case (int)ProjIds.ShotgunIceSled:
 					character.addIgFreezeProgress(2);
 					break;
 				case (int)ProjIds.Hyouretsuzan:

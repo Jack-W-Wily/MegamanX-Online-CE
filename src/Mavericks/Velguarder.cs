@@ -18,7 +18,7 @@ public class Velguarder : Maverick {
 		awardWeaponId = WeaponIds.Buster;
 		weakWeaponId = WeaponIds.ShotgunIce;
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
-
+		canClimbWall = true;
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
 		netActorCreateId = NetActorCreateId.Velguarder;
@@ -129,7 +129,7 @@ public class VelGFireProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 125, 1, player, "velg_proj_fire",
-		0, 0.01f, netProjId, player.ownedByLocalPlayer
+		4, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.VelGFire;
 		maxTime = 1f;
@@ -148,6 +148,22 @@ public class VelGFireProj : Projectile {
 			return;
 		}
 	}
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
+			playSound("flamemOilBurn", sendRpc: true);
+			new FlameMBigFireProj(
+				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true
+			);
+			// oilSpill.time = 0;
+			oilSpill.destroySelf(doRpcEvenIfNotOwned: true);
+			destroySelf();
+		}
+	}
+
 }
 
 public class VelGIceProj : Projectile {
@@ -172,6 +188,9 @@ public class VelGIceProj : Projectile {
 	public override void update() {
 		base.update();
 	}
+
+
+	
 }
 #endregion
 

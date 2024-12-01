@@ -9,7 +9,7 @@ public class CrystalHunter : Weapon {
 	public static CrystalHunter netWeapon = new();
 
 	public CrystalHunter() : base() {
-		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged" };
+		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged", "" };
 		fireRate = 75;
 		index = (int)WeaponIds.CrystalHunter;
 		weaponBarBaseIndex = 9;
@@ -18,7 +18,7 @@ public class CrystalHunter : Weapon {
 		killFeedIndex = 20;
 		weaknessIndex = (int)WeaponIds.MagnetMine;
 		//switchCooldown = 0.5f;
-		switchCooldownFrames = 30;
+		switchCooldownFrames = 0;
 		damage = "0-3/0";
 		effect = "Crystalize enemies. C: Slows down the area.";
 		hitcooldown = "0-1/0";

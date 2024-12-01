@@ -63,8 +63,7 @@ public class VirusSlash2 : CharState {
 
 		if (character.grounded){
 			if (player.input.isPressed(Control.Shoot, player) 
-				&& player.input.isHeld (Control.Down,player)
-			&&  character.frameIndex > 2 && player.currency > 0){
+			&&  character.frameIndex > 2 ){
 			character.changeState(new VirusSlash3(), true);
 			
 			}
@@ -104,8 +103,8 @@ public class VirusSlash3 : CharState {
 
 		if (character.grounded){
 			if (player.input.isPressed(Control.Shoot, player) 
-			&& player.input.isHeld (Control.Down,player)
-			&& character.frameIndex > 4 && player.currency > 0){
+			
+			&& character.frameIndex > 4){
 			character.changeState(new VirusSlash1(), true);
 		
 			}
@@ -148,9 +147,8 @@ public class SigmaSlashState : CharState {
 	public override void update() {
 		base.update();
 		if (character.grounded){
-			if (player.input.isPressed(Control.Shoot, player) 
-			&& player.input.isHeld (Control.Down,player)
-			&& stateTime > 0.1 && character.frameIndex >= 2 && player.currency > 0){
+			if (player.input.isHeld (Control.Special2,player)
+			&& stateTime > 0.1 && player.currency > 0){
 			character.changeState(new VirusSlash2(), true);
 			player.currency -= 1;
 			}

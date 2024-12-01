@@ -188,6 +188,8 @@ public class GenericStun : CharState {
 		if (character.paralyzedTime == 0) {
 			return;
 		}
+		character.useGravity = false;
+		character.vel.y = 0;
 		if (canPlayStaticSound) {
 			character.playSound("voltcStatic");
 			canPlayStaticSound = false;
@@ -255,6 +257,8 @@ public class GenericStun : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
+
+		
 		hurtDir = -character.xDir;
 		// To continue the flinch if was flinched before the stun.
 		if (oldState is Hurt hurtState) {
@@ -273,6 +277,8 @@ public class GenericStun : CharState {
 			paralyzeAnim.destroySelf();
 			paralyzeAnim = null;
 		}
+
+			character.useGravity = true;
 		if (character.crystalizedTime != 0 || character.isCrystalized) {
 			character.crystalizeEnd();
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize);

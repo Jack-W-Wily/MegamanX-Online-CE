@@ -21,9 +21,9 @@ public class MorphMothCocoon : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(MorphMCThreadState), new MaverickStateCooldown(false, true, 0.75f));
-
+	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(MorphMCThreadState), new MaverickStateCooldown(false, true, 0.75f));
+		canClimbWall = true;
 		weapon = getWeapon();
 		angle = 0;
 
@@ -535,7 +535,7 @@ public class MorphMCThreadState : MaverickState {
 			return;
 		}
 
-		if (input.isPressed(Control.Special1, player)) {
+		if (stateTime > 0.1f && input.isPressed(Control.Special1, player)) {
 			proj.reverse();
 		}
 

@@ -243,6 +243,8 @@ public class GameMode {
 		}
 	}
 
+	public bool DesperationTrigger;
+
 	public virtual void update() {
 		Helpers.decrementTime(ref hudErrorMsgTime);
 
@@ -269,6 +271,12 @@ public class GameMode {
 				else if (eliminationTime >= phase2Time) virusStarted = 2;
 			}
 		}
+
+		if (!DesperationTrigger && (isOvertime() || remainingTime < 10)){
+			Global.changeMusic("boss_x1");
+			DesperationTrigger = true;
+		}
+
 
 		if (currentVoteKick != null) {
 			currentVoteKick.update();

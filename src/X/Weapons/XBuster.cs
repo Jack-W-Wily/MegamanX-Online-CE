@@ -14,7 +14,7 @@ public class XBuster : Weapon {
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 0;
-		shootSounds = new string[] { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "", "" };
 		fireRate = 9;
 		canHealAmmo = false;
 		drawAmmo = false;
@@ -134,7 +134,13 @@ public class XBuster : Weapon {
 		string sound = "";
 
 		if (chargeLevel == 0) {
+			if (character.charState is Dash or AirDash){
+			lemonsOnField.Add(new BusterProj(this, pos, xDir, 1, player, player.getNextActorNetId(), true));
+			}
+			else{
 			lemonsOnField.Add(new BusterProj(this, pos, xDir, 0, player, player.getNextActorNetId(), true));
+			}
+			
 			sound = "buster";
 		} else if (chargeLevel == 1) {
 			new Buster2Proj(this, pos, xDir, player, player.getNextActorNetId(), true);
@@ -178,7 +184,7 @@ public class XBuster : Weapon {
 		} else if (chargeLevel == 2) {
 			new Buster3Proj(this, pos, xDir, 0, player, player.getNextActorNetId(), true);
 			sound = "buster3";
-		} else if (chargeLevel == 3) {
+		} else if (chargeLevel >= 3) {
 			if (player.ownedByLocalPlayer) {
 				if (character.charState is not WallSlide) {
 				mmx.shootCooldown = 0;

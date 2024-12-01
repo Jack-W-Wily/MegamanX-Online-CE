@@ -217,7 +217,7 @@ public class SaberParryStartState : CharState {
 		if (damagingActor is not Projectile) {
 			return false;
 		}
-		return character.frameIndex == 0;
+		return character.frameIndex < 2;
 	}
 }
 

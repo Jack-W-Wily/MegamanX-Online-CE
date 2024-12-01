@@ -7,13 +7,13 @@ public class CrushCrawfish : Maverick {
 	public Weapon meleeWeapon;
 	public CrushCrawfish(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(CrushCShootArmState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(CrushCDashState), new MaverickStateCooldown(false, false, 0.5f));
+	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(CrushCShootArmState), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(CrushCDashState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
-
+			canClimbWall = true;
 		awardWeaponId = WeaponIds.SpinningBlade;
 		weakWeaponId = WeaponIds.TriadThunder;
 		weakMaverickWeaponId = WeaponIds.VoltCatfish;

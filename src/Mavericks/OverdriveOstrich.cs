@@ -15,10 +15,10 @@ public class OverdriveOstrich : Maverick {
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(OverdriveOShootState), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(OverdriveOShoot2State), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(OverdriveOJumpKickState), new MaverickStateCooldown(true, true, 1f));
+	//	stateCooldowns.Add(typeof(OverdriveOJumpKickState), new MaverickStateCooldown(true, true, 1f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.SonicSlicer;
 		weakWeaponId = WeaponIds.CrystalHunter;
 		weakMaverickWeaponId = WeaponIds.CrystalSnail;
@@ -147,7 +147,7 @@ public class OverdriveOstrich : Maverick {
 public class OverdriveOSonicSlicerProj : Projectile {
 	bool once;
 	public OverdriveOSonicSlicerProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "overdriveo_slicer_start", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 3, player, "overdriveo_slicer_start", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.OverdriveOSonicSlicer;
 		maxTime = 0.5f;
 		destroyOnHit = false;

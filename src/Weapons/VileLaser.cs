@@ -253,16 +253,22 @@ public class NecroBurstAttack : CharState {
 
 public class NecroBurstProj : Projectile {
 	public float radius = 10;
+	public IDamagable directHit;
+	public int directHitXDir;
 	public float attackRadius { get { return radius + 15; } }
 	public NecroBurstProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 6, player, "empty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 6, player, "necroempty", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
+
+		this.directHit = directHit;
+		this.directHitXDir = directHitXDir;
+	
 		vel = new Point();
 		projId = (int)ProjIds.NecroBurst;
 		shouldVortexSuck = false;
-
+		healAmount = -4;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -270,7 +276,7 @@ public class NecroBurstProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (isRunByLocalPlayer()) {
+		//if (isRunByLocalPlayer()) {
 			foreach (var go in getCloseActors(MathInt.Ceiling(radius + 50))) {
 				var chr = go as Character;
 				bool isHurtSelf = chr?.player == damager.owner;
@@ -289,7 +295,7 @@ public class NecroBurstProj : Projectile {
 				if (isHurtSelf) overrideFlinch = 0;
 				damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: overrideDamage, overrideFlinch: overrideFlinch);
 			}
-		}
+		//}
 		radius += Global.spf * 400;
 	}
 
@@ -302,15 +308,55 @@ public class NecroBurstProj : Projectile {
 		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius * 0.5f, true, col2, 5, zIndex + 1, true);
 		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, col3, 5, zIndex + 1, true, col3);
 	}
+
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
+		Character? character = damagable as Character;
+
+		if (character != null) {
+			bool directHit = this.directHit == character;
+			int directHitXDir = this.directHitXDir;
+			bool isSelf = (character == attacker.character);
+
+			var victimCenter = character.getCenterPos();
+			var bombCenter = pos;
+			if (directHit) {
+				bombCenter.x = victimCenter.x - (directHitXDir * 5);
+			}
+			var dirTo = bombCenter.directionTo(victimCenter);
+			var distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
+
+			if (isSelf) character.vel.y += dirTo.y * 10 * distFactor;
+			else character.vel.y = dirTo.y * 10 * distFactor;
+
+			if (character == attacker.character) {
+				character.xSwingVel += dirTo.x * 10 * distFactor;
+				float damage = damager.damage;
+				if ((character as Axl)?.isWhiteAxl() == true) { damage = 0; }
+				return new DamagerMessage() {
+					damage = damage,
+					flinch = 0
+				};
+			} else {
+				character.xPushVel = dirTo.x * 10 * distFactor;
+			}
+		}
+
+		return null;
+	}
+
+
 }
 
 public class RAShrapnelProj : Projectile {
+	public IDamagable directHit;
+	public int directHitXDir;
 	public RAShrapnelProj(Weapon weapon, Point pos, string spriteName, int xDir, bool hasRaColorShader, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 4, player, spriteName, Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.35f;
 		vel = new Point();
 		projId = (int)ProjIds.NecroBurstShrapnel;
-
+		this.directHit = directHit;
+		this.directHitXDir = directHitXDir;
 		var rect = new Rect(0, 0, 10, 10);
 		globalCollider = new Collider(rect.getPoints(), true, this, false, false, 0, new Point(0, 0));
 
@@ -325,6 +371,41 @@ public class RAShrapnelProj : Projectile {
 			byte hasRaColorShaderByte = hasRaColorShader ? (byte)1 : (byte)0;
 			rpcCreate(pos, player, netProjId, xDir, spriteIndexBytes[0], spriteIndexBytes[1], hasRaColorShaderByte);
 		}
+	}
+
+	public override DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
+		Character? character = damagable as Character;
+
+		if (character != null) {
+			bool directHit = this.directHit == character;
+			int directHitXDir = this.directHitXDir;
+			bool isSelf = (character == attacker.character);
+
+			var victimCenter = character.getCenterPos();
+			var bombCenter = pos;
+			if (directHit) {
+				bombCenter.x = victimCenter.x - (directHitXDir * 5);
+			}
+			var dirTo = bombCenter.directionTo(victimCenter);
+			var distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
+
+			if (isSelf) character.vel.y += dirTo.y * 10 * distFactor;
+			else character.vel.y = dirTo.y * 10 * distFactor;
+
+			if (character == attacker.character) {
+				character.xSwingVel += dirTo.x * 10 * distFactor;
+				float damage = damager.damage;
+				if ((character as Axl)?.isWhiteAxl() == true) { damage = 0; }
+				return new DamagerMessage() {
+					damage = damage,
+					flinch = 0
+				};
+			} else {
+				character.xPushVel = dirTo.x * 10 * distFactor;
+			}
+		}
+
+		return null;
 	}
 }
 

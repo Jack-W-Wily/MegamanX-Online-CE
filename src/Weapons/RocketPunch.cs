@@ -93,7 +93,7 @@ public class RocketPunchProj : Projectile {
 		damager.flinch = Global.halfFlinch;
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
-			damager.damage = 0.25f;
+			damager.damage = 0.5f;
 			damager.hitCooldown = 0.1f;
 			maxTime = 0.15f;
 			destroyOnHit = true;

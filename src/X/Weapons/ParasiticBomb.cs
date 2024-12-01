@@ -9,7 +9,7 @@ public class ParasiticBomb : Weapon {
 	public static float beeRange = 120;
 
 	public ParasiticBomb() : base() {
-		shootSounds = new string[] { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "" , ""};
 		fireRate = 60;
 		index = (int)WeaponIds.ParasiticBomb;
 		weaponBarBaseIndex = 18;

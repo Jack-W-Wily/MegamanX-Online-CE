@@ -10,14 +10,14 @@ public class MorphMoth : Maverick {
 
 	public MorphMoth(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer, overrideState: isHatch ? new MorphMHatchState() : null) {
-		stateCooldowns.Add(typeof(MorphMShoot), new MaverickStateCooldown(true, false, 0.5f));
-		stateCooldowns.Add(typeof(MorphMShootAir), new MaverickStateCooldown(true, false, 0.5f));
+	//	stateCooldowns.Add(typeof(MorphMShoot), new MaverickStateCooldown(true, false, 0.5f));
+	//	stateCooldowns.Add(typeof(MorphMShootAir), new MaverickStateCooldown(true, false, 0.5f));
 
 		weapon = getWeapon();
 		spriteToCollider["sweep"] = getDashCollider();
 
 		canFly = true;
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.SilkShot;
 		weakWeaponId = WeaponIds.SpeedBurner;
 		weakMaverickWeaponId = WeaponIds.FlameStag;

@@ -16,9 +16,9 @@ public class WheelGator : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 1.25f));
-		stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 2f));
-
+	//	stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 1.25f));
+	//	stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 2f));
+		canClimbWall = true;
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
 

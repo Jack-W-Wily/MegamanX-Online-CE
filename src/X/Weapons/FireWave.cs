@@ -13,11 +13,11 @@ public class FireWave : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 4;
 		weaknessIndex = (int)WeaponIds.StormTornado;
-		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" };
+		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" , ""};
 		fireRate = 4;
 		isStream = true;
 		//switchCooldown = 0.25f;
-		switchCooldownFrames = 15;
+		switchCooldownFrames = 0;
 		damage = "1/1";
 		ammousage = 0.5;
 		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.";
@@ -25,6 +25,16 @@ public class FireWave : Weapon {
 		maxAmmo = 28;
 		ammo = maxAmmo;
 	}
+
+	public float altfireCooldown;
+
+	
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref altfireCooldown);
+	}
+
+	
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel >= 3) {
@@ -41,12 +51,33 @@ public class FireWave : Weapon {
 
 		if (character != null) {
 			if (character.isUnderwater()) return;
+
+			if (character.player.input.isHeld(Control.Up, player) && altfireCooldown == 0){
+			altfireCooldown = 0.5f;
+				new VelGFireProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+				new VelGFireProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				}, 0.025f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+				new VelGFireProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				}, 0.055f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+				new VelGFireProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				}, 0.075f));
+			}
+
 			if (chargeLevel < 3) {
 				var proj = new FireWaveProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 				proj.vel.inc(character.vel.times(-0.5f));
-			} else {
+			} 
+			if (chargeLevel == 3) {
 				new FireWaveProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 			}
+			if (chargeLevel == 4) {
+				character.changeState(new FireWaveUltraCharge(character.grounded), true);
+			}
+
+			
 		}
 	}
 }
@@ -120,6 +151,21 @@ public class FireWaveProjChargedStart : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		var character = damagable as Character;
+	}
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
+			playSound("flamemOilBurn", sendRpc: true);
+			new FlameMBigFireProj(
+				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true
+			);
+			// oilSpill.time = 0;
+			oilSpill.destroySelf(doRpcEvenIfNotOwned: true);
+			destroySelf();
+		}
 	}
 
 	public void putOutFire() {
@@ -232,4 +278,72 @@ public class FireWaveProjCharged : Projectile {
 	public void putOutFire() {
 		base.destroySelf("", "", false, true);
 	}
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
+			playSound("flamemOilBurn", sendRpc: true);
+			new FlameMBigFireProj(
+				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true
+			);
+			// oilSpill.time = 0;
+			oilSpill.destroySelf(doRpcEvenIfNotOwned: true);
+		}
+	}
 }
+
+
+
+
+
+public class FireWaveUltraCharge : CharState {
+	bool fired = false;
+	bool groundedOnce;
+	public FireWaveUltraCharge(bool grounded) : base(!grounded ? "fall" : "punch_ground", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.ownedByLocalPlayer) return;
+
+		if (!groundedOnce) {
+			if (!character.grounded) {
+				stateTime = 0;
+				return;
+			} else {
+				groundedOnce = true;
+				sprite = "punch_ground";
+				character.changeSprite("mmx_punch_ground", true);
+			}
+		}
+
+		if (character.frameIndex >= 6 && !fired) {
+			fired = true;
+
+			float x = character.pos.x;
+			float y = character.pos.y;
+
+			character.shakeCamera(sendRpc: true);
+
+			var weapon = new TriadThunder();
+			new FlameMOilProj(new FlameMOilWeapon(),  character.pos.addxy(0,-30), -1, player, player.getNextActorNetId(), rpc: true);
+			new FlameMOilProj(new FlameMOilWeapon(), character.pos.addxy(0,-30), 1, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderQuake(weapon, new Point(x, y), 1, player, player.getNextActorNetId(), rpc: true);
+
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+		}
+
+		if (stateTime > 0.75f) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character.vel.y < 0) character.vel.y = 0;
+	}
+}
+

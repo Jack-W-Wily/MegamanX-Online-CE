@@ -3,6 +3,20 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
+public class CharStateCooldown {
+	public readonly bool isGlobal;  // "Global" states no longer shares the global cooldown but sets all states at their max
+	public readonly bool startOnEnter;
+	public readonly float maxCooldown;
+	public float cooldown;
+
+	public CharStateCooldown(bool isGlobal, bool startOnEnter, float maxCooldown) {
+		this.isGlobal = isGlobal;
+		this.startOnEnter = startOnEnter;
+		this.maxCooldown = maxCooldown;
+	}
+}
+
+
 public class CharState {
 	public string sprite;
 	public string defaultSprite;
@@ -559,7 +573,9 @@ public class Idle : CharState {
 			}
 			character.changeSpriteFromName(sprite, true);				
 		}
+
 		if (character is Vile) {
+			
 			if (player.health <= 8) {
 				sprite = "weak";
 			} else {
@@ -567,13 +583,25 @@ public class Idle : CharState {
 			}
 			character.changeSpriteFromName(sprite, true);				
 		}
+		
 		character.dashedInAir = 0;
 	}
 
 	public override void update() {
 		base.update();
-		
 
+		if (character is Vile && (character.wasFightingX ||
+		character.wasFightingZeroEarly || character.wasFightingSigma ) && stateTime > 5) {
+			
+		
+			if (!character.sprite.name.Contains("vs"))
+				if (character.wasFightingX)sprite = "idle_vsx";
+				if (character.wasFightingZeroEarly )sprite = "idle_vszero";
+				if (character.wasFightingSigma)sprite = "idle_vssigma";
+			
+			character.changeSpriteFromName(sprite, true);				
+		}
+		
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			if (!character.isAttacking() && !character.isSoftLocked() && character.canTurn()) {
 				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
@@ -1728,9 +1756,9 @@ public class GenericGrabbedState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabInvulnTime = 1;
+		character.grabInvulnTime = 0.5f;
 		if (this is VileMK2Grabbed) {
-			character.stunInvulnTime = 1;
+			character.stunInvulnTime = 0.5f;
 		}
 		character.useGravity = true;
 		character.setzIndex(savedZIndex);

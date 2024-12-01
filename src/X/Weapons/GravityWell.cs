@@ -6,7 +6,7 @@ public class GravityWell : Weapon {
 	public static GravityWell netWeapon = new();
 
 	public GravityWell() : base() {
-		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" };
+		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" , ""};
 		fireRate = 30;
 		index = (int)WeaponIds.GravityWell;
 		weaponBarBaseIndex = 22;

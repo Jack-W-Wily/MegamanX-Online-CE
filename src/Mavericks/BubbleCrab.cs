@@ -22,7 +22,7 @@ public class BubbleCrab : Maverick {
 		//stateCooldowns.Add(typeof(BCrabShieldStartState), new MaverickStateCooldown(false, true, 0.75f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.BubbleSplash;
 		weakWeaponId = WeaponIds.SpinWheel;
 		weakMaverickWeaponId = WeaponIds.WheelGator;
@@ -78,7 +78,7 @@ public class BubbleCrab : Maverick {
 
 		bool floating = false;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new BCrabShootState());
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -148,7 +148,10 @@ public class BubbleCrab : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("jump_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BCrabClaw, player, 1, Global.defFlinch, 0.15f);
+			return new GenericMeleeProj(weapon, centerPoint, 
+			ProjIds.BCrabClaw, player, 1, 
+			Global.defFlinch, 0.15f,
+			isJuggleProjectile : true);
 		}
 		return null;
 	}
@@ -286,6 +289,7 @@ public class BCrabClawState : MaverickState {
 
 public class BCrabClawJumpState : MaverickState {
 	public BCrabClawJumpState() : base("jump_attack", "") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -426,7 +430,7 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		projId = (int)ProjIds.BCrabCrablingBubble;
 		setIndestructableProperties();
 		syncScale = true;
-
+		isShield = true;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

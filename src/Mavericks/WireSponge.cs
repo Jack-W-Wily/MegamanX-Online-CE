@@ -14,11 +14,11 @@ public class WireSponge : Maverick {
 
 	public WireSponge(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(WSpongeSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeLightningState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeChainSpinState), new MaverickStateCooldown(false, true, 0.75f));
-
+	//	stateCooldowns.Add(typeof(WSpongeSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(WSpongeLightningState), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(WSpongeChainSpinState), new MaverickStateCooldown(false, true, 0.75f));
+		canClimbWall = true;
 		weapon = getWeapon();
 		chainWeapon = getChainWeapon(player);
 
@@ -179,8 +179,13 @@ public class WSpongeSideChainProj : Projectile {
 	public int maxDist = 100;
 	public int origXDir;
 	public int type;
+		public int upOrDown;
 	public bool isCharged { get { return type == 1; } }
 	public float hookWaitTime;
+
+	public float speedy;
+
+
 	public Point chainVel;
 	public Actor wireSponge;
 	public Point netOrigin;
@@ -194,11 +199,27 @@ public class WSpongeSideChainProj : Projectile {
 		projId = (int)ProjIds.WSpongeChain;
 
 		maxDist = 50 + (int)(Helpers.clampMax(spinTime, 1.5f) * 100);
-		vel = new Point(xDir * (300 + maxDist), 0);
-		speed = MathF.Abs(vel.x);
 
+		if (owner.input.isHeld(Control.Up, owner)) {
+				vel = new Point(xDir * (300 + maxDist), -350);
+			} else if (owner.input.isHeld(Control.Down, owner)) {
+				vel = new Point(xDir * (300 + maxDist), 350);
+			}else{
+			vel = new Point(xDir * (300 + maxDist), 0);
+			}
+		
+		speed = MathF.Abs(vel.x);
 		chainVel = vel;
 		netOrigin = pos;
+
+		if (owner.isX) {
+			changeSprite("strikechain_proj", true);
+			
+			damager.damage = 2;
+
+		
+			
+		}
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -211,7 +232,7 @@ public class WSpongeSideChainProj : Projectile {
 		base.postUpdate();
 		if (!ownedByLocalPlayer) return;
 
-		if (wireSponge != null) {
+		if (wireSponge != null && state == 1) {
 			var shootPos = wireSponge.getFirstPOIOrDefault();
 			changePos(new Point(shootPos.x + wireSponge.xDir * (distMoved - distRetracted), shootPos.y));
 		}
@@ -219,6 +240,8 @@ public class WSpongeSideChainProj : Projectile {
 
 	public override void update() {
 		base.update();
+
+	
 		if (!ownedByLocalPlayer) {
 			if (!reversed) distMoved += MathF.Abs(speed * Global.spf);
 			else distRetracted += MathF.Abs(speed * Global.spf);
@@ -234,6 +257,7 @@ public class WSpongeSideChainProj : Projectile {
 
 		// Firing
 		if (state == 0) {
+			
 			distMoved += MathF.Abs(speed * Global.spf);
 			if (distMoved >= maxDist) // || (type == 0 && !player.input.isHeld(Control.Shoot)))
 			{
@@ -289,6 +313,8 @@ public class WSpongeSideChainProj : Projectile {
 			hookedActor.vel.y = -100;
 			(hookedActor as Anim).ttl = 0.5f;
 		}
+
+		owner.character.useGravity = true;
 	}
 
 	public override void render(float x, float y) {
@@ -303,8 +329,16 @@ public class WSpongeSideChainProj : Projectile {
 		float distFromStartX = MathF.Abs(pos.x - origin.x);
 		const float len = 8;
 		float pieceCount = distFromStartX / len;
+
+		if (owner.isSigma){
 		for (int i = 0; i < pieceCount; i++) {
 			Global.sprites["wsponge_vine_base_left"].draw(0, origin.x + (xDir * len * i), pos.y, xDir, 1, null, 1, 1, 1, ZIndex.Background + 100);
+		}
+		}
+		if (owner.isX){
+		for (int i = 0; i < pieceCount; i++) {
+			Global.sprites["strikechain_chain"].draw(0, origin.x + (xDir * len * i), pos.y, xDir, 1, null, 1, 1, 1, ZIndex.Background + 100);
+		}
 		}
 	}
 
@@ -574,7 +608,7 @@ public class WSpongeUpChainProj : Projectile {
 		projId = (int)ProjIds.WSpongeUpChain;
 		setIndestructableProperties();
 		this.wireSponge = wireSponge;
-		vel = new Point(0, -350);
+		vel = new Point(300, -350);
 		maxDist = 50 + (int)(Helpers.clampMax(spinTime, 1.5f) * 100);
 		netOrigin = pos;
 

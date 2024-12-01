@@ -16,10 +16,10 @@ public class GravityBeetle : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
-		stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
-		stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
-
+	//	stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
+	//	stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
+	//	stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
+		canClimbWall = true;
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
 
@@ -223,6 +223,7 @@ public class GBeetleDashState : MaverickState {
 	float dustTime;
 	float partTime;
 	public GBeetleDashState() : base("dash", "dash_start") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -298,6 +299,7 @@ public class GBeetleLiftState : MaverickState {
 	bool grabbedOnce;
 	public GBeetleLiftState(Character grabbedChar) : base("dash_lift") {
 		this.grabbedChar = grabbedChar;
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -388,7 +390,8 @@ public class GBeetleGravityWellProj : Projectile {
 
 	public override void update() {
 		base.update();
-
+		if (owner.health == 0)destroySelf();
+		
 		drawRadius = radiusFactor * maxRadius;
 		if (radiusFactor > 0) {
 			globalCollider = new Collider(new Rect(0, 0, 24 + (radiusFactor * maxRadius), 24 + (radiusFactor * maxRadius)).getPoints(), true, this, false, false, 0, Point.zero);
@@ -471,6 +474,7 @@ public class GBeetleGravityWellState : MaverickState {
 	float partTime;
 	float chargeTime;
 	public GBeetleGravityWellState() : base("blackhole_start", "") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -497,7 +501,13 @@ public class GBeetleGravityWellState : MaverickState {
 			Point? shootPos = maverick.getFirstPOI();
 			if (!once && shootPos != null) {
 				once = true;
+				if (!player.input.isHeld(Control.Special2,player)){
 				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, chargeTime, player, player.getNextActorNetId(), sendRpc: true);
+				}
+				if (player.currency > 19 && player.input.isHeld(Control.Special2,player)){
+				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, 80, player, player.getNextActorNetId(), sendRpc: true);
+				player.currency -= 20;
+				}
 			}
 			if (maverick.isAnimOver()) {
 				maverick.changeToIdleOrFall();

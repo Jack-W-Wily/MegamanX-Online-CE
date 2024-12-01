@@ -18,8 +18,10 @@ public class BusterProj : Projectile {
 		reflectable = true;
 		maxTime = 0.5175f;
 		if (type == 0) projId = (int)ProjIds.Buster;
-		else if (type == 1) projId = (int)ProjIds.ZBuster;
-
+		else if (type == 1) {
+			projId = (int)ProjIds.ZBuster;
+			damager.flinch = 1;
+		}
 		if (rpc) {
 			byte[] extraArgs = new byte[] { (byte)type};
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
@@ -51,11 +53,12 @@ public class Buster2Proj : Projectile {
 		bool rpc = false
 	) : base(
 		weapon, pos, xDir, 350, 2, 
-		player, "buster2", 4, 0, netProjId, 
+		player, "buster2", 1, 0, netProjId, 
 		player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster2_fade";
 		reflectable = true;
+		isJuggleProjectile = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster2;
 

@@ -71,6 +71,7 @@ public class X6SaberState : CharState {
 		landSprite = "beam_saber2";
 		airMove = true;
 		useDashJumpSpeed = true;
+		normalCtrl = true;
 	}
 
 	public override void update() {

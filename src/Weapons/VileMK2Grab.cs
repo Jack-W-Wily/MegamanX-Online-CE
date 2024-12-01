@@ -166,10 +166,11 @@ public class VileMK2GrabState : CharState {
 		base.onExit(newState);
 		character.grabCooldown = 1;
 		if (newState is not VileMK2GrabState && victim != null) {
-			victim.grabInvulnTime = 1;
-			victim.stunInvulnTime = 1;
+			victim.grabInvulnTime = 0.5f;
+			//victim.stunInvulnTime = 0.5f;
 			victim?.releaseGrab(character, true);
 		}
+
 		character.useGravity = true;
 		character.sprite.restart();
 		character.stopMoving();
@@ -245,8 +246,8 @@ public class VileStompState : CharState {
 			leechTime = 0;
 			character.addHealth(1);
 			character.shakeCamera(sendRpc: true);
-			var damager = new Damager(player, 1f, 0, 0);
-			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
+		//	var damager = new Damager(player, 1f, 0, 0);
+		//	damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}
 		
 		
@@ -269,7 +270,7 @@ public class VileStompState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.grabCooldown = 1;
+		character.grabCooldown = 0.5f;
 		victim.grabInvulnTime = 0.5f;
 		victim?.releaseGrab(character);
 	}
@@ -300,7 +301,7 @@ public class VileStomped : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabInvulnTime = 2;
+		character.grabInvulnTime = 0.5f;
 		character.setzIndex(savedZIndex);
 	}
 
@@ -325,7 +326,7 @@ public class VileAirRaid : CharState {
 	float timeWaiting;
 	public VileAirRaid(Character? victim) : base("air_raid", "", "", "") {
 		this.victim = victim;
-		grabTime = 3;
+		grabTime = 6;
 	}
 
 	public override void update() {
@@ -364,21 +365,21 @@ public class VileAirRaid : CharState {
 	if (!player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Shoot, player)) {
 
-			if (Helpers.randomRange(0,3) == 0 && leechTime > 0.05f){
-			character.changeSpriteFromName("punch_1", true);
-			leechTime = 0;
-			}
-			if (Helpers.randomRange(0,3) == 1  && leechTime > 0.05f){
+		
+			 if (Helpers.randomRange(0,3) == 1 ){
 			character.changeSpriteFromName("punch_2", true);
-			leechTime = 0;
+			
 			}
-			if (Helpers.randomRange(0,3) == 2 && leechTime > 0.05f){
+			else if (Helpers.randomRange(0,3) == 2){
 			character.changeSpriteFromName("kick", true);
-			leechTime = 0;
+			
 			}
-			if (Helpers.randomRange(0,3) == 3 && leechTime > 0.05f){
+			else if (Helpers.randomRange(0,3) == 3 ){
 			character.changeSpriteFromName("kick_2", true);
-			leechTime = 0;
+			
+ 			} 
+			else {
+				character.changeSpriteFromName("punch_1", true);
 			}
 			
 		}
@@ -412,7 +413,7 @@ public class VileAirRaid : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.grabCooldown = 1;
+		character.grabCooldown = 0.5f;
 		victim.grabInvulnTime = 0.5f;
 		victim?.releaseGrab(character);
 	}

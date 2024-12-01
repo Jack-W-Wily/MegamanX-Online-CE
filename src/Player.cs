@@ -124,7 +124,7 @@ public partial class Player {
 	public const int AxlHyperCost = 10;
 	public const int reviveVileCost = 1;
 	public const int reviveSigmaCost = 10;
-	public const int reviveXCost = 10;
+	public const int reviveXCost = 0;
 	public const int goldenArmorCost = 5;
 	public const int ultimateArmorCost = 10;
 	public bool lastDeathCanRevive;
@@ -645,9 +645,9 @@ public partial class Player {
 
 	public float getMaverickMaxHp() {
 		if (!Global.level.is1v1() && isTagTeam()) {
-			return getModifiedHealth(20) + (heartTanks * getHeartTankModifier());
+			return getModifiedHealth(40) + (heartTanks * getHeartTankModifier());
 		}
-		return MathF.Ceiling(getModifiedHealth(24));
+		return MathF.Ceiling(getModifiedHealth(44));
 	}
 
 	public bool hasAllItems() {

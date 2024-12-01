@@ -13,7 +13,7 @@ public class ElectricSpark : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 6;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;
-		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
+		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" , ""};
 		fireRate = 30;
 		damage = "2/4";
 		effect =  "Can Split. Charged: Doesn't destroy on hit.";
@@ -30,8 +30,11 @@ public class ElectricSpark : Weapon {
 
 		if (chargeLevel < 3) {
 			new ElectricSparkProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
-		} else {
+		} if (chargeLevel == 3) {
 			new ElectricSparkProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+		}
+		if (chargeLevel == 4) {
+				character.changeState(new ESparkUltraCharged(character.grounded), true);
 		}
 	}
 }
@@ -183,5 +186,58 @@ public class ElectricSparkProjCharged : Projectile {
 			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
 			arg.player, arg.netId
 		);
+	}
+}
+
+
+public class ESparkUltraCharged : CharState {
+	bool fired = false;
+	bool groundedOnce;
+	public ESparkUltraCharged(bool grounded) : base(!grounded ? "fall" : "punch_ground", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.ownedByLocalPlayer) return;
+
+		if (!groundedOnce) {
+			if (!character.grounded) {
+				stateTime = 0;
+				return;
+			} else {
+				groundedOnce = true;
+				sprite = "punch_ground";
+				character.changeSprite("mmx_punch_ground", true);
+			}
+		}
+
+		if (character.frameIndex >= 6 && !fired) {
+			fired = true;
+
+			float x = character.pos.x;
+			float y = character.pos.y;
+
+			character.shakeCamera(sendRpc: true);
+
+			var weapon = new TriadThunder();
+			new TriadThunderProjCharged(weapon, new Point(x, y), -1, 1, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderProjCharged(weapon, new Point(x, y), 1, 1, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderQuake(weapon, new Point(x, y), 1, player, player.getNextActorNetId(), rpc: true);
+
+			character.playSound("sparkmSparkX1", forcePlay: false, sendRpc: true);
+		
+		}
+
+		if (stateTime > 0.75f) {
+			character.changeToIdleOrFall();
+		}
+
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character.vel.y < 0) character.vel.y = 0;
 	}
 }

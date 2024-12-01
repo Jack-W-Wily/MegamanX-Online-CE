@@ -237,7 +237,11 @@ public partial class KaiserSigma : Character {
 	}
 
 	public override bool canPickupFlag() {
-		return false;
+		return true;
+	}
+
+	public override bool isCCImmuneHyperMode() {
+		return true;
 	}
 
 	public override List<byte> getCustomActorNetData() {

@@ -13,15 +13,16 @@ public class BlastHornet : Maverick {
 
 	public BlastHornet(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 2f));
-		stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.25f));
-		stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
-		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
+	//	stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 2f));
+	//	stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.25f));
+	//	stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
+	//	stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 		wings = new Sprite("bhornet_wings");
 		canFly = true;
-
+		spriteFrameToSounds["bhornet_run/1"] = "hornetWalk";
+		spriteFrameToSounds["bhornet_run/6"] = "hornetWalk";
 		awardWeaponId = WeaponIds.ParasiticBomb;
 		weakWeaponId = WeaponIds.GravityWell;
 		weakMaverickWeaponId = WeaponIds.GravityBeetle;
@@ -126,7 +127,7 @@ public class BlastHornet : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.EndsWith("_stinger_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 7, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
 		}
 		return null;
 	}
@@ -138,7 +139,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	public Actor? latchTarget;
 	float latchLerpTime;
 	public BHornetBeeProj(Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 0, 1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 1, 1f, netProjId, player.ownedByLocalPlayer) {
 		this.weapon = weapon;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -495,6 +496,7 @@ public class BHornetStingState : MaverickState {
 	bool isAIRise;
 	public BHornetStingState() : base("fly_stinger_attack", "fly_stinger_start") {
 		useGravity = false;
+		superArmor = true;
 	}
 
 	public override void update() {

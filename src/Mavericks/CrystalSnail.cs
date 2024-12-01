@@ -16,12 +16,12 @@ public class CrystalSnail : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(CSnailShootState), new MaverickStateCooldown(false, false, 0.75f));
+	//	stateCooldowns.Add(typeof(CSnailShootState), new MaverickStateCooldown(false, false, 0.75f));
 
 		spriteToCollider["shell"] = getShellCollider();
 		spriteToCollider["shell_spin"] = getShellCollider();
 		spriteToCollider["shell_dash"] = getShellCollider();
-
+		canClimbWall = true;
 		weapon = getWeapon();
 
 		awardWeaponId = WeaponIds.CrystalHunter;

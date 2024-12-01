@@ -12,13 +12,13 @@ public class LaunchOctopus : Maverick {
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		meleeWeapon = new LaunchODrainWeapon(player);
 
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 1f));
-		stateCooldowns.Add(typeof(LaunchOShoot), new MaverickStateCooldown(false, true, 0.325f));
-		stateCooldowns.Add(typeof(LaunchOHomingTorpedoState), new MaverickStateCooldown(false, true, 1.5f));
-		stateCooldowns.Add(typeof(LaunchOWhirlpoolState), new MaverickStateCooldown(false, false, 2));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0f));
+		stateCooldowns.Add(typeof(LaunchOShoot), new MaverickStateCooldown(false, true, 0f));
+		stateCooldowns.Add(typeof(LaunchOHomingTorpedoState), new MaverickStateCooldown(false, true, 0f));
+		stateCooldowns.Add(typeof(LaunchOWhirlpoolState), new MaverickStateCooldown(false, false, 0));
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.HomingTorpedo;
 		weakWeaponId = WeaponIds.RollingShield;
 		weakMaverickWeaponId = WeaponIds.ArmoredArmadillo;

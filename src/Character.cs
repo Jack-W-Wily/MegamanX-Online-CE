@@ -51,6 +51,7 @@ public partial class Character : Actor, IDamagable {
 	public float slideVel = 0;
 	public Flag? flag;
 	public float stingChargeTime;
+	public float UltraStingChargeTime;
 	public bool isCrystalized;
 	public bool insideCharacter;
 	public float invulnTime = 0;
@@ -81,6 +82,9 @@ public partial class Character : Actor, IDamagable {
 	public float flattenedTime;
 	public float saberCooldown;
 	public float ComboTimer;
+	public float ignoreStateCooldownTime;
+	public float DamageScaling;
+	public float DamageScalingCD;
 
 	public const float maxLastAttackerTime = 5;
 
@@ -163,6 +167,24 @@ public partial class Character : Actor, IDamagable {
 	public bool hasParasite { get { return parasiteTime > 0; } }
 	public float parasiteTime;
 	public float parasiteMashTime;
+	
+
+	// Special Interaction trigger (wcut)
+	public bool wasFightingX;
+	public bool wasFightingZeroEarly;
+	public bool wasFightingZeroMid;
+	public bool wasFightingZeroEND;
+	public bool wasFightingVile;
+	public bool wasFightingVileMK2;
+	public bool wasFightingVileMK5;
+	public bool wasFightingSigma;
+	public bool wasFightingAxl;
+	//>>>>>>>>>>>>>>>>>
+
+	//StateCooldown System (wcut)
+	public Dictionary<Type, CharStateCooldown> stateCooldowns = new Dictionary<Type, CharStateCooldown>();
+	
+
 	
 	// Disables status.
 	public float paralyzedTime;
@@ -834,8 +856,50 @@ public partial class Character : Actor, IDamagable {
 
 	public override void update() {
 
+		// Wcut Statecooldown system
+		foreach (var key in stateCooldowns.Keys) {
+			Helpers.decrementTime(ref stateCooldowns[key].cooldown);
+		}
 
+		//Wcut Damage Systems
 		Helpers.decrementFrames(ref ComboTimer);
+		Helpers.decrementFrames(ref ignoreStateCooldownTime);
+		Helpers.decrementFrames(ref DamageScalingCD);
+		
+		if (DamageScalingCD == 0){
+		Helpers.decrementFrames(ref DamageScaling);
+		}
+		
+
+		if (sprite.name.Contains("hurt") 
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("knocked")
+		||sprite.name.Contains("grabbed")
+		||sprite.name.Contains("lose")  
+		|| sprite.name.Contains("stunned")){
+		DamageScaling += Global.spf;
+		DamageScalingCD = 0.5f;
+		}
+		//
+	
+		// Wcut Burst System
+
+		if ((sprite.name.Contains("hurt") 
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("knocked")
+		||sprite.name.Contains("grabbed")
+		||sprite.name.Contains("lose")  
+		|| sprite.name.Contains("stunned"))
+		&& player.input.isHeld(Control.WeaponLeft, player)
+		&& player.input.isHeld(Control.WeaponRight, player)
+		&& player.currency > 0){
+		changeState(new Idle(), true);
+		invulnTime = 1.5f;
+		new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+		pos.addxy(6 * xDir, 0f), xDir, player, 
+		player.getNextActorNetId(), rpc: true);	
+		playSound("crash", true);
+		}
 	
 		if (charState is not InRideChaser && charState is VileDashState) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
@@ -1116,6 +1180,22 @@ public partial class Character : Actor, IDamagable {
 			if (stingChargeTime <= 0) {
 				player.delaySubtank();
 				stingChargeTime = 0;
+			}
+		}
+
+		if (UltraStingChargeTime > 0) {
+			if (player.isX) {
+				UltraStingChargeTime -= Global.spf;
+
+				player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
+				if (player.weapon.ammo < 0) player.weapon.ammo = 0;
+				UltraStingChargeTime = player.weapon.ammo;
+			} else {
+				UltraStingChargeTime -= Global.spf;
+			}
+			if (UltraStingChargeTime <= 0) {
+				player.delaySubtank();
+				UltraStingChargeTime = 0;
 			}
 		}
 
@@ -1610,7 +1690,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isToughGuyHyperMode() {
-		return false;
+		return DamageScaling > 2;
 	}
 
 	public bool isImmuneToKnockback() {
@@ -1905,7 +1985,7 @@ public partial class Character : Actor, IDamagable {
 		bool clampTo3 = true;
 		switch (this) {
 			case MegamanX mmx:
-				clampTo3 = !mmx.isHyperX;
+				clampTo3 = !mmx.isHyperX && !player.hasArmArmor(ArmorId.Max);
 				break;
 			case Zero zero:
 				clampTo3 = true;
@@ -1967,6 +2047,18 @@ public partial class Character : Actor, IDamagable {
 		// Set the character as soon as posible.
 		newState.character = this;
 		newState.altCtrls = new bool[altCtrlsLength];
+
+
+
+		//>>>>>>>>>>
+		//wcut statecooldown system
+		CharStateCooldown oldStateCooldown = charState == null ? null : stateCooldowns.GetValueOrDefault(charState.GetType());
+		CharStateCooldown newStateCooldown = stateCooldowns.GetValueOrDefault(newState.GetType());
+
+		if (newStateCooldown != null ) {
+			if (newStateCooldown.cooldown > 0) return false;
+		}
+		//>>>>>>>>>>>>
 
 		// Check if we can change.
 		if (!forceChange &&
@@ -2743,6 +2835,16 @@ public partial class Character : Actor, IDamagable {
 					damageSavings += originalDamage / 8m;
 				}
 			}
+			if (DamageScaling > 5){
+			damageSavings += (originalDamage * 0.75m);
+			}
+			if (DamageScaling > 2 && DamageScaling < 6){
+			damageSavings += (originalDamage * 0.5m);
+			}
+			if (DamageScaling > 0 && DamageScaling < 3){
+			damageSavings += (originalDamage * 0.25m);
+			}
+
 			if (this is Vile vile && vile.hasFrozenCastleBarrier()) {
 				damageSavings += originalDamage * Vile.frozenCastlePercent;
 			}
@@ -3200,7 +3302,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isInvisible() {
-		return stingChargeTime > 0 && player.isX;
+		return UltraStingChargeTime > 0|| stingChargeTime > 0 && player.isX;
 	}
 
 	public bool genmuImmune(Player owner) {
@@ -3265,7 +3367,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isAttacking() {
-		return sprite.name.Contains("attack");
+		return sprite.name.Contains("attack")
+		||  sprite.name.Contains("shoot")
+		||  sprite.name.Contains("slash");
 	}
 
 	public bool canLandOnRideArmor() {

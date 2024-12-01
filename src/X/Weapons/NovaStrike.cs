@@ -9,7 +9,7 @@ public class NovaStrike : Weapon {
 		if (player != null) {
 			damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		}
-		shootSounds = new string[] { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "" , ""};
 		fireRate = 90;
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = 42;

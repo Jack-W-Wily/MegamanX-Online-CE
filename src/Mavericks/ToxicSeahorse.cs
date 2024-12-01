@@ -7,12 +7,12 @@ public class ToxicSeahorse : Maverick {
 	public float teleportCooldown;
 	public ToxicSeahorse(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 1f));
-		stateCooldowns.Add(typeof(TSeahorseShoot2State), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(TSeahorseTeleportState), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 1f));
+	//	stateCooldowns.Add(typeof(TSeahorseShoot2State), new MaverickStateCooldown(true, true, 2f));
+	//	stateCooldowns.Add(typeof(TSeahorseTeleportState), new MaverickStateCooldown(false, true, 0.75f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.AcidBurst;
 		weakWeaponId = WeaponIds.FrostShield;
 		weakMaverickWeaponId = WeaponIds.BlizzardBuffalo;

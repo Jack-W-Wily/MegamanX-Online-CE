@@ -13,7 +13,7 @@ public class ChameleonSting : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
 		weaknessIndex = (int)WeaponIds.BoomerangCutter;
-		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge" };
+		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge", "stingCharge" };
 		fireRate = 45;
 		damage = "2";
 		effect = "Full Charge grants invulnerability.";
@@ -35,8 +35,11 @@ public class ChameleonSting : Weapon {
 
 		if (chargeLevel < 3) {
 			new StingProj(this, pos, xDir, player, 0, player.getNextActorNetId(), true);
-		} else {
+		} if (chargeLevel == 3) {
 			character.stingChargeTime = 8;
+		}
+		if (chargeLevel == 4) {
+			character.UltraStingChargeTime = 8;
 		}
 	}
 }
@@ -48,7 +51,7 @@ public class StingProj : Projectile {
 		int type, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 300, 2, player, "sting_start", 
-		0, 0.25f, netProjId, player.ownedByLocalPlayer
+		Global.miniFlinch, 0f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.Sting;
 		maxTime = 0.6f;
@@ -66,7 +69,7 @@ public class StingProj : Projectile {
 			}
 			changeSprite(sprite, false);
 			reflectable = true;
-			damager.damage = 2;
+			damager.damage = 1;
 			projId = (int)ProjIds.StingDiag;
 		}
 		fadeSprite = "buster1_fade";

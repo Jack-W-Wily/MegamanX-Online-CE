@@ -9,15 +9,15 @@ public class DrDoppler : Maverick {
 	public int ballType;
 	public DrDoppler(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(DrDopplerAbsorbState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 1.5f));
+	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(DrDopplerAbsorbState), new MaverickStateCooldown(false, true, 0.75f));
+	//	stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 1.5f));
 
 		weapon = getWeapon();
 		canClimbWall = true;
 		canClimb = true;
-		spriteFrameToSounds["drdoppler_run/1"] = "run";
-		spriteFrameToSounds["drdoppler_run/5"] = "run";
+		spriteFrameToSounds["drdoppler_run/1"] = "colonelwalk";
+		spriteFrameToSounds["drdoppler_run/5"] = "colonelwalk";
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 
@@ -168,6 +168,7 @@ public class DrDopplerBallProj : Projectile {
 public class DrDopplerDashStartState : MaverickState {
 	public DrDopplerDashStartState() : base("dash_charge", "") {
 		stopMovingOnEnter = true;
+		superArmor = true;
 		enterSound = "ryuenjin";
 	}
 

@@ -517,8 +517,8 @@ public class XUPGrabState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.grabCooldown = 1;
-		victim.grabInvulnTime = 2;
+		character.grabCooldown = 0.5f;
+		victim.grabInvulnTime = 0.5f;
 		victim?.releaseGrab(character);
 	}
 }
@@ -546,7 +546,7 @@ public class UPGrabbed : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabInvulnTime = 2;
+		character.grabInvulnTime = 0.5f;
 		character.setzIndex(savedZIndex);
 	}
 

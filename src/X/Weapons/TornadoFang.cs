@@ -8,7 +8,7 @@ public class TornadoFang : Weapon {
 	public static TornadoFang netWeapon = new();
 
 	public TornadoFang() : base() {
-		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" };
+		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" , ""};
 		fireRate = 60;
 		index = (int)WeaponIds.TornadoFang;
 		weaponBarBaseIndex = 24;
@@ -37,7 +37,7 @@ public class TornadoFang : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		if (chargeLevel < 3) {
+		if (chargeLevel > 1) {
 			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
 				if (timeSinceLastShoot != null && timeSinceLastShoot < fireRate) {
 					new TornadoFangProj(this, pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);

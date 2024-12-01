@@ -7,7 +7,7 @@ public class TriadThunder : Weapon {
 	public static TriadThunder netWeapon = new TriadThunder();
 
 	public TriadThunder() : base() {
-		shootSounds = new string[] { "triadThunder", "triadThunder", "triadThunder", "" };
+		shootSounds = new string[] { "triadThunder", "triadThunder", "triadThunder", "", "" };
 		fireRate = 135;
 		index = (int)WeaponIds.TriadThunder;
 		weaponBarBaseIndex = 19;
@@ -262,7 +262,7 @@ public class TriadThunderProjCharged : Projectile {
 		base(weapon, pos, xDir, 0, 4, player, "triadthunder_charged", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.TriadThunderCharged;
 		if (type == 1) {
-			maxTime = 1f;
+			maxTime = 3f;
 			projId = (int)ProjIds.SparkMSpark;
 			// netcodeOverride = NetcodeModel.FavorDefender;
 			changeSprite("sparkm_proj_spark", true);

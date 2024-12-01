@@ -23,7 +23,7 @@ public class ArmoredArmadillo : Maverick {
 		awardWeaponId = WeaponIds.RollingShield;
 		weakWeaponId = WeaponIds.ElectricSpark;
 		weakMaverickWeaponId = WeaponIds.SparkMandrill;
-
+		canClimbWall = true;
 		netActorCreateId = NetActorCreateId.ArmoredArmadillo;
 		netOwner = player;
 		if (sendRpc) {
@@ -70,7 +70,7 @@ public class ArmoredArmadillo : Maverick {
 		} else if (state is ArmoredAGuardState) {
 			drainAmmo(1);
 		} else if (state is not ArmoredARollEnterState && state is not ArmoredARollExitState && state is not ArmoredAGuardState) {
-			rechargeAmmo(2);
+			rechargeAmmo(4);
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {

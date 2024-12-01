@@ -13,7 +13,7 @@ public class StormTornado : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
 		weaknessIndex = (int)WeaponIds.ChameleonSting;
-		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3" };
+		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3", "tornado" };
 		fireRate = 120;
 		//switchCooldown = 0.5f;
 		switchCooldownFrames = 30;

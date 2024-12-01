@@ -59,7 +59,7 @@ public class Axl : Character {
 	public LoopingSound iceGattlingSound;
 	public float whiteAxlTime;
 	public float dodgeRollCooldown;
-	public const float maxDodgeRollCooldown = 1.5f;
+	public const float maxDodgeRollCooldown = 0.5f;
 	public float RainstormCooldown;
 	public bool hyperAxlUsed;
 	//public ShaderWrapper axlPaletteShader;
@@ -91,7 +91,8 @@ public class Axl : Character {
 	) {
 		charId = CharIds.Axl;
 		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);
-
+		spriteFrameToSounds["axl_run/4"] = "run";
+		spriteFrameToSounds["axl_run/8"] = "run";
 		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
 		muzzleFlash.visible = false;
 		axlHyperMode = player.loadout?.axlLoadout?.hyperMode ?? 0;

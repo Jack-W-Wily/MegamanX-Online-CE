@@ -6,8 +6,8 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class RideArmor : Actor, IDamagable {
-	public float health = 32;
-	public float maxHealth = 32;
+	public float health = 42;
+	public float maxHealth = 42;
 	public float goliathHealth = 0;
 	public float healAmount = 0;
 	public float healTime = 0;
@@ -321,7 +321,7 @@ public class RideArmor : Actor, IDamagable {
 
 			selfDestructTime += Global.spf;
 			if (selfDestructTime >= maxSelfDestructTime) {
-				explode();
+				explode();			
 				return;
 			}
 		}
@@ -621,9 +621,9 @@ public class RideArmor : Actor, IDamagable {
 					}
 				} else {
 					// Non-neutral ride armors: don't allow other characters to take
-					if (!isNeutral && chr.player != netOwner) {
-						return;
-					}
+					//if (!isNeutral && chr.player != netOwner) {
+					//	return;
+					//}
 				}
 
 				putCharInRideArmor(chr);
@@ -2195,11 +2195,11 @@ public class InRideArmor : CharState {
 			} else if (!character.sprite.name.Contains("ra_show") || character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
 			}
-		} else {
-			if (character is Vile vile && player.input.isPressed(Control.Special1, player)) {
+		} //else {
+			if (character is Vile vile && player.input.isPressed(Control.WeaponRight, player)) {
 				tossGrenade(vile);
 			}
-		}
+	//	}
 
 		bool ejectInput = character.player.input.isHeld(Control.Up, player) && character.player.input.isPressed(Control.Jump, player);
 		if (ejectInput) {
@@ -2215,13 +2215,13 @@ public class InRideArmor : CharState {
 		if (vile.napalmWeapon.shootCooldown > 0) {
 			return;
 		}
-		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
+		if (player.input.isHeld(Control.Up, character.player)){//vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new SplashHitGrenadeProj(
 				vile.napalmWeapon, character.pos.addxy(0, -3),
 				character.xDir, character.player, character.player.getNextActorNetId(), rpc: true
 			);
-		} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
+		} else if (player.input.isLeftOrRightHeld(character.player)){//vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new MK2NapalmGrenadeProj(
 				vile.napalmWeapon, character.pos.addxy(0, -3), character.xDir,

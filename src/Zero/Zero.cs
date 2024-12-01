@@ -92,6 +92,8 @@ public class Zero : Character {
 
 		hyperMode = zeroLoadout.hyperMode;
 		altCtrlsLength = 2;
+		spriteFrameToSounds["zero_run/5"] = "zerowalkx4";
+		spriteFrameToSounds["zero_run/11"] = "zerowalkx4";
 	}
 
 
@@ -511,7 +513,10 @@ public class Zero : Character {
 	public bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
-
+		if (isBlack && player.input.isPressed(Control.WeaponLeft,player)){
+		
+		changeState(new SaberParryStartState(), true);
+		}
 		if (yDir != 1 && yDir != -1){
 			if (gigaAttack.ammo >= 10 &&
 				player.input.isPressed(Control.WeaponRight, player) ) {

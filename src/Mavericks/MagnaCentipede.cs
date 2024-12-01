@@ -15,12 +15,12 @@ public class MagnaCentipede : Maverick {
 
 	public MagnaCentipede(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MagnaCShootState), new MaverickStateCooldown(false, true, 0.5f));
-		stateCooldowns.Add(typeof(MagnaCMagnetPullState), new MaverickStateCooldown(true, false, 2f));
-		stateCooldowns.Add(typeof(MagnaCDrainState), new MaverickStateCooldown(true, false, 2f));
+	//	stateCooldowns.Add(typeof(MagnaCShootState), new MaverickStateCooldown(false, true, 0.5f));
+	//	stateCooldowns.Add(typeof(MagnaCMagnetPullState), new MaverickStateCooldown(true, false, 2f));
+	//	stateCooldowns.Add(typeof(MagnaCDrainState), new MaverickStateCooldown(true, false, 2f));
 
 		weapon = getWeapon();
-
+		canClimbWall = true;
 		awardWeaponId = WeaponIds.MagnetMine;
 		weakWeaponId = WeaponIds.SilkShot;
 		weakMaverickWeaponId = WeaponIds.MorphMoth;

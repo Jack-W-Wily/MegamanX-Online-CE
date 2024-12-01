@@ -59,7 +59,18 @@ public class Vulcan : Weapon {
 		if (type == (int)VulcanType.DistanceNeedler && shootCooldown > 0) return;
 		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
 
-		Player player = vile.player;
+			Player player = vile.player;
+		if (player.input.isHeld(Control.Down,player)){
+			type = 2;
+		}
+			if (player.input.isHeld(Control.Up,player)){
+			type = 1;
+		}
+		if (!player.input.isHeld(Control.Up,player)&&
+		!player.input.isHeld(Control.Down,player)){
+			type =0;
+		}
+	
 		if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 			if (vile.charState is LadderClimb) {
 				if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
@@ -98,6 +109,7 @@ public class VulcanProj : Projectile {
 			destroyOnHit = false;
 			damager.hitCooldown = 0.2f;
 			damager.damage = 2;
+			damager.flinch = 2;
 			projId = (int)ProjIds.DistanceNeedler;
 		} else if (weapon.type == (int)VulcanType.BuckshotDance) {
 			//this.xDir = 1;

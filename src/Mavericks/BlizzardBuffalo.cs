@@ -16,13 +16,13 @@ public class BlizzardBuffalo : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(BBuffaloDashState), new MaverickStateCooldown(false, true, 1.25f));
-		stateCooldowns.Add(typeof(BBuffaloShootBeamState), new MaverickStateCooldown(false, false, 2));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0f));
+		stateCooldowns.Add(typeof(BBuffaloDashState), new MaverickStateCooldown(false, true, 0f));
+		stateCooldowns.Add(typeof(BBuffaloShootBeamState), new MaverickStateCooldown(false, false, 0));
 
-		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
-		spriteFrameToSounds["bbuffalo_run/6"] = "walkStomp";
-
+		spriteFrameToSounds["bbuffalo_run/2"] = "buffalowalk";
+		spriteFrameToSounds["bbuffalo_run/6"] = "buffalowalk";
+			canClimbWall = true;
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
 
@@ -401,6 +401,7 @@ public class BBuffaloShootBeamState : MaverickState {
 	public BBuffaloBeamProj proj;
 	public BBuffaloShootBeamState() : base("shoot_beam", "shoot_beam_start") {
 		//enterSound = "bbuffaloBeamStart";
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -438,6 +439,7 @@ public class BBuffaloDashState : MaverickState {
 	float dustTime;
 	Character victim;
 	public BBuffaloDashState() : base("dash", "dash_start") {
+		superArmor = true;
 	}
 
 	public override void update() {

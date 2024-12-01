@@ -13,7 +13,7 @@ public class PunchyZero : Character {
 	public int hyperMode;
 
 	// Hypermode timers.
-	public static readonly float maxBlackZeroTime = 20 * 60;
+	public static readonly float maxBlackZeroTime = 40 * 60;
 	public float hyperModeTimer;
 	public float scrapDrainCounter = 120;
 	public bool hyperOvertimeActive;
@@ -74,6 +74,8 @@ public class PunchyZero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 		hyperMode = pzeroLoadout.hyperMode;
+		spriteFrameToSounds["zerox1_run/4"] = "run";
+		spriteFrameToSounds["zerox1_run/8"] = "run";
 	}
 
 	public override void update() {
@@ -167,7 +169,7 @@ public class PunchyZero : Character {
 			if (scrapDrainCounter > 0) {
 				scrapDrainCounter--;
 			} else {
-				scrapDrainCounter = 120;
+				scrapDrainCounter = 220;
 				player.currency--;
 				if (player.currency < 0) {
 					player.currency = 0;
@@ -469,6 +471,10 @@ public class PunchyZero : Character {
 				changeState(new PZeroShoryuken(), true);
 				return true;
 			}
+			if (yDir == 1) {
+				changeState(new PunchyZeroHadangeki(), true);
+				return true;
+			}
 			if (grounded && isDashing) {
 				slideVel = xDir * getDashSpeed() * 0.8f;
 			}
@@ -488,6 +494,7 @@ public class PunchyZero : Character {
 			changeState(new PZeroDiveKickState(), true);
 			return true;
 		}
+	
 		if (shootPressTime > 0) {
 			changeState(new PZeroKick(), true);
 		}
@@ -497,7 +504,7 @@ public class PunchyZero : Character {
 	public bool groundSpcAttacks() {
 		int yDir = player.input.getYDir(player);
 		if (yDir == -1) {
-			changeState(new PZeroShoryuken(), true);
+			changeState(new ZeroBurnKnuckle(), true);
 			return true;
 		}
 		if (yDir == 1) {
@@ -597,8 +604,9 @@ public class PunchyZero : Character {
 			"zerox1_shoryuken" => MeleeIds.Uppercut,
 			"zerox1_megapunch" => MeleeIds.StrongPunch,
 			"zerox1_dropkick" => MeleeIds.DropKick,
+			"zerox1_burnknuckle" => MeleeIds.BurnKnUckle,
 			"zerox1_block" => MeleeIds.Gokumonken,
-			"zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zerox1_pipe_attack" or "zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
@@ -635,6 +643,10 @@ public class PunchyZero : Character {
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
 				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 4, 0, 0.5f,
 				addToLevel: addToLevel
+			),
+			(int)MeleeIds.BurnKnUckle => new GenericMeleeProj(
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 4, 0, 0.5f,
+				addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
 				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 2, 40, 0.5f,
@@ -685,7 +697,7 @@ public class PunchyZero : Character {
 					float damage = 2;
 					int flinch = 0;
 					if (isGenmuZero) {
-						damage = 4;
+						damage = 0;
 						flinch = Global.defFlinch;
 					}
 					Projectile proj = new GenericMeleeProj(
@@ -706,7 +718,7 @@ public class PunchyZero : Character {
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.AwakenedAura) {
 			if (isGenmuZero) {
-				proj.damager.damage = 4;
+				proj.damager.damage = 0;
 				proj.damager.flinch = Global.defFlinch;
 			}
 		}
@@ -721,6 +733,8 @@ public class PunchyZero : Character {
 		AirKick,
 		Uppercut,
 		DropKick,
+		BurnKnUckle,
+
 		Parry,
 		ParryAttack,
 		SaberSwing,

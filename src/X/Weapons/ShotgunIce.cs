@@ -13,7 +13,7 @@ public class ShotgunIce : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 8;
 		weaknessIndex = (int)WeaponIds.FireWave;
-		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind" };
+		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind", "" };
 		fireRate = 30;
 		damage = "2/1-2";
 		effect = "Insta Freeze enemies. Ice sled up to 12 DMG.";
@@ -51,7 +51,7 @@ public class ShotgunIceProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId,
 		(int x, int y)? velOverride = null, Character? hitChar = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 2, player, "shotgun_ice", 0, 0.01f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 400, 1, player, "shotgun_ice", 1, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.ShotgunIce;
 		maxTime = 0.4f;

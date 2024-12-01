@@ -46,10 +46,14 @@ public class Vile : Character {
 	public VileFlamethrower flamethrowerWeapon;
 	public VileLaser laserWeapon;
 	public MechMenuWeapon rideMenuWeapon;
+
+
+	//Statecooldowns
 	public float dodgeRollCooldown;
 	public float HyperDashCooldown;
+	public float AirSplashHitCD;
 	public const float maxDodgeRollCooldown = 0.8f;
-	
+	//
 
 	public Vile(
 		Player player, float x, float y, int xDir,
@@ -80,7 +84,9 @@ public class Vile : Character {
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.vulcan);
 
 		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
-	
+		spriteFrameToSounds["vile_run/4"] = "vileWalk";
+		spriteFrameToSounds["vile_run/8"] = "vileWalk";
+		spriteFrameToSounds["vile_land/0"] = "vileLand";
 
 		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
 		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
@@ -91,6 +97,11 @@ public class Vile : Character {
 		};
 		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+
+
+		//Vile Cooldowns
+		stateCooldowns.Add(typeof(AirSplashHitGranadeLaunch), new CharStateCooldown(false, true, 1f));
+		
 	}
 
 	public Sprite? getCannonSprite(out Point poiPos, out int zIndexDir) {
@@ -193,6 +204,18 @@ public class Vile : Character {
 		&& player.input.isPressed(Control.Shoot,player)) {
 			changeState(new VileChainGrabState(), true);
 		}
+
+		// blow up ride
+
+		if (startRideArmor != null && player.input.isHeld(Control.Down,player)
+		&& player.input.isPressed(Control.Taunt,player)){
+			startRideArmor.explode(shrapnel: true);
+			shakeCamera(sendRpc: true);				
+			new NecroBurstProj(
+				new VileLaser(VileLaserType.NecroBurst), startRideArmor.pos,
+				xDir, player, player.getNextActorNetId(), rpc: true);
+			playSound("necroburst", sendRpc: true);
+		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) && vileHoverTime > 0) {
@@ -250,9 +273,10 @@ public class Vile : Character {
 			calldownMechCooldown -= Global.spf;
 			if (calldownMechCooldown < 0) calldownMechCooldown = 0;
 		}
-
+		//Vilestatecds
 		Helpers.decrementTime(ref dodgeRollCooldown);
 		Helpers.decrementTime(ref HyperDashCooldown);
+		Helpers.decrementTime(ref AirSplashHitCD);
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
@@ -293,12 +317,20 @@ public class Vile : Character {
 	
 
 
-		if (WPLeftPressed) {
+			if (WPLeftPressed) {
+			if (player.input.isHeld(Control.Up, player) 
+			&& AirSplashHitCD == 0){
+				AirSplashHitCD = 0.8f;
+				changeState(new AirSplashHitGranadeLaunch(), true);
+			player.vileAmmo -= 8;			
+			}
+
 			if (player.input.isHeld(Control.Down, player) ){
-			if (missileWeapon.type > -1) 
 			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);					
 			return true;			
 			}
+
+
 		}
 
 
@@ -309,7 +341,10 @@ public class Vile : Character {
 		}
 		if (shootPressed) {
 			normalAttacks2();
+
+			if (grabCooldown == 0){
 			dashGrabSpecial();
+			}
 		}
 		if (WeaponRightHeld) {
 			vulcanWeapon.vileShoot(0, this);
@@ -744,10 +779,18 @@ public class Vile : Character {
 				1, 22,  0.15f, isDeflectShield: true
 			);
 		}
-		if (sprite.name.Contains("super")) {
+		if (sprite.name.Contains("super") 
+		&& player.input.isHeld(Control.Up,player)) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
+				2, 0,  0.15f, isDeflectShield: true
+			);
+		}
+		if (sprite.name.Contains("super") 
+		&& !player.input.isHeld(Control.Up,player)) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
-				3, 0,  0.15f, isDeflectShield: true
+				2, 0,  0.15f, isDeflectShield: true
 			);
 		}
 

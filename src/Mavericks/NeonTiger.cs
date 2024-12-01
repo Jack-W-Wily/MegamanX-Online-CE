@@ -14,7 +14,7 @@ public class NeonTiger : Maverick {
 		// stateCooldowns.Add(typeof(NeonTDashState), new MaverickStateCooldown(false, true, 0.5f));
 
 		weapon = getWeapon();
-
+	
 		canClimbWall = true;
 
 		awardWeaponId = WeaponIds.RaySplasher;

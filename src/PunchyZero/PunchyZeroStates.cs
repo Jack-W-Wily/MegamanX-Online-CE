@@ -76,9 +76,17 @@ public class PZeroPunch2 : PZeroGenericMeleeState {
 			zero.changeState(new PZeroShoryuken(), true);
 			return true;
 		}
+		if (zero.shootPressTime > 0 && player.input.getYDir(player) == 1) {
+			zero.changeState(new PunchyZeroHadangeki(), true);
+			return true;
+		}
 		return false;
 	}
 }
+
+
+
+
 
 public class PZeroKick : PZeroGenericMeleeState {
 	public PZeroKick() : base("kick_air") {
@@ -91,6 +99,36 @@ public class PZeroKick : PZeroGenericMeleeState {
 		useDashJumpSpeed = true;
 	}
 }
+
+
+public class ZeroBurnKnuckle : CharState {
+	public ZeroBurnKnuckle() : base("burnknuckle") {
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded && stateTime > 0.5f) {
+			landingCode();
+			return;
+		}
+
+		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
+			character.vel.y = 0;
+		}
+		if (character.frameIndex >2)character.move(new Point(character.xDir * 300, 0));
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
 
 public class PZeroYoudantotsu : PZeroGenericMeleeState {
 	public PZeroYoudantotsu() : base("megapunch") {
@@ -703,9 +741,9 @@ public class PZeroDoubleBuster : CharState {
 public class PunchyZeroHadangeki : CharState {
 	bool fired;
 
-	public PunchyZeroHadangeki() : base("projswing") {
-		landSprite = "projswing";
-		airSprite = "projswing_air";
+	public PunchyZeroHadangeki() : base("pipe_attack") {
+	//	landSprite = "pipe_attack";
+		//airSprite = "projswing_air";
 		useDashJumpSpeed = true;
 		airMove = true;
 		superArmor = true;
@@ -716,13 +754,9 @@ public class PunchyZeroHadangeki : CharState {
 		if (character.grounded) {
 			character.isDashing = false;
 		}
-		if (character.frameIndex >= 7 && !fired) {
+		if (character.frameIndex >= 1 && !fired) {
 			character.playSound("zerosaberx3", sendRpc: true);
 			fired = true;
-			new PZeroHadangeki(
-				character.pos.addxy(30 * character.xDir, -20), character.xDir,
-				player, player.getNextActorNetId(), rpc: true
-			);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -734,19 +768,13 @@ public class PunchyZeroHadangeki : CharState {
 					character.dashedInAir++;
 				}
 				character.vel.y = -character.getJumpPower();
-				sprite = "projswing_air";
-				character.changeSpriteFromName(sprite, false);
+			character.changeSpriteFromName(sprite, false);
 			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (!character.grounded || character.vel.y < 0) {
-			sprite = "projswing_air";
-			defaultSprite = sprite;
-			character.changeSpriteFromName(sprite, true);
-		}
 	}
 
 	public override void onExit(CharState oldState) {

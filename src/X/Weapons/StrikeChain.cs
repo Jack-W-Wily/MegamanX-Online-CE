@@ -8,8 +8,8 @@ public class StrikeChain : Weapon {
 
 	public static StrikeChain netWeapon = new();
 	public StrikeChain() : base() {
-		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged" };
-		fireRate = 45;
+		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged", "" };
+		fireRate = 25;
 		index = (int)WeaponIds.StrikeChain;
 		weaponBarBaseIndex = 14;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -23,7 +23,7 @@ public class StrikeChain : Weapon {
 		Flinch = "Hooked Time";
 		FlinchCD = "0";
 	}
-
+  
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];
 		Point pos = character.getShootPos();
@@ -36,7 +36,13 @@ public class StrikeChain : Weapon {
 			if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) && character.grounded) { } else upOrDown = 1;
 		}
 		if (chargeLevel < 3) {
-			new StrikeChainProj(this, pos, xDir, 0, upOrDown, player, player.getNextActorNetId(), rpc: true);
+
+		
+					 new WSpongeSideChainProj(this, pos, xDir, player.character, 1,
+			  player, player.getNextActorNetId(), rpc: true);
+			
+
+			//new StrikeChainProj(this, pos, xDir, 0, upOrDown, player, player.getNextActorNetId(), rpc: true);
 		} else {
 			float ang = player.input.getYDir(player) * 32;
 			if (xDir < 0) ang = -ang + 128;

@@ -19,6 +19,8 @@ public class CmdSigma : BaseSigma {
 		netId, ownedByLocalPlayer, isWarpIn
 	) {
 		sigmaSaberMaxCooldown = 1;
+		spriteFrameToSounds["sigma_run/2"] = "sigmawalk";
+		spriteFrameToSounds["sigma_run/7"] = "sigmawalk";
 	}
 
 	public override void update() {
@@ -84,6 +86,7 @@ public class CmdSigma : BaseSigma {
 				playSound("sigmaSaber", sendRpc: true);
 				return true;
 			}
+
 			if (!player.input.isHeld(Control.Up, player) &&
 			!player.input.isHeld(Control.Down, player) )
 			changeState(new SigmaSlashState(charState), true);

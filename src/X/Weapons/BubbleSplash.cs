@@ -11,7 +11,7 @@ public class BubbleSplash : Weapon {
 	public float hyperChargeDelay;
 
 	public BubbleSplash() : base() {
-		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged" };
+		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged", "" };
 		fireRate = 6;
 		isStream = true;
 		index = (int)WeaponIds.BubbleSplash;

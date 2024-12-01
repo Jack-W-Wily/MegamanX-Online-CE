@@ -8,16 +8,16 @@ public class FlameMammoth : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
+	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
 		stompWeapon = new FlameMStompWeapon(player);
-		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
+	//	stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
 
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.StormTornado;
 		weakMaverickWeaponId = WeaponIds.StormEagle;
 
 		weapon = new Weapon(WeaponIds.FlameMGeneric, 100);
-
+		canClimbWall = true;
 		netActorCreateId = NetActorCreateId.FlameMammoth;
 		netOwner = player;
 		if (sendRpc) {

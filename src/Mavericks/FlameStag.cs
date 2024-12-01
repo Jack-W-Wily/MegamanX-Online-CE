@@ -20,12 +20,12 @@ public class FlameStag : Maverick {
 		antler = new Sprite("fstag_antler");
 		antlerDown = new Sprite("fstag_antler_down");
 		antlerSide = new Sprite("fstag_antler_side");
-		spriteFrameToSounds["fstag_run/2"] = "run";
-		spriteFrameToSounds["fstag_run/6"] = "run";
+		spriteFrameToSounds["fstag_run/2"] = "dragoonfall_2";
+		spriteFrameToSounds["fstag_run/6"] = "dragoonfall_2";
 
 		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
-		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(true, false, 0.75f));
+	//	stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
+	//	stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(true, false, 0.75f));
 
 		awardWeaponId = WeaponIds.SpeedBurner;
 		weakWeaponId = WeaponIds.BubbleSplash;
@@ -60,9 +60,23 @@ public class FlameStag : Maverick {
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
+					if (!input.isHeld(Control.Special2, player)){
 					changeState(new FStagShoot(false));
+					} 
+					if (input.isHeld(Control.Special2, player) && player.currency > 0){
+					changeState(new FStagOrochinagiStart(false));
+					player.currency -= 1;
+					}
 				} else if (input.isPressed(Control.Special1, player)) {
-					changeState(new FStagGrabState(false));
+				
+					if (!input.isHeld(Control.Special2, player)){
+						changeState(new FStagGrabState(false));
+					} 
+					if (input.isHeld(Control.Special2, player) && player.currency > 0){
+					changeState(new FStagKen());
+					player.currency -= 1;
+					}
+
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new FStagDashChargeState());
 				} else if (input.isHeld(Control.Down, player)) {
@@ -85,6 +99,11 @@ public class FlameStag : Maverick {
 				}
 			}
 		}
+	}
+
+
+	public bool isInvincible(Player attacker, int? projId) {
+		return state is FStagKen;
 	}
 
 	public override string getMaverickPrefix() {
@@ -153,6 +172,13 @@ public class FlameStag : Maverick {
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("dash_grab")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.FStagUppercut, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
+		}
+		if (sprite.name.Contains("orochinagi")) {
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.SpeedBurnerCharged, player, damage: 3, flinch: 30, hitCooldown: 0.2f, owningActor: this);
+		}
+		if (sprite.name.Contains("ken")) {
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.SpeedBurnerCharged, player, damage: 1, 
+			flinch: 20, hitCooldown: 0.1f, owningActor: this, isJuggleProjectile : true);
 		}
 		return null;
 	}
@@ -452,6 +478,88 @@ public class FStagGrabState : MaverickState {
 		return false;
 	}
 }
+
+
+
+
+
+public class FStagOrochinagiStart : MaverickState {
+	float xVel = 400;
+	public Character victim;
+	float endLagTime;
+	public FStagOrochinagiStart(bool fromDash) : base("orochinagi_start", "") {
+		if (!fromDash) xVel = 0;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		xVel = Helpers.lerp(xVel, 0, Global.spf * 2);
+		maverick.move(new Point(maverick.xDir * xVel, 0));
+
+		maverick.turnToInput(input, player);
+
+		
+		if (!player.input.isHeld(Control.Shoot,player)) {
+	
+				maverick.changeState(new FStagOrochinagiEnd(false));
+			}
+		}
+	}
+
+
+
+
+public class FStagOrochinagiEnd : MaverickState {
+	float xVel = 400;
+	public Character victim;
+	float endLagTime;
+	public FStagOrochinagiEnd(bool fromDash) : base("orochinagi_end", "") {
+		if (!fromDash) xVel = 0;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		xVel = Helpers.lerp(xVel, 0, Global.spf * 2);
+		maverick.move(new Point(maverick.xDir * xVel, 0));
+		
+		if (maverick.isAnimOver()) {
+	
+				maverick.changeToIdleOrFall();
+			}
+		}
+	}
+
+	
+public class FStagKen : MaverickState {
+	float xVel = 100;
+	public Character victim;
+	float endLagTime;
+	public FStagKen() : base("stag_ken", "") {
+
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		xVel = Helpers.lerp(xVel, 0, Global.spf * 2);
+		if (maverick.frameIndex > 30){
+		maverick.move(new Point(maverick.xDir * xVel, -500));
+		}
+		if (maverick.isAnimOver()) {
+	
+				maverick.changeToIdleOrFall();
+			}
+		}
+	}
+
+
+
+
 
 public class FStagUppercutState : MaverickState {
 	FStagDashProj proj;
