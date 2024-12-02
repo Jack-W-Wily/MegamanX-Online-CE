@@ -503,9 +503,6 @@ public class ViralSigmaRevive : CharState {
 				player.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Tank));
 				player.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Hopper));
 				player.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Bird));
-
-				player.weaponSlot = 0;
-
 				character.frameSpeed = 1;
 
 				character.invulnTime = 0.5f;

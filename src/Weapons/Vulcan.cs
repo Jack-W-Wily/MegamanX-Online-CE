@@ -177,7 +177,7 @@ public class VulcanCharState : CharState {
 			return;
 		}
 
-		if (!player.input.isHeld(Control.Shoot, player) || !(player.weapon is Vulcan)) {
+		if (!player.input.isHeld(Control.Shoot, player)) {
 			if (isCrouch) {
 				character.changeToCrouchOrFall();
 			} else {
