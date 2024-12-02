@@ -24,6 +24,7 @@ public class VileMK2GrabState : CharState {
 	bool violentcrusherspawn; 
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
+
 	public VileMK2GrabState(Character? victim) : base("grab", "", "", "") {
 		this.victim = victim;
 		airMove = true;
@@ -164,7 +165,9 @@ public class VileMK2GrabState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.grabCooldown = 1;
+		if (character is Vile vile) {
+			vile.grabCooldown = 1;
+		}
 		if (newState is not VileMK2GrabState && victim != null) {
 			victim.grabInvulnTime = 0.5f;
 			//victim.stunInvulnTime = 0.5f;

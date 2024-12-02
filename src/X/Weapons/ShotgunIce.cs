@@ -33,7 +33,7 @@ public class ShotgunIce : Weapon {
 			pos = pos.addxy(xDir * 25, 0);
 			pos.y = mmx.pos.y;
 
-			mmx.shotgunIceChargeTime = 1.5f;
+			//mmx.shotgunIceChargeTime = 1.5f;
 
 			new ShotgunIceProjSled(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
@@ -197,8 +197,9 @@ public class ShotgunIceProjSled : Projectile {
 		fadeSound = "iceBreak";
 		shouldShieldBlock = false;
 		isPlatform = true;
+		Global.level.modifyObjectGridGroups(this, isActor: true, isTerrain: true);
 		//this.collider.wallOnly = true;
-		canBeLocal = true;
+		canBeLocal = false;
 
 		if (rpc) rpcCreate(pos, player, netProjId, xDir);
 	}

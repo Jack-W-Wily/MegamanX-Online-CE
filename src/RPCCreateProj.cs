@@ -67,7 +67,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new ZSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.XSaberProj:
-				proj = new XSaberProj(new ZXSaber(player), pos, xDir, player, netProjByte);
+				proj = new XSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
 				proj = new Buster3Proj(new XBuster(), pos, xDir, extraData[0], player, netProjByte);
@@ -217,14 +217,14 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.SonicSlicer:
 				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, extraData[0], player, netProjByte);
 				break;
-			case (int)ProjIds.StrikeChain:
+			/* case (int)ProjIds.StrikeChain:
 				proj = new StrikeChainProj(
 					new StrikeChain(), pos, xDir, arguments[extraDataIndex],
 					arguments[extraDataIndex + 1] - 128, player, netProjByte
-				);
+				); */
 				break;
 			case (int)ProjIds.SpeedBurnerTrail:
-				proj = new SpeedBurnerProjGround(new SpeedBurner(null), pos, xDir, player, netProjByte);
+				proj = new SpeedBurnerProjGround(SpeedBurner.netWeapon, pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.GigaCrush:
 				proj = new GigaCrushProj(new GigaCrush(), pos, xDir, player, netProjByte);

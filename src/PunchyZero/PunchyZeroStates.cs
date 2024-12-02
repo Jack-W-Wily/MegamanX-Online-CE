@@ -270,12 +270,13 @@ public class PZeroParry : CharState {
 
 	public PZeroParry() : base("parry_start") {
 		superArmor = true;
+		specialId = SpecialStateIds.PZeroParry;
 	}
 
 	public override void update() {
 		base.update();
 		if (character.frameIndex != 0) {
-			character.specialState = (int)SpecialStateIds.None;
+			specialId = (int)SpecialStateIds.None;
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -316,12 +317,10 @@ public class PZeroParry : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.specialState = (int)SpecialStateIds.PZeroParry;
 		zero = character as PunchyZero ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
-		character.specialState = (int)SpecialStateIds.None;
 		base.onExit(newState);
 		
 	}
@@ -354,7 +353,7 @@ public class PZeroParryCounter : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex < 5) {
-			character.addRenderEffect(RenderEffectType.ChargeOrange, 0.033333f, 0.1f);
+			character.addRenderEffect(RenderEffectType.ChargeOrange, 2, 6);
 		}
 		if (counterAttackTarget == null || calcOnce && !canCounterDash) {
 			if (character.frameIndex >= 2) {

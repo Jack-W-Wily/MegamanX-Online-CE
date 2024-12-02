@@ -82,7 +82,7 @@ public partial class Player {
 	}
 
 	public bool shouldBlockMechSlotScroll() {
-		if (character is Vile { isVileMK5: true, startRideArmor: not null }) {
+		if (character is Vile { isVileMK5: true, linkedRideArmor: not null }) {
 			return false;
 		}
 		return Options.main.blockMechSlotScroll;
@@ -142,8 +142,8 @@ public partial class Player {
 			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponRight();
 		} else if (character != null && !Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
-			if (isVile && weapon is MechMenuWeapon mmw &&
-				character.startRideArmor == null &&
+			if (weapon is MechMenuWeapon mmw &&
+				character.linkedRideArmor == null &&
 				shouldBlockMechSlotScroll()
 			) {
 				if (input.isPressed(Key.Num1, canControl)) {
@@ -270,7 +270,7 @@ label:
 				if (ws < 0) ws = 0;
 			}
 		}
-		if ((weapons.ElementAtOrDefault(ws) is GigaCrush && Options.main.gigaCrushSpecial) || (weapons.ElementAtOrDefault(ws) is NovaStrike && Options.main.novaStrikeSpecial)) {
+		if ((weapons.ElementAtOrDefault(ws) is GigaCrush && Options.main.gigaCrushSpecial) || (weapons.ElementAtOrDefault(ws) is HyperNovaStrike && Options.main.novaStrikeSpecial)) {
 			ws--;
 			goto label;
 		}
@@ -287,7 +287,7 @@ label:
 		if (ws >= max) {
 			ws = 0;
 		}
-		if ((weapons.ElementAtOrDefault(ws) is GigaCrush && Options.main.gigaCrushSpecial) || (weapons.ElementAtOrDefault(ws) is NovaStrike && Options.main.novaStrikeSpecial)) {
+		if ((weapons.ElementAtOrDefault(ws) is GigaCrush && Options.main.gigaCrushSpecial) || (weapons.ElementAtOrDefault(ws) is HyperNovaStrike && Options.main.novaStrikeSpecial)) {
 			ws++;
 			goto label;
 		}
@@ -321,7 +321,6 @@ label:
 				weapons = Weapon.getAllXWeapons().Select(w => w.clone()).ToList();
 				if (hasArmArmor(3)) weapons.Add(new HyperCharge());
 				if (hasBodyArmor(2)) weapons.Add(new GigaCrush());
-				if (hasUltimateArmor()) weapons.Add(new NovaStrike(this));
 			} else if (Global.level.is1v1()) {
 				if (xArmor1v1 == 1) {
 					weapons.Add(new XBuster());
@@ -342,7 +341,7 @@ label:
 					weapons.Add(new SonicSlicer());
 					weapons.Add(new StrikeChain());
 					weapons.Add(new MagnetMine());
-					weapons.Add(new SpeedBurner(this));
+					weapons.Add(new SpeedBurner());
 					weapons.Add(new GigaCrush());
 				} else if (xArmor1v1 == 3) {
 					weapons.Add(new XBuster());
@@ -498,7 +497,7 @@ label:
 		int miscSlots = 0;
 		if (weapons.Any(w => w is GigaCrush)) miscSlots++;
 		if (weapons.Any(w => w is HyperCharge)) miscSlots++;
-		if (weapons.Any(w => w is NovaStrike)) miscSlots++;
+		if (weapons.Any(w => w is HyperNovaStrike)) miscSlots++;
 		return weapons.Count - miscSlots;
 	}
 
@@ -515,16 +514,16 @@ label:
 	}
 
 	public void addNovaStrike() {
-		if (!weapons.Any(w => w is NovaStrike)) {
-			weapons.Add(new NovaStrike(this));
+		if (!weapons.Any(w => w is HyperNovaStrike)) {
+			weapons.Add(new HyperNovaStrike());
 		}
 	}
 
 	public void removeNovaStrike() {
-		if (weapon is NovaStrike) {
+		if (weapon is HyperNovaStrike) {
 			weaponSlot = 0;
 		}
-		weapons.RemoveAll(w => w is NovaStrike);
+		weapons.RemoveAll(w => w is HyperNovaStrike);
 	}
 
 	public void removeHyperCharge() {
@@ -547,7 +546,7 @@ label:
 			if (character != null && health > 0) {
 				bool alwaysOn = false;
 				if (weapon is GigaCrush && Options.main.gigaCrushSpecial ||
-					weapon is NovaStrike && Options.main.novaStrikeSpecial
+					weapon is HyperNovaStrike && Options.main.novaStrikeSpecial
 				) {
 					alwaysOn = true;
 				}

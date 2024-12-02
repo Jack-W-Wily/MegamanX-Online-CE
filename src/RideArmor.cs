@@ -291,7 +291,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public override void postUpdate() {
 		Player? player = this.player ?? netOwner;
-		MegamanX? mmx = character as MegamanX;
+		RagingChargeX? rcx = character as RagingChargeX;
 
 		base.postUpdate();
 
@@ -373,7 +373,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 		if (punchCooldown > 0) {
 			punchCooldown -= Global.spf;
-			if (mmx?.isHyperX == true) punchCooldown -= Global.spf;
+			if (rcx != null) punchCooldown -= Global.spf;
 			if (punchCooldown < 0) punchCooldown = 0;
 		}
 
@@ -411,8 +411,9 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		Helpers.decrementTime(ref missileCooldown);
-		if (mmx?.isHyperX == true) Helpers.decrementTime(ref missileCooldown);
-
+		if (rcx != null) {
+			Helpers.decrementTime(ref missileCooldown);
+		}
 		if (consecutiveJumpTimeout > 0) {
 			consecutiveJumpTimeout -= Global.spf;
 			if (consecutiveJumpTimeout <= 0) {
@@ -616,7 +617,7 @@ public class RideArmor : Actor, IDamagable {
 						} else if (!(ownedByLocalPlayer && chr.ownedByLocalPlayer)) {
 							return;
 						}
-					} else if (chr?.startRideArmor != this || selfDestructTime > 0) {
+					} else if (chr?.linkedRideArmor != this || selfDestructTime > 0) {
 						return;
 					}
 				} else {
@@ -704,7 +705,7 @@ public class RideArmor : Actor, IDamagable {
 		chr.changeState(new InRideArmor(), true);
 		changeState(new RAIdle("ridearmor_activating"), true);
 		if (character != null) {
-			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.startRideArmor == this) {
+			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.linkedRideArmor == this) {
 				healedOnEnter = true;
 				character.fillHealthToMax();
 			}
@@ -755,7 +756,7 @@ public class RideArmor : Actor, IDamagable {
 			health -= damage;
 		}
 
-		if (owner != null && weaponIndex != null) {
+		if ((damage > 0 || Damager.alwaysAssist(projId)) && owner != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));
 		}
 
@@ -763,7 +764,7 @@ public class RideArmor : Actor, IDamagable {
 			health = 0;
 		}
 		if (health <= 0) {
-			if (character != null && !ownedByMK5 && character.startRideArmor == this) {
+			if (character != null && !ownedByMK5 && character.linkedRideArmor == this) {
 				character.invulnTime = 1;
 			}
 

@@ -799,7 +799,7 @@ public class DarkHoldState : CharState {
 	public bool shouldDrawAxlArm = true;
 	public float lastArmAngle = 0;
 
-	public DarkHoldState(Character character, float time) : base(character?.sprite?.name ?? "grabbed") {
+	public DarkHoldState(Character character, float time) : base(character.sprite.name) {
 		immuneToWind = true;
 		stunTime = time;
 
@@ -822,12 +822,7 @@ public class DarkHoldState : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.darkHoldInvulnTime > 0 ||
-			character.isInvulnerable() ||
-			character.isVaccinated() ||
-			character.isCCImmune() ||
-			character.charState.invincible
-		) {
+		if (character.darkHoldInvulnTime > 0 || character.isTrueStatusImmune()) {
 			return false;
 		}
 		return base.canEnter(character);
@@ -840,6 +835,8 @@ public class DarkHoldState : CharState {
 		character.frameIndex = frameIndex;
 		character.stopMoving();
 		character.isDarkHoldState = true;
+		invincible = oldState.invincible;
+		specialId = oldState.specialId;
 	}
 
 	public override void onExit(CharState newState) {

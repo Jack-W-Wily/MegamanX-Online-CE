@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -30,7 +30,7 @@ public class Hurt : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		if (character.vaccineTime > 0) return false;
 		if (character.rideArmorPlatform != null) return false;
 		return base.canEnter(character);
@@ -45,11 +45,13 @@ public class Hurt : CharState {
 		}
 		if (!character.grounded){
 		if (!spiked) {
-			character.vel.y = (-0.125f * (flinchTime - 1)) * 60f;
+			float flichLimitusTime = flinchTime <= 30 ? flinchTime : 30;
+
+			character.vel.y = (-0.125f * (flichLimitusTime - 1)) * 60f;
 			if (isCombo && character.pos.y < flinchYPos) {
 				// Magic equation. Changing gravity from 0.25 probably super-break this.
 				// That said, we do not change base gravity.
-				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
+				character.vel.y = (0.002f * flichLimitusTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
 		}
 		}
@@ -61,7 +63,7 @@ public class Hurt : CharState {
 	public override void update() {
 		base.update();
 		if (hurtSpeed != 0) {
-			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime  * Global.speedMul, hurtDir);
+			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime * Global.speedMul, hurtDir);
 			character.move(new Point(hurtSpeed * 60f, 0));
 		}
 
@@ -78,13 +80,6 @@ public class Hurt : CharState {
 				if (player.charNum == 2) character.frameIndex = 1;
 				if (player.charNum == 3) character.frameIndex = 2;
 			}
-		}
-
-		if (player.character is MegamanX or Zero &&
-			player.character.canCharge() &&
-			player.character.chargeButtonHeld()
-		) {
-			player.character.increaseCharge();
 		}
 
 		if (stateFrames >= flinchTime) {
@@ -247,7 +242,7 @@ public class GenericStun : CharState {
 		if (flinchFrames >= 2) {
 			character.vel.y = (-0.125f * (flinchFrames - 1)) * 60f;
 			if (isCombo && character.pos.y < flinchYPos) {
-				character.vel.y *= (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
+				character.vel.y = (0.002f * flinchTime - 0.076f) * (flinchYPos - character.pos.y) + 1;
 			}
 		}
 		flinchTime = flinchFrames;
@@ -314,7 +309,7 @@ public class KnockedDown : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		if (character.charState.superArmor || character.charState.invincible) return false;
 		if (character.isInvulnerable()) return false;
 		if (character.vaccineTime > 0) return false;

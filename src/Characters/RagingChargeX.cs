@@ -4,16 +4,17 @@ using System.Linq;
 
 namespace MMXOnline;
 
-public class RCX : Character {
+public class RagingChargeX : Character {
 
 	public int unpoShotCount;
 	public float upPunchCooldown;
 	public float xSaberCooldown;
 	public float parryCooldown;
+	public float maxParryCooldown = 30;
 	float UPDamageCooldown;
 	public float unpoDamageMaxCooldown = 2;
 	public Projectile? unpoAbsorbedProj;
-	public RCX(
+	public RagingChargeX(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
@@ -39,7 +40,7 @@ public class RCX : Character {
 					changeState(new XUPPunchState(grounded), true);
 					return;
 				}
-			} else if (player.input.isPressed(Control.Special1, player) && !isInvisible() &&
+			} else if (player.input.isPressed(Control.Special1, player) &&
 				  (charState is Dash || charState is AirDash)) {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
@@ -60,7 +61,7 @@ public class RCX : Character {
 
 		if (charState.attackCtrl && canShoot() && canChangeWeapons() && 
 			player.input.isPressed(Control.Special1, player) &&
-			!isAttacking() && !isInvisible() &&!charState.isGrabbing
+			charState.normalCtrl && !charState.isGrabbing
 		) {
 			if (xSaberCooldown == 0) {
 				xSaberCooldown = 60;
