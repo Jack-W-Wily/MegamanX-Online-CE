@@ -468,7 +468,11 @@ public class RideArmor : Actor, IDamagable {
 				playSound("frogShootX3", forcePlay: false, sendRpc: true);
 			}
 		}
-			bool attackConditionMet = character != null && canAttack() && character.player.input.isPressed(Control.Shoot, character.player) && punchCooldown == 0;
+			bool attackConditionMet = character != null 
+			&& canAttack() && 
+			(character.player.input.isPressed(Control.Shoot, character.player) 
+			|| character.player.input.isPressed(Control.AxlCrouch, character.player) )
+			&& punchCooldown == 0;
 			if (raNum == 5) attackConditionMet = canAttack() && character != null && character.player.input.isHeld(Control.Shoot, character.player);
 			if (attackConditionMet) {
 				if (rideArmorState is RARun) changeState(new RAIdle(), true);
@@ -487,8 +491,9 @@ public class RideArmor : Actor, IDamagable {
 				punchCooldown == 0 &&
 				raNum == 2 &&
 				vile.napalmWeapon.shootCooldown == 0 &&
-				player.input.isPressed(Control.Special1, player) &&
+				player.input.isPressed(Control.Special1, player)		 &&
 				player.input.isHeld(Control.Down, player) &&
+				
 				!rideArmorState.inTransition()
 			) {
 				hawkBombCount--;
@@ -617,10 +622,10 @@ public class RideArmor : Actor, IDamagable {
 						} else if (!(ownedByLocalPlayer && chr.ownedByLocalPlayer)) {
 							return;
 						}
-					} else if (chr?.linkedRideArmor != this || selfDestructTime > 0) {
-						return;
-					}
-				} else {
+					}// else if (chr?.linkedRideArmor != this || selfDestructTime > 0) {
+			//			return;
+			//		}
+			//	} else {
 					// Non-neutral ride armors: don't allow other characters to take
 					//if (!isNeutral && chr.player != netOwner) {
 					//	return;
@@ -897,7 +902,7 @@ public class RideArmor : Actor, IDamagable {
 			return 15;
 		}
 		if (rideArmorState is RAFall raFall && raFall.hovering && raNum != 2) {
-			return 30;
+			return 70;
 		}
 		if (raNum == 3) {
 			if (isSwimming) {
@@ -907,11 +912,11 @@ public class RideArmor : Actor, IDamagable {
 		} else if (raNum == 2) {
 			return 80;
 		} else if (raNum == 1) {
-			if (isNeutral) return 70;
-			return 54;
+			if (isNeutral) return 50;
+			return 70;
 		} else {
-			if (isNeutral) return 80;
-			return 60;
+			if (isNeutral) return 60;
+			return 80;
 		}
 	}
 
@@ -1133,7 +1138,7 @@ public class RideArmorState {
 	}
 
 	public bool inTransition() {
-		if (Global.level.rideArmorFlight) {
+		if (!rideArmor.ownedByMK5) {
 			return false;
 		}
 
@@ -1223,7 +1228,22 @@ public class RideArmorState {
 				rideArmor.move(move);
 			}
 
-			if (rideArmor.raNum == 3 && player.input.isPressed(Control.Dash, player) && player.input.isHeld(Control.Down, player)) {
+			if (!rideArmor.ownedByMK5 && rideArmor.raNum == 3 && 
+			!rideArmor.isNeutral &&		
+			 player.input.isPressed(Control.Dash, player) 
+			&& player.input.isHeld(Control.Down, player)) {
+				rideArmor.changeState(new RAGroundPoundStart(), true);
+			}
+			if (rideArmor.ownedByMK5 && rideArmor.raNum == 3 && 
+			 player.input.isPressed(Control.Dash, player) 
+			&& player.input.isHeld(Control.Down, player)
+			&& player.input.isHeld(Control.AimAngleUp, player)) {
+				rideArmor.changeState(new RAGroundPoundStart(), true);
+			}
+			if (rideArmor.ownedByMK5 && rideArmor.raNum == 3 && 
+			 player.input.isPressed(Control.AxlCrouch, player) 
+			&& player.input.isHeld(Control.Down, player)
+			&& !player.input.isHeld(Control.AimAngleUp, player)) {
 				rideArmor.changeState(new RAGroundPoundStart(), true);
 			}
 		}
@@ -1891,6 +1911,57 @@ public class RACalldown : RideArmorState {
 		rideArmor.useGravity = true;
 	}
 }
+
+
+
+
+public class VileTeleport : CharState {
+	const float warpHeight = 150;
+	float origYPos;
+	int phase = 0;
+	Point summonPos;
+	bool isNew;
+	public VileTeleport(Point summonPos) : base("warp_beam") {
+		this.summonPos = summonPos;
+		this.isNew = isNew;
+		enterSound = "warpIn";
+	}
+
+	public override void update() {
+		base.update();
+		if (phase == 0) {
+			character.incPos(new Point(0, -Global.spf * 450));
+			if (character.pos.y < origYPos - warpHeight) {
+				character.changePos(summonPos.addxy(0, -warpHeight));
+				phase = 1;
+			}
+		} else if (phase == 1) {
+			character.incPos(new Point(0, Global.spf * 450));
+			if (character.pos.y >= summonPos.y) {		
+					character.changeState(new Idle(), true);	
+			}
+		}
+	}
+
+	public override void onEnter(CharState? oldState) {
+		base.onEnter(oldState);
+		character.vel = Point.zero;
+		character.useGravity = false;
+		origYPos = character.linkedRideArmor.pos.y;
+	
+		if (isNew) {
+			character.changePos(summonPos.addxy(0, -warpHeight));
+			phase = 1;
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
 
 public class RAChainCharge : RideArmorState {
 	public RAChainCharge() : base("ridearmor_charge", "", "") {

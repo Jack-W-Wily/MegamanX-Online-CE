@@ -160,7 +160,7 @@ public partial class Character : Actor, IDamagable {
 
 	//StateCooldown System (wcut)
 	public Dictionary<Type, CharStateCooldown> stateCooldowns = new Dictionary<Type, CharStateCooldown>();
-	
+	public float grabCooldown;
 
 	
 	// Disables status.
@@ -1053,6 +1053,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		updateParasite();
+		updateBanzai();
 
 		if (stingChargeTime > 0) {
 			if (player.isX) {
@@ -1834,7 +1835,7 @@ public partial class Character : Actor, IDamagable {
 		bool clampTo3 = true;
 		switch (this) {
 			case MegamanX mmx:
-				clampTo3 = !mmx.isHyperX && !player.hasArmArmor(ArmorId.Max);
+				clampTo3 =  !player.hasArmArmor(ArmorId.Max);
 				break;
 			case Zero zero:
 				clampTo3 = true;
@@ -3125,6 +3126,67 @@ public partial class Character : Actor, IDamagable {
 		parasiteMashTime = 0;
 		parasiteDamager = null;
 	}
+
+
+
+	// Banzai SECTION
+	public void addBanzai(Player attacker) {
+		if (!ownedByLocalPlayer) return;
+		if (charState.invincible || isInvulnerable()) return;
+		Damager damager = new Damager(attacker, 1, Global.superFlinch, 0);
+		parasiteTime = Global.spf;
+		parasiteDamager = damager;
+		parasiteAnim = new ParasiteAnim(getCenterPos(), "vileproj_banzai_2", player.getNextActorNetId(), true, true);
+	}
+
+	public void updateBanzai() {
+		if (parasiteTime <= 0) return;
+		slowdownTime = Math.Max(slowdownTime, 0.05f);
+
+		if (!(charState is BanzaiCarry) && parasiteTime > 1.5f) {
+			foreach (var otherPlayer in Global.level.players) {
+				if (otherPlayer.character == null) continue;
+				if (otherPlayer == player) continue;
+				if (otherPlayer == parasiteDamager?.owner) continue;
+				if (otherPlayer.character.isInvulnerable()) continue;
+				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+				if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+				Character target = otherPlayer.character;
+				changeState(new BanzaiCarry(target, true));
+				break;
+			}
+		}
+
+		if (parasiteAnim != null) {
+			parasiteAnim.changePos(getParasitePos());
+		}
+
+		parasiteTime += Global.spf;
+	}
+
+
+		public void removeBanzai(bool ejected, bool carried) {
+		if (!ownedByLocalPlayer) return;
+		if (parasiteDamager == null) return;
+
+		parasiteAnim?.destroySelf();
+		if (ejected) {
+			new Anim(getCenterPos(), "parasitebomb_latch", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer) {
+				vel = new Point(50 * xDir, -50),
+				useGravity = true
+			};
+		} else {
+			new Anim(getCenterPos(), "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer);
+			playSound("explosion", sendRpc: true);
+			if (!carried) parasiteDamager.applyDamage(this, player.weapon is FrostShield, new VileMK2Grab(), this, (int)ProjIds.ParasiticBombExplode, overrideDamage: 1, overrideFlinch: Global.superFlinch);
+		}
+
+		parasiteTime = 0;
+		parasiteMashTime = 0;
+		parasiteDamager = null;
+	}
+
+
 
 	public virtual bool isInvisible() {
 		return UltraStingChargeTime > 0|| stingChargeTime > 0 && player.isX;

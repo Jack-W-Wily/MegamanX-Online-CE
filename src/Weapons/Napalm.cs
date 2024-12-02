@@ -483,7 +483,7 @@ public class MK2NapalmProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		var actor = damagable.actor();
-		if (actor is Character chr && chr.isCCImmune()) return;
+		if (actor is Character chr && chr.isStatusImmune()) return;
 		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
 
 		float mag = 100;

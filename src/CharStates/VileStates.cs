@@ -41,10 +41,18 @@ public class CallDownMech : CharState {
 		}
 	}
 
+		public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
+		character.stopMoving();
+		character.useGravity = false;
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
@@ -54,10 +62,12 @@ public class VileDodge : CharState {
 	public float dashTime = 0;
 	public int initialDashDir;
 	Vile vile;
+	public BanzaiBeetleProj Banzai;
 
 	public VileDodge() : base("roll", "", "") {
-		attackCtrl = true;
+		attackCtrl = false;
 		normalCtrl = true;
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -72,17 +82,32 @@ public class VileDodge : CharState {
 		initialDashDir = character.xDir;
 		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
-		character.specialState = (int)SpecialStateIds.AxlRoll;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		vile.dodgeRollCooldown = 0.5f;
-		character.specialState = (int)SpecialStateIds.None;
 	}
 
 	public override void update() {
 		base.update();
+
+
+		if (player.input.isPressed(Control.Special1, player)) {
+			character.playSound("vileMissile", true);
+			character.changeSpriteFromName("banzai_launch", true);	
+					character.turnToInput(player.input, player);
+		}
+
+		if (character.sprite.name.Contains("banzai")
+		&& character.frameIndex == 4){	
+			if (Banzai == null){
+			Banzai=	new BanzaiBeetleProj(new VileMK2Grab(), 
+			character.getShootPos(), character.xDir, player, 
+			player.getNextActorNetId(), true);
+			}
+		}
+
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -265,18 +290,20 @@ public class VileHover : CharState {
 	public Point flyVel;
 	float flyVelAcc = 500;
 	float flyVelMaxSpeed = 200;
+	public float shootcd;
 	public float fallY;
 	Vile vile = null!;
 
 	public VileHover(string transitionSprite = "") : base("hover", "hover_shoot", "", transitionSprite) {
 		exitOnLanding = true;
-		attackCtrl = true;
+		attackCtrl = false;
 		normalCtrl = true;
 		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
 		base.update();
+		shootcd += Global.spf;
 		if (player == null) return;
 
 		if (character.flag != null) {
@@ -296,9 +323,22 @@ public class VileHover : CharState {
 			character.vel.y = 0;
 		}
 
+		
 		Point move = getHoverMove();
+		
+
+		if (player.input.isHeld(Control.AxlCrouch, player)){
+		
+		character.vel.y = 0;
+		character.stopMoving();
+		
+		}
 
 		if (!character.sprite.name.EndsWith("cannon_air") || character.sprite.time > 0.1f) {
+			if (MathF.Abs(move.x) < -75 && !character.isUnderwater()) {
+				sprite = "hover_backward";
+				character.changeSpriteFromNameIfDifferent("hover_backward", false);
+			}
 			if (MathF.Abs(move.x) > 75 && !character.isUnderwater()) {
 				sprite = "hover_forward";
 				character.changeSpriteFromNameIfDifferent("hover_forward", false);
@@ -308,9 +348,20 @@ public class VileHover : CharState {
 			}
 		}
 
+	if (player.input.isHeld(Control.Special1, player) && vile.gizmoCooldown == 0) {
+		vile.changeSpriteFromNameIfDifferent("cannon_gizmo_air", true);
+		shootLogic(vile);
+		vile.longshotGizmoCount++;
+			if (vile.longshotGizmoCount >= 5 || player.vileAmmo <= 3) {
+				vile.longshotGizmoCount = 0;
+				vile.isShootingLongshotGizmo = false;
+			}
+	}
 		if (move.magnitude > 0) {
 			character.move(move);
 		}
+
+		
 
 		if (character.isUnderwater()) {
 			character.frameIndex = 0;
@@ -322,6 +373,45 @@ public class VileHover : CharState {
 		}
 	}
 
+
+
+	public static void shootLogic(Vile vile) {
+		
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
+			return;
+		}
+		Point shootVel = vile.getVileShootVel(true);
+
+		var player = vile.player;
+		vile.playSound("frontrunner", sendRpc: true);
+
+		string muzzleSprite = "cannon_muzzle";
+		 muzzleSprite += "_lg";
+
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.sprite.name.EndsWith("_grab")) {
+			shootPos = vile.getFirstPOIOrDefault("s");
+		}
+
+		var muzzle = new Anim(
+			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
+		);
+		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+		if (vile.GizmoSpreadCD == 0){
+		new VileCannonProj(
+			new VileCannon(VileCannonType.LongshotGizmo),
+			shootPos, MathF.Round(shootVel.byteAngle), //vile.longshotGizmoCount,
+			player, player.getNextActorNetId(), rpc: true
+		);
+	
+		}
+	}
+
+
+
 	public Point getHoverMove() {
 		bool isSoftLocked = character.isSoftLocked();
 		bool isJumpHeld = !isSoftLocked && player.input.isHeld(Control.Jump, player) && character.pos.y > -5;
@@ -329,8 +419,8 @@ public class VileHover : CharState {
 		var inputDir = isSoftLocked ? Point.zero : player.input.getInputDir(player);
 		inputDir.y = isJumpHeld ? -1 : 0;
 
-		if (inputDir.x > 0) character.xDir = 1;
-		if (inputDir.x < 0) character.xDir = -1;
+		//if (inputDir.x > 0) character.xDir = 1;
+		//if (inputDir.x < 0) character.xDir = -1;
 
 		if (inputDir.y == 0 || character.gravityWellModifier > 1) {
 			if (character.frameIndex >= character.sprite.loopStartFrame) {
@@ -488,6 +578,10 @@ public class VileSuperKickState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+
+		if (player.input.isHeld(Control.Up, player)){
+			character.changeSpriteFromName("superkick_up",true);
+		}
 	
 	}
 

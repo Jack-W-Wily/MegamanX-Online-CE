@@ -471,6 +471,8 @@ public enum ProjIds {
 	VileStomp,
 	VileSuperKick,
 	VileAirRaidStart,
+	VileAirRaidPlusKnock,
+	BanzaiBeetleProj,
 	NecroBurst,
 	NecroBurstShrapnel,
 	RisingSpecter,

@@ -275,6 +275,9 @@ public class Damager {
 				case (int)ProjIds.ParasiticBomb:
 					damagerMessage = onParasiticBombDamage(damagable, owner);
 					break;
+				case (int)ProjIds.BanzaiBeetleProj:
+					damagerMessage = onBanzai(damagable, owner);
+					break;
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
 				case (int)ProjIds.MorphMPowder:
@@ -369,7 +372,11 @@ public class Damager {
 			character.changeState(new VileStomped(owner.character), true);
 			}
 			// Vile Air Raid 
-			if (owner.isVile && projId == (int)ProjIds.VileAirRaidStart){
+			if (owner.isVile && 
+			(
+				projId == (int)ProjIds.VileAirRaidStart
+			|| projId == (int)ProjIds.VileAirRaidPlusKnock
+			)){
 			owner.character.changeState(new VileAirRaid(character), true);
 			}
 			
@@ -385,7 +392,9 @@ public class Damager {
 
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		//Get Launched
-		if ((projId == (int)ProjIds.BlockableLaunch && !victim.sprite.name.Contains("block"))) {		
+		if (((projId == (int)ProjIds.BlockableLaunch
+		|| projId == (int)ProjIds.VileAirRaidPlusKnock
+		) &&	 !victim.sprite.name.Contains("block"))) {		
 		character.changeState(new LaunchedState(owner.character), true);
 		}
 
@@ -427,10 +436,10 @@ public class Damager {
 				flinch = 0;
 			}
 			//if ((owner?.character as Zero)?.isViral == true) {
-			//	character.addInfectedTime(owner, damage);
+			//	character.addVirusTime(owner, damage);
 			//}
 			//if ((owner?.character as PunchyZero)?.isViral == true) {
-			//	character.addInfectedTime(owner, damage);
+			//	character.addVirusTime(owner, damage);
 			//}
 
 			switch (projId) {
@@ -584,13 +593,13 @@ public class Damager {
 					character.addDarkHoldTime(DarkHoldState.totalStunTime, owner);
 					break;
 				case (int)ProjIds.MagnaCTail:
-					character.addInfectedTime(owner, 4f);
+					character.addVirusTime(owner, 4f);
 					break;	
 				case (int)ProjIds.SigmaHeadProjectile:
-					character.addInfectedTime(owner, 2f);
+					character.addVirusTime(owner, 2f);
 					break;	
 				case (int)ProjIds.VirusSlash:
-					character.addInfectedTime(owner, 2f);
+					character.addVirusTime(owner, 2f);
 					break;	
 				case (int)ProjIds.MechPunch:
 				case (int)ProjIds.MechDevilBearPunch:
@@ -1197,6 +1206,16 @@ public class Damager {
 		var chr = damagable as Character;
 		if (chr != null && chr.ownedByLocalPlayer && !chr.hasParasite) {
 			chr.addParasite(attacker);
+			chr.playSound("parasiteBombLatch", sendRpc: true);
+		}
+
+		return null;
+	}
+
+	public static DamagerMessage? onBanzai(IDamagable damagable, Player attacker) {
+		var chr = damagable as Character;
+		if (chr != null && chr.ownedByLocalPlayer && !chr.hasParasite) {
+			chr.addBanzai(attacker);
 			chr.playSound("parasiteBombLatch", sendRpc: true);
 		}
 

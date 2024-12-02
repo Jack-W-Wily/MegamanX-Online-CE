@@ -1325,11 +1325,17 @@ public class LadderClimb : CharState {
 		}
 		if (!isAttacking && character.canClimbLadder()) {
 			if (player.input.isHeld(Control.Up, player)) {
-				character.move(new Point(0, -75));
+				character.move(new Point(0, -175));
 				character.frameSpeed = 1;
+				if (!character.sprite.name.Contains("climb")){
+					character.changeSpriteFromName("ladder_climb", true);
+				}
 			} else if (player.input.isHeld(Control.Down, player)) {
-				character.move(new Point(0, 75));
+				character.move(new Point(0, 175));
 				character.frameSpeed = 1;
+					if (!character.sprite.name.Contains("climb")){
+					character.changeSpriteFromName("ladder_climb", true);
+				}
 			}
 		}
 

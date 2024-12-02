@@ -351,7 +351,7 @@ public class PushedOver : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.isCCImmune()) return false;
+		if (character.isStatusImmune()) return false;
 		if (character.charState.superArmor || character.charState.invincible) return false;
 		if (character.isInvulnerable()) return false;
 		if (character.vaccineTime > 0) return false;

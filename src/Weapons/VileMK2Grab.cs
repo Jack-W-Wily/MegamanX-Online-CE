@@ -324,6 +324,7 @@ public class VileStomped : CharState {
 
 public class VileAirRaid : CharState {
 	public Character? victim;
+	public BanzaiBeetleProj Banzai;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
@@ -393,11 +394,27 @@ public class VileAirRaid : CharState {
 		}
 
 
+			if ( player.input.isHeld(Control.Down, player) 
+			&& player.input.isPressed(Control.Special1, player)) {
+			character.changeSpriteFromName("banzai_launch", true);	
+				character.playSound("vileMissile", true);
+		}
+
+		if (character.sprite.name.Contains("banzai")
+		&& character.frameIndex == 4){	
+			if (Banzai == null){
+			Banzai=	new BanzaiBeetleProj(new VileMK2Grab(), 
+			character.pos, character.xDir, player, 
+			player.getNextActorNetId(), true);
+			}
+		}
+
+
 		if (character.sprite.name.Contains("air_bomb") && character.isAnimOver()){
 			character.changeToIdleOrFall();
 		}
 
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isPressed(Control.Jump, player)) {
 			character.changeToIdleOrFall();
 			return;
 		}

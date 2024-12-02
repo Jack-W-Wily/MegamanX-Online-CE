@@ -403,7 +403,7 @@ public class Axl : Character {
 
 
 	if (player.weapon is AxlBullet || player.weapon is DoubleBullet){	
-		if (charState.canAttack() || ComboTimer > 0){
+		if (!isAttacking() || ComboTimer > 0){
 			if (player.input.isPressed(Control.Special1, player) 
 			&& !player.input.isHeld(Control.Up, player) 
 			&& !player.input.isHeld(Control.Down, player)
@@ -461,7 +461,7 @@ public class Axl : Character {
 		Helpers.decrementTime(ref RainstormCooldown);
 
 		//somehow you could do air dodge roll, added "grounded" to fix that "bug"
-		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
+		if (dodgeRollCooldown == 0 && player.canControl) {
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
 				changeState(new DodgeRoll(), true);
 			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {

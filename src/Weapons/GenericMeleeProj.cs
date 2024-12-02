@@ -12,8 +12,6 @@ public class GenericMeleeProj : Projectile {
 		Actor? owningActor = null, bool isShield = false,
 		 bool isDeflectShield = false, bool isReflectShield = false, 
 		 bool isJuggleProjectile = false, bool ShouldClang = false,
-		bool addToLevel = true
-		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = true,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
 	) : base(

@@ -69,7 +69,12 @@ public class ControlMenu : IMainMenu {
 		/* if (charNum == 4) {
 			bindableControls.Add(new string[] { Control.SigmaCommand, "Command Button" });
 		} */
-
+		// Vile Settings
+		if (charNum == 2) {
+			bindableControls.Add(new string[] { Control.AxlCrouch, "Ride Attack" });
+			bindableControls.Add(new string[] { Control.AimAngleUp, "Ride Hold" });
+				
+		}
 		// Axl specific settings
 		if (charNum == 3) {
 			if (axlAimMode == 0) {

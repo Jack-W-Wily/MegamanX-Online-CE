@@ -6,7 +6,7 @@ namespace MMXOnline;
 
 public class Vile : Character {
 	public const float maxCalldownMechCooldown = 2;
-	public float grabCooldown = 1;
+	public float grabCooldown;
 	public bool vulcanActive;
 	public float vulcanLingerTime;
 	public const int callNewMechCost = 3;
@@ -53,6 +53,7 @@ public class Vile : Character {
 	//Statecooldowns
 	public float dodgeRollCooldown;
 	public float HyperDashCooldown;
+	public float GizmoSpreadCD;
 	public float AirSplashHitCD;
 	public const float maxDodgeRollCooldown = 0.8f;
 	//
@@ -207,14 +208,20 @@ public class Vile : Character {
 			changeState(new VileChainGrabState(), true);
 		}
 
+		// vileteleport
+		if (charState is VileDodge &&
+		linkedRideArmor != null &&
+		player.input.isPressed(Control.Up,player)){
+		changeState(new VileTeleport(linkedRideArmor.pos), true);
+		}
 		// blow up ride
 
-		if (startRideArmor != null && player.input.isHeld(Control.Down,player)
+		if (linkedRideArmor != null && player.input.isHeld(Control.Down,player)
 		&& player.input.isPressed(Control.Taunt,player)){
-			startRideArmor.explode(shrapnel: true);
+			linkedRideArmor.explode(shrapnel: true);
 			shakeCamera(sendRpc: true);				
 			new NecroBurstProj(
-				new VileLaser(VileLaserType.NecroBurst), startRideArmor.pos,
+				new VileLaser(VileLaserType.NecroBurst), linkedRideArmor.pos,
 				xDir, player, player.getNextActorNetId(), rpc: true);
 			playSound("necroburst", sendRpc: true);
 		}
@@ -279,6 +286,7 @@ public class Vile : Character {
 		Helpers.decrementTime(ref dodgeRollCooldown);
 		Helpers.decrementTime(ref HyperDashCooldown);
 		Helpers.decrementTime(ref AirSplashHitCD);
+		Helpers.decrementTime(ref GizmoSpreadCD);
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
@@ -491,7 +499,8 @@ public class Vile : Character {
 		} 
 	}
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Special1, player);
+		return player.input.isHeld(Control.Special1, player)
+		|| player.input.isHeld(Control.Shoot,player);
 	}
 	public override bool canCharge() {
 		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
@@ -663,7 +672,7 @@ public class Vile : Character {
 				}
 			}
 		} else {
-			if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+		//	if (!(charState is Idle || charState is Run || charState is Crouch)) return;
 			changeState(new CallDownMech(linkedRideArmor, false), true);
 		}
 	}
@@ -806,15 +815,15 @@ public class Vile : Character {
 				1, 22,  0.15f, isDeflectShield: true
 			);
 		}
-		if (sprite.name.Contains("super") 
-		&& player.input.isHeld(Control.Up,player)) {
+		if (sprite.name.EndsWith("superkick_up") 
+		) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
+				new VileStomp(), centerPoint, ProjIds.VileAirRaidPlusKnock, player,
 				2, 0,  0.15f, isDeflectShield: true
 			);
 		}
-		if (sprite.name.Contains("super") 
-		&& !player.input.isHeld(Control.Up,player)) {
+		if (sprite.name.EndsWith("superkick") 
+		) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
 				2, 0,  0.15f, isDeflectShield: true
@@ -831,14 +840,14 @@ public class Vile : Character {
 
 		if (sprite.name.Contains("kick_3")) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
+				new VileStomp(), centerPoint, ProjIds.VileAirRaidPlusKnock, player,
 				2, 0,  0.15f, isDeflectShield: true
 			);
 		}
 
 			if (sprite.name.Contains("spring_grab")) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileGrab, player,
+				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
 				0, 0,  0.15f, isDeflectShield: true
 			);
 		}
