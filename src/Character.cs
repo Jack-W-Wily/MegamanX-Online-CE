@@ -17,6 +17,14 @@ public partial class Character : Actor, IDamagable {
 		"Sigma"
 	};
 
+	// Health.
+	public decimal health;
+	public decimal maxHealth;
+	
+	// Player linked data.
+	public Player player;
+	public int currency;
+
 	public List<Weapon> weapons = new();
 	public int weaponSlot;
 	public Weapon? currentWeapon { get {
@@ -25,9 +33,13 @@ public partial class Character : Actor, IDamagable {
 		}
 		return weapons[weaponSlot];
 	}}
+	
+
+	// Statemachine stuff.
 	public CharState charState;
-	public Player player;
 	public bool isDashing;
+
+	// Movement and charge.
 	public bool changedStateInFrame;
 	public bool pushedByTornadoInFrame;
 
@@ -178,6 +190,9 @@ public partial class Character : Actor, IDamagable {
 	// Ctrl data
 	public int altCtrlsLength = 1;
 
+	// Etc.
+	public int camOffsetX;
+
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -237,6 +252,9 @@ public partial class Character : Actor, IDamagable {
 
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
+		maxHealth = (decimal)player.getMaxHealth();
+		health = 1;
+		healAmount = (float)maxHealth - 1;
 	}
 
 	public override void onStart() {
@@ -569,7 +587,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool canKeepFlag() {
 		if (player.isPossessed()) return false;
-		if (player.health <= 0) return false;
+		if (health <= 0) return false;
 		if (isInvulnerable()) return false;
 		if (isCCImmuneHyperMode()) return false;
 		if (charState is Die) return false;
@@ -589,15 +607,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual float getRunSpeed() {
-		float runSpeed = Physics.WalkSpeed;
-		if (player.isX) {
-			if (charState is XHover) {
-				runSpeed = Physics.WalkSpeed;
-			}
-		} else if (player.isVile && player.speedDevil) {
-			runSpeed *= 1.1f;
-		}
-		return runSpeed * getRunDebuffs();
+		return Physics.WalkSpeed * getRunDebuffs();
 	}
 
 	public float getRunDebuffs() {
@@ -614,12 +624,6 @@ public partial class Character : Actor, IDamagable {
 			return getRunSpeed();
 		}
 		float dashSpeed = 3.45f * 60f;
-
-		if (charState is XHover) {
-			dashSpeed *= 1.25f;
-		} else if (player.isVile && player.speedDevil) {
-			dashSpeed *= 1.1f;
-		}
 		return dashSpeed * getRunDebuffs();
 	}
 
@@ -1100,11 +1104,11 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (player.health >= player.maxHealth) {
+		if (health >= maxHealth) {
 			healAmount = 0;
 			usedSubtank = null;
 		}
-		if (healAmount > 0 && player.health > 0) {
+		if (healAmount > 0 && health > 0) {
 			healTime += Global.spf;
 			if (healTime > 0.05) {
 				healTime = 0;
@@ -1112,7 +1116,7 @@ public partial class Character : Actor, IDamagable {
 				if (usedSubtank != null) {
 					usedSubtank.health--;
 				}
-				player.health = Helpers.clampMax(player.health + 1, player.maxHealth);
+				health = Helpers.clampMax(health + 1, maxHealth);
 				if (acidTime > 0) {
 					acidTime--;
 					if (acidTime < 0) removeAcid();
@@ -1432,7 +1436,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool isSpawning() {
-		return sprite.name.Contains("warp_in") || !visible || (player.isVile && invulnTime > 0);
+		return sprite.name.Contains("warp_in") || !visible;
 	}
 
 	public Point getCharRideArmorPos() {
@@ -1696,25 +1700,12 @@ public partial class Character : Actor, IDamagable {
 		return pos.addxy(0, -18);
 	}
 
-	public Point getParasitePos() {
-		float yOff = -18;
+	public virtual Point getParasitePos() {
 		if (sprite.name.Contains("_ra_")) {
-			float hideY = 0;
-			if (sprite.name.Contains("_ra_hide")) {
-				hideY = 22 * ((float)sprite.frameIndex / sprite.totalFrameNum);
-			}
-			yOff = -6 + hideY;
-		} else if (player.isZero) yOff = -20;
-		else if (player.isVile) yOff = -24;
-		if (player.isSigma) {
-			return getCenterPos();
-		} else if (player.isAxl) yOff = -18;
-
-		return pos.addxy(0, yOff);
+			return pos.addxy(0, -6);
+		}
+		return getCenterPos();
 	}
-
-	public int camOffsetX;
-
 
 	public virtual Actor getFollowActor() {
 		if (rideArmorPlatform != null) {
@@ -1790,21 +1781,12 @@ public partial class Character : Actor, IDamagable {
 		return chargeTime >= charge1Time;
 	}
 
-	public Point getShootPos() {
-		var busterOffsetPos = currentFrame.getBusterOffset();
-		if (busterOffsetPos == null) {
+	public virtual Point getShootPos() {
+		var busterOffset = currentFrame.getBusterOffset();
+		if (busterOffset == null) {
 			return getCenterPos();
 		}
-		var busterOffset = (Point)busterOffsetPos;
-		if (player.isX && player.armArmorNum == 3 && sprite.needsX3BusterCorrection()) {
-			if (busterOffset.x > 0) busterOffset.x += 4;
-			else if (busterOffset.x < 0) busterOffset.x -= 4;
-		}
-		busterOffset.x *= xDir;
-		if (player.weapon is RollingShield && charState is Dash) {
-			busterOffset.y -= 2;
-		}
-		return pos.add(busterOffset);
+		return pos.add(busterOffset.Value);
 	}
 
 	public void stopCharge() {
@@ -1831,34 +1813,27 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+	public virtual int getMaxChargeLevel() {
+		return 3;
+	}
+
+
 	public virtual int getChargeLevel() {
-		bool clampTo3 = true;
-		switch (this) {
-			case MegamanX mmx:
-				clampTo3 =  !player.hasArmArmor(ArmorId.Max);
-				break;
-			case Zero zero:
-				clampTo3 = true;
-				break;
-			case Vile vile:
-				clampTo3 = !vile.isVileMK5;
-				break;
-			case BusterZero:
-				clampTo3 = false;
-				break;
-		}
+		int chargeLevel = 0;
+		int maxCharge = getMaxChargeLevel();
+
 		if (chargeTime < charge1Time) {
-			return 0;
+			chargeLevel = 0;
 		} else if (chargeTime >= charge1Time && chargeTime < charge2Time) {
-			return 1;
+			chargeLevel = 1;
 		} else if (chargeTime >= charge2Time && chargeTime < charge3Time) {
-			return 2;
+			chargeLevel = 2;
 		} else if (chargeTime >= charge3Time && chargeTime < charge4Time) {
-			return 3;
+			chargeLevel = 3;
 		} else if (chargeTime >= charge4Time) {
-			return clampTo3 ? 3 : 4;
+			chargeLevel = 4;
 		}
-		return -1;
+		return Helpers.clampMax(chargeLevel, maxCharge);
 	}
 
 	public virtual void changeToIdleOrFall(string transitionSprite = "") {
@@ -2011,11 +1986,6 @@ public partial class Character : Actor, IDamagable {
 			chargeEffect.render(getParasitePos().add(new Point(x, y)));
 		}
 
-		if (player.isX && sprite.name.Contains("frozen")) {
-			Global.sprites["frozen_block"].draw(
-				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
-			);
-		}
 
 		if (isCrystalized) {
 			float yOff = 0;
@@ -2483,7 +2453,7 @@ public partial class Character : Actor, IDamagable {
 		float healthBarInnerWidth = 30;
 		Color color = new Color();
 
-		float healthPct = player.health / player.maxHealth;
+		float healthPct = (float)(health / maxHealth);
 		float width = Helpers.clampMax(MathF.Ceiling(healthBarInnerWidth * healthPct), healthBarInnerWidth);
 		if (healthPct > 0.66) color = Color.Green;
 		else if (healthPct <= 0.66 && healthPct >= 0.33) color = Color.Yellow;
@@ -2533,15 +2503,15 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canBeHealed(int healerAlliance) {
-		return player.alliance == healerAlliance && player.health > 0 && player.health < player.maxHealth;
+		return player.alliance == healerAlliance && health > 0 && health < maxHealth;
 	}
 
 	public virtual void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 		if (!allowStacking && this.healAmount > 0) return;
-		if (player.health < player.maxHealth) {
+		if (health < maxHealth) {
 			playHealSound = true;
 		}
-		commonHealLogic(healer, healAmount, player.health, player.maxHealth, drawHealText);
+		commonHealLogic(healer, (decimal)healAmount, health, maxHealth, drawHealText);
 		addHealth(healAmount, fillSubtank: false);
 	}
 
@@ -2584,8 +2554,7 @@ public partial class Character : Actor, IDamagable {
 		if (!ownedByLocalPlayer) return;
 		decimal damage = decimal.Parse(fDamage.ToString());
 		decimal originalDamage = damage;
-		decimal originalHP = decimal.Parse(player.health.ToString());
-		decimal decimalHP = originalHP;
+		decimal originalHP = health;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
 
@@ -2692,8 +2661,8 @@ public partial class Character : Actor, IDamagable {
 		// This is to defend from overkill damage.
 		// Or at least attempt to.
 		if (damageSavings > 0 &&
-			decimalHP - damage <= 0 &&
-			(decimalHP + damageSavings) - damage > 0
+			health - damage <= 0 &&
+			(health + damageSavings) - damage > 0
 		) {
 			// Apply in the normal way.
 			while (damageSavings >= 1) {
@@ -2713,12 +2682,13 @@ public partial class Character : Actor, IDamagable {
 		// If somehow the damage is negative.
 		// Heals are not really applied here.
 		if (damage < 0) { damage = 0; }
+		health -= damage;
+		// Clamp to 0. We do not want to go into the negatives here.
+		if (health < 0) {
+			health = 0;
+		}
 
-		decimalHP = decimalHP - damage;
-		// We use this to attempt to reduce float errors.
-		player.health = float.Parse(decimalHP.ToString());
-
-		if (player.showTrainingDps && player.health > 0 && originalDamage > 0) {
+		if (player.showTrainingDps && health > 0 && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
 				player.trainingDpsStartTime = Global.time;
 				Global.level.gameMode.dpsString = "";
@@ -2737,10 +2707,10 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
-			addDamageTextHelper(attacker, (float)damage, player.maxHealth, true);
+			addDamageTextHelper(attacker, (float)damage, (float)maxHealth, true);
 		}
-		if (player.health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
-			decimal modifier = (32 / (decimal)player.maxHealth);
+		if (health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
+			decimal modifier = (32 / maxHealth);
 			decimal gigaDamage = damage;
 			if (originalDamage > damage) {
 				gigaDamage = originalDamage;
@@ -2812,7 +2782,7 @@ public partial class Character : Actor, IDamagable {
 			damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
 		}
 
-		if (player.health <= 0) {
+		if (health <= 0) {
 			if (player.showTrainingDps && player.trainingDpsStartTime > 0) {
 				float timeToKill = Global.time - player.trainingDpsStartTime;
 				float dps = player.trainingDpsTotalDamage / timeToKill;
@@ -2830,7 +2800,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void killPlayer(Player? killer, Player? assister, int? weaponIndex, int? projId) {
-		player.health = 0;
+		health = 0;
 		int? assisterProjId = null;
 		int? assisterWeaponId = null;
 		if (charState is not Die || !ownedByLocalPlayer) {
@@ -2925,14 +2895,14 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addHealth(float amount, bool fillSubtank = true) {
-		if (player.health >= player.maxHealth && fillSubtank) {
+		if (health >= maxHealth && fillSubtank) {
 			player.fillSubtank(amount);
 		}
 		healAmount += amount;
 	}
 
 	public void fillHealthToMax() {
-		healAmount += player.maxHealth;
+		healAmount += (float)Math.Ceiling(maxHealth);
 	}
 
 	public virtual void addAmmo(float amount) {
@@ -3276,13 +3246,18 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canAffordRideArmor() {
-		if (Global.level.is1v1()) return player.health > (player.maxHealth / 2);
+		if (Global.level.is1v1()) {
+			return health > Math.Floor(maxHealth / 2);
+		}
 		return player.currency >= Vile.callNewMechCost;
 	}
 
 	public void buyRideArmor() {
-		if (Global.level.is1v1()) player.health -= (player.maxHealth / 2);
-		else player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);
+		if (Global.level.is1v1()) {
+			health -= Math.Floor(maxHealth / 2);
+			return;
+		}
+		player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);
 	}
 
 	public virtual void onMechSlotSelect(MechMenuWeapon mmw) {
@@ -3376,7 +3351,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (player.weapon is AssassinBullet && (player.isVile || player.isSigma)) {
+		if (player.weapon is AssassinBullet && (this is Vile or BaseSigma)) {
 			if (player.input.isHeld(Control.Shoot, player)) {
 				increaseCharge();
 			} else {
@@ -3473,8 +3448,8 @@ public partial class Character : Actor, IDamagable {
 		customData.Add(0);
 
 		// Always on values.
-		customData.Add((byte)MathF.Ceiling(player.health));
-		customData.Add((byte)MathF.Ceiling(player.maxHealth));
+		customData.Add((byte)Math.Ceiling(health));
+		customData.Add((byte)Math.Ceiling(maxHealth));
 		customData.Add((byte)player.alliance);
 		customData.Add((byte)player.currency);
 
@@ -3544,10 +3519,10 @@ public partial class Character : Actor, IDamagable {
 
 	public override void updateCustomActorNetData(byte[] data) {
 		// Always on values.
-		player.health = data[1];
-		player.maxHealth = data[2];
+		health = data[1];
+		maxHealth = data[2];
 		player.alliance = data[3];
-		player.currency = data[4];
+		currency = data[4];
 
 		// Bool variables.
 		bool[] boolData = Helpers.byteToBoolArray(data[5]);
