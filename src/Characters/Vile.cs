@@ -223,6 +223,12 @@ public class Vile : Character {
 			new NecroBurstProj(
 				new VileLaser(VileLaserType.NecroBurst), linkedRideArmor.pos,
 				xDir, player, player.getNextActorNetId(), rpc: true);
+			if (linkedRideArmor.raNum >= 4){
+			new GigaCrushProj(
+				new GigaCrush(), linkedRideArmor.pos, xDir,
+				player, player.getNextActorNetId(), rpc: true
+			);
+			}
 			playSound("necroburst", sendRpc: true);
 		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

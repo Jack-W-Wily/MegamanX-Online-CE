@@ -142,6 +142,14 @@ public class MegamanX : Character {
 		}
 	}
 
+
+	public override int getMaxChargeLevel() {
+		if (player.hasArmArmor(3) || hasUltimateArmor){
+		return 4;
+		}
+		return 3;
+	}
+
 	// General update.
 	public override void update() {
 		base.update();

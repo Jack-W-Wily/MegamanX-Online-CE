@@ -123,10 +123,10 @@ public class RideArmor : Actor, IDamagable {
 	}
 
 	public void setMaxHealth() {
-		if (raNum == 2) maxHealth = 24; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
-		else if (raNum == 3) maxHealth = 24; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
-		else maxHealth = 32;
-		if (raNum == 4) goliathHealth = 32;
+		if (raNum == 2) maxHealth = 34; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
+		else if (raNum == 3) maxHealth = 34; // + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
+		else maxHealth = 42;
+		if (raNum == 4) goliathHealth = 42;
 		maxHealth = Player.getModifiedHealth(maxHealth);
 	}
 

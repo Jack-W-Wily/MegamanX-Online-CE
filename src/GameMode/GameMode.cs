@@ -1295,6 +1295,9 @@ public class GameMode {
 			damageSavings = 0;
 		}
 
+		
+
+
 		if (isMech && player.character?.rideChaser != null) {
 			spriteName = "hud_health_base_bike";
 			health = player.character.rideChaser.health;

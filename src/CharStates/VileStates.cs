@@ -260,6 +260,7 @@ public class VileRevive : CharState {
 				vile.linkedRideArmor.ownedByMK5 = true;
 			}
 		}
+		new GigaCrushEffect(character);
 	}
 
 	public override void onExit(CharState newState) {

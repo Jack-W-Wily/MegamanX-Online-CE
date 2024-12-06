@@ -662,22 +662,22 @@ public partial class Player {
 		}
 		int bonus = 0;
 		if (isX) {
-			bonus = 12;
+			bonus = 16;
 		}
 		if (isAxl) {
-			bonus = 8;
+			bonus = 12;
 		}
 		if (isVile) {
 			bonus = 4;
 		}
 		if (isZero) {
-			bonus = 12;
+			bonus = 16;
 		}
 		if (isSigma) {
-			bonus = 12;
+			bonus = 16;
 		}
 		if (isX1Zero) {
-			bonus = 14;
+			bonus = 18;
 		}
 		return MathF.Ceiling(
 			getModifiedHealth(16 + bonus) + (heartTanks * getHeartTankModifier())

@@ -11,11 +11,14 @@ public class XLoadoutSetup {
 	public static List<Weapon> getLoadout(Player player) {
 		List<Weapon> weapons = new();
 		// 1v1/Training loadout.
+
+		weapons.Add(new XBuster());
+		
 		if (Global.level.isTraining() && !Global.level.server.useLoadout || Global.level.is1v1()) {
 			bool enableX1Weapons = player.xArmor1v1 == 1 || !Global.level.server.useLoadout;
 			bool enableX2Weapons = player.xArmor1v1 == 2 || !Global.level.server.useLoadout;
 			bool enableX3Weapons = player.xArmor1v1 == 3 || !Global.level.server.useLoadout;
-			weapons.Add(new XBuster());
+			
 
 			if (enableX1Weapons) {
 				weapons.Add(new HomingTorpedo());
