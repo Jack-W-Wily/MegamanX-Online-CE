@@ -1542,7 +1542,6 @@ public partial class Player {
 
 		// Weapon configuration.
 		oldWeapons = weapons;
-		retChar.weapons = new List<Weapon>(dnaCore.weapons);
 
 		if (charNum == (int)CharIds.Zero) {
 			retChar.weapons.Add(new ZSaber());
@@ -1670,6 +1669,8 @@ public partial class Player {
 		lastDNACore = null;
 		lastDNACoreIndex = 4;
 		character.ownedByLocalPlayer = ownedByLocalPlayer;
+
+		character.weapons.AddRange(oldChar.weapons.Where((Weapon w) => w is MaverickWeapon { summonedOnce: true }));
 
 		if (ownedByLocalPlayer) {
 			if (oldChar.charState.canStopJump) {
