@@ -125,6 +125,15 @@ public class PunchyZero : Character {
 			return;
 		}
 
+
+		if (charState is Crouch){
+				if (gigaAttack.ammo >= 28 &&
+				player.input.isPressed(Control.WeaponRight, player) ) {
+					gigaAttack.addAmmo(-28, player);			
+					changeState(new ZeroInferno(), true);	
+					
+		}
+		}
 		// Local update starts here.
 		inputUpdate();
 		Helpers.decrementFrames(ref donutTimer);
@@ -514,15 +523,13 @@ public class PunchyZero : Character {
 			if (!isAwakened){
 
 					if (isViral){
-						new FireWaveProjChargedStart(new FireWave(), pos, 1, player, 
-						player.getNextActorNetId(), true);
-						new FireWaveProjChargedStart(new FireWave(), pos, -1, player, 
-						player.getNextActorNetId(), true);
-					}
+					changeState(new Rakuhouha(new ShinMessenkou()), true);	
+					}else{
 					changeState(new ZeroRocks(new FakeZeroWeapon(player)), true);
-					} else {
-					changeState(new Rakuhouha(new ShinMessenkou()), true);		
-				}
+					}
+			} else {
+			changeState(new Rakuhouha(new ShinMessenkou()), true);		
+			}
 				gigaAttack.addAmmo(-10, player);
 			
 			return true;

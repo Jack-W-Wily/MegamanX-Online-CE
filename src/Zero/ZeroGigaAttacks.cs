@@ -489,6 +489,161 @@ public class Rekkoha : CharState {
 	}
 }
 
+
+
+
+
+public class ZeroInferno : CharState {
+	bool fired1 = false;
+	bool fired2 = false;
+	bool fired3 = false;
+	bool fired4 = false;
+	bool fired5 = false;
+	bool sound;
+	int loop;
+	public RekkohaEffect? effect;
+
+	public ZeroInferno( ) : base("rekkoha", "", "", "") {
+		
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		float topScreenY = Global.level.getTopScreenY(character.pos.y);
+
+		if (character.frameIndex == 13 && loop < 15) {
+			character.frameIndex = 10;
+			loop++;
+		}
+
+		if (character.frameIndex == 5 && !sound) {
+			sound = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("crashX2", sendRpc: true);
+			character.playSound("rekkoha", sendRpc: true);
+		}
+
+		if (stateTime > 26/60f && !fired1) {
+			fired1 = true;
+			new InfernoBeamUp(new FireWave(), new Point(character.pos.x, character.pos.y), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+		}
+	
+		if (stateTime > 0.8f && !fired3) {
+			fired3 = true;
+			new InfernoBeamDown(new FireWave(), new Point(character.pos.x - 70, character.pos.y),character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+			new InfernoBeamDown(new FireWave(), new Point(character.pos.x + 70, character.pos.y),character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+		}
+	
+		if (stateTime > 1.2f && !fired5) {
+			fired5 = true;
+			new InfernoBeamUp(new FireWave(), new Point(character.pos.x - 150, character.pos.y),character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+			new InfernoBeamUp(new FireWave(), new Point(character.pos.x + 150, character.pos.y),character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+
+public class InfernoBeamUp : Projectile {
+	Player player;
+	public InfernoBeamUp(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
+		base(weapon, pos, 4, 0, 1, player, "zerox1_firebeam_up", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.InfernoBeamUp;
+		shouldShieldBlock = false;
+		shouldVortexSuck = false;
+		destroyOnHit = false;
+		maxTime = 0.7f;
+		this.player = player;
+
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+	}
+
+	public override bool shouldDealDamage(IDamagable damagable) {
+		if (damagable is Actor actor && MathF.Abs(pos.x - actor.pos.x) > 40) {
+			return false;
+		}
+		return true;
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
+		}
+	}
+}
+
+
+
+public class InfernoBeamDown : Projectile {
+	Player player;
+	public InfernoBeamDown(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
+		base(weapon, pos, 1, 0, 1, player, "zerox1_firebeam_down", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.InfernoBeamDown;
+		shouldShieldBlock = false;
+		shouldVortexSuck = false;
+		destroyOnHit = false;
+		maxTime = 0.7f;
+		this.player = player;
+
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+	}
+
+	public override bool shouldDealDamage(IDamagable damagable) {
+		if (damagable is Actor actor && MathF.Abs(pos.x - actor.pos.x) > 40) {
+			return false;
+		}
+		return true;
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isImmuneToKnockback()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, 600));
+		}
+	}
+}
+
+
+
 public class RekkohaProj : Projectile {
 	float len = 0;
 	private float reverseLen;

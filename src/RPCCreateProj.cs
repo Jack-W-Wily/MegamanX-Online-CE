@@ -326,6 +326,12 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.SplashHitProj:
 				proj = new SplashHitProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.InfernoBeamUp:
+				proj = new InfernoBeamUp(new FireWave(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.InfernoBeamDown:
+				proj = new InfernoBeamDown(new FireWave(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.ShinMessenkou:
 				proj = new ShinMessenkouProj(new ShinMessenkou(), pos, xDir, player, netProjByte);
 				break;

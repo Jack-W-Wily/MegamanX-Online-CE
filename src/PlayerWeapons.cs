@@ -349,13 +349,7 @@ label:
 		}
 	}
 
-	public Weapon getAxlBullet(int axlBulletType) {
-		if (axlBulletType == (int)AxlBulletWeaponType.DoubleBullets) {
-			return new DoubleBullet();
-		}
-		return new AxlBullet((AxlBulletWeaponType)axlBulletType);
-	}
-
+	
 
 	public int getLastWeaponIndex() {
 		int miscSlots = 0;

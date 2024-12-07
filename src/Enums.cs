@@ -701,6 +701,8 @@ public enum ProjIds {
 	// PunchyZeroStuff
 	PZeroPunch,
 	PZeroPunch2,
+	InfernoBeamUp,
+	InfernoBeamDown,
 	PZeroAirKick,
 	PZeroSenpuukyaku, // Spin kick
 	PZeroShoryuken, // Air Upercut
