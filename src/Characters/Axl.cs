@@ -325,6 +325,14 @@ public class Axl : Character {
 	public override void update() {
 		base.update();
 
+
+
+		if (whiteAxlTime > 0) {
+				if (musicSource == null) {
+					addMusicSource("wildFang", getCenterPos(), true);
+				}
+		}
+
 		if (whiteAxlTime > 0) {
 			whiteAxlTime -= Global.spf;
 			if (whiteAxlTime < 0) {
@@ -476,10 +484,9 @@ public class Axl : Character {
 			changeState(new OcelotSpin(), true);
 		if (charState is Crouch)invulnTime = 0.2f;
 			}
-			if (player.input.isPressed(Control.Special1, player) 
-			&& !player.input.isHeld(Control.Up, player) 
-			&& player.input.isHeld(Control.Down, player)
-			&& !player.input.isLeftOrRightHeld(player)
+			if (player.input.isPressed(Control.Down, player) 
+			&&  charState is  Dash
+
 			&& charState is not RisingBarrage
 			){
 			changeState(new RisingBarrage(), true);
@@ -504,7 +511,7 @@ public class Axl : Character {
 			if (player.input.checkShoryuken(player, xDir , Control.Special1)) {
 		changeState(new RainStorm(isUnderwater()), true);
 				invulnTime = 0.5f;
-				 RainstormCooldown = 1.5f;
+				 RainstormCooldown = 2.5f;
 			}
 		 }
 	}
@@ -1879,6 +1886,7 @@ public class Axl : Character {
 	}
 
 	public override bool canShoot() {
+		if (sprite.name.Contains("block")) { return false; }
 		if (sniperMissileProj != null) { return false; }
 		if (invulnTime > 0) return false;
 		return base.canShoot();

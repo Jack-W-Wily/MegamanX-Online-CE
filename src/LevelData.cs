@@ -582,6 +582,7 @@ public class LevelData {
 		// X3 stuff.
 		{ "aircraftcarrier", "gravityBeetle" },
 		{ "dopplerlab", "dopplerLab" },
+		{ "dopplerlab2", "dopplerLab" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },
@@ -598,11 +599,12 @@ public class LevelData {
 		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
 		{ "centralcomputer_1v1", "boss_X2" },
 		{ "sigma4_1v1", "boss_X1" },
-		{ "Cannonball_megasfc","MegaloVava" },
+		{ "recyclingplant2","VavaFactory" },
 
 		// Others.
 		{ "japetribute", "variableX" },
 		{ "nodetest", "credits_X1" },
+		{ "sigmazone", "virusSigma" },
 		{ "training", "training_vodaz" },
 	};
 

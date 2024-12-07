@@ -83,20 +83,20 @@ public class VileMissile : Weapon {
 		} else if (vile.charState is InRideArmor) {
 			if (!vile.isVileMK2) {
 				vile.setVileShootTime(this);
-				if (vile.missileWeapon.type == 2 || vile.missileWeapon.type == 1) {
-					vile.playSound("vileMissile", sendRpc: true);
-					new VileMissileProj(vile.missileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
-				} else {
+			//	if (vile.missileWeapon.type == 2 || vile.missileWeapon.type == 1) {
+			//		vile.playSound("vileMissile", sendRpc: true);
+			//		new VileMissileProj(vile.missileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
+			//	} else {
 					new StunShotProj(this, vile.pos.addxy(15 * vile.xDir, -10), vile.getShootXDir(), 0, player, player.getNextActorNetId(), vile.getVileShootVel(true), rpc: true);
-				}
+			//	}
 			} else {
 				vile.setVileShootTime(this);
-				if (vile.missileWeapon.type == 2 || vile.missileWeapon.type == 1) {
+			//	if (vile.missileWeapon.type == 2 || vile.missileWeapon.type == 1) {
 					vile.playSound("mk2stunshot", sendRpc: true);
 					new VileMissileProj(vile.missileWeapon, vile.getFirstPOIOrDefault(), vile.getShootXDir(), 0, vile.player, vile.player.getNextActorNetId(), new Point(vile.xDir, 0), rpc: true);
-				} else {
-					MissileAttack.mk2ShootLogic(vile, true);
-				}
+			//	} else {
+			//		MissileAttack.mk2ShootLogic(vile, true);
+			//	}
 			}
 		}
 	}

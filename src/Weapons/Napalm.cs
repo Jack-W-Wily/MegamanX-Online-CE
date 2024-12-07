@@ -135,6 +135,48 @@ public class AirSplashHitGranadeLaunch : CharState {
 }
 
 
+
+public class BumptyBoomGranadeLaunch : CharState {
+	int bombNum;
+
+	Vile vile = null!;
+
+	public BumptyBoomGranadeLaunch(string transitionSprite = "") : base("crouch_nade", "", "", transitionSprite) {
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+			var poi = character.getFirstPOI();
+			if (!once && poi != null) {
+				once = true;
+				var proj = new BumptyBoomProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				proj.vel = new Point(character.xDir * 100, 0);
+			}
+
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+		}
+
+	
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
 public class NapalmGrenadeProj : Projectile {
 	bool exploded;
 	public NapalmGrenadeProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
@@ -180,6 +222,57 @@ public class NapalmGrenadeProj : Projectile {
 		destroySelf();
 	}
 }
+
+
+
+
+public class BumptyBoomProj : Projectile {
+		public IDamagable target;
+	bool exploded;
+	public BumptyBoomProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, xDir, 150, 2, player, "napalm_grenade", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.NapalmGrenade;
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+		this.vel = new Point(speed * xDir, -200);
+		useGravity = true;
+		collider.wallOnly = true;
+		fadeSound = "explosion";
+		fadeSprite = "explosion";
+		shouldShieldBlock = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (grounded) {
+			explode();
+		}
+	}
+
+	public override void onHitWall(CollideData other) {
+		xDir *= -1;
+		explode();
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (ownedByLocalPlayer) explode();
+	}
+
+	public void explode() {
+		if (exploded) return;
+		exploded = true;
+		if (ownedByLocalPlayer) {
+			new GrenadeExplosionProj(
+				weapon, pos, xDir, owner, 1, target, Math.Sign(vel.x), owner.getNextActorNetId()
+			);
+		}
+		destroySelf();
+	}
+}
+
+
 
 public class NapalmPartProj : Projectile {
 	float xDist;

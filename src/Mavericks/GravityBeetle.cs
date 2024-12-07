@@ -371,6 +371,8 @@ public class GBeetleGravityWellProj : Projectile {
 	public float drawRadius;
 	const float riseSpeed = 150;
 	public float radiusFactor;
+
+	public float GwellTime;
 	float randPartTime;
 	public float maxRadius = 50;
 	float ttl = 4;
@@ -390,12 +392,14 @@ public class GBeetleGravityWellProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (owner.health == 0)destroySelf();
+		if (owner.health == 0 || GwellTime > 15)destroySelf();
 		
 		drawRadius = radiusFactor * maxRadius;
 		if (radiusFactor > 0) {
 			globalCollider = new Collider(new Rect(0, 0, 24 + (radiusFactor * maxRadius), 24 + (radiusFactor * maxRadius)).getPoints(), true, this, false, false, 0, Point.zero);
 		}
+
+		GwellTime += Global.spf ;
 
 		if (!ownedByLocalPlayer) return;
 

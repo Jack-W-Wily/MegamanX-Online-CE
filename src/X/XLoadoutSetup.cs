@@ -54,6 +54,7 @@ public class XLoadoutSetup {
 			if (player.hasArmArmor(3) || player.xArmor1v1 == 2) weapons.Add(new HyperCharge());
 			if (player.hasBodyArmor(2) || player.xArmor1v1 == 3) weapons.Add(new GigaCrush());
 		}
+		
 		// Regular Loadout.
 		else {
 			weapons = player.loadout.xLoadout.getWeaponsFromLoadout(player);

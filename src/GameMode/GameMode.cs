@@ -1276,9 +1276,9 @@ public class GameMode {
 			frameIndex = player.character.rideArmor.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = false;
-			if (player.weapon.drawAmmo) {
+			//if (player.weapon.drawAmmo) {
 				baseX += 15;
-			}
+			//}
 			damageSavings = 0;
 		}
 		if (isMech && player.character?.rideArmorPlatform != null) {
@@ -1288,9 +1288,9 @@ public class GameMode {
 			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
 			frameIndex = player.character.rideArmorPlatform.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
-			if (player.weapon.drawAmmo) {
+			//if (player.weapon.drawAmmo) {
 				baseX += 15;
-			}
+			//}
 			mechBarExists = false;
 			damageSavings = 0;
 		}

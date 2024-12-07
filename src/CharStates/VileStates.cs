@@ -286,6 +286,46 @@ public class VileRevive : CharState {
 	}
 }
 
+
+
+public class VileStationaryHover : CharState {
+
+	
+	Vile vile = null!;
+	
+	public VileStationaryHover() : base("hover", "") {
+		attackCtrl = false;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		 if ((!player.input.isHeld(Control.AimAngleUp, player) && stateTime > 0.2f)) {
+			character.changeToIdleOrFall();
+		}
+
+		character.stopMoving();
+	}
+
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.useGravity = false;
+}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.stopMoving();
+		character.useGravity = true;
+	}
+}
+
+
+
 public class VileHover : CharState {
 	public SoundWrapper sound;
 	public Point flyVel;
@@ -328,7 +368,7 @@ public class VileHover : CharState {
 		Point move = getHoverMove();
 		
 
-		if (player.input.isHeld(Control.AxlCrouch, player)){
+		if (player.input.isHeld(Control.AimAngleUp, player)){
 		
 		character.vel.y = 0;
 		character.stopMoving();
@@ -352,12 +392,13 @@ public class VileHover : CharState {
 	if (player.input.isHeld(Control.Special1, player) && vile.gizmoCooldown == 0) {
 		vile.changeSpriteFromNameIfDifferent("cannon_gizmo_air", true);
 		shootLogic(vile);
-		vile.longshotGizmoCount++;
+	
 			if (vile.longshotGizmoCount >= 5 || player.vileAmmo <= 3) {
 				vile.longshotGizmoCount = 0;
 				vile.isShootingLongshotGizmo = false;
+				vile.gizmoCooldown = 1f;
 			}
-	}
+		}
 		if (move.magnitude > 0) {
 			character.move(move);
 		}
@@ -384,7 +425,7 @@ public class VileHover : CharState {
 		Point shootVel = vile.getVileShootVel(true);
 
 		var player = vile.player;
-		vile.playSound("frontrunner", sendRpc: true);
+		
 
 		string muzzleSprite = "cannon_muzzle";
 		 muzzleSprite += "_lg";
@@ -407,7 +448,9 @@ public class VileHover : CharState {
 			shootPos, MathF.Round(shootVel.byteAngle), //vile.longshotGizmoCount,
 			player, player.getNextActorNetId(), rpc: true
 		);
-	
+		vile.playSound("frontrunner", sendRpc: true);
+		vile.GizmoSpreadCD = 0.12f;
+			vile.longshotGizmoCount++;
 		}
 	}
 
@@ -428,7 +471,7 @@ public class VileHover : CharState {
 				character.frameIndex = character.sprite.loopStartFrame;
 				character.frameSpeed = 0;
 			}
-			character.addGravity(ref fallY);
+if(!player.input.isHeld(Control.AimAngleUp,player))character.addGravity(ref fallY);
 		} else {
 			character.frameSpeed = 1;
 			fallY = Helpers.lerp(fallY, 0, Global.spf * 10);

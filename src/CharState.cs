@@ -410,7 +410,12 @@ public class WarpIn : CharState {
 
 		if (character.player == Global.level.mainPlayer && !warpSoundPlayed) {
 			warpSoundPlayed = true;
+
+			if (!player.isVile){
 			character.playSound("warpIn", sendRpc: true);
+			} else {
+			character.playSound("vileWarp", sendRpc: true);	
+			}
 		}
 
 		float yInc = Global.spf * 450 * getSigmaRoundsMod(sigmaRounds);
@@ -762,7 +767,7 @@ public class ZeroClang : CharState {
 public class Jump : CharState {
 	public Jump() : base("jump", "jump_shoot", Options.main.getAirAttack()) {
 		accuracy = 5;
-		enterSound = "jump";
+
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -780,6 +785,16 @@ public class Jump : CharState {
 			return;
 		}
 	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character is not Vile){
+				character.playSound("jump", sendRpc: true);
+				} else{
+					character.playSound("vileJump", sendRpc: true);
+				}
+	}
+
 }
 
 public class Fall : CharState {
@@ -807,8 +822,10 @@ public class Fall : CharState {
 				limboVehicleCheckTime = 0;
 			}
 		}
-	}
 
+			
+	}
+	
 	public void setLimboVehicleCheck(Actor limboVehicle) {
 		if (limboVehicleCheckTime == 0 && character.limboRACheckCooldown == 0) {
 			this.limboVehicle = limboVehicle;

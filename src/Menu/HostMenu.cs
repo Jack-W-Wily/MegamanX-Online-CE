@@ -845,7 +845,8 @@ public class HostMenu : IMainMenu {
 		"robotjunkyard", "desertbase", "desertbase2", "crystalmine", "centralcomputer",
 		"xhunter1", "xhunter2", "hunterbase", "highway2", "giantdam", "giantdam2",
 		"weaponsfactory", "frozentown", "aircraftcarrier", "powercenter", "shipyard",
-		"quarry", "safaripark", "dopplerlab", "hunterbase2", "nodetest",
+		"quarry", "safaripark", "dopplerlab","dopplerlab2","doppler4", "hunterbase2", "nodetest",
+		 "recyclingplant2", "sigmazone",
 	};
 	public int mapSortFunc(LevelData a, LevelData b) {
 		int aIndex = -1;

@@ -129,11 +129,12 @@ public class VelGFireProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 125, 1, player, "velg_proj_fire",
-		4, 0.1f, netProjId, player.ownedByLocalPlayer
+		0, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.VelGFire;
 		maxTime = 1f;
 		vel.y = 200;
+		isJuggleProjectile = true;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

@@ -364,7 +364,7 @@ public class EvasionBarrage : CharState {
 			var gunpos = character.getFirstPOI();
 		
 			if (character.sprite.frameIndex >= 2) {
-			character.move(new Point(character.xDir * 150, -120f));
+			character.move(new Point(character.xDir * -150, -120f));
 			projTime += Global.spf;
 			if (projTime > 0.06f) {
 				projTime = 0;

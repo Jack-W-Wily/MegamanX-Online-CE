@@ -238,11 +238,11 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (raNum == 4 && character != null && musicSource == null) {
-			addMusicSource("vile_X3", getCenterPos(), true);
+			addMusicSource("GOLIATH", getCenterPos(), true);
 		}
-		if (character == null && musicSource != null) {
-			destroyMusicSource();
-		}
+		//if (character == null && musicSource != null) {
+		//	destroyMusicSource();
+		//}
 
 		if (ownedByLocalPlayer && ownedByMK5) {
 			var mk5Pos = getMK5Pos();
@@ -786,7 +786,7 @@ public class RideArmor : Actor, IDamagable {
 
 	public void explode(bool shrapnel = false) {
 		if (!ownedByLocalPlayer) return;
-
+		
 		if (!isExploding) {
 			isExploding = true;
 			sprite.frameSpeed = 0;
@@ -796,6 +796,7 @@ public class RideArmor : Actor, IDamagable {
 
 			rideArmorState?.onExit(null);
 			destroySelf();
+			destroyMusicSource();
 		}
 	}
 
@@ -1138,9 +1139,10 @@ public class RideArmorState {
 	}
 
 	public bool inTransition() {
-		if (!rideArmor.ownedByMK5) {
+		if (!rideArmor.ownedByMK5 && !rideArmor.isNeutral) {
 			return false;
 		}
+	
 
 		var realTransitionSprite = transitionSprite?.Replace("ridearmor", rideArmor?.getRaTypeName() ?? "") ?? transitionSprite;
 		return !string.IsNullOrEmpty(transitionSprite) && realTransitionSprite != null 
@@ -1228,7 +1230,10 @@ public class RideArmorState {
 				rideArmor.move(move);
 			}
 
-			if (!rideArmor.ownedByMK5 && rideArmor.raNum == 3 && 
+			if (!rideArmor.ownedByMK5 && (rideArmor.raNum == 3
+			|| rideArmor.raNum == 4  )
+			
+			&& 
 			!rideArmor.isNeutral &&		
 			 player.input.isPressed(Control.Dash, player) 
 			&& player.input.isHeld(Control.Down, player)) {
@@ -1236,13 +1241,13 @@ public class RideArmorState {
 			}
 			if (rideArmor.ownedByMK5 && rideArmor.raNum == 3 && 
 			 player.input.isPressed(Control.Dash, player) 
-			&& player.input.isHeld(Control.Down, player)
+		//	&& player.input.isHeld(Control.Down, player)
 			&& player.input.isHeld(Control.AimAngleUp, player)) {
 				rideArmor.changeState(new RAGroundPoundStart(), true);
 			}
 			if (rideArmor.ownedByMK5 && rideArmor.raNum == 3 && 
 			 player.input.isPressed(Control.AxlCrouch, player) 
-			&& player.input.isHeld(Control.Down, player)
+		//	&& player.input.isHeld(Control.Down, player)
 			&& !player.input.isHeld(Control.AimAngleUp, player)) {
 				rideArmor.changeState(new RAGroundPoundStart(), true);
 			}
@@ -1404,7 +1409,9 @@ public class RAIdle : RideArmorState {
 		if (player != null) {
 			bool jumpHeld = player.input.isHeld(Control.Jump, player);
 			bool dashHeld = player.input.isHeld(Control.Dash, player) && character.flag == null;
-			if (jumpHeld && rideArmor.raNum == 3 && character.flag == null) {
+			if (jumpHeld && (rideArmor.raNum == 3
+			|| rideArmor.raNum == 4  )
+			&& character.flag == null) {
 				if (rideArmor.consecutiveJumpTimeout > 0 && character.flag == null && !rideArmor.isUnderwater()) {
 					rideArmor.consecutiveJumpTimeout = 0;
 					rideArmor.consecutiveJump++;
@@ -1587,7 +1594,8 @@ public class RAFall : RideArmorState {
 	private void defaultHoverCode() {
 		updateHoverExhaustPos();
 		if (player != null) {
-			if (player.input.isHeld(Control.Jump, player)) {
+			if (player.input.isHeld(Control.Jump, player)
+			&& player.input.isHeld(Control.Up, player)) {
 				if (!hoveredOnce) {
 					hovering = true;
 					hoveredOnce = true;
@@ -1714,7 +1722,7 @@ public class RAFall : RideArmorState {
 }
 
 public class RAGroundPoundStart : RideArmorState {
-	public RAGroundPoundStart(string transitionSprite = "") : base("frog_groundpound_start") {
+	public RAGroundPoundStart(string transitionSprite = "") : base("groundpound_start") {
 	}
 
 	public override void update() {
@@ -1740,7 +1748,7 @@ public class RAGroundPoundStart : RideArmorState {
 }
 
 public class RAGroundPound : RideArmorState {
-	public RAGroundPound(string transitionSprite = "") : base("frog_groundpound") {
+	public RAGroundPound(string transitionSprite = "") : base("groundpound") {
 	}
 
 	public override void update() {
@@ -1759,7 +1767,7 @@ public class RAGroundPound : RideArmorState {
 }
 
 public class RAGroundPoundLand : RideArmorState {
-	public RAGroundPoundLand(string transitionSprite = "") : base("frog_groundpound_land") {
+	public RAGroundPoundLand(string transitionSprite = "") : base("groundpound_land") {
 	}
 
 	public override void update() {

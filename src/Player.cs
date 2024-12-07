@@ -1658,7 +1658,7 @@ public partial class Player {
 		character.xDir = oldDir;
 		maxHealth = getMaxHealth();
 		health = Math.Min(health, maxHealth);
-		loadout = oldAxlLoadout;
+	//	loadout = oldAxlLoadout;
 		character.weapons = oldWeapons;
 		character.weaponSlot = 0;
 

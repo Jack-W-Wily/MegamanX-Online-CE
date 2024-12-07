@@ -170,6 +170,10 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.RumblingBangGrenade:
 				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.BumptyBoomProj:
+				proj = new BumptyBoomProj(new Weapon(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.Napalm:
 			case (int)ProjIds.RumblingBangProj:
 				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
 				break;

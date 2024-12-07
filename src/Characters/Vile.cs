@@ -13,6 +13,7 @@ public class Vile : Character {
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public int buckshotDanceNum;
+	public int VileMode = 0;
 	public float vileAmmoRechargeCooldown;
 	public bool isShootingLongshotGizmo;
 	public int longshotGizmoCount;
@@ -55,6 +56,9 @@ public class Vile : Character {
 	public float HyperDashCooldown;
 	public float GizmoSpreadCD;
 	public float AirSplashHitCD;
+	public float ModeCD;
+	public float AirBombCD;
+	public float BumptyBoomCD;
 	public const float maxDodgeRollCooldown = 0.8f;
 	//
 
@@ -89,7 +93,9 @@ public class Vile : Character {
 		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
 		spriteFrameToSounds["vile_run/4"] = "vileWalk";
 		spriteFrameToSounds["vile_run/8"] = "vileWalk";
-		spriteFrameToSounds["vile_land/0"] = "vileLand";
+
+		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
+
 
 		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
 		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
@@ -199,13 +205,16 @@ public class Vile : Character {
 		if (PressA && charState is VileChainGrabState && frameIndex > 2) {
 			changeState(new VilePunch1(), true);
 		}
-		if (shoryukenL && HyperDashCooldown == 0) {
+		if (VileMode == 1){
+		if (shoryukenS && HyperDashCooldown == 0) {
 			changeState(new SplashHitState(), true);
 			HyperDashCooldown = 1.5f;
 		}
+		
 		if (shoryukenA || charState is RocketPunch && player.input.isHeld(Control.Down,player)
 		&& player.input.isPressed(Control.Shoot,player)) {
 			changeState(new VileChainGrabState(), true);
+		}
 		}
 
 		// vileteleport
@@ -292,18 +301,53 @@ public class Vile : Character {
 		Helpers.decrementTime(ref dodgeRollCooldown);
 		Helpers.decrementTime(ref HyperDashCooldown);
 		Helpers.decrementTime(ref AirSplashHitCD);
+		Helpers.decrementTime(ref AirBombCD);
+		Helpers.decrementTime(ref BumptyBoomCD);
 		Helpers.decrementTime(ref GizmoSpreadCD);
+		Helpers.decrementTime(ref ModeCD);
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 
-		if (dodgeRollCooldown == 0 && player.canControl) {
+
+		if (player.input.isPressed(Control.WeaponLeft, player) 
+		&& ModeCD == 0
+		&& VileMode == 0){
+		VileMode = 1;
+		ModeCD = 0.01f;
+		Global.level.gameMode.setHUDErrorMessage(player, 
+		"Strategy Type: Beatdown", playSound: false);
+			
+		playSound("vileModule", sendRpc: true);	
+		}
+		if (player.input.isPressed(Control.WeaponLeft, player)
+		&&	ModeCD == 0
+	 && VileMode == 1){
+		VileMode = 0;
+			ModeCD = 0.01f;
+		Global.level.gameMode.setHUDErrorMessage(player, 
+		"Strategy Type: Trash Metal", playSound: false);
+		playSound("vileModule", sendRpc: true);
+		}
+
+
+		if (charState is not VileStationaryHover &&
+			dodgeRollCooldown == 0 && player.canControl) {
 		 if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new VileDodge(), true);
 			}
 		}
+		if (charState is not VileStationaryHover && charState is not VileHover &&
+				player.input.isHeld(Control.AimAngleUp, player) &&
+			vileForm == 2 && player.canControl){
+			changeState(new VileStationaryHover(), true);
 
-			if (player.input.isHeld(Control.Down, player) &&
+	
+			}
+
+
+			if (charState is not VileStationaryHover &&
+				player.input.isHeld(Control.Down, player) &&
 			player.input.isPressed(Control.Dash, player) &&  HyperDashCooldown == 0){
 			changeState(new VileDashChargeState(), true);
 			playSound("vilehyperdashstart", true);
@@ -322,6 +366,9 @@ public class Vile : Character {
 		}
 		chargeLogic(shoot);
 	}
+
+
+	// Vile attacks
 	public override bool attackCtrl() {
 
 
@@ -333,22 +380,6 @@ public class Vile : Character {
 	
 
 
-			if (WPLeftPressed) {
-			if (player.input.isHeld(Control.Up, player) 
-			&& AirSplashHitCD == 0){
-				AirSplashHitCD = 0.8f;
-				changeState(new AirSplashHitGranadeLaunch(), true);
-			player.vileAmmo -= 8;			
-			}
-
-			if (player.input.isHeld(Control.Down, player) ){
-			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);					
-			return true;			
-			}
-
-
-		}
-
 
 		if (specialPressed) {
 		
@@ -358,11 +389,11 @@ public class Vile : Character {
 		if (shootPressed) {
 			normalAttacks2();
 
-			if (grabCooldown == 0){
+			if (grabCooldown == 0 && VileMode == 1){
 			dashGrabSpecial();
 			}
 		}
-		if (WeaponRightHeld) {
+		if (WeaponRightHeld && VileMode == 0) {
 			vulcanWeapon.vileShoot(0, this);
 		}
 		
@@ -373,7 +404,7 @@ public class Vile : Character {
 			bool LeftorRightHeld = player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player);
 		bool UpHeld = player.input.isHeld(Control.Up, player);
 		bool DownHeld = player.input.isHeld(Control.Down, player);
-		
+		if (VileMode == 1){
 	if (DownHeld) {
 		if (player.vileAmmo > 4)	
 		changeState(new SpoiledBratPunch(), true);
@@ -381,48 +412,93 @@ public class Vile : Character {
 			return true;			
 		}
 		if (UpHeld) {
-			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
-			return true;
+			if (player.vileAmmo > 4)	
+		changeState(new InfinityGigAttack(), true);
+		player.vileAmmo -= 4;
+			return true;			
 		}
-			if (LeftorRightHeld && !UpHeld && grounded) {
-			if (rocketPunchWeapon.type > -1) {
-				rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
-			}
-			return true;
+		if (LeftorRightHeld && !UpHeld && grounded) {
+			if (player.vileAmmo > 4)	
+			changeState(new GoGetterRightAttack(), true);
+			player.vileAmmo -= 4;
+			return true;			
 		}
+			//if (rocketPunchWeapon.type > -1) {
+			//	rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+			//}
+		return true;
+		}
+
+		if (VileMode == 0){
+		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f) {
+		
+				cannonWeapon.vileShoot(0, this);
+		}
+		}
+		
 			return false;
+	}
+
+		public bool airDownAttacks() {
+		bool HeldDown = player.input.isHeld(Control.Down, player);
+		bool dashorairdash = charState is Dash || charState is AirDash;
+		if (!grounded && !dashorairdash) {
+			if (!HeldDown && AirBombCD == 0 && VileMode == 0){
+				AirBombCD = 0.5f;	
+				changeState(new ExplosiveRoundState(), true);
+				player.vileAmmo -= 4;			
+			}
+			if (!HeldDown && AirBombCD == 0 && VileMode == 1){
+				AirBombCD = 0.5f;	
+				changeState(new SpreadShotKnee(), true);		
+			}
+			  
+			 if (HeldDown && AirSplashHitCD == 0 && VileMode == 0){
+				AirSplashHitCD = 0.5f;	
+				changeState(new PeaceOutRollerAttack(), true);
+				player.vileAmmo -= 8;			
+			}
+			if (HeldDown && AirSplashHitCD == 0 && VileMode == 1){
+				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);			
+			}
+		return true;
+		}
+		return false;
 	}
 
 	public bool normalAttacks() {
 		bool LeftorRightHeld = player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player);
 		bool UpHeld = player.input.isHeld(Control.Up, player);
 		
-		
-		if (charState is Crouch) {
-			napalmWeapon.vileShoot(WeaponIds.Napalm, this);
-			return true;
-		}
 	
+			if (player.input.isHeld(Control.Down, player) 
+			&& BumptyBoomCD == 0 && VileMode == 0 && grounded){
+				BumptyBoomCD = 0.8f;	
+				changeState(new BumptyBoomGranadeLaunch(), true);
+				player.vileAmmo -= 8;			
+			}
+
+			if (player.input.isHeld(Control.Up, player) 
+			&& AirSplashHitCD == 0 && VileMode == 1){
+				AirSplashHitCD = 0.8f;
+				changeState(new AirSplashHitGranadeLaunch(), true);
+			player.vileAmmo -= 8;			
+			}
 
 
-
-		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f) 
-				cannonWeapon.vileShoot(0, this);
-
-		return false;
-	}
-	public bool airDownAttacks() {
-		bool HeldDown = player.input.isHeld(Control.Down, player);
-		bool dashorairdash = charState is Dash || charState is AirDash;
-		if (!grounded && !dashorairdash) {
-			if (!HeldDown) 
-				grenadeWeapon.vileShoot(WeaponIds.VileBomb, this);
-			 else 
-				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
-			return true;
+		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
+		&& VileMode == 1 && (grounded || charState is AirDash)) {
+		
+			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
 		}
+		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
+		&& VileMode == 0 && (grounded || charState is AirDash)) {	
+			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);			
+		}
+
 		return false;
 	}
+
 	public bool dashGrabSpecial() {
 		if (charState is Dash || charState is AirDash) {
 				charState.isGrabbing = true;
@@ -447,9 +523,9 @@ public class Vile : Character {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
+				//	if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
 						missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
-					}
+			//		}
 				}
 				if (goliathShotPressed) {
 					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {
@@ -469,7 +545,9 @@ public class Vile : Character {
 			changeSpriteFromName("fall", true);
 		}
 			
-		if (charState.attackCtrl && charState is not Dash && grounded && 
+		if (charState.attackCtrl
+		 && charState is not Dash && grounded && 
+		!player.input.isHeld(Control.WeaponRight, player)&&
 				player.input.isHeld(Control.Up, player) )
 			 {
 			turnToInput(player.input, player);
@@ -1040,4 +1118,12 @@ public class Vile : Character {
 		player.frozenCastle = boolData[0];
 		player.speedDevil = boolData[1];
 	}
+
+	public override bool isToughGuyHyperMode() {
+		return sprite.name.Contains("grab") 
+		|| charState is VileStationaryHover ;
+	}
 }
+
+
+

@@ -360,7 +360,7 @@ public class ExplosiveRoundState : CharState {
 	bool isNapalm;
 	Vile vile = null!;
 
-	public ExplosiveRoundState(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	public ExplosiveRoundState() : base("air_bomb_attack", "", "") {
 		this.isNapalm = isNapalm;
 		useDashJumpSpeed = true;
 	}
@@ -424,7 +424,7 @@ public class PeaceOutRollerAttack : CharState {
 	bool isNapalm;
 	Vile vile = null!;
 
-	public PeaceOutRollerAttack(string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	public PeaceOutRollerAttack() : base("air_bomb_attack", "", "") {
 	
 		useDashJumpSpeed = true;
 	}
@@ -462,7 +462,7 @@ public class SpreadShotKnee : CharState {
 	int bombNum;
 	Vile vile = null!;
 
-	public SpreadShotKnee( string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	public SpreadShotKnee( ) : base("air_bomb_attack", "", "") {
 	
 		useDashJumpSpeed = true;
 	}

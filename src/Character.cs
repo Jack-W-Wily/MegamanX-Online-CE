@@ -1237,7 +1237,11 @@ public partial class Character : Actor, IDamagable {
 					xDir = -wallKickDir;
 				}
 			} else {
+				if (this is not Vile){
 				playSound("jump", sendRpc: true);
+				} else{
+					playSound("vileJump", sendRpc: true);
+				}
 			}
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
 			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
@@ -1265,7 +1269,11 @@ public partial class Character : Actor, IDamagable {
 					grounded = false;
 				}
 				vel.y = -getJumpPower();
+				if (this is not Vile){
 				playSound("jump", sendRpc: true);
+				} else{
+					playSound("vileJump", sendRpc: true);
+				}
 				if (charState.airSprite != "") {
 					changeSpriteFromName(charState.airSprite, false);
 				}
@@ -1862,8 +1870,15 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void landingCode(bool useSound = true) {
 		if (useSound) {
+
+			if (this is not Vile){
 			playSound("land", sendRpc: true);
+			}
+			if (this is Vile){
+			playSound("vileLand", sendRpc: true);
+			}
 		}
+
 		dashedInAir = 0;
 		changeState(new Idle("land"), true);
 	}

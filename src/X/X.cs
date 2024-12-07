@@ -28,10 +28,10 @@ public class MegamanX : Character {
 	public ArmorId hyperLegArmor;
 	public ArmorId hyperHelmetArmor;
 
-	public const int headArmorCost = 2;
-	public const int bodyArmorCost = 3;
-	public const int armArmorCost = 3;
-	public const int bootsArmorCost = 2;
+	public const int headArmorCost = 1;
+	public const int bodyArmorCost = 1;
+	public const int armArmorCost = 1;
+	public const int bootsArmorCost = 1;
 
 	public float headbuttAirTime = 0;
 	public int hyperChargeTarget;
@@ -182,6 +182,26 @@ public class MegamanX : Character {
 		}
 	}
 
+
+
+	public override bool normalCtrl() {
+		
+	if (!player.input.isHeld(Control.Shoot, player) 
+		 && charState is not Dash && grounded && 
+				player.input.isHeld(Control.Up, player) )
+			 {
+			turnToInput(player.input, player);
+
+			if (player.weapon is not FireWave){
+			changeState(new SwordBlock());
+			}
+			return true;
+		}
+
+		return base.normalCtrl();
+	}
+
+
 	public override bool attackCtrl() {
 		if (!isCharging() && currentWeapon != null && (
 				player.input.isPressed(Control.Shoot, player) ||
@@ -193,6 +213,10 @@ public class MegamanX : Character {
 				shoot(0);
 				return true;
 			}
+		}
+		if (player.input.isPressed(Control.Special1, player)) {
+			changeState(new X6SaberState(grounded), true);
+			
 		}
 		return base.attackCtrl();
 	}
@@ -414,6 +438,7 @@ public class MegamanX : Character {
 		return (int)(sprite.name switch {
 			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
 			"mmx_shoryuken" => MeleeIds.Shoryuken,
+			"mmx_block" => MeleeIds.XBlock,
 			"mmx_beam_saber" or "mmx_beam_saber_air" => MeleeIds.MaxZSaber,
 			"mmx_beam_saber2" => MeleeIds.ZSaber,
 			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
@@ -453,11 +478,15 @@ public class MegamanX : Character {
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				3, 0, 0.5f, addToLevel: addToLevel
+				2, 10, 0.5f, addToLevel: addToLevel
+			),
+			(int)MeleeIds.XBlock => new GenericMeleeProj(
+				ZXSaber.netWeapon, projPos, ProjIds.Headbutt, player,
+				0, 0, 0f, addToLevel: addToLevel, isDeflectShield : true
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 0, 0.5f, addToLevel: addToLevel
+				2, 10, 0.5f, addToLevel: addToLevel
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
@@ -477,6 +506,7 @@ public class MegamanX : Character {
 		ZSaber,
 		ZSaberAir,
 		NovaStrike,
+		XBlock,
 	}
 
 	// Other overrides.

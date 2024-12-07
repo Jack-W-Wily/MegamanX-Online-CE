@@ -295,6 +295,155 @@ public class RocketPunchAttack : CharState {
 
 
 
+
+public class GoGetterRightAttack : CharState {
+	bool shot = false;
+	RocketPunchProj? proj;
+	float specialPressTime;
+	Vile vile = null!;
+
+	public GoGetterRightAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+			proj.reversed = true;
+		}
+
+		if (!shot && character.sprite.frameIndex == 3) {
+			shoot();
+		}
+
+		if (proj == null){
+		if (player.input.isPressed(Control.Special1, player)) {
+				character.changeToIdleOrFall();
+		}
+		}
+		if (proj != null) {
+			if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
+				if (player.input.isPressed(Control.Special1, player)) {
+					specialPressTime = 0.25f;
+				}
+
+				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+					character.frameIndex = 4;
+					character.frameTime = 0;
+				} else if (character.isAnimOver()) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			} else {
+				if (proj.returned || proj.destroyed) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			}
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("rocketPunch", sendRpc: true);
+		character.frameIndex = 3;
+		character.frameTime = 0;
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.GoGetterRight), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+	}
+
+	public void reset() {
+		character.frameIndex = 0;
+		stateTime = 0;
+		shot = false;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+}
+
+
+
+public class InfinityGigAttack : CharState {
+	bool shot = false;
+	RocketPunchProj? proj;
+	float specialPressTime;
+	Vile vile = null!;
+
+	public InfinityGigAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+			proj.reversed = true;
+		}
+
+		if (!shot && character.sprite.frameIndex == 3) {
+			shoot();
+		}
+
+		if (proj == null){
+		if (player.input.isPressed(Control.Special1, player)) {
+				character.changeToIdleOrFall();
+		}
+		}
+		if (proj != null) {
+			if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
+				if (player.input.isPressed(Control.Special1, player)) {
+					specialPressTime = 0.25f;
+				}
+
+				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+					character.frameIndex = 4;
+					character.frameTime = 0;
+				} else if (character.isAnimOver()) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			} else {
+				if (proj.returned || proj.destroyed) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			}
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("rocketPunch", sendRpc: true);
+		character.frameIndex = 3;
+		character.frameTime = 0;
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.InfinityGig), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+	}
+
+	public void reset() {
+		character.frameIndex = 0;
+		stateTime = 0;
+		shot = false;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+}
+
+
+
+
+
 public class SpoiledBratPunch : CharState {
 	bool shot = false;
 	RocketPunchProj proj;
