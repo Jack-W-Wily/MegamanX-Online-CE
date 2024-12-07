@@ -293,6 +293,33 @@ public class Axl : Character {
 	public override void preUpdate() {
 		lastXDir = xDir;
 		base.preUpdate();
+
+		if (player.weapon is MaverickWeapon mw2 && mw2.maverick != null) {
+			if (mw2.maverick.aiBehavior != MaverickAIBehavior.Control && mw2.maverick.state is not MExit) {
+				foreach (var weapon in player.weapons) {
+					if (weapon is MaverickWeapon mw) {
+						if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
+							mw.maverick.aiBehavior = player.currentMaverickCommand;
+						}
+						if (mw.isMenuOpened) {
+							mw.isMenuOpened = false;
+						}
+					}
+				}
+				mw2.maverick.aiBehavior = MaverickAIBehavior.Control;
+			}
+		} else if (player.currentMaverick != null) {
+			foreach (var weapon in player.weapons) {
+				if (weapon is MaverickWeapon mw) {
+					if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
+						mw.maverick.aiBehavior = player.currentMaverickCommand;
+					}
+					if (mw.isMenuOpened) {
+						mw.isMenuOpened = false;
+					}
+				}
+			}
+		}
 	}
 
 	public override void update() {
@@ -338,6 +365,15 @@ public class Axl : Character {
 				}
 			}
 			return;
+		}
+
+		if (linkedRideArmor != null &&
+			player.input.isHeld(Control.Down, player) &&
+			player.input.isHeld(Control.Special2, player) && 
+			linkedRideArmor.rideArmorState is not RACalldown
+		) {
+			linkedRideArmor.changeState(new RACalldown(pos, false), true);
+			linkedRideArmor.xDir = xDir;
 		}
 
 		if (stingChargeTime > 0) {
@@ -413,7 +449,6 @@ public class Axl : Character {
 		}
 
 		player.changeWeaponControls();
-
 		updateAxlAim();
 
 		// AXl Attacks
@@ -553,7 +588,9 @@ public class Axl : Character {
 		}
 
 		if (player.weapon is not AssassinBullet) {
-			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet) && invulnTime == 0 && flag == null) {
+			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is RevolverBarrel || player.weapon is AncientGun) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
 				/* if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
@@ -575,7 +612,9 @@ public class Axl : Character {
 					stingChargeTime = 0;
 					playSound("stingCharge", sendRpc: true);
 				} else if (isCharging()) {
-					if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+						player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 						recoilTime = 0.2f;
 						if (!isWhiteAxl()) {
 							player.axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
@@ -624,7 +663,6 @@ public class Axl : Character {
 			}
 		}
 		chargeGfx();
-
 		bool weCanShoot = (undisguiseTime == 0 && assassinTime == 0);
 		if (weCanShoot) {
 			// Axl bullet
@@ -638,7 +676,23 @@ public class Axl : Character {
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
-
+				switch(player.weapon) {
+					case MettaurCrash:
+					case BeastKiller: 
+					case MachineBullets:
+					case RevolverBarrel:
+					case AncientGun:
+						if (canShoot() && !player.weapon.noAmmo()) {
+							if (shootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
+								recoilTime = 0.2f;
+								player.axlWeapon.axlShoot(player);
+							} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
+								recoilTime = 0.2f;
+								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+							}
+						}
+						break; 
+				}
 				// Double bullet
 				if (player.weapon is DoubleBullet && canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
@@ -864,6 +918,15 @@ public class Axl : Character {
 			dashedInAir++;
 			changeState(new Hover(), true);
 			return true;
+		}
+		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
+			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
+				changeState(new DodgeRoll(), true);
+				return true;
+			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new DodgeRoll(), true);
+				return true;
+			}
 		}
 		return base.normalCtrl();
 	}
@@ -1765,6 +1828,8 @@ public class Axl : Character {
 		if (isAnyZoom() || sniperMissileProj != null) {
 			return true;
 		}
+		if (player.currentMaverick != null) return true;
+
 		return base.isSoftLocked();
 	}
 

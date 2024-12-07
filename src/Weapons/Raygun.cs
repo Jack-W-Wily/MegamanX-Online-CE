@@ -287,7 +287,7 @@ public class RayGunAltProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, 1.5f, player, "axl_raygun_laser", 0, 0.33f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.RayGun2;
+		projId = (int)ProjIds.RayGunChargeBeam;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
