@@ -300,3 +300,56 @@ public class DrDopplerUncoatState : MaverickState {
 		}
 	}
 }
+
+
+
+public class BurnerPunch : CharState {
+
+	public bool earthquake;
+	public BurnerPunch() : base("flamepunch", "", "", "") {
+		superArmor = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
+		character.move(new Point(character.xDir * 200, 0));
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			
+			if (!earthquake){
+			character.shakeCamera(sendRpc: true);
+			earthquake = true;
+			var weapon = new TriadThunder();
+			new TriadThunderQuake(weapon, character.pos, 1, player, player.getNextActorNetId(), rpc: true);
+
+			character.playSound("crashX3", forcePlay: false, sendRpc: true);
+			}
+			return;
+		} 
+		 if (stateTime > 3f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+		
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		}
+}
+
+

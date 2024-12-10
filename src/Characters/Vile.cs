@@ -1121,7 +1121,8 @@ public class Vile : Character {
 
 	public override bool isToughGuyHyperMode() {
 		return sprite.name.Contains("grab") 
-		|| charState is VileStationaryHover ;
+		|| charState is VileStationaryHover
+		|| charState is VileHover ;
 	}
 }
 

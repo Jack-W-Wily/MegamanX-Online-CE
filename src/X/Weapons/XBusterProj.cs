@@ -22,10 +22,11 @@ public class BusterProj : Projectile {
 			projId = (int)ProjIds.ZBuster;
 			weapon = ZeroBuster.netWeapon;
 		}
-
+		if (!owner.isSigma){
 		if (rpc) {
 			byte[] extraArgs = new byte[] { (byte)type};
 			rpcCreate(pos, player, netProjId, xDir, extraArgs);
+		}
 		}
 	}
 

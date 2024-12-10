@@ -120,7 +120,7 @@ public class BlackArrowProj : Projectile {
 			} else if (type == 1) {
 				updateAngle();
 			}
-
+			//HeadShot Code
 			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
 				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
 				damager.damage = 0;
@@ -128,6 +128,7 @@ public class BlackArrowProj : Projectile {
 				destroySelf();
 				return;
 			}
+			//>>>>>>>>>>>>>>>>>>>>>>
 		}
 	}
 	public override List<byte> getCustomActorNetData() {
@@ -155,9 +156,9 @@ public class BlackArrowProj : Projectile {
 		type = 2;
 		vel = new Point();
 		useGravity = false;
-		maxTime = 4;
+		maxTime = 0;
 		if ((owner.character as Axl)?.isWhiteAxl() == true) {
-			maxTime = 10;
+			maxTime = 4;
 		}
 	}
 	public override void render(float x, float y) {
@@ -184,7 +185,7 @@ public class WindCutterProj : Projectile {
 	public float turnDir = 1;
 	public bool targetHit;
 	public WindCutterProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 450, 2, player, "windcutter_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 450, 2, player, "windcutter_proj", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 1f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;

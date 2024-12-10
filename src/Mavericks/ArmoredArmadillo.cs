@@ -65,6 +65,10 @@ public class ArmoredArmadillo : Maverick {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
+
+		if (input.isPressed(Control.Taunt, player)){
+		shakeCamera(sendRpc: true);
+		}
 		if (state is ArmoredARollState) {
 			drainAmmo(4);
 		} else if (state is ArmoredAGuardState) {

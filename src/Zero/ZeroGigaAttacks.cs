@@ -565,7 +565,7 @@ public class ZeroInferno : CharState {
 public class InfernoBeamUp : Projectile {
 	Player player;
 	public InfernoBeamUp(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 4, player, "zerox1_firebeam_up", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 0, 6, player, "zerox1_firebeam_up", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.InfernoBeamUp;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
@@ -606,7 +606,7 @@ public class InfernoBeamUp : Projectile {
 public class InfernoBeamDown : Projectile {
 	Player player;
 	public InfernoBeamDown(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 4, player, "zerox1_firebeam_down", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 0, 6, player, "zerox1_firebeam_down", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.InfernoBeamDown;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;

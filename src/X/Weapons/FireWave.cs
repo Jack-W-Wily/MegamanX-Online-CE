@@ -88,7 +88,7 @@ public class FireWaveProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 400, 1, player, "fire_wave",
-		1, 0.2f, netProjId, player.ownedByLocalPlayer
+		0, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.FireWave;
 		fadeSprite = "fire_wave_fade";

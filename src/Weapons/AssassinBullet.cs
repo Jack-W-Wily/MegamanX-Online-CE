@@ -24,15 +24,15 @@ public class AssassinBullet : AxlWeapon {
 	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle, IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
 		if (player.assassinHitPos == null) {
 			// URGENT TODO
-			// player.assassinHitPos = player.character.getFirstHitPos(AssassinBulletProj.range);
+			// player.assassinHitPos = player.character.pos;//getFirstHitPos(AssassinBulletProj.range);
 		}
-		var bullet = new AssassinBulletProj(weapon, bulletPos, player.assassinHitPos.hitPos, xDir, player, target, headshotTarget, netId);
-		bullet.applyDamage(player.assassinHitPos.hitGos.ElementAtOrDefault(0), player.assassinHitPos.isHeadshot);
+		//var bullet = new AssassinBulletProj(weapon, bulletPos, player.assassinHitPos.hitPos, xDir, player, target, headshotTarget, netId);
+		//bullet.applyDamage(player.assassinHitPos.hitGos.ElementAtOrDefault(0), player.assassinHitPos.isHeadshot);
 
-		if (player.ownedByLocalPlayer) {
-			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(bulletPos, bullet);
-			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
-		}
+		//if (player.ownedByLocalPlayer) {
+		//	AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(bulletPos, bullet);
+	//		RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
+		//}
 	}
 }
 

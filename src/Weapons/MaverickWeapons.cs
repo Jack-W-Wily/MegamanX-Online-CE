@@ -176,7 +176,7 @@ public class ChillPenguinWeapon : MaverickWeapon {
 	public ChillPenguinWeapon(Player? player) : base(player) {
 		index = (int)WeaponIds.ChillPenguin;
 		weaponSlotIndex = 66;
-		displayName = "Chill Penguin";
+		displayName = "Icy Penguigo";
 	}
 }
 
@@ -184,7 +184,7 @@ public class SparkMandrillWeapon : MaverickWeapon {
 	public SparkMandrillWeapon(Player? player) : base(player) {
 		index = (int)WeaponIds.SparkMandrill;
 		weaponSlotIndex = 67;
-		displayName = "Spark Mandrill";
+		displayName = "Spark Mandriller";
 	}
 }
 
@@ -264,7 +264,7 @@ public class BubbleCrabWeapon : MaverickWeapon {
 	public BubbleCrabWeapon(Player? player) : base(player) {
 		index = (int)WeaponIds.BubbleCrab;
 		weaponSlotIndex = 77;
-		displayName = "Bubble Crab";
+		displayName = "Bubbly Crablos";
 	}
 }
 
@@ -318,7 +318,7 @@ public class FakeZeroWeapon : MaverickWeapon {
 	public FakeZeroWeapon(Player? player) : base(player) {
 		index = (int)WeaponIds.FakeZero;
 		weaponSlotIndex = 83;
-		displayName = "Fake Zero";
+		displayName = "Claudio (Clone Zero)";
 	}
 }
 

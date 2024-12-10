@@ -209,7 +209,7 @@ public class X3ChargeShot : CharState {
 			if (state == 0) {
 				Point shootPos = character.getShootPos();
 				int shootDir = character.getShootXDir();
-				if (mmx.hasUltimateArmor) {
+				if (!mmx.hasUltimateArmor) {
 					new Anim(
 						shootPos, "buster4_x3_muzzle", shootDir,
 						player.getNextActorNetId(), true, sendRpc: true

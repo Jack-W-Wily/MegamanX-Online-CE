@@ -362,10 +362,10 @@ public partial class Player {
 		name = serverPlayer.name;
 		ping = serverPlayer.ping;
 
-		if (!ownedByLocalPlayer) {
-			kills = serverPlayer.kills;
-			deaths = serverPlayer.deaths;
-		}
+	//	if (ownedByLocalPlayer) {
+		kills = serverPlayer.kills;
+		deaths = serverPlayer.deaths;
+	//	}
 
 		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null &&
 			newAlliance != serverPlayer.autobalanceAlliance.Value
@@ -1555,7 +1555,9 @@ public partial class Player {
 		if (charNum == (int)CharIds.Sigma) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}
-		//weapons.Add(new AssassinBullet());
+		if (charNum == (int)CharIds.Axl) {
+		retChar.weapons.Add(new AssassinBullet());
+		}
 		retChar.weapons.Add(new UndisguiseWeapon());
 
 		sigmaAmmo = dnaCore.rakuhouhaAmmo;
@@ -1906,7 +1908,7 @@ public partial class Player {
 	}
 
 	public bool canReviveVile() {
-		if (Global.level.isElimination() ||
+		if (//Global.level.isElimination() ||
 			!lastDeathCanRevive ||
 			newCharNum != 2 ||
 			currency < reviveVileCost ||
@@ -1914,7 +1916,7 @@ public partial class Player {
 		) {
 			return false;
 		}
-		if (limboChar is not Vile vile || vile.summonedGoliath) {
+		if (limboChar is not Vile vile ){//|| vile.summonedGoliath) {
 			return false;
 		}
 		return true;
@@ -1936,6 +1938,7 @@ public partial class Player {
 			newCharNum != 4 ||
 			currency < reviveSigmaCost ||
 			lastDeathWasSigmaHyper
+			|| !isSigma3()
 		) {
 			return false;
 		}
@@ -1985,7 +1988,8 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return !Global.level.isElimination() && armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
+		return false;
+		//!Global.level.isElimination() && armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
 	}
 
 	public void reviveVile(bool toMK5) {
@@ -2561,7 +2565,8 @@ public partial class Player {
 	}
 
 	public bool isPuppeteer() {
-		return loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
+		return true;
+		//loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
 	}
 
 	public bool isStriker() {
@@ -2569,7 +2574,8 @@ public partial class Player {
 	}
 
 	public bool isTagTeam() {
-		return loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
+		return false;
+		//loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
 	}
 
 	public bool isRefundableMode() {

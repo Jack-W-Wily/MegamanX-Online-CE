@@ -583,6 +583,7 @@ public class LevelData {
 		{ "aircraftcarrier", "gravityBeetle" },
 		{ "dopplerlab", "dopplerLab" },
 		{ "dopplerlab2", "dopplerLab" },
+		{ "doppler4", "doppleSigma" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse" },

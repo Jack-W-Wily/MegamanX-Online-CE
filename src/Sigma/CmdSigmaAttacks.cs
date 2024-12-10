@@ -62,7 +62,8 @@ public class VirusSlash2 : CharState {
 		base.update();
 
 		if (character.grounded){
-			if (player.input.isPressed(Control.Shoot, player) 
+			if (player.input.isHeld(Control.Down,player)
+			&& player.input.isLeftOrRightHeld(player)
 			&&  character.frameIndex > 2 && player.currency > 0){
 				player.currency -= 1;
 			character.changeState(new VirusSlash3(), true);
@@ -70,7 +71,7 @@ public class VirusSlash2 : CharState {
 			}
 		}
 
-		if (character.isAnimOver()) {
+		if (character.isAnimOver() || !player.input.isHeld(Control.Shoot,player)) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -103,14 +104,17 @@ public class VirusSlash3 : CharState {
 		base.update();
 
 		if (character.grounded){
-			if (player.input.isPressed(Control.Shoot, player) 
+			if (player.input.isHeld(Control.Up,player)
+			&& player.input.isLeftOrRightHeld(player)
 			&& character.frameIndex > 4 && player.currency > 0){
 				player.currency -= 1;
 			character.changeState(new VirusSlash1(), true);
 		
 			}
 		}
-		if (character.isAnimOver()) {
+
+		
+		if (character.isAnimOver() || !player.input.isHeld(Control.Shoot, player) )  {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -148,7 +152,7 @@ public class SigmaSlashState : CharState {
 	public override void update() {
 		base.update();
 		if (character.grounded){
-			if (player.input.isHeld (Control.Special2,player)
+			if (player.input.isHeld(Control.Up,player)
 			&& stateTime > 0.1 && player.currency > 0){
 				player.currency -= 1;
 			character.changeState(new VirusSlash2(), true);

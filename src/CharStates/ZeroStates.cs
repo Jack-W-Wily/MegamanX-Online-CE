@@ -80,14 +80,19 @@ public class HyperZeroStart : CharState {
 		character.player.currency -= 5;
 	
 		if (player.input.isHeld(Control.Up, player)) {
-			zero.changeSpriteFromName("hyper_awakened", true);
+			zero.changeSpriteFromName("hyper_start2", true);
 			virusAnimName = "zerovirus";
 			virusAnim[0] = createVirusAnim();
 			virusEffectParts = new Anim(character.pos.addxy(0, 4), "viruseffect", -character.xDir, null, false);
 			virusEffectParts.blink = true;
-		} else {
-		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
-			
+		} 
+		
+		if (player.input.isHeld(Control.Down, player)) {
+			zero.changeSpriteFromName("hyper_start3", true);
+		}
+		 if (!player.input.isHeld(Control.Down, player)
+		 &&player.input.isHeld(Control.Up, player) ) {
+		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);	
 		}
 	}
 
@@ -135,19 +140,19 @@ public class HyperZeroStart : CharState {
 	}
 
 	public void activateHypermode() {
-		if (player.input.isHeld(Control.Up, player)) {
+		if (character.sprite.name.Contains("2")) {
 			zero.awakenedPhase = 1;
 			float storedAmmo = zero.gigaAttack.ammo;
 			zero.gigaAttack = new ShinMessenkou();
 			zero.gigaAttack.ammo = 32;
 		} 
-		if (player.input.isHeld(Control.Down, player)) {
+		if (character.sprite.name.Contains("3")) {
 			zero.isViral = true;
 			float storedAmmo = zero.gigaAttack.ammo;
 			zero.gigaAttack = new DarkHoldWeapon();
 			zero.gigaAttack.ammo = 32;
-		} if (!player.input.isHeld(Control.Down, player)
-		    && !player.input.isHeld(Control.Up, player)) {
+		} if (!character.sprite.name.Contains("2")
+		    && !character.sprite.name.Contains("3")) {
 			zero.isBlack = true;
 			zero.freeBusterShots = 10;
 		}

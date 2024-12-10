@@ -149,15 +149,15 @@ public class CmdSigma : BaseSigma {
 			),
 				"sigma_slash_1" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
-				3, 30, 0.15f
+				2, Global.defFlinch, 0.15f
 			),
 				"sigma_slash_2" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
-				2, 30, 0.15f
+				3, Global.superFlinch, 0.15f
 			),
 				"sigma_slash_3" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
-				3, 30, 0.15f
+				3, Global.defFlinch, 0.15f
 			),
 			_ => null
 		};

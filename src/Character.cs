@@ -818,6 +818,7 @@ public partial class Character : Actor, IDamagable {
 		&& player.input.isHeld(Control.WeaponLeft, player)
 		&& player.input.isHeld(Control.WeaponRight, player)
 		&& player.currency > 0){
+		player.currency -= 1;
 		changeState(new Idle(), true);
 		invulnTime = 1.5f;
 		new MechFrogStompShockwave(new MechFrogStompWeapon(player), 

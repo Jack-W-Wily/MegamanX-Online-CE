@@ -12,7 +12,7 @@ public class HyperCharge : Weapon {
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = 31;
 		weaponSlotIndex = 36;
-		//shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
+		shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
 		fireRate = 120;
 		//switchCooldown = 0.25f;
 		switchCooldownFrames = 15;

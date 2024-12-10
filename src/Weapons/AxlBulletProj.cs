@@ -2,7 +2,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 public class AxlBulletProj : Projectile {
 	public AxlBulletProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, 1, 600, 1, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBullet;
 		angle = bulletDir.angle;
@@ -10,6 +10,20 @@ public class AxlBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
+	}
+
+	
+	public override void update() {
+		base.update();
+		//HeadShot Code
+			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
+				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
+				damager.damage = 0;
+				playSound("hurt");
+				destroySelf();
+				return;
+			}
+			//>>>>>>>>>>>>>>>>>>>>>>
 	}
 
 	public override void onHitWall(CollideData other) {

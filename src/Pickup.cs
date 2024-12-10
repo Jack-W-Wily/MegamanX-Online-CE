@@ -108,6 +108,10 @@ public class Pickup : Actor {
 }
 
 public class LargeHealthPickup : Pickup {
+
+	public float timer;
+
+	public NeutralEnemy enemy;
 	public LargeHealthPickup(
 		Player owner, Point pos, ushort? netId,
 		bool ownedByLocalPlayer, bool sendRpc = false
@@ -117,7 +121,14 @@ public class LargeHealthPickup : Pickup {
 	) {
 		healAmount = 8;
 		pickupType = PickupType.Health;
-	}
+	//	if (enemy == null){
+	//	enemy = new NeutralEnemy(
+	//			 pos, 0, true, 150, true);
+	//	}
+	}	
+
+
+	
 }
 
 public class SmallHealthPickup : Pickup {

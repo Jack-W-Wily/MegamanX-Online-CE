@@ -298,14 +298,20 @@ public class BHornetShootState : MaverickState {
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
+
+			maverick.playSound("busterX3");
+
+			if (!maverick.sprite.name.Contains("fly")){
+			new ParasiticBombProj(maverick.weapon, shootPos.Value,  maverick.xDir, player, player.getNextActorNetId(), true);
+			}else {
 			//maverick.playSound("???", sendRpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 2).normalize(), player, player.getNextActorNetId(), rpc: true);
+			}
 		}
-
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleFallOrFly();
 		}

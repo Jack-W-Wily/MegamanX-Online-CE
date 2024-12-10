@@ -49,11 +49,24 @@ public class NeutralEnemy : Actor, IDamagable {
 
 	// Sprite change override.
 	public virtual string getSprite(string spriteName) {
-		if (spriteName is null or "") {
-			return "";
-		}
-		return spriteName;
+	//	if (spriteName is null or "") {
+	//		return "ms_hogumer_idle";
+	//	}
+		return "ms_hogumer_idle";// + spriteName;
 	}
+
+
+	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
+		
+			return new GenericMeleeProj(
+					new FireWave(), centerPoint, ProjIds.BBuffaloStomp,
+					null, damage: 4 , flinch: Global.defFlinch, hitCooldown: 0.5f
+				);
+		}
+		
+	
+	
+
 
 	public virtual void changeState(NeutralEnemyState newState) {
 		// Set the character as soon as posible.
