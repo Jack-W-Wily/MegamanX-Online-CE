@@ -10,7 +10,7 @@ public class StrikeChain : Weapon {
 	public static StrikeChain netWeapon = new();
 	public StrikeChain() : base() {
 		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged", "" };
-		fireRate = 25;
+		fireRate = 15;
 		index = (int)WeaponIds.StrikeChain;
 		weaponBarBaseIndex = 14;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -194,6 +194,7 @@ public class StrikeChainProj : Projectile {
 		projId = (int)ProjIds.StrikeChain;
 		destroyOnHit = false;
 		maxTime = 4;
+		ShouldClang = true;
 		startDir = xDir;
 		//xScale = 1;
 

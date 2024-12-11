@@ -246,6 +246,12 @@ public class Damager {
 				case (int)ProjIds.CrystalHunter:
 					character?.crystalize();
 					break;
+				case (int)ProjIds.SpreadShot:
+					character?.crystalize();
+					break;
+				case (int)ProjIds.MK2StunShot:
+					character?.crystalize();
+					break;
 				case (int)ProjIds.CSnailCrystalHunter:
 					character?.crystalize();
 					break;
@@ -279,7 +285,6 @@ public class Damager {
 					damagerMessage = onBanzai(damagable, owner);
 					break;
 				case (int)ProjIds.ElectricShock:
-				case (int)ProjIds.MK2StunShot:
 				case (int)ProjIds.MorphMPowder:
 					character?.paralize();
 					break;
@@ -366,9 +371,20 @@ public class Damager {
 			owner.character.wasFightingSigma = true;
 			character.wasFightingVile = true;
 			}
+
+			// Hexa stuff
+			if (character.charState is HexaInvoluteState) {
+					character.addHealth(damage);			
+			}
 			// Vile stomp 
-			if (character.sprite.name.Contains("knocked_down") && projId == (int)ProjIds.VileStomp){
+			if (character.sprite.name.Contains("knocked_down")
+			 && projId == (int)ProjIds.VileStomp
+			 && !character.isStatusImmune()){
 			owner.character.changeState(new VileStompState(character), true);
+			character.changeState(new VileStomped(owner.character), true);
+			}
+			if (projId == (int)ProjIds.VileStomp2
+			&& !character.isStatusImmune()){
 			character.changeState(new VileStomped(owner.character), true);
 			}
 			// Vile Air Raid 
@@ -381,7 +397,9 @@ public class Damager {
 			}
 			
 			// Vile Blockable Grab
-			if (!character.sprite.name.Contains("block") && projId == (int)ProjIds.VileGrab){
+			if (!character.sprite.name.Contains("block") &&
+			 projId == (int)ProjIds.VileGrab
+			 && !character.isStatusImmune()){
 			character.changeState(new VileMK2Grabbed(owner.character), true);
 			}
 			if (owner.character.charState is VileAirRaid){
@@ -394,7 +412,8 @@ public class Damager {
 		//Get Launched
 		if (((projId == (int)ProjIds.BlockableLaunch
 		|| projId == (int)ProjIds.VileAirRaidPlusKnock
-		) &&	 !victim.sprite.name.Contains("block"))) {		
+		) &&	 !victim.sprite.name.Contains("block"))
+		&& !character.isStatusImmune()) {		
 		character.changeState(new LaunchedState(owner.character), true);
 		}
 

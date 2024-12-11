@@ -466,6 +466,10 @@ public class Projectile : Actor {
 				return;
 			}
 
+
+			
+
+
 			if (this is ShotgunIceProj) {
 				var shotgunIceProj = this as ShotgunIceProj;
 				if (shotgunIceProj == other.gameObject) return;

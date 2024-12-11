@@ -115,6 +115,7 @@ public class GenericStun : CharState {
 
 		crystalizeLogic();
 		paralizeAnimLogic();
+		paralizeAnimLogic2();
 		freezeLogic();
 
 		if (hurtSpeed != 0) {
@@ -209,6 +210,39 @@ public class GenericStun : CharState {
 			}
 		}
 	}
+
+
+	public void paralizeAnimLogic2() {
+		if (character.paralyzedTime == 0) {
+			return;
+		}
+		character.useGravity = true;
+		character.vel.y = 0;
+		if (canPlayStaticSound) {
+			character.playSound("voltcStatic");
+			canPlayStaticSound = false;
+		}
+		reduceStunFrames(ref character.paralyzedTime);
+		character.stunInvulnTime = 2;
+
+		if (paralyzeAnim == null && character.paralyzedTime > 0) {
+			paralyzeAnim = new Anim(
+				character.getCenterPos(), "vile_stun_static",
+				1, character.player.getNextActorNetId(), false,
+				host: character, sendRpc: true
+			);
+			paralyzeAnim.setzIndex(character.zIndex + 100);
+		}
+		if (character.paralyzedTime == 0) {
+			changeAnim = true;
+			canPlayStaticSound = true;
+			if (paralyzeAnim != null) {
+				paralyzeAnim.destroySelf();
+				paralyzeAnim = null;
+			}
+		}
+	}
+
 
 	public string getStunAnim() {
 		if (character.frozenTime > 0) {

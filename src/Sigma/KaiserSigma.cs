@@ -278,6 +278,11 @@ public partial class KaiserSigma : Character {
 		return null;
 	}
 
+
+	public virtual bool isStatusImmune() {
+		return true;
+	}
+
 	public override Point getCamCenterPos(bool ignoreZoom = false) {
 		if (sprite.name.StartsWith("kaisersigma_virus")) {
 			return pos.addxy(camOffsetX, -12);

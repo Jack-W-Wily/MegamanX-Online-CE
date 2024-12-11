@@ -50,7 +50,7 @@ public class SpiralMagnum : AxlWeapon {
 
 		Point shellPos = bulletPos.add(axl.getAxlBulletDir().times(-20));
 		var spiralMagnumShell = new SpiralMagnumShell(shellPos, -axl.xDir, player.getNextActorNetId(), sendRpc: true);
-
+		
 		if (axl.isZooming() == false) {
 			bullet = new SpiralMagnumProj(weapon, bulletPos, 0, 0, player, bulletDir.Value, target, headshotTarget, netId);
 		} else {
@@ -165,7 +165,10 @@ public class SpiralMagnumProj : Projectile {
 		this.headshotChar = headshotChar;
 
 		Axl? axl = player.character as Axl;
-
+		if (type == 2){
+		damager.damage = 12f;
+		damager.flinch = Global.superFlinch;
+		}
 		if (type == 0) damager.damage = 1.5f;
 		isHyper = axl?.isWhiteAxl() == true;
 		isScoped = type == 1;

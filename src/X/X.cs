@@ -157,6 +157,12 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+
+			player.fgMoveAmmo += Global.speedMul;
+		if (player.fgMoveAmmo > player.fgMoveMaxAmmo) player.fgMoveAmmo = player.fgMoveMaxAmmo;
+
+
+
 		gigaWeapon?.update();
 		hyperNovaStrike?.update();
 		itemTracer?.update();
@@ -218,6 +224,29 @@ public class MegamanX : Character {
 			changeState(new X6SaberState(grounded), true);
 			
 		}
+
+
+		bool hadokenCheck = false;
+		bool shoryukenCheck = false;
+		if (hasHadoukenEquipped()) {
+			hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
+		}
+		if (hasShoryukenEquipped()) {
+			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		}
+		if (player.isX && hadokenCheck && canUseFgMove()) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Hadouken(), true);
+			return true;
+		}
+		if (player.isX && shoryukenCheck && canUseFgMove()) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Shoryuken(isUnderwater()), true);
+			return true;
+		}
+
 		return base.attackCtrl();
 	}
 

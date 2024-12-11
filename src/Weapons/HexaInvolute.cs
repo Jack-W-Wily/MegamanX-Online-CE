@@ -20,7 +20,7 @@ public class HexaInvoluteState : CharState {
 	public HexaInvoluteState() : base("super", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;
-		invincible = true;
+		//invincible = true;
 	}
 
 	public override void update() {
@@ -108,6 +108,9 @@ public class HexaInvoluteProj : Projectile {
 	public float ang;
 	SoundWrapper sound;
 	float soundCooldown;
+
+
+
 	public List<HexaInvolutePart> parts = new List<HexaInvolutePart>();
 	public HexaInvoluteProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "empty", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
@@ -119,6 +122,11 @@ public class HexaInvoluteProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+
+
+		isMelee = true;
+
+
 	}
 
 	public override void update() {

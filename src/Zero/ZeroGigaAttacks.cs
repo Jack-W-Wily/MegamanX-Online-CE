@@ -363,7 +363,7 @@ public class RakuhouhaProj : Projectile {
 		if (!isCFlasher) {
 			fadeSprite = "rakuhouha_fade";
 		} else {
-			damager.damage = 2;
+			damager.damage = 3;
 			damager.hitCooldown = 0.5f;
 			damager.flinch = 0;
 			destroyOnHit = false;
@@ -388,6 +388,8 @@ public class RakuhouhaProj : Projectile {
 		if (time > 0.5) {
 			destroySelf(fadeSprite);
 		}
+
+		if (!isCFlasher && time > 0.3f)damager.damage = 4;
 	}
 }
 

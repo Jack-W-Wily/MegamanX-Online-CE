@@ -137,6 +137,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.ElectricShock:
 				proj = new StunShotProj(new VileMissile(VileMissileType.ElectricShock), pos, xDir, 0, player, netProjByte);
 				break;
+				case (int)ProjIds.SpreadShot:
+				proj = new StunShotProj(new VileMissile(VileMissileType.ElectricShock), pos, xDir, 0, player, netProjByte);
+				break;
 			case (int)ProjIds.MK2StunShot:
 				proj = new VileMK2StunShotProj(new VileMK2StunShot(), pos, xDir, player, netProjByte);
 				break;

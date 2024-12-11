@@ -26,6 +26,24 @@ public class AssassinBullet : AxlWeapon {
 			// URGENT TODO
 			// player.assassinHitPos = player.character.pos;//getFirstHitPos(AssassinBulletProj.range);
 		}
+		if (!player.ownedByLocalPlayer) return;
+		if (player.character == null) return;
+		if (player.character is not Axl axl) return;
+			Point? bulletDir = Point.createFromAngle(angle);
+		Projectile? bullet = null;
+		Point? origPos = bulletPos;
+		float jumpDist = 0;
+		Point shellPos = bulletPos.add(axl.getAxlBulletDir().times(-20));
+		var spiralMagnumShell = new SpiralMagnumShell(shellPos, -axl.xDir, player.getNextActorNetId(), sendRpc: true);
+			if (headshotTarget != null || target != null) {
+				bulletPos = axl.axlGenericCursorWorldPos;
+				jumpDist = bulletPos.distanceTo(bulletPos);
+			}
+			bullet = new SpiralMagnumProj(weapon, bulletPos, jumpDist, 2, player, bulletDir.Value, target, headshotTarget, netId);			
+			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(origPos.Value, bullet);
+					RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, origPos.Value, xDir, angle);
+
+
 		//var bullet = new AssassinBulletProj(weapon, bulletPos, player.assassinHitPos.hitPos, xDir, player, target, headshotTarget, netId);
 		//bullet.applyDamage(player.assassinHitPos.hitGos.ElementAtOrDefault(0), player.assassinHitPos.isHeadshot);
 

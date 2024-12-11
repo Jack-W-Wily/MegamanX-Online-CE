@@ -1527,6 +1527,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+
 	public void crystalize(float timeToCrystalize = 120) {
 		if (!ownedByLocalPlayer ||
 			isInvulnerable() ||

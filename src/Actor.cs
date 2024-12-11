@@ -385,8 +385,8 @@ public partial class Actor : GameObject {
 		var matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 
 		// If vile mk2 and mk5 sounds were not found, use the vile ones
-		if (matchingVoice == null && (spriteName.StartsWith("vilemk2_") || spriteName.StartsWith("vilemk5_"))) {
-			spriteName = spriteName.Replace("vilemk2_", "vile_").Replace("vilemk5_", "vile_");
+		if (matchingVoice == null && (spriteName.StartsWith("vilemk2_") || spriteName.StartsWith("vilemk2_"))) {
+			spriteName = spriteName.Replace("vilemk2_", "vile_").Replace("vilemk2_", "vile_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
 

@@ -428,6 +428,7 @@ public enum ProjIds {
 	TBreakerProj,
 
 	ElectricShock,
+	SpreadShot,
 	MK2StunShot,
 	VileMissile,
 	PopcornDemon,

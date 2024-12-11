@@ -578,9 +578,9 @@ public class Vile : Character {
 		if (chargeLevel == 3) {
 			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 		}
-		if (chargeLevel == 4 && isVileMK5) {
-			changeState(new HexaInvoluteState(), true);
-		} 
+	//	if (chargeLevel == 4 && isVileMK5) {
+	//		changeState(new HexaInvoluteState(), true);
+	//	} 
 	}
 	public override bool chargeButtonHeld() {
 		return player.input.isHeld(Control.Special1, player)
@@ -869,6 +869,10 @@ public class Vile : Character {
 		if (sprite.name.Contains("crouch_start")) {
 			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.VileStomp, player, 0, 0, 0);
 		}
+		if (sprite.name.Contains("vilemk5_stomp")) {
+			proj = new GenericMeleeProj(new VileStomp(), 
+			centerPoint, ProjIds.VileStomp2, player, 0.3f, 0, 0.05f);
+		}
 
 		if (sprite.name.Contains("air_bomb_attack")) {
 			proj = new GenericMeleeProj( new MechFrogStompWeapon(player), 
@@ -978,9 +982,9 @@ public class Vile : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-	//	if (isVileMK5) {
-	//		return "vilemk5_" + spriteName;
-	//	}
+		if (isVileMK5) {
+			return "vilemk5_" + spriteName;
+		}
 	//	if (isVileMK2) {
 	//		return "vilemk2_" + spriteName;
 	//	}
@@ -1124,6 +1128,12 @@ public class Vile : Character {
 		|| charState is VileStationaryHover
 		|| charState is VileHover ;
 	}
+
+	public virtual bool isStatusImmune() {
+		return charState is HexaInvoluteState ;
+	}
+
+
 }
 
 

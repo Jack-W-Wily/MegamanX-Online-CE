@@ -309,6 +309,7 @@ public class BurnerPunch : CharState {
 	public BurnerPunch() : base("flamepunch", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;
+		normalCtrl = true;
 	}
 
 	public override void update() {
@@ -329,11 +330,11 @@ public class BurnerPunch : CharState {
 
 			character.playSound("crashX3", forcePlay: false, sendRpc: true);
 			}
-			return;
+			
 		} 
 		 if (stateTime > 3f) {
 			character.changeToIdleOrFall();
-			return;
+			
 		}
 
 		

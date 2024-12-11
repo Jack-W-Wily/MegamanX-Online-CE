@@ -99,11 +99,18 @@ public class VileDodge : CharState {
 					character.turnToInput(player.input, player);
 		}
 
+		if (player.input.isPressed(Control.Down, player)
+		&& character.sprite.name.Contains("mk5")) {
+		
+		character.changeState(new HexaInvoluteState(), true);
+		}
+
+
 		if (character.sprite.name.Contains("banzai")
 		&& character.frameIndex == 4){	
 			if (Banzai == null){
 			Banzai=	new BanzaiBeetleProj(new VileMK2Grab(), 
-			character.getShootPos(), character.xDir, player, 
+			character.pos.addxy(0,-30), character.xDir, player, 
 			player.getNextActorNetId(), true);
 			}
 		}

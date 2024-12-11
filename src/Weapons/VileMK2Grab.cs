@@ -247,7 +247,8 @@ public class VileStompState : CharState {
 
 		if (leechTime > 0.10f && character.frameIndex == 2) {
 			leechTime = 0;
-			character.addHealth(1);
+			if (!character.sprite.name.Contains("mk5"))character.addHealth(1);
+			if (character.sprite.name.Contains("mk5"))character.addHealth(0.33f);
 			character.shakeCamera(sendRpc: true);
 		//	var damager = new Damager(player, 1f, 0, 0);
 		//	damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);

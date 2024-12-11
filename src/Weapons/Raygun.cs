@@ -163,7 +163,7 @@ public class RayGunProj : Projectile {
 	//float lastAngle;
 	const float maxLen = 50;
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, xDir, 400, 0.35f, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 0.5f, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		reflectable = true;
 		if ((player?.character as Axl)?.isWhiteAxl() == true) {
 			speed = 525;
@@ -184,6 +184,17 @@ public class RayGunProj : Projectile {
 
 	public override void update() {
 		base.update();
+
+				//HeadShot Code
+			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
+				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
+				damager.damage = 0;
+				playSound("hurt");
+				return;
+			}
+			//>>>>>>>>>>>>>>>>>>>>>>
+
+
 		if (lenDelay > 0.01f) {
 			len += Global.spf * 300;
 			if (len > maxLen) len = maxLen;
