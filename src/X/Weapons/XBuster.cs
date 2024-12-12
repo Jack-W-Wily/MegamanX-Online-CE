@@ -80,7 +80,13 @@ public class XBuster : Weapon {
 		Player player = character.player;
 		bool isUA = (character as MegamanX)?.hasUltimateArmor == true;
 		string sound = "";
-
+		if (player.hasArmArmor((int)ArmorId.Giga)){
+			shootSecond(character, args);
+		}
+		else if (player.hasArmArmor((int)ArmorId.Max)){
+			shootMax(character, args);
+		}
+		else {
 		if (chargeLevel == 0) {
 			lemonsOnField.Add(new BusterProj(pos, xDir, 0, player, player.getNextActorNetId(), true));
 			sound = "buster";
@@ -115,6 +121,7 @@ public class XBuster : Weapon {
 		}
 
 		if (!string.IsNullOrEmpty(sound)) character.playSound(sound, sendRpc: true);	
+		}
 	}
 
 	public override void shootSecond(Character character, int[] args) {

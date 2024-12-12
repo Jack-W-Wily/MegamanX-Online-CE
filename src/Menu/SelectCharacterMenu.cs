@@ -24,18 +24,19 @@ public class PlayerCharData {
 }
 
 public enum CharIds {
-	X,
-	Zero,
-	Vile,
-	Axl,
-	Sigma,
-	PunchyZero,
-	BusterZero,
+	X = 0,
+	Zero  = 1,
+	Vile  = 2,
+	Axl  = 3,
+	Sigma  = 4,
+	PunchyZero  = 5,
+	BusterZero  = 6,
+	RagingChargeX  = 7,
 	// Non-standard chars start here.
 	WolfSigma = 100,
 	ViralSigma,
 	KaiserSigma,
-	RagingChargeX,
+	
 	// Non-vanilla chars start here.
 	Rock = 10,
 }
@@ -53,6 +54,7 @@ public class CharSelection {
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", 0, 1, 0, "smenu_x", 0),
+		new CharSelection("X (Rage)", 7, 1, 0, "smenu_x", 0),
 		
 		new CharSelection("Zero (Early)", 5, 1, 0, "smenu_zero", 0) {
 		},

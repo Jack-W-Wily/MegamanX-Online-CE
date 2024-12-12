@@ -461,7 +461,11 @@ public class WarpIn : CharState {
 		destY = character.pos.y;
 		destX = character.pos.x;
 		startY = character.pos.y;
-
+		if (player.isRageX){
+			player.weapons.Add(new RagingChargeBuster());
+			player.weapons.Add(new XBuster());
+		}
+			
 		if (player.warpedInOnce || Global.debug) {
 			sigmaRounds = 10;
 		}

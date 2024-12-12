@@ -157,6 +157,26 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		// Shotos
+		bool hadokenCheck = false;
+		bool shoryukenCheck = false;
+		if (hasHadoukenEquipped()) {
+			hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
+		}
+		if (hasShoryukenEquipped()) {
+			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		}
+		if (player.isX && hadokenCheck && canUseFgMove()) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Hadouken(), true);
+		}
+		if (player.isX && shoryukenCheck && canUseFgMove()) {
+			if (!player.hasAllItems()) player.currency -= 3;
+			player.fgMoveAmmo = 0;
+			changeState(new Shoryuken(isUnderwater()), true);
+		}
+		//>>>>>>>>>>>>>>>>>
 
 			player.fgMoveAmmo += Global.speedMul;
 		if (player.fgMoveAmmo > player.fgMoveMaxAmmo) player.fgMoveAmmo = player.fgMoveMaxAmmo;
@@ -192,6 +212,27 @@ public class MegamanX : Character {
 
 	public override bool normalCtrl() {
 		
+		if (!grounded) {
+		if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
+			CharState dashState;
+			if (player.hasBootsArmor(3)){
+				if (player.input.isHeld(Control.Up, player)) {
+					dashState = new UpDash(Control.Dash);
+				} else {
+				dashState = new AirDash(dashControl);
+				}	
+			}
+			else if (player.hasBootsArmor(2)){
+				dashState = new AirDash(dashControl);		
+			}
+			else {
+				isDashing = true;
+				dashState = new Fall();		
+			
+			}
+			
+		}
+		}
 	if (!player.input.isHeld(Control.Shoot, player) 
 		 && charState is not Dash && grounded && 
 				player.input.isHeld(Control.Up, player) )
@@ -226,27 +267,7 @@ public class MegamanX : Character {
 		}
 
 
-		bool hadokenCheck = false;
-		bool shoryukenCheck = false;
-		if (hasHadoukenEquipped()) {
-			hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
-		}
-		if (hasShoryukenEquipped()) {
-			shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
-		}
-		if (player.isX && hadokenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) player.currency -= 3;
-			player.fgMoveAmmo = 0;
-			changeState(new Hadouken(), true);
-			return true;
-		}
-		if (player.isX && shoryukenCheck && canUseFgMove()) {
-			if (!player.hasAllItems()) player.currency -= 3;
-			player.fgMoveAmmo = 0;
-			changeState(new Shoryuken(isUnderwater()), true);
-			return true;
-		}
-
+	
 		return base.attackCtrl();
 	}
 
@@ -389,6 +410,45 @@ public class MegamanX : Character {
 		stingActiveTime = 0;
 	}
 
+
+	public override void addAmmo(float amount) {
+		getRefillTargetWeapon()?.addAmmoHeal(amount);
+	}
+
+	public override void addPercentAmmo(float amount) {
+		getRefillTargetWeapon()?.addAmmoPercentHeal(amount);
+	}
+
+	public Weapon? getRefillTargetWeapon() {
+		if (player.weapon.canHealAmmo && player.weapon.ammo < player.weapon.maxAmmo) {
+			return player.weapon;
+		}
+		foreach (Weapon weapon in player.weapons) {
+			if (weapon is GigaCrush or HyperNovaStrike or HyperCharge &&
+			player.weapon.ammo < player.weapon.maxAmmo
+			) {
+				return weapon;
+			}
+		}
+		Weapon? targetWeapon = null;
+		float targetAmmo = Int32.MaxValue;
+		foreach (Weapon weapon in player.weapons) {
+			if (!weapon.canHealAmmo) {
+				continue;
+			}
+			if (weapon != player.weapon &&
+				weapon.ammo < weapon.maxAmmo &&
+				weapon.ammo < targetAmmo
+			) {
+				targetWeapon = weapon;
+				targetAmmo = targetWeapon.ammo;
+			}
+		}
+		return targetWeapon;
+	}
+
+	
+
 	public void activateMaxBarrier(bool isFlinchOrStun) {
 		if (!ownedByLocalPlayer ||
 			barrierActiveTime > 0 ||
@@ -428,8 +488,8 @@ public class MegamanX : Character {
 			!isInvulnerableAttack() && 
 			chargedRollingShieldProj == null && 
 			stingActiveTime == 0 && canAffordFgMove() && 
-			hadoukenCooldownTime == 0 && currentWeapon is XBuster && 
-			player.fgMoveAmmo >= player.fgMoveMaxAmmo && grounded
+			hadoukenCooldownTime == 0 && 
+			player.fgMoveAmmo >= player.fgMoveMaxAmmo 
 		);
 	}
 
@@ -467,11 +527,13 @@ public class MegamanX : Character {
 		return (int)(sprite.name switch {
 			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
 			"mmx_shoryuken" => MeleeIds.Shoryuken,
-			"mmx_block" => MeleeIds.XBlock,
-			"mmx_beam_saber" or "mmx_beam_saber_air" => MeleeIds.MaxZSaber,
-			"mmx_beam_saber2" => MeleeIds.ZSaber,
-			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
-			"mmx_nova_strike" or "mmx_nova_strike_down" or "mmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_block" or "rmx_block" => MeleeIds.XBlock,
+			"mmx_beam_saber" or "mmx_beam_saber_air" or
+			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
+			"mmx_beam_saber2" or "rmx_beam_saber2" => MeleeIds.ZSaber,
+			"mmx_beam_saber_air2" or "rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
+			"mmx_nova_strike" or "mmx_nova_strike_down" or 
+			"mmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light Helmet.
 			"mmx_jump" or "mmx_jump_shoot" or "mmx_wall_kick" or "mmx_wall_kick_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbutt,
@@ -510,7 +572,7 @@ public class MegamanX : Character {
 				2, 10, 0.5f, addToLevel: addToLevel
 			),
 			(int)MeleeIds.XBlock => new GenericMeleeProj(
-				ZXSaber.netWeapon, projPos, ProjIds.Headbutt, player,
+				ZXSaber.netWeapon, projPos, ProjIds.FrostShield, player,
 				0, 0, 0f, addToLevel: addToLevel, isDeflectShield : true
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(

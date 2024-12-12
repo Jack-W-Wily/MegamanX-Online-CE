@@ -39,17 +39,17 @@ public class XUPParryStartState : CharState {
 		Actor? counterAttackTarget = null;
 		Projectile? absorbedProj = null;
 		
-		if (player.weapon is XBuster { isUnpoBuster: true }) {
-			player.weapon.ammo = player.weapon.maxAmmo;
-		}
+	//	if (player.weapon is XBuster { isUnpoBuster: true }) {
+	//		player.weapon.ammo = player.weapon.maxAmmo;
+	//	}
 		
 		if (damagingActor is GenericMeleeProj gmp) {
 			counterAttackTarget = gmp.owningActor;
-		} else if (damagingActor is Projectile proj) {
-			if (!proj.isMelee && proj.shouldVortexSuck) {
-				absorbedProj = proj;
-				absorbedProj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
-			}
+	//	} else if (damagingActor is Projectile proj) {
+	//		if (!proj.isMelee && proj.shouldVortexSuck) {
+	//			absorbedProj = proj;
+	//			absorbedProj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+	//		}
 		}
 
 		if (absorbedProj != null) {
@@ -76,13 +76,13 @@ public class XUPParryStartState : CharState {
 		}
 
 		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 && counterAttackTarget is Character chr) {
-			if (!chr.ownedByLocalPlayer) {
-				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
-			} else {
-				chr.changeState(new ParriedState(), true);
-			}
+	//		if (!chr.ownedByLocalPlayer) {
+	//			RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+	//		} else {
+	//			chr.changeState(new ParriedState(), true);
+	//		}
 		}
-		mmx.addPercentAmmo(100);
+	//	mmx.addPercentAmmo(100);
 		character.playSound("upParry", sendRpc: true);
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}

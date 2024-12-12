@@ -2830,6 +2830,8 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player) {
 				killer.addKill();
+				killer.character.addHealth(3);
+				killer.character.addAmmo(5);
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {

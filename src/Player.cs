@@ -119,6 +119,7 @@ public partial class Player {
 	public MaverickAIBehavior currentMaverickCommand;
 
 	public bool isX { get { return charNum == (int)CharIds.X; } }
+	public bool isRageX { get { return charNum == (int)CharIds.RagingChargeX; } }
 	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
 	public bool isX1Zero { get { return charNum == (int)CharIds.PunchyZero; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
@@ -207,6 +208,7 @@ public partial class Player {
 	// Subtanks
 	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
 		{ (int)CharIds.X, new List<SubTank>() },
+		{ (int)CharIds.RagingChargeX, new() },
 		{ (int)CharIds.Zero, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
 		{ (int)CharIds.Axl, new List<SubTank>() },
@@ -219,6 +221,7 @@ public partial class Player {
 	// Heart tanks
 	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
 		{ (int)CharIds.X, new() },
+		{ (int)CharIds.RagingChargeX, new() },
 		{ (int)CharIds.Zero, new() },
 		{ (int)CharIds.Vile, new() },
 		{ (int)CharIds.Axl, new() },
@@ -246,7 +249,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 12;
+	public const int maxCharCurrencyId = 100;
 	public static int curMul = Helpers.randomRange(2, 8);
 
 	public ProtectedArrayInt charCurrency = new ProtectedArrayInt(maxCharCurrencyId);
@@ -661,6 +664,9 @@ public partial class Player {
 			return getModifiedHealth(28);
 		}
 		int bonus = 0;
+		if (isRageX) {
+			bonus = 26;
+		}
 		if (isX) {
 			bonus = 16;
 		}
@@ -1123,7 +1129,7 @@ public partial class Player {
 				currency = 9999;
 			}
 		}
-
+		
 		if (charNum == (int)CharIds.X) {
 			character = new MegamanX(
 				this, pos.x, pos.y, xDir,
@@ -1176,7 +1182,14 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else {
+		
+		} else if (charNum == (int)CharIds.RagingChargeX) {
+			character = new RagingChargeX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		// Do this once char has spawned and is not null.
@@ -1320,6 +1333,12 @@ public partial class Player {
 		charNum = data.charNum;
 
 		Character? retChar = null;
+			if (data.charNum == (int)CharIds.RagingChargeX) {
+			retChar = new RagingChargeX(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}
 		if (data.charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
 				this, character.pos.x, character.pos.y, character.xDir,
@@ -1478,6 +1497,12 @@ public partial class Player {
 		loadout = dnaCore.loadout;
 
 		Character? retChar = null;
+		if (charNum == (int)CharIds.RagingChargeX) {
+			retChar = new RagingChargeX(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
 		if (charNum == (int)CharIds.X) {
 			retChar = new MegamanX(
 				this, character.pos.x, character.pos.y, character.xDir,
@@ -1494,6 +1519,7 @@ public partial class Player {
 				true, dnaNetId, true, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
 			);
+
 		} else if (charNum == (int)CharIds.Axl) {
 			retChar = new Axl(
 				this, character.pos.x, character.pos.y, character.xDir,
