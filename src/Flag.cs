@@ -86,9 +86,9 @@ public class Flag : Actor {
 			}
 		}
 
-		if (timeDropped > 30 && pickedUpOnce) {
-			returnFlag();
-		}
+	//	if (timeDropped > 30 && pickedUpOnce) {
+	//		returnFlag();
+	//	}
 	}
 
 	public float? getUpdraftY() {

@@ -500,6 +500,12 @@ public class BHornetStingState : MaverickState {
 	float moveTime;
 	Anim stingAnim;
 	bool isAIRise;
+
+		Character otherChar;
+	float moveAmount;
+	float maxMoveAmount;
+
+	
 	public BHornetStingState() : base("fly_stinger_attack", "fly_stinger_start") {
 		useGravity = false;
 		superArmor = true;
@@ -507,11 +513,24 @@ public class BHornetStingState : MaverickState {
 
 	public override void update() {
 		base.update();
+
+		
 		if (inTransition()) {
 			if (isAIRise && maverick.frameIndex < 7) {
 				maverick.useGravity = false;
 				maverick.grounded = false;
-				maverick.move(new Point(0, -200));
+				Point amount = maverick.getCenterPos().directionToNorm(otherChar.getCenterPos()).times(250);
+
+		maverick.move(amount);
+
+		moveAmount += amount.magnitude * Global.spf;
+		if (maverick.getCenterPos().distanceTo(otherChar.getCenterPos()) < 5) {
+	//		character.removeBanzai(false, true);
+
+		} else if (moveAmount > maxMoveAmount) {
+	//		character.removeBanzai(false, false);
+		
+		}
 			}
 
 			maverick.turnToInput(input, player);

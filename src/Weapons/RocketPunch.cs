@@ -100,7 +100,7 @@ public class RocketPunchProj : Projectile {
 		ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, getSpeed(weapon.type), 3,
-		player, weapon.projSprite, Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		player, weapon.projSprite, Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.RocketPunch;
 		destroyOnHit = false;

@@ -124,7 +124,7 @@ public class FSplasherState : CharState {
 			character.changeState(new Fall());
 			return;
 		}
-
+		
 		var move = new Point(0, 0);
 		move.x = character.getDashSpeed() * character.xDir * modifier;
 		move.y = upSpeed * 100;

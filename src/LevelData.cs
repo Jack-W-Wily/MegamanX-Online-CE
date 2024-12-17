@@ -559,9 +559,16 @@ public class LevelData {
 		{ "forest2", "stingChameleon" },
 		{ "highway", "centralHighway" },
 		{ "highway2", "castRoll_X1" },
+
+		{ "mountain_md", "imperialCode_doujin" },
 		{ "mountain", "chillPenguin" },
+
 		{ "ocean", "launchOctopus" },
 		{ "powerplant", "sparkMandrill" },
+
+		{ "sigma1_md", "endlessDespair_doujin" },
+
+
 		{ "sigma1", "sigmaFortress" },
 		{ "sigma2", "sigmaFortress2" },
 		{ "sigma3", "sigmaFortress3" },

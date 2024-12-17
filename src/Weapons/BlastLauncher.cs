@@ -38,6 +38,7 @@ public class BlastLauncher : AxlWeapon {
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
+			if (player.ownedByLocalPlayer){
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile grenade;
 		if (chargeLevel < 3) {
@@ -53,6 +54,7 @@ public class BlastLauncher : AxlWeapon {
 
 		if (player.ownedByLocalPlayer) {
 			RPC.axlShoot.sendRpc(player.id, grenade.projId, netId, bulletPos, xDir, angle);
+		}
 		}
 	}
 }

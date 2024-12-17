@@ -152,7 +152,9 @@ public class SigmaSlashState : CharState {
 	public override void update() {
 		base.update();
 		if (character.grounded){
-			if (player.input.isHeld(Control.Up,player)
+			if (player.input.isHeld(Control.Shoot,player)
+			&&
+				player.input.isHeld(Control.Up,player)
 			&& stateTime > 0.1 && player.currency > 0){
 				player.currency -= 1;
 			character.changeState(new VirusSlash2(), true);

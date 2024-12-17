@@ -278,7 +278,9 @@ public class TunnelRShoot2State : MaverickState {
 public class TunnelRDashState : MaverickState {
 	float dustTime;
 	public TunnelRDashState() : base("dash", "dash_start") {
+		superArmor = true;
 	}
+
 
 	public override void update() {
 		base.update();
@@ -295,7 +297,7 @@ public class TunnelRDashState : MaverickState {
 			};
 		}
 
-		var move = new Point(250 * maverick.xDir, 0);
+		var move = new Point(300 * maverick.xDir, 0);
 		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {
 			maverick.changeState(new MIdle());

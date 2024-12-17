@@ -6,6 +6,14 @@ namespace MMXOnline;
 
 public class MegamanX : Character {
 	// Shoot variables.
+
+
+	public int cStingPaletteIndex;
+	public float cStingPaletteTime;
+
+
+
+
 	public float shootCooldown;
 	public int lastShootPressed;
 	public float specialSaberCooldown;
@@ -32,6 +40,8 @@ public class MegamanX : Character {
 	public const int bodyArmorCost = 1;
 	public const int armArmorCost = 1;
 	public const int bootsArmorCost = 1;
+
+	public bool UnlockZsaber;
 
 	public float headbuttAirTime = 0;
 	public int hyperChargeTarget;
@@ -64,6 +74,7 @@ public class MegamanX : Character {
 	public float barrierActiveTime;
 	public Sprite barrierAnim = new Sprite("barrier_start");
 	public bool stockedCharge;
+	public float stockedChargeFlashTime;
 	public bool stockedX3Charge;
 	public bool stockedSaber;
 
@@ -72,6 +83,7 @@ public class MegamanX : Character {
 	public List<BubbleSplashProjCharged> chargedBubbles = new();
 	public StrikeChainProj? strikeChainProj;
 	public StrikeChainProjCharged? strikeChainChargedProj;
+	public StrikeChainSemiCharged? strikeChainSemiChargedProj;
 	public GravityWellProjCharged? chargedGravityWell;
 	public SpinningBladeProjCharged? chargedSpinningBlade;
 	public FrostShieldProjCharged? chargedFrostShield;
@@ -154,6 +166,14 @@ public class MegamanX : Character {
 	public override void update() {
 		base.update();
 
+		if (cStingPaletteTime > 5) {
+			cStingPaletteTime = 0;
+			cStingPaletteIndex++;
+		}
+		cStingPaletteTime++;
+
+
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -206,6 +226,7 @@ public class MegamanX : Character {
 		else if (stockedBuster) {
 			addRenderEffect(RenderEffectType.ChargePink, 2, 6);
 		}
+		
 	}
 
 
@@ -217,13 +238,13 @@ public class MegamanX : Character {
 			CharState dashState;
 			if (player.hasBootsArmor(3)){
 				if (player.input.isHeld(Control.Up, player)) {
-					dashState = new UpDash(Control.Dash);
+				changeState(new UpDash(Control.Dash));
 				} else {
-				dashState = new AirDash(dashControl);
+				changeState(new AirDash(dashControl));
 				}	
 			}
 			else if (player.hasBootsArmor(2)){
-				dashState = new AirDash(dashControl);		
+				changeState(new AirDash(dashControl));		
 			}
 			else {
 				isDashing = true;
@@ -261,7 +282,8 @@ public class MegamanX : Character {
 				return true;
 			}
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isPressed(Control.Special1, player)
+		&& UnlockZsaber) {
 			changeState(new X6SaberState(grounded), true);
 			
 		}
@@ -499,6 +521,7 @@ public class MegamanX : Character {
 			chargedFrostShield != null ||
 			chargedTornadoFang != null ||
 			strikeChainProj != null ||
+			strikeChainSemiChargedProj != null ||
 			strikeChainChargedProj != null
 		);
 	}
@@ -513,6 +536,8 @@ public class MegamanX : Character {
 		strikeChainProj?.destroySelf();
 		strikeChainProj = null;
 		strikeChainChargedProj?.destroySelf();
+		strikeChainSemiChargedProj?.destroySelf();
+		strikeChainSemiChargedProj = null;
 		strikeChainChargedProj = null;
 	}
 	
@@ -565,11 +590,11 @@ public class MegamanX : Character {
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				4, Global.defFlinch, 0.5f, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 10, 0.5f, addToLevel: addToLevel
+				2, 10, 0.5f, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.XBlock => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.FrostShield, player,
@@ -577,7 +602,7 @@ public class MegamanX : Character {
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 10, 0.5f, addToLevel: addToLevel
+				2, 10, 0.5f, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
@@ -679,5 +704,53 @@ public class MegamanX : Character {
 			
 		}
 		base.render(x, y);
+	}
+
+
+	public bool isCStingInvisibleGraphics() {
+		return false;
+	}
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+
+		
+		ShaderWrapper? palette = null;
+		int index = player.weapon.index;
+
+		if (index == (int)WeaponIds.GigaCrush ||
+			index == (int)WeaponIds.ItemTracer ||
+			index == (int)WeaponIds.AssassinBullet ||
+			index == (int)WeaponIds.Undisguise ||
+			index == (int)WeaponIds.UPParry
+		) {
+			index = 0;
+		}
+		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
+			index = player.weapons[player.hyperChargeSlot].index;
+		}
+	//	if (hasGoldenArmor()) {
+	//		index = 25;
+	//	}
+		if (hasUltimateArmor) {
+			index = 0;
+		}
+		palette = player.xPaletteShader;
+
+		if (!isCStingInvisibleGraphics()) {
+			palette?.SetUniform("palette", index);
+			palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
+		} else {
+			palette?.SetUniform("palette", this.cStingPaletteIndex % 9);
+			palette?.SetUniform("paletteTexture", Global.textures["cStingPalette"]);
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
 	}
 }

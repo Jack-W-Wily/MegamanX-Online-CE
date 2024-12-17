@@ -906,11 +906,11 @@ public class Zero : Character {
 			),
 			// Ground Specials
 			(int)MeleeIds.Raijingeki => new GenericMeleeProj(
-				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 1, Global.defFlinch, 0.06f,
+				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 1, 0, 0.06f,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RaijingekiWeak => new GenericMeleeProj(
-				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 0.06f,
+				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 1, 0, 0.06f,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),

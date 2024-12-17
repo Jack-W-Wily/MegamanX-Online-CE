@@ -85,7 +85,7 @@ public class CrushCrawfish : Maverick {
 public class CrushCProj : Projectile {
 	bool once;
 	public CrushCProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 200, 3, player, "crushc_proj", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 200, 3, player, "crushc_proj", Global.miniFlinch, 0.01f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.CrushCProj;
 		maxDistance = 150f;
 
@@ -212,6 +212,7 @@ public class CrushCDashState : MaverickState {
 	float ftdWaitTime;
 	public CrushCDashState() : base("dash", "dash_start") {
 		enterSound = "dashX3";
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -231,7 +232,7 @@ public class CrushCDashState : MaverickState {
 
 		if (!player.ownedByLocalPlayer) return;
 
-		var move = new Point(150 * maverick.xDir, 0);
+		var move = new Point(-350 * maverick.xDir, 0);
 
 		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {

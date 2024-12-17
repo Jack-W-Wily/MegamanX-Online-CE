@@ -172,7 +172,7 @@ public class Sprite {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
 			isUPX = character is RagingChargeX;
-			isUltX = character is MegamanX { hasUltimateArmor: true };
+			isUltX = character is RagingChargeX { hasUltimateArmor: true };
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;
@@ -260,7 +260,7 @@ public class Sprite {
 		float extraXOff = 0;
 
 		if (isUltX) {
-		//	bitmap = Global.textures["XUltimate"];
+			bitmap = Global.textures["RMXUAX"];
 			extraYOff = 3;
 			extraY = 3;
 			armors = null;

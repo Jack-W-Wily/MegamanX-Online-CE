@@ -2,7 +2,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 public class AxlBulletProj : Projectile {
 	public AxlBulletProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, 1, 600, 1f, player, "axl_bullet", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 0, 0.005f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBullet;
 		angle = bulletDir.angle;
@@ -180,7 +180,7 @@ public class AncientGunProj : Projectile {
 
 public class CopyShotProj : Projectile {
 	public CopyShotProj(Weapon weapon, Point pos, int chargeLevel, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, 1, 250, 2, player, "axl_bullet_charged", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 250, 2, player, "axl_bullet_charged", 0, 0.005f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.CopyShot;
 
 		xScale = 0.75f;

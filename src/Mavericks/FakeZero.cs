@@ -17,7 +17,10 @@ public class FakeZero : Maverick {
 		stateCooldowns.Add(typeof(FakeZeroGroundPunchState), new MaverickStateCooldown(false, false, 1.5f));
 		stateCooldowns.Add(typeof(FakeZeroShootAirState), new MaverickStateCooldown(false, true, 0.5f));
 		stateCooldowns.Add(typeof(FakeZeroShootAir2State), new MaverickStateCooldown(false, true, 0.5f));
-	
+		stateCooldowns.Add(typeof(FakeZeroTrippleSlash), new MaverickStateCooldown(false, true, 0.3f));
+
+
+		
 		weapon = getWeapon();
 
 		weakWeaponId = WeaponIds.SpeedBurner;
@@ -93,7 +96,7 @@ public class FakeZero : Maverick {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isHeld(Control.Shoot, player) && state is MRun) {
 					changeState(new FakeZeroMeleeState());
-				} else if (input.isHeld(Control.Shoot, player)) {
+				} else if (input.isPressed(Control.Shoot, player)) {
 				//	changeState(getShootState(false));
 
 				if (!input.isHeld(Control.Up,player)){

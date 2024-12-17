@@ -18,7 +18,7 @@ public class StingChameleon : Maverick {
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		tongueWeapon = new StingCTongueWeapon(player);
 
-	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
 	//	stateCooldowns.Add(typeof(StingCTongueState), new MaverickStateCooldown(false, true, 1));
 	//	stateCooldowns.Add(typeof(StingCClimbTongueState), new MaverickStateCooldown(false, true, 1));
 	//	stateCooldowns.Add(typeof(StingCHangState), new MaverickStateCooldown(false, false, 2f));

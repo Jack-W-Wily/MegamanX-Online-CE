@@ -100,7 +100,7 @@ public class GravityBeetle : Maverick {
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (sprite.name.Contains("gbeetle_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleLift, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleLift, player, damage: 3, flinch: 0, hitCooldown: 0.1f, owningActor: this);
 		}
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();
@@ -252,7 +252,7 @@ public class GBeetleDashState : MaverickState {
 			partTime = 0.1f;
 		}
 
-		var move = new Point(250 * maverick.xDir, 0);
+		var move = new Point(350 * maverick.xDir, 0);
 
 		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {

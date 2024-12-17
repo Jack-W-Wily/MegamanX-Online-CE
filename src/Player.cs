@@ -120,11 +120,16 @@ public partial class Player {
 
 	public bool isX { get { return charNum == (int)CharIds.X; } }
 	public bool isRageX { get { return charNum == (int)CharIds.RagingChargeX; } }
+
+	
 	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
 	public bool isX1Zero { get { return charNum == (int)CharIds.PunchyZero; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
+
+	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
+
 
 	public float healthBackup;
 
@@ -216,6 +221,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.Zain, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -229,6 +235,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new() },
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
+		{ (int)CharIds.Zain, new() },
 	};
 
 	// Getter functions.
@@ -477,12 +484,12 @@ public partial class Player {
 	}
 
 	public int getStartHeartTanks() {
-		if (Global.level.isNon1v1Elimination() && Global.level.gameMode.playingTo < 3) {
-			return 8;
-		}
-		if (Global.level.is1v1()) {
-			return 8;
-		}
+	//	if (Global.level.isNon1v1Elimination() && Global.level.gameMode.playingTo < 3) {
+	//		return 8;
+	//	}
+	//	if (Global.level.is1v1()) {
+	//		return 8;
+	//	}
 		if (Global.level?.server?.customMatchSettings != null) {
 			return Global.level.server.customMatchSettings.startHeartTanks;
 		}
@@ -659,34 +666,35 @@ public partial class Player {
 	}
 
 	public float getMaxHealth() {
-		// 1v1 is the only mode without possible heart tanks/sub tanks
-		if (Global.level.is1v1()) {
-			return getModifiedHealth(28);
-		}
+	//	// 1v1 is the only mode without possible heart tanks/sub tanks
+	//	if (Global.level.is1v1()) {
+	//		return getModifiedHealth(28);
+	//	}
 		int bonus = 0;
 		if (isRageX) {
-			bonus = 26;
+			bonus = 20;
 		}
 		if (isX) {
-			bonus = 16;
-		}
-		if (isAxl) {
 			bonus = 12;
 		}
-		if (isVile) {
-			bonus = 4;
+		if (isAxl) {
+			bonus = 8;
 		}
+	
 		if (isZero) {
-			bonus = 16;
+			bonus = 12;
 		}
 		if (isSigma) {
-			bonus = 16;
+			bonus = 12;
 		}
 		if (isX1Zero) {
-			bonus = 18;
+			bonus = 14;
+		}
+		if (isZain) {
+			bonus = 16;
 		}
 		return MathF.Ceiling(
-			getModifiedHealth(16 + bonus) + (heartTanks * getHeartTankModifier())
+			getModifiedHealth(20 + bonus) + (heartTanks * getHeartTankModifier())
 		);
 	}
 
@@ -1189,6 +1197,12 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
+		else if (charNum == (int)CharIds.Zain) {
+			character = new Zain(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
 		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
@@ -1392,6 +1406,12 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
+		}
+		else if (data.charNum == (int)CharIds.Zain) {
+			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
@@ -1557,7 +1577,14 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else {
+		} 
+		else if (charNum == (int)CharIds.Zain) {
+			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
+		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		if (retChar is Vile vile) {
@@ -1895,11 +1922,11 @@ public partial class Player {
 			return;
 		}
 		// Check for stuff that cannot gain scraps.
-		if (character is RagingChargeX or KaiserSigma or ViralSigma or WolfSigma) return;
+	//	if (character is RagingChargeX or KaiserSigma or ViralSigma or WolfSigma) return;
 		if (character?.rideArmor?.raNum == 4 && character.charState is InRideArmor) return;
-		if (character is MegamanX mmx && mmx.hasUltimateArmor) {
-			return;
-		}
+	//	if (character is MegamanX mmx && mmx.hasUltimateArmor) {
+	//		return;
+	//	}
 		
 		if (Global.level?.server?.customMatchSettings != null) {
 			currency += Global.level.server.customMatchSettings.currencyGain;

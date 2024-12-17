@@ -9,7 +9,7 @@ public class WheelGator : Maverick {
 	public Weapon upBiteWeapon;
 
 	public float damageEaten;
-	//public ShaderWrapper eatenShader;
+	public ShaderWrapper eatenShader;
 
 	public WheelGator(
 		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
@@ -26,7 +26,7 @@ public class WheelGator : Maverick {
 		weakWeaponId = WeaponIds.StrikeChain;
 		weakMaverickWeaponId = WeaponIds.WireSponge;
 
-		//eatenShader = Helpers.cloneShaderSafe("wheelgEaten");
+		eatenShader = Helpers.cloneShaderSafe("wheelgEaten");
 		player.gatorArmorShader?.SetUniform("paletteTexture", Global.textures["paletteWheelGator"]);
 
 		netActorCreateId = NetActorCreateId.WheelGator;
@@ -87,7 +87,7 @@ public class WheelGator : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 85;
+		return 95;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -168,6 +168,12 @@ public class WheelGator : Maverick {
 
 		damageEaten = data[0];
 	}
+
+
+	public bool isInvincible(Player attacker, int? projId) {
+		return eatenShader != null;
+}
+
 }
 
 public class WheelGSpinWheelProj : Projectile {

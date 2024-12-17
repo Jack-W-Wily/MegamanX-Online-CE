@@ -150,6 +150,7 @@ public class XBuster : Weapon {
 						mmx.shootCooldown = 0;
 					}
 					int type = mmx.stockedCharge ? 1 : 0;
+					
 					character.changeState(new X2ChargeShot(type), true);
 				}
 			}

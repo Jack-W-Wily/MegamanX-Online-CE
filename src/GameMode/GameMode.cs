@@ -272,7 +272,7 @@ public class GameMode {
 			}
 		}
 
-		if (!DesperationTrigger && (isOvertime() || remainingTime < 10)){
+		if (!DesperationTrigger && (isOvertime() || remainingTime < 60)){
 			Global.changeMusic("boss_x1");
 			DesperationTrigger = true;
 		}
@@ -649,6 +649,15 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
+				if (drawPlayer.character is Zain zain) {
+					int yStart = 159;
+					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+					Fonts.drawText(FontType.Grey,
+				"x" + zain.ZainCounters, 16, 152, Alignment.Left
+					);
+					yStart += 12;
+				}
+
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
 				//if (zero.isViral) {

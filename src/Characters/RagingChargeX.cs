@@ -5,12 +5,16 @@ using System.Linq;
 namespace MMXOnline;
 
 public class RagingChargeX : Character {
+
+	public bool hasUltimateArmor;
+
 	public float shootCooldown;
 	public int unpoShotCount;
 	public float upPunchCooldown;
 	public float xSaberCooldown;
 	public float parryCooldown;
 	public float maxParryCooldown = 30;
+	
 	float UPDamageCooldown;
 	public float unpoDamageMaxCooldown = 2;
 
@@ -21,7 +25,7 @@ public class RagingChargeX : Character {
 	public float maxShoryukenCooldownTime = 60;
 
 
-
+	
 	public Projectile? unpoAbsorbedProj;
 	public RagingChargeX(
 		Player player, float x, float y, int xDir,
@@ -58,6 +62,14 @@ public override bool normalCtrl() {
 	public override void update() {
 		base.update();
 
+
+		if (player.currency > 4 && !hasUltimateArmor &&
+		player.input.isPressed(Control.Special2, player)){
+		hasUltimateArmor = true;
+		addHealth(50);
+		player.currency -= 5;
+		changeSpriteFromName("warpin", true);
+		}
 		// Charge and release charge logic.
 		chargeLogic(shoot);
 		player.changeWeaponControls();
@@ -104,9 +116,9 @@ public override bool normalCtrl() {
 	
 		}
 
-	//	if (musicSource == null) {
-	//		addMusicSource("introStageBreisX4_JX", getCenterPos(), true);
-	//	}
+		if (musicSource == null && hasUltimateArmor) {
+			addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
+		}
 		
 		if (!ownedByLocalPlayer) return;
 
@@ -131,16 +143,25 @@ public override bool normalCtrl() {
 				changeSpriteFromName("unpo_grab_dash", true);
 			} else if
 			  (
+				  hasUltimateArmor &&
 				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 &&
 				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
 			  ) {
 				if (unpoAbsorbedProj != null) {
 					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-					unpoAbsorbedProj = null;
+				//	unpoAbsorbedProj = null;
 					return;
 				} else {
 					changeState(new XUPParryStartState(), true);
 				}
+			}
+			else if
+			  (
+				 !hasUltimateArmor &&
+				  player.input.isWeaponLeftOrRightPressed(player) && parryCooldown == 0 &&
+				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
+			  ) {
+					changeState(new GlobalParryState(), true);	
 			}
 		}
 
@@ -164,9 +185,10 @@ public override bool normalCtrl() {
 			and not GenericGrabbedState
 		) {
 			UPDamageCooldown += Global.spf;
-			if (UPDamageCooldown > unpoDamageMaxCooldown) {
+			if (hasUltimateArmor &&
+				UPDamageCooldown > unpoDamageMaxCooldown) {
 				UPDamageCooldown = 0;
-				applyDamage(0.3f, player, this, null, null);
+				applyDamage(1f, player, this, null, null);
 			}
 		}
 		unpoShotCount = 0;
@@ -178,10 +200,7 @@ public override bool normalCtrl() {
 
 	// Shoots stuff.
 	public void shoot(int chargeLevel) {
-	
-	if (player.currency <= 0) { return; }
-		if (chargeLevel == 0) { return; }
-		int currencyUse = 0;
+	if (ownedByLocalPlayer){
 
 		// Cancel non-invincible states.
 		if (!charState.attackCtrl && !charState.invincible) {
@@ -202,11 +221,14 @@ public override bool normalCtrl() {
 				new BusterUnpoProj(new RagingChargeBuster(),  getShootPos(), xDir, player, player.getNextActorNetId(), true);
 		
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
-			playSound("buster4", sendRpc: true);
-				new BusterUnpoProj(new RagingChargeBuster(),  getShootPos(), xDir, player, player.getNextActorNetId(), true);
-			}			
+			playSound("plasmaShot", sendRpc: true);
+				new BusterPlasmaProj(
+					getShootPos(), getShootXDir(),
+					player, player.getNextActorNetId(), rpc: true
+				);
+				}			
 		}
-	
+	}
 	
 
 
@@ -357,6 +379,9 @@ public override bool normalCtrl() {
 	}
 
 	public override int getMaxChargeLevel() {
+		if (!hasUltimateArmor){
+		return 2;	
+		}
 		return 4;
 	}
 
@@ -420,18 +445,18 @@ public override bool normalCtrl() {
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 10, 0.5f, addToLevel: addToLevel
+				2, 10, 0.5f, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
 				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
 			),
 			(int)MeleeIds.UPGrab => new GenericMeleeProj(
-				new XUPGrab(), projPos, ProjIds.UPGrab, player, 0, 0, 0, addToLevel: addToLevel
+				new XUPGrab(), projPos, ProjIds.UPGrab, player, 0, 0, 0, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.UPPunch => new GenericMeleeProj(
 				new XUPPunch(player), projPos, ProjIds.UPPunch, player,
-			 0, Global.halfFlinch, 0.15f, addToLevel: addToLevel
+			 2, Global.halfFlinch, 0.15f, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.UPParryBlock => new GenericMeleeProj(
 				new XUPParry(), projPos, ProjIds.UPParryBlock, player, 0, 0, 1, addToLevel: addToLevel

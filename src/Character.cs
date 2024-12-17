@@ -174,6 +174,11 @@ public partial class Character : Actor, IDamagable {
 	public Dictionary<Type, CharStateCooldown> stateCooldowns = new Dictionary<Type, CharStateCooldown>();
 	public float grabCooldown;
 
+	public float parryCooldown;
+	public float maxParryCooldown = 30;
+
+	public Projectile? unpoAbsorbedProj;
+
 	
 	// Disables status.
 	public float paralyzedTime;
@@ -612,6 +617,7 @@ public partial class Character : Actor, IDamagable {
 
 	public float getRunDebuffs() {
 		float runSpeed = 1;
+		if (acidTime > 0)  runSpeed *= 0.75f;
 		if (slowdownTime > 0) runSpeed *= 0.75f;
 		if (igFreezeProgress >= 3) runSpeed *= 0.25f;
 		else if (igFreezeProgress >= 2) runSpeed *= 0.75f;
@@ -806,7 +812,11 @@ public partial class Character : Actor, IDamagable {
 		DamageScalingCD = 0.5f;
 		}
 		//
-	
+
+
+		Helpers.decrementFrames(ref parryCooldown);
+
+
 		// Wcut Burst System
 
 		if ((sprite.name.Contains("hurt") 
@@ -928,6 +938,9 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (acidTime > 0) {
+
+			charState.superArmor = false;
+			charState.invincible = false;
 			acidTime -= Global.spf;
 			acidHurtCooldown += Global.speedMul;
 			if (acidHurtCooldown >= 60) {
@@ -935,11 +948,13 @@ public partial class Character : Actor, IDamagable {
 				if (acidHurtCooldown <= 0) {
 					acidHurtCooldown = 0;
 				}
-				acidDamager?.applyDamage(
-					this, player.weapon is TornadoFang,
-					new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
-					overrideDamage: 1f
-				);
+			//	acidDamager?.applyDamage(
+			//		this, player.weapon is TornadoFang,
+			//		new AcidBurst(), this, (int)ProjIds.AcidBurstPoison,
+			//		overrideDamage: 1f
+			//	);
+
+
 				new Anim(
 					getCenterPos().addxy(Helpers.randomRange(-6, 6), -20),
 					"torpedo_smoke", 1, null, true) {
@@ -1337,7 +1352,8 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Air normal states.
 		else {
-			if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
+			if (!player.isX &&
+			player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
 				changeState(new AirDash(dashControl));
 				return true;
 			}
@@ -1482,7 +1498,7 @@ public partial class Character : Actor, IDamagable {
 		return sprite.EndsWith("jump") || sprite.EndsWith("up_dash") || sprite.EndsWith("wall_kick");
 	}
 
-	public void freeze(int timeToFreeze = 120) {
+	public void freeze(int timeToFreeze = 180) {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -1507,7 +1523,7 @@ public partial class Character : Actor, IDamagable {
 		);
 	}
 
-	public void paralize(float timeToParalize = 120) {
+	public void paralize(float timeToParalize = 180) {
 		if (!ownedByLocalPlayer ||
 			isInvulnerable() ||
 			isVaccinated() ||
@@ -2830,8 +2846,12 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player) {
 				killer.addKill();
+				
+
 				killer.character.addHealth(3);
+				if (!killer.isRageX){
 				killer.character.addAmmo(5);
+				}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {

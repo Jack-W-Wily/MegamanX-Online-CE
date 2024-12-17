@@ -90,7 +90,7 @@ public class Damager {
 				newFlinch = 0;
 				weakness = false;
 			}
-
+// Counter system aka Frail guy
 			if (chr.isAttacking()
 			 && newFlinch > 0) {
 				if (newFlinch < Global.halfFlinch) {
@@ -102,6 +102,7 @@ public class Damager {
 				else {
 					newFlinch = Global.superFlinch;
 				}
+				chr.addDamageText("COUNTER!!!", 1);		
 			}
 		}
 
@@ -286,6 +287,8 @@ public class Damager {
 					break;
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MorphMPowder:
+				case (int)ProjIds.Raijingeki:
+				case (int)ProjIds.Raijingeki2:
 					character?.paralize();
 					break;
 			}
@@ -374,7 +377,8 @@ public class Damager {
 
 			// Hexa stuff
 			if (character.charState is HexaInvoluteState) {
-					character.addHealth(damage);			
+					character.addHealth(damage);	
+					victim.addDamageText("ABSORBED!", 1);		
 			}
 			// Vile stomp 
 			if (character.sprite.name.Contains("knocked_down")
@@ -423,8 +427,10 @@ public class Damager {
 				character.DamageScaling += 1;
 				character.DamageScalingCD = 0.5f;
 			}
-		
-		
+			
+			if (isArmorPiercing(projId)) {
+			victim.addDamageText("PIERCE!", 1);	
+			}
 
 			//WCUT OP Block
 			if (character.sprite.name.Contains("block")
@@ -842,6 +848,11 @@ public class Damager {
 				}
 			}
 			// Superarmor.
+			if (maverick.isInvincible(owner, projId)) {
+				flinch = 0;
+				damage = 0;
+				maverick.playSound("m10ding");
+			}
 			if (maverick.state.superArmor) {
 				flinch = 0;
 			}
@@ -881,10 +892,25 @@ public class Damager {
 						}
 					}
 				}
+
+
+
 				if (maverick is ArmoredArmadillo aa) {
 					if ((hitFromBehind(maverick, damagingActor, owner, projId) ||
 						maverick.sprite.name == "armoreda_roll"
 						) && !aa.hasNoArmor() && !isArmorPiercingOrElectric(projId)
+					) {
+						damage = MathF.Floor(damage * 0.5f);
+						if (damage == 0) {
+							maverick.playSound("m10ding");
+						}
+					}
+				}
+				
+				if (maverick is GravityBeetle gb) {
+					if ((hitFromBehind(maverick, damagingActor, owner, projId) ||
+						maverick.sprite.name == "armoreda_roll"
+						) && !isArmorPiercingOrElectric(projId)
 					) {
 						damage = MathF.Floor(damage * 0.5f);
 						if (damage == 0) {
@@ -955,29 +981,57 @@ public class Damager {
 
 		if (finalDamage > 0 && character != null &&
 			character.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
-			parryState.canParry() && !isDot(projId)
+			parryState.canParry(damagingActor) && !isDot(projId)
 		) {
+			victim.addDamageText("PARRY!", 1);	
 			parryState.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
 			return true;
 		}
+
+		if (finalDamage > 0 && character != null &&
+			character.ownedByLocalPlayer && charState is GlobalParryState parryStateG &&
+			parryStateG.canParry(damagingActor) && !isDot(projId)
+		) {
+			victim.addDamageText("PARRY!", 1);	
+			parryStateG.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
+			return true;
+		}
+
+
 		if (finalDamage > 0 && character != null &&
 			character.ownedByLocalPlayer &&
 			charState is SaberParryStartState parryState2
 			&& parryState2.canParry(damagingActor) &&
 			!isDot(projId)
 		) {
+			victim.addDamageText("PARRY!", 1);	
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
 			return true;
 		}
+
+
+		if (finalDamage > 0 && character != null &&
+			character.ownedByLocalPlayer &&
+			charState is ZainParryStartState parryStateZain
+			&& parryStateZain.canParry(damagingActor) &&
+			!isDot(projId)
+		) {
+			victim.addDamageText("PARRY!", 1);	
+			parryStateZain.counterAttack(owner, damagingActor, finalDamage);
+			return true;
+		}
+
 		if ((damage > 0 || finalDamage > 0) && character != null &&
 			character.ownedByLocalPlayer &&
 			character.charState.specialId == SpecialStateIds.PZeroParry &&
 			charState is PZeroParry zeroParryState &&
 			zeroParryState.canParry(damagingActor, projId)
 		) {
+			victim.addDamageText("PARRY!", 1);	
 			zeroParryState.counterAttack(owner, damagingActor);
 			return true;
 		}
+		
 		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 
 		return true;

@@ -117,14 +117,15 @@ public class BlizzardBuffalo : Maverick {
 				weapon, centerPoint, ProjIds.BBuffaloDrag,
 				player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this
 			);
-		} else{
+		} 
+		if (!input.isHeld(Control.Up, player)){
 			return new GenericMeleeProj(
-				weapon, centerPoint, ProjIds.BBuffaloIceProj,
+				weapon, centerPoint, ProjIds.Hyouretsuzan2,
 				player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this
 			);
+		
 		}
 		}
-
 		
 		if (sprite.name.Contains("fall")) {
 			float damagePercent = getStompDamage();

@@ -23,9 +23,9 @@ public class FlameStag : Maverick {
 		spriteFrameToSounds["fstag_run/2"] = "dragoonfall_2";
 		spriteFrameToSounds["fstag_run/6"] = "dragoonfall_2";
 
-		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
-	//	stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.75f));
-	//	stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(true, false, 0.75f));
+		stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.2f));
+		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(true, false, 0.2f));
+		stateCooldowns.Add(typeof(FStagGrabState), new MaverickStateCooldown(true, false, 0.4f));
 
 		awardWeaponId = WeaponIds.SpeedBurner;
 		weakWeaponId = WeaponIds.BubbleSplash;
@@ -174,10 +174,10 @@ public class FlameStag : Maverick {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.FStagUppercut, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
 		}
 		if (sprite.name.Contains("orochinagi")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.SpeedBurnerCharged, player, damage: 3, flinch: 30, hitCooldown: 0.2f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.SpeedBurnerCharged, player, damage: 6, flinch: 30, hitCooldown: 0.2f, owningActor: this);
 		}
 		if (sprite.name.Contains("ken")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.SpeedBurnerCharged, player, damage: 1, 
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.SpeedBurnerCharged, player, damage: 3, 
 			flinch: 20, hitCooldown: 0.1f, owningActor: this, isJuggleProjectile : true);
 		}
 		return null;
@@ -398,6 +398,7 @@ public class FStagDashState : MaverickState {
 	public FStagDashState(float chargeTime) : base("dash", "") {
 		this.chargeTime = chargeTime;
 		enterSound = "fstagDash";
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -442,6 +443,7 @@ public class FStagGrabState : MaverickState {
 	float endLagTime;
 	public FStagGrabState(bool fromDash) : base("dash_grab", "") {
 		if (!fromDash) xVel = 0;
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -489,6 +491,7 @@ public class FStagOrochinagiStart : MaverickState {
 	float endLagTime;
 	public FStagOrochinagiStart(bool fromDash) : base("orochinagi_start", "") {
 		if (!fromDash) xVel = 0;
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -517,6 +520,7 @@ public class FStagOrochinagiEnd : MaverickState {
 	float endLagTime;
 	public FStagOrochinagiEnd(bool fromDash) : base("orochinagi_end", "") {
 		if (!fromDash) xVel = 0;
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -539,7 +543,7 @@ public class FStagKen : MaverickState {
 	public Character victim;
 	float endLagTime;
 	public FStagKen() : base("stag_ken", "") {
-
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -572,6 +576,7 @@ public class FStagUppercutState : MaverickState {
 	public FStagUppercutState(Character victim) : base("updash", "") {
 		this.victim = victim;
 		enterSound = "fstagUppercut";
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -679,7 +684,7 @@ public class FStagGrabbed : GenericGrabbedState {
 	public Character grabbedChar;
 	public float timeNotGrabbed;
 	string lastGrabberSpriteName;
-	public const float maxGrabTime = 4;
+	public const float maxGrabTime = 20;
 	public FStagGrabbed(FlameStag grabber) : base(grabber, maxGrabTime, "_dash_grab") {
 		customUpdate = true;
 	}

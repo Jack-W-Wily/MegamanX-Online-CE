@@ -53,6 +53,7 @@ public class RayGun : AxlWeapon {
 		if (player.character is not Axl axl) {
 			return;
 		}
+		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		if (chargeLevel < 3) {
@@ -133,6 +134,7 @@ public class RayGunClassic : AxlWeapon {
 		if (player.character is not Axl axl) {
 			return;
 		}
+		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 
@@ -163,7 +165,7 @@ public class RayGunProj : Projectile {
 	//float lastAngle;
 	const float maxLen = 50;
 	public RayGunProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, xDir, 400, 0.5f, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 400, 0.5f, player, "axl_raygun_laser", 0, 0.005f, netProjId, player.ownedByLocalPlayer) {
 		reflectable = true;
 		if ((player?.character as Axl)?.isWhiteAxl() == true) {
 			speed = 525;

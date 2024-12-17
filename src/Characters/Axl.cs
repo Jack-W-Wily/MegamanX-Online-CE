@@ -462,7 +462,10 @@ public class Axl : Character {
 		// AXl Attacks
 
 
-	if (player.weapon is AxlBullet || player.weapon is DoubleBullet){	
+	if ((player.weapon is AxlBullet || player.weapon is DoubleBullet) &&
+	  !sprite.name.Contains("hurt")
+		 && !sprite.name.Contains("grabbed")
+		  && !sprite.name.Contains("frozen")){	
 		if (!isAttacking() || ComboTimer > 0){
 			if (player.input.isPressed(Control.Special1, player) 
 			&& !player.input.isHeld(Control.Up, player) 
@@ -519,14 +522,7 @@ public class Axl : Character {
 
 		Helpers.decrementTime(ref RainstormCooldown);
 
-		//somehow you could do air dodge roll, added "grounded" to fix that "bug"
-		if (dodgeRollCooldown == 0 && player.canControl) {
-			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
-				changeState(new DodgeRoll(), true);
-			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
-				changeState(new DodgeRoll(), true);
-			}
-		}
+
 
 		sprite.reversed = false;
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false) || isZooming()) && canChangeDir() && charState is not WallSlide) {
@@ -926,7 +922,7 @@ public class Axl : Character {
 			changeState(new Hover(), true);
 			return true;
 		}
-		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
+		if (dodgeRollCooldown == 0 && player.canControl) {
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
 				changeState(new DodgeRoll(), true);
 				return true;

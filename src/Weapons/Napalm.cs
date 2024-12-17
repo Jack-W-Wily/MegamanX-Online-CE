@@ -136,6 +136,48 @@ public class AirSplashHitGranadeLaunch : CharState {
 
 
 
+
+public class AirFireNadeLaunch : CharState {
+	int bombNum;
+
+	Vile vile = null!;
+
+	public AirFireNadeLaunch(string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+			var poi = character.getFirstPOI();
+			if (!once && poi != null) {
+				once = true;
+				var proj = new MK2NapalmGrenadeProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				proj.vel = new Point(character.xDir * 100, 0);
+			}
+
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+		}
+
+	
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
 public class BumptyBoomGranadeLaunch : CharState {
 	int bombNum;
 
@@ -152,7 +194,7 @@ public class BumptyBoomGranadeLaunch : CharState {
 			if (!once && poi != null) {
 				once = true;
 				var proj = new BumptyBoomProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-				proj.vel = new Point(character.xDir * 100, 0);
+				proj.vel = new Point(character.xDir * 100, -100);
 			}
 
 			if (stateTime > 0.25f) {

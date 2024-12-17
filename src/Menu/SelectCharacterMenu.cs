@@ -32,6 +32,7 @@ public enum CharIds {
 	PunchyZero  = 5,
 	BusterZero  = 6,
 	RagingChargeX  = 7,
+	Zain  = 8,
 	// Non-standard chars start here.
 	WolfSigma = 100,
 	ViralSigma,
@@ -65,6 +66,7 @@ public class CharSelection {
 		new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
 		new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
 		new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
+		new CharSelection("Zain", 8, 1, 0, "smenu_zain", 0),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
 

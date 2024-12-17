@@ -712,6 +712,9 @@ public class Maverick : Actor, IDamagable {
 	public void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			killer.addKill();
+
+
+			
 			if (Global.level.gameMode is TeamDeathMatch) {
 				if (Global.isHost) {
 					if (killer.alliance != player.alliance) {

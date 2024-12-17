@@ -9,9 +9,9 @@ public class DrDoppler : Maverick {
 	public int ballType;
 	public DrDoppler(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-	//	stateCooldowns.Add(typeof(DrDopplerAbsorbState), new MaverickStateCooldown(false, true, 0.75f));
-	//	stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 1.5f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.3f));
+		stateCooldowns.Add(typeof(DrDopplerAbsorbState), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = getWeapon();
 		canClimbWall = true;
@@ -147,13 +147,16 @@ public class DrDopplerBallProj : Projectile {
 	) {
 		isDeflectShield = true;
 		if (type == 0) {
+			maxTime = 0.75f;
 			projId = (int)ProjIds.DrDopplerBall;
 		} else {
 			projId = (int)ProjIds.DrDopplerBall2;
 			damager.damage = 1;
 			destroyOnHit = false;
+			maxTime = 3f;
+			vel.x = 40;
 		}
-		maxTime = 0.75f;
+		
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);

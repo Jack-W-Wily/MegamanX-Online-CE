@@ -283,6 +283,11 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
+
+
+	//   Zain
+
+	ZainParry,
 	DNACore = 250
 }
 
@@ -709,6 +714,10 @@ public enum ProjIds {
 	RideChaserCrash,
 	DarkHold,
 
+
+	// Zain stuff
+	ZainSaberProj,
+	
 	// PunchyZeroStuff
 	PZeroPunch,
 	PZeroPunch2,

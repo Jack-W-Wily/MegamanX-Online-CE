@@ -19,7 +19,7 @@ public class SpinWheel : Weapon {
 		effect = "Inflicts Slowdown. Doesn't destroy on hit.\nUncharged won't give assists.";
 		hitcooldown = "0.2/0";
 		Flinch = "0/26";
-		maxAmmo = 16;
+		maxAmmo = 28;
 		ammo = maxAmmo;
 	}
 
@@ -34,10 +34,21 @@ public class SpinWheel : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		if (chargeLevel < 3) {
+		if (chargeLevel < 2) {
 			new SpinWheelProj(this, pos, xDir, player, player.getNextActorNetId(), true);
-		} else {
-			new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+		} 
+		
+		if (chargeLevel == 2) {
+			new WheelGSpinWheelProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+		}
+		if (chargeLevel == 3) {
+		new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+		}
+		if (chargeLevel == 4) {
+		new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+		Global.level.delayedActions.Add(new DelayedAction(() => {
+		new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
+		}, 0.3f));
 		}
 	}
 }

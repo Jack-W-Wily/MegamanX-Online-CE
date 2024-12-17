@@ -46,6 +46,7 @@ public class AxlBullet : AxlWeapon {
 		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 		IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
+		if (player.ownedByLocalPlayer){
 		Point? bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		if (chargeLevel == 0) {			
@@ -56,6 +57,7 @@ public class AxlBullet : AxlWeapon {
 		if (player.ownedByLocalPlayer && bullet != null) {
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		}
+	}
 	}
 }
 public class DoubleBullet : AxlWeapon {

@@ -66,7 +66,7 @@ public class BlackArrowProj : Projectile {
 	public List<Point> lastPoses = new List<Point>();
 
 	public BlackArrowProj(Weapon weapon, Point pos, Player player, Point bulletDir, int type, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 450, 1, player, "blackarrow_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 450, 1, player, "blackarrow_proj", 0, 0.005f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;

@@ -7,9 +7,9 @@ public class ToxicSeahorse : Maverick {
 	public float teleportCooldown;
 	public ToxicSeahorse(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 1f));
-	//	stateCooldowns.Add(typeof(TSeahorseShoot2State), new MaverickStateCooldown(true, true, 2f));
-	//	stateCooldowns.Add(typeof(TSeahorseTeleportState), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 1f));
+		stateCooldowns.Add(typeof(TSeahorseShoot2State), new MaverickStateCooldown(true, true, 1f));
+		stateCooldowns.Add(typeof(TSeahorseTeleportState), new MaverickStateCooldown(false, true, 0.15f));
 
 		weapon = getWeapon();
 		canClimbWall = true;
@@ -50,8 +50,8 @@ public class ToxicSeahorse : Maverick {
 				} else if (input.isPressed(Control.Special1, player)) {
 					changeState(new TSeahorseShoot2State());
 				} else if (input.isPressed(Control.Dash, player) && teleportCooldown == 0) {
-					if (ammo >= 8) {
-						deductAmmo(8);
+					if (ammo >= 6) {
+						deductAmmo(5);
 						changeState(new TSeahorseTeleportState());
 					}
 				}
@@ -316,6 +316,6 @@ public class TSeahorseTeleportState : MaverickState {
 		base.onExit(newState);
 		maverick.useGravity = true;
 		maverick.angle = 0;
-		(maverick as ToxicSeahorse).teleportCooldown = 0.25f;
+		(maverick as ToxicSeahorse).teleportCooldown = 0.15f;
 	}
 }

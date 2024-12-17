@@ -5,6 +5,78 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+
+public class GlobalParryState : CharState {
+	public GlobalParryState() : base("parry_start", "", "", "") {
+		superArmor = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			character.parryCooldown = 30;
+		}
+	}
+
+	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
+		Actor? counterAttackTarget = null;
+		if (damagingActor is GenericMeleeProj gmp) {
+			counterAttackTarget = gmp.owningActor;
+		}
+		if (counterAttackTarget == null) {
+			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
+		}
+
+		Projectile? proj = damagingActor as Projectile;
+		bool stunnableParry = proj != null && proj.canBeParried();
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
+			counterAttackTarget is Character chr && stunnableParry
+		) {
+			if (player.isVile){
+			if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new ParriedState(), true);
+			}
+			}
+		}
+		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
+		character.changeState(new Idle(), true);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+	public bool canParry(Actor damagingActor) {
+		if (damagingActor is not Projectile) {
+			return false;
+		}
+	//	if (player.isVile)return character.frameIndex < 5;
+		return character.frameIndex == 0;
+	}
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.isX || player.isRageX) {
+		character.changeSpriteFromName("unpo_parry_start", true);
+		}
+		//if (player.isVile){
+		//character.changeSpriteFromName("win", true);
+		//}
+		}
+	
+}
+
+
 public class XTeleportState : CharState {
 	public bool onceTeleportInSound;
 	bool isInvisible;

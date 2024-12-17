@@ -63,6 +63,10 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.ItemTracer:
 				proj = new ItemTracerProj(new ItemTracer(), pos, xDir, player, null, netProjByte);
 				break;
+			case (int)ProjIds.ZainSaberProj:
+				proj = new ZSaberProj(pos, xDir, player, netProjByte);
+				break;
+
 			case (int)ProjIds.ZSaberProj:
 				proj = new ZSaberProj(pos, xDir, player, netProjByte);
 				break;

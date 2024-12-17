@@ -35,9 +35,16 @@ public class HomingTorpedo : Weapon {
 		Player player = character.player;
 
 
-		if (chargeLevel < 3) {
+		if (chargeLevel == 0) {
 			new TorpedoProj(this, pos, xDir, player, 0, player.getNextActorNetId(true), rpc: true);
-		} if (chargeLevel == 3) {
+		} 
+		if (chargeLevel == 1) {
+			new TorpedoProj(this, pos, xDir, player, 1, player.getNextActorNetId(true), rpc: true);
+		}
+		if (chargeLevel == 2) {
+			new TorpedoProj(this, pos, xDir, player, 3, player.getNextActorNetId(true), rpc: true);
+		}
+		if (chargeLevel == 3) {
 			player.getNextActorNetId(true);
 			new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 1, player.getNextActorNetId(true), 30, true);
 			new TorpedoProj(this, pos.addxy(0, 1), xDir, player, 1, player.getNextActorNetId(true), 15, true);

@@ -16,9 +16,12 @@ public class XUPParry : Weapon {
 	}
 }
 
+
+
+
 // If fixing parry code also fix kknuckle parry
 public class XUPParryStartState : CharState {
-	RagingChargeX mmx;
+//	RagingChargeX mmx;
 
 	public XUPParryStartState() : base("unpo_parry_start", "", "", "") {
 	}
@@ -32,6 +35,7 @@ public class XUPParryStartState : CharState {
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
+			character.parryCooldown = 60;
 		}
 	}
 
@@ -45,11 +49,11 @@ public class XUPParryStartState : CharState {
 		
 		if (damagingActor is GenericMeleeProj gmp) {
 			counterAttackTarget = gmp.owningActor;
-	//	} else if (damagingActor is Projectile proj) {
-	//		if (!proj.isMelee && proj.shouldVortexSuck) {
-	//			absorbedProj = proj;
-	//			absorbedProj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
-	//		}
+		} else if (damagingActor is Projectile proj) {
+			if (!proj.isMelee && proj.shouldVortexSuck) {
+				absorbedProj = proj;
+				absorbedProj.destroySelfNoEffect(doRpcEvenIfNotOwned: true);
+			}
 		}
 
 		if (absorbedProj != null) {
@@ -58,8 +62,8 @@ public class XUPParryStartState : CharState {
 				bool absorbThenShoot = false;
 				character.playSound("upParryAbsorb", sendRpc: true);
 				if (!player.input.isWeaponLeftOrRightHeld(player)) {
-					mmx.unpoAbsorbedProj = absorbedProj;
-					//character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
+					character.unpoAbsorbedProj = absorbedProj;
+					character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
 				} else {
 					shootProj = true;
 					absorbThenShoot = true;
@@ -87,7 +91,10 @@ public class XUPParryStartState : CharState {
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}
 
-	public bool canParry() {
+	public bool canParry(Actor damagingActor) {
+		if (damagingActor is GenericMeleeProj) {
+			return false;
+		}
 		return character.frameIndex == 0;
 	}
 
@@ -98,7 +105,7 @@ public class XUPParryStartState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-	//	mmx.parryCooldown = mmx.maxParryCooldown;
+		character.parryCooldown = 60;
 	}
 }
 
@@ -158,7 +165,8 @@ public class XUPParryMeleeState : CharState {
 	Actor counterAttackTarget;
 	float damage;
 	public XUPParryMeleeState(Actor counterAttackTarget, float damage) : base("unpo_parry_attack", "", "", "") {
-		invincible = true;
+	//	invincible = true;
+	superArmor = true;
 		this.counterAttackTarget = counterAttackTarget;
 		this.damage = damage;
 	}
@@ -366,6 +374,7 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
+		character.unpoAbsorbedProj = null;
 	//	if (character is RagingChargeX mmx) {
 	//		mmx.parryCooldown = mmx.maxParryCooldown;
 	//	}

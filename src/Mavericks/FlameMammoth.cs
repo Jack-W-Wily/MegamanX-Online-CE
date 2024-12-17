@@ -8,9 +8,9 @@ public class FlameMammoth : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.2f));
 		stompWeapon = new FlameMStompWeapon(player);
-	//	stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.2f));
 
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.StormTornado;
@@ -41,7 +41,7 @@ public class FlameMammoth : Maverick {
 				}
 				
 			} else if (state is MJump || state is MFall) {
-				if (input.isPressed(Control.Dash, player) && getDistFromGround() > 75) {
+				if (input.isHeld(Control.Dash, player)) { //&& getDistFromGround() > 75) {
 					changeState(new FlameMJumpPressState());
 				}
 			}

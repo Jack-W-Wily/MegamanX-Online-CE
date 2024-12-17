@@ -28,9 +28,13 @@ public class ElectricSpark : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		if (chargeLevel < 3) {
+		if (chargeLevel < 2) {
 			new ElectricSparkProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
-		} if (chargeLevel == 3) {
+		}
+		if (chargeLevel == 2) {
+			new ElectricSparkProjSemiCharged(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
+		}
+		if (chargeLevel == 3) {
 			new ElectricSparkProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 		if (chargeLevel == 4) {
@@ -123,6 +127,93 @@ public class ElectricSparkProj : Projectile {
 		base.onReflect();
 	}
 }
+
+
+public class ElectricSparkProjSemiCharged : Projectile {
+	public int type = 0;
+	public bool split = false;
+	public ElectricSparkProjSemiCharged(
+		Weapon weapon, Point pos, int xDir, Player player, 
+		int type, ushort netProjId, (int x, int y)? vel = null, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 150, 3, player, "sparkm_proj_spark",
+		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
+	) {
+		projId = (int)ProjIds.ElectricSpark;
+		maxTime = 2f;
+
+		if (type >= 1) {
+			maxTime = 0.4f;
+
+			if (vel != null) base.vel = new Point(vel.Value.x, vel.Value.y);
+		}
+
+		fadeSprite = "electric_spark_fade";
+		this.type = type;
+		reflectable = true;
+		shouldShieldBlock = false;
+		canBeLocal = false;
+
+		if (rpc) {
+			byte[] extraArgs;
+
+			if (vel != null) {
+				extraArgs = new byte[] { 
+					(byte)type, 
+					(byte)(vel.Value.x + 128),
+					(byte)(vel.Value.y + 128) };
+			} else {
+				extraArgs = new byte[] { (byte)type, (byte)(128 + xDir), 128 };
+			}
+
+			rpcCreate(pos, player, netProjId, xDir, extraArgs);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new ElectricSparkProjSemiCharged(
+			ElectricSpark.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.extraData[0], arg.netId,
+			(arg.extraData[1] - 128, arg.extraData[2] - 128)
+		);
+	}
+
+	public override void onHitWall(CollideData other) {
+		if (split) return;
+		if (type == 0) {
+			destroySelf(fadeSprite);
+			split = true;
+			if (!ownedByLocalPlayer) {
+				return;
+			}
+
+			var normal = other?.hitData?.normal;
+            if (normal != null) {
+                if (normal.Value.x == 0) normal = new Point(-1, 0);
+                normal = ((Point)normal).leftNormal();
+            }
+
+            Point normal2 =  new Point(0, 1);
+			if (normal != null) normal2 = (Point)normal;
+            normal2.multiply(speed * 3);
+
+			new ElectricSparkProj(
+				weapon, pos.clone(), xDir, damager.owner, 1,
+				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x, (int)normal2.y), true
+			);
+			new ElectricSparkProj(
+				weapon, pos.clone(), xDir, damager.owner, 2,
+				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x * -1, (int)normal2.y * -1), rpc: true
+			);
+		}
+	}
+
+	public override void onReflect() {
+		vel.y *= -1;
+		base.onReflect();
+	}
+}
+
 
 public class ElectricSparkProjChargedStart : Projectile {
 	public ElectricSparkProjChargedStart(
@@ -221,10 +312,10 @@ public class ESparkUltraCharged : CharState {
 
 			character.shakeCamera(sendRpc: true);
 
-			var weapon = new TriadThunder();
-			new TriadThunderProjCharged(weapon, new Point(x, y), -1, 1, player, player.getNextActorNetId(), rpc: true);
-			new TriadThunderProjCharged(weapon, new Point(x, y), 1, 1, player, player.getNextActorNetId(), rpc: true);
-			new TriadThunderQuake(weapon, new Point(x, y), 1, player, player.getNextActorNetId(), rpc: true);
+			
+			new TriadThunderProjCharged(player.weapon, new Point(x, y), -1, 1, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderProjCharged(player.weapon, new Point(x, y), 1, 1, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderQuake(player.weapon, new Point(x, y), 1, player, player.getNextActorNetId(), rpc: true);
 
 			character.playSound("sparkmSparkX1", forcePlay: false, sendRpc: true);
 		

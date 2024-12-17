@@ -1455,6 +1455,7 @@ public partial class Actor : GameObject {
 				CmdSigma => "sigma",
 				NeoSigma => "neosigma",
 				Doppma => "doppma",
+				Zain => "zain",
 				_ => "error"
 			};
 
