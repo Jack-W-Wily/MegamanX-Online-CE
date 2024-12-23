@@ -18,6 +18,8 @@ public class SilkShot : Weapon {
 		damage = "2+1/4+1";
 		effect = "Able to heal allies.\nRewards one metal by healing 16 HP.";
 		Flinch = "0/26";
+		type = index;
+		displayName = "Silk Shot ";
 	}
 
 	public override void shoot(Character character, int[] args) {

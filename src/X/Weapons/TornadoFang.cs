@@ -21,6 +21,8 @@ public class TornadoFang : Weapon {
 		hitcooldown = "0.25/0.125";
 		Flinch = "0/26";
 		FlinchCD = "0/1";
+		type = index;
+		displayName = "Tornado Fang ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

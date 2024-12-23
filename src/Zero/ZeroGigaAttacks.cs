@@ -585,9 +585,7 @@ public class InfernoBeamUp : Projectile {
 	}
 
 	public override bool shouldDealDamage(IDamagable damagable) {
-		if (damagable is Actor actor && MathF.Abs(pos.x - actor.pos.x) > 40) {
-			return false;
-		}
+	
 		return true;
 	}
 
@@ -604,11 +602,10 @@ public class InfernoBeamUp : Projectile {
 }
 
 
-
-public class InfernoBeamDown : Projectile {
+public class InfernoBeamDown: Projectile {
 	Player player;
 	public InfernoBeamDown(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 0, 6, player, "zerox1_firebeam_down", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 0, 6, player, "zerox1_firebeam_up", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.InfernoBeamDown;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
@@ -626,9 +623,7 @@ public class InfernoBeamDown : Projectile {
 	}
 
 	public override bool shouldDealDamage(IDamagable damagable) {
-		if (damagable is Actor actor && MathF.Abs(pos.x - actor.pos.x) > 40) {
-			return false;
-		}
+	
 		return true;
 	}
 
@@ -639,7 +634,7 @@ public class InfernoBeamDown : Projectile {
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, 600));
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
 		}
 	}
 }
@@ -821,7 +816,11 @@ public class DarkHoldWeapon : Weapon {
 		maxAmmo = 28;
 		fireRate = 60 * 3;
 		index = (int)WeaponIds.DarkHold;
+		if (Global.level.mainPlayer.isZero){
 		type = (int)ZeroGigaType.DarkHold;
+		} else {
+			type = index;
+		}
 		killFeedIndex = 175;
 		weaponBarBaseIndex = 69;
 		weaponBarIndex = 58;
@@ -829,11 +828,21 @@ public class DarkHoldWeapon : Weapon {
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
 		allowSmallBar = false;
+	
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
 		return 14;
 	}
+
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
+		new DarkHoldProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			}
 }
 
 public class DarkHoldProj : Projectile {

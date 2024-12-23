@@ -716,6 +716,22 @@ public class GameMode {
 					xStart += 15;
 				}
 			}
+			if (drawPlayer.character is Vile vilin) {
+				int xStart = 26;
+				int yStart = 159;
+				
+				Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
+				yStart -= 16;
+				for (var i = 0; i < MathF.Ceiling(vilin.player.vileMaxAmmo ); i++) {
+				if (i < Math.Ceiling(vilin.player.vileAmmo)) {
+					Global.sprites["hud_weapon_full"].drawToHUD(32, xStart, yStart);
+				} else {
+					Global.sprites["hud_health_empty"].drawToHUD(0, xStart, yStart);
+				}
+				yStart -= 2;
+				}
+				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);
+			}
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
@@ -951,6 +967,11 @@ public class GameMode {
 		if (level.mainPlayer.isX && level.mainPlayer.hasHelmetArmor(3)) {
 			return true;
 		}
+
+		//if (level.mainPlayer.isVile && level.mainPlayer.character.linkedRideArmor != null) {
+		//	return true;
+		//}
+
 		if (level.mainPlayer.isAxl && level.boundBlasterAltProjs.Any(b => b.state == 1)) {
 			return true;
 		}
@@ -2126,6 +2147,20 @@ public class GameMode {
 			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
+
+		if (weapon is DoubleCyclone dcy) {
+			var sprite = Global.sprites["double_cyclone_proj"];
+
+			float w = sprite.frames[0].rect.w();
+			float h = sprite.frames[0].rect.h();
+
+			float scaleX = Helpers.clampMax(10f / w, 1);
+			float scaleY = Helpers.clampMax(10f / h, 1);
+
+			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+			Global.sprites["double_cyclone_proj"].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
+		}
+
 	}
 
 	private void drawWeaponStateOverlay(float x, float y, int type) {

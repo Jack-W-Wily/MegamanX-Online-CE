@@ -7,5 +7,7 @@ public class LhHeadbutt : Weapon {
 		//damager = new Damager(player, 2, 13, 0.5f);
 		index = (int)WeaponIds.LigthHelmetHeadbutt;
 		killFeedIndex = 64;
+		type = index;
+		displayName = "LH Headbutt ";
 	}
 }

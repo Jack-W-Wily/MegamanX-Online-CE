@@ -122,12 +122,12 @@ public class TBreakerState : CharState {
 			var rect = new Rect(poi.x - 10, poi.y - 5, poi.x + 10, poi.y + 5);
 			Shape shape = rect.getShape();
 			var hit = Global.level.checkCollisionShape(shape, null);
-			if (hit != null && hit.gameObject is Wall) {
+		//	if (hit != null && hit.gameObject is Wall) {
 				new TBreakerProj(
 					poi, character.xDir,
 					player, player.getNextActorNetId(), sendRpc: true
 				);
-			}
+		//	}
 		}
 
 		if (character.isAnimOver()) {

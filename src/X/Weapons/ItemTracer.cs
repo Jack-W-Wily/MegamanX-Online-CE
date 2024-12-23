@@ -14,6 +14,8 @@ public class ItemTracer : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 26;
 		killFeedIndex = 20 + (index - 9);
+		type = index;
+		displayName = "Item Tracer ";
 	}
 
 	public override void shoot(Character character, int[] args) {

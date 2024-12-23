@@ -84,7 +84,7 @@ public class BoundBlasterProj : Projectile {
 		Point anglePoint = Point.createFromAngle(angle);
 		vel.x = anglePoint.x * speed;
 		vel.y = anglePoint.y * speed;
-		maxTime = 1.5f;
+		maxTime = 1f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = 3f;
 			isWaProj = true;

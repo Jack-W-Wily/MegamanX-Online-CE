@@ -566,9 +566,6 @@ public class LevelData {
 		{ "ocean", "launchOctopus" },
 		{ "powerplant", "sparkMandrill" },
 
-		{ "sigma1_md", "endlessDespair_doujin" },
-
-
 		{ "sigma1", "sigmaFortress" },
 		{ "sigma2", "sigmaFortress2" },
 		{ "sigma3", "sigmaFortress3" },
@@ -614,6 +611,7 @@ public class LevelData {
 		{ "nodetest", "credits_X1" },
 		{ "sigmazone", "virusSigma" },
 		{ "training", "training_vodaz" },
+		{ "jackobelevator_md",  "endlessDespair_doujin" }
 	};
 
 	public string getMusicKey(List<Player> players) {

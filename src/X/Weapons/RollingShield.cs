@@ -17,6 +17,8 @@ public class RollingShield : Weapon {
 		damage = "2/1";
 		effect = "Mobile Shield That Deletes Projectiles.";
 		hitcooldown = "0/0.33";	
+		type = index;
+		displayName = "Rolling Shield ";
 	}
 
 	public override void shoot(Character character, int[] args) {

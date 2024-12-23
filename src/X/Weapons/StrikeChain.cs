@@ -23,6 +23,8 @@ public class StrikeChain : Weapon {
 		hitcooldown = "0.5";
 		Flinch = "Hooked Time";
 		FlinchCD = "0";
+		type = index;
+		displayName = "Strike Chain ";
 	}
   
 	public override void shoot(Character character, int[] args) {

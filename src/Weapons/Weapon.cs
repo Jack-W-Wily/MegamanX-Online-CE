@@ -170,6 +170,9 @@ public class Weapon {
 				new GravityWell(),
 				new FrostShield(),
 				new TornadoFang(),
+				new DoubleCyclone(),
+				new ZXSaber(),
+				new DarkHoldWeapon(),
 			};
 	}
 

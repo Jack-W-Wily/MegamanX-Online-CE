@@ -19,6 +19,8 @@ public class BoomerangCutter : Weapon {
 		effect = "Charged: Doesn't destroy on hit.\nCharged won't give assists.";
 		hitcooldown = "0/0.5";
 		Flinch = "0/26";
+		type = index;
+		displayName = "Boomerang Cutter ";
 	}
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];

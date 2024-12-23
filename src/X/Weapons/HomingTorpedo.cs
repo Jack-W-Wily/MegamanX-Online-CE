@@ -21,6 +21,9 @@ public class HomingTorpedo : Weapon {
 		Flinch = "0/13";
 		maxAmmo = 16;
 		ammo = maxAmmo;
+
+		type = index;
+		displayName = "Homing Torpedo";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

@@ -156,7 +156,7 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
-		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && vile.isVileMK5;
+		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && (vile.isVileMK5 || Options.main.vileLoadout.cannon == 2);
 
 		// Health bar
 		if (ownedByLocalPlayer && isVileMk5 && !isInvincible(null, null)) {
@@ -468,6 +468,7 @@ public class RideArmor : Actor, IDamagable {
 				playSound("frogShootX3", forcePlay: false, sendRpc: true);
 			}
 		}
+
 			bool attackConditionMet = character != null 
 			&& canAttack() && 
 			(character.player.input.isPressed(Control.Shoot, character.player) 
@@ -512,7 +513,7 @@ public class RideArmor : Actor, IDamagable {
 				}
 			}
 
-			if (character != null &&
+			if (character != null && !isAttacking() &&
 				!ownedByMK5 &&
 				(character.destroyed || character.charState is not InRideArmor)
 			) {
@@ -638,7 +639,8 @@ public class RideArmor : Actor, IDamagable {
 	}
 
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (hitbox == null || player == null || sprite?.name == null) {
+		if (hitbox == null || player == null
+		 || sprite?.name == null) {
 			return null;
 		}
 		// whats the center point value?
@@ -2222,6 +2224,7 @@ public class InRideArmor : CharState {
 
 		Helpers.decrementTime(ref innerCooldown);
 
+		
 		float healthPercent = player.health / player.maxHealth;
 		if (frozenTime > 0) {
 			if (freezeAnim == null) freezeAnim = new Anim(character.pos, "frozen_block_head", character.xDir, character.player.getNextActorNetId(), false, sendRpc: true);
@@ -2259,6 +2262,9 @@ public class InRideArmor : CharState {
 			stunAnim = null;
 		}
 
+		if (character.rideArmor != null && character.rideArmor.sprite.name.Contains("taunt")){
+		character.changeSpriteFromName("ra_taunt", true);
+		}
 		if (!isHiding) {
 			if (character.rideArmor != null && character.rideArmor.isAttacking()) {
 				character.changeSpriteFromName("ra_attack", true);
@@ -2292,6 +2298,7 @@ public class InRideArmor : CharState {
 
 	public void tossGrenade(Vile vile) {
 		Projectile? grenade = null;
+			character.changeSpriteFromName("ra_bomb", true);
 		if (vile.napalmWeapon.shootCooldown > 0) {
 			return;
 		}

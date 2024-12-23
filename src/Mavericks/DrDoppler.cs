@@ -143,7 +143,7 @@ public class DrDopplerBallProj : Projectile {
 		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
 		weapon, pos, xDir, 250, 3, player, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2",
-		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		isDeflectShield = true;
 		if (type == 0) {
@@ -152,6 +152,7 @@ public class DrDopplerBallProj : Projectile {
 		} else {
 			projId = (int)ProjIds.DrDopplerBall2;
 			damager.damage = 1;
+			damager.flinch = 0;
 			destroyOnHit = false;
 			maxTime = 3f;
 			vel.x = 40;

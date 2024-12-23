@@ -671,7 +671,7 @@ public class Projectile : Actor {
 			if (chr.isUnderwater()) modifier = 2;
 			if (chr.isImmuneToKnockback()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 0 * modifier, -400));
+			chr.move(new Point(xMoveVel * 0 * modifier, -300));
 		}
 	
 

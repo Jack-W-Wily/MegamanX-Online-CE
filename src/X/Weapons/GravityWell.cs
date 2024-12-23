@@ -20,6 +20,8 @@ public class GravityWell : Weapon {
 		Flinch = "0/26";
 		maxAmmo = 16;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Gravity Well ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

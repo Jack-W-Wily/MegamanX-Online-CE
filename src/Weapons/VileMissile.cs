@@ -107,7 +107,7 @@ public class VileMissileProj : Projectile {
 	bool split;
 	int type;
 	public VileMissileProj(VileMissile weapon, Point pos, int xDir, int type, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 200, 3, player, weapon.projSprite, 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 200, 3, player, weapon.projSprite, 4, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		projId = (int)ProjIds.VileMissile;
@@ -257,7 +257,7 @@ public class VileMK2StunShotProj : Projectile {
 }
 
 public class MissileAttack : CharState {
-	public MissileAttack() : base("idle_shoot", "", "", "") {
+	public MissileAttack() : base("idle_missle", "", "", "") {
 		exitOnAirborne = true;
 		normalCtrl = true;
 	}

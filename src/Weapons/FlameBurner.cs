@@ -57,7 +57,7 @@ public class FlameBurnerProj : Projectile {
 	public FlameBurnerProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 150, 1, player, "flameburner_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FlameBurner;
-		maxTime = 0.5f;
+		maxTime = 0.2f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			projId = (int)ProjIds.FlameBurnerHyper;
 		}
@@ -203,7 +203,7 @@ public class CircleBlazeProj : Projectile {
 		projId = (int)ProjIds.CircleBlaze;
 		//fadeSprite = "circleblaze_fade";
 		fadeSound = "circleBlazeExplosion";
-		maxTime = 0.5f;
+		maxTime = 0.2f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		if (isUnderwater()) {

@@ -22,6 +22,8 @@ public class RagingChargeBuster : Weapon {
 		ammoGainMultiplier = 2;
 		maxAmmo = 12;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Rage Buster ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) { return 3; }

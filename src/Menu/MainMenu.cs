@@ -83,7 +83,8 @@ public class MainMenu : IMainMenu {
 			} else if (selectY == 2) {
 				Menu.change(new HostMenu(this, null, true, true));
 			} else if (selectY == 3) {
-				Menu.change(new PreLoadoutMenu(this));
+				selectY = 4;
+			//	Menu.change(new PreLoadoutMenu(this));
 			//} else if (selectY == 4) {
 			//	Menu.change(new PreControlMenu(this, false));
 			} else if (selectY == 4) {

@@ -70,16 +70,7 @@ public class Vulcan : Weapon {
 		if (string.IsNullOrEmpty(vile.charState.shootSprite)) return;
 
 			Player player = vile.player;
-		if (player.input.isHeld(Control.Down,player)){
-			type = 2;
-		}
-			if (player.input.isHeld(Control.Up,player)){
-			type = 1;
-		}
-		if (!player.input.isHeld(Control.Up,player)&&
-		!player.input.isHeld(Control.Down,player)){
-			type =0;
-		}
+
 	
 		if (vile.tryUseVileAmmo(vileAmmoUsage, true)) {
 			if (vile.charState is LadderClimb) {
@@ -107,15 +98,18 @@ public class Vulcan : Weapon {
 }
 
 public class VulcanProj : Projectile {
+
+
 	public VulcanProj(Vulcan weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, weapon.type == (int)VulcanType.DistanceNeedler ? 600 : 500, 1, player, weapon.projSprite, 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, weapon.type == (int)VulcanType.DistanceNeedler ? 600 : 500, 1, player, "vulcan_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.Vulcan;
 		maxTime = 0.25f;
 		destroyOnHit = true;
 		reflectable = true;
-
+		
 		if (weapon.type == (int)VulcanType.DistanceNeedler) {
 			maxTime = 0.3f;
+			changeSprite("vulcan_dn_proj", true) ;
 			destroyOnHit = false;
 			damager.hitCooldown = 0.2f;
 			damager.damage = 2;
@@ -123,6 +117,7 @@ public class VulcanProj : Projectile {
 			projId = (int)ProjIds.DistanceNeedler;
 		} else if (weapon.type == (int)VulcanType.BuckshotDance) {
 			//this.xDir = 1;
+			changeSprite("vulcan_bd_proj", true);
 			//pixelPerfectRotation = true;
 			int rand = 0;
 			if (player.character is Vile vile) {

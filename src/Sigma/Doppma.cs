@@ -26,6 +26,16 @@ public class Doppma : BaseSigma {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+
+		if (charState.attackCtrl){
+			if ((charState is Dash || charState is AirDash) 
+			&& (player.input.isPressed(Control.Shoot, player)
+			|| player.input.isPressed(Control.Special1, player))){
+			slideVel = xDir * getDashSpeed();			
+			}
+		}
+
+
 		fireballWeapon.update();
 		Helpers.decrementTime(ref fireballCooldown);
 		Helpers.decrementTime(ref shieldCooldown);
@@ -136,6 +146,20 @@ public class Doppma : BaseSigma {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.FireWave, player,
 				damage: 2, flinch: 20, hitCooldown: 1, isDeflectShield: true, isShield: true
+			);
+		}
+
+		if (sprite.name.Contains("dash")) {
+			return new GenericMeleeProj(
+				new Weapon(), centerPoint, ProjIds.UPPunch, player,
+				damage: 2, flinch: 20, hitCooldown: 1, isDeflectShield: true, isShield: true
+			);
+		}
+
+		if (sprite.name.Contains("throw")) {
+			return new GenericMeleeProj(
+				new Weapon(), centerPoint, ProjIds.VileSuperKick, player,
+				damage: 2, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true
 			);
 		}
 

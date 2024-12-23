@@ -231,6 +231,7 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["crouch*"] = getCrouchingCollider();
 		spriteToCollider["ra_*"] = getRaCollider();
 		spriteToCollider["rc_*"] = getRcCollider();
+		spriteToCollider["tgbdbike_*"] = getRcCollider();
 		spriteToCollider["warp_beam"] = null;
 		spriteToCollider["warp_out"] = null;
 		spriteToCollider["warp_in"] = null;
@@ -1079,7 +1080,7 @@ public partial class Character : Actor, IDamagable {
 			if (player.isX) {
 				stingChargeTime -= Global.spf;
 
-				player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
+			//	player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
 				if (player.weapon.ammo < 0) player.weapon.ammo = 0;
 				stingChargeTime = player.weapon.ammo;
 			} else {
@@ -1095,7 +1096,7 @@ public partial class Character : Actor, IDamagable {
 			if (player.isX) {
 				UltraStingChargeTime -= Global.spf;
 
-				player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
+	//			player.weapon.ammo -= (Global.spf * 3 * (player.hasChip(3) ? 0.5f : 1));
 				if (player.weapon.ammo < 0) player.weapon.ammo = 0;
 				UltraStingChargeTime = player.weapon.ammo;
 			} else {
@@ -2849,8 +2850,8 @@ public partial class Character : Actor, IDamagable {
 				
 
 				killer.character.addHealth(3);
-				if (!killer.isRageX){
-				killer.character.addAmmo(5);
+				if (!killer.isRageX && !killer.isAxl){
+				killer.character.addAmmo(8);
 				}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {

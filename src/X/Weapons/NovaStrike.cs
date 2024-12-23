@@ -18,6 +18,8 @@ public class HyperNovaStrike : Weapon {
 		ammo = 28;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		type = index;
+		displayName = "Nova Strike ";
 	}
 
 	public override void shoot(Character character, int[] args) {

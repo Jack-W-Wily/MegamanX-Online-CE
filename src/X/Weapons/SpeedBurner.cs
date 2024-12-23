@@ -21,6 +21,8 @@ public SpeedBurner() : base() {
 		hitcooldown = "0-0.25/0";
 		Flinch = "0/26";
 		FlinchCD = "0/0.5";
+		type = index;
+		displayName = "Speed Burner ";
 	}
 
 	public override void shoot(Character character, int[] args) {

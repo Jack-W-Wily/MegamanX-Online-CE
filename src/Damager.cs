@@ -286,6 +286,7 @@ public class Damager {
 					damagerMessage = onBanzai(damagable, owner);
 					break;
 				case (int)ProjIds.ElectricShock:
+				case (int)ProjIds.DrDopplerBall2:
 				case (int)ProjIds.MorphMPowder:
 				case (int)ProjIds.Raijingeki:
 				case (int)ProjIds.Raijingeki2:
@@ -340,7 +341,7 @@ public class Damager {
 			}
 
 
-			if (owner.health > 0 && projId != null){
+			if (owner.health > 0){
 			// Combotimer
 			owner.character.ComboTimer = 0.25f;;
 			}
@@ -354,7 +355,17 @@ public class Damager {
 			}
 			
 			if (owner.health > 0){
-				
+			
+
+			// GBD stuff
+
+			if ( projId == (int)ProjIds.GBDKick){
+			
+				owner.character.isDashing = true;
+			
+			owner.character.vel.y = -owner.character.getJumpPower();
+			owner.character.changeState(new WallKick() ,true);
+			}
 			// ZeroFinal
 			if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart){
 			owner.character.changeState(new ZeroFinalEnd(character), true);
@@ -376,10 +387,16 @@ public class Damager {
 			}
 
 			// Hexa stuff
-			if (character.charState is HexaInvoluteState) {
-					character.addHealth(damage);	
-					victim.addDamageText("ABSORBED!", 1);		
+		//	if (character.charState is HexaInvoluteState) {
+		//			character.addHealth(damage);	
+		//			victim.addDamageText("ABSORBED!", 1);		
+		//	}
+
+			if (projId == (int)ProjIds.HexaInvolute && owner.health > 0) {
+				owner.character.addHealth(0.1f);
 			}
+
+
 			// Vile stomp 
 			if (character.sprite.name.Contains("knocked_down")
 			 && projId == (int)ProjIds.VileStomp
@@ -1044,7 +1061,7 @@ public class Damager {
 	public static bool isArmorPiercing(int? projId) {
 		if (projId == null) return false;
 		return projId switch {
-			(int)ProjIds.SpiralMagnum => true,
+			//(int)ProjIds.SpiralMagnum => true,
 			(int)ProjIds.AssassinBullet => true,
 			(int)ProjIds.AssassinBulletQuick => true,
 			(int)ProjIds.VileMK2Grab => true,

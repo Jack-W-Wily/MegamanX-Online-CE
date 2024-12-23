@@ -22,6 +22,11 @@ public class HyperCharge : Weapon {
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
 		allowSmallBar = false;
+		type = index;
+		displayName = "Hyper Charge";
+		
+
+		
 	}
 
 	public override void update() {

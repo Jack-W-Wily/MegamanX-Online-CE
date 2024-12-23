@@ -6,7 +6,7 @@ public class Zain : Character {
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Zain;
 	}
@@ -72,8 +72,7 @@ public override bool normalCtrl() {
 
 		if (charState.attackCtrl){
 			if ((charState is Dash || charState is AirDash) 
-			&& (player.input.isPressed(Control.Special1, player)
-			|| player.input.isPressed(Control.Shoot, player))){
+			&& (player.input.isPressed(Control.Shoot, player))){
 			slideVel = xDir * getDashSpeed();			
 			}
 		}
@@ -85,9 +84,10 @@ public override bool normalCtrl() {
 		changeSpriteFromName("spinslash", true);
 		}
 
-		if (charState.attackCtrl &&
+		if (charState.attackCtrl && SlashCooldown == 0 &&
 		 player.input.isPressed(Control.Shoot, player))
 		{	
+			SlashCooldown = 0.5f;
        		changeState(new ZainProjSwingState(grounded, shootProj: false), forceChange: true);
 		}
 		if (charState.attackCtrl  && grounded && ZainCounters > 3 &&
@@ -109,12 +109,21 @@ public override bool normalCtrl() {
 			  ) {
 				if (unpoAbsorbedProj != null) {
 					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-					//unpoAbsorbedProj = null;
-					return;
+					unpoAbsorbedProj = null;		
 				} else {
 					changeState(new XUPParryStartState(), true);
 				}
-			}
+		}
+
+		 if  (player.input.isPressed(Control.Special1,player) && parryCooldown == 0 &&
+				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
+			  ) {
+				if (unpoAbsorbedProj != null) {
+					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
+					unpoAbsorbedProj = null;	
+				}
+			  }
+
 		
 		
 		
@@ -149,7 +158,7 @@ public override bool normalCtrl() {
 		}
 		if (  sprite.name.Contains("parry"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.VileSuperKick, player, 5f, 30, 0.15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.VileSuperKick, player, 1f, 0, 0.15f);
 		}
 		if (  sprite.name.Contains("thrust"))
 		{

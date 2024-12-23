@@ -14,13 +14,15 @@ public class HexaInvoluteWeapon : Weapon {
 public class HexaInvoluteState : CharState {
 	HexaInvoluteProj proj;
 	bool startGrounded;
+
+	bool KeepHexa = false;
 	float ammoTime;
 	Vile vile = null!;
 
 	public HexaInvoluteState() : base("super", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;
-		//invincible = true;
+		invincible = true;
 	}
 
 	public override void update() {
@@ -44,8 +46,15 @@ public class HexaInvoluteState : CharState {
 			}
 		}
 
+
+		if (player.currency > 2 && (player.input.isPressed(Control.Taunt, player) && stateTime > 1)) {
+			KeepHexa = true;
+			player.currency -= 3;
+		}
+
 		if (player.vileAmmo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
 			character.changeToIdleOrFall();
+		
 		}
 	}
 
@@ -64,7 +73,11 @@ public class HexaInvoluteState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+
+
+		if (!KeepHexa){
 		proj?.destroySelf();
+		}
 		character.useGravity = true;
 	}
 }
@@ -113,16 +126,17 @@ public class HexaInvoluteProj : Projectile {
 
 	public List<HexaInvolutePart> parts = new List<HexaInvolutePart>();
 	public HexaInvoluteProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 1, player, "empty", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 1, player, "vilemk5_super_proj", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.HexaInvolute;
 		setIndestructableProperties();
-		sprite.hitboxes = new Collider[6];
+	//	sprite.hitboxes = new Collider[6];
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		canBeLocal = false;
+		canBeLocal = true;
 
+	
 
 		isMelee = true;
 
@@ -132,6 +146,14 @@ public class HexaInvoluteProj : Projectile {
 	public override void update() {
 		base.update();
 
+		if (owner.character.charState is not HexaInvoluteState){
+			damager.damage = 0.1f;
+			damager.flinch = 0;
+		}
+		if (ownedByLocalPlayer && owner.character == null ||
+		owner.health == 0) {
+		destroySelf();
+		}
 		if (ownedByLocalPlayer && owner.character != null) {
 			incPos(owner.character.deltaPos);
 		}
@@ -186,7 +208,7 @@ public class HexaInvoluteProj : Projectile {
 		foreach (var part in parts) {
 			Point partPos = part.getPos();
 			float partSize = part.getRadius();
-			if (Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance) {
+			if (owner.character.charState is not HexaInvoluteState) {
 				Global.sprites["vilemk5_super_part2"].draw(0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1);
 			} else {
 				Global.sprites["vilemk5_super_part"].draw(0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1);

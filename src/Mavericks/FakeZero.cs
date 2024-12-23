@@ -510,6 +510,8 @@ public class FakeZeroRockProj : Projectile {
 	public FakeZeroRockProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1.5f, player, "fakezero_rock", Global.halfFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FakeZeroGroundPunch;
+			fadeSprite = "explosion";
+		
 		maxTime = 1.25f;
 		useGravity = true;
 		vel = new Point(0, -500);
@@ -518,7 +520,15 @@ public class FakeZeroRockProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
+
+
+
+
+
 }
+
+
+
 
 public class FakeZeroGuardState : MaverickState {
 	public FakeZeroGuardState() : base("guard", "") {

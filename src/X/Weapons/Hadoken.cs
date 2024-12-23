@@ -10,6 +10,8 @@ public class HadoukenWeapon : Weapon {
 		weaponBarBaseIndex = 19;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 14;
+		type = index;
+		displayName = "Hadouken ";
 	}
 }
 

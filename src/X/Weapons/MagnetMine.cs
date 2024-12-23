@@ -22,6 +22,8 @@ public class MagnetMine : Weapon {
 		damage = "2-4/1-2-4";
 		Flinch = "0/26";
 		FlinchCD = "0/1";
+		type = index;
+		displayName = "Magnet Mine ";
 	}
 
 	public override void shoot(Character character, int[] args) {

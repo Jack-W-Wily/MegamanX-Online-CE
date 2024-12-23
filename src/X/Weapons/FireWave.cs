@@ -24,6 +24,8 @@ public class FireWave : Weapon {
 		hitcooldown = "0.2/0.33";
 		maxAmmo = 28;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Fire Wave ";
 	}
 
 	public float altfireCooldown;

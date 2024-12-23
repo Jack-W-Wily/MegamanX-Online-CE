@@ -20,6 +20,8 @@ public class ElectricSpark : Weapon {
 		hitcooldown = "0/0.5";
 		Flinch = "6/26";
 		FlinchCD = "1/0";
+		type = index;
+		displayName = "Electric Spark ";
 	}
 
 	public override void shoot(Character character, int[] args) {

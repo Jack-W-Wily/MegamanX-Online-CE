@@ -21,6 +21,8 @@ public class SpinWheel : Weapon {
 		Flinch = "0/26";
 		maxAmmo = 28;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Spin Wheel ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

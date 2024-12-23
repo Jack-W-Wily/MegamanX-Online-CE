@@ -33,7 +33,8 @@ public class CallDownMech : CharState {
 			}
 			*/
 
-			if (vile.isVileMK5 != true && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
+			if (//vile.isVileMK5 != true &&
+			 MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
 				rideArmor.putCharInRideArmor(character);
 			} else {
 				character.changeToIdleOrFall();
@@ -99,11 +100,7 @@ public class VileDodge : CharState {
 					character.turnToInput(player.input, player);
 		}
 
-		if (player.input.isPressed(Control.Down, player)
-		&& character.sprite.name.Contains("mk5")) {
-		
-		character.changeState(new HexaInvoluteState(), true);
-		}
+	
 
 
 		if (character.sprite.name.Contains("banzai")

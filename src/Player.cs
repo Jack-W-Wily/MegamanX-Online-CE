@@ -130,6 +130,8 @@ public partial class Player {
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
 
+	public bool isGBD { get { return charNum == (int)CharIds.GBD; } }
+
 
 	public float healthBackup;
 
@@ -222,6 +224,7 @@ public partial class Player {
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
+		{ (int)CharIds.GBD, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -236,6 +239,7 @@ public partial class Player {
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Zain, new() },
+		{ (int)CharIds.GBD, new() },
 	};
 
 	// Getter functions.
@@ -692,6 +696,9 @@ public partial class Player {
 		}
 		if (isZain) {
 			bonus = 16;
+		}
+		if (isGBD) {
+			bonus = 12;
 		}
 		return MathF.Ceiling(
 			getModifiedHealth(20 + bonus) + (heartTanks * getHeartTankModifier())
@@ -1203,6 +1210,12 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
+		else if (charNum == (int)CharIds.GBD) {
+			character = new GBD(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
 		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
@@ -1412,6 +1425,12 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
+		}
+		else if (data.charNum == (int)CharIds.GBD) {
+			retChar = new GBD(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
@@ -1580,6 +1599,12 @@ public partial class Player {
 		} 
 		else if (charNum == (int)CharIds.Zain) {
 			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (charNum == (int)CharIds.GBD) {
+			retChar = new GBD(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);

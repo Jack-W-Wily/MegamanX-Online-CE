@@ -46,6 +46,7 @@ public class GlobalParryState : CharState {
 			} else {
 				chr.changeState(new ParriedState(), true);
 			}
+			character.addHealth(1);
 			}
 		}
 		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
@@ -60,7 +61,7 @@ public class GlobalParryState : CharState {
 		if (damagingActor is not Projectile) {
 			return false;
 		}
-	//	if (player.isVile)return character.frameIndex < 5;
+		if (player.isVile)return character.frameIndex < 5;
 		return character.frameIndex == 0;
 	}
 

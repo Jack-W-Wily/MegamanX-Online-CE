@@ -159,12 +159,30 @@ public class FlamethrowerState : CharState {
 				poiPos = (character.getFirstPOI() ?? character.getPOIPos(groundShotPOI));
 
 			}
+
+			if (player.input.isHeld(Control.Up,player)){
 			new FlamethrowerProj(
-				vile.flamethrowerWeapon,
+				DragonsWrath.netWeapon,
+				poiPos,	character.xDir, isGrounded, player,
+				player.getNextActorNetId(), sendRpc: true);
+			}
+			if (player.input.isHeld(Control.Down,player)){
+			new FlamethrowerProj(SeaDragonRage.netWeapon,
+			poiPos,
+			character.xDir, isGrounded, player,
+			player.getNextActorNetId(), sendRpc: true
+			);
+			}
+			if (!player.input.isHeld(Control.Down,player)
+			&&
+			!player.input.isHeld(Control.Up,player)){
+			new FlamethrowerProj(
+				WildHorseKick.netWeapon,
 				poiPos,
 				character.xDir, isGrounded, player,
 				player.getNextActorNetId(), sendRpc: true
 			);
+			}
 		}
 
 		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
@@ -190,17 +208,19 @@ public class FlamethrowerProj : Projectile {
 		VileFlamethrower weapon, Point pos, int xDir,
 		bool groundedVariant, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, weapon.projSprite, 0, 0.1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 1, player, weapon.projSprite, 1, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = weapon.projId;
 		fadeSprite = weapon.projFadeSprite;
 		destroyOnHit = true;
 		this.groundedVariant = groundedVariant;
+		isJuggleProjectile = true;
 
 		maxTime = 0.3f;
 		if (weapon.type == (int)VileFlamethrowerType.SeaDragonRage) {
-			maxTime = 0.2f;
+			damager.flinch = 0;
 		}
+
 		if (!groundedVariant) {
 			vel = new Point(xDir, 2f);
 			vel = vel.normalize().times(350);

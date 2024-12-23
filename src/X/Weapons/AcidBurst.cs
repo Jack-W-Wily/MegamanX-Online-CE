@@ -14,9 +14,12 @@ public class AcidBurst : Weapon {
 		weaponBarIndex = 17;
 		weaponSlotIndex = 17;
 		killFeedIndex = 40;
+		
 		weaknessIndex = (int)WeaponIds.FrostShield;
 		damage = "1/1";
 		effect = "DOT: 2+1/3+1. Reduces Enemy Defense. Acid DMG \nstops when cured or immersed in water. Doesn't Assists.";
+		type = index;
+		displayName = "Acid Burst ";
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -44,8 +47,8 @@ public class AcidBurstProj : Projectile {
 		Weapon weapon, Point pos, int xDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 0, player, "acidburst_proj", 
-		10, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 1, player, "acidburst_proj", 
+		4, 0.005f, netProjId, player.ownedByLocalPlayer
 	) {
 		useGravity = true;
 		maxTime = 1.5f;
@@ -100,8 +103,8 @@ public class AcidBurstProjSmall : Projectile {
 		Weapon weapon, Point pos, int xDir, Point vel,
 		ProjIds projId, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 2, player,
-		"acidburst_proj_small", 0, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 1, player,
+		"acidburst_proj_small", 0, 0.05f, netProjId, player.ownedByLocalPlayer
 	) {
 		useGravity = true;
 		maxTime = 1.5f;
@@ -154,8 +157,8 @@ public class AcidBurstProjCharged : Projectile {
 		Weapon weapon, Point pos, int xDir, int type, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 3, player, "acidburst_charged_start", 
-		20, 0f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 1, player, "acidburst_charged_start", 
+		20, 0.005f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 4f;
 		projId = (int)ProjIds.AcidBurstCharged;

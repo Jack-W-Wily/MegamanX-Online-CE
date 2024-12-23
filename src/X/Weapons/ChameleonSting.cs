@@ -18,6 +18,8 @@ public class ChameleonSting : Weapon {
 		damage = "2";
 		effect = "Splits. \nFull Charge grants invulnerability.";
 		hitcooldown = "0";
+		type = index;
+		displayName = "Chameleon Sting ";
 	}
 
 	public override float getAmmoUsageEX(int chargeLevel, Character character) {

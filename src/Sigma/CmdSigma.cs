@@ -6,6 +6,9 @@ namespace MMXOnline;
 public class CmdSigma : BaseSigma {
 	public float saberCooldown;
 	public float leapSlashCooldown;
+
+	public float dodgeRollCooldown;
+	
 	public float sigmaAmmoRechargeCooldown = 0;
 	public float sigmaAmmoRechargeTime;
 	public float sigmaHeadBeamRechargePeriod = 5;
@@ -27,10 +30,28 @@ public class CmdSigma : BaseSigma {
 	public override void update() {
 		base.update();
 
+
+		if (charState.attackCtrl){
+			if ((charState is Dash || charState is AirDash) 
+			&& (player.input.isPressed(Control.Shoot, player)
+			|| player.input.isPressed(Control.Special1, player))){
+			slideVel = xDir * getDashSpeed();			
+			}
+		}
+
+		if (dodgeRollCooldown == 0 && player.canControl) {
+		 if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new SigDodge(), true);
+				rideArmorPlatform = null;
+			}
+		}
+
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
 		// Cooldowns.
+			Helpers.decrementTime(ref dodgeRollCooldown);
 		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
@@ -130,6 +151,8 @@ public class CmdSigma : BaseSigma {
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
+		
+		
 		Projectile? proj = sprite.name switch {
 			"sigma_ladder_attack" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
@@ -159,11 +182,21 @@ public class CmdSigma : BaseSigma {
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
 				3, Global.defFlinch, 0.15f
 			),
+				"sigma_grab" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VileSuperKick, player,
+				2, Global.defFlinch, 0.15f
+			),
+				"sigma_block" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				2, Global.defFlinch, 1f
+			),
 			_ => null
 		};
 		if (proj != null) {
 			return proj;
 		}
+
+		
 		return base.getProjFromHitbox(collider, centerPoint);
 	}
 

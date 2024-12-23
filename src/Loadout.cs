@@ -26,9 +26,9 @@ public class XLoadout {
 	}
 
 	public void validate() {
-		if (weapon1 < 0 || weapon1 > 24) weapon1 = 0;
-		if (weapon2 < 0 || weapon2 > 24) weapon2 = 0;
-		if (weapon3 < 0 || weapon3 > 24) weapon3 = 0;
+		if (weapon1 < 0 || weapon1 > 26) weapon1 = 0;
+		if (weapon2 < 0 || weapon2 > 26) weapon2 = 0;
+		if (weapon3 < 0 || weapon3 > 26) weapon3 = 0;
 
 		if ((weapon1 == weapon2 && weapon1 >= 0) ||
 			(weapon1 == weapon3 && weapon2 >= 0) ||
@@ -43,6 +43,7 @@ public class XLoadout {
 
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
 		var indices = new List<byte>();
+		indices.Add((int)WeaponIds.Buster);
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);

@@ -20,6 +20,8 @@ public class FrostShield : Weapon {
 		Flinch = "0/26-26";
 		maxAmmo = 16;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Frost Shield ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -33,9 +35,18 @@ public class FrostShield : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		if (chargeLevel < 3) {
+		if (chargeLevel == 0) {
 			new FrostShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);
-		} else {
+		} 
+		if (chargeLevel == 1) {
+			new FrostShieldProj(this, pos.addxy(0,-5), xDir, player, player.getNextActorNetId(), true);
+			new FrostShieldProj(this, pos.addxy(0,5), xDir, player, player.getNextActorNetId(), true);
+		}
+		if (chargeLevel == 2) {
+			new FrostShieldProjChargedGround(this, pos, xDir, player, player.getNextActorNetId(), true);
+		}  
+		
+		if (chargeLevel == 3) {
 			if (character.isUnderwater() == true) {
 				new FrostShieldProjPlatform(this, pos, xDir, player, player.getNextActorNetId(), true);
 			} else {
@@ -47,6 +58,25 @@ public class FrostShield : Weapon {
 				}	
 			}
 		}
+		if (chargeLevel == 4){
+			new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 3, player.getNextActorNetId(true), 0, true);
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					new FrostShieldProj(this, pos.addxy(0,-5), xDir, player, player.getNextActorNetId(), true);
+				}, 0.025f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					new FrostShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+				}, 0.055f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					new FrostShieldProj(this, pos.addxy(0,5), xDir, player, player.getNextActorNetId(), true);
+				}, 0.075f));
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					new FrostShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);
+				}, 0.1f));
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					new FrostShieldProj(this, pos.addxy(0,-5), xDir, player, player.getNextActorNetId(), true);
+				}, 0.15f));
+		}
+		
 	}
 }
 

@@ -652,11 +652,11 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.BurnKnUckle => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 4, 0, 0.5f,
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, 20, 0.5f,
 				addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 2, 40, 0.5f,
+				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 2, 30, 0.5f,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),

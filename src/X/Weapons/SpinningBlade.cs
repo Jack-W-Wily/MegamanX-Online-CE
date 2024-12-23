@@ -24,6 +24,8 @@ public class SpinningBlade : Weapon {
 		FlinchCD = "0/1";
 		maxAmmo = 16;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Spinning Blade ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -59,7 +61,7 @@ public class SpinningBladeProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 250, 2, player, "spinningblade_proj", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		0, 0.3f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 2f;
 		projId = (int)ProjIds.SpinningBlade;

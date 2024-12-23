@@ -15,6 +15,66 @@ public class SigmaSlashWeapon : Weapon {
 
 
 
+public class SigDodge : CharState {
+	public float dashTime = 0;
+	public int initialDashDir;
+	CmdSigma sigma;
+	public BanzaiBeetleProj Banzai;
+
+	public SigDodge() : base("roll", "", "") {
+		attackCtrl = false;
+		normalCtrl = true;
+		specialId = SpecialStateIds.AxlRoll;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		sigma = character as CmdSigma;
+		character.isDashing = true;
+		character.burnTime -= 1;
+		if (character.burnTime < 0) {
+			character.burnTime = 0;
+		}
+
+		initialDashDir = character.xDir;
+		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
+		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		sigma.dodgeRollCooldown = 0.5f;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		if (player.input.isPressed(Control.Special1, player)) {
+			character.changeSpriteFromName("grab", true);	
+					character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+		if (character.frameIndex >= 4) return;
+
+		dashTime += Global.spf;
+
+		var move = new Point(0, 0);
+		move.x = character.getDashSpeed() * initialDashDir;
+		character.move(move);
+		if (stateTime > 0.1) {
+			stateTime = 0;
+			//new Anim(this.character.pos.addxy(0, -4), "dust", this.character.xDir, null, true);
+		}
+	}
+}
+
+
 
 public class VirusSlash1 : CharState {
 	bool fired = false;
@@ -64,8 +124,8 @@ public class VirusSlash2 : CharState {
 		if (character.grounded){
 			if (player.input.isHeld(Control.Down,player)
 			&& player.input.isLeftOrRightHeld(player)
-			&&  character.frameIndex > 2 && player.currency > 0){
-				player.currency -= 1;
+			&&  character.frameIndex > 2 && player.sigmaAmmo > 4){
+				player.sigmaAmmo -= 4;
 			character.changeState(new VirusSlash3(), true);
 			
 			}
@@ -106,8 +166,8 @@ public class VirusSlash3 : CharState {
 		if (character.grounded){
 			if (player.input.isHeld(Control.Up,player)
 			&& player.input.isLeftOrRightHeld(player)
-			&& character.frameIndex > 4 && player.currency > 0){
-				player.currency -= 1;
+			&& character.frameIndex > 4 && player.sigmaAmmo > 4){
+				player.sigmaAmmo -= 4;
 			character.changeState(new VirusSlash1(), true);
 		
 			}
@@ -155,8 +215,8 @@ public class SigmaSlashState : CharState {
 			if (player.input.isHeld(Control.Shoot,player)
 			&&
 				player.input.isHeld(Control.Up,player)
-			&& stateTime > 0.1 && player.currency > 0){
-				player.currency -= 1;
+			&& stateTime > 0.1 && player.sigmaAmmo > 4){
+				player.sigmaAmmo -= 4;
 			character.changeState(new VirusSlash2(), true);
 			
 			}
@@ -207,6 +267,9 @@ public class SigmaSlashProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
+		isJuggleProjectile = true;
+		isShield = true;
+		isReflectShield = true;
 		maxTime = 0.1f;
 		projId = (int)ProjIds.SigmaSlash;
 		isMelee = true;

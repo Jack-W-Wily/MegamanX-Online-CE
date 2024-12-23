@@ -174,7 +174,7 @@ public class RayGunProj : Projectile {
 		}
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		maxTime = 0.35f;
+		maxTime = 0.25f;
 		projId = (int)ProjIds.RayGun;
 		updateAngle();
 		destroyOnHitWall = true;

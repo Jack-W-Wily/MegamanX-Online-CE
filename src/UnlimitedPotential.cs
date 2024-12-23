@@ -351,7 +351,7 @@ public class XUPParryProjState : CharState {
 		Point? shootPos = character.getFirstPOI("proj");
 		if (!once && shootPos != null) {
 			once = true;
-			float damage = Math.Max(otherProj.damager.damage * 2, 4);
+			float damage = Math.Max(otherProj.damager.damage, 4);
 			//int flinch = otherProj.damager.flinch;
 			int flinch = Global.defFlinch;
 			float hitCooldown = otherProj.damager.hitCooldown;
@@ -374,7 +374,7 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		character.unpoAbsorbedProj = null;
+		//character.unpoAbsorbedProj = null;
 	//	if (character is RagingChargeX mmx) {
 	//		mmx.parryCooldown = mmx.maxParryCooldown;
 	//	}

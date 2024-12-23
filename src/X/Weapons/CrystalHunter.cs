@@ -25,6 +25,8 @@ public class CrystalHunter : Weapon {
 		Flinch = "0-26/0";
 		maxAmmo = 28;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Crystal Hunter ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

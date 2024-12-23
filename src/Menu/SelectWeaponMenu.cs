@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using SFML.Graphics;
+
 
 namespace MMXOnline;
 
@@ -42,7 +45,280 @@ public class XWeaponCursor {
 	}
 }
 
+
+
+
+
 public class SelectWeaponMenu : IMainMenu {
+	
+	public WeaponCursor[] cursors;
+	public int selCursorIndex;
+	public bool inGame;
+	public string error = "";
+
+	public static List<Weapon> SpecialWeapon1 = new List<Weapon>() {
+
+				new XBuster(),
+				new HomingTorpedo(),
+				new ChameleonSting(),
+				new RollingShield(),
+				new FireWave(),
+				new StormTornado(),
+				new ElectricSpark(),
+				new BoomerangCutter(),
+				new ShotgunIce(),
+				new CrystalHunter(),
+				new BubbleSplash(),
+				new SilkShot(),
+				new SpinWheel(),
+				new SonicSlicer(),
+				new StrikeChain(),
+				new MagnetMine(),
+				new SpeedBurner(),
+				new AcidBurst(),
+				new ParasiticBomb(),
+				new TriadThunder(),
+				new SpinningBlade(),
+				new RaySplasher(),
+				new GravityWell(),
+				new FrostShield(),
+				new TornadoFang(),
+				new ZXSaber(),
+				new DoubleCyclone(),
+				new DarkHoldWeapon()
+	};
+
+	public static List<Weapon> SpecialWeapon2 = new List<Weapon>() {
+
+				new XBuster(),
+				new HomingTorpedo(),
+				new ChameleonSting(),
+				new RollingShield(),
+				new FireWave(),
+				new StormTornado(),
+				new ElectricSpark(),
+				new BoomerangCutter(),
+				new ShotgunIce(),
+				new CrystalHunter(),
+				new BubbleSplash(),
+				new SilkShot(),
+				new SpinWheel(),
+				new SonicSlicer(),
+				new StrikeChain(),
+				new MagnetMine(),
+				new SpeedBurner(),
+				new AcidBurst(),
+				new ParasiticBomb(),
+				new TriadThunder(),
+				new SpinningBlade(),
+				new RaySplasher(),
+				new GravityWell(),
+				new FrostShield(),
+				new TornadoFang(),
+				new ZXSaber(),
+				new DoubleCyclone(),
+				new DarkHoldWeapon()
+	};
+
+	public static List<Weapon> SpecialWeapon3 = new List<Weapon>() {
+
+				new XBuster(),
+				new HomingTorpedo(),
+				new ChameleonSting(),
+				new RollingShield(),
+				new FireWave(),
+				new StormTornado(),
+				new ElectricSpark(),
+				new BoomerangCutter(),
+				new ShotgunIce(),
+				new CrystalHunter(),
+				new BubbleSplash(),
+				new SilkShot(),
+				new SpinWheel(),
+				new SonicSlicer(),
+				new StrikeChain(),
+				new MagnetMine(),
+				new SpeedBurner(),
+				new AcidBurst(),
+				new ParasiticBomb(),
+				new TriadThunder(),
+				new SpinningBlade(),
+				new RaySplasher(),
+				new GravityWell(),
+				new FrostShield(),
+				new TornadoFang(),
+				new ZXSaber(),
+				new DoubleCyclone(),
+				
+				new DarkHoldWeapon()
+	};
+
+	public static List<Weapon> SubWeapon = new List<Weapon>() {
+		new XBuster(),
+		new ZXSaber()
+	};
+
+
+	public static List<Tuple<string, List<Weapon>>> xWeaponCategories = new List<Tuple<string, List<Weapon>>>() {
+		Tuple.Create("WEAPON 1", SpecialWeapon1),
+		Tuple.Create("WEAPON 2", SpecialWeapon2),
+		Tuple.Create("WEAPON 3", SpecialWeapon3),
+		Tuple.Create("SUB WEAPON", SubWeapon),
+};
+
+	public IMainMenu prevMenu;
+
+	public SelectWeaponMenu(IMainMenu prevMenu, bool inGame) {
+		this.prevMenu = prevMenu;
+		this.inGame = inGame;
+
+		cursors = new WeaponCursor[] {
+			new WeaponCursor( Options.main.xLoadout.weapon1),
+			new WeaponCursor( Options.main.xLoadout.weapon2),
+			new WeaponCursor( Options.main.xLoadout.weapon3),
+			new WeaponCursor( Options.main.xLoadout.melee)
+		};
+	}
+
+	public void update() {
+		if (!string.IsNullOrEmpty(error)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+				error = null;
+			}
+			return;
+		}
+
+		int maxCatCount = 3;
+		if (selCursorIndex < 4) {
+			maxCatCount = xWeaponCategories[selCursorIndex].Item2.Count;
+		}
+
+		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, maxCatCount - 1, wrap: true, playSound: true);
+		Helpers.menuUpDown(ref selCursorIndex, 0, cursors.Length - 1);
+
+		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
+		
+		if (selectPressed) {
+	
+
+			int[] oldArray = {
+				Options.main.xLoadout.weapon3,
+				Options.main.xLoadout.melee,
+				Options.main.xLoadout.weapon1,
+				Options.main.xLoadout.weapon2
+			};
+
+			Options.main.xLoadout.weapon1 = xWeaponCategories[0].Item2[cursors[0].index].type;
+			Options.main.xLoadout.weapon2 = xWeaponCategories[1].Item2[cursors[1].index].type;
+			Options.main.xLoadout.weapon3 = xWeaponCategories[2].Item2[cursors[2].index].type;
+			Options.main.xLoadout.melee = xWeaponCategories[3].Item2[cursors[3].index].type;
+			int[] newArray = {	
+				Options.main.xLoadout.weapon3,
+				Options.main.xLoadout.melee,
+				Options.main.xLoadout.weapon1,
+				Options.main.xLoadout.weapon2
+			};
+		
+			if (!Enumerable.SequenceEqual(oldArray, newArray)) {
+				Options.main.saveToFile();
+				
+			if (inGame) {
+				Global.level.mainPlayer.syncLoadout();
+					if (Options.main.killOnLoadoutChange) {
+						Global.level.mainPlayer.forceKill();
+					} else if (!Global.level.mainPlayer.isDead) {
+						Global.level.gameMode.setHUDErrorMessage(Global.level.mainPlayer, "Change will apply on next death", playSound: false);
+					}
+				}
+			}
+
+			if (inGame) Menu.exit();
+			else Menu.change(prevMenu);
+		} else if (backPressed) {
+			Menu.change(prevMenu);
+		}
+	}
+
+
+	public void render() {
+		if (!inGame) {
+			DrawWrappers.DrawTextureHUD(Global.textures["loadoutbackground"], 0, 0);
+		} else {
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
+		}
+
+		Fonts.drawText(FontType.Yellow, "X Loadout", Global.screenW * 0.5f, 20, Alignment.Center);
+		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
+		float botOffY = inGame ? 0 : -2;
+
+		int startY = 40;
+		int startX = 30;
+		int wepH = 15;
+
+		float wepPosX = 195;
+		float wepTextX = 207;
+
+		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
+		Color color;
+		float alpha;
+		for (int i = 0; i < cursors.Length - 1; i++) {
+			color = Color.White;
+			alpha = 1f;
+			float yPos = startY - 3 + (i * wepH);
+			Fonts.drawText(
+				FontType.Blue, xWeaponCategories[i].Item1 + ":", 40,
+				yPos, selected: selCursorIndex == i
+			);
+			var weapon = xWeaponCategories[i].Item2[cursors[i].index];
+			Fonts.drawText(FontType.Purple, weapon.displayName, wepTextX, yPos,selected: selCursorIndex == i);
+			Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3, alpha);
+		}
+		color = Color.White;
+		alpha = 1f;
+		int wsy = 167;
+		DrawWrappers.DrawRect(
+			22, wsy-12, Global.screenW - 22, wsy + 28, true, new Color(0, 0, 0, 100), 1,
+			ZIndex.HUD, false, outlineColor: outlineColor
+		);
+		if (selCursorIndex < 5) {
+			var wep = xWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
+			int posY = 6;
+			foreach (string description in wep.description) {
+				Fonts.drawText(
+					FontType.RedishOrange, wep.description[0], 28, wsy-8, Alignment.Left
+				);
+				posY += 9;
+			}
+			Fonts.drawText(FontType.DarkPurple, "Effect: ", 27, 173);
+			Fonts.drawText(FontType.Red, "Damage: ", 27.5f, 186);
+			Fonts.drawText(FontType.Red, "Flinch: ", 126, 186);
+			Fonts.drawText(FontType.Red, "Hit CD: ", 219, 186);
+			var wep1 = xWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
+			Fonts.drawText(FontType.DarkPurple, wep1.effect, 72, 173);
+			Fonts.drawText(FontType.Red, wep1.damage, 73, 186);
+			Fonts.drawText(FontType.Red, wep1.Flinch, 170, 186);
+			Fonts.drawText(FontType.Red, wep1.hitcooldown, 268, 186);
+		} 
+		
+		if (!string.IsNullOrEmpty(error)) {
+			float top = Global.screenH * 0.4f;
+			DrawWrappers.DrawRect(
+				17, 17, Global.screenW - 17, Global.screenH - 17, true,
+				new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
+			Fonts.drawTextEX(
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
+				Global.screenW / 2, 20 + top, alignment: Alignment.Center
+			);
+		}
+	}
+}
+
+
+public class SelectWeaponMenuOLD : IMainMenu {
 	public bool inGame;
 	public List<XWeaponCursor> cursors;
 	public int selCursorIndex;
@@ -77,12 +353,14 @@ public class SelectWeaponMenu : IMainMenu {
 			"Gravity Well",
 			"Frost Shield",
 			"Tornado Fang",
+			"Double Cyclone",
+			"Dark Hold",
 		};
 
 	public List<int> selectedWeaponIndices;
 	public IMainMenu prevMenu;
 
-	public SelectWeaponMenu(IMainMenu prevMenu, bool inGame) {
+	public SelectWeaponMenuOLD(IMainMenu prevMenu, bool inGame) {
 		this.prevMenu = prevMenu;
 		for (int i = 0; i < 9; i++) {
 			weaponPositions.Add(new Point(80, 42 + (i * 18)));
@@ -125,7 +403,7 @@ public class SelectWeaponMenu : IMainMenu {
 		if (selCursorIndex < 3) {
 			if (Global.input.isPressedMenu(Control.MenuLeft)) {
 				cursors[selCursorIndex].index--;
-				if (cursors[selCursorIndex].index == -1) cursors[selCursorIndex].index = 24; //8;
+				if (cursors[selCursorIndex].index == -1) cursors[selCursorIndex].index = 26; //8;
 				else if (cursors[selCursorIndex].index == 8) cursors[selCursorIndex].index = 8; //16;
 				else if (cursors[selCursorIndex].index == 16) cursors[selCursorIndex].index = 16; //24;
 				Global.playSound("menuX2");
@@ -133,7 +411,8 @@ public class SelectWeaponMenu : IMainMenu {
 				cursors[selCursorIndex].index++;
 				if (cursors[selCursorIndex].index == 9) cursors[selCursorIndex].index = 9; //0;
 				else if (cursors[selCursorIndex].index == 17) cursors[selCursorIndex].index = 17; //9;
-				else if (cursors[selCursorIndex].index == 25) cursors[selCursorIndex].index = 0; //17;
+				else if (cursors[selCursorIndex].index == 26) cursors[selCursorIndex].index = 0; //17;
+				
 				Global.playSound("menuX2");
 			}
 			if (Global.input.isPressedMenu(Control.WeaponLeft)) {
@@ -201,7 +480,7 @@ public class SelectWeaponMenu : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Fonts.drawText(FontType.Yellow, "X Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
+		Fonts.drawText(FontType.Yellow, "X Loadout", Global.screenW * 0.5f, 26, Alignment.Center);
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -1;
 
@@ -247,15 +526,15 @@ public class SelectWeaponMenu : IMainMenu {
 				break;
 			}
 
-			Fonts.drawText(FontType.Blue, (i + 1).ToString(), 30, yPos + 2, selected: selCursorIndex == i);
+			Fonts.drawText(FontType.Blue, (i + 1).ToString(), 30, yPos + 3, selected: selCursorIndex == i);
 
 			if (Global.frameCount % 60 < 30) {
 				Fonts.drawText(
-					FontType.Blue, ">", cursors[i].index < 9 ? rightArrowPos : rightArrowPos - 20, yPos + 2,
+					FontType.Blue, ">", cursors[i].index < 9 ? rightArrowPos : rightArrowPos - 20, yPos + 3,
 					Alignment.Center, selected: selCursorIndex == i
 				);
 				Fonts.drawText(
-					FontType.Blue, "<", leftArrowPos, yPos + 2, Alignment.Center, selected: selCursorIndex == i
+					FontType.Blue, "<", leftArrowPos, yPos + 3, Alignment.Center, selected: selCursorIndex == i
 				);
 			}
 

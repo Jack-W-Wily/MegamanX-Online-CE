@@ -24,6 +24,8 @@ public class StormTornado : Weapon {
 		FlinchCD = "0/1";
 		maxAmmo = 28;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Storm Tornado ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

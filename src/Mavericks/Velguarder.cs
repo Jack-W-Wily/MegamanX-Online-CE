@@ -117,7 +117,7 @@ public class VelGMeleeWeapon : Weapon {
 	public VelGMeleeWeapon(Player player) {
 		index = (int)WeaponIds.VelGMelee;
 		killFeedIndex = 101;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
+		damager = new Damager(player, 3, Global.superFlinch, 0.5f);
 	}
 }
 #endregion

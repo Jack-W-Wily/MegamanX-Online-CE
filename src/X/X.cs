@@ -20,6 +20,8 @@ public class MegamanX : Character {
 	public XBuster specialBuster;
 	public int specialButtonMode;
 
+	public bool UnlockZsaber;
+
 	// Armor variables.
 	public ArmorId chestArmor;
 	public ArmorId armArmor;
@@ -285,21 +287,8 @@ public class MegamanX : Character {
 			if (player.weapon is not FireWave){
 			changeState(new SwordBlock());
 			}
-			return true;
-		}
-
-		return base.normalCtrl();
-	}
 
 
-	public override bool normalCtrl() {
-		if (!grounded) {
-			if (player.input.isPressed(Control.Dash, player) && canAirDash() && canDash() && flag == null) {
-				if (player.input.isHeld(Control.Up, player) && player.hasBootsArmor(3)) {
-					changeState(new UpDash(Control.Dash));
-					return true;
-				}
-			}
 			if (!player.isAI && hasUltimateArmor &&
 				player.input.isPressed(Control.Jump, player) &&
 				canJump() && !isDashing && canAirDash() && flag == null
@@ -319,10 +308,7 @@ public class MegamanX : Character {
 			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
 			itemTracer.shootCooldown = itemTracer.fireRate;
 		}
-		if (player.input.isPressed(Control.Special1, player) && !hasAnyArmor) {
-			changeState(new X6SaberState(grounded), true);
-			return true;
-		}
+		
 		if (player.input.isPressed(Control.Shoot, player) && stockedMaxBuster) {
 			shoot(1, specialBuster, false);
 			return true;
@@ -345,6 +331,11 @@ public class MegamanX : Character {
 		if (player.input.isPressed(Control.Special1, player)
 		&& UnlockZsaber) {
 			changeState(new X6SaberState(grounded), true);
+			
+		}
+		if (player.input.isPressed(Control.Special1, player)
+		&& !UnlockZsaber) {
+			changeState(new XUPPunchState(grounded), true);
 			
 		}
 
@@ -657,13 +648,15 @@ public class MegamanX : Character {
 		return (int)(sprite.name switch {
 			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
 			"mmx_shoryuken" => MeleeIds.Shoryuken,
-			"rmx_block" or "rmx_block" => MeleeIds.XBlock,
-			"mmx_beam_saber" or "mmx_beam_saber_air" or
-			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
-			"mmx_beam_saber2" or "rmx_beam_saber2" => MeleeIds.ZSaber,
-			"mmx_beam_saber_air2" or "rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
+			"mmx_block" => MeleeIds.XBlock,
+			"mmx_beam_saber" or "mmx_beam_saber_air"  => MeleeIds.MaxZSaber,
+			"mmx_beam_saber2" => MeleeIds.ZSaber,
+			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
 			"mmx_nova_strike" or "mmx_nova_strike_down" or 
 			"mmx_nova_strike_up" => MeleeIds.NovaStrike,
+				"mmx_unpo_punch" or "mmx_unpo_air_punch" or 
+				"mmx_unpo_punch_2" => MeleeIds.UPPunch,
+			
 			// Light Helmet.
 			"mmx_jump" or "mmx_jump_shoot" or "mmx_wall_kick" or "mmx_wall_kick_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbutt,
@@ -713,6 +706,10 @@ public class MegamanX : Character {
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
 				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
 			),
+			(int)MeleeIds.UPPunch => new GenericMeleeProj(
+				new XUPPunch(player), projPos, ProjIds.UPPunch, player,
+			 2, Global.halfFlinch, 0.15f, addToLevel: addToLevel, ShouldClang : true
+			),
 			_ => null
 		};
 	}
@@ -728,6 +725,7 @@ public class MegamanX : Character {
 		ZSaberAir,
 		NovaStrike,
 		XBlock,
+		UPPunch,
 	}
 
 	// Other overrides.
@@ -815,6 +813,12 @@ public class MegamanX : Character {
 		int index = player.weapon.index;
 
 		if (index >= (int)WeaponIds.GigaCrush) {
+			index = 0;
+		}
+		if (index >= (int)WeaponIds.XSaber) {
+			index = 0;
+		}
+		if (index >= (int)WeaponIds.DoubleCyclone) {
 			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {

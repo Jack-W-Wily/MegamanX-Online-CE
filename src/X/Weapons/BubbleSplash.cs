@@ -28,6 +28,8 @@ public class BubbleSplash : Weapon {
 		effect = "Charged: Grants Jump Boost.";
 		maxAmmo = 28;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Bubble Splash ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

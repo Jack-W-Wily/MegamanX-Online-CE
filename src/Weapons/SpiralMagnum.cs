@@ -83,6 +83,7 @@ public class SpiralMagnumShell : Anim {
 		if (xDir == -1) angularVel = -300;
 		else angularVel = 300;
 		ttl = 4;
+		
 	}
 
 	public override void update() {
@@ -156,7 +157,7 @@ public class SpiralMagnumProj : Projectile {
 		base(weapon, pos, 1, 1000, 2, player, "spiralmagnum_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		destroyOnHit = false;
 		this.target = target;
-		reflectable = false;
+		reflectable = true;
 		vel.x = bulletDir.x * 1000;
 		vel.y = bulletDir.y * 1000;
 		angle = bulletDir.angle;

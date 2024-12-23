@@ -108,7 +108,7 @@ public class ZeroBurnKnuckle : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.grounded && stateTime > 0.5f) {
+		if (character.grounded && stateTime > 0.75f) {
 			landingCode();
 			return;
 		}
@@ -116,7 +116,7 @@ public class ZeroBurnKnuckle : CharState {
 		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
 			character.vel.y = 0;
 		}
-		if (character.frameIndex >2)character.move(new Point(character.xDir * 300, 0));
+		if (character.frameIndex >2)character.move(new Point(character.xDir * 300, -45));
 		
 	}
 
@@ -745,7 +745,7 @@ public class PunchyZeroHadangeki : CharState {
 		//airSprite = "projswing_air";
 		useDashJumpSpeed = true;
 		airMove = true;
-		superArmor = true;
+	//	superArmor = true;
 	}
 
 	public override void update() {

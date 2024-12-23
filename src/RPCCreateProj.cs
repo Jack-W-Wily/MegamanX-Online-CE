@@ -496,6 +496,12 @@ public partial class RPCCreateProj : RPC {
 					pos, xDir, extraData[0] == 1, player, netProjByte
 				);
 				break;
+			case (int)ProjIds.ShieldBoomerang:
+				proj = new ShieldBoomerangProj(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.ShieldBoomerang2:
+				proj = new ShieldBoomerangProj2(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.BlueBullet:
 				proj = new BlueBulletProj(
 					new DoubleBullet(),
@@ -521,6 +527,12 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.StraightNightmare:
 				proj = new StraightNightmareProj(
 					new VileLaser(VileLaserType.StraightNightmare),
+					pos, xDir, player, netProjByte
+				);
+				break;
+			case (int)ProjIds.DoubleCycloneCharged:
+				proj = new DoubleCycloneCharged(
+					new DoubleCyclone(),
 					pos, xDir, player, netProjByte
 				);
 				break;
@@ -636,7 +648,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new FakeZeroMeleeProj(FakeZero.getWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.FakeZeroGroundPunch:
-				proj = new FakeZeroRockProj(FakeZero.getWeapon(), pos, xDir, player, netProjByte);
+				proj = new FakeZeroRockProj(new SigmaElectricBallWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma2Ball:
 				proj = new SigmaElectricBallProj(new SigmaElectricBallWeapon(), pos, 0, player, netProjByte);

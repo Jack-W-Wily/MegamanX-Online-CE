@@ -22,6 +22,8 @@ public class TriadThunder : Weapon {
 		FlinchCD = "2.25/0";
 		maxAmmo = 10;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Triad Thunder ";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

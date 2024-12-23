@@ -20,6 +20,8 @@ public class RaySplasher : Weapon {
 		damage = "1/1";
 		effect = "Charged: Grants Super Armor.";
 		hitcooldown = "0.075";
+		type = index;
+		displayName = "Ray Splasher ";
 	}
 
 	public override void shoot(Character character, int[] args) {

@@ -331,7 +331,7 @@ public class VileAirRaid : CharState {
 	float timeWaiting;
 	public VileAirRaid(Character? victim) : base("air_raid", "", "", "") {
 		this.victim = victim;
-		grabTime = 6;
+		grabTime = 3;
 	}
 
 	public override void update() {

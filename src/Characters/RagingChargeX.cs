@@ -149,7 +149,7 @@ public override bool normalCtrl() {
 			  ) {
 				if (unpoAbsorbedProj != null) {
 					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-				//	unpoAbsorbedProj = null;
+					unpoAbsorbedProj = null;
 					return;
 				} else {
 					changeState(new XUPParryStartState(), true);

@@ -24,6 +24,8 @@ public class ParasiticBomb : Weapon {
 		FlinchCD = "iwish";
 		maxAmmo = 16;
 		ammo = maxAmmo;
+		type = index;
+		displayName = "Parasitic Bomb ";
 	}
 	
 	public override float getAmmoUsage(int chargeLevel) {

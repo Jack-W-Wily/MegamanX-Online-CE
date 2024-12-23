@@ -43,7 +43,7 @@ public class BlizzardBuffalo : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -118,13 +118,7 @@ public class BlizzardBuffalo : Maverick {
 				player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this
 			);
 		} 
-		if (!input.isHeld(Control.Up, player)){
-			return new GenericMeleeProj(
-				weapon, centerPoint, ProjIds.Hyouretsuzan2,
-				player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this
-			);
-		
-		}
+	
 		}
 		
 		if (sprite.name.Contains("fall")) {
@@ -332,7 +326,7 @@ public class BBuffaloBeamProj : Projectile {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
-		if (bb == null) return;
+		//if (bb == null) return;
 
 		spikeTime += Global.spf;
 

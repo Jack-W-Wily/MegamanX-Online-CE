@@ -18,6 +18,8 @@ public class GigaCrush : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 25;
 		killFeedIndex = 13;
+		type = index;
+		displayName = "Giga Crush ";
 	}
 
 	public override void shoot(Character character, int[] args) {

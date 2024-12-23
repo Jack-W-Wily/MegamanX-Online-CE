@@ -74,9 +74,15 @@ public enum WeaponIds {
 	GravityWell,
 	FrostShield,
 	TornadoFang,
+
+	XSaber,
+
+	DoubleCyclone,
+	DarkHold,
+
 	GigaCrush,
 	ItemTracer,
-	XSaber,
+	
 	HyperCharge,
 	Hadouken,
 	Shoryuken,
@@ -146,7 +152,7 @@ public enum WeaponIds {
 	ZeroShoryuken,
 	MegaPunchWeapon,
 	DropKick,
-	DarkHold,
+
 
 	MechMenuWeapon,
 	MechBuster,
@@ -288,7 +294,13 @@ public enum WeaponIds {
 	//   Zain
 
 	ZainParry,
-	DNACore = 250
+	DNACore = 250,
+
+
+	// GBD
+	GBDKick,
+
+	ShieldBoomerang,
 }
 
 public enum ProjIds {
@@ -373,6 +385,10 @@ public enum ProjIds {
 	TornadoFang,
 	TornadoFang2,
 	TornadoFangCharged,
+
+	DoubleCyclone,
+	DoubleCycloneCharged,
+	
 	GigaCrush,
 	ItemTracer,
 	HyperBuster,
@@ -738,6 +754,13 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+
+
+	// GBD stuff
+
+	GBDKick,
+	ShieldBoomerang,
+	ShieldBoomerang2,
 
 	// Extras
 	BlockableLaunch,
