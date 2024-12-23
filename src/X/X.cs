@@ -166,8 +166,8 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref specialSaberCooldown);
 
 		// For the shooting animation.
-		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.speedMul;
+		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
+			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
@@ -256,39 +256,38 @@ public class MegamanX : Character {
 
 
 	public override bool normalCtrl() {
-		
-		if (!grounded) {
-		if (player.dashPressed(out string dashControl) && canAirDash() && canDash() && flag == null) {
-			CharState dashState;
-			if (player.hasBootsArmor(3)){
-				if (player.input.isHeld(Control.Up, player)) {
+		if (grounded) {
+			if (legArmor == ArmorId.Max &&
+				player.input.isPressed(Control.Dash, player) &&
+				player.input.isHeld(Control.Up, player) &&
+				canDash() && flag == null
+			) {
 				changeState(new UpDash(Control.Dash));
-				} else {
-				changeState(new AirDash(dashControl));
-				}	
+				return true;
 			}
-			else if (player.hasBootsArmor(2)){
-				changeState(new AirDash(dashControl));		
+			if (legArmor == ArmorId.Light && grounded &&
+				player.dashPressed(out string dashControlL) &&
+				canDash()
+			) {
+				changeState(new LigthDash(dashControlL), true);
+				return true;
 			}
-			else {
-				isDashing = true;
-				dashState = new Fall();		
-			
+		} else if (!grounded) {
+			if (legArmor == ArmorId.Max &&
+				player.input.isPressed(Control.Dash, player) &&
+				player.input.isHeld(Control.Up, player) &&
+				canAirDash() && canDash() && flag == null
+			) {
+				changeState(new UpDash(Control.Dash));
+				return true;
 			}
-			
-		}
-		}
-	if (!player.input.isHeld(Control.Shoot, player) 
-		 && charState is not Dash && grounded && 
-				player.input.isHeld(Control.Up, player) )
-			 {
-			turnToInput(player.input, player);
-
-			if (player.weapon is not FireWave){
-			changeState(new SwordBlock());
+			if (legArmor == ArmorId.Giga && !grounded &&
+				player.dashPressed(out string dashControlG) &&
+				canAirDash() && canDash()
+			) {
+				changeState(new GigaAirDash(dashControlG), true);
+				return true;
 			}
-
-
 			if (!player.isAI && hasUltimateArmor &&
 				player.input.isPressed(Control.Jump, player) &&
 				canJump() && !isDashing && canAirDash() && flag == null
@@ -348,7 +347,7 @@ public class MegamanX : Character {
 	public void shoot(int chargeLevel) {
 		shoot(chargeLevel, currentWeapon, false);
 	}
-	
+
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
 		// Check if can shoot.
 		if (shootCooldown > 0 ||
@@ -358,29 +357,39 @@ public class MegamanX : Character {
 		) {
 			return;
 		}
-		// Changes to shoot animation and gets sound.
-		setShootAnim();
-		shootAnimTime = DefaultShootAnimTime;
-		string shootSound = weapon.shootSounds[chargeLevel];
 		// Calls the weapon shoot function.
 		bool useCrossShotAnim = false;
 		if (chargeLevel >= 3 && armArmor == ArmorId.Giga || busterStock) {
 			if (!busterStock) {
 				stockedBuster = true;
+			} else if (chargeLevel < 3) {
+				stockedBuster = false;
 			}
 			if (charState.normalCtrl && charState.attackCtrl) {
 				useCrossShotAnim = true;
+			} else {
+				chargeLevel = 3;
 			}
 		}
+		// Changes to shoot animation and gets sound.
+		setShootAnim();
+		shootAnimTime = DefaultShootAnimTime;
+		string shootSound = weapon.shootSounds[chargeLevel];
+		// Shoot.
 		if (useCrossShotAnim) {
 			changeState(new X2ChargeShot(null, busterStock ? 1 : 0), true);
-			shootSound = "";
+			stopCharge();
+			return;
 		} else {
 			weapon.shoot(this, [chargeLevel, busterStock ? 1 : 0]);
 		}
 		// Sets up global shoot cooldown to the weapon shootCooldown.
-		weapon.shootCooldown = weapon.fireRate;
-		shootCooldown = weapon.fireRate;
+		if (!stockedBuster || busterStock || weapon.fireRate <= 12) {
+			weapon.shootCooldown = weapon.fireRate;
+		} else {
+			weapon.shootCooldown = 12;
+		}
+		shootCooldown = weapon.shootCooldown;
 		// Add ammo.
 		weapon.addAmmo(-weapon.getAmmoUsageEX(chargeLevel, this), player);
 		// Play sound if any.
@@ -406,11 +415,6 @@ public class MegamanX : Character {
 			return getRunSpeed();
 		}
 		float dashSpeed = 3.5f * 60;
-		if (legArmor == ArmorId.Light && charState is Dash) {
-			dashSpeed *= 1.15f;
-		} else if (legArmor == ArmorId.Giga && charState is AirDash) {
-			dashSpeed *= 1.15f;
-		}
 		return dashSpeed * getRunDebuffs();
 	}
 
@@ -488,10 +492,10 @@ public class MegamanX : Character {
 
 	public override void increaseCharge() {
 		if (armArmor == ArmorId.Light) {
-			chargeTime += Global.speedMul * 1.5f;
+			chargeTime += speedMul * 1.5f;
 			return;
 		}
-		chargeTime += Global.speedMul;
+		chargeTime += speedMul;
 	}
 
 	public override bool chargeButtonHeld() {
@@ -803,7 +807,23 @@ public class MegamanX : Character {
 				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
 		}
+		float backupAlpha = alpha;
+		if (stingActiveTime > 0) {
+			if (stingPaletteTime > 6) {
+				stingPaletteTime = 0;
+				stingPaletteIndex++;
+				if (stingPaletteIndex >= 9) {
+					stingPaletteIndex = 0;
+				}
+			} else {
+				stingPaletteTime++;
+			}
+			if (stingPaletteTime % 4 <= 1) {
+				alpha *= 0.25f;
+			}
+		}
 		base.render(x, y);
+		alpha = backupAlpha;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -811,6 +831,15 @@ public class MegamanX : Character {
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
 		int index = player.weapon.index;
+
+		if (stingActiveTime > 0 && stingPaletteIndex != 0){
+			palette = player.xStingPaletteShader;
+			palette.SetUniform("palette", stingPaletteIndex);
+
+			shaders.Add(palette);
+			shaders.AddRange(baseShaders);
+			return shaders;
+		}
 
 		if (index >= (int)WeaponIds.GigaCrush) {
 			index = 0;
@@ -833,7 +862,6 @@ public class MegamanX : Character {
 		palette = player.xPaletteShader;
 
 		palette?.SetUniform("palette", index);
-		palette?.SetUniform("paletteTexture", Global.textures["paletteTexture"]);
 
 		if (palette != null) {
 			shaders.Add(palette);

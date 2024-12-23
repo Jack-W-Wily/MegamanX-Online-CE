@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -12,6 +12,7 @@ public class XHover : CharState {
 		airMove = true;
 		attackCtrl = true;
 		normalCtrl = true;
+		useGravity = false;
 	}
 
 	public override void update() {
@@ -69,8 +70,7 @@ public class XHover : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel = new Point();
+		character.stopMovingWeak();
 		startXDir = character.xDir;
 		if (stateTime <= 0.1f) {
 			sound = character.playSound("uahover", forcePlay: false, sendRpc: true);
@@ -79,12 +79,204 @@ public class XHover : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		character.useGravity = true;
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
 		RPC.stopSound.sendRpc("uahover", character.netId);
+	}
+}
 
+public class LigthDash : CharState {
+	public float dashTime;
+	public float dustTime;
+	public string initialDashButton;
+	public int dashDir;
+	public bool stop;
+	public Anim? dashSpark;
+	public Anim? exaust;
+
+	public LigthDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
+		enterSound = "dash";
+		this.initialDashButton = initialDashButton;
+		attackCtrl = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
+			dashTime = 900;
+		}
+		float inputXDir = player.input.getInputDir(player).x;
+
+		if (dashTime > 37 || stop) {
+			if (!stop) {
+				if (exaust?.destroyed == false) {
+					exaust.destroySelf();
+				}
+				dashTime = 0;
+				character.frameIndex = 0;
+				character.sprite.frameTime = 0;
+				character.sprite.animTime = 0;
+				character.sprite.frameSpeed = 0.1f;
+				stop = true;
+			} else {
+				if (inputXDir != 0 && character.grounded) {
+					character.changeState(new Run(), true);
+				} else {
+					character.changeToIdleOrFall();
+				}
+				return;
+			}
+		}
+		if (dashTime > 3 || stop) {
+			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+		} else {
+			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir * 1.15f, 0));
+		}
+
+		if (dashTime <= 3 || stop) {
+			if (inputXDir != 0 && inputXDir != dashDir) {
+				character.xDir = (int)inputXDir;
+				dashDir = character.xDir;
+			}
+		}
+
+		if (!character.grounded) {
+			character.dashedInAir++;
+			character.changeState(new Fall());
+		}
+
+		if (exaust == null && dashTime > 3 && !stop) {
+			exaust = new Anim(
+				character.pos.addxy(-15 * dashDir, -7),
+				"fakezero_exhaust", dashDir, player.getNextActorNetId(),
+				false, sendRpc: true, zIndex: character.zIndex - 100, host: character 
+			);
+		}
+
+		if (dustTime >= 6 && !character.isUnderwater()) {
+			dustTime = 0;
+			new Anim(
+				character.getDashDustEffectPos(dashDir),
+				"dust", dashDir, player.getNextActorNetId(), true,
+				sendRpc: true
+			);
+		} else {
+			dustTime += character.speedMul;
+		}
+		dashTime += character.speedMul;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		dashDir = character.xDir;
+		character.isDashing = true;
+		character.globalCollider = character.getDashingCollider();
+		dashSpark = new Anim(
+			character.getDashSparkEffectPos(dashDir),
+			"dash_sparks", dashDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		if (dashSpark?.destroyed == false) {
+			dashSpark.destroySelf();
+		}
+		if (exaust?.destroyed == false) {
+			exaust.destroySelf();
+		}
+	}
+}
+
+public class GigaAirDash : CharState {
+	public float dashTime;
+	public string initialDashButton;
+	public int dashDir;
+	public bool stop;
+	public Anim? dashSpark;
+	public Anim? exaust = null!;
+
+	public GigaAirDash(string initialDashButton) : base("dash", "dash_shoot", "attack_dash") {
+		enterSound = "dash";
+		this.initialDashButton = initialDashButton;
+		attackCtrl = true;
+		normalCtrl = true;
+		useGravity = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
+			dashTime = 900;
+		}
+		float inputXDir = player.input.getInputDir(player).x;
+
+		if (dashTime > 37 || stop) {
+			if (!stop) {
+				if (exaust?.destroyed == false) {
+					exaust.destroySelf();
+				}
+				dashTime = 0;
+				character.frameIndex = 0;
+				character.sprite.frameTime = 0;
+				character.sprite.animTime = 0;
+				character.sprite.frameSpeed = 0.1f;
+				stop = true;
+			} else {
+				if (inputXDir != 0 && character.grounded) {
+					character.changeState(new Run(), true);
+				} else {
+					character.changeToIdleOrFall();
+				}
+				return;
+			}
+		}
+		if (dashTime > 3 || stop) {
+			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+		} else {
+			character.move(new Point(character.getRunSpeed() * dashDir * 1.15f, 0));
+		}
+		if (exaust == null && dashTime > 3 && !stop) {
+			exaust = new Anim(
+				character.pos.addxy(-15 * dashDir, -7),
+				"fakezero_exhaust", dashDir, player.getNextActorNetId(),
+				false, sendRpc: true, zIndex: character.zIndex - 100, host: character 
+			);
+		}
+
+		if (dashTime <= 3 || stop) {
+			if (inputXDir != 0 && inputXDir != dashDir) {
+				character.xDir = (int)inputXDir;
+				dashDir = character.xDir;
+			}
+		}
+		dashTime += character.speedMul;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.dashedInAir++;
+		dashDir = character.xDir;
+		character.isDashing = true;
+		character.globalCollider = character.getDashingCollider();
+		dashSpark = new Anim(
+			character.getDashSparkEffectPos(dashDir),
+			"dash_sparks", dashDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		if (dashSpark?.destroyed == false) {
+			dashSpark.destroySelf();
+		}
+		if (exaust?.destroyed == false) {
+			exaust.destroySelf();
+		}
 	}
 }
 
@@ -170,16 +362,19 @@ public class X2ChargeShot : CharState {
 	Weapon weapon => (weaponOverride ?? mmx.currentWeapon);
 	MegamanX mmx = null!;
 
-	public X2ChargeShot(Weapon weaponOverride, int shootNum) : base(shootNum == 0 ? "x2_shot" : "x2_shot2") {
+	public X2ChargeShot(Weapon weaponOverride, int shootNum) : base("x2_shot") {
 		this.shootNum = shootNum;
 		this.weaponOverride = weaponOverride;
 		useDashJumpSpeed = true;
 		airMove = true;
+		canStopJump = true;
 		landSprite = "x2_shot";
 		airSprite = "x2_air_shot";
 		canJump = true;
 		if (shootNum == 1) {
-			landSprite = "x2_shot2";
+			sprite = "x2_shot2";
+			defaultSprite = sprite;
+			landSprite = sprite;
 			airSprite = "x2_air_shot2";
 		}
 	}
@@ -190,13 +385,16 @@ public class X2ChargeShot : CharState {
 			fired = true;
 			if (shootNum == 0) {
 				weapon.shoot(mmx, [4, 0]);
-				character.playSound("buster4X2", sendRpc: true);
+				weapon.shootCooldown = weapon.fireRate;
+				mmx.shootCooldown = weapon.fireRate;
 				if (weapon.shootSounds[3] != "") {
 					character.playSound(weapon.shootSounds[3], sendRpc: true);
 				}
 			} else {
 				mmx.stockedBuster = false;
 				weapon.shoot(mmx, [4, 1]);
+				weapon.shootCooldown = weapon.fireRate;
+				mmx.shootCooldown = weapon.fireRate;
 				if (weapon.shootSounds[3] != "") {
 					character.playSound(weapon.shootSounds[3], sendRpc: true);
 				}
@@ -206,14 +404,12 @@ public class X2ChargeShot : CharState {
 			if (shootNum == 0 && pressFire) {
 				fired = false;
 				shootNum = 1;
-				Global.serverClient?.rpc(RPC.playerToggle, (byte)player.id, (int)RPCToggleType.UnstockCharge);
 				sprite = "x2_shot2";
 				defaultSprite = sprite;
-				landSprite = "x2_shot2";
-				airSprite = "x2_shot2";
+				landSprite = sprite;
+				airSprite = "x2_air_shot2";
 				if (!character.grounded || character.vel.y < 0) {
 					sprite = "x2_air_shot2";
-					defaultSprite = sprite;
 				}
 				character.changeSpriteFromName(sprite, true);
 			} else {
@@ -233,7 +429,6 @@ public class X2ChargeShot : CharState {
 			} else {
 				sprite = "x2_air_shot2";
 			}
-			character.changeSpriteFromName(sprite, true);
 		}
 		character.changeSpriteFromName(sprite, true);
 	}

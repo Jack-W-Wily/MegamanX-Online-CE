@@ -397,7 +397,8 @@ public partial class Player {
 	}
 
 	// Shaders
-	public ShaderWrapper xPaletteShader = Helpers.cloneShaderSafe("palette");
+	public ShaderWrapper xPaletteShader = Helpers.cloneGenericPaletteShader("paletteTexture");
+	public ShaderWrapper xStingPaletteShader = Helpers.cloneGenericPaletteShader("cStingPalette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
 	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
@@ -971,7 +972,6 @@ public partial class Player {
 					null
 				);
 			}
-			bool sendRpc = ownedByLocalPlayer;
 			if (shouldRespawn()) {
 				ushort charNetId = getNextATransNetId();
 
@@ -980,26 +980,26 @@ public partial class Player {
 						p => p.teamAlliance == teamAlliance && p.health > 0 && p.character != null
 					);
 					if (spawnPoints.Count != 0) {
-						Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character;
+						Character randomChar = spawnPoints[Helpers.randomRange(0, spawnPoints.Count - 1)].character!;
 						Point warpInPos = Global.level.getGroundPosNoKillzone(
 							randomChar.pos, Global.screenH
 						) ?? randomChar.pos;
 						spawnCharAtPoint(
 							newCharNum, getCharSpawnData(newCharNum),
-							warpInPos, randomChar.xDir, charNetId, sendRpc
+							warpInPos, randomChar.xDir, charNetId, true
 						);
 					} else {
 						SpawnPoint spawnPoint = firstSpawn ?? Global.level.getSpawnPoint(this, !warpedInOnce);
 						firstSpawn = null;
 						int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
-						spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+						spawnCharAtSpawnIndex(spawnPointIndex, charNetId, true);
 					}
 				}
 				else {
 					var spawnPoint = Global.level.getSpawnPoint(this, !warpedInOnce);
 					if (spawnPoint == null) return;
 					int spawnPointIndex = Global.level.spawnPoints.IndexOf(spawnPoint);
-					spawnCharAtSpawnIndex(spawnPointIndex, charNetId, sendRpc);
+					spawnCharAtSpawnIndex(spawnPointIndex, charNetId, true);
 				}
 			}
 		}

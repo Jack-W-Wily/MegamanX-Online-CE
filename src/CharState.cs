@@ -243,20 +243,31 @@ public class CharState {
 	}
 
 	public virtual void airTrasition() {
-		if (airSprite != "" && !character.grounded && wasGrounded && sprite != airSprite) {
+		if (airSprite != "" && !character.grounded && wasGrounded && sprite == landSprite) {
 			sprite = airSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
-			character.changeSprite(sprite, false);
-			character.sprite.frameIndex = oldFrameIndex;
-			character.sprite.frameTime = oldFrameTime;
-		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite != landSprite) {
+			character.changeSpriteFromName(sprite, false);
+			if (oldFrameIndex < character.sprite.totalFrameNum) {
+				character.sprite.frameIndex = oldFrameIndex;
+				character.sprite.frameTime = oldFrameTime;
+			} else {
+				character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
+			}
+		} else if (landSprite != "" && character.grounded && !wasGrounded && sprite == airSprite) {
+			character.playSound("land", sendRpc: true);
 			sprite = landSprite;
 			int oldFrameIndex = character.sprite.frameIndex;
 			float oldFrameTime = character.sprite.frameTime;
 			character.changeSpriteFromName(sprite, false);
-			character.sprite.frameIndex = oldFrameIndex;
-			character.sprite.frameTime = oldFrameTime;
+			if (oldFrameIndex < character.sprite.totalFrameNum) {
+				character.sprite.frameIndex = oldFrameIndex;
+				character.sprite.frameTime = oldFrameTime;
+			} else {
+				character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+				character.sprite.frameTime = character.sprite.getCurrentFrame().duration;
+			}
 		}
 	}
 
@@ -627,8 +638,6 @@ public class Idle : CharState {
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					string loseSprite = "lose";
-					if (player.isX && character.player.hasArmor(2)) loseSprite = "mmx_lose_x2";
-					if (player.isX && character.player.hasArmor(3)) loseSprite = "mmx_lose_x3";
 					character.changeSpriteFromName(loseSprite, true);
 				}
 			}
@@ -911,7 +920,6 @@ public class Dash : CharState {
 
 	public override void update() {
 		dashBackwardsCode(character, initialDashDir);
-
 		base.update();
 
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
@@ -1064,7 +1072,7 @@ public class AirDash : CharState {
 
 		initialDashDir = character.xDir;
 
-		if (player.isAxl && player.axlWeapon?.isTwoHanded(false) == true) {
+		if (character is Axl && (character.currentWeapon as AxlWeapon)?.isTwoHanded(false) == true) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 			else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 		}

@@ -154,7 +154,7 @@ public class UPParryMeleeProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new UPParryMeleeProj(
-			XUPParry.netWeapon, args.pos,
+			RCXParry.netWeapon, args.pos,
 			args.xDir, args.extraData[0],
 			args.player, args.netId
 		);
@@ -265,16 +265,6 @@ public class XUPParryMeleeStateBuxa : CharState {
 	}
 }
 
-public class AbsorbWeapon : Weapon {
-	public Projectile absorbedProj;
-	public AbsorbWeapon(Projectile otherProj) {
-		index = (int)WeaponIds.UPParry;
-		weaponSlotIndex = 118;
-		killFeedIndex = 168;
-		this.absorbedProj = otherProj;
-		drawAmmo = false;
-	}
-}
 
 public class UPParryRangedProj : Projectile {
 	public UPParryRangedProj(
@@ -306,7 +296,7 @@ public class UPParryRangedProj : Projectile {
 		string sprite = Encoding.ASCII.GetString(args.extraData[6..]);
 
 		return new UPParryRangedProj(
-			XUPParry.netWeapon, args.pos,
+			RCXParry.netWeapon, args.pos,
 			args.xDir, sprite,
 			args.extraData[0], args.extraData[1], hitCooldown,
 			args.player, args.netId
@@ -355,7 +345,7 @@ public class XUPParryProjState : CharState {
 			//int flinch = otherProj.damager.flinch;
 			int flinch = Global.defFlinch;
 			float hitCooldown = otherProj.damager.hitCooldown;
-			new UPParryRangedProj(new XUPParry(), shootPos.Value, character.xDir, otherProj.sprite.name, damage, flinch, hitCooldown, player, player.getNextActorNetId(), rpc: true);
+			new UPParryRangedProj(new RCXParry(), shootPos.Value, character.xDir, otherProj.sprite.name, damage, flinch, hitCooldown, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		if (character.isAnimOver()) {
@@ -381,14 +371,6 @@ public class XUPParryProjState : CharState {
 	}
 }
 
-public class XUPPunch : Weapon {
-	public XUPPunch(Player player) : base() {
-		fireRate = 45;
-		index = (int)WeaponIds.UPPunch;
-		killFeedIndex = 167;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
-	}
-}
 
 public class XUPPunchState : CharState {
 	float slideVelX;

@@ -209,7 +209,6 @@ public partial class Character : Actor, IDamagable {
 		this.player = player;
 		this.xDir = xDir;
 
-		isDashing = false;
 		splashable = true;
 		// Intialize state as soon as posible.
 		charState = new NetLimbo();
@@ -627,11 +626,14 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual float getDashSpeed() {
+		return (3.45f * 60f) * getRunDebuffs();
+	}
+
+	public virtual float getDashOrRunSpeed() {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		float dashSpeed = 3.45f * 60f;
-		return dashSpeed * getRunDebuffs();
+		return getDashSpeed();
 	}
 
 	public virtual float getJumpPower() {
@@ -1285,6 +1287,9 @@ public partial class Character : Actor, IDamagable {
 				} else {
 					grounded = false;
 				}
+				if (player.input.isHeld(Control.Dash, player) && charState.useDashJumpSpeed && canDash()) { 
+					isDashing = true;
+				}
 				vel.y = -getJumpPower();
 				if (this is not Vile){
 				playSound("jump", sendRpc: true);
@@ -1423,7 +1428,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (!wallKickMove && xDpadDir != 0) {
 			Point moveSpeed = new Point();
-			if (canMove()) { moveSpeed.x = getDashSpeed() * xDpadDir; }
+			if (canMove()) { moveSpeed.x = getDashOrRunSpeed() * xDpadDir; }
 			if (canTurn()) { xDir = xDpadDir; }
 			if (moveSpeed.magnitude > 0) { move(moveSpeed); }
 		}
@@ -1946,6 +1951,9 @@ public partial class Character : Actor, IDamagable {
 		if (!newState.canEnter(this)) {
 			return false;
 		}
+		CharState oldState = charState;
+		oldState.onExit(newState);
+
 		changedStateInFrame = true;
 		bool hasShootAnim = newState.canUseShootAnim();
 		if (shootAnimTime > 0 && hasShootAnim) {
@@ -1962,8 +1970,6 @@ public partial class Character : Actor, IDamagable {
 				sprite.visible = true;
 			}
 		}
-		CharState oldState = charState;
-		oldState.onExit(newState);
 
 		charState = newState;
 		newState.onEnter(oldState);

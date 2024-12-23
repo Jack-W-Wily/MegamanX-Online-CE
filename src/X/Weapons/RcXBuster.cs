@@ -37,3 +37,4 @@ public class RagingChargeBuster : Weapon {
 		new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
 	}
 }
+
