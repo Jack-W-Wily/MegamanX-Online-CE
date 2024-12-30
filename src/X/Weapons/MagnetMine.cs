@@ -31,15 +31,17 @@ public class MagnetMine : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
 
 		if (chargeLevel < 3) {
+	
 			var magnetMineProj = new MagnetMineProj(this, pos, xDir, player, player.getNextActorNetId(), true);
-			mmx.magnetMines.Add(magnetMineProj);
-			if (mmx.magnetMines.Count > maxMinesPerPlayer) {
-				mmx.magnetMines[0].destroySelf();
-				mmx.magnetMines.RemoveAt(0);
+			character.magnetMines.Add(magnetMineProj);
+			if (character.magnetMines.Count > maxMinesPerPlayer) {
+				character.magnetMines[0].destroySelf();
+				character.magnetMines.RemoveAt(0);
 			}
+		
 		} else {
 			new MagnetMineProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}

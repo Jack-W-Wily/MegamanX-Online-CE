@@ -1799,6 +1799,7 @@ public class RPCCommandGrabPlayer : RPC {
 		Character? grabberChar = grabber as Character;
 		Maverick? grabberMaverick = grabber as Maverick;
 		Character? victimChar = victim as Character;
+		Maverick? victimMav = victim as Maverick;
 
 		if (hookScenario == CommandGrabScenario.StrikeChain) {
 			if (victimChar == null) return;

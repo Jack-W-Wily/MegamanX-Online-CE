@@ -1095,6 +1095,10 @@ public class MDie : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+
+		if (player.isTagTeam()){
+		Global.level.mainPlayer.forceKill();
+		}
 		maverick.useGravity = false;
 		maverick.stopMoving();
 		maverick.globalCollider = null;

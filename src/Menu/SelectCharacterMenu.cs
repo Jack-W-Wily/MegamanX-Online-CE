@@ -31,13 +31,17 @@ public enum CharIds {
 	Sigma  = 4,
 	PunchyZero  = 5,
 	BusterZero  = 6,
-	RagingChargeX  = 7,
+	XMID  = 7,
 	Zain  = 8,
 	GBD  = 9,
+
+	Dynamo  = 11,
 	// Non-standard chars start here.
 	WolfSigma = 100,
 	ViralSigma,
 	KaiserSigma,
+
+	RagingChargeX,
 	
 	// Non-vanilla chars start here.
 	Rock = 10,
@@ -67,6 +71,7 @@ public class CharSelection {
 		new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
 		new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
 		new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
+		new CharSelection("Dynamo", 11, 1, 0, "smenu_dynamo", 0),
 		new CharSelection("Zain", 8, 1, 0, "smenu_zain", 0),
 		new CharSelection("GBD", 9, 1, 0, "smenu_gbd", 0),
 		

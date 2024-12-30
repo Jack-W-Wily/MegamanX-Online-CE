@@ -474,9 +474,9 @@ public class XUPGrabState : CharState {
 			}
 		}
 
-		if (leechTime > 0.33f) {
+		if (leechTime > 0.5f) {
 			leechTime = 0;
-	
+			character.addHealth(1);
 			var damager = new Damager(player, 1, 0, 0);
 			damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);
 		}

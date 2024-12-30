@@ -31,14 +31,18 @@ public partial class Global {
 	public static View view = null!;
 	public static View backgroundView = null!;
 
+
+
+	// CE camera
+
 	public static uint screenW = 384;
 	public static uint screenH = 216;
 
 	public static uint viewScreenW { get { return screenW * (uint)viewSize; } }
 	public static uint viewScreenH { get { return screenH * (uint)viewSize; } }
 
-	public static uint halfViewScreenW { get { return viewScreenW / 2; } }
-	public static uint halfViewScreenH { get { return viewScreenH / 2; } }
+	public static float halfViewScreenW { get { return viewScreenW / 1.25f; } }
+	public static float halfViewScreenH { get { return viewScreenH / 1.25f; } }
 
 	public static uint halfScreenW = screenW / 2;
 	public static uint halfScreenH = screenH / 2;
@@ -63,9 +67,9 @@ public partial class Global {
 
 		changeWindowSize(options.windowScale);
 
-		screenRenderTextureS = new RenderTexture(screenW, screenH);
-		srtBuffer1S = new RenderTexture(screenW, screenH);
-		srtBuffer2S = new RenderTexture(screenW, screenH);
+		screenRenderTextureS = new RenderTexture(screenW , screenH );
+		srtBuffer1S = new RenderTexture(screenW, screenH );
+		srtBuffer2S = new RenderTexture(screenW , screenH );
 
 		screenRenderTextureL = new RenderTexture(screenW * 2, screenH * 2);
 		srtBuffer1L = new RenderTexture(screenW * 2, screenH * 2);

@@ -481,7 +481,9 @@ public class PunchyZero : Character {
 				return true;
 			}
 			if (yDir == 1) {
-				changeState(new PunchyZeroHadangeki(), true);
+				
+					changeState(new PZeroYoudantotsu(), true);
+				
 				return true;
 			}
 			if (grounded && isDashing) {
@@ -537,7 +539,7 @@ public class PunchyZero : Character {
 		if (isDashing) {
 			slideVel = xDir * getDashSpeed() * 0.8f;
 		}
-		changeState(new PZeroYoudantotsu(), true);
+		changeState(new PunchyZeroHadangeki(), true);
 		return true;
 	}
 
@@ -608,11 +610,12 @@ public class PunchyZero : Character {
 			"zerox1_kick_air" => MeleeIds.AirKick,
 			"zerox1_parry_start" => MeleeIds.Parry,
 			"zerox1_parry" => MeleeIds.ParryAttack,
-			"zerox1_shoryuken" => MeleeIds.Uppercut,
+			"zerox1_shoryuken" or "zerox1_pipe_rising" => MeleeIds.Uppercut,
 			"zerox1_megapunch" => MeleeIds.StrongPunch,
 			"zerox1_dropkick" => MeleeIds.DropKick,
 			"zerox1_burnknuckle" => MeleeIds.BurnKnUckle,
 			"zerox1_block" => MeleeIds.Gokumonken,
+
 			"zerox1_pipe_attack" or "zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});

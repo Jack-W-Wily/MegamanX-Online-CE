@@ -172,7 +172,7 @@ public class Sprite {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
 			isUPX = character is RagingChargeX;
-			isUltX = character is RagingChargeX { hasUltimateArmor: true };
+			isUltX = character is XMID { hasUltimateArmor: true };
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;

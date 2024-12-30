@@ -27,9 +27,13 @@ public class RollingShield : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		if (chargeLevel < 3) {
+		if (chargeLevel < 2) {
 			new RollingShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);	
-		} else {
+		}
+		if (chargeLevel == 2) {
+			new RollingShieldProjSemi(this, pos, xDir, player, player.getNextActorNetId(), true);	
+		}
+		 if (chargeLevel > 2)  {
 			new RollingShieldProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	}
@@ -91,6 +95,67 @@ public class RollingShieldProj : Projectile {
 		}
 	}
 }
+
+
+
+
+public class RollingShieldProjSemi : Projectile {
+	public RollingShieldProjSemi(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 200, 3, player, "armoreda_roll", 
+		10, 0, netProjId, player.ownedByLocalPlayer
+	) {
+		projId = (int)ProjIds.RollingShield;
+		fadeSprite = "explosion";
+		fadeSound = "explosion";
+		useGravity = true;
+		collider.wallOnly = true;
+		vel.x = 0;
+		canBeLocal = false;
+
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new RollingShieldProj(
+			RollingShield.netWeapon, arg.pos, arg.xDir, 
+			arg.player, arg.netId
+		);
+	}
+
+	public override void update() {
+		if (!ownedByLocalPlayer) {
+			base.update();
+			return;
+		}
+
+		move(new Point(xDir * 200, 0));
+		if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
+			var collideData = Global.level.checkTerrainCollisionOnce(this, xDir, 0, vel);
+			if (collideData?.hitData?.normal != null && !(collideData.hitData.normal.Value.isAngled())) {
+				xDir *= -1;
+			}
+		} else {
+			//this.vel.x = 0;
+		}
+
+		base.update();
+
+		if (time > 1.5) {
+			destroySelf(fadeSprite, fadeSound);
+		}
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		if (damagable is not TorpedoProj) {
+			base.onHitDamagable(damagable);
+		}
+	}
+}
+
+
 
 public class RollingShieldProjCharged : Projectile {
 	public MegamanX? mmx;

@@ -65,10 +65,8 @@ public class ZainParryStartState : CharState {
 	}
 
 	public bool canParry(Actor damagingActor) {
-		if (damagingActor is not GenericMeleeProj) {
-			return false;
-		}
-		return character.frameIndex == 0;
+	
+		return character.frameIndex == 1;
 	}
 }
 
@@ -114,53 +112,124 @@ public class ZainParryMeleeState : CharState {
 	}
 }
 
-
+	
 
 public class ZainProjSwingState : CharState {
 	bool fired;
 	bool grounded;
 	bool shootProj;
 	bool once;
+
+	bool once1;
 	public ZainProjSwingState(
 		bool grounded, bool shootProj
 	) : base(
-		grounded ? "projswing" : "projswing_air", "", "", ""
+		grounded ? "slash" : "projswing_air", "", "", ""
 	) {
 		this.grounded = grounded;
-		landSprite = "projswing";
+		landSprite = "slash";
 		this.shootProj = shootProj;
 		if (shootProj) {
 			superArmor = true;
 		}
 		airMove = true;
 		useDashJumpSpeed = true;
+		bonusAttackCtrl = true;
+	}
+
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.input.isHeld(Control.Up, player)){
+		  character.changeSpriteFromName("uppercut_slash", true);
+		}
 	}
 
 	public override void update() {
 		base.update();
 
 		
+		if (character.frameIndex >= 4 && !fired) {
+			fired = true;
+			character.playSound("ZeroSaberX3", forcePlay: false, sendRpc: true);
+			if (shootProj) {
+				new ZainSaberProj(
+					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
+					character.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+			}
+		}
+		
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "projswing_air";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+}
 
-		 if (base.player.input.isHeld("up", base.player)
-		 && character is Zain zain && zain.ZainCounters > 0){
+
+
+public class ZainKokuSlash : CharState {
+	bool fired;
+	bool grounded;
+	bool shootProj;
+	bool once;
+
+	bool once1;
+	public ZainKokuSlash(
+		bool grounded, bool shootProj
+	) : base(
+		grounded ? "projswing" : "projswing_air", "", "", ""
+	) {
+		this.grounded = grounded;
+		landSprite = "slash";
+		this.shootProj = shootProj;
+		if (shootProj) {
+			superArmor = true;
+		}
+		airMove = true;
+		useDashJumpSpeed = true;
+		bonusAttackCtrl = true;
+	}
+
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		 if (base.player.input.isHeld("up", base.player)){
 		    character.changeSpriteFromName("rising", true);
 			character.dashedInAir++;
-			float ySpeedMod = 0.5f;
-			if (!once){
-				once = true;
-				zain.ZainCounters -= 1;
-			}
+			float ySpeedMod = 1.5f;
 			character.vel.y = (0f - character.getJumpPower()) * ySpeedMod;
 		}
 
-		 if (base.player.input.isHeld("down", base.player)
-		 && character is Zain zain2 && zain2.ZainCounters > 0){
+		 if (player.input.isHeld(Control.Down, player)
+		&& character.grounded){
 		    character.changeSpriteFromName("thrust", true);
-			if (!once){
-				once = true;
-				zain2.ZainCounters -= 1;
-			}
 		}
+
+		if (base.player.input.isHeld(Control.Down, base.player)
+		&& !character.grounded){
+		    character.changeSpriteFromName("projswing", true);	
+			character.vel.y += 300;	
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+		
 
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;

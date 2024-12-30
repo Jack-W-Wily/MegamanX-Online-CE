@@ -30,7 +30,7 @@ public class CmdSigma : BaseSigma {
 	public override void update() {
 		base.update();
 
-
+		if (sprite.name.Contains("slash"))sigmaAmmoRechargeCooldown = 0.5f;
 		if (charState.attackCtrl){
 			if ((charState is Dash || charState is AirDash) 
 			&& (player.input.isPressed(Control.Shoot, player)

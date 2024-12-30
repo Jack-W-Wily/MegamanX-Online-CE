@@ -17,7 +17,7 @@ public class FireWave : Weapon {
 		fireRate = 4;
 		isStream = true;
 		//switchCooldown = 0.25f;
-		switchCooldownFrames = 0;
+	//	switchCooldownFrames = 0;
 		damage = "1/1";
 		ammousage = 0.5;
 		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.\nBurn won't give assists.";
@@ -72,10 +72,10 @@ public class FireWave : Weapon {
 				var proj = new FireWaveProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 				proj.vel.inc(character.vel.times(-0.5f));
 			} 
-			if (chargeLevel == 3) {
+			if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 				new FireWaveProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 			}
-			if (chargeLevel == 4) {
+			if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 				character.changeState(new FireWaveUltraCharge(character.grounded), true);
 			}
 

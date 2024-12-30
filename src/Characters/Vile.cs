@@ -241,7 +241,8 @@ public class Vile : Character {
 					changeState(new GlobalParryState(), true);	
 			}
 		
-		if (linkedRideArmor != null && player.input.isPressed(Control.AxlCrouch,player)){
+		if (linkedRideArmor != null && linkedRideArmor.raNum == 0 &&
+		player.input.isPressed(Control.AxlCrouch,player)){
 		linkedRideArmor.changeSprite("ridearmor_attack", true);
 		}
 		// blow up ride
@@ -513,7 +514,7 @@ public class Vile : Character {
 			}
 
 			if (player.input.isHeld(Control.Up, player) 
-			&& AirSplashHitCD == 0 && VileMode == 0 && vileForm == 1){
+			&& AirSplashHitCD == 0 && VileMode == 0 && (vileForm == 1|| player.loadout.vileLoadout.cannon == 1)){
 				AirSplashHitCD = 1.5f;
 				changeState(new AirFireNadeLaunch(), true);
 			player.vileAmmo -= 8;			
@@ -619,7 +620,7 @@ public class Vile : Character {
 		if (chargeLevel == 3) {
 			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 		}
-		if (chargeLevel == 4 && (isVileMK5 || Options.main.vileLoadout.cannon == 2)) {
+		if (chargeLevel == 4 && (isVileMK5 || player.loadout.vileLoadout.cannon  == 2)) {
 			changeState(new HexaInvoluteState(), true);
 		} 
 	}
@@ -631,7 +632,7 @@ public class Vile : Character {
 		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
 	}
 	public override int getMaxChargeLevel() {
-		if (isVileMK5 || Options.main.vileLoadout.cannon == 2){
+		if (isVileMK5 || player.loadout.vileLoadout.cannon  == 2){
 			return 4;
 		}
 		return  3;
@@ -660,9 +661,14 @@ public class Vile : Character {
 		chargeGfx();
 	}
 	public void RideLinkMK5() {
-		if ((isVileMK5 ||Options.main.vileLoadout.cannon == 2) &&  linkedRideArmor != null &&
-			player.input.isPressed(Control.Special2, player) &&
-			player.input.isHeld(Control.Down, player) || charState is GenericStun
+		if ((isVileMK5 ||player.loadout.vileLoadout.cannon  == 2) &&  linkedRideArmor != null &&
+		(player.input.isPressed(Control.Special2, player) &&
+			player.input.isHeld(Control.Down, player) 
+			|| charState is GenericStun
+			|| sprite.name.Contains("lose")
+			|| sprite.name.Contains("hurt")
+			|| sprite.name.Contains("knocked")
+			|| sprite.name.Contains("grabbed"))
 		) {
 			if (linkedRideArmor.rideArmorState is RADeactive) {
 				linkedRideArmor.manualDisabled = false;
@@ -677,7 +683,7 @@ public class Vile : Character {
 			}
 		}
 		// Vile V Ride control.
-		if (!(isVileMK5 ||Options.main.vileLoadout.cannon == 2) || linkedRideArmor == null) {
+		if (!(isVileMK5 ||player.loadout.vileLoadout.cannon  == 2) || linkedRideArmor == null) {
 			if (player.input.isPressed(Control.Special2, player) &&
 				rideMenuWeapon != null && calldownMechCooldown == 0 &&
 				(!alreadySummonedNewMech || linkedRideArmor != null)
@@ -696,7 +702,7 @@ public class Vile : Character {
 			}
 		}
 
-		if ((isVileMK5 ||Options.main.vileLoadout.cannon == 2) && linkedRideArmor != null) {
+		if ((isVileMK5 ||player.loadout.vileLoadout.cannon  == 2) && linkedRideArmor != null) {
 			if (canLinkMK5()) {
 				if (linkedRideArmor.character == null) {
 					linkedRideArmor.linkMK5(this);
@@ -716,11 +722,11 @@ public class Vile : Character {
 	}
 
 	public bool isVileMK5Linked() {
-		return (isVileMK5 ||Options.main.vileLoadout.cannon == 2) && linkedRideArmor?.character == this;
+		return (isVileMK5 ||player.loadout.vileLoadout.cannon  == 2) && linkedRideArmor?.character == this;
 	}
 
 	public bool canVileHover() {
-		return (isVileMK5 ||Options.main.vileLoadout.cannon == 2) && player.vileAmmo > 0 && flag == null;
+		return (isVileMK5 ||player.loadout.vileLoadout.cannon  == 2) && player.vileAmmo > 0 && flag == null;
 	}
 
 	public override bool canTurn() {
@@ -766,7 +772,7 @@ public class Vile : Character {
 			} else if (canAffordRideArmor()) {
 				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
 				if (player.selectedRAIndex == 4 && player.currency < 10) {
-					if (isVileMK2) {
+					if (isVileMK2 || player.loadout.vileLoadout.cannon == 1) {
 						Global.level.gameMode.setHUDErrorMessage(
 							player, $"Goliath armor requires 10 {Global.nameCoins}"
 						);
@@ -784,7 +790,7 @@ public class Vile : Character {
 					if (isVileMK5 && raIndex == 4) raIndex++;
 					linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
 					if (linkedRideArmor.raNum == 4) summonedGoliath = true;
-					if (isVileMK5 || Options.main.vileLoadout.cannon == 2 ) {
+					if (isVileMK5 || player.loadout.vileLoadout.cannon  == 2 ) {
 						linkedRideArmor.ownedByMK5 = true;
 						linkedRideArmor.zIndex = zIndex - 1;
 					}
@@ -1026,8 +1032,11 @@ public class Vile : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		if (Options.main.vileLoadout.cannon == 2) {
+		if (player.loadout.vileLoadout.cannon == 2) {
 			return "vilemk5_" + spriteName;
+		}
+		if (player.loadout.vileLoadout.cannon == 1) {
+			return "vilemk2_" + spriteName;
 		}
 	//	if (isVileMK2) {
 	//		return "vilemk2_" + spriteName;

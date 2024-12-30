@@ -198,6 +198,42 @@ public partial class Character : Actor, IDamagable {
 	// Etc.
 	public int camOffsetX;
 
+
+	// Made it so That X and XMID share stuff
+		// Weapon-specific.
+	public RollingShieldProjCharged? chargedRollingShieldProj;
+	public List<BubbleSplashProjCharged> chargedBubbles = new();
+	public StrikeChainProj? strikeChainProj;
+	public StrikeChainProjCharged? strikeChainChargedProj;
+	public StrikeChainSemiCharged? strikeChainSemiChargedProj;
+	public GravityWellProjCharged? chargedGravityWell;
+	public SpinningBladeProjCharged? chargedSpinningBlade;
+	public FrostShieldProjCharged? chargedFrostShield;
+	public TornadoFangProjCharged? chargedTornadoFang;
+	public GravityWellProj? linkedGravityWell;
+	public TriadThunderProj? linkedTriadThunder;
+	public BeeSwarm? chargedParasiticBomb;
+	public List<MagnetMineProj> magnetMines = new();
+	public List<RaySplasherTurret> rayTurrets = new();
+	public RaySplasher? shootingRaySplasher = new();
+
+		// Chamaleon Sting.
+	public float stingActiveTime;
+	public int stingPaletteIndex;
+	public float stingPaletteTime;
+
+	// Input Stuff (WCUT)
+	public float inputdecreasedCD;
+	public int downPressedTimes = 0;
+
+	public int upPressedTimes = 0;
+
+	public int leftPressedTimes = 0;
+
+	public int rightPressedTimes = 0;
+
+
+
 	// Main character class starts here.
 	public Character(
 		Player player, float x, float y, int xDir,
@@ -525,6 +561,11 @@ public partial class Character : Actor, IDamagable {
 		return dashedInAir == 0;
 	}
 
+
+	public virtual bool canControlAirDash() {
+		return player.isAxl || player.isGBD;
+	}
+
 	public virtual bool canAirJump() {
 		return false;
 	}
@@ -670,13 +711,13 @@ public partial class Character : Actor, IDamagable {
 		}
 		float hSize = 30;
 		if (sprite.name.Contains("crouch")) {
-			hSize = 22;
+			hSize = 16;
 		}
 		if (sprite.name.Contains("dash")) {
-			hSize = 22;
+			hSize = 16;
 		}
 		if (sprite.name.Contains("_ra_")) {
-			hSize = 20;
+			hSize = 16;
 		}
 		return new Collider(
 			new Rect(0f, 0f, 18, hSize).getPoints(),
@@ -818,6 +859,34 @@ public partial class Character : Actor, IDamagable {
 
 
 		Helpers.decrementFrames(ref parryCooldown);
+
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// New Presing system
+		Helpers.decrementTime(ref inputdecreasedCD);
+		if (player.input.isPressed(Control.Down, player)){
+		downPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Up, player)){
+		upPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Left, player)){
+		leftPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Right, player)){
+		rightPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+
+		if (inputdecreasedCD == 0){
+		downPressedTimes = 0;
+		upPressedTimes = 0;
+		leftPressedTimes = 0;
+		rightPressedTimes = 0;
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 		// Wcut Burst System
@@ -1629,7 +1698,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isToughGuyHyperMode() {
-		return DamageScaling > 2;
+		return DamageScaling > 2 || sprite.name.Contains("ra_");
 	}
 
 	public bool isImmuneToKnockback() {
@@ -2854,11 +2923,14 @@ public partial class Character : Actor, IDamagable {
 			if (killer != null && killer != player) {
 				killer.addKill();
 				
-
+				if  (killer.character.charState is not Die &&player.health > 0 ){
 				killer.character.addHealth(3);
 				if (!killer.isRageX && !killer.isAxl){
 				killer.character.addAmmo(8);
 				}
+				}
+
+
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {
@@ -3012,7 +3084,8 @@ public partial class Character : Actor, IDamagable {
 			changeState(new Hurt(dir, flinchFrames, true, stunState.flinchYPos), true);
 			return;
 		}
-		if (charState is not Die and not InRideArmor and not InRideChaser) {
+		if (charState is not Die// and not InRideArmor 
+		and not InRideChaser) {
 			changeState(new Hurt(dir, flinchFrames, spiked), true);
 			return;
 		}
@@ -3478,6 +3551,43 @@ public partial class Character : Actor, IDamagable {
 			stopCharge();
 		}
 		chargeGfx();
+	}
+
+
+
+
+	
+	public bool hasLastingProj() {
+		return (
+			chargedSpinningBlade != null ||
+			chargedFrostShield != null ||
+			chargedTornadoFang != null ||
+			strikeChainProj != null ||
+			strikeChainSemiChargedProj != null ||
+			strikeChainChargedProj != null
+		);
+	}
+
+	public void removeLastingProjs() {
+		chargedSpinningBlade?.destroySelf();
+		chargedSpinningBlade = null;
+		chargedFrostShield?.destroySelf();
+		chargedFrostShield = null;
+		chargedTornadoFang?.destroySelf();
+		chargedTornadoFang = null;
+		strikeChainProj?.destroySelf();
+		strikeChainProj = null;
+		strikeChainChargedProj?.destroySelf();
+		strikeChainSemiChargedProj?.destroySelf();
+		strikeChainSemiChargedProj = null;
+		strikeChainChargedProj = null;
+	}
+	
+	public void popAllBubbles() {
+		for (int i = chargedBubbles.Count - 1; i >= 0; i--) {
+			chargedBubbles[i].destroySelf();
+		}
+		chargedBubbles.Clear();
 	}
 
 	public virtual void aiUpdate(Actor? target) { }

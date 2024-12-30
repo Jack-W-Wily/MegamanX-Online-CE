@@ -18,7 +18,7 @@ public class CrystalHunter : Weapon {
 		killFeedIndex = 20;
 		weaknessIndex = (int)WeaponIds.MagnetMine;
 		//switchCooldown = 0.5f;
-		switchCooldownFrames = 0;
+	//	switchCooldownFrames = 0;
 		damage = "0-3/0";
 		effect = "Crystalizes enemies on contact.\nC: Slows down the area by 25%.";
 		hitcooldown = "0-1/0";

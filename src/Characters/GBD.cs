@@ -51,7 +51,7 @@ public override bool normalCtrl() {
 
 
 		if (grounded) {
-			if (player.input.isPressed(Control.Jump, player) && ComboTimer > 0) {
+			if (player.input.isPressed(Control.Jump, player) ) {
 				vel.y = -getJumpPower();
 				isDashing = (
 					isDashing || player.dashPressed(out string dashControl) && canDash()
@@ -149,34 +149,59 @@ public override bool normalCtrl() {
 			changeState(new WallKick(), true);
 					}
 		if (charState.attackCtrl  && !isOnBike &&
-		 player.input.isPressed("shoot", player))
+		 player.input.isPressed(Control.WeaponRight, player))
 		{	
 			if ((player.input.isHeld("left", player) ||
 			player.input.isHeld("right", player)) 
 			&& !player.input.isHeld("up", player)){
-				changeSpriteFromName("spear_1", true);
-       		// changeState(new GBDSpear1(), true);
+			 changeState(new GBDSpear1(), true);
 			}
 			if ((!player.input.isHeld("left", player) &&
 			!player.input.isHeld("right", player)) 
 			&& player.input.isHeld("up", player)){
-				changeSpriteFromName("spear_up", true);
-       		 //changeState(new GBDSpearUp(), true);
+			 changeState(new GBDSpearUp(), true);
 			}
 			if ((!player.input.isHeld("left", player) &&
 			!player.input.isHeld("right", player)) 
 			&& !player.input.isHeld("up", player)){
-       		//changeState(new GBDSpearSpin(), true);
-			changeSpriteFromName("spear_spin", true);
+       		changeState(new GBDSpearSpin(), true);
 			}
 			if ((player.input.isHeld("left", player) ||
 			player.input.isHeld("right", player)) 
 			&& player.input.isHeld("up", player)){
-       		changeSpriteFromName("spear_rising", true);
-			// changeState(new GBDSpearRising(), true);
+       	changeState(new GBDSpearRising(), true);
 			}
 			
 		}
+
+
+		if (charState.attackCtrl  && !isOnBike &&
+		 player.input.isPressed(Control.Shoot, player))
+		{	
+			if (!sprite.name.Contains("tonfa")){
+				changeSpriteFromName("tonfa_1", true);
+			
+			}
+
+			if (sprite.name.Contains("tonfa_1") && sprite.frameIndex > 3){
+				changeSpriteFromName("tonfa_2", true);
+			
+			}
+
+			if (sprite.name.Contains("tonfa_2") && sprite.frameIndex > 3){
+				changeSpriteFromName("tonfa_3", true);
+			
+			}
+
+		
+		
+			
+		}
+
+		if (sprite.name.Contains("tonfa") && isAnimOver()){
+		changeToIdleOrFall();
+		}
+
 		if (charState.attackCtrl && TPCooldown == 0f &&
 		 player.input.isPressed("special1", player))
 					{
@@ -202,7 +227,7 @@ public override bool normalCtrl() {
 			if (charState is KnockedDown)  isOnBike = false;
 				
 		if (charState.attackCtrl && !isOnBike && TPCooldown == 0f &&
-		 player.input.isPressed(Control.WeaponRight, player))
+		 player.input.isPressed(Control.WeaponLeft, player))
 					{
 			changeState(new XTeleportState(), true);
 			//xSaberCooldown = 1f;
@@ -225,7 +250,7 @@ public override bool normalCtrl() {
 			else if (sprite.name.Contains("dash") && (isOnBike || shiningSparkStacks > 10 ))
 		{
 			return  new GenericMeleeProj(new GBDKick(), centerPoint,
-			 ProjIds.SigmaSwordBlock, player, 2f, 8, 0.5f, null, 
+			 ProjIds.SigmaSwordBlock, player, 2f, 20, 0.5f, null, 
 			 isShield: false, isDeflectShield: true,
 			 isJuggleProjectile : true, ShouldClang : true);
 		}
@@ -240,38 +265,53 @@ public override bool normalCtrl() {
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
 			ProjIds.GBDKick, player, 0f, 0, 0f);
 		}
-		else if (  sprite.name.Contains("wall_kick") && shiningSparkStacks < 20)
+		else if (  sprite.name.Contains("wall_kick") )
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.UPPunch, player, 2f, 12, 0.5f);
+			ProjIds.MechFrogStompShockwave, player, 2f, 0, 0.5f);
 		}
-		else if (  sprite.name.Contains("wall_kick") && shiningSparkStacks >= 20)
-		{
-			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.UPPunch, player, 2f, 30, 0.5f);
-		}
+	
 		if (  sprite.name.Contains("spear_1"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.UPPunch, player, 2f, 30, 0.14f,
-			isJuggleProjectile : true, ShouldClang : true);
+			ProjIds.Raijingeki2, player, 2f, 30, 0.14f,
+			isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("spear_up"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.RisingFang, player, 2f, 30,0.15f,
-			isJuggleProjectile : true, ShouldClang : true);
+			ProjIds.Raijingeki2, player, 2f, 30,0.15f,
+			isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("spear_rising"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint,
-			 ProjIds.RisingFang, player, 2f, 30, 0.3f,
-			isJuggleProjectile : true, ShouldClang : true);
+			 ProjIds.Raijingeki2, player, 2f, 30, 0.3f,
+			isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("spear_spin"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
+			ProjIds.Raijingeki2, player, 1f, 10, 0.15f,
+			isJuggleProjectile : true, ShouldClang : true);
+		}
+
+		if (  sprite.name.Contains("tonfa_1"))
+		{
+			return new GenericMeleeProj(new GBDKick(), centerPoint, 
 			ProjIds.UPPunch, player, 1f, 10, 0.15f,
+			 ShouldClang : true);
+		}
+		if (  sprite.name.Contains("tonfa_2"))
+		{
+			return new GenericMeleeProj(new GBDKick(), centerPoint, 
+			ProjIds.UPPunch, player, 1f, 10, 0.15f,
+			 ShouldClang : true);
+		}
+		if (  sprite.name.Contains("tonfa_3"))
+		{
+			return new GenericMeleeProj(new GBDKick(), centerPoint, 
+			ProjIds.UPPunch, player, 2f, 10, 0.15f,
 			isJuggleProjectile : true, ShouldClang : true);
 		}
 		return null;

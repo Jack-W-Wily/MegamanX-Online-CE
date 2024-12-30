@@ -48,12 +48,12 @@ public class DoubleCyclone : Weapon {
 			new DoubleCycloneProj(this, pos, 1, 0, player, player.getNextActorNetId(true), true);
 			new DoubleCycloneProj(this, pos, -1, 0, player, player.getNextActorNetId(true), true);
 		} 
-		if (chargeLevel == 3){
+		if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)){
 		character.changeSpriteFromName("shoot_2hands", true);
 		new DoubleCycloneCharged(this, pos, 1, player, player.getNextActorNetId(), sendRpc: true);
 		new DoubleCycloneCharged(this, pos, -1, player, player.getNextActorNetId(), sendRpc: true);
 		}
-		if (chargeLevel == 4){
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 		character.changeSpriteFromName("shoot_2hands", true);
 			new DoubleCycloneProj(this, pos, 1, 0, player, player.getNextActorNetId(true), true);
 			new DoubleCycloneProj(this, pos, -1, 0, player, player.getNextActorNetId(true), true);
@@ -74,7 +74,7 @@ public class DoubleCycloneProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 250, 1, player, "double_cyclone_proj", 
-		0, 0.3f, netProjId, player.ownedByLocalPlayer
+		4, 0.3f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 1f;
 		projId = (int)ProjIds.DoubleCyclone;
@@ -171,7 +171,7 @@ public class DoubleCycloneCharged : Projectile {
 	public float soundTime;
 
 	public DoubleCycloneCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, "double_cyclone_charged_proj", 1, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 1, player, "double_cyclone_charged_proj", 20, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.DoubleCycloneCharged;
 		maxTime = 0.7f;
 		sprite.visible = false;

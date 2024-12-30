@@ -506,6 +506,8 @@ public class FakeZeroMeleeState : MaverickState {
 	}
 }
 
+/*
+
 public class FakeZeroRockProj : Projectile {
 	public FakeZeroRockProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1.5f, player, "fakezero_rock", Global.halfFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
@@ -520,13 +522,61 @@ public class FakeZeroRockProj : Projectile {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
-
-
-
-
-
 }
 
+
+
+
+*/
+
+
+
+
+public class FakeZeroRockProj : Projectile {
+	public float displacent;
+	public float offset;
+	public Point dest;
+	public bool fall;
+
+	public FakeZeroRockProj(Weapon weapon, Point pos, int num, Player player, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, 1, 0, 2, player, "fakezero_rock_proj", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
+		fadeSprite = "explosion";
+		maxTime = 1;
+		projId = (int)ProjIds.FakeZeroRockProj;
+		destroyOnHit = true;
+
+		if (num == 0) dest = new Point(-90, -100);
+		if (num == 1) dest = new Point(-45, -100);
+		if (num == 2) dest = new Point(-0, -100);
+		if (num == 3) dest = new Point(45, -100);
+		if (num == 4) dest = new Point(90, -100);
+		if (num == 5) dest = new Point(-130, -100);
+		if (num == 6) dest = new Point(130, -100);
+
+		vel.y = -500;
+		useGravity = true;
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir, (byte)num);
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+		vel.y += Global.speedMul * getGravity();
+		if (!fall) {
+			displacent = Helpers.lerp(displacent, dest.x, Global.spf * 10);
+			incPos(new Point(displacent - offset, 0));
+			offset = displacent;
+
+			if (vel.y > 0) {
+				fall = true;
+				yDir = -1;
+			}
+		}
+	}
+}
 
 
 
@@ -559,21 +609,21 @@ public class FakeZeroGroundPunchState : MaverickState {
 			Weapon w = maverick.weapon;
 			new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	
-			new FakeZeroRockProj(w, maverick.pos.addxy(-15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
-			new FakeZeroRockProj(w, maverick.pos.addxy(15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+			new FakeZeroRockProj(w, maverick.pos.addxy(-15, 0), 0, player, player.getNextActorNetId(), rpc: true);
+			new FakeZeroRockProj(w, maverick.pos.addxy(15, 0), 1, player, player.getNextActorNetId(), rpc: true);
 
 			Global.level.delayedActions.Add(new DelayedAction(() => {
-				new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0),maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	
-				new FakeZeroRockProj(w, maverick.pos.addxy(-35, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
-				new FakeZeroRockProj(w, maverick.pos.addxy(35, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(-35, 0),2,  player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(35, 0),3,  player, player.getNextActorNetId(), rpc: true);
 			}, 0.075f));
 
 			Global.level.delayedActions.Add(new DelayedAction(() => {
 				new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	
-				new FakeZeroRockProj(w, maverick.pos.addxy(-55, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
-				new FakeZeroRockProj(w, maverick.pos.addxy(55, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(-55, 0),4, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(55, 0),5,  player, player.getNextActorNetId(), rpc: true);
 			}, 0.15f));
 		}
 

@@ -12,14 +12,14 @@ public class RagingChargeBuster : Weapon {
 		weaponBarBaseIndex = 70;
 		weaponBarIndex = 59;
 		weaponSlotIndex = 121;
-		shootSounds = new string[] { "buster2", "buster2", "buster2", "buster2" };
+		shootSounds = new string[] { "buster2", "buster2", "buster2", "buster2", "buster2" };
 		fireRate = 45;
 		canHealAmmo = true;
 		drawAmmo = true;
 		drawCooldown = true;
 		allowSmallBar = false;
 		ammoGainMultiplier = 2;
-		maxAmmo = 12;
+		maxAmmo = 15;
 		ammo = maxAmmo;
 	}
 
@@ -28,10 +28,19 @@ public class RagingChargeBuster : Weapon {
 	public override void shoot(Character character, int[] args) {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
+		int chargeLevel = args[0];
 		Player player = character.player;
-
+	
+		if (chargeLevel < 4){
 		new RagingBusterProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		new Anim(pos, "buster_unpo_muzzle", xDir, null, true);
+		}
+			if (chargeLevel >= 4) {
+			new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+			new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
+			character.playSound("plasmaShot", sendRpc: true);	
+		
+		}
 	}
 }
 

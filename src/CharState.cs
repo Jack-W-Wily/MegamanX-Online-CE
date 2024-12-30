@@ -65,6 +65,8 @@ public class CharState {
 	// Control system.
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
+
+	public bool bonusAttackCtrl;
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
@@ -146,11 +148,24 @@ public class CharState {
 	}
 
 	public virtual bool canEnter(Character character) {
-		//if (character.charState is InRideArmor &&
-		//	!(this is LaunchedState || this is PushedOver || this is KnockedDown || this is Die || this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
-		//	  this is NecroBurstAttack || this is UPGrabbed || this is WhirlpoolGrabbed || this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))) {
-		//	return false;
-		//}
+		if (character.charState is InRideArmor &&
+			!(this is LaunchedState ||
+			 this is PushedOver || 
+			  this is PushedOver2 || 
+			 this is KnockedDown || 
+			 this is GenericStun ||
+			  this is Hurt ||
+			 this is Die || this is Idle || this is Jump || this is Fall || 
+			 this is StrikeChainHooked || this is ParasiteCarry || 
+			 this is VileMK2Grabbed || 
+			 this is DarkHoldState ||
+			  this is NecroBurstAttack   ||
+			   this is UPGrabbed ||
+			   this is WhirlpoolGrabbed || 
+			   this is DeadLiftGrabbed || 
+			   Helpers.isOfClass(this, typeof(GenericGrabbedState)))) {
+			return false;
+		}
 		if (character.charState is DarkHoldState dhs && dhs.stunTime > 0) {
 			if (this is not Die && this is not Hurt) {
 				return false;
@@ -476,10 +491,7 @@ public class WarpIn : CharState {
 		destY = character.pos.y;
 		destX = character.pos.x;
 		startY = character.pos.y;
-		if (player.isRageX){
-			player.weapons.Add(new RagingChargeBuster());
-			player.weapons.Add(new XBuster());
-		}
+	
 			
 		if (player.warpedInOnce || Global.debug) {
 			sigmaRounds = 10;
@@ -766,6 +778,10 @@ public class ZeroClang : CharState {
 
 	public override void update() {
 		base.update();
+
+		if (!character.sprite.name.Contains("clang")){
+			character.changeSpriteFromName("land", true);
+		}
 		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
 			character.move(new Point(hurtSpeed, 0));
@@ -1016,6 +1032,18 @@ public class AirDash : CharState {
 
 		base.update();
 
+
+		if (character.canControlAirDash()){
+		character.turnToInput(player.input, player);
+
+			if (player.input.isHeld(Control.Up, player)){
+			character.vel.y = -50;
+			}
+			if (player.input.isHeld(Control.Down, player)){
+			character.vel.y = 50;
+			}
+		}
+
 		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
@@ -1055,15 +1083,31 @@ public class AirDash : CharState {
 				character.changeState(new Fall());
 			}
 		}
-		if (dashTime > Global.spf * 3 || stop) {
+		// TO make it so people that aren't X get Vanilla Dash
+		if (player.isX){
+			if (dashTime > Global.spf * 3 || stop) {
 			var move = new Point(0, 0);
 			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);
-		} else {
+			} else {
 			var move = new Point(0, 0);
 			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier;
 			character.move(move);
+			}
 		}
+		if (!player.isX){
+			if (dashTime > Global.spf * 3 || stop) {
+			var move = new Point(0, 0);
+			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
+			character.move(move);
+			} else {
+			var move = new Point(0, 0);
+			move.x = character.getDashSpeed() * character.getRunDebuffs() * initialDashDir * speedModifier;
+			character.move(move);
+			}
+		}
+
+
 		dashTime += Global.spf;
 	}
 

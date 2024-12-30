@@ -649,13 +649,32 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
-				if (drawPlayer.character is Zain zain) {
+			// Zain display
+			if (drawPlayer.character is Zain zain) {
 					int yStart = 159;
-					Global.sprites["hud_killfeed_weapon"].drawToHUD(170, 7, 155);
+						int xStart = 26;
+
+						
+					Global.sprites["hud_zaincounter"].drawToHUD(170, 7, 155);
 					Fonts.drawText(FontType.Grey,
 				"x" + zain.ZainCounters, 16, 152, Alignment.Left
 					);
-					yStart += 12;
+				///	yStart += 12;
+
+
+			
+				yStart -= 36;
+				Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
+				for (var i = 0; i < MathF.Ceiling(zain.player.vileMaxAmmo ); i++) {
+				if (i < Math.Ceiling(zain.player.vileAmmo)) {
+					Global.sprites["hud_weapon_full"].drawToHUD(32, xStart, yStart);
+				} else {
+					Global.sprites["hud_health_empty"].drawToHUD(0, xStart, yStart);
+				}
+				yStart -= 2;
+				}
+				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);
+		
 				}
 
 			if (drawPlayer.character is Zero zero) {
@@ -718,7 +737,7 @@ public class GameMode {
 			}
 			if (drawPlayer.character is Vile vilin) {
 				int xStart = 26;
-				int yStart = 159;
+				int yStart = 129;
 				
 				Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
 				yStart -= 16;

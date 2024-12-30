@@ -36,6 +36,9 @@ public partial class Level {
 	public List<BoundBlasterAltProj> boundBlasterAltProjs = new List<BoundBlasterAltProj>();
 	public List<CrystalHunterCharged> chargedCrystalHunters = new List<CrystalHunterCharged>();
 	public List<DarkHoldProj> darkHoldProjs = new List<DarkHoldProj>();
+
+	public List<DarkHoldDProj> darkHoldDProjs = new List<DarkHoldDProj>();
+
 	public List<GravityWellProj> unchargedGravityWells = new List<GravityWellProj>();
 	public List<BackloggedSpawns> backloggedSpawns = new List<BackloggedSpawns>();
 	public List<DelayedAction> delayedActions = new List<DelayedAction>();
@@ -340,6 +343,9 @@ public partial class Level {
 			Global.srtBuffer1 = Global.srtBuffer1L;
 			Global.srtBuffer2 = Global.srtBuffer2L;
 		} else {
+			Global.viewSize = 1;
+			Global.view.Size = new Vector2f(Global.halfViewScreenW, Global.halfViewScreenH);
+		
 			Global.screenRenderTexture = Global.screenRenderTextureS;
 			Global.srtBuffer1 = Global.srtBuffer1S;
 			Global.srtBuffer2 = Global.srtBuffer2S;
@@ -1651,7 +1657,7 @@ public partial class Level {
 		if (actor == null) return false;
 
 		if (actor.timeStopTime > 10) {
-			slowAmount = 0.125f;
+			slowAmount = 0.0625f;
 			return true;
 		}
 
@@ -1690,6 +1696,8 @@ public partial class Level {
 				}
 			}
 		}
+
+
 
 		return isSlown;
 	}
@@ -1833,6 +1841,13 @@ public partial class Level {
 			foreach (var dhp in level.darkHoldProjs) {
 				if (dhp.screenShader != null) {
 					ppShaders.Add(dhp.screenShader);
+				}
+			}
+
+
+			foreach (var dhdp in level.darkHoldDProjs) {
+				if (dhdp.screenShader != null) {
+					ppShaders.Add(dhdp.screenShader);
 				}
 			}
 

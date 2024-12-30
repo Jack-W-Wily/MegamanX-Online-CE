@@ -17,7 +17,7 @@ public class ToxicSeahorse : Maverick {
 		weakWeaponId = WeaponIds.FrostShield;
 		weakMaverickWeaponId = WeaponIds.BlizzardBuffalo;
 
-		spriteToCollider["teleport"] = getDashCollider(1, 0.25f);
+		spriteToCollider["teleport"] = getDashCollider(0.05f, 0.05f);
 
 		netActorCreateId = NetActorCreateId.ToxicSeahorse;
 		netOwner = player;
@@ -293,12 +293,12 @@ public class TSeahorseTeleportState : MaverickState {
 			maverick.turnToInput(input, player);
 			if (dir.x != 0) {
 				var move = new Point(100 * dir.x, 0);
-				var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir.x * 20, 20);
-				if (hitGroundMove == null) {
-				} else {
+				//var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir.x * 20, 20);
+				//if (hitGroundMove == null) {
+		//		} else {
 					maverick.move(move);
 					maverick.frameSpeed = 1;
-				}
+		//		}
 			}
 
 			if (input.isPressed(Control.Dash, player) || maverick.ammo <= 0 || (isAI && stateTime > 1)) {

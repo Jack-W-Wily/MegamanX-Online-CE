@@ -43,6 +43,29 @@ public class Maverick : Actor, IDamagable {
 	public float weaponHealTime = 0;
 	public bool playHealSound;
 
+		// Disables status.
+
+	public bool isCrystalized;
+	public float paralyzedTime;
+	public float paralyzedMaxTime;
+	public float frozenTime;
+	public float frozenMaxTime;
+	public float crystalizedTime;
+	public float crystalizedMaxTime;
+	
+	// Buffs.
+	public float vaccineTime;
+	public float vaccineHurtCooldown;
+
+	public float igFreezeProgress;
+	public float freezeInvulnTime;
+	public float stunInvulnTime;
+	public float crystalizeInvulnTime;
+	public float grabInvulnTime;
+	public float darkHoldInvulnTime;
+	public bool isDarkHoldState;
+	public bool isStrikeChainState;
+
 	// New ammo variables.
 	public float ammo = 32;
 	public float maxAmmo = 32;
@@ -219,6 +242,99 @@ public class Maverick : Actor, IDamagable {
 		health = lastHealth;
 	}
 
+
+	float igFreezeRecoveryCooldown = 0;
+	public void addIgFreezeProgress(float amount, int freezeTime = 120) {
+		if (freezeInvulnTime > 0) return;
+
+
+		igFreezeProgress += amount;
+		igFreezeRecoveryCooldown = 0;
+		if (igFreezeProgress >= 4) {
+			igFreezeProgress = 4;
+		}
+		if (igFreezeProgress >= 4 && canFreeze()) {
+			igFreezeProgress = 0;
+			freeze(freezeTime);
+		}
+	}
+
+
+
+		public void freeze(int timeToFreeze = 180) {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		frozenMaxTime = timeToFreeze;
+		frozenTime = timeToFreeze;
+		if (state is not MGenericStun) {
+			changeState(new MGenericStun(), true);
+		}
+	}
+
+	public bool canFreeze() {
+		return 
+			state is not MDie || this is not ChillPenguin
+			&& this is not BlizzardBuffalo;
+			
+	}
+
+	public void paralize(float timeToParalize = 180) {
+		if (!ownedByLocalPlayer ||
+		
+			(state is MDie or MvrkVileMK2Grabbed) 
+		
+		) {
+			return;
+		}
+		paralyzedMaxTime = timeToParalize;
+		paralyzedTime = timeToParalize;
+		if (state is not MGenericStun) {
+			changeState(new MGenericStun(), true);
+		}
+	}
+
+
+	public void crystalize(float timeToCrystalize = 120) {
+		if (!ownedByLocalPlayer ||
+			
+			(state is MDie) ||
+			
+			crystalizeInvulnTime > 0
+		) {
+			return;
+		}
+		vel.y = 0;
+		crystalizedMaxTime = timeToCrystalize;
+		crystalizedTime = timeToCrystalize;
+		if (state is not MGenericStun) {
+			changeState(new MGenericStun(), true);
+		}
+	}
+
+	public void crystalizeStart() {
+		isCrystalized = true;
+		if (globalCollider != null) globalCollider.isClimbable = true;
+		new Anim(getCenterPos(), "crystalhunter_activate", 1, null, true);
+		playSound("crystalize");
+	}
+
+	public void crystalizeEnd() {
+		isCrystalized = false;
+		playSound("crystalizeDashingX2");
+		for (int i = 0; i < 8; i++) {
+			var anim = new Anim(getCenterPos().addxy(Helpers.randomRange(-20, 20), Helpers.randomRange(-20, 20)), "crystalhunter_piece", Helpers.randomRange(0, 1) == 0 ? -1 : 1, null, false);
+			anim.frameIndex = Helpers.randomRange(0, 1);
+			anim.frameSpeed = 0;
+			anim.useGravity = true;
+			anim.vel = new Point(Helpers.randomRange(-150, 150), Helpers.randomRange(-300, 25));
+		}
+	}
+
+
+
+
+
 	public void addAmmo(float amount) {
 		weaponHealAmount += amount;
 	}
@@ -233,6 +349,18 @@ public class Maverick : Actor, IDamagable {
 
 		Helpers.decrementTime(ref invulnTime);
 		Helpers.decrementTime(ref weaknessCooldown);
+		
+		igFreezeRecoveryCooldown += Global.spf;
+		if (igFreezeRecoveryCooldown > 0.2f) {
+			igFreezeRecoveryCooldown = 0;
+			igFreezeProgress--;
+			if (igFreezeProgress < 0) igFreezeProgress = 0;
+		}
+		Helpers.decrementTime(ref freezeInvulnTime);
+		Helpers.decrementTime(ref stunInvulnTime);
+		Helpers.decrementTime(ref crystalizeInvulnTime);
+		Helpers.decrementTime(ref grabInvulnTime);
+		Helpers.decrementTime(ref darkHoldInvulnTime);
 
 		if (grounded) {
 			lastGroundedPos = pos;
@@ -555,6 +683,11 @@ public class Maverick : Actor, IDamagable {
 			return null;
 		}
 
+
+		if (sprite.name.Contains("teleport") &&  this is ToxicSeahorse){
+		 hSize = 2;
+		 wSize = 2;
+		}
 		if (reversedGravity && this is MagnaCentipede) {
 			return new Collider(
 				new Rect(0f, 0f, wSize, hSize).getPoints(),

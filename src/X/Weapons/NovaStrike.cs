@@ -48,6 +48,8 @@ public class HyperNovaStrike : Weapon {
 public class NovaStrikeState : CharState {
 	int upOrDown;
 	int leftOrRight;
+
+	bool earthquake;
 	public NovaStrikeState(Point inputDir) : base(getNovaDir(inputDir), "", "", "nova_strike_start") {
 		immuneToWind = true;
 		invincible = true;
@@ -65,11 +67,11 @@ public class NovaStrikeState : CharState {
 		if (!once && character.isAnimOver()) {
 			once = true;
 
-			if (Helpers.randomRange(0, 10) < 10) {
-				character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
-			} else {
+			//if (Helpers.randomRange(0, 10) < 10) {
+		//		character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+		//	} else {
 				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
-			}
+		//	}
 		}
 
 		if (!inTransition()) {
@@ -78,6 +80,52 @@ public class NovaStrikeState : CharState {
 			) {
 				character.changeToIdleOrFall();
 				return;
+			}
+		}
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			
+			if (!earthquake){
+			character.shakeCamera(sendRpc: true);
+			earthquake = true;
+			var weapon = new HyperNovaStrike();
+			new TriadThunderQuake(weapon, character.pos, 1, player, player.getNextActorNetId(), rpc: true);
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+			character.pos.addxy(6 * character.xDir, 0f), character.xDir, player, 
+			player.getNextActorNetId(), rpc: true);	
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			}
+			
+		} 
+
+			for (int i = 1; i <= 4; i++) {
+				CollideData collideData2 = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
+				if (!character.grounded && collideData2 != null && collideData2.gameObject is Wall wall
+					&& !wall.isMoving && !wall.topWall && collideData2.isCeilingHit()) {		
+			if (!earthquake){
+			character.shakeCamera(sendRpc: true);
+			earthquake = true;
+			var weapon = new HyperNovaStrike();
+			new TriadThunderQuake(weapon, character.pos, 1, player, player.getNextActorNetId(), rpc: true);
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+			character.pos.addxy(6 * character.xDir, 0f), character.xDir, player, 
+			player.getNextActorNetId(), rpc: true);	
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			}
+			}
+
+			if (character.sprite.name.Contains("down")){
+			if (!earthquake){
+			character.shakeCamera(sendRpc: true);
+			earthquake = true;
+			var weapon = new HyperNovaStrike();
+			new TriadThunderQuake(weapon, character.pos, 1, player, player.getNextActorNetId(), rpc: true);
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player), 
+			character.pos.addxy(6 * character.xDir, 0f), character.xDir, player, 
+			player.getNextActorNetId(), rpc: true);	
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			}
 			}
 		}
 	}

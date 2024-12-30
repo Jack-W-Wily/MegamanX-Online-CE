@@ -47,7 +47,7 @@ public class HomingTorpedo : Weapon {
 		if (chargeLevel == 2) {
 			new TorpedoProj(this, pos, xDir, player, 3, player.getNextActorNetId(true), rpc: true);
 		}
-		if (chargeLevel == 3) {
+		if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 			player.getNextActorNetId(true);
 			new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 1, player.getNextActorNetId(true), 30, true);
 			new TorpedoProj(this, pos.addxy(0, 1), xDir, player, 1, player.getNextActorNetId(true), 15, true);
@@ -55,7 +55,7 @@ public class HomingTorpedo : Weapon {
 			new TorpedoProj(this, pos.addxy(0, -1), xDir, player, 1, player.getNextActorNetId(true), -15, true);
 			new TorpedoProj(this, pos.addxy(0, -2), xDir, player, 1, player.getNextActorNetId(true), -30, true);
 		}
-		if (chargeLevel == 4) {
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 			player.getNextActorNetId(true);
 				new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 3, player.getNextActorNetId(true), 0, true);
 				Global.level.delayedActions.Add(new DelayedAction(() => {

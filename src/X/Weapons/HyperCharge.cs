@@ -16,7 +16,7 @@ public class HyperCharge : Weapon {
 		shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
 		fireRate = 120;
 		//switchCooldown = 0.25f;
-		switchCooldownFrames = 15;
+	//	switchCooldownFrames = 15;
 		ammo = 0;
 		maxAmmo = 28;
 		drawGrayOnLowAmmo = true;
@@ -80,7 +80,9 @@ public class HyperCharge : Weapon {
 
 	public override void shoot(Character character, int[] args) {
 		Player player = character.player;
-		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
+	
+		MegamanX mmx = character as MegamanX;
 		Weapon wep = player.weapons[player.hyperChargeSlot];
 
 		if (wep is XBuster) {

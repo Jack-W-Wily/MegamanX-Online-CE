@@ -15,15 +15,7 @@ public class AxlBulletProj : Projectile {
 	
 	public override void update() {
 		base.update();
-		//HeadShot Code
-			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
-				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
-				damager.damage = 0;
-				playSound("hurt");
-				destroySelf();
-				return;
-			}
-			//>>>>>>>>>>>>>>>>>>>>>>
+
 	}
 
 	public override void onHitWall(CollideData other) {

@@ -119,7 +119,7 @@ public partial class Player {
 	public MaverickAIBehavior currentMaverickCommand;
 
 	public bool isX { get { return charNum == (int)CharIds.X; } }
-	public bool isRageX { get { return charNum == (int)CharIds.RagingChargeX; } }
+	public bool isRageX { get { return charNum == (int)CharIds.XMID; } }
 
 	
 	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
@@ -131,6 +131,8 @@ public partial class Player {
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
 
 	public bool isGBD { get { return charNum == (int)CharIds.GBD; } }
+
+	public bool isDynamo { get { return charNum == (int)CharIds.Dynamo; } }
 
 
 	public float healthBackup;
@@ -215,7 +217,7 @@ public partial class Player {
 	// Subtanks
 	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
 		{ (int)CharIds.X, new List<SubTank>() },
-		{ (int)CharIds.RagingChargeX, new() },
+		{ (int)CharIds.XMID, new() },
 		{ (int)CharIds.Zero, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
 		{ (int)CharIds.Axl, new List<SubTank>() },
@@ -225,12 +227,13 @@ public partial class Player {
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
 		{ (int)CharIds.GBD, new List<SubTank>() },
+		{ (int)CharIds.Dynamo, new List<SubTank>() },
 	};
 
 	// Heart tanks
 	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
 		{ (int)CharIds.X, new() },
-		{ (int)CharIds.RagingChargeX, new() },
+		{ (int)CharIds.XMID, new() },
 		{ (int)CharIds.Zero, new() },
 		{ (int)CharIds.Vile, new() },
 		{ (int)CharIds.Axl, new() },
@@ -240,6 +243,7 @@ public partial class Player {
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Zain, new() },
 		{ (int)CharIds.GBD, new() },
+		{ (int)CharIds.Dynamo, new() },
 	};
 
 	// Getter functions.
@@ -427,6 +431,7 @@ public partial class Player {
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
 
+	public ShaderWrapper darkHoldDScreenShader = Helpers.cloneShaderSafe("trail");
 
 	// Character specific data populated on RPC request
 	public ushort? charNetId;
@@ -696,9 +701,12 @@ public partial class Player {
 			bonus = 14;
 		}
 		if (isZain) {
-			bonus = 16;
+			bonus = 10;
 		}
 		if (isGBD) {
+			bonus = 8;
+		}
+		if (isDynamo) {
 			bonus = 12;
 		}
 		return MathF.Ceiling(
@@ -1198,8 +1206,8 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		
-		} else if (charNum == (int)CharIds.RagingChargeX) {
-			character = new RagingChargeX(
+		} else if (charNum == (int)CharIds.XMID) {
+			character = new XMID(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
@@ -1212,6 +1220,12 @@ public partial class Player {
 		}
 		else if (charNum == (int)CharIds.GBD) {
 			character = new GBD(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		else if (charNum == (int)CharIds.Dynamo) {
+			character = new Dynamo(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
@@ -1360,8 +1374,8 @@ public partial class Player {
 		charNum = data.charNum;
 
 		Character? retChar = null;
-			if (data.charNum == (int)CharIds.RagingChargeX) {
-			retChar = new RagingChargeX(
+			if (data.charNum == (int)CharIds.XMID) {
+			retChar = new XMID(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
@@ -1426,12 +1440,20 @@ public partial class Player {
 				true, data.dnaNetId, false, isWarpIn: false
 			);
 		}
+		
 		else if (data.charNum == (int)CharIds.GBD) {
 			retChar = new GBD(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else {
+		}
+		else if (data.charNum == (int)CharIds.Dynamo) {
+			retChar = new Dynamo(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}
+		 else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
 
@@ -1536,8 +1558,8 @@ public partial class Player {
 		loadout = dnaCore.loadout;
 
 		Character? retChar = null;
-		if (charNum == (int)CharIds.RagingChargeX) {
-			retChar = new RagingChargeX(
+		if (charNum == (int)CharIds.XMID) {
+			retChar = new XMID(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
@@ -1605,6 +1627,12 @@ public partial class Player {
 		}
 		else if (charNum == (int)CharIds.GBD) {
 			retChar = new GBD(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (charNum == (int)CharIds.Dynamo) {
+			retChar = new Dynamo(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
@@ -1930,7 +1958,7 @@ public partial class Player {
 
 		// First we fill ST.
 		if (isVile) {
-			fillSubtank(2);
+			fillSubtank(1);
 		} else if (isAxl) {
 			fillSubtank(3);
 		} else {
@@ -1945,6 +1973,10 @@ public partial class Player {
 			pzero.freeBusterShots++;
 			currency++;
 			return;
+		}
+
+		if (character is Dynamo dynamo) {
+		currency += 1;	
 		}
 		// Check for stuff that cannot gain scraps.
 	//	if (character is RagingChargeX or KaiserSigma or ViralSigma or WolfSigma) return;
@@ -2066,8 +2098,7 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return false;
-		//!Global.level.isElimination() && armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
+		return  armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
 	}
 
 	public void reviveVile(bool toMK5) {
@@ -2613,8 +2644,8 @@ public partial class Player {
 	}
 
 	public bool isPuppeteer() {
-		return true;
-		//loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
+		return 
+		loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 1;
 	}
 
 	public bool isStriker() {
@@ -2622,8 +2653,8 @@ public partial class Player {
 	}
 
 	public bool isTagTeam() {
-		return false;
-		//loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
+		return 
+		loadout?.sigmaLoadout != null && loadout.sigmaLoadout.commandMode == 3;
 	}
 
 	public bool isRefundableMode() {

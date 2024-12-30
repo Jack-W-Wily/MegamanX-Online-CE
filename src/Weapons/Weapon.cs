@@ -173,6 +173,7 @@ public class Weapon {
 				new DoubleCyclone(),
 				new ZXSaber(),
 				new DarkHoldWeapon(),
+				new RagingChargeBuster(),
 			};
 	}
 

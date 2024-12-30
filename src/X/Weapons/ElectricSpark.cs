@@ -36,10 +36,10 @@ public class ElectricSpark : Weapon {
 		if (chargeLevel == 2) {
 			new ElectricSparkProjSemiCharged(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
 		}
-		if (chargeLevel == 3) {
+		if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 			new ElectricSparkProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
-		if (chargeLevel == 4) {
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 				character.changeState(new ESparkUltraCharged(character.grounded), true);
 		}
 	}

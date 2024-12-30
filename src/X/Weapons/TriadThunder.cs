@@ -59,7 +59,7 @@ public class TriadThunder : Weapon {
 public class TriadThunderProj : Projectile {
 	int state;
 	Character? character;
-	MegamanX mmx = null!;
+	Character mmx = null!;
 	public List<TriadThunderBall> balls;
 	public TriadThunderProj(
 		Point pos, int xDir, int yDir, Player player, ushort netProjId, bool rpc = false

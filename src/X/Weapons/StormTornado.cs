@@ -16,7 +16,7 @@ public class StormTornado : Weapon {
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3", "tornado" };
 		fireRate = 120;
 		//switchCooldown = 0.5f;
-		switchCooldownFrames = 30;
+		//switchCooldownFrames = 30;
 		damage = "1/4";
 		effect = "Weak push. Extinguishes Fire. Ignores Shields.\nUncharged won't give assists.";
 		hitcooldown = "0.25/0.33";

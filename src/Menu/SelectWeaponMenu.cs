@@ -189,9 +189,9 @@ public class SelectWeaponMenu : IMainMenu {
 		}
 
 		int maxCatCount = 3;
-		if (selCursorIndex < 4) {
+	//	if (selCursorIndex < 4) {
 			maxCatCount = xWeaponCategories[selCursorIndex].Item2.Count;
-		}
+	//	}
 
 		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, maxCatCount - 1, wrap: true, playSound: true);
 		Helpers.menuUpDown(ref selCursorIndex, 0, cursors.Length - 1);

@@ -741,8 +741,8 @@ public class PunchyZeroHadangeki : CharState {
 	bool fired;
 
 	public PunchyZeroHadangeki() : base("pipe_attack") {
-	//	landSprite = "pipe_attack";
-		//airSprite = "projswing_air";
+		landSprite = "pipe_attack";
+		airSprite = "pipe_rising";
 		useDashJumpSpeed = true;
 		airMove = true;
 	//	superArmor = true;

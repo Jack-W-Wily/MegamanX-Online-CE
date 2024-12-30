@@ -298,6 +298,7 @@ public class ZeroRocks : CharState {
 		}
 		float x = character.pos.x;
 		float y = character.pos.y;
+		Weapon w = FakeZero.getWeapon();
 		if (character.frameIndex > 7 && !fired) {
 			fired = true;
 			
@@ -305,18 +306,18 @@ public class ZeroRocks : CharState {
 			character.playSound("crashX2", forcePlay: false, sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 			
-			Weapon w = player.weapon;
-			new FakeZeroRockProj(w, character.pos.addxy(-15, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
-			new FakeZeroRockProj(w, character.pos.addxy(15, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+			
+			new FakeZeroRockProj(w, character.pos.addxy(-15, 0),0,  player, player.getNextActorNetId(), rpc: true);
+			new FakeZeroRockProj(w, character.pos.addxy(15, 0),1,  player, player.getNextActorNetId(), rpc: true);
 
 			Global.level.delayedActions.Add(new DelayedAction(() => {
-				new FakeZeroRockProj(w, character.pos.addxy(-35, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
-				new FakeZeroRockProj(w, character.pos.addxy(35, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, character.pos.addxy(-35, 0),2,  player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, character.pos.addxy(35, 0),3,  player, player.getNextActorNetId(), rpc: true);
 			}, 0.075f));
 
 			Global.level.delayedActions.Add(new DelayedAction(() => {
-				new FakeZeroRockProj(w, character.pos.addxy(-55, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
-				new FakeZeroRockProj(w, character.pos.addxy(55, 0), character.xDir, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, character.pos.addxy(-55, 0),4, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, character.pos.addxy(55, 0),5,  player, player.getNextActorNetId(), rpc: true);
 			}, 0.15f));
 
 			} 
@@ -856,7 +857,7 @@ public class DarkHoldProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, 0, player, "empty", 0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 1.25f;
+		maxTime = 5.25f;
 		vel = new Point();
 		projId = (int)ProjIds.DarkHold;
 		setIndestructableProperties();

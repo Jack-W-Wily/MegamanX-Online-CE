@@ -46,7 +46,7 @@ public class FrostShield : Weapon {
 			new FrostShieldProjChargedGround(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}  
 		
-		if (chargeLevel == 3) {
+		if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 			if (character.isUnderwater() == true) {
 				new FrostShieldProjPlatform(this, pos, xDir, player, player.getNextActorNetId(), true);
 			} else {
@@ -58,9 +58,9 @@ public class FrostShield : Weapon {
 				}	
 			}
 		}
-		if (chargeLevel == 4){
-			new TorpedoProj(this, pos.addxy(0, 2), xDir, player, 3, player.getNextActorNetId(true), 0, true);
-				Global.level.delayedActions.Add(new DelayedAction(() => {
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
+				new FrostShieldProjChargedGround(this, pos, xDir, player, player.getNextActorNetId(), true);
+			Global.level.delayedActions.Add(new DelayedAction(() => {
 					new FrostShieldProj(this, pos.addxy(0,-5), xDir, player, player.getNextActorNetId(), true);
 				}, 0.025f));
 				Global.level.delayedActions.Add(new DelayedAction(() => {
@@ -73,8 +73,8 @@ public class FrostShield : Weapon {
 					new FrostShieldProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 				}, 0.1f));
 					Global.level.delayedActions.Add(new DelayedAction(() => {
-					new FrostShieldProj(this, pos.addxy(0,-5), xDir, player, player.getNextActorNetId(), true);
-				}, 0.15f));
+					new FrostShieldProj(this, pos.addxy(0,-10), xDir, player, player.getNextActorNetId(), true);
+				}, 0.125f));
 		}
 		
 	}

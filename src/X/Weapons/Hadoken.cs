@@ -20,8 +20,8 @@ public class HadoukenProj : Projectile {
 		Weapon weapon, Point pos, int xDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 250, Damager.ohkoDamage, player, "hadouken", 
-		Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 250, 4, player, "hadouken", 
+		60, 0.15f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 0.4f;
 		fadeSprite = "hadouken_fade";
@@ -44,7 +44,7 @@ public class HadoukenProj : Projectile {
 
 public class Hadouken : CharState {
 	bool fired = false;
-	MegamanX? mmx;
+	//MegamanX? mmx;
 
 	public Hadouken() : base("hadouken", "", "", "") {
 		superArmor = true;
@@ -72,12 +72,12 @@ public class Hadouken : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX;
+	//	mmx = character as MegamanX;
 		character.stopCharge();
 	}
 
 	public override void onExit(CharState newState) {
-		if (mmx != null) mmx.hadoukenCooldownTime = mmx.maxHadoukenCooldownTime;
+	//	if (mmx != null) mmx.hadoukenCooldownTime = mmx.maxHadoukenCooldownTime;
 		base.onExit(newState);
 	}
 }

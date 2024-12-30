@@ -64,7 +64,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new ItemTracerProj(new ItemTracer(), pos, xDir, player, null, netProjByte);
 				break;
 			case (int)ProjIds.ZainSaberProj:
-				proj = new ZSaberProj(pos, xDir, player, netProjByte);
+				proj = new ZainSaberProj(new ItemTracer(),pos, xDir, player, netProjByte);
 				break;
 
 			case (int)ProjIds.ZSaberProj:
@@ -205,6 +205,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.InfinityGig:
 				proj = new RocketPunchProj(new RocketPunch(RocketPunchType.InfinityGig), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.DynamoBoomerangProj:
+				proj = new DynamoBoomerangProj(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.Vulcan:
 				proj = new VulcanProj(new Vulcan(VulcanType.CherryBlast), pos, xDir, player, netProjByte);
 				break;
@@ -340,6 +343,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.InfernoBeamUp:
 				proj = new InfernoBeamUp(new FireWave(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.DynamoBeam:
+				proj = new DynamoBeam(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.InfernoBeamDown:
 				proj = new InfernoBeamDown(new FireWave(), pos, xDir, player, netProjByte);
 				break;
@@ -366,6 +372,15 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.PeaceOutRoller:
 				proj = new PeaceOutRollerProj(new VileBall(VileBallType.PeaceOutRoller), pos, xDir, player, 0, netProjByte);
+				break;
+			case (int)ProjIds.PeaceOutRoller2:
+				proj = new PeaceOutRollerProj(new VileBall(VileBallType.PeaceOutRoller), pos, xDir, player, 1, netProjByte);
+				break;
+			case (int)ProjIds.DynamoAirBuster:
+				proj = new DynamoAirBuster(new XBuster(), pos, xDir, player, 0, netProjByte);
+				break;
+			case (int)ProjIds.DynamoAirBuster2:
+				proj = new DynamoAirBuster(new XBuster(), pos, xDir, player, 1, netProjByte);
 				break;
 			case (int)ProjIds.NecroBurst:
 				proj = new NecroBurstProj(new VileLaser(VileLaserType.NecroBurst), pos, xDir, player, netProjByte);
@@ -496,6 +511,10 @@ public partial class RPCCreateProj : RPC {
 					pos, xDir, extraData[0] == 1, player, netProjByte
 				);
 				break;
+			case (int)ProjIds.DynamoCross:
+				proj = new DynamoCrossProj(new ShieldBoomerang(), pos, xDir, player, netProjByte);
+				break;
+
 			case (int)ProjIds.ShieldBoomerang:
 				proj = new ShieldBoomerangProj(new ShieldBoomerang(), pos, xDir, player, netProjByte);
 				break;
@@ -647,8 +666,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.FakeZeroMelee:
 				proj = new FakeZeroMeleeProj(FakeZero.getWeapon(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.FakeZeroGroundPunch:
-				proj = new FakeZeroRockProj(new SigmaElectricBallWeapon(), pos, xDir, player, netProjByte);
+		
+			case (int)ProjIds.FakeZeroRockProj:
+				proj = new FakeZeroRockProj(FakeZero.getWeapon(), pos, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma2Ball:
 				proj = new SigmaElectricBallProj(new SigmaElectricBallWeapon(), pos, 0, player, netProjByte);

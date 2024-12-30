@@ -47,17 +47,17 @@ public override bool normalCtrl() {
 
 		
 
-		player.vileAmmo += 1;
+			player.vileAmmo += Global.spf * 15;
+			if (player.vileAmmo > player.vileMaxAmmo) {
+				player.vileAmmo = 0;
+				ZainCounters += 1;
+			}
+
 		if (ZainCounters >8 ) ZainCounters =8;
 		if (ZainCounters < 0) ZainCounters = 0;
-		if (CounterTimer == 0 && CounterAddcooldown == 0){
-		ZainCounters += 1;
-		CounterTimer = 4;
-		CounterAddcooldown = 2;
-		player.vileAmmo = 0;
-		
-		} 
-		
+
+
+	
 
 		
 
@@ -78,34 +78,63 @@ public override bool normalCtrl() {
 		}
 
 		
+		if (charState.attackCtrl){
+			if ((charState is AirDash) 
+			&& (player.input.isPressed(Control.Shoot, player)
+			|| player.input.isPressed(Control.Special1, player))){
+			slideVel = xDir * getDashSpeed();			
+			}
+		}
+
+		
 		if (player.input.isHeld(Control.Down,player)
 		&& charState is Dash or AirDash or Fall or Jump &&
 		!sprite.name.Contains("spinslash")){
 		changeSpriteFromName("spinslash", true);
 		}
 
-		if (charState.attackCtrl && SlashCooldown == 0 &&
+		if (player.input.isHeld(Control.Special1,player)
+		&& charState.attackCtrl && 
+		!sprite.name.Contains("jab")){
+		changeSpriteFromName("jab", true);
+		}
+
+		if (sprite.name.Contains("jab") && isAnimOver()){
+		changeToIdleOrFall();
+		}
+
+		if (charState.attackCtrl  &&
 		 player.input.isPressed(Control.Shoot, player))
 		{	
-			SlashCooldown = 0.5f;
+			
        		changeState(new ZainProjSwingState(grounded, shootProj: false), forceChange: true);
 		}
-		if (charState.attackCtrl  && grounded && ZainCounters > 3 &&
+
+		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 0 &&
+		 player.input.isPressed(Control.WeaponRight, player))
+		{	
+			changeState(new ZainKokuSlash(grounded, shootProj: false), forceChange: true);
+			ZainCounters -= 1;
+       }
+
+		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 3 &&
 		 player.input.isPressed(Control.Special2, player))
 		{	
 			changeState(new ZainProjSwingState(grounded, shootProj: true), forceChange: true);
 			ZainCounters -= 4;
-			CounterTimer = 4;
        }
-		if (charState.attackCtrl && SlashCooldown == 0f &&
-		 player.input.isPressed(Control.WeaponRight, player))
-					{
-			SlashCooldown = 1f;     
+
+
+		if ((charState.attackCtrl || charState.bonusAttackCtrl) 
+		 &&	 player.input.isPressed(Control.WeaponLeft, player) 
+		 && player.input.isHeld(Control.Up,player))
+			{ 
 			changeState(new ZainParryStartState(), true);
-		}
+			}
 		
-		 if  (player.input.isPressed(Control.WeaponLeft,player) && parryCooldown == 0 &&
-				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
+		 if  (player.input.isPressed(Control.WeaponLeft,player)
+		  &&  (charState.attackCtrl || charState.bonusAttackCtrl) 
+				 && !player.input.isHeld(Control.Up,player)
 			  ) {
 				if (unpoAbsorbedProj != null) {
 					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
@@ -123,11 +152,23 @@ public override bool normalCtrl() {
 					unpoAbsorbedProj = null;	
 				}
 			  }
-
-		
-		
-		
 	}
+
+
+	public override bool isToughGuyHyperMode() {
+		return true;
+	}
+
+	public override void addAmmo(float amount) {
+		weaponHealAmount += amount;
+	}
+	public override void addPercentAmmo(float amount) {
+		weaponHealAmount += amount * 0.32f;
+	}
+	public override bool canAddAmmo() {
+		return player.vileAmmo < player.vileMaxAmmo;
+	}
+
 
 
 // This can run on both owners and non-owners. So data used must be in sync
@@ -151,18 +192,39 @@ public override bool normalCtrl() {
 				ShouldClang : true
 			);
 		}
-		if (  sprite.name.Contains("projswing"))
+		if (  sprite.name.Contains("projswing_air"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.UPPunch, player, 5f, 30, 0.15f, ShouldClang : true);
+			 ProjIds.ZSaber3, player, 4f, 30, 0.15f, ShouldClang : true);
+		}
+		if (  sprite.name.Contains("jab"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.UPPunch, player, 2f, 10, 0.15f, ShouldClang : true);
+		}
+		if (  sprite.name.Contains("slash") && !sprite.name.Contains("uppercut"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.ZSaber2, player, 3f, 20, 0.15f, ShouldClang : true);
+		}
+		if (  sprite.name.Contains("uppercut"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.ZSaber1, player, 3f, 20, 0.15f, ShouldClang : true,
+			 isJuggleProjectile : true);
+		}
+		if (  sprite.name.Contains("projswing") && !sprite.name.Contains("air"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.MechFrogGroundPound , player, 5f, 20, 0.15f, ShouldClang : true);
 		}
 		if (  sprite.name.Contains("parry"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.VileSuperKick, player, 1f, 0, 0.15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, player, 1f, 0, 0.15f);
 		}
 		if (  sprite.name.Contains("thrust"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.Raijingeki, player, 2f, 0, 0.15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.NormalPush, player, 2f, 0, 0.15f);
 		}
 		return null;
 	}

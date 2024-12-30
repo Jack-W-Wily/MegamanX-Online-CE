@@ -264,7 +264,7 @@ public class ParasiteCarry : CharState {
 }
 
 public class BeeSwarm {
-	public MegamanX mmx;
+	public Character mmx;
 	public List<BeeCursorAnim> beeCursors = new List<BeeCursorAnim>();
 	int currentIndex;
 	float currentTime = 0f;
@@ -357,13 +357,19 @@ public class BeeSwarm {
 
 public class BeeCursorAnim : Anim {
 	public int state = 0;
-	MegamanX? character;
+	Character? character;
 	Player player;
 	public Actor? target;
 	public BeeCursorAnim(Point pos, Character character)
 		: base(pos, "parasite_cursor_start", 1, character.player.getNextActorNetId(), false, true, character.ownedByLocalPlayer) {
-		this.character = character as MegamanX;
 		player = character.player;
+	
+		if (player.isX){
+		this.character = character as MegamanX;
+		}
+		if (player.isX){
+		this.character = character as XMID;
+		}
 	}
 
 	public override void update() {
@@ -401,8 +407,8 @@ public class BeeCursorAnim : Anim {
 						//character.chargeTime = character.charge3Time;
 						//character.shoot(character.getChargeLevel());
 						if (character.charState.attackCtrl) {
-							character.setShootAnim();
-							character.shootAnimTime = Character.DefaultShootAnimTime;
+						//	character.setShootAnim();
+						//	character.shootAnimTime = Character.DefaultShootAnimTime;
 						}
 						character.currentWeapon?.addAmmo(-player.weapon.getAmmoUsage(3), player);
 						character.chargeTime = 0;

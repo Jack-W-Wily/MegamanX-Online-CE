@@ -28,6 +28,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.Tornado, TornadoProj.rpcInvoke },
 		{ (int)ProjIds.TornadoCharged, TornadoProjCharged.rpcInvoke },
 		{ (int)ProjIds.ElectricSpark, ElectricSparkProj.rpcInvoke },
+		
 		{ (int)ProjIds.ElectricSparkChargedStart, ElectricSparkProjChargedStart.rpcInvoke },
 		{ (int)ProjIds.ElectricSparkCharged, ElectricSparkProjCharged.rpcInvoke },
 		{ (int)ProjIds.Boomerang, BoomerangProj.rpcInvoke },
@@ -85,6 +86,10 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.TornadoFangCharged, TornadoFangProjCharged.rpcInvoke },
 		{ (int)ProjIds.XSaberProj, XSaberProj.rpcInvoke },
 
+		// X4 Projs
+		{ (int)ProjIds.DoubleCyclone, DoubleCycloneProj.rpcInvoke },
+	
+
 		//EXTRA
 		{ (int)ProjIds.UPParryMelee, UPParryMeleeProj.rpcInvoke },
 		{ (int)ProjIds.UPParryProj, UPParryRangedProj.rpcInvoke },
@@ -97,6 +102,9 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.DZBuster, DZBusterProj.rpcInvoke },
 		{ (int)ProjIds.DZBuster2, DZBuster2Proj.rpcInvoke },
 		{ (int)ProjIds.DZBuster3, DZBuster3Proj.rpcInvoke },
+
+		// Dynamo
+			{ (int)ProjIds.DynamoIceDagger, DynamoKnifeProj.rpcInvoke },
 		// Mavericks
 		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke },
 	};

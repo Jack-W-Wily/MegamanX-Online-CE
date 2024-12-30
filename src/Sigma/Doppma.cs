@@ -159,7 +159,7 @@ public class Doppma : BaseSigma {
 
 		if (sprite.name.Contains("throw")) {
 			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.VileSuperKick, player,
+				new Weapon(), centerPoint, ProjIds.NormalPush, player,
 				damage: 2, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true
 			);
 		}

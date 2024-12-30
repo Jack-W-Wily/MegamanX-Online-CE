@@ -373,9 +373,8 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		base.onDestroy();
 		if (!ownedByLocalPlayer) return;
 
-		if (damager.owner.character is MegamanX mmx) {
-			mmx.chargedGravityWell = null;
-		}
+			owner.character.chargedGravityWell = null;
+		
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
@@ -396,7 +395,6 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 
 public class GravityWellChargedState : CharState {
 	bool fired = false;
-	MegamanX? mmx;
 
 	public GravityWellChargedState() : base("point_up", "", "", "") {
 		superArmor = true;
@@ -408,8 +406,8 @@ public class GravityWellChargedState : CharState {
 		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			stateTime = 0;
-			if (mmx != null) {
-				mmx.chargedGravityWell = new GravityWellProjCharged(
+			if (character != null) {
+				character.chargedGravityWell = new GravityWellProjCharged(
 					character.getShootPos(), 1,
 					player.input.isHeld(Control.Down, player) ? -1 : 1,
 					player, player.getNextActorNetId(), rpc: true
@@ -424,7 +422,6 @@ public class GravityWellChargedState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = character as MegamanX;
 		character.useGravity = false;
 		character.vel = new Point();
 	}

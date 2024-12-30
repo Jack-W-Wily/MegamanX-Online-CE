@@ -43,10 +43,10 @@ public class SpinWheel : Weapon {
 		if (chargeLevel == 2) {
 			new WheelGSpinWheelProj(this, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 		}
-		if (chargeLevel == 3) {
+		if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 		new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
-		if (chargeLevel == 4) {
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 		new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);
 		Global.level.delayedActions.Add(new DelayedAction(() => {
 		new SpinWheelProjChargedStart(this, pos, xDir, player, player.getNextActorNetId(), true);

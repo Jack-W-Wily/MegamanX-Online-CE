@@ -31,15 +31,16 @@ public class ShotgunIce : Weapon {
 
 		if (chargeLevel < 3) {
 			new ShotgunIceProj(this, pos, xDir, player, 0, player.getNextActorNetId(), rpc: true);
-		} else if (character is MegamanX mmx) {
+		} 
+		 if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 			pos = pos.addxy(xDir * 25, 0);
-			pos.y = mmx.pos.y;
+			pos.y = character.pos.y;
 
 			//mmx.shotgunIceChargeTime = 1.5f;
 
 			new ShotgunIceProjSled(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
-		if (chargeLevel == 4){
+	if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 				float topY = Global.level.getTopScreenY(character.pos.y);
 				
 			new ChillPBlizzardProj(

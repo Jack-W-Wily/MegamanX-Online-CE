@@ -186,15 +186,15 @@ public class RayGunProj : Projectile {
 
 	public override void update() {
 		base.update();
-
+/*
 				//HeadShot Code
 			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
-				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
-				damager.damage = 0;
+				//damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
+				damager.damage = 1;
 				playSound("hurt");
 				return;
 			}
-			//>>>>>>>>>>>>>>>>>>>>>>
+			//>>>>>>>>>>>>>>>>>>>>>>*/
 
 
 		if (lenDelay > 0.01f) {

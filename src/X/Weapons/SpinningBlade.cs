@@ -43,10 +43,18 @@ public class SpinningBlade : Weapon {
 			player.setNextActorNetId(player.getNextActorNetId());
 			new SpinningBladeProj(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
 			new SpinningBladeProj(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
-		} else if (character is MegamanX mmx) {
+		} else{
+			if (character is MegamanX mmx) {
 			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 			if (mmx.ownedByLocalPlayer) {
 				mmx.chargedSpinningBlade = csb;
+			}
+			}
+		 if (character is XMID mmx2) {
+			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
+			if (mmx2.ownedByLocalPlayer) {
+				mmx2.chargedSpinningBlade = csb;
+			}
 			}
 		}
 	}
@@ -134,7 +142,7 @@ public class SpinningBladeProj : Projectile {
 }
 
 public class SpinningBladeProjCharged : Projectile {
-	public MegamanX? mmx;
+	public Character? mmx;
 	public float xDist;
 	const float maxXDist = 90;
 	public float spinAngle;

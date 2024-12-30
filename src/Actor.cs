@@ -1456,6 +1456,7 @@ public partial class Actor : GameObject {
 				NeoSigma => "neosigma",
 				Doppma => "doppma",
 				Zain => "zain",
+				Dynamo => "Dynamo",
 				_ => "error"
 			};
 

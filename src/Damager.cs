@@ -246,15 +246,19 @@ public class Damager {
 			switch (projId) {
 				case (int)ProjIds.CrystalHunter:
 					character?.crystalize();
+					maverick?.crystalize();
 					break;
 				case (int)ProjIds.SpreadShot:
 					character?.crystalize();
+					maverick?.crystalize();
 					break;
 				case (int)ProjIds.MK2StunShot:
 					character?.crystalize();
+					maverick?.crystalize();
 					break;
 				case (int)ProjIds.CSnailCrystalHunter:
 					character?.crystalize();
+					maverick?.crystalize();
 					break;
 				case (int)ProjIds.AcidBurst:
 					damagerMessage = onAcidDamage(damagable, owner, 2);
@@ -291,6 +295,7 @@ public class Damager {
 				case (int)ProjIds.Raijingeki:
 				case (int)ProjIds.Raijingeki2:
 					character?.paralize();
+					maverick?.paralize();
 					break;
 			}
 			if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
@@ -439,6 +444,12 @@ public class Damager {
 		}
 
 
+		if (((projId == (int)ProjIds.ForceGrabState) &&	 !victim.sprite.name.Contains("knocked"))
+		&& !character.isStatusImmune()) {		
+		character.changeState(new VileMK2Grabbed(owner.character), true);
+		}
+
+
 			// Damage Scaling	
 			if (character != null){
 				character.DamageScaling += 1;
@@ -562,6 +573,7 @@ public class Damager {
 					character.addIgFreezeProgress(2);
 					break;
 				case (int)ProjIds.ShotgunIce:
+				case (int)ProjIds.DynamoIceDagger:
 					character.addIgFreezeProgress(2);
 					break;
 				case (int)ProjIds.ShotgunIceSled:
@@ -611,16 +623,24 @@ public class Damager {
 				case (int)ProjIds.FlameMStompShockwave:
 				case (int)ProjIds.TBreakerProj:
 				case (int)ProjIds.ZBuster4:
+				case (int)ProjIds.UPParryMelee:
+				
 					if (character.ownedByLocalPlayer) {
 						character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 					}
 					break;
 				case (int)ProjIds.VileSuperKick:
+				case (int)ProjIds.HeavyPush:
 				case (int)ProjIds.PZeroYoudantotsu:
-					if (character.ownedByLocalPlayer) {
+					if (character.ownedByLocalPlayer && !character.charState.stunResistant) {
 						character.changeState(new PushedOver(character.pos.x < damagingActor?.pos.x ? 1 : -1), true);
 					}
 					break;
+				case (int)ProjIds.NormalPush:
+					if (character.ownedByLocalPlayer && !character.charState.stunResistant) {
+						character.changeState(new PushedOver2(character.pos.x < damagingActor?.pos.x ? 1 : -1), true);
+					}
+						break;
 				case (int)ProjIds.MechFrogGroundPound:
 					if (!character.grounded) {
 						character.vel.y += 300;
@@ -632,6 +652,7 @@ public class Damager {
 					character.playSound("flamemOil");
 					break;
 				case (int)ProjIds.DarkHold:
+				case (int)ProjIds.DarkHoldD:
 					character.addDarkHoldTime(DarkHoldState.totalStunTime, owner);
 					break;
 				case (int)ProjIds.MagnaCTail:
@@ -888,7 +909,7 @@ public class Damager {
 				//	if (!maverick.player.isTagTeam()) {
 				//		flinch = 0;
 				//	} 
-					if (maverick.player.isTagTeam()) {
+					if (!maverick.player.isTagTeam()) {
 						// Large mavericks
 						if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
 							if (flinch <= Global.miniFlinch) {

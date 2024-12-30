@@ -479,6 +479,7 @@ public enum ProjIds {
 	VileEBombStart,
 	VileEBomb,
 	PeaceOutRoller,
+	PeaceOutRoller2,
 	RumblingBangGrenade,
 	FlameRoundGrenade,
 	SplashHitGrenade,
@@ -502,6 +503,7 @@ public enum ProjIds {
 	VileStomp2,
 	VileStomp,
 	VileSuperKick,
+
 	VileAirRaidStart,
 	VileAirRaidPlusKnock,
 	BanzaiBeetleProj,
@@ -665,6 +667,7 @@ public enum ProjIds {
 	FakeZeroBuster2,
 	FakeZeroSwordBeam,
 	FakeZeroGroundPunch,
+	FakeZeroRockProj,
 	BBuffaloIceProj,
 	BBuffaloIceProjGround,
 	BBuffaloBeam,
@@ -762,8 +765,24 @@ public enum ProjIds {
 	ShieldBoomerang,
 	ShieldBoomerang2,
 
+
+	// Dynamo Stuff
+
+	DynamoCross,
+	DynamoAirBuster,
+	DynamoAirBuster2,
+	DynamoBeam,
+	DynamoBoomerangProj,
+	DynamoIceDagger,
+
+	DarkHoldD,
+
 	// Extras
 	BlockableLaunch,
+
+		NormalPush,
+		HeavyPush,
+	ForceGrabState,
 
 	// Special damage types.
 	SelfDmg = 30000,

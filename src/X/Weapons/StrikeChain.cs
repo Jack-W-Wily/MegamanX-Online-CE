@@ -37,11 +37,11 @@ public class StrikeChain : Weapon {
 		if (player.input.isHeld(Control.Up, player)) upOrDown = -1;
 		else if (player.input.isHeld(Control.Down, player)) upOrDown = 1;
 
-		if (chargeLevel == 4) {
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 			player.character.changeState(new StrikeChainLightningState());
 		} 
 
-		if (chargeLevel == 3) {
+		 if (chargeLevel == 3 || chargeLevel >= 3  && player.hasArmArmor(2)) {
 
 			new StrikeChainProjCharged(this, pos, xDir, player, player.getNextActorNetId(), upOrDown, true);
 		} 
@@ -182,7 +182,7 @@ public class StrikeChainProj : Projectile {
 
 	int upOrDown;
 	int startDir;
-	MegamanX mmx;
+	Character mmx;
 	Player player;
 	float dist;
 	float distRetracted;
@@ -211,7 +211,12 @@ public class StrikeChainProj : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		if (player.isX){
+		mmx = player.character as MegamanX;
+		}
+		if (player.isRageX){
+		mmx = player.character as XMID;
+		}
 		mmx.strikeChainProj = this;
 		this.player = player;
 
@@ -425,7 +430,7 @@ public class StrikeChainSemiCharged : Projectile {
 
 	int upOrDown;
 	int startDir;
-	MegamanX mmx;
+	Character mmx;
 	Player player;
 	float dist;
 	float distRetracted;
@@ -453,7 +458,12 @@ public class StrikeChainSemiCharged : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		if (player.isX){
+		mmx = player.character as MegamanX;
+		}
+		if (player.isRageX){
+		mmx = player.character as XMID;
+		}
 		mmx.strikeChainSemiChargedProj = this;
 		this.player = player;
 
@@ -667,7 +677,8 @@ public class StrikeChainProjCharged : Projectile {
 
 	int upOrDown;
 	int startDir;
-	MegamanX mmx;
+	Character mmx;
+
 	Player player;
 	float dist;
 	float distRetracted;
@@ -695,7 +706,12 @@ public class StrikeChainProjCharged : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		if (player.isX){
+		mmx = player.character as MegamanX;
+		}
+		if (player.isRageX){
+		mmx = player.character as XMID;
+		}
 		mmx.strikeChainChargedProj = this;
 		this.player = player;
 

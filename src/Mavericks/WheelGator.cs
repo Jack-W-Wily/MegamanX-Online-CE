@@ -114,7 +114,7 @@ public class WheelGator : Maverick {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGGrab, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 		}
 		if (sprite.name.Contains("slash") && deltaPos.y <= 0) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.VileSuperKick, player, damage: 2, flinch: 0, hitCooldown: 0.5f, owningActor: this);
+			return new GenericMeleeProj(weapon, centerPoint, ProjIds.HeavyPush, player, damage: 2, flinch: 0, hitCooldown: 0.5f, owningActor: this);
 		}
 		if (sprite.name.Contains("fall")) {
 			return new GenericMeleeProj(weapon, centerPoint, ProjIds.ZSaber1, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this

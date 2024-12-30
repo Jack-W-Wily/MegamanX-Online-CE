@@ -850,22 +850,22 @@ public class Zero : Character {
 		return id switch {
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber1, player, 1, 4, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber1, player, Global.miniFlinch, 2, 0.25f, isReflectShield: true,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber2, player, 1, 10, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber2, player, 1, Global.miniFlinch, 0.25f, isReflectShield: true,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
-				2, Global.defFlinch, 0.25f, isReflectShield: true,
+				1, Global.halfFlinch, 0.15f, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 2, 4, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 2, 8, 0.25f, isReflectShield: true,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
@@ -881,13 +881,13 @@ public class Zero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
-				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.halfFlinch, 0.25f,
+				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.defFlinch, 0.25f,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 4, 0.25f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, Global.miniFlinch, 0.25f, isReflectShield: true,
 				isJuggleProjectile: true,
 				ShouldClang : true,
 				addToLevel: addToLevel

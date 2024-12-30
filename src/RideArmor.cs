@@ -156,7 +156,7 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
-		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && (vile.isVileMK5 || Options.main.vileLoadout.cannon == 2);
+		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && (vile.isVileMK5 || player.loadout.vileLoadout.cannon  == 2);
 
 		// Health bar
 		if (ownedByLocalPlayer && isVileMk5 && !isInvincible(null, null)) {
@@ -1232,7 +1232,7 @@ public class RideArmorState {
 				rideArmor.move(move);
 			}
 
-			if (!rideArmor.ownedByMK5 && (rideArmor.raNum == 3
+			if ((rideArmor.raNum == 3
 			|| rideArmor.raNum == 4  )
 			
 			&& 
@@ -1724,7 +1724,7 @@ public class RAFall : RideArmorState {
 }
 
 public class RAGroundPoundStart : RideArmorState {
-	public RAGroundPoundStart(string transitionSprite = "") : base("groundpound_start") {
+	public RAGroundPoundStart(string transitionSprite = "") : base("frog_groundpound_start") {
 	}
 
 	public override void update() {
@@ -1739,6 +1739,10 @@ public class RAGroundPoundStart : RideArmorState {
 
 	public override void onEnter(RideArmorState? oldState) {
 		base.onEnter(oldState);
+
+		if (rideArmor.raNum == 4){
+		rideArmor.changeSprite("goliath_groundpound_start", true);
+		}
 		rideArmor.vel = new Point();
 		rideArmor.useGravity = false;
 	}
@@ -1750,7 +1754,7 @@ public class RAGroundPoundStart : RideArmorState {
 }
 
 public class RAGroundPound : RideArmorState {
-	public RAGroundPound(string transitionSprite = "") : base("groundpound") {
+	public RAGroundPound(string transitionSprite = "") : base("frog_groundpound") {
 	}
 
 	public override void update() {
@@ -1764,12 +1768,15 @@ public class RAGroundPound : RideArmorState {
 
 	public override void onEnter(RideArmorState? oldState) {
 		base.onEnter(oldState);
+		if (rideArmor.raNum == 4){
+		rideArmor.changeSprite("goliath_groundpound", true);
+		}
 		rideArmor.vel = new Point(0, 400);
 	}
 }
 
 public class RAGroundPoundLand : RideArmorState {
-	public RAGroundPoundLand(string transitionSprite = "") : base("groundpound_land") {
+	public RAGroundPoundLand(string transitionSprite = "") : base("frog_groundpound_land") {
 	}
 
 	public override void update() {
@@ -1782,6 +1789,9 @@ public class RAGroundPoundLand : RideArmorState {
 
 	public override void onEnter(RideArmorState? oldState) {
 		base.onEnter(oldState);
+		if (rideArmor.raNum == 4){
+		rideArmor.changeSprite("goliath_groundpound_land", true);
+		}
 		if (player == null) return;
 		rideArmor.playSound("crash", sendRpc: true);
 		new MechFrogStompShockwave(new MechFrogStompWeapon(player), rideArmor.pos.addxy(6 * rideArmor.xDir, 0), rideArmor.xDir, player, player.getNextActorNetId(), rpc: true);
@@ -2215,6 +2225,7 @@ public class InRideArmor : CharState {
 	public bool winTaunt;
 	public float innerCooldown;
 	public InRideArmor(string transitionSprite = "") : base("ra_idle", "", "", transitionSprite) {
+
 	}
 
 	public override void update() {
@@ -2278,7 +2289,10 @@ public class InRideArmor : CharState {
 						character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
 					}
 				}
-			} else if (!character.sprite.name.Contains("ra_show") || character.sprite.isAnimOver()) {
+			} else if (!character.sprite.name.Contains("ra_bomb") ||
+				!character.sprite.name.Contains("ra_taunt") ||
+				!character.sprite.name.Contains("ra_show") ||
+			 character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
 			}
 		} //else {

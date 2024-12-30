@@ -415,6 +415,48 @@ public class PushedOver : CharState {
 
 
 
+public class PushedOver2 : CharState {
+	public int hurtDir;
+	public float hurtSpeed;
+	public float flinchTime;
+	public PushedOver2(int dir) : base("hurt") {
+		hurtDir = dir;
+		hurtSpeed = dir * 300;
+		flinchTime = 0.5f;
+	}
+
+	public override bool canEnter(Character character) {
+		if (character.isStatusImmune()) return false;
+		if (character.charState.superArmor || character.charState.invincible) return false;
+		if (character.isInvulnerable()) return false;
+		if (character.vaccineTime > 0) return false;
+		return base.canEnter(character);
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -300;
+	}
+
+	public override void update() {
+		base.update();
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
+			character.move(new Point(hurtSpeed, 0));
+		}
+
+		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+			player.character.increaseCharge();
+		}
+
+		if (stateTime >= flinchTime) {
+			character.changeState(new Idle(), true);
+		}
+	}
+}
+
+
+
 
 public class LaunchedState : GenericGrabbedState {
 	public Character grabbedChar;

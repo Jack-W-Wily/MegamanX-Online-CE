@@ -34,7 +34,7 @@ public class AcidBurst : Weapon {
 			player.setNextActorNetId(player.getNextActorNetId());
 			new AcidBurstProjCharged(this, pos, xDir, 0, player, player.getNextActorNetId(true), true);
 			new AcidBurstProjCharged(this, pos, xDir, 1, player, player.getNextActorNetId(true), true);
-		if (chargeLevel == 4){
+		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 			new AcidBurstProj(this, pos, -xDir, player, player.getNextActorNetId(), true);
 			new AcidBurstProj(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}

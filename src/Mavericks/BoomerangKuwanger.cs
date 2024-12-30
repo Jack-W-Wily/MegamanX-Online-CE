@@ -163,7 +163,7 @@ public class BoomerangKuwanger : Maverick {
 				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this);
 		}
 		if (sprite.name.Contains("boomerk_kick")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.VileSuperKick, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this);
+				return new GenericMeleeProj(weapon, centerPoint, ProjIds.NormalPush, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this);
 		}
 		if (sprite.name.Contains("boomerk_fall")) {
 				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);

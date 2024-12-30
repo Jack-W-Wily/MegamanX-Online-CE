@@ -228,6 +228,9 @@ public class RocketPunchAttack : CharState {
 	float specialPressTime;
 	Vile vile = null!;
 
+		public float pushBackSpeed;
+
+
 	public RocketPunchAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
 	}
 
@@ -269,6 +272,26 @@ public class RocketPunchAttack : CharState {
 				}
 			}
 		}
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
 	}
 
 	public void shoot() {
@@ -286,11 +309,6 @@ public class RocketPunchAttack : CharState {
 		stateTime = 0;
 		shot = false;
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
-	}
 }
 
 
@@ -301,6 +319,9 @@ public class GoGetterRightAttack : CharState {
 	RocketPunchProj? proj;
 	float specialPressTime;
 	Vile vile = null!;
+
+
+	public float pushBackSpeed;
 
 	public GoGetterRightAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
 	}
@@ -343,6 +364,26 @@ public class GoGetterRightAttack : CharState {
 				}
 			}
 		}
+			if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
 	}
 
 	public void shoot() {
@@ -361,10 +402,12 @@ public class GoGetterRightAttack : CharState {
 		shot = false;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
+		public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
 	}
+
+
 }
 
 
@@ -374,6 +417,9 @@ public class InfinityGigAttack : CharState {
 	RocketPunchProj? proj;
 	float specialPressTime;
 	Vile vile = null!;
+
+		public float pushBackSpeed;
+
 
 	public InfinityGigAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
 	}
@@ -416,8 +462,33 @@ public class InfinityGigAttack : CharState {
 				}
 			}
 		}
+			if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
 	}
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+
+		public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+	
 	public void shoot() {
 		shot = true;
 		character.playSound("rocketPunch", sendRpc: true);
@@ -434,10 +505,7 @@ public class InfinityGigAttack : CharState {
 		shot = false;
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
-	}
+
 }
 
 
@@ -450,6 +518,9 @@ public class SpoiledBratPunch : CharState {
 	float specialPressTime;
 	float shootcd;
 	bool grounded;
+
+		public float pushBackSpeed;
+
 	public SpoiledBratPunch(string transitionSprite = "") : base("spoiled_brat", "", "", transitionSprite) {
 	this.grounded = grounded;
 	airMove = true;
@@ -480,8 +551,32 @@ public class SpoiledBratPunch : CharState {
 				}
 			
 		
+			if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
 	}
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		specialPressTime = 0.25f;
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+
+		public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
 	public void shoot() {
 		character.playSound("rocketPunch", sendRpc: true);
 		var poi = character.sprite.getCurrentFrame().POIs[0];
@@ -497,9 +592,6 @@ public class SpoiledBratPunch : CharState {
 		shot = false;
 	}
 
-		public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		specialPressTime = 0.25f;
-	}
+
 
 }

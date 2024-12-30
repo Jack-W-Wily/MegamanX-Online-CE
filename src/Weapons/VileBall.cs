@@ -154,7 +154,10 @@ public class PeaceOutRollerProj : Projectile {
 	) {
 		projId = (int)ProjIds.PeaceOutRoller;
 		maxTime = 0.5f;
-		if (type == 1) maxTime = 0.4f;
+		if (type == 1) {
+		maxTime = 0.4f;
+		projId = (int)ProjIds.PeaceOutRoller2;
+		}
 		destroyOnHit = false;
 		this.type = type;
 		if (vel != null) this.vel = (Point)vel;

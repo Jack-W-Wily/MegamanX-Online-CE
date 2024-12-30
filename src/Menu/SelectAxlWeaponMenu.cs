@@ -257,9 +257,9 @@ public class SelectAxlWeaponMenu : IMainMenu {
 					if (canAfford) {
 						if (mainPlayer.axlBulletTypeBought[index] == false) {
 							mainPlayer.axlBulletTypeBought[index] = true;
-							mainPlayer.axlBulletTypeAmmo[index] = 32;
+							mainPlayer.axlBulletTypeAmmo[index] = 532;
 						} else {
-							mainPlayer.axlBulletTypeAmmo[index] += 32;
+							mainPlayer.axlBulletTypeAmmo[index] += 532;
 						}
 						Global.playSound("ching");
 					} else {

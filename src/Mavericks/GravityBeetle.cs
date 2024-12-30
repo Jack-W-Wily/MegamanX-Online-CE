@@ -340,14 +340,17 @@ public class BeetleGrabbedState : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-			if (character.stopCeiling()) {
-				(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
+				for (int i = 1; i <= 4; i++) {
+				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
+				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
+					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+				
+					(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
 				character.playSound("crash", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}
-			return;
+			}
 		}
-
 		if (grabber.sprite?.name.EndsWith("_dash_lift") == true) {
 			if (grabber.frameIndex < 2) {
 				trySnapToGrabPoint(true);

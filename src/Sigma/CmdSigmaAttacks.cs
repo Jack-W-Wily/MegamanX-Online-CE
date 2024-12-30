@@ -225,11 +225,11 @@ public class SigmaSlashState : CharState {
 			landSprite = "attack";
 		}
 
-		if (prevCharState is Dash) {
-			if (character.frameIndex < attackFrame) {
-				character.move(new Point(character.getDashSpeed() * character.xDir, 0));
-			}
-		}
+		//if (prevCharState is Dash) {
+		//	if (character.frameIndex < attackFrame) {
+		//		character.move(new Point(character.getDashSpeed() * character.xDir, 0));
+		//	}
+		//}
 
 		if (character.frameIndex >= attackFrame && !fired) {
 			fired = true;
