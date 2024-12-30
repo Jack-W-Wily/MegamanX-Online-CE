@@ -546,6 +546,26 @@ public partial class Level {
 		return triggers;
 	}
 
+	public List<CollideData> getTerrainTriggerList(Shape shape, params Type[] classTypes) {
+		var triggers = new List<CollideData>();
+		var gameObjects = getTerrainInSameCell(shape);
+		foreach (var go in gameObjects) {
+			if (classTypes.Length > 0 && !classTypes.Contains(go.GetType())) continue;
+			var otherColliders = go.getAllColliders();
+			if (otherColliders.Count == 0) continue;
+
+			foreach (var otherCollider in otherColliders) {
+				var isTrigger = otherCollider.isTrigger;
+				if (!isTrigger) continue;
+				var hitData = shape.intersectsShape(otherCollider.shape, null);
+				if (hitData != null) {
+					triggers.Add(new CollideData(null, otherCollider, null, isTrigger, go, hitData));
+				}
+			}
+		}
+		return triggers;
+	}
+
 
 	public List<CollideData> getTerrainTriggerList(
 		Actor actor, Point posIncrease, params Type[] classTypes
@@ -939,7 +959,7 @@ public partial class Level {
 				if (!isTrigger1 || !isTrigger2) {
 					continue;
 				}
-				HitData hitData = collider1.shape.intersectsShape(collider2.shape);
+				HitData? hitData = collider1.shape.intersectsShape(collider2.shape);
 				if (hitData != null) {
 					triggers1.Add(new CollideData(collider1, collider2, null, isTrigger1, secondObj, hitData));
 					triggers2.Add(new CollideData(collider2, collider1, null, isTrigger2, firstObj, hitData));
@@ -972,16 +992,16 @@ public partial class Level {
 
 	public List<CollideData> organizeTriggers(List<CollideData> triggerList) {
 		// Prioritize certain colliders over others, running them first
-			return triggerList.OrderBy(trigger => {
-				if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None &&
-					(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zero_block")) {
-					return 0;
-				} else if (trigger.otherCollider.originalSprite?.StartsWith("kaisersigma") == true && trigger.otherCollider.name == "head") {
-					return 0;
-				} else if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None && trigger.otherCollider.originalSprite == "drdoppler_absorb") {
-					return 0;
-				}
-				return 1;
-			}).ToList();
+		return triggerList.OrderBy(trigger => {
+			if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None &&
+				(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zero_block")) {
+				return 0;
+			} else if (trigger.otherCollider.originalSprite?.StartsWith("kaisersigma") == true && trigger.otherCollider.name == "head") {
+				return 0;
+			} else if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None && trigger.otherCollider.originalSprite == "drdoppler_absorb") {
+				return 0;
+			}
+			return 1;
+		}).ToList();
 	}
 }

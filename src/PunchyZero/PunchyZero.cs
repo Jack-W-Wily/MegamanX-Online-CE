@@ -13,7 +13,7 @@ public class PunchyZero : Character {
 	public int hyperMode;
 
 	// Hypermode timers.
-	public static readonly float maxBlackZeroTime = 40 * 60;
+	public static readonly float maxBlackZeroTime = 20 * 60;
 	public float hyperModeTimer;
 	public float scrapDrainCounter = 120;
 	public bool hyperOvertimeActive;
@@ -22,11 +22,6 @@ public class PunchyZero : Character {
 	public int awakenedAuraFrame;
 	public float awakenedAuraAnimTime;
 	public byte hypermodeBlink;
-
-
-	//buster stuff
-	public int stockedBusterLv;
-	public bool stockedSaber;
 
 	// Weapons.
 	public PunchyZeroMeleeWeapon meleeWeapon = new();
@@ -74,47 +69,24 @@ public class PunchyZero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 		hyperMode = pzeroLoadout.hyperMode;
-		spriteFrameToSounds["zerox1_run/4"] = "run";
-		spriteFrameToSounds["zerox1_run/8"] = "run";
 	}
 
 	public override void update() {
-
-		if (stockedBusterLv > 0 && player.input.isPressed(Control.Shoot,player)
-		&& charState is not PZeroDoubleBuster){
-				changeState(new PZeroDoubleBuster(true, true), true);
-		}
-
-			if (stockedBusterLv > 0 || stockedSaber) {
-			var renderGfx = stockedBusterLv switch {
-				_ when stockedSaber || stockedBusterLv == 2 => RenderEffectType.ChargeGreen,
-				1 => RenderEffectType.ChargePink,
-				2 => RenderEffectType.ChargeOrange,
-				_ => RenderEffectType.ChargeBlue
-			};
-			addRenderEffect(renderGfx, 0.033333f, 0.1f);
-		}
-
-
-		if (charState is WarpIn){
-		freeBusterShots = 3;
-		}
-
-		if (isAwakened || isBlack) {
+		if (isAwakened) {
 			updateAwakenedAura();
 		}
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("zero_X2", getCenterPos(), true);
+					addMusicSource("zero_X1", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
-					addMusicSource("CannonBall_megasfc", getCenterPos(), true);
+					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 				}
 			} else if (isViral && ownedByLocalPlayer) {
 				if (musicSource == null) {
-					addMusicSource("zero_X1", getCenterPos(), true);
+					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
 				}
 			} else {
 				destroyMusicSource();
@@ -125,15 +97,6 @@ public class PunchyZero : Character {
 			return;
 		}
 
-
-		if (charState is Crouch){
-				if (gigaAttack.ammo >= 28 &&
-				player.input.isPressed(Control.WeaponRight, player) ) {
-					gigaAttack.addAmmo(-28, player);			
-					changeState(new ZeroInferno(), true);	
-					
-		}
-		}
 		// Local update starts here.
 		inputUpdate();
 		Helpers.decrementFrames(ref donutTimer);
@@ -142,6 +105,7 @@ public class PunchyZero : Character {
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref diveKickCooldown);
 		Helpers.decrementFrames(ref uppercutCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
 		base.update();
@@ -178,7 +142,7 @@ public class PunchyZero : Character {
 			if (scrapDrainCounter > 0) {
 				scrapDrainCounter--;
 			} else {
-				scrapDrainCounter = 220;
+				scrapDrainCounter = 120;
 				player.currency--;
 				if (player.currency < 0) {
 					player.currency = 0;
@@ -224,8 +188,8 @@ public class PunchyZero : Character {
 	public void setShootAnim() {
 		string shootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
-			if (grounded) { shootSprite = "zerox1_shoot"; }
-			else { shootSprite = "zerox1_fall_shoot"; }
+			if (grounded) { shootSprite = "zero_shoot"; }
+			else { shootSprite = "zero_fall_shoot"; }
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
@@ -272,16 +236,10 @@ public class PunchyZero : Character {
 			);
 		} else if (chargeLevel == 3 || chargeLevel >= 4) {
 			currencyUse = 1;
-			if (!isViral){
 			playSound("buster4", sendRpc: true);
 			new ZBuster4Proj(
 				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
 			);
-			}
-			if (isViral)changeState(new PZeroDoubleBuster(false, true), true);
-			
-			
-				
 		}
 		if (currencyUse > 0) {
 			if (freeBusterShots > 0) {
@@ -371,15 +329,6 @@ public class PunchyZero : Character {
 
 	public override bool normalCtrl() {
 		// Hypermode activation.
-
-		if (charState.attackCtrl && charState is not Dash && grounded && 
-				player.input.isHeld(Control.Up, player) )
-			 {
-			turnToInput(player.input, player);
-			changeState(new SwordBlock());
-			return true;
-		}
-
 		int cost = Player.zeroHyperCost;
 		if (isAwakened) {
 			cost = 4;
@@ -480,12 +429,6 @@ public class PunchyZero : Character {
 				changeState(new PZeroShoryuken(), true);
 				return true;
 			}
-			if (yDir == 1) {
-				
-					changeState(new PZeroYoudantotsu(), true);
-				
-				return true;
-			}
 			if (grounded && isDashing) {
 				slideVel = xDir * getDashSpeed() * 0.8f;
 			}
@@ -500,12 +443,10 @@ public class PunchyZero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
-		if (//diveKickCooldown == 0 && 
-		(shootPressTime > 0 || specialPressTime > 0) && yDir == 1) {
+		if (diveKickCooldown == 0 && (shootPressTime > 0 || specialPressTime > 0) && yDir == 1) {
 			changeState(new PZeroDiveKickState(), true);
 			return true;
 		}
-	
 		if (shootPressTime > 0) {
 			changeState(new PZeroKick(), true);
 		}
@@ -515,48 +456,49 @@ public class PunchyZero : Character {
 	public bool groundSpcAttacks() {
 		int yDir = player.input.getYDir(player);
 		if (yDir == -1) {
-			changeState(new ZeroBurnKnuckle(), true);
+			changeState(new PZeroShoryuken(), true);
 			return true;
 		}
 		if (yDir == 1) {
 			if (gigaAttack.shootCooldown > 0 || gigaAttack.ammo < gigaAttack.getAmmoUsage(0)) {
 				return false;
 			}
-			if (!isAwakened){
-
-					if (isViral){
-					changeState(new Rakuhouha(new ShinMessenkou()), true);	
-					}else{
-					changeState(new ZeroRocks(new FakeZeroWeapon(player)), true);
-					}
+			if (gigaAttack is RekkohaWeapon) {
+				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+				changeState(new Rekkoha(gigaAttack), true);
 			} else {
-			changeState(new Rakuhouha(new ShinMessenkou()), true);		
+				gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+				changeState(new Rakuhouha(gigaAttack), true);
 			}
-				gigaAttack.addAmmo(-10, player);
-			
 			return true;
 		}
 		if (isDashing) {
 			slideVel = xDir * getDashSpeed() * 0.8f;
 		}
-		changeState(new PunchyZeroHadangeki(), true);
+		changeState(new PZeroYoudantotsu(), true);
 		return true;
 	}
 
 	public override bool canAirJump() {
-		return dashedInAir == 0 || isBlack;
+		return dashedInAir == 0;
 	}
 
 	public override string getSprite(string spriteName) {
-		return "zerox1_" + spriteName;
+		if (Global.sprites.ContainsKey("pzero_" + spriteName)) {
+			return "pzero_" + spriteName;
+		}
+		return "zero_" + spriteName;
 	}
 
 	public override bool isToughGuyHyperMode() {
 		return isBlack || isGenmuZero;
 	}
 	public override bool canShoot() {
-	//	if (isInvulnerableAttack()) return false;
-		return true;//base.canShoot();
+		if (isInvulnerableAttack()) return false;
+		return base.canShoot();
+	}
+	public bool hypermodeActive() {
+		return isBlack || isAwakened || isViral;
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -588,35 +530,18 @@ public class PunchyZero : Character {
 		return shaders;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		int meleeId = getHitboxMeleeId(hitbox);
-		if (meleeId == -1) {
-			return null;
-		}
-		Projectile? proj = getMeleeProjById(meleeId, centerPoint);
-		if (proj != null) {
-			proj.meleeId = meleeId;
-			proj.owningActor = this;
-			return proj;
-		}
-		return null;
-	}
-
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zerox1_punch" => MeleeIds.Punch,
-			"zerox1_punch2" => MeleeIds.Punch2,
-			"zerox1_spinkick" => MeleeIds.Spin,
-			"zerox1_kick_air" => MeleeIds.AirKick,
-			"zerox1_parry_start" => MeleeIds.Parry,
-			"zerox1_parry" => MeleeIds.ParryAttack,
-			"zerox1_shoryuken" or "zerox1_pipe_rising" => MeleeIds.Uppercut,
-			"zerox1_megapunch" => MeleeIds.StrongPunch,
-			"zerox1_dropkick" => MeleeIds.DropKick,
-			"zerox1_burnknuckle" => MeleeIds.BurnKnUckle,
-			"zerox1_block" => MeleeIds.Gokumonken,
-
-			"zerox1_pipe_attack" or "zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zero_punch" => MeleeIds.Punch,
+			"zero_punch2" => MeleeIds.Punch2,
+			"zero_spinkick" => MeleeIds.Spin,
+			"zero_kick_air" => MeleeIds.AirKick,
+			"zero_parry_start" => MeleeIds.Parry,
+			"zero_parry" => MeleeIds.ParryAttack,
+			"zero_shoryuken" => MeleeIds.Uppercut,
+			"zero_megapunch" => MeleeIds.StrongPunch,
+			"zero_dropkick" => MeleeIds.DropKick,
+			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
@@ -625,42 +550,31 @@ public class PunchyZero : Character {
 		Projectile? proj = id switch {
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
-				2, Global.halfFlinch, 0.25f,
-				ShouldClang : true,
+				2, 0, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 0.25f,
-				ShouldClang : true,
+				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch, 0.5f,
-				ShouldClang : true,
+				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 2, Global.halfFlinch, 0.25f,
-				ShouldClang : true,
+				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
-				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 3, Global.defFlinch, 0.5f,
-				ShouldClang : true,
-				isJuggleProjectile : true,
+				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 4, 0, 0.5f,
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, Global.defFlinch,
 				addToLevel: addToLevel
 			),
-			(int)MeleeIds.BurnKnUckle => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, 20, 0.5f,
-				addToLevel: addToLevel, ShouldClang : true
-			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 2, 30, 0.5f,
-				ShouldClang : true,
+				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Parry => new GenericMeleeProj(
@@ -668,33 +582,24 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ParryAttack => (new GenericMeleeProj(
-				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch, 0.5f,
-				ShouldClang : true,
+				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
 			(int)MeleeIds.AwakenedAura => (new GenericMeleeProj(
-				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 0, 0, 0.5f,
+				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 2, 0,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
-				3, Global.defFlinch, 0.5f, isReflectShield: true,
-				addToLevel: addToLevel
-			),
-			(int)MeleeIds.Gokumonken => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
+				3, Global.defFlinch, isReflectShield: true,
 				addToLevel: addToLevel
 			),
 			_ => null
 		};
-
-
-		
-
 		return proj;
 	}
 
@@ -707,12 +612,12 @@ public class PunchyZero : Character {
 					float damage = 2;
 					int flinch = 0;
 					if (isGenmuZero) {
-						damage = 0;
+						damage = 4;
 						flinch = Global.defFlinch;
 					}
 					Projectile proj = new GenericMeleeProj(
 						awakenedAuraWeapon, centerPoint,
-						ProjIds.AwakenedAura, player, damage, flinch, 0.5f
+						ProjIds.AwakenedAura, player, damage, flinch
 					) {
 						globalCollider = globalCollider.clone(),
 						meleeId = (int)MeleeIds.AwakenedAura
@@ -728,7 +633,7 @@ public class PunchyZero : Character {
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.AwakenedAura) {
 			if (isGenmuZero) {
-				proj.damager.damage = 0;
+				proj.damager.damage = 4;
 				proj.damager.flinch = Global.defFlinch;
 			}
 		}
@@ -743,12 +648,9 @@ public class PunchyZero : Character {
 		AirKick,
 		Uppercut,
 		DropKick,
-		BurnKnUckle,
-
 		Parry,
 		ParryAttack,
 		SaberSwing,
-		Gokumonken,
 		AwakenedAura
 	}
 
@@ -796,9 +698,9 @@ public class PunchyZero : Character {
 
 	public override void render(float x, float y) {
 		if (isViral && visible) {
-			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+			addRenderEffect(RenderEffectType.Trail);
 		} else {
-			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+			removeRenderEffect(RenderEffectType.Trail);
 		}
 		float auraAlpha = 1;
 		if (isAwakened && visible && hypermodeBlink > 0) {
@@ -815,36 +717,6 @@ public class PunchyZero : Character {
 			string auraSprite = "zero_awakened_aura";
 			if (sprite.name.Contains("dash")) {
 				auraSprite = "zero_awakened_aura2";
-				auraXDir = xDir;
-				yOff = 8;
-			}
-			var shaders = new List<ShaderWrapper>();
-			if (isGenmuZero &&
-				Global.frameCount % Global.normalizeFrames(6) > Global.normalizeFrames(3) &&
-				Global.shaderWrappers.ContainsKey("awakened")
-			) {
-				shaders.Add(Global.shaderWrappers["awakened"]);
-			}
-			Global.sprites[auraSprite].draw(
-				awakenedAuraFrame,
-				pos.x + x + (xOff * auraXDir),
-				pos.y + y + yOff, auraXDir,
-				1, null, auraAlpha, 1, 1,
-				zIndex - 1, shaders: shaders
-			);
-		}
-		if (isBlack && visible) {
-			float xOff = 0;
-			int auraXDir = 1;
-			float yOff = 5;
-			string auraSprite = "zero_absolutewing3";
-			if (sprite.name.Contains("dash")) {
-				auraSprite = "zero_absolutewing2";
-				auraXDir = xDir;
-				yOff = 8;
-			}
-			if (!grounded) {
-				auraSprite = "zero_absolute_wing";
 				auraXDir = xDir;
 				yOff = 8;
 			}
@@ -899,5 +771,87 @@ public class PunchyZero : Character {
 		if (flags[0]) {
 			hypermodeBlink = data[2];
 		}
+	}
+	
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (player.currency >= Player.zeroHyperCost && !isInvulnerable() &&
+		   charState is not (HyperPunchyZeroStart or LadderClimb) && !hypermodeActive() && !player.isMainPlayer
+		) {
+			changeState(new HyperPunchyZeroStart(), true);
+		}
+		int ZKattack = Helpers.randomRange(0, 6);
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && charState.attackCtrl) {
+			switch (ZKattack) {
+				case 0 when grounded && isFacingTarget:
+					changeState(new PZeroPunch1(), true);
+					break;
+				case 1 when grounded && isFacingTarget:
+					changeState(new PZeroShoryuken(), true);
+					break;
+				case 2 when charState is Dash:
+					changeState(new PZeroSpinKick(), true);
+					break;
+				case 3 when grounded && gigaAttack.ammo >= 16:
+					changeState(new Rakuhouha(gigaAttack), true);
+					gigaAttack.addAmmo(-16, player);
+					break;
+				case 4 when grounded && isFacingTarget:
+					changeState(new PZeroYoudantotsu(), true);
+					break;
+				case 5 when charState is Fall:
+					changeState(new PZeroDiveKickState(), true);
+					break;
+				case 6 when charState is Jump or Fall:
+					changeState(new PZeroKick(), true);
+					break;
+			}
+			aiAttackCooldown = 10;
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(48, true, false, false)) {
+			if (gameObject is Projectile proj&& proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (gigaAttack.shootCooldown <= 0 && grounded) {
+						switch (gigaAttack) {
+							case RekkohaWeapon when gigaAttack.ammo >= 28:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rekkoha(gigaAttack), true);
+								break;
+							case CFlasher when gigaAttack.ammo >= 7:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new CFlasher()), true);
+								break;
+							case RakuhouhaWeapon when gigaAttack.ammo >= 14:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new RakuhouhaWeapon()), true);
+								break;
+							case DarkHoldWeapon when gigaAttack.ammo >= 14 && isViral:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new DarkHoldWeapon()), true);
+								break;
+							case ShinMessenkou when gigaAttack.ammo >= 14 && isAwakened:
+								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
+								changeState(new Rakuhouha(new ShinMessenkou()), true);
+								break;
+						}
+					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded) {
+					turnToInput(player.input, player);
+					changeState(new PZeroParry(), true);
+				}
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

@@ -6,7 +6,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class BoomerangKuwanger : Maverick {
-	public BoomerangKBoomerangWeapon boomerangWeapon = new BoomerangKBoomerangWeapon();
+	public BoomerangKBoomerangWeapon boomerangWeapon = new();
 	public BoomerangKDeadLiftWeapon deadLiftWeapon;
 	public bool bald;
 	public float dashSoundCooldown;
@@ -15,13 +15,12 @@ public class BoomerangKuwanger : Maverick {
 	public BoomerangKuwanger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(BoomerKPunchState), new MaverickStateCooldown(false, true, 0.4f));
+		//stateCooldowns.Add(typeof(BoomerKDeadLiftState), new MaverickStateCooldown(false, true, 0.75f));
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);
-
 		gravityModifier = 1.25f;
 
 		weapon = new Weapon(WeaponIds.BoomerangKGeneric, 97);
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.BoomerangCutter;
 		weakWeaponId = WeaponIds.HomingTorpedo;
 		weakMaverickWeaponId = WeaponIds.LaunchOctopus;
@@ -54,7 +53,7 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or BoomerKDashState or FakeZeroGuardState) {
+			if (state is MIdle or MRun or MLand or BoomerKDashState) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;
@@ -64,30 +63,12 @@ public class BoomerangKuwanger : Maverick {
 						xDir = 1;
 						changeState(new BoomerKDashState(Control.Right));
 						return;
-					} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 					}
 				}
 				if (shootPressed() && !bald) {
-					if (!player.input.isHeld(Control.Special2,player)){
 					changeState(getShootState());
-					}
-					if (player.input.isHeld(Control.Special2,player)
-					&& player.currency > 0){
-					player.currency -= 1;
-					changeState(new BoomerKChargedRangState());
-					}
-				} else if (specialPressed()) {
-					if (!player.input.isHeld(Control.Up,player)
-					&& !player.input.isHeld(Control.Down,player)){
+				} else if (specialPressed() && !bald) {
 					changeState(new BoomerKDeadLiftState());
-					}
-					if (player.input.isHeld(Control.Up,player)){
-					changeState(new BoomerKPunchState());
-					}
-					if (player.input.isHeld(Control.Down,player)){
-					changeState(new BoomerKKickState());
-					}
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
 						deductAmmo(8);
@@ -123,7 +104,7 @@ public class BoomerangKuwanger : Maverick {
 
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
-		//	bald = true;
+			bald = true;
 			playSound("boomerkBoomerang", sendRpc: true);
 			float inputAngle = 25;
 			var inputDir = input.getInputDir(player);
@@ -152,26 +133,29 @@ public class BoomerangKuwanger : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("boomerk_deadlift")) {
-			return new GenericMeleeProj(deadLiftWeapon, centerPoint, ProjIds.BoomerangKDeadLift, player, damage: 0, flinch: 0, hitCooldown: 0, this);
-		}
-		if (sprite.name.Contains("boomerk_orara")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 1, flinch: Global.halfFlinch, hitCooldown: 0.1f, owningActor: this);
-		}
-		if (sprite.name.Contains("boomerk_dash")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this);
-		}
-		if (sprite.name.Contains("boomerk_kick")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.NormalPush, player, damage: 1, flinch: 0, hitCooldown: 0.1f, owningActor: this);
-		}
-		if (sprite.name.Contains("boomerk_fall")) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.BoomerangKBoomerang, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
-		}
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		DeadLift,
+	}
 
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"boomerk_deadlift" => MeleeIds.DeadLift,
+			_ => MeleeIds.None
+		});
+	}
 
-
-		return null;
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.DeadLift => new GenericMeleeProj(
+				deadLiftWeapon, pos, ProjIds.BoomerangKDeadLift, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public void setTeleportCooldown() {
@@ -189,9 +173,9 @@ public class BoomerangKBoomerangWeapon : Weapon {
 
 public class BoomerangKDeadLiftWeapon : Weapon {
 	public BoomerangKDeadLiftWeapon(Player player) {
-		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		index = (int)WeaponIds.BoomerangKDeadLift;
 		killFeedIndex = 97;
+		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 	}
 }
 #endregion
@@ -204,8 +188,13 @@ public class BoomerangKBoomerangProj : Projectile {
 	public float maxSpeed = 400;
 	float returnTime = 0.15f;
 	public BoomerangKuwanger maverick;
-	public BoomerangKBoomerangProj(Weapon weapon, Point pos, int xDir, BoomerangKuwanger maverick, float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 250, 3, player, "boomerk_proj_horn", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public BoomerangKBoomerangProj(
+		Weapon weapon, Point pos, int xDir, BoomerangKuwanger maverick,
+		float throwDirAngle, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 250, 3, player, "boomerk_proj_horn",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.BoomerangKBoomerang;
 		angle = throwDirAngle;
 		this.maverick = maverick;
@@ -217,8 +206,6 @@ public class BoomerangKBoomerangProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		// ToDo: Make local.
-		canBeLocal = false;
 	}
 
 	public override void onCollision(CollideData other) {
@@ -239,7 +226,7 @@ public class BoomerangKBoomerangProj : Projectile {
 			if (pickup != null) {
 				pickup.changePos(bk.pos);
 			}
-			//bk.bald = false;
+			bk.bald = false;
 			bk.changeSpriteFromName("catch", true);
 			destroySelf();
 		}
@@ -395,20 +382,6 @@ public class BoomerKTeleportState : MaverickState {
 		if (clone != null) {
 			clone.destroySelf();
 		}
-
-		new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), 
-		maverick.pos.addxy(-5,-32), 
-		 maverick.xDir, 
-		 player, player.
-		 getNextActorNetId());
-
-		 new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), 
-		maverick.pos.addxy(25,-32), 
-		 maverick.xDir, 
-		 player, player.
-		 getNextActorNetId());
-
-
 	}
 
 	public bool canChangePos() {
@@ -496,122 +469,9 @@ public class BoomerKDeadLiftState : MaverickState {
 	}
 }
 
-
-
-public class BoomerKPunchState : MaverickState {
-	private Character grabbedChar;
-	float timeWaiting;
-	bool grabbedOnce;
-	public BoomerKPunchState() : base("orara") {
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void update() {
-		base.update();
-
-		
-
-
-		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
-		}
-	}
-
-	public override bool trySetGrabVictim(Character grabbed) {
-		if (grabbedChar == null) {
-			grabbedChar = grabbed;
-			return true;
-		}
-		return false;
-	}
-}
-
-
-
-public class BoomerKKickState : MaverickState {
-	private Character grabbedChar;
-	float timeWaiting;
-	bool grabbedOnce;
-	public BoomerKKickState() : base("kick") {
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void update() {
-		base.update();
-
-		
-
-
-		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
-		}
-	}
-
-	public override bool trySetGrabVictim(Character grabbed) {
-		if (grabbedChar == null) {
-			grabbedChar = grabbed;
-			return true;
-		}
-		return false;
-	}
-}
-
-
-
-public class BoomerKChargedRangState : MaverickState {
-	private Character grabbedChar;
-	float timeWaiting;
-	bool grabbedOnce;
-	bool once;
-	public BoomerKChargedRangState() : base("doublethrow") {
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-	}
-
-	public override void update() {
-		base.update();
-
-		
-		if (maverick.frameIndex == 5 && !once){
-			once = true;
-			maverick.playSound("boomerang", true);
-			maverick.playSound("cutter", true);
-			maverick.playSound("buster4", true);
-			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(0, 5), null,maverick. xDir, player, 90, 1, player.getNextActorNetId(true), null, true);
-			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(5, 0), null, maverick.xDir, player, 0, 1, player.getNextActorNetId(true), null, true);
-			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(0, -5), null, maverick.xDir, player, -90, 1, player.getNextActorNetId(true), null, true);
-			 new BoomerangProjCharged(new BoomerangCutter(), maverick.pos.addxy(-5, 0), null, maverick.xDir, player, -180, 1, player.getNextActorNetId(true), null, true);
-
-
-			
-		}
-
-		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
-		}
-	}
-
-	public override bool trySetGrabVictim(Character grabbed) {
-		if (grabbedChar == null) {
-			grabbedChar = grabbed;
-			return true;
-		}
-		return false;
-	}
-}
-
 public class DeadLiftGrabbed : GenericGrabbedState {
-	public Character grabbedChar;
+	public Character? grabbedChar;
 	public bool launched;
-	bool once;
 	float launchTime;
 	public DeadLiftGrabbed(BoomerangKuwanger grabber) : base(grabber, 1, "") {
 		customUpdate = true;
@@ -627,20 +487,10 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-		for (int i = 1; i <= 4; i++) {
-				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
-				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
-					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
-						if (!once){
-								once = true;
-							character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
-						//	character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
-		
-						}
-							character.playSound("crash", sendRpc: true);
-							character.shakeCamera(sendRpc: true);
-							//return;
-						}
+			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
+				new BoomerangKDeadLiftWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.BoomerangKDeadLift);
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(sendRpc: true);
 			}
 			return;
 		}

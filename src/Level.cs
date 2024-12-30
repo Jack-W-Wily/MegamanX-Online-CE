@@ -344,8 +344,7 @@ public partial class Level {
 			Global.srtBuffer2 = Global.srtBuffer2L;
 		} else {
 			Global.viewSize = 1;
-			Global.view.Size = new Vector2f(Global.halfViewScreenW, Global.halfViewScreenH);
-		
+			Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 			Global.screenRenderTexture = Global.screenRenderTextureS;
 			Global.srtBuffer1 = Global.srtBuffer1S;
 			Global.srtBuffer2 = Global.srtBuffer2S;
@@ -870,6 +869,14 @@ public partial class Level {
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
 	}
 
+	public void changeCameraScale(float scale) {
+		if (server.fixedCamera) {
+			scale *= 2;
+		}
+		Global.viewSize = scale;
+		Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
+	}
+
 	private long getZIndexFromProperty(dynamic property, long defaultZIndex) {
 		string zIndexString = property;
 		long zIndex;
@@ -1305,6 +1312,23 @@ public partial class Level {
 		foreach ((int x, int y)gridData in arrayGrid) {
 			// Initalize data.
 			List<GameObject> currentGrid = new(grid[gridData.x, gridData.y]);
+			// Give piority to some objects.
+			currentGrid = currentGrid.OrderBy(gameObj => {
+				if (gameObj is not Actor actor) {
+					return 4;
+				}
+				if (actor.highPiority) {
+					return 0;
+				}
+				if (actor is IDamagable) {
+					return 3;
+				}
+				if (actor.lowPiority) {
+					return 2;
+				}
+				return 1;
+			}).ToList();
+			// Get the terrain.
 			List<GameObject>? currentTerrainGrid = null;
 			if (terrainGrid[gridData.x, gridData.y].Count >= 1) {
 				currentTerrainGrid = new List<GameObject>(terrainGrid[gridData.x, gridData.y]);
@@ -1663,32 +1687,31 @@ public partial class Level {
 
 		bool isSlown = false;
 
-		if (actor is Character chr2) {
-			if (chr2.virusTime > 0) {
-				slowAmount = 1 - (0.25f * (chr2.virusTime / 8));
-				isSlown = true;
-			}
-		}
-
-		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is OverdriveOstrich) {
+		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is Maverick) {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
 				if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
 				if (chr != null && chr.isStatusImmune()) continue;
 
 				var proj = go as Projectile;
-				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) continue;
-				if (proj != null && proj.damager?.owner?.character?.isStatusImmune() == true) continue;
-
+				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) {
+					continue;
+				}
 				var mech = go as RideArmor;
-				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) continue;
-
-				var oo = actor as OverdriveOstrich;
-				if (oo != null && oo.player != null && oo.player.alliance == cch.owner.alliance) continue;
-
+				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) {
+					continue;
+				}
+				var mvrk = actor as Maverick;
+				if (mvrk != null && mvrk.player != null && mvrk.player.alliance == cch.owner.alliance) {
+					continue;
+				}
 				if (cch.pos.distanceTo(actor.getCenterPos()) < CrystalHunterCharged.radius) {
-					if (cch.isSnails) slowAmount = 0.5f;
-					if (oo != null && oo.ownedByLocalPlayer && oo.state is not OverdriveOCrystalizedState && oo.crystalizeCooldown == 0) {
+					if (cch.isSnails) {
+						slowAmount = 0.5f;
+					}
+					if (actor is OverdriveOstrich oo && oo.ownedByLocalPlayer &&
+						oo.state is not OverdriveOCrystalizedState && oo.crystalizeCooldown == 0
+					) {
 						oo.changeState(new OverdriveOCrystalizedState());
 					}
 					isSlown = true;
@@ -1697,7 +1720,15 @@ public partial class Level {
 			}
 		}
 
-
+		if (actor is Character chr2) {
+			if (chr2.virusTime > 0) {
+				if (!isSlown) {
+					slowAmount = 1;
+				}
+				slowAmount *= 1 - (0.25f * (chr2.virusTime / 8));
+				isSlown = true;
+			}
+		}
 
 		return isSlown;
 	}

@@ -344,6 +344,11 @@ public class Maverick : Actor, IDamagable {
 		if (ammo < 0) ammo = 0;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 
@@ -411,8 +416,6 @@ public class Maverick : Actor, IDamagable {
 		if (usedSubtank != null && usedSubtank.health <= 0) {
 			usedSubtank = null;
 		}
-
-		updateProjectileCooldown();
 
 		foreach (var key in stateCooldowns.Keys) {
 			Helpers.decrementTime(ref stateCooldowns[key].cooldown);
@@ -619,7 +622,9 @@ public class Maverick : Actor, IDamagable {
 					if (dist < 0) press(Control.Left);
 					else press(Control.Right);
 
-					var jumpZones = Global.level.getTriggerList(this, 0, 0, null, typeof(JumpZone));
+					var jumpZones = Global.level.getTerrainTriggerList(
+						this, Point.zero, typeof(JumpZone)
+					);
 					if (jumpZones.Count > 0) {
 						press(Control.Jump);
 					}
@@ -633,7 +638,9 @@ public class Maverick : Actor, IDamagable {
 				else press(Control.Right);
 			}
 
-			var jumpZones = Global.level.getTriggerList(this, 0, 0, null, typeof(JumpZone));
+			var jumpZones = Global.level.getTerrainTriggerList(
+				this, Point.zero, typeof(JumpZone)
+			);
 			if (jumpZones.Count > 0) {
 				press(Control.Jump);
 			}
@@ -724,7 +731,7 @@ public class Maverick : Actor, IDamagable {
 				Point centerPoint = globalCollider.shape.getRect().center();
 				float damage = 3;
 				int flinch = 0;
-				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch, 0.5f);
+				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch);
 				proj.globalCollider = globalCollider.clone();
 				return proj;
 			};
@@ -1242,6 +1249,17 @@ public class Maverick : Actor, IDamagable {
 			if (state?.wasFlying == true) changeState(new MFly(transitionSprite));
 			else if (state is not MFall) changeState(new MFall(transitionSprite));
 		}
+	}
+
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > 10) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [player.darkHoldShader];
+			}
+		}
+		return null;
 	}
 
 	public const int CustomNetDataLength = 3;

@@ -161,7 +161,7 @@ public class VileCutterProj : Projectile {
 			maxAngleDist = 45;
 			returnTime = 0;
 			damager.damage = 1;
-			damager.hitCooldown = 0.33f;
+			damager.hitCooldown = 20;
 		}
 
 		this.vel.y = 50;
@@ -171,6 +171,7 @@ public class VileCutterProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void onCollision(CollideData other) {

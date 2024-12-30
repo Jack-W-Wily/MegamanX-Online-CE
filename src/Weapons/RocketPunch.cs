@@ -111,9 +111,9 @@ public class RocketPunchProj : Projectile {
 		damager.flinch = Global.halfFlinch;
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
-			damager.damage = 0.5f;
-			damager.hitCooldown = 0.1f;
-			maxTime = 0.15f;
+			damager.damage = 2;
+			damager.hitCooldown = 6;
+			maxTime = 0.25f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBrat;
 			type = 1;
@@ -127,6 +127,7 @@ public class RocketPunchProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public bool ownerExists => (owner.character?.destroyed == false);
@@ -380,218 +381,5 @@ public class GoGetterRightAttack : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
-		if (!character.grounded) {
-			character.stopMovingWeak();
-			pushBackSpeed = 100;
-		}
 	}
-
-	public void shoot() {
-		shot = true;
-		character.playSound("rocketPunch", sendRpc: true);
-		character.frameIndex = 3;
-		character.frameTime = 0;
-		var poi = character.sprite.getCurrentFrame().POIs[0];
-		poi.x *= character.xDir;
-		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.GoGetterRight), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-	}
-
-	public void reset() {
-		character.frameIndex = 0;
-		stateTime = 0;
-		shot = false;
-	}
-
-		public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-	}
-
-
-}
-
-
-
-public class InfinityGigAttack : CharState {
-	bool shot = false;
-	RocketPunchProj? proj;
-	float specialPressTime;
-	Vile vile = null!;
-
-		public float pushBackSpeed;
-
-
-	public InfinityGigAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
-	}
-
-	public override void update() {
-		base.update();
-
-		Helpers.decrementTime(ref specialPressTime);
-
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
-			proj.reversed = true;
-		}
-
-		if (!shot && character.sprite.frameIndex == 3) {
-			shoot();
-		}
-
-		if (proj == null){
-		if (player.input.isPressed(Control.Special1, player)) {
-				character.changeToIdleOrFall();
-		}
-		}
-		if (proj != null) {
-			if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
-				if (player.input.isPressed(Control.Special1, player)) {
-					specialPressTime = 0.25f;
-				}
-
-				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
-					character.frameIndex = 4;
-					character.frameTime = 0;
-				} else if (character.isAnimOver()) {
-					character.changeToIdleOrFall();
-					return;
-				}
-			} else {
-				if (proj.returned || proj.destroyed) {
-					character.changeToIdleOrFall();
-					return;
-				}
-			}
-		}
-			if (!character.grounded && pushBackSpeed > 0) {
-			character.useGravity = false;
-			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
-			pushBackSpeed -= 7.5f;
-		} else {
-			if (!character.grounded) {
-				character.move(new Point(-30 * character.xDir, 0));
-			}
-			character.useGravity = true;
-		}
-
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
-		if (!character.grounded) {
-			character.stopMovingWeak();
-			pushBackSpeed = 100;
-		}
-	}
-
-		public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-	}
-	
-	public void shoot() {
-		shot = true;
-		character.playSound("rocketPunch", sendRpc: true);
-		character.frameIndex = 3;
-		character.frameTime = 0;
-		var poi = character.sprite.getCurrentFrame().POIs[0];
-		poi.x *= character.xDir;
-		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.InfinityGig), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-	}
-
-	public void reset() {
-		character.frameIndex = 0;
-		stateTime = 0;
-		shot = false;
-	}
-
-
-}
-
-
-
-
-
-public class SpoiledBratPunch : CharState {
-	bool shot = false;
-	RocketPunchProj proj;
-	float specialPressTime;
-	float shootcd;
-	bool grounded;
-
-		public float pushBackSpeed;
-
-	public SpoiledBratPunch(string transitionSprite = "") : base("spoiled_brat", "", "", transitionSprite) {
-	this.grounded = grounded;
-	airMove = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		Helpers.decrementTime(ref specialPressTime);
-			Helpers.decrementTime(ref shootcd);
-
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
-			proj.reversed = true;
-		}
-
-		if (shootcd == 0 && (character.sprite.frameIndex == 1 || character.sprite.frameIndex == 3) ) {
-			shoot();
-			shootcd = 0.1f;
-			player.vileAmmo -= 4;
-		}
-			if (player.input.isPressed(Control.Shoot, player)) {
-					specialPressTime = 0.25f;
-				}
-
-				if (specialPressTime == 0 || player.vileAmmo == 0) {
-					character.changeState(new Idle(), true);
-					return;
-				}
-			
-		
-			if (!character.grounded && pushBackSpeed > 0) {
-			character.useGravity = false;
-			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
-			pushBackSpeed -= 7.5f;
-		} else {
-			if (!character.grounded) {
-				character.move(new Point(-30 * character.xDir, 0));
-			}
-			character.useGravity = true;
-		}
-
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		specialPressTime = 0.25f;
-		if (!character.grounded) {
-			character.stopMovingWeak();
-			pushBackSpeed = 100;
-		}
-	}
-
-		public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-	}
-	public void shoot() {
-		character.playSound("rocketPunch", sendRpc: true);
-		var poi = character.sprite.getCurrentFrame().POIs[0];
-		poi.x *= character.xDir;
-		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.SpoiledBrat), 
-		character.pos.add(poi), character.xDir, character.player, 
-		character.player.getNextActorNetId(), rpc: true);
-	}
-
-	public void reset() {
-		character.frameIndex = 0;
-		stateTime = 0;
-		shot = false;
-	}
-
-
-
 }

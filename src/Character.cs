@@ -243,6 +243,7 @@ public partial class Character : Actor, IDamagable {
 		null!, new Point(x, y), netId, ownedByLocalPlayer, dontAddToLevel: true
 	) {
 		this.player = player;
+		netOwner = player;
 		this.xDir = xDir;
 
 		splashable = true;
@@ -761,6 +762,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override void preUpdate() {
 		base.preUpdate();
+		updateProjectileCooldown();
 		insideCharacter = false;
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
@@ -804,7 +806,7 @@ public partial class Character : Actor, IDamagable {
 			character.player.alliance != player.alliance
 		) {
 			Damager.applyDamage(
-				player, 3, 1f, Global.defFlinch, character, false,
+				player, 3, 60, Global.defFlinch, character, false,
 				(int)WeaponIds.CrystalHunter, 20, this,
 				(int)ProjIds.CrystalHunterDash
 			);
@@ -1100,8 +1102,6 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		updateProjectileCooldown();
-
 		igFreezeRecoveryCooldown += Global.spf;
 		if (igFreezeRecoveryCooldown > 0.2f) {
 			igFreezeRecoveryCooldown = 0;
@@ -1225,7 +1225,7 @@ public partial class Character : Actor, IDamagable {
 			usedSubtank = null;
 		}
 
-		if (ai != null ) {
+		if (ai != null) {
 			ai.update();
 		}
 
@@ -1241,7 +1241,7 @@ public partial class Character : Actor, IDamagable {
 			if (gravityWellModifier < 0 && vel.y < -300) {
 				Damager.applyDamage(
 					lastGravityWellDamager,
-					4, 0.5f, Global.halfFlinch, this,
+					4, 30, Global.halfFlinch, this,
 					false, (int)WeaponIds.GravityWell, 45, this,
 					(int)ProjIds.GravityWellCharged
 				);
@@ -2283,10 +2283,6 @@ public partial class Character : Actor, IDamagable {
 				Alignment.Center, true, depth: ZIndex.HUD
 			);
 			if (ai != null) {
-				//DrawWrappers.DrawText(
-				//	"state:" + ai.aiState.GetType().Name, textPosX, textPosY -= 10,
-				//	Alignment.Center, fontSize: fontSize, outlineColor: outlineColor
-				//);
 				var charTarget = ai.target as Character;
 				Fonts.drawText(
 					FontType.Grey, "dest:" + ai.aiState.getDestNodeName(),
@@ -2299,6 +2295,10 @@ public partial class Character : Actor, IDamagable {
 				Fonts.drawText(
 					FontType.Grey, "prev:" + ai.aiState.getPrevNodeName(), textPosX, textPosY -= 10,
 					Alignment.Center, true, depth: ZIndex.HUD
+				);
+				Fonts.drawText(
+					FontType.Grey, ai.aiState.GetType().ToString().RemovePrefix("MMXOnline."),
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
 				);
 				if (charTarget != null) {
 					Fonts.drawText(
@@ -3303,14 +3303,6 @@ public partial class Character : Actor, IDamagable {
 		return retProjs;
 	}
 
-	public float getKaiserStompDamage() {
-		float damagePercent = 0.25f;
-		if (deltaPos.y > 150 * Global.spf) damagePercent = 0.5f;
-		if (deltaPos.y > 210 * Global.spf) damagePercent = 0.75f;
-		if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-		return damagePercent;
-	}
-
 	public void releaseGrab(Actor grabber, bool sendRpc = false) {
 		charState.releaseGrab();
 		if (!ownedByLocalPlayer) {
@@ -3591,11 +3583,18 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void aiUpdate(Actor? target) { }
+	public virtual void aiUpdate() { }
 
-	public virtual void aiAttack(Actor target) { }
+	public virtual void aiAttack(Actor? target) { }
 
 	public virtual void aiDodge(Actor? target) { }
 
+	public int getRandomWeaponIndex() {
+		if (player.weapons.Count == 0) return 0;
+		List<Weapon> weapons = player.weapons.FindAll(w => w is not DNACore).ToList();
+		return weapons.IndexOf(weapons.GetRandomItem());
+	}
+	
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
 

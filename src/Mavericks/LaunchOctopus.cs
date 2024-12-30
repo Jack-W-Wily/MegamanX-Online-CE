@@ -3,14 +3,13 @@
 namespace MMXOnline;
 
 public class LaunchOctopus : Maverick {
-	public LaunchOMissileWeapon missileWeapon = new LaunchOMissileWeapon();
-	public LaunchODrainWeapon meleeWeapon;
-	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new LaunchOHomingTorpedoWeapon();
+	public LaunchOMissileWeapon missileWeapon = new();
+	public LaunchODrainWeapon meleeWeapon = new();
+	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new();
 	public bool lastFrameWasUnderwater;
 
 	public LaunchOctopus(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		meleeWeapon = new LaunchODrainWeapon(player);
 
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0f));
 		stateCooldowns.Add(typeof(LaunchOShoot), new MaverickStateCooldown(false, true, 0f));
@@ -111,11 +110,29 @@ public class LaunchOctopus : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("launcho_spin")) {
-			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.LaunchODrain, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		OctoSpin,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"launcho_spin" => MeleeIds.OctoSpin,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.OctoSpin => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.LaunchODrain, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
@@ -135,10 +152,9 @@ public class LaunchOWhirlpoolWeapon : Weapon {
 }
 
 public class LaunchODrainWeapon : Weapon {
-	public LaunchODrainWeapon(Player player) {
+	public LaunchODrainWeapon() {
 		index = (int)WeaponIds.LaunchOMelee;
 		killFeedIndex = 96;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
 }
 
@@ -176,9 +192,13 @@ public class LaunchOMissile : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (MathF.Abs(vel.x) < 300) {
 			vel.x += Global.spf * 300 * xDir;
@@ -459,7 +479,7 @@ public class LaunchODrainState : MaverickState {
 			leechTime = 0;
 			maverick.addHealth(2, true);
 			var damager = new Damager(player, 2, 0, 0);
-			damager.applyDamage(victim, false, new LaunchODrainWeapon(player), maverick, (int)ProjIds.LaunchODrain);
+			damager.applyDamage(victim, false, new LaunchODrainWeapon(), maverick, (int)ProjIds.LaunchODrain);
 		}
 
 		soundTime += Global.spf;

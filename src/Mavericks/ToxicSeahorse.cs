@@ -89,14 +89,31 @@ public class ToxicSeahorse : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("teleport2")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.TSeahorseEmerge, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f);
-		} else if (sprite.name.Contains("teleport")) {
-			//return new GenericMeleeProj(weapon, centerPoint, ProjIds.TSeahorsePuddle, player, damage: 0, flinch: 0, hitCooldown: 1f, this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Teleport,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"tseahorse_teleport2" => MeleeIds.Teleport,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Teleport => new GenericMeleeProj(
+				weapon, pos, ProjIds.TSeahorseEmerge, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 public class TSeahorseAcidProj : Projectile, IDamagable {
@@ -113,6 +130,11 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		checkBigAcidUnderwater();
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
@@ -184,8 +206,14 @@ public class TSeahorseAcid2Proj : Projectile {
 	int bounces = 0;
 	int type;
 	bool once;
-	public TSeahorseAcid2Proj(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 300, 0, player, "tseahorse_proj_acid", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+
+	public TSeahorseAcid2Proj(
+		Point pos, int xDir, int type,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		ToxicSeahorse.getWeapon(), pos, xDir, 300, 0, player, "tseahorse_proj_acid",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		maxTime = 4f;
 		projId = (int)ProjIds.TSeahorseAcid2;
 		useGravity = true;
@@ -195,24 +223,21 @@ public class TSeahorseAcid2Proj : Projectile {
 		if (type == 2) vel = new Point(xDir * 50, -300);
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
 		checkBigAcidUnderwater();
 	}
 
 	public override void update() {
 		base.update();
-
 		if (sprite.name == "acidburst_charged_start" && isAnimOver()) {
 			changeSprite("acidburst_charged", true);
 			vel.x = xDir * 100;
 		}
-
 		checkBigAcidUnderwater();
 	}
 
 	public override void onHitWall(CollideData other) {
-		if (!ownedByLocalPlayer) return;
 		acidSplashEffect(other, ProjIds.TSeahorseAcid2);
 		bounces++;
 		if (bounces > 3) {
@@ -247,6 +272,12 @@ public class TSeahorseAcid2Proj : Projectile {
 			}
 		}
 		base.onHitDamagable(damagable);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TSeahorseAcid2Proj(
+			args.pos, args.xDir, args.extraData[0], args.player, args.netId
+		);
 	}
 }
 

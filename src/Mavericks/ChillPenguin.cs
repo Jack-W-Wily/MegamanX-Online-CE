@@ -5,11 +5,11 @@ using System.Linq;
 namespace MMXOnline;
 
 public class ChillPenguin : Maverick {
-	public ChillPIceShotWeapon iceShotWeapon = new ChillPIceShotWeapon();
-	public ChillPIceStatueWeapon iceStatueWeapon = new ChillPIceStatueWeapon();
-	public ChillPIceBlowWeapon iceWindWeapon = new ChillPIceBlowWeapon();
-	public ChillPBlizzardWeapon blizzardWeapon = new ChillPBlizzardWeapon();
-	public ChillPSlideWeapon slideWeapon;
+	public ChillPIceShotWeapon iceShotWeapon = new();
+	public ChillPIceStatueWeapon iceStatueWeapon = new();
+	public ChillPIceBlowWeapon iceWindWeapon = new();
+	public ChillPBlizzardWeapon blizzardWeapon = new();
+	public ChillPSlideWeapon slideWeapon = new();
 
 	public ChillPenguin(
 		Player player, Point pos, Point destPos,
@@ -17,13 +17,12 @@ public class ChillPenguin : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		slideWeapon = new ChillPSlideWeapon(player);
-	//	stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
-	//	stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
-	//	stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
-	//	stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
+		stateCooldowns.Add(typeof(ChillPIceBlowState), new MaverickStateCooldown(true, false, 2f));
+		stateCooldowns.Add(typeof(ChillPSlideState), new MaverickStateCooldown(true, false, 0.5f));
+		stateCooldowns.Add(typeof(ChillPBlizzardState), new MaverickStateCooldown(false, false, 3f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		spriteToCollider["slide"] = getDashCollider();
-		canClimbWall = true;
+
 		weapon = new Weapon(WeaponIds.ChillPGeneric, 93);
 
 		awardWeaponId = WeaponIds.ShotgunIce;
@@ -67,8 +66,6 @@ public class ChillPenguin : Maverick {
 					changeState(new ChillPIceBlowState());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new ChillPSlideState(false));
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Special1, player)) {
@@ -129,17 +126,33 @@ public class ChillPenguin : Maverick {
 	}
 	*/
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile proj = null;
-		if (isSlidingAndCanDamage()) {
-			proj = new GenericMeleeProj(slideWeapon, centerPoint, ProjIds.ChillPSlide, player);
-		}
-
-		return proj;
-	}
-
 	public bool isSlidingAndCanDamage() {
 		return sprite.name.EndsWith("slide") && MathF.Abs(deltaPos.x) > 1.66f;
+	}
+	
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Slide,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"chillp_slide" => MeleeIds.Slide,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Slide => new GenericMeleeProj(
+				slideWeapon, pos, ProjIds.ChillPSlide, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
@@ -173,10 +186,9 @@ public class ChillPBlizzardWeapon : Weapon {
 }
 
 public class ChillPSlideWeapon : Weapon {
-	public ChillPSlideWeapon(Player player) {
+	public ChillPSlideWeapon() {
 		index = (int)WeaponIds.ChillPSlide;
 		killFeedIndex = 93;
-		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
 	}
 }
 
@@ -289,9 +301,13 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (sprite.isAnimOver()) {
 			useGravity = true;

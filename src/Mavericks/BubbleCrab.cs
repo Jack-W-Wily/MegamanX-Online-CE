@@ -22,7 +22,7 @@ public class BubbleCrab : Maverick {
 		//stateCooldowns.Add(typeof(BCrabShieldStartState), new MaverickStateCooldown(false, true, 0.75f));
 
 		weapon = getWeapon();
-		canClimbWall = true;
+
 		awardWeaponId = WeaponIds.BubbleSplash;
 		weakWeaponId = WeaponIds.SpinWheel;
 		weakMaverickWeaponId = WeaponIds.WheelGator;
@@ -78,15 +78,13 @@ public class BubbleCrab : Maverick {
 
 		bool floating = false;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or MJump or MFall) {
+			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new BCrabShootState());
 				} else if (input.isPressed(Control.Special1, player)) {
 					changeState(getSpecialState());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new BCrabClawState());
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Dash, player)) {
@@ -146,14 +144,29 @@ public class BubbleCrab : Maverick {
 		return aiAttackStates().GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("jump_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, 
-			ProjIds.BCrabClaw, player, 1, 
-			Global.defFlinch, 0.15f,
-			isJuggleProjectile : true);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		JumpAttack,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"bcrab_jump_attack" or "bcrab_jump_attack_start" => MeleeIds.JumpAttack,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.JumpAttack => new GenericMeleeProj(
+				weapon, pos, ProjIds.BCrabClaw, player,
+				1, Global.defFlinch, 9, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void onDestroy() {
@@ -289,7 +302,6 @@ public class BCrabClawState : MaverickState {
 
 public class BCrabClawJumpState : MaverickState {
 	public BCrabClawJumpState() : base("jump_attack", "") {
-		superArmor = true;
 	}
 
 	public override void update() {
@@ -338,9 +350,13 @@ public class BCrabShieldProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (!ownedByLocalPlayer) return;
 
@@ -430,11 +446,16 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		projId = (int)ProjIds.BCrabCrablingBubble;
 		setIndestructableProperties();
 		syncScale = true;
-		isShield = true;
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 		canBeLocal = false;
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
@@ -514,6 +535,11 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		base.onStart();
 		if (!ownedByLocalPlayer) return;
 		shield = new BCrabSummonBubbleProj(maverick.weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {

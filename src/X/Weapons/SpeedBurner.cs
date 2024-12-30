@@ -23,6 +23,7 @@ public SpeedBurner() : base() {
 		FlinchCD = "0/0.5";
 		type = index;
 		displayName = "Speed Burner ";
+		hasCustomChargeAnim = true;
 	}
 
 	public override void shoot(Character character, int[] args) {

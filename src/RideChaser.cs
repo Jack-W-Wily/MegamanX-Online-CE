@@ -43,10 +43,13 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void postUpdate() {
 		base.postUpdate();
-
-		updateProjectileCooldown();
 		fadeXMomentum();
 
 		Helpers.decrementTime(ref slowdownTime);
@@ -581,9 +584,9 @@ public class RideChaser : Actor, IDamagable {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (player != null && canRunEnemyOver()) {
-			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 4, Global.defFlinch, 1);
+			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 4, Global.defFlinch);
 		} else if (player != null && canHurtEnemy()) {
-			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 2, 0, 1);
+			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 2, 0);
 		}
 		return null;
 	}

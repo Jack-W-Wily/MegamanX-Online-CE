@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class TornadoFang : Weapon {
-
+	public float doubleShootCooldown;
 	public static TornadoFang netWeapon = new();
 
 	public TornadoFang() : base() {
@@ -27,10 +27,15 @@ public class TornadoFang : Weapon {
 
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel < 3) {
-			if (timeSinceLastShoot != null && timeSinceLastShoot < fireRate) return 2;
-			else return 1;
+			if (doubleShootCooldown > 0) { return 2; }
+			else { return 1; }
 		}
-		return 8;
+		return 0;
+	}
+
+	public override void update() {
+		base.update();
+		Helpers.decrementFrames(ref doubleShootCooldown);
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -41,14 +46,13 @@ public class TornadoFang : Weapon {
 
 		if (chargeLevel > 1) {
 			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
-				if (timeSinceLastShoot != null && timeSinceLastShoot < fireRate) {
+				if (doubleShootCooldown > 0) {
 					new TornadoFangProj(this, pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
 					new TornadoFangProj(this, pos, xDir, 2, player, player.getNextActorNetId(), rpc: true);
-					timeSinceLastShoot = null;
+					doubleShootCooldown = 0;
 				} else {
 					new TornadoFangProj(this, pos, xDir, 0, player, player.getNextActorNetId(), rpc: true);
-					timeSinceLastShoot = 0;
-					mmx.shootCooldown = 30;
+					doubleShootCooldown = 30;
 				}
 			}
 		} else {
@@ -56,7 +60,15 @@ public class TornadoFang : Weapon {
 			if (character.ownedByLocalPlayer && character is MegamanX mmx) {
 				mmx.chargedTornadoFang = ct;
 			}
+			doubleShootCooldown = 0;
 		}
+	}
+
+	public override float getFireRate(Character character, int chargeLevel, int[] args) {
+		if (chargeLevel < 3 && doubleShootCooldown > 0) {
+			return 10;
+		}
+		return fireRate;
 	}
 }
 
@@ -133,7 +145,7 @@ public class TornadoFangProj : Projectile {
 				vel.x = 4 * xDir;
 				// To update the reduced speed.
 				if (ownedByLocalPlayer) {
-				forceNetUpdateNextFrame = true;
+					forceNetUpdateNextFrame = true;
 				}
 
 				if (damagable is not CrackedWall) {
@@ -166,6 +178,9 @@ public class TornadoFangProj : Projectile {
 public class TornadoFangProjCharged : Projectile {
 	public MegamanX? mmx;
 	float sparksCooldown;
+	public bool unliked;
+	public Point offset;
+	public Anim exhaust;
 
 	public TornadoFangProjCharged(
 		Weapon weapon, Point pos, int xDir, 
@@ -194,23 +209,31 @@ public class TornadoFangProjCharged : Projectile {
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref sparksCooldown);
-
 		if (!ownedByLocalPlayer) return;
 
-		if (mmx == null || mmx.destroyed) {
-			destroySelf();
-			return;
-		}
-
-		weapon.addAmmo(-Global.spf * 5, mmx.player);
-		if (weapon.ammo <= 0) {
-			destroySelf();
-			return;
-		}
-
-		if (mmx.currentWeapon is not TornadoFang && mmx.currentWeapon is not HyperCharge) {
-			destroySelf();
-			return;
+		if (mmx.chargedTornadoFang == this) {
+			if (mmx == null || mmx.destroyed) {
+				destroySelf();
+				return;
+			}
+			if (weapon != TornadoFang.netWeapon) {
+				weapon.addAmmo(speedMul * -0.08f, mmx.player);
+			}
+			if (weapon.ammo <= 0) {
+				destroySelf();
+				return;
+			}
+			if (mmx.currentWeapon is not TornadoFang && mmx.currentWeapon is not HyperCharge) {
+				destroySelf();
+				return;
+			}
+		} else if (!unliked) {
+			unliked = true;
+			vel.x = xDir * 125;
+			time = 0;
+			maxTime = 2;
+			exhaust = new Anim(pos.addxy(-7 * xDir, 0), "tunnelfang_exhaust", xDir, null, false, host: this);
+			exhaust.setzIndex(zIndex - 100);
 		}
 	}
 
@@ -219,11 +242,16 @@ public class TornadoFangProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 		if (destroyed) return;
 
-		if (mmx != null) {
-			changePos(mmx.getShootPos());
+		if (mmx != null && mmx.chargedTornadoFang == this) {
+			if (mmx.currentFrame.POIs.Length == 0) {
+				changePos(mmx.pos.add(offset));
+			} else {
+				Point busterPos = mmx.getShootPos();
+				changePos(busterPos);
+				offset = busterPos - mmx.pos;
+			}
 			xDir = mmx.getShootXDir();
 		}
-		
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -243,6 +271,18 @@ public class TornadoFangProjCharged : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		mmx?.removeLastingProjs();
+		if (exhaust != null) {
+			exhaust.destroySelf();
+		}
+		if (mmx.chargedTornadoFang == this) {
+			mmx.chargedTornadoFang = null;
+		}
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (unliked) {
+			new Anim(pos, "explosion", xDir, damager.owner.getNextActorNetId(), true, true);
+			playSound("explosion", true, true);
+		}
 	}
 }

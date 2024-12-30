@@ -29,6 +29,7 @@ public class NeoSigma : BaseSigma {
 		Helpers.decrementTime(ref normalAttackCooldown);
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb) {
 			if (isAnimOver() && charState != null && charState is not SigmaClawState) {
@@ -116,47 +117,65 @@ public class NeoSigma : BaseSigma {
 		return "sigma2_" + spriteName;
 	}
 
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Guard,
+		Slash1,
+		Slash2,
+		DashSlash,
+		AirSlash,
+		UpSlash,
+		DownSlash,
+		LadderSlash,
+		WallSlash,
+		GigaAttackSlash
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync.
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		Projectile? proj = sprite.name switch {
-			"sigma2_attack" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				2, 0, 0.2f, addToLevel: true
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"sigma2_attack" => MeleeIds.Slash1,
+			"sigma2_attack2" => MeleeIds.Slash2,
+			"sigma2_attack_air" => MeleeIds.AirSlash,
+			"sigma2_attack_dash" => MeleeIds.DashSlash,
+			"sigma2_upslash" => MeleeIds.UpSlash,
+			"sigma2_downslash" => MeleeIds.DownSlash,
+			"sigma2_ladder_attack" => MeleeIds.LadderSlash,
+			"sigma2_wall_slide_attack" => MeleeIds.WallSlash,
+			"sigma2_shoot2" => MeleeIds.GigaAttackSlash,
+			_ => MeleeIds.None
+		});
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Slash1 => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				2, 0, 12, addToLevel: addToLevel
 			),
-			"sigma2_attack2" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw2, player,
-				2, Global.halfFlinch, 0.5f, addToLevel: true
+			MeleeIds.Slash2 => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw2, player,
+				2, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
-			"sigma2_attack_air" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.375f, addToLevel: true
+			MeleeIds.AirSlash or MeleeIds.DashSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				3, 0, 22, addToLevel: addToLevel
 			),
-			"sigma2_attack_dash" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.375f, addToLevel: true
+			MeleeIds.UpSlash or MeleeIds.DownSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2UpDownClaw, player,
+				3, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-			"sigma2_upslash" or "sigma2_downslash" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2UpDownClaw, player,
-				3, Global.defFlinch, 0.5f, addToLevel: true
+			MeleeIds.WallSlash or MeleeIds.LadderSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				3, 0, 15, addToLevel: addToLevel
 			),
-			"sigma2_ladder_attack" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.25f, addToLevel: true
-			),
-			"sigma2_wall_slide_attack" => new GenericMeleeProj(
-				SigmaClawWeapon.netWeapon, centerPoint, ProjIds.Sigma2Claw, player,
-				3, 0, 0.25f, addToLevel: true
-			),
-			"sigma2_shoot2" => new GenericMeleeProj(
-				new SigmaElectricBall2Weapon(), centerPoint, ProjIds.Sigma2Ball2, player,
-				6, Global.defFlinch, 1f, addToLevel: true
+			MeleeIds.GigaAttackSlash => new GenericMeleeProj(
+				new SigmaElectricBall2Weapon(), pos, ProjIds.Sigma2Ball2, player,
+				6, Global.defFlinch, 15, addToLevel: addToLevel
 			),
 			_ => null
 		};
-		if (proj != null) {
-			return proj;
-		}
-		return base.getProjFromHitbox(collider, centerPoint);
 	}
 
 	public override void addAmmo(float amount) {
@@ -185,5 +204,65 @@ public class NeoSigma : BaseSigma {
 
 		// Per-player data.
 		player.sigmaAmmo = data[0];
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		if (currentWeapon is MaverickWeapon mw &&
+			mw.maverick == null && canAffordMaverick(mw)
+		) {
+			buyMaverick(mw);
+			if (mw.maverick != null) {
+				changeState(new CallDownMaverick(mw.maverick, true, false), true);
+			}
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			player.changeToSigmaSlot();
+		}
+		if (charState is not LadderClimb) {
+				int Neoattack = Helpers.randomRange(0, 5);
+				if (charState?.isGrabbedState == false && !player.isDead
+				    && !isInvulnerable() && aiAttackCooldown <= 0
+					&& !(charState is CallDownMaverick or SigmaElectricBall2State or SigmaElectricBallState)) {
+					switch (Neoattack) {
+						case 0 when isTargetClose:
+							player.press(Control.Shoot);
+							break;
+						case 1 when sigmaDownSlashCooldown <= 0 && grounded && isTargetInAir:
+							changeState(new SigmaUpDownSlashState(true), true);
+							sigmaDownSlashCooldown = 1f;						
+							break;
+						case 2 when sigmaUpSlashCooldown <= 0 && !grounded:
+							changeState(new SigmaUpDownSlashState(false), true);
+							sigmaUpSlashCooldown = 0.75f;
+							break;
+						case 3:
+							player.changeWeaponSlot(1);
+							break;
+						case 4:
+							player.changeWeaponSlot(2);						
+							break;
+						case 5:
+							player.changeWeaponSlot(0);
+							break;
+					}
+					aiAttackCooldown = 14;
+				}
+			}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
+				if (player.sigmaAmmo >= 16 && player.sigmaAmmo <= 24) {
+					player.sigmaAmmo -= 16;
+					changeState(new SigmaElectricBallState(), true);
+				} else if (player.sigmaAmmo >= 28) {
+					player.sigmaAmmo = 0;
+					changeState(new SigmaElectricBall2State(), true);
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

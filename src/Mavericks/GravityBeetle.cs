@@ -16,10 +16,10 @@ public class GravityBeetle : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-	//	stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
-	//	stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
-	//	stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
-		canClimbWall = true;
+		stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
+		stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
+		stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
+
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
 
@@ -51,20 +51,8 @@ public class GravityBeetle : Maverick {
 					changeState(new GBeetleGravityWellState());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new GBeetleDashState());
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 				}
-
 			} else if (state is MJump || state is MFall) {
-					if (input.isPressed(Control.Shoot, player)) {
-					changeState(new GBeetleShoot(false));
-				} else if (input.isPressed(Control.Special1, player) && well == null) {
-					changeState(new GBeetleGravityWellState());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new GBeetleDashState());
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
-				}
 			}
 		}
 	}
@@ -90,35 +78,44 @@ public class GravityBeetle : Maverick {
 		};
 	}
 
-	public float getStompDamage() {
-		float damagePercent = 0;
-		if (deltaPos.y > 150 * Global.spf) damagePercent = 0.5f;
-		if (deltaPos.y > 225 * Global.spf) damagePercent = 0.75f;
-		if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-		return damagePercent;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Dash,
+		Fall,
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("gbeetle_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleLift, player, damage: 3, flinch: 0, hitCooldown: 0.1f, owningActor: this);
-		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
-			}
-		}
-		return null;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"gbeetle_dash" => MeleeIds.Dash,
+			"gbeetle_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Dash => new GenericMeleeProj(
+				weapon, pos, ProjIds.GBeetleLift, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			MeleeIds.Fall => new GenericMeleeProj(
+				weapon, pos, ProjIds.GBeetleStomp, player,
+				1, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (sprite.name.EndsWith("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				proj.damager.damage = 4 * damagePercent;
-			}
+		if (proj.projId == (int)ProjIds.GBeetleStomp) {
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.9f), 1, 4);
+			proj.damager.damage = damage;
 		}
 	}
+
 }
 
 public class GBeetleBallProj : Projectile {
@@ -140,6 +137,7 @@ public class GBeetleBallProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -223,7 +221,6 @@ public class GBeetleDashState : MaverickState {
 	float dustTime;
 	float partTime;
 	public GBeetleDashState() : base("dash", "dash_start") {
-		superArmor = true;
 	}
 
 	public override void update() {
@@ -252,7 +249,7 @@ public class GBeetleDashState : MaverickState {
 			partTime = 0.1f;
 		}
 
-		var move = new Point(350 * maverick.xDir, 0);
+		var move = new Point(250 * maverick.xDir, 0);
 
 		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {
@@ -299,7 +296,6 @@ public class GBeetleLiftState : MaverickState {
 	bool grabbedOnce;
 	public GBeetleLiftState(Character grabbedChar) : base("dash_lift") {
 		this.grabbedChar = grabbedChar;
-		superArmor = true;
 	}
 
 	public override void update() {
@@ -340,17 +336,14 @@ public class BeetleGrabbedState : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-				for (int i = 1; i <= 4; i++) {
-				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
-				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
-					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
-				
-					(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
-				character.playSound("crash", sendRpc: true);
+			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
+				(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
+				character.playSound("crashX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}
-			}
+			return;
 		}
+
 		if (grabber.sprite?.name.EndsWith("_dash_lift") == true) {
 			if (grabber.frameIndex < 2) {
 				trySnapToGrabPoint(true);
@@ -374,13 +367,17 @@ public class GBeetleGravityWellProj : Projectile {
 	public float drawRadius;
 	const float riseSpeed = 150;
 	public float radiusFactor;
-
-	public float GwellTime;
 	float randPartTime;
 	public float maxRadius = 50;
 	float ttl = 4;
-	public GBeetleGravityWellProj(Weapon weapon, Point pos, int xDir, float chargeTime, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+
+	public GBeetleGravityWellProj(
+		Weapon weapon, Point pos, int xDir, float chargeTime,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.GBeetleGravityWell;
 		setIndestructableProperties();
 
@@ -395,14 +392,11 @@ public class GBeetleGravityWellProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (owner.health == 0 || GwellTime > 15)destroySelf();
-		
+
 		drawRadius = radiusFactor * maxRadius;
 		if (radiusFactor > 0) {
 			globalCollider = new Collider(new Rect(0, 0, 24 + (radiusFactor * maxRadius), 24 + (radiusFactor * maxRadius)).getPoints(), true, this, false, false, 0, Point.zero);
 		}
-
-		GwellTime += Global.spf ;
 
 		if (!ownedByLocalPlayer) return;
 
@@ -481,7 +475,6 @@ public class GBeetleGravityWellState : MaverickState {
 	float partTime;
 	float chargeTime;
 	public GBeetleGravityWellState() : base("blackhole_start", "") {
-		superArmor = true;
 	}
 
 	public override void update() {
@@ -508,13 +501,7 @@ public class GBeetleGravityWellState : MaverickState {
 			Point? shootPos = maverick.getFirstPOI();
 			if (!once && shootPos != null) {
 				once = true;
-				if (!player.input.isHeld(Control.Special2,player)){
 				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, chargeTime, player, player.getNextActorNetId(), sendRpc: true);
-				}
-				if (player.currency > 19 && player.input.isHeld(Control.Special2,player)){
-				(maverick as GravityBeetle).well = new GBeetleGravityWellProj(maverick.weapon, shootPos.Value, maverick.xDir, 80, player, player.getNextActorNetId(), sendRpc: true);
-				player.currency -= 20;
-				}
 			}
 			if (maverick.isAnimOver()) {
 				maverick.changeToIdleOrFall();

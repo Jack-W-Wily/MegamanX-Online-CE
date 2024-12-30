@@ -22,6 +22,7 @@ public class TriadThunder : Weapon {
 		FlinchCD = "2.25/0";
 		maxAmmo = 10;
 		ammo = maxAmmo;
+		hasCustomChargeAnim = true;
 		type = index;
 		displayName = "Triad Thunder ";
 	}
@@ -198,7 +199,11 @@ public class TriadThunderBeam : Actor {
 	float time = 1;
 	Player player;
 	public List<TriadThunderBeamPiece> pieces = new List<TriadThunderBeamPiece>();
-	public TriadThunderBeam(Point pos, int type, int xDir, int yDir, Player player, bool ownedByLocalPlayer) : base("empty", pos, null, ownedByLocalPlayer, false) {
+	public TriadThunderBeam(
+		Point pos, int type, int xDir, int yDir, Player player, bool ownedByLocalPlayer
+	) : base(
+		"empty", pos, null, ownedByLocalPlayer, false
+	) {
 		this.xDir = xDir;
 		this.yDir = yDir;
 		this.type = type;

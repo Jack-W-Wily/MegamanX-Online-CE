@@ -93,27 +93,66 @@ public class NeonTiger : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name == "neont_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw, player, damage: 2, flinch: 0, hitCooldown: 0.2f, owningActor: this);
-		} else if (sprite.name == "neont_slash2") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw2, player, damage: 2, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
-		} else if (sprite.name == "neont_jump_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawAir, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.25f, owningActor: this);
-		} else if (sprite.name == "neont_dash_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
-		} else if (sprite.name == "neont_wall_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawWall, player, damage: 3, flinch: 0, hitCooldown: 0.25f, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Slash,
+		Slash2,
+		JumpSlash,
+		DashSlash,
+		WallSlash,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"neont_slash" => MeleeIds.Slash,
+			"neont_slash2" => MeleeIds.Slash2,
+			"neont_jump_slash" => MeleeIds.JumpSlash,
+			"neont_dash_slash" => MeleeIds.DashSlash,
+			"neont_wall_slash" => MeleeIds.WallSlash,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Slash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClaw, player,
+				2, 0, 12, addToLevel: addToLevel
+			),
+			MeleeIds.Slash2 => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClaw2, player,
+				2, Global.halfFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.JumpSlash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClawAir, player,
+				3, Global.defFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.DashSlash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClawDash, player,
+				3, Global.halfFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.WallSlash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClawWall, player,
+				3, 0, 15, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
 public class NeonTRaySplasherProj : Projectile {
 	int shootNum;
 	bool isHanging;
-	public NeonTRaySplasherProj(Weapon weapon, Point pos, int xDir, int shootNum, bool isHanging, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "neont_projectile_start", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public NeonTRaySplasherProj(
+		Weapon weapon, Point pos, int xDir, int shootNum,
+		bool isHanging, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "neont_projectile_start",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.NeonTRaySplasher;
 		maxTime = 0.875f;
 		this.shootNum = shootNum;

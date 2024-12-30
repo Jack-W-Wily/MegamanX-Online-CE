@@ -111,7 +111,7 @@ public class VulcanProj : Projectile {
 			maxTime = 0.3f;
 			changeSprite("vulcan_dn_proj", true) ;
 			destroyOnHit = false;
-			damager.hitCooldown = 0.2f;
+			damager.hitCooldown = 12;
 			damager.damage = 2;
 			damager.flinch = 2;
 			projId = (int)ProjIds.DistanceNeedler;

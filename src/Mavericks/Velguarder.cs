@@ -3,7 +3,7 @@
 namespace MMXOnline;
 
 public class Velguarder : Maverick {
-	public VelGMeleeWeapon meleeWeapon;
+	public VelGMeleeWeapon meleeWeapon = new();
 
 	public Velguarder(
 		Player player, Point pos, Point destPos, int xDir,
@@ -12,13 +12,12 @@ public class Velguarder : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		meleeWeapon = new VelGMeleeWeapon(player);
 		canClimbWall = true;
 
 		awardWeaponId = WeaponIds.Buster;
 		weakWeaponId = WeaponIds.ShotgunIce;
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
-		canClimbWall = true;
+
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
 		netActorCreateId = NetActorCreateId.Velguarder;
@@ -40,17 +39,8 @@ public class Velguarder : Maverick {
 					changeState(getShootState2());
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new VelGPounceStartState());
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall) {
-				if (shootPressed()) {
-					changeState(getShootState());
-				} else if (specialPressed()) {
-					changeState(getShootState2());
-				} else if (input.isPressed(Control.Dash, player)) {
-					changeState(new VelGPounceStartState());
-				}
 			}
 		}
 	}
@@ -90,12 +80,31 @@ public class Velguarder : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("pounce")) {
-			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.VelGMelee, player);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Pounce,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"velg_pounce" => MeleeIds.Pounce,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Pounce => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.VelGMelee, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 #region weapons
@@ -114,10 +123,9 @@ public class VelGIceWeapon : Weapon {
 }
 
 public class VelGMeleeWeapon : Weapon {
-	public VelGMeleeWeapon(Player player) {
+	public VelGMeleeWeapon() {
 		index = (int)WeaponIds.VelGMelee;
 		killFeedIndex = 101;
-		damager = new Damager(player, 3, Global.superFlinch, 0.5f);
 	}
 }
 #endregion
@@ -129,12 +137,11 @@ public class VelGFireProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 125, 1, player, "velg_proj_fire",
-		0, 0.1f, netProjId, player.ownedByLocalPlayer
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.VelGFire;
 		maxTime = 1f;
 		vel.y = 200;
-		isJuggleProjectile = true;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -149,22 +156,6 @@ public class VelGFireProj : Projectile {
 			return;
 		}
 	}
-
-	public override void onCollision(CollideData other) {
-		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
-		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
-			playSound("flamemOilBurn", sendRpc: true);
-			new FlameMBigFireProj(
-				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
-				oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true
-			);
-			// oilSpill.time = 0;
-			oilSpill.destroySelf(doRpcEvenIfNotOwned: true);
-			destroySelf();
-		}
-	}
-
 }
 
 public class VelGIceProj : Projectile {
@@ -189,9 +180,6 @@ public class VelGIceProj : Projectile {
 	public override void update() {
 		base.update();
 	}
-
-
-	
 }
 #endregion
 

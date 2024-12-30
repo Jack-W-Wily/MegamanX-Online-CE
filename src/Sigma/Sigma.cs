@@ -79,7 +79,7 @@ public class BaseSigma : Character {
 		bool isStriker = player.isStriker();
 		bool isTagTeam = player.isTagTeam();
 
-		if (isPuppeteer && Options.main.puppeteerHoldOrToggle &&
+		if (!player.isAI && isPuppeteer && Options.main.puppeteerHoldOrToggle &&
 			!player.input.isHeld(Control.WeaponLeft, player) &&
 			!player.input.isHeld(Control.WeaponRight, player)
 		) {
@@ -95,6 +95,23 @@ public class BaseSigma : Character {
 		if (flag != null) {
 			shootPressed = false;
 			spcPressed = false;
+		}
+
+		if (player.isAI && charState.attackCtrl) {
+			foreach (Weapon weapon in weapons) {
+				if (weapon is MaverickWeapon mw && mw.maverick == null) {
+					if (mw.summonedOnce) {
+						mw.summon(player, pos.addxy(0, -112), pos, xDir);
+					}
+					else if (canAffordMaverick(mw)) {
+						buyMaverick(mw);
+						mw.summon(player, pos.addxy(0, -112), pos, xDir);
+						mw.summonedOnce = true;
+					}
+				}
+			}
+
+			return;
 		}
 
 		if (isPuppeteer) {
@@ -381,17 +398,6 @@ public class BaseSigma : Character {
 
 	public override bool canCrouch() {
 		return false;
-	}
-
-	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name.Contains("sigma_block") && !collider.isHurtBox()) {
-			return new GenericMeleeProj(
-				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true
-			);
-		}
-		return null;
 	}
 
 	public void becomeSigma(Point pos, int xDir) {

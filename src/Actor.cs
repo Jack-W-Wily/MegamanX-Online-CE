@@ -161,6 +161,8 @@ public partial class Actor : GameObject {
 	public float waterTime;
 
 	public float timeStopTime;
+	public bool highPiority;
+	public bool lowPiority;
 
 	public Actor(
 		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel
@@ -1283,9 +1285,12 @@ public partial class Actor : GameObject {
 		frameSpeed = 1;
 	}
 
-	public void addRenderEffect(RenderEffectType type, float flashTime = 0, float time = float.MaxValue) {
+	public void addRenderEffect(
+		RenderEffectType type, float flashTime = 0,
+		float time = float.MaxValue, float cycleTime = -1
+	) {
 		if (renderEffects.ContainsKey(type)) return;
-		renderEffects[type] = new RenderEffect(type, flashTime, time);
+		renderEffects[type] = new RenderEffect(type, flashTime, time, cycleTime);
 	}
 
 	public void addRenderEffect(RenderEffectType type) {
@@ -1553,14 +1558,14 @@ public partial class Actor : GameObject {
 			string projName = key;
 			float cooldown = projectileCooldown[key];
 			if (cooldown > 0) {
-				projectileCooldown[projName] = Helpers.clampMin(cooldown - Global.spf, 0);
+				projectileCooldown[projName] = Helpers.clampMin(cooldown - speedMul, 0);
 			}
 		}
 		foreach (var key in flinchCooldown.Keys.ToList()) {
 			int projName = key;
 			float cooldown = flinchCooldown[key];
 			if (cooldown > 0) {
-				flinchCooldown[projName] = Helpers.clampMin(cooldown - Global.spf, 0);
+				flinchCooldown[projName] = Helpers.clampMin(cooldown - speedMul, 0);
 			}
 		}
 	}

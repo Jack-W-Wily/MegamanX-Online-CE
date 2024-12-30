@@ -33,9 +33,7 @@ public class StrikeChain : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 
-		int upOrDown = 0;
-		if (player.input.isHeld(Control.Up, player)) upOrDown = -1;
-		else if (player.input.isHeld(Control.Down, player)) upOrDown = 1;
+		int upOrDown = player.input.getYDir(player);
 
 		if (chargeLevel == 4 && !player.hasArmArmor(2)) {
 			player.character.changeState(new StrikeChainLightningState());
@@ -838,7 +836,9 @@ public class StrikeChainProjCharged : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (hookedActor != null) hookedActor.useGravity = true;
-		mmx.strikeChainChargedProj = null;
+		if (mmx != null && mmx.strikeChainProj == this) {
+			mmx.strikeChainProj = null;
+		}
 	}
 
 	public override void onHitWall(CollideData other) {

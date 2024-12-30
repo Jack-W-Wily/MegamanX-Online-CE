@@ -288,7 +288,9 @@ public class MaverickState {
 		rect.y2 -= 15;
 		var shape = rect.getShape();
 		var ladders = Global.level.getTerrainTriggerList(maverick, new Point(0, 0), typeof(Ladder));
-		var backwallZones = maverick is StingChameleon ? Global.level.getTriggerList(shape, typeof(BackwallZone)) : new List<CollideData>();
+		var backwallZones = maverick is StingChameleon ? Global.level.getTerrainTriggerList(
+			shape, typeof(BackwallZone)
+		) : new List<CollideData>();
 		if (ladders.Count > 0 || (backwallZones.Count > 0 && !backwallZones.Any(bw => (bw.gameObject as BackwallZone).isExclusion))) {
 			if (ladders.Count > 0) hitLadder = true;
 			return true;
@@ -353,7 +355,9 @@ public class MaverickState {
 			maverick.changeState(new MTaunt());
 		} else if (player.input.isPressed(Control.Down, player) && !maverick.canClimb) {
 			maverick.checkLadderDown = true;
-			var ladders = Global.level.getTriggerList(maverick, 0, 1, null, typeof(Ladder));
+			var ladders = Global.level.getTerrainTriggerList(
+				maverick, new Point(0, 1), typeof(Ladder)
+			);
 			if (ladders.Count > 0) {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
@@ -365,7 +369,9 @@ public class MaverickState {
 			maverick.checkLadderDown = false;
 		} else if (player.input.isPressed(Control.Down, player) && maverick.canClimb) {
 			maverick.checkLadderDown = true;
-			var ladders = Global.level.getTriggerList(maverick, 0, 1, null, typeof(Ladder));
+			var ladders = Global.level.getTerrainTriggerList(
+				maverick, new Point(0, 1), typeof(Ladder)
+			);
 			if (ladders.Count > 0) {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
@@ -788,7 +794,7 @@ public class MJump : MaverickState {
 	public override void update() {
 		base.update();
 
-		bool jumpHeld = player.input.isHeld(Control.Jump, player);
+		bool jumpHeld = player.input.isHeld(Control.Jump, player) || maverick.aiBehavior != MaverickAIBehavior.Control;
 		if (stateFrame > 2 && jumpFramesHeld == 0 && !jumpHeld && maverick.vel.y < 0) {
 			jumpFramesHeld = 1;
 			maverick.vel.y *= 0.25f;

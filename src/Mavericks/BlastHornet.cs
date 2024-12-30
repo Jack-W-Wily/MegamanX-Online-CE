@@ -1,28 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MMXOnline;
 
 public class BlastHornet : Maverick {
 	public static Weapon netWeapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 
-	public BHornetCursorProj cursor;
+	public BHornetCursorProj? cursor;
 	//public Actor lockOnTarget;
 	//public float lockOnTime;
 	public Sprite wings;
 
 	public BlastHornet(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-	//	stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 2f));
-	//	stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.25f));
-	//	stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
-	//	stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
+		stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 2f));
+		stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.25f));
+		stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
+		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
 
 		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 		wings = new Sprite("bhornet_wings");
 		canFly = true;
-		spriteFrameToSounds["bhornet_run/1"] = "hornetWalk";
-		spriteFrameToSounds["bhornet_run/6"] = "hornetWalk";
+
 		awardWeaponId = WeaponIds.ParasiticBomb;
 		weakWeaponId = WeaponIds.GravityWell;
 		weakMaverickWeaponId = WeaponIds.GravityBeetle;
@@ -56,8 +56,6 @@ public class BlastHornet : Maverick {
 					if (cursor == null) {
 						changeState(new BHornetShootCursorState(true));
 					}
-				}else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 				}
 			} else if (state is MJump || state is MFall || state is MFly) {
 				if (input.isPressed(Control.Shoot, player)) {
@@ -76,7 +74,7 @@ public class BlastHornet : Maverick {
 		return "bhornet";
 	}
 
-	public MaverickState getSpecialState() {
+	public MaverickState? getSpecialState() {
 		if (cursor != null) {
 			if (cursor.target != null) {
 				return new BHornetShoot2State(cursor.target);
@@ -125,11 +123,30 @@ public class BlastHornet : Maverick {
 		}
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.EndsWith("_stinger_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BHornetSting, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Stinger,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"bhornet_fly_stinger_attack" => MeleeIds.Stinger,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Stinger => new GenericMeleeProj(
+				weapon, pos, ProjIds.BHornetSting, player,
+				7, Global.defFlinch, owningActor: this,
+				addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
@@ -138,9 +155,11 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	const float maxSpeed = 150;
 	public Actor? latchTarget;
 	float latchLerpTime;
-	public BHornetBeeProj(Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 1, 1f, netProjId, player.ownedByLocalPlayer) {
-		this.weapon = weapon;
+	public BHornetBeeProj(
+		Weapon weapon, Point pos, int xDir, Point unitDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "bhornet_proj_wasp_small", 0, 1f, netProjId, player.ownedByLocalPlayer
+	) {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		maxTime = 1.25f;
@@ -156,9 +175,13 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		if (!ownedByLocalPlayer) return;
 
 		if (latchTarget?.destroyed == true) {
@@ -191,6 +214,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 		if (!ownedByLocalPlayer) return;
 
 		maxTime = 3;
+		forceNetUpdateNextFrame = true;
 		if (latchTarget == null) {
 			stopMoving();
 			latchTarget = damagable.actor();
@@ -231,12 +255,11 @@ public class BHornetBeeProj : Projectile, IDamagable {
 }
 
 public class BHornetHomingBeeProj : Projectile, IDamagable {
-	public Actor target;
+	public Actor? target;
 	public Point lastMoveAmount;
 	const float maxSpeed = 150;
-	public BHornetHomingBeeProj(Weapon weapon, Point pos, int xDir, Actor target, Player player, ushort netProjId, bool rpc = false) :
+	public BHornetHomingBeeProj(Weapon weapon, Point pos, int xDir, Actor? target, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 4, player, "bhornet_proj_wasp_small_glowing", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
-		this.weapon = weapon;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		maxTime = 3f;
@@ -256,9 +279,13 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (Global.isOnFrameCycle(10)) {
 			changeSpriteIfDifferent("bhornet_proj_wasp_small", false);
@@ -298,20 +325,14 @@ public class BHornetShootState : MaverickState {
 		Point? shootPos = maverick.getFirstPOI("s");
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-
-			maverick.playSound("busterX3");
-
-			if (!maverick.sprite.name.Contains("fly")){
-			new ParasiticBombProj(maverick.weapon, shootPos.Value,  maverick.xDir, player, player.getNextActorNetId(), true);
-			}else {
 			//maverick.playSound("???", sendRpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 2).normalize(), player, player.getNextActorNetId(), rpc: true);
-			}
 		}
+
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleFallOrFly();
 		}
@@ -344,7 +365,13 @@ public class BHornetShootCursorState : MaverickState {
 			var inputDir = input.getInputDir(player);
 			if (inputDir.x != maverick.xDir) inputDir.x = 0;
 			if (inputDir.x == 0 && inputDir.y == 0) inputDir.x = maverick.xDir;
-			bh.cursor = new BHornetCursorProj(maverick.weapon, shootPos.Value, maverick.xDir, inputDir, bh, player, player.getNextActorNetId(), rpc: true);
+			if (bh != null) {
+				bh.cursor = new BHornetCursorProj(
+					maverick.weapon, shootPos.Value, maverick.xDir,
+					inputDir, bh, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}		
 		}
 
 		if (maverick.isAnimOver()) {
@@ -372,7 +399,6 @@ public class BHornetCursorProj : Projectile {
 	) : base(
 		weapon, pos, xDir, 0, 0, player, "bhornet_particle_aim_small", 0, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		this.weapon = weapon;
 		this.bh = bh;
 		if (ownedByLocalPlayer) {
 			maxTime = 0.6f;
@@ -393,7 +419,7 @@ public class BHornetCursorProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 
 		if (target != null) {
-			changePos(getTargetPos());
+			changePos(getTargetPos(target));
 
 			if (target.pos.distanceTo(bh.pos) > 200 || target.destroyed) {
 				target = null;
@@ -402,9 +428,12 @@ public class BHornetCursorProj : Projectile {
 		}
 	}
 
-	public Point getTargetPos() {
-		if (target is Character chr) return chr.getParasitePos();
-		else return target.getCenterPos();
+	public Point getTargetPos([NotNull] Actor target) {
+		if (target is Character chr) {
+			return chr.getParasitePos();
+		} else {
+			return target.getCenterPos();
+		}
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
@@ -424,7 +453,7 @@ public class BHornetCursorProj : Projectile {
 
 	public override void render(float x, float y) {
 		if (target != null && !ownedByLocalPlayer) {
-			var targetPos = getTargetPos();
+			var targetPos = getTargetPos(target);
 			var diff = targetPos.subtract(pos);
 			base.render(x + diff.x, y + diff.y);
 		} else {
@@ -450,9 +479,9 @@ public class BHornetCursorProj : Projectile {
 
 public class BHornetShoot2State : MaverickState {
 	bool shotOnce;
-	Actor target;
+	Actor? target;
 	bool isAIRise;
-	public BHornetShoot2State(Actor target) : base("fly_wasp_spawn", "") {
+	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn", "") {
 		this.target = target;
 	}
 
@@ -498,39 +527,19 @@ public class BHornetShoot2State : MaverickState {
 
 public class BHornetStingState : MaverickState {
 	float moveTime;
-	Anim stingAnim;
+	Anim? stingAnim;
 	bool isAIRise;
-
-		Character otherChar;
-	float moveAmount;
-	float maxMoveAmount;
-
-	
 	public BHornetStingState() : base("fly_stinger_attack", "fly_stinger_start") {
 		useGravity = false;
-		superArmor = true;
 	}
 
 	public override void update() {
 		base.update();
-
-		
 		if (inTransition()) {
 			if (isAIRise && maverick.frameIndex < 7) {
 				maverick.useGravity = false;
 				maverick.grounded = false;
-				Point amount = maverick.getCenterPos().directionToNorm(otherChar.getCenterPos()).times(250);
-
-		maverick.move(amount);
-
-		moveAmount += amount.magnitude * Global.spf;
-		if (maverick.getCenterPos().distanceTo(otherChar.getCenterPos()) < 5) {
-	//		character.removeBanzai(false, true);
-
-		} else if (moveAmount > maxMoveAmount) {
-	//		character.removeBanzai(false, false);
-		
-		}
+				maverick.move(new Point(0, -200));
 			}
 
 			maverick.turnToInput(input, player);

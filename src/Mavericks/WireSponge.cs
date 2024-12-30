@@ -132,6 +132,7 @@ public class WSpongeChainSpinProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 
@@ -889,7 +890,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		destroyOnHit = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-
+		canBeLocal = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -901,9 +902,13 @@ public class WSpongeSpike : Projectile, IDamagable {
 		return "wsponge_spike_ceiling";
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		moveWithMovingPlatform();
 	}
 

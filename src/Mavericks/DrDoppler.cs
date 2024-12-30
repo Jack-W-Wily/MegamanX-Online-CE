@@ -9,15 +9,15 @@ public class DrDoppler : Maverick {
 	public int ballType;
 	public DrDoppler(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.3f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
 		stateCooldowns.Add(typeof(DrDopplerAbsorbState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 0.5f));
+		stateCooldowns.Add(typeof(DrDopplerDashStartState), new MaverickStateCooldown(false, false, 1.5f));
 
 		weapon = getWeapon();
 		canClimbWall = true;
 		canClimb = true;
-		spriteFrameToSounds["drdoppler_run/1"] = "colonelwalk";
-		spriteFrameToSounds["drdoppler_run/5"] = "colonelwalk";
+		spriteFrameToSounds["drdoppler_run/1"] = "run";
+		spriteFrameToSounds["drdoppler_run/5"] = "run";
 		weakWeaponId = WeaponIds.AcidBurst;
 		weakMaverickWeaponId = WeaponIds.ToxicSeahorse;
 
@@ -72,14 +72,7 @@ public class DrDoppler : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new DrDopplerDashStartState());
 				}
-				 else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
-				}
-
 			} else if (state is MJump || state is MFall) {
-				if (input.isPressed(Control.Dash, player)) {
-					changeState(new DrDopplerDashStartState());
-				}
 			}
 		}
 	}
@@ -114,22 +107,47 @@ public class DrDoppler : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name == "drdoppler_dash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDash, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this
-			,isDeflectShield : true, isShield : true);
-		} else if (sprite.name == "drdoppler_dash_water") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDashWater, player, damage: 2, flinch: 0, hitCooldown: 0.5f, owningActor: this);
-		} else if (sprite.name == "drdoppler_absorb") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerAbsorb, player, damage: 0, flinch: 0, hitCooldown: 0.25f, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Charge,
+		ChargeUnderwater,
+		AttackAbsorb,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"drdoppler_dash" => MeleeIds.Charge,
+			"drdoppler_dash_water" => MeleeIds.ChargeUnderwater,
+			"drdoppler_absorb" => MeleeIds.AttackAbsorb,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Charge => new GenericMeleeProj(
+				weapon, pos, ProjIds.DrDopplerDash, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.ChargeUnderwater => new GenericMeleeProj(
+				weapon, pos, ProjIds.DrDopplerDashWater, player,
+				2, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.AttackAbsorb => new GenericMeleeProj(
+				weapon, pos, ProjIds.DrDopplerAbsorb, player,
+				0, 0, 15, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public void healDrDoppler(Player attacker, float damage) {
 		if (ownedByLocalPlayer && health < maxHealth) {
 			addHealth(damage, true);
-			playSound("heal", sendRpc: true);
+			playSound("healX3", sendRpc: true);
 			addDamageText(-damage);
 			ammo -= damage;
 			if (ammo < 0) ammo = 0;
@@ -143,21 +161,16 @@ public class DrDopplerBallProj : Projectile {
 		Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
 		weapon, pos, xDir, 250, 3, player, type == 0 ? "drdoppler_proj_ball" : "drdoppler_proj_ball2",
-		Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		isDeflectShield = true;
 		if (type == 0) {
-			maxTime = 0.75f;
 			projId = (int)ProjIds.DrDopplerBall;
 		} else {
 			projId = (int)ProjIds.DrDopplerBall2;
-			damager.damage = 1;
-			damager.flinch = 0;
+			damager.damage = 0;
 			destroyOnHit = false;
-			maxTime = 3f;
-			vel.x = 40;
 		}
-		
+		maxTime = 0.75f;
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -172,7 +185,6 @@ public class DrDopplerBallProj : Projectile {
 public class DrDopplerDashStartState : MaverickState {
 	public DrDopplerDashStartState() : base("dash_charge", "") {
 		stopMovingOnEnter = true;
-		superArmor = true;
 		enterSound = "ryuenjin";
 	}
 
@@ -189,7 +201,6 @@ public class DrDopplerDashState : MaverickState {
 	float soundTime;
 	public DrDopplerDashState() : base("dash", "dash_start") {
 		stopMovingOnEnter = true;
-		superArmor = true;
 	}
 
 	public override void update() {
@@ -304,57 +315,3 @@ public class DrDopplerUncoatState : MaverickState {
 		}
 	}
 }
-
-
-
-public class BurnerPunch : CharState {
-
-	public bool earthquake;
-	public BurnerPunch() : base("flamepunch", "", "", "") {
-		superArmor = true;
-		immuneToWind = true;
-		normalCtrl = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		
-
-		character.move(new Point(character.xDir * 200, 0));
-
-		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
-		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
-			
-			if (!earthquake){
-			character.shakeCamera(sendRpc: true);
-			earthquake = true;
-			var weapon = new TriadThunder();
-			new TriadThunderQuake(weapon, character.pos, 1, player, player.getNextActorNetId(), rpc: true);
-
-			character.playSound("crashX3", forcePlay: false, sendRpc: true);
-			}
-			
-		} 
-		 if (stateTime > 3f) {
-			character.changeToIdleOrFall();
-			
-		}
-
-		
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel.y = 0;
-		
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-		}
-}
-
-

@@ -3,15 +3,14 @@
 namespace MMXOnline;
 
 public class ArmoredArmadillo : Maverick {
-	public ArmoredAProjWeapon projWeapon = new ArmoredAProjWeapon();
-	public ArmoredAChargeReleaseWeapon chargeReleaseWeapon = new ArmoredAChargeReleaseWeapon();
-	public ArmoredARollWeapon rollWeapon;
+	public ArmoredAProjWeapon projWeapon = new();
+	public ArmoredAChargeReleaseWeapon chargeReleaseWeapon = new();
+	public ArmoredARollWeapon rollWeapon = new();
 	public const float rollTransJumpPower = 250;
 	public bool noArmor;
 
 	public ArmoredArmadillo(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		rollWeapon = new ArmoredARollWeapon(player);
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.6f));
 		//stateCooldowns.Add(typeof(ArmoredARollEnterState), new MaverickStateCooldown(false, false, 4));
 
@@ -23,7 +22,7 @@ public class ArmoredArmadillo : Maverick {
 		awardWeaponId = WeaponIds.RollingShield;
 		weakWeaponId = WeaponIds.ElectricSpark;
 		weakMaverickWeaponId = WeaponIds.SparkMandrill;
-		canClimbWall = true;
+
 		netActorCreateId = NetActorCreateId.ArmoredArmadillo;
 		netOwner = player;
 		if (sendRpc) {
@@ -65,20 +64,16 @@ public class ArmoredArmadillo : Maverick {
 		base.update();
 		if (!ownedByLocalPlayer) return;
 
-
-		if (input.isPressed(Control.Taunt, player)){
-		shakeCamera(sendRpc: true);
-		}
 		if (state is ArmoredARollState) {
 			drainAmmo(4);
 		} else if (state is ArmoredAGuardState) {
 			drainAmmo(1);
 		} else if (state is not ArmoredARollEnterState && state is not ArmoredARollExitState && state is not ArmoredAGuardState) {
-			rechargeAmmo(4);
+			rechargeAmmo(2);
 		}
 
-		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or MJump or MFall) {
+		if (aiBehavior == MaverickAIBehavior.Control && !player.isSummoner()) {
+			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed() && !noArmor) {
@@ -89,12 +84,6 @@ public class ArmoredArmadillo : Maverick {
 					if (ammo >= 8) {
 						deductAmmo(8);
 						changeState(new ArmoredARollEnterState());
-					}
-				}
-				 if (input.isPressed(Control.Dash, player) && player.input.isHeld("down", player)) {
-					if (ammo >= 8) {
-						deductAmmo(8);
-						changeState(new DropRoll());
 					}
 				}
 			}
@@ -109,7 +98,9 @@ public class ArmoredArmadillo : Maverick {
 				}
 				var hits = Global.level.checkCollisionsShape(rect.getShape(), null);
 				foreach (var hit in hits) {
-					if (hit.gameObject is Projectile proj && proj.owner.alliance != player.alliance && MathF.Sign(proj.deltaPos.x) != xDir) {
+					if (hit.gameObject is Projectile proj && proj.owner.alliance != player.alliance &&
+						MathF.Sign(proj.deltaPos.x) != xDir
+					) {
 						shouldGuard = true;
 						break;
 					}
@@ -143,20 +134,14 @@ public class ArmoredArmadillo : Maverick {
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(true),
-				new ArmoredAGuardState(),
-				new ArmoredARollEnterState(),
-		};
+		return [
+			getShootState(true),
+			new ArmoredARollEnterState(),
+		];
 	}
 
 	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(true),
-		};
-		return attacks.GetRandomItem();
+		return aiAttackStates().GetRandomItem();
 	}
 
 	private MaverickState getShootState(bool isAI) {
@@ -165,19 +150,40 @@ public class ArmoredArmadillo : Maverick {
 			new ArmoredAProj(projWeapon, pos, xDir, player, player.getNextActorNetId(), rpc: true);
 		}, null);
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 6, 0.33f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.33f);
 		}
 		return shootState;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("roll")) {
-			return new GenericMeleeProj(rollWeapon, centerPoint, ProjIds.ArmoredARoll, player, damage: hasNoArmor() ? 2 : 3);
-		}
-		if (sprite.name.Contains("sword")) {
-			return new GenericMeleeProj(rollWeapon, centerPoint, ProjIds.MechFrogStompShockwave, player, damage: hasNoArmor() ? 2 : 3);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Roll,
+		RollArmorless,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"armoreda_roll" => MeleeIds.Roll,
+			"armoreda_na_roll" => MeleeIds.RollArmorless,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Roll => new GenericMeleeProj(
+				rollWeapon, pos, ProjIds.ArmoredARoll, player,
+				3, Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			MeleeIds.RollArmorless => new GenericMeleeProj(
+				rollWeapon, pos, ProjIds.ArmoredARoll, player,
+				3, Global.defFlinch, 45, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
@@ -197,8 +203,7 @@ public class ArmoredAChargeReleaseWeapon : Weapon {
 }
 
 public class ArmoredARollWeapon : Weapon {
-	public ArmoredARollWeapon(Player player) {
-		damager = new Damager(player, 3, Global.defFlinch, 0.75f);
+	public ArmoredARollWeapon() {
 		index = (int)WeaponIds.ArmoredARoll;
 		killFeedIndex = 95;
 	}
@@ -225,16 +230,19 @@ public class ArmoredAProj : Projectile {
 }
 
 public class ArmoredAChargeReleaseProj : Projectile {
-	public ArmoredAChargeReleaseProj(Weapon weapon, Point pos, int xDir, Point vel, float damage, Player player, ushort netProjId, bool rpc = false) :
+	public ArmoredAChargeReleaseProj(Weapon weapon, Point pos, int xDir, Point? vel, float damage, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 400, 4, player, "armoreda_proj_release", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.ArmoredAChargeRelease;
 		maxTime = 0.4f;
 		damager.damage = damage;
-		this.vel = vel.times(speed);
+		if (vel != null) {
+			this.vel = vel.Value.times(speed);
+		}
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -297,9 +305,7 @@ public class ArmoredAGuardChargeState : MaverickState {
 	public override void update() {
 		base.update();
 		if (player == null) return;
-		if (player.input.isPressed("special1", player)) {
-			maverick.changeState(new ArmoredAGuardSwordState(damage));
-		}
+
 		if (stateTime > 1.7f) {
 			maverick.changeState(new ArmoredAGuardReleaseState(damage));
 		}
@@ -522,74 +528,4 @@ public class ArmoredARollExitState : MaverickState {
 		}
 	}
 }
-
-
-
-public class DropRoll : MaverickState {
-	public DropRoll() : base("roll", "") {
-		
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		maverick.vel.y = -ArmoredArmadillo.rollTransJumpPower;
-		maverick.frameSpeed = 0;
-	}
-
-	public override void update() {
-		base.update();
-		if (player == null) return;
-
-
-		Point airMove = new Point(0, 0);
-		
-
-		if (!maverick.grounded) {
-
-			if (input.isHeld(Control.Left, player)) {
-				airMove.x = -maverick.getRunSpeed() * maverick.getDashSpeed();
-				maverick.xDir = -1;
-			} else if (input.isHeld(Control.Right, player)) {
-				airMove.x = maverick.getRunSpeed() * maverick.getDashSpeed();
-				maverick.xDir = 1;
-			}
-
-		}
-		maverick.stopCeiling();
-
-		if (maverick.vel.y > 0) {
-			maverick.frameSpeed = 1;
-		}
-
-		if (maverick.grounded) {
-			maverick.playSound("armoredaCrash", sendRpc: true);
-			maverick.shakeCamera(sendRpc: true);
-			new MechFrogStompShockwave(new MechFrogStompWeapon(player), maverick.pos.addxy(6 * maverick.xDir, 0f), maverick.xDir, player, player.getNextActorNetId(), rpc: true);	
-			maverick.changeState(new ArmoredARollExitState());
-		}
-	}
-}
-
-
-
-public class ArmoredAGuardSwordState : MaverickState {
-	float damage;
-	public ArmoredAGuardSwordState(float damage) : base("sword", "") {
-		this.damage = damage;
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		maverick.playSound("sigmaSaber", sendRpc: true);
-	}
-
-	public override void update() {
-		base.update();
-		if (player == null) return;
-		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
-		}
-	}
-}
-
 #endregion

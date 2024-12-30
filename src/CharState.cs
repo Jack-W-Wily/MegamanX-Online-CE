@@ -1031,6 +1031,7 @@ public class AirDash : CharState {
 		Dash.dashBackwardsCode(character, initialDashDir);
 
 		base.update();
+		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 
 
 		if (character.canControlAirDash()){
@@ -1202,7 +1203,7 @@ public class WallSlide : CharState {
 		*/
 
 		if (stateFrames >= 9) {
-			if (mmx == null || mmx.strikeChainProj == null || mmx.strikeChainChargedProj == null) {
+			if (mmx == null || mmx.strikeChainProj?.destroyed != false) {
 				var hit = character.getHitWall(wallDir, 0);
 				var hitWall = hit?.gameObject as Wall;
 

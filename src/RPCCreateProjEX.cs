@@ -107,6 +107,7 @@ public partial class RPCCreateProj : RPC {
 			{ (int)ProjIds.DynamoIceDagger, DynamoKnifeProj.rpcInvoke },
 		// Mavericks
 		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke },
+		{ (int)ProjIds.TSeahorseAcid2, TSeahorseAcid2Proj.rpcInvoke }
 	};
 
 }

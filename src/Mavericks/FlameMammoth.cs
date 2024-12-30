@@ -1,23 +1,24 @@
-﻿namespace MMXOnline;
+﻿using System;
+using System.Collections.Generic;
+namespace MMXOnline;
 
 public class FlameMammoth : Maverick {
-	public FlameMStompWeapon stompWeapon;
+	public FlameMStompWeapon stompWeapon = new();
 
 	public FlameMammoth(
 		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.2f));
-		stompWeapon = new FlameMStompWeapon(player);
-		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.2f));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
 
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.StormTornado;
 		weakMaverickWeaponId = WeaponIds.StormEagle;
 
 		weapon = new Weapon(WeaponIds.FlameMGeneric, 100);
-		canClimbWall = true;
+
 		netActorCreateId = NetActorCreateId.FlameMammoth;
 		netOwner = player;
 		if (sendRpc) {
@@ -36,12 +37,9 @@ public class FlameMammoth : Maverick {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {
 					changeState(new FlameMOilState());
-				} else if (input.isHeld(Control.Down, player)) {
-					changeState(new FakeZeroGuardState());
 				}
-				
 			} else if (state is MJump || state is MFall) {
-				if (input.isHeld(Control.Dash, player)) { //&& getDistFromGround() > 75) {
+				if (input.isPressed(Control.Dash, player) && getDistFromGround() > 75) {
 					changeState(new FlameMJumpPressState());
 				}
 			}
@@ -84,18 +82,39 @@ public class FlameMammoth : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("fall")) {
-			float damage = 0;
-			if (deltaPos.y > 100 * Global.spf) damage = 2f;
-			if (deltaPos.y > 200 * Global.spf) damage = 4f;
-			if (deltaPos.y > 300 * Global.spf) damage = 6f;
-			if (damage > 0) {
-				return new GenericMeleeProj(stompWeapon, centerPoint, ProjIds.FlameMStomp, player, damage: damage);
-			}
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Fall,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"flamem_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Fall => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.FlameMStomp, player,
+				6, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.FlameMStomp) {
+			float damage = Helpers.clamp(MathF.Floor(vel.y / 75), 1, 6);
+			if (vel.y > 300) damage += 2;
+			proj.damager.damage = damage;
+		}
+	}
+
 }
 
 #region weapons
@@ -107,10 +126,9 @@ public class FlameMFireballWeapon : Weapon {
 }
 
 public class FlameMStompWeapon : Weapon {
-	public FlameMStompWeapon(Player player) {
+	public FlameMStompWeapon() {
 		index = (int)WeaponIds.FlameMStomp;
 		killFeedIndex = 100;
-		damager = new Damager(player, 6, Global.defFlinch, 0.5f);
 	}
 }
 

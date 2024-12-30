@@ -21,6 +21,7 @@ public class ShotgunIce : Weapon {
 		Flinch = "0";
 		type = index;
 		displayName = "Shotgun Ice ";
+		hasCustomChargeAnim = true;
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -161,9 +162,7 @@ public class ShotgunIceProjCharged : Projectile {
 		0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = isChillP ? (int)ProjIds.ChillPIceBlow : (int)ProjIds.ShotgunIceCharged;
-
 		shouldShieldBlock = false;
-
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
