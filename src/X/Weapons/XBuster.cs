@@ -25,7 +25,7 @@ public class XBuster : Weapon {
 		Flinch = "0/0/13/26";
 		FlinchCD = "0";
 		type = index;
-		displayName = "X Buster ";
+		displayName = "X-Buster";
 	}
 	public void setUnpoBuster(MegamanX mmx) {
 		isUnpoBuster = true;

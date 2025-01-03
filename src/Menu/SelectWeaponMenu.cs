@@ -57,117 +57,117 @@ public class SelectWeaponMenu : IMainMenu {
 	public string error = "";
 
 	public static List<Weapon> SpecialWeapon1 = new List<Weapon>() {
-				new XBuster(),
-				new HomingTorpedo(),
-				new ChameleonSting(),
-				new RollingShield(),
-				new FireWave(),
-				new StormTornado(),
-				new ElectricSpark(),
-				new BoomerangCutter(),
-				new ShotgunIce(),
-				new CrystalHunter(),
-				new BubbleSplash(),
-				new SilkShot(),
-				new SpinWheel(),
-				new SonicSlicer(),
-				new StrikeChain(),
-				new MagnetMine(),
-				new SpeedBurner(),
-				new AcidBurst(),
-				new ParasiticBomb(),
-				new TriadThunder(),
-				new SpinningBlade(),
-				new RaySplasher(),
-				new GravityWell(),
-				new FrostShield(),
-				new TornadoFang(),
-				new LightningWeb(),
-				new	FrostTower(),
-				new	SoulBody(),
-				new	RisingFire(),
-				new	GroundHunter(),
-				new	AimingLaser(),
-				new	DoubleCyclone(),
-				new	TwinSlasher(),				
-				new ZXSaber(),
-				new DarkHoldWeapon()
+		new XBuster(),
+		new HomingTorpedo(),
+		new ChameleonSting(),
+		new RollingShield(),
+		new FireWave(),
+		new StormTornado(),
+		new ElectricSpark(),
+		new BoomerangCutter(),
+		new ShotgunIce(),
+		new CrystalHunter(),
+		new BubbleSplash(),
+		new SilkShot(),
+		new SpinWheel(),
+		new SonicSlicer(),
+		new StrikeChain(),
+		new MagnetMine(),
+		new SpeedBurner(),
+		new AcidBurst(),
+		new ParasiticBomb(),
+		new TriadThunder(),
+		new SpinningBlade(),
+		new RaySplasher(),
+		new GravityWell(),
+		new FrostShield(),
+		new TornadoFang(),
+		new LightningWeb(),
+		new	FrostTower(),
+		new	SoulBody(),
+		new	RisingFire(),
+		new	GroundHunter(),
+		new	AimingLaser(),
+		new	DoubleCyclone(),
+		new	TwinSlasher(),				
+		new ZXSaber(),
+		new DarkHoldWeapon()
 	};
 
 	public static List<Weapon> SpecialWeapon2 = new List<Weapon>() {
-				new XBuster(),
-				new HomingTorpedo(),
-				new ChameleonSting(),
-				new RollingShield(),
-				new FireWave(),
-				new StormTornado(),
-				new ElectricSpark(),
-				new BoomerangCutter(),
-				new ShotgunIce(),
-				new CrystalHunter(),
-				new BubbleSplash(),
-				new SilkShot(),
-				new SpinWheel(),
-				new SonicSlicer(),
-				new StrikeChain(),
-				new MagnetMine(),
-				new SpeedBurner(),
-				new AcidBurst(),
-				new ParasiticBomb(),
-				new TriadThunder(),
-				new SpinningBlade(),
-				new RaySplasher(),
-				new GravityWell(),
-				new FrostShield(),
-				new TornadoFang(),
-				new LightningWeb(),
-				new	FrostTower(),
-				new	SoulBody(),
-				new	RisingFire(),
-				new	GroundHunter(),
-				new	AimingLaser(),
-				new	DoubleCyclone(),
-				new	TwinSlasher(),				
-				new ZXSaber(),
-				new DarkHoldWeapon()
+		new XBuster(),
+		new HomingTorpedo(),
+		new ChameleonSting(),
+		new RollingShield(),
+		new FireWave(),
+		new StormTornado(),
+		new ElectricSpark(),
+		new BoomerangCutter(),
+		new ShotgunIce(),
+		new CrystalHunter(),
+		new BubbleSplash(),
+		new SilkShot(),
+		new SpinWheel(),
+		new SonicSlicer(),
+		new StrikeChain(),
+		new MagnetMine(),
+		new SpeedBurner(),
+		new AcidBurst(),
+		new ParasiticBomb(),
+		new TriadThunder(),
+		new SpinningBlade(),
+		new RaySplasher(),
+		new GravityWell(),
+		new FrostShield(),
+		new TornadoFang(),
+		new LightningWeb(),
+		new	FrostTower(),
+		new	SoulBody(),
+		new	RisingFire(),
+		new	GroundHunter(),
+		new	AimingLaser(),
+		new	DoubleCyclone(),
+		new	TwinSlasher(),				
+		new ZXSaber(),
+		new DarkHoldWeapon()
 	};
 
 	public static List<Weapon> SpecialWeapon3 = new List<Weapon>() {
-new XBuster(),
-				new HomingTorpedo(),
-				new ChameleonSting(),
-				new RollingShield(),
-				new FireWave(),
-				new StormTornado(),
-				new ElectricSpark(),
-				new BoomerangCutter(),
-				new ShotgunIce(),
-				new CrystalHunter(),
-				new BubbleSplash(),
-				new SilkShot(),
-				new SpinWheel(),
-				new SonicSlicer(),
-				new StrikeChain(),
-				new MagnetMine(),
-				new SpeedBurner(),
-				new AcidBurst(),
-				new ParasiticBomb(),
-				new TriadThunder(),
-				new SpinningBlade(),
-				new RaySplasher(),
-				new GravityWell(),
-				new FrostShield(),
-				new TornadoFang(),
-				new LightningWeb(),
-				new	FrostTower(),
-				new	SoulBody(),
-				new	RisingFire(),
-				new	GroundHunter(),
-				new	AimingLaser(),
-				new	DoubleCyclone(),
-				new	TwinSlasher(),				
-				new ZXSaber(),
-				new DarkHoldWeapon()
+		new XBuster(),
+		new HomingTorpedo(),
+		new ChameleonSting(),
+		new RollingShield(),
+		new FireWave(),
+		new StormTornado(),
+		new ElectricSpark(),
+		new BoomerangCutter(),
+		new ShotgunIce(),
+		new CrystalHunter(),
+		new BubbleSplash(),
+		new SilkShot(),
+		new SpinWheel(),
+		new SonicSlicer(),
+		new StrikeChain(),
+		new MagnetMine(),
+		new SpeedBurner(),
+		new AcidBurst(),
+		new ParasiticBomb(),
+		new TriadThunder(),
+		new SpinningBlade(),
+		new RaySplasher(),
+		new GravityWell(),
+		new FrostShield(),
+		new TornadoFang(),
+		new LightningWeb(),
+		new	FrostTower(),
+		new	SoulBody(),
+		new	RisingFire(),
+		new	GroundHunter(),
+		new	AimingLaser(),
+		new	DoubleCyclone(),
+		new	TwinSlasher(),				
+		new ZXSaber(),
+		new DarkHoldWeapon()
 	};
 
 	public static List<Weapon> SubWeapon = new List<Weapon>() {
@@ -269,14 +269,14 @@ new XBuster(),
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 
-		int startY = 40;
+		int startY = 43;
 		int startX = 30;
 		int wepH = 15;
 
 		float wepPosX = 195;
 		float wepTextX = 207;
-
-		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
+		renderBoxes();
+		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH));
 		Color color;
 		float alpha;
 		for (int i = 0; i < cursors.Length - 1; i++) {
@@ -294,10 +294,6 @@ new XBuster(),
 		color = Color.White;
 		alpha = 1f;
 		int wsy = 167;
-		DrawWrappers.DrawRect(
-			22, wsy-12, Global.screenW - 22, wsy + 28, true, new Color(0, 0, 0, 100), 1,
-			ZIndex.HUD, false, outlineColor: outlineColor
-		);
 		if (selCursorIndex < 5) {
 			var wep = xWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
 			int posY = 6;
@@ -307,15 +303,6 @@ new XBuster(),
 				);
 				posY += 9;
 			}
-			Fonts.drawText(FontType.DarkPurple, "Effect: ", 27, 173);
-			Fonts.drawText(FontType.Red, "Damage: ", 27.5f, 186);
-			Fonts.drawText(FontType.Red, "Flinch: ", 126, 186);
-			Fonts.drawText(FontType.Red, "Hit CD: ", 219, 186);
-			var wep1 = xWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
-			Fonts.drawText(FontType.DarkPurple, wep1.effect, 72, 173);
-			Fonts.drawText(FontType.Red, wep1.damage, 73, 186);
-			Fonts.drawText(FontType.Red, wep1.Flinch, 170, 186);
-			Fonts.drawText(FontType.Red, wep1.hitcooldown, 268, 186);
 		} 
 		
 		if (!string.IsNullOrEmpty(error)) {
@@ -332,9 +319,78 @@ new XBuster(),
 			);
 		}
 	}
+	public void renderBoxes() {
+		var wep1 = xWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
+		string damage = wep1.damage;
+		string rateOfFire = wep1.fireRate.ToString();
+		string maxAmmo = wep1.maxAmmo.ToString();
+		string effect = wep1.effect;
+		string hitcooldown = wep1.hitcooldown;
+		string Flinch = wep1.Flinch;
+		string FlinchCD = wep1.FlinchCD;
+		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
+		Color DefaultColor = new Color(0, 0, 0, 100);
+
+		DrawWrappers.DrawRect(25, 32, Global.screenW - 25, 84, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Up Rectangle	
+		DrawWrappers.DrawRect(25, 118, Global.screenW - 25, 132, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Weapon Stats Rectangle	
+		DrawWrappers.DrawRect(25, 118, 359, 192, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); // Bottom Rectangle
+		DrawWrappers.DrawRect(25, 133, 148, 147, true, DefaultColor, 
+		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //DMG Rectangle
+		DrawWrappers.DrawRect(25, 147, 148, 158, true, DefaultColor, 
+		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
+		DrawWrappers.DrawRect(25, 158, 148, 170, true, DefaultColor, 
+		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FireRate Rectangle
+		DrawWrappers.DrawRect(148, 133, 288, 147, true, DefaultColor, 
+		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
+		DrawWrappers.DrawRect(148, 147, 288, 158, true, DefaultColor, 
+		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FlinchCD Rectangle
+		DrawWrappers.DrawRect(148, 158, 288, 170, true, DefaultColor, 
+		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
+		Fonts.drawText(FontType.Purple, "Weapon Stats",Global.halfScreenW, 122, Alignment.Center);
+		
+		if (selCursorIndex < 5) {
+			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 138);
+			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 26, 150);
+			Fonts.drawText(FontType.Blue, "Fire Rate: " + rateOfFire, 25, 162);
+			Fonts.drawText(FontType.Blue, "Hit CD: " + hitcooldown, 152, 138);
+			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 151, 150);
+			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
+			Fonts.drawText(FontType.Blue, effect, 26, 172);
+			if (wep1 is XBuster) {
+				switch (Global.level?.mainPlayer.armArmorNum) {
+					case (int)ArmorId.Light:
+						effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+						break;
+					
+					case (int)ArmorId.Giga:
+						effect = "Mega Buster Mark 17 with Double Charge Shot.";
+						break;
+
+					case (int)ArmorId.Max:
+						effect = "Mega Buster Mark 17 with Cross Charge Shot.";
+						break;
+					default:
+						effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+						break;
+				}
+				Fonts.drawText(FontType.Blue, effect, 26, 172);
+			}
+			if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasUltimateArmor == true) {
+				effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
+				Fonts.drawText(FontType.Blue, effect, 26, 172);
+			}			
+			if (wep1 is FrostShield) {
+				if (Global.frameCount % 600 < 80) {
+					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon"; } 
+				else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it.";}	
+				Fonts.drawText(FontType.Blue, effect, 26, 172);
+			}
+		}
+	}
 }
-
-
 public class SelectWeaponMenuOLD : IMainMenu {
 	public bool inGame;
 	public List<XWeaponCursor> cursors;
