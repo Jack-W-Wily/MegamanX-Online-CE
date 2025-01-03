@@ -170,23 +170,21 @@ public class DoubleCycloneCharged : Projectile {
 	public float maxSpeed = 400;
 	public float tornadoTime;
 	public float blowModifier = 0.25f;
-	public float soundTime;
 
 	public DoubleCycloneCharged(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 150, 1, player, "double_cyclone_charged_proj", 20, 0.15f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.DoubleCycloneCharged;
 		maxTime = 0.7f;
 		sprite.visible = false;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
 		for (var i = 0; i < maxLen; i++) {
 			var midSprite = new Sprite("double_cyclone_charged_proj");
 			midSprite.visible = false;
 			spriteMids.Add(midSprite);
-		}
-		destroyOnHit = false;
-		shouldShieldBlock = false;
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
@@ -199,7 +197,6 @@ public class DoubleCycloneCharged : Projectile {
 				xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex
 			);
 		}
-
 		if (Global.showHitboxes && collider != null) {
 			DrawWrappers.DrawPolygon(collider.shape.points, new Color(0, 0, 255, 128), true, ZIndex.HUD, isWorldPos: true);
 		}
@@ -207,30 +204,17 @@ public class DoubleCycloneCharged : Projectile {
 
 	public override void update() {
 		base.update();
-
-		Helpers.decrementTime(ref soundTime);
-		//if (soundTime == 0) {
-		//	playSound("straightNightmare");
-	//		soundTime = 0.1f;
-	//	}
-
 		var topX = 0;
 		var topY = 0;
-
 		var spriteMidLen = 12;
-
 		var botX = length * spriteMidLen;
 		var botY = 40;
-
 		var rect = new Rect(topX, topY, botX, botY);
-		globalCollider = new Collider(rect.getPoints(), true, this, false, false, 0, new Point(0, 0));
-
+		globalCollider = new Collider(rect.getPoints(), true, this, false, false, 0, new Point(40, 0));
 		tornadoTime += Global.spf;
-		if (tornadoTime > 0.05f) {
+		if (tornadoTime > 3/60f) {
 			if (length < maxLen) {
 				length++;
-			} else {
-				//vel.x = maxSpeed * xDir;
 			}
 			tornadoTime = 0;
 		}
@@ -253,4 +237,3 @@ public class DoubleCycloneCharged : Projectile {
 		}
 	}
 }
-
