@@ -88,17 +88,14 @@ public class Vile : Character {
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
 		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-<<<<<<< HEAD
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.vulcan);
-
-=======
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
->>>>>>> 142e736dd7b9412aaba26bbb0398da06e123bbfb
 		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
 		spriteFrameToSounds["vile_run/4"] = "vileWalk";
 		spriteFrameToSounds["vile_run/8"] = "vileWalk";
-		spriteFrameToSounds["vilemk5_run/7"] = "vileMk5Walk";
+		spriteFrameToSounds["vilemk2_run/2"] = "vileMk2Walk";
+		spriteFrameToSounds["vilemk2_run/7"] = "vileMk2Walk";
 		spriteFrameToSounds["vilemk5_run/4"] = "vileMk5Walk";
+		spriteFrameToSounds["vilemk5_run/7"] = "vileMk5Walk";
 
 		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
 
@@ -219,11 +216,12 @@ public class Vile : Character {
 			changeState(new SplashHitState(), true);
 			HyperDashCooldown = 1.5f;
 		}
+		}
+
 		
-		if (shoryukenA || charState is RocketPunch && player.input.isHeld(Control.Down,player)
+		if (shoryukenA || charState is GoGetterRightAttack && player.input.isHeld(Control.Down,player)
 		&& player.input.isPressed(Control.Shoot,player)) {
 			changeState(new VileChainGrabState(), true);
-		}
 		}
 
 		// vileteleport
@@ -918,7 +916,6 @@ public class Vile : Character {
 		}
 	}
 
-<<<<<<< HEAD
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile? proj = null;
 
@@ -927,7 +924,7 @@ public class Vile : Character {
 		}
 		if (sprite.name.Contains("vilemk5_stomp")) {
 			proj = new GenericMeleeProj(new VileStomp(), 
-			centerPoint, ProjIds.VileStomp2, player, 0.3f, 0, 0.05f);
+			centerPoint, ProjIds.VileStomp2, player, 0.3f, 0, 5f);
 		}
 
 		if (sprite.name.Contains("air_bomb_attack")) {
@@ -936,7 +933,7 @@ public class Vile : Character {
 		}
 		if (sprite.name.Contains("violentcrusher_grab")) {
 			proj = new GenericMeleeProj( new MechFrogStompWeapon(player), 
-			centerPoint, ProjIds.MechFrogStompShockwave, player, 3, 0, 0);
+			centerPoint, ProjIds.MechFrogStompShockwave, player, 3, 0, 10);
 		}
 
 		if (sprite.name.Contains("dash_grab")) {
@@ -953,27 +950,27 @@ public class Vile : Character {
 		if (sprite.name.Contains("punch")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1f, 22,  0.15f, isDeflectShield: true, ShouldClang : true
+				1f, 22,  15f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 			if (sprite.name.Contains("kick") &&  !sprite.name.Contains("kick_3") &&  !sprite.name.Contains("super")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1, 22,  0.15f, isDeflectShield: true, ShouldClang : true
+				1, 22,  15f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 		if (sprite.name.EndsWith("superkick_up") 
 		) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileAirRaidPlusKnock, player,
-				2, 0,  0.15f, isDeflectShield: true
+				2, 0,  15f, isDeflectShield: true
 			);
 		}
 		if (sprite.name.EndsWith("superkick") 
 		) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
-				2, 0,  0.15f, isDeflectShield: true
+				2, 0,  15f, isDeflectShield: true
 			);
 		}
 
@@ -981,21 +978,28 @@ public class Vile : Character {
 		if (sprite.name.Contains("hyperdash")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
-				3, 0,  0.5f, isDeflectShield: true, ShouldClang : true
+				3, 0,  10f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 
 		if (sprite.name.Contains("kick_3")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileAirRaidPlusKnock, player,
-				2, 0,  0.15f, isDeflectShield: true
+				2, 0,  15f, isDeflectShield: true
 			);
 		}
 
-			if (sprite.name.Contains("spring_grab")) {
+			if (sprite.name.Contains("spring_grab") && 	VileMode == 1) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
-				0, 0,  0.15f, isDeflectShield: true
+				0, 0,  15f, isDeflectShield: true
+			);
+		}
+
+		if (sprite.name.Contains("spring_grab") && 	VileMode == 0) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.VileMK2Grab, player,
+				0, 0,  15f, isDeflectShield: true
 			);
 		}
 
@@ -1003,32 +1007,6 @@ public class Vile : Character {
 
 		
 		return proj;
-=======
-	// Melee IDs for attacks.
-	public enum MeleeIds {
-		None = -1,
-		Grab,
-	}
-
-	// This can run on both owners and non-owners. So data used must be in sync.
-	public override int getHitboxMeleeId(Collider hitbox) {
-		if (sprite.name.Contains("dash_grab")) {
-			return (int)MeleeIds.Grab;
-		};
-		return (int)MeleeIds.None;
-	}
-
-	// This can be called from a RPC, so make sure there is no character conditionals here.
-	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
-		return (MeleeIds)id switch {
-			MeleeIds.Grab => new GenericMeleeProj(
-				new VileMK2Grab(), pos, ProjIds.VileMK2Grab, player,
-				0, 0, 0,
-				addToLevel: true
-			),
-			_ => null
-		};
->>>>>>> 142e736dd7b9412aaba26bbb0398da06e123bbfb
 	}
 
 	public override bool isSoftLocked() {
@@ -1207,7 +1185,7 @@ public class Vile : Character {
 		player.frozenCastle = boolData[0];
 		player.speedDevil = boolData[1];
 	}
-<<<<<<< HEAD
+
 
 	public override bool isToughGuyHyperMode() {
 		return sprite.name.Contains("grab") 
@@ -1220,8 +1198,8 @@ public class Vile : Character {
 	}
 
 
-=======
-	public float aiAttackCooldown;
+
+public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
 		int Vattack = Helpers.randomRange(1, 9);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
@@ -1276,8 +1254,4 @@ public class Vile : Character {
 		}
 		base.aiUpdate();
 	}
->>>>>>> 142e736dd7b9412aaba26bbb0398da06e123bbfb
 }
-
-
-

@@ -130,7 +130,7 @@ public class GenericStun : CharState {
 			}
 		}
 
-		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0) {
+		if (character.frozenTime == 0 && character.crystalizedTime == 0 && character.paralyzedTime == 0 && character.paralyzedTime2 == 0) {
 			if (flinchTime > 0) {
 				character.changeState(
 					new Hurt(hurtDir, MathInt.Ceiling(flinchTime), false, flinchYPos
@@ -184,7 +184,7 @@ public class GenericStun : CharState {
 			return;
 		}
 		character.useGravity = false;
-		character.vel.y = 0;
+		//character.vel.y = 0;
 		if (canPlayStaticSound) {
 			character.playSound("voltcStatic");
 			canPlayStaticSound = false;
@@ -212,7 +212,7 @@ public class GenericStun : CharState {
 
 
 	public void paralizeAnimLogic2() {
-		if (character.paralyzedTime == 0) {
+		if (character.paralyzedTime2 == 0) {
 			return;
 		}
 		character.useGravity = true;
@@ -221,18 +221,18 @@ public class GenericStun : CharState {
 			character.playSound("voltcStatic");
 			canPlayStaticSound = false;
 		}
-		reduceStunFrames(ref character.paralyzedTime);
+		reduceStunFrames(ref character.paralyzedTime2);
 		character.stunInvulnTime = 2;
 
-		if (paralyzeAnim == null && character.paralyzedTime > 0) {
+		if (paralyzeAnim == null && character.paralyzedTime2 > 0) {
 			paralyzeAnim = new Anim(
-				character.getCenterPos(), "vile_stun_static",
+				character.getCenterPos(), "vile_stun_static_x3",
 				1, character.player.getNextActorNetId(), false,
 				host: character, sendRpc: true
 			);
 			paralyzeAnim.setzIndex(character.zIndex + 100);
 		}
-		if (character.paralyzedTime == 0) {
+		if (character.paralyzedTime2 == 0) {
 			changeAnim = true;
 			canPlayStaticSound = true;
 			if (paralyzeAnim != null) {
@@ -253,6 +253,9 @@ public class GenericStun : CharState {
 		if (character.paralyzedTime > 0 && character.grounded) {
 			return "lose";
 		}
+		if (character.paralyzedTime2 > 0 && character.grounded) {
+			return "lose";
+		}
 		return "hurt";
 	}
 
@@ -266,6 +269,9 @@ public class GenericStun : CharState {
 		}
 		if (character.paralyzedTime >= 3) {
 			character.paralyzedTime = 2;
+		}
+		if (character.paralyzedTime2 >= 3) {
+			character.paralyzedTime2 = 2;
 		}
 		bool isCombo = (flinchTime != 0);
 		hurtSpeed = 1.6f * xDir;
@@ -312,6 +318,7 @@ public class GenericStun : CharState {
 			Global.serverClient?.rpc(RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize);
 		}
 		character.paralyzedTime = 0;
+		character.paralyzedTime2 = 0;
 		character.frozenTime = 0;
 		character.crystalizedTime = 0;
 

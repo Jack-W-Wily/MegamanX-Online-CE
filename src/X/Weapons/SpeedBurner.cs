@@ -57,7 +57,7 @@ public class SpeedBurnerProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 275, 2, player, "speedburner_start", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		20, 0.005f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurner;

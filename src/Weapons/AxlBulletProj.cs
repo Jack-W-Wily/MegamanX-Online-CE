@@ -2,7 +2,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 public class AxlBulletProj : Projectile {
 	public AxlBulletProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId) :
-		base(weapon, pos, 1, 600, 0.5f, player, "axl_bullet", 0, 0.005f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 1f, player, "axl_bullet", 0, 0.005f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBullet;
 		angle = bulletDir.angle;
@@ -10,6 +10,13 @@ public class AxlBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.17f;
 		reflectable = true;
+		isJuggleProjectile = true;
+
+		if (Helpers.randomRange(0,10) == 10){
+		changeSprite("axl_bullet_blue", true);
+		damager.damage = 2;
+		damager.flinch = 20;
+		}
 	}
 
 	
@@ -57,7 +64,7 @@ public class MettaurCrashProj : Projectile {
 
 public class BeastKillerProj : Projectile {
 	public BeastKillerProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, 1, 600, 1, player, "beastkiller_proj", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 600, 1, player, "beastkiller_proj", 10, 0, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.BeastKiller;
 		angle = bulletDir.angle;

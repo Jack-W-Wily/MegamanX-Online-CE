@@ -75,11 +75,17 @@ public enum WeaponIds {
 	FrostShield,
 	TornadoFang,
 
-	XSaber,
-
+	LightningWeb,
+	FrostTower,
+	SoulBody,
+	RisingFire,
+	GroundHunter,
+	AimingLaser,
 	DoubleCyclone,
+	TwinSlasher,
 	DarkHold,
 
+	XSaber,
 	GigaCrush,
 	ItemTracer,
 	
@@ -91,6 +97,7 @@ public enum WeaponIds {
 	UPPunch,
 	UPParry,
 	NovaStrike,
+	ForceNovaStrike,
 	X6Saber,
 	RagingChargeBuster,
 
@@ -568,6 +575,8 @@ public enum ProjIds {
 	CircleBlazeExplosion,
 
 	SigmaSlash,
+
+	DragoonSpark,
 	VirusSlash,
 	SigmaHeadProjectile,
 	SigmaSwordBlock,
@@ -788,6 +797,52 @@ public enum ProjIds {
 		NormalPush,
 		HeavyPush,
 	ForceGrabState,
+
+
+		// NEUTRAL ENEMIES
+
+	GunVoltSpark,
+	GunVoltTorpedo,
+
+	//Force Busters
+	StockBuster,
+	PlasmaBuster,
+	PlasmaBusterHit,
+	PlasmaBuster3,
+
+	// X4 Wps
+
+	LightningWebProj,
+	LightningWeb,
+	LightningWebChargedProj,
+	LightningWebCharged,
+	FrostTower,
+	FrostTowerCharged,
+	SoulBodyHologram,
+	SoulBodyHologram2,
+	SoulBodyX5,
+	RisingFire,
+	RisingFireChargedStart,
+	RisingFireCharged,
+	RisingFireUnderwater,
+	RisingFireUnderwaterCharged,
+	GroundHunter,
+	GroundHunterCharged,
+	GroundHunterSmall,
+	AimingLaser,
+	AimingLaserCharged,
+	AimingLaserMissle,
+	AimingLaserBlade,
+	TwinSlasher,
+	TwinSlasher2,
+	TwinSlasherCharged,
+	TwinSlasherCharged2,
+	TwinSlasherCharged3,
+	TwinSlasherCharged4,
+	TwinSlasherCharged5,
+	TwinSlasherCharged6,
+	TwinSlasherCharged7,
+	TwinSlasherCharged8,
 
 	// Special damage types.
 	SelfDmg = 30000,

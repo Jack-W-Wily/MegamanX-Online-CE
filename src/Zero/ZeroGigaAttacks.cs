@@ -366,7 +366,7 @@ public class RakuhouhaProj : Projectile {
 		} else {
 			damager.damage = 2;
 			damager.hitCooldown = 30;
-			damager.flinch = 0;
+			//damager.flinch = 0;
 			destroyOnHit = false;
 		}
 
@@ -813,9 +813,9 @@ public class RekkohaEffect : Effect {
 
 public class DarkHoldWeapon : Weapon {
 	public DarkHoldWeapon() : base() {
-		ammo = 0;
+		ammo = 28;
 		maxAmmo = 28;
-		fireRate = 60 * 3;
+		fireRate = 10;
 		index = (int)WeaponIds.DarkHold;
 		if (Global.level.mainPlayer.isZero){
 		type = (int)ZeroGigaType.DarkHold;

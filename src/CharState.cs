@@ -1027,25 +1027,26 @@ public class AirDash : CharState {
 		attackCtrl = true;
 	}
 
+		public static void dashBackwardsCode(Character character, int initialDashDir) {
+		//if (character.player.isAxl ) {
+			if (character.xDir != initialDashDir) {
+				if (!character.sprite.name.EndsWith("backwards")) {
+					character.changeSpriteFromName("dash_backwards", false);
+				}
+			} else {
+				if (character.sprite.name.EndsWith("backwards")) {
+					character.changeSpriteFromName("dash", false);
+				}
+			}
+		//}
+	}
+
+
 	public override void update() {
-		Dash.dashBackwardsCode(character, initialDashDir);
-
+	dashBackwardsCode(character, initialDashDir);
 		base.update();
+
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
-
-
-		if (character.canControlAirDash()){
-		character.turnToInput(player.input, player);
-
-			if (player.input.isHeld(Control.Up, player)){
-			character.vel.y = -50;
-			}
-			if (player.input.isHeld(Control.Down, player)){
-			character.vel.y = 50;
-			}
-		}
-
-		if (!player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 50;
 		}
 
@@ -1058,57 +1059,63 @@ public class AirDash : CharState {
 		float inputXDir = player.input.getInputDir(player).x;
 
 		if (player.isVile) {
+
+		
 			if (player.isVile && player.speedDevil)speedModifier = 1.15f;
 			distanceModifier = 99;
 		}
 
 
-		if (player.isX && player.hasBootsArmor(2)) {
+		if (player.isX && player.hasBootsArmor(1)) {
 			speedModifier = 1.15f;
 			distanceModifier = 1.15f;
 		}
-		if (player.character.sprite.name.EndsWith("unpo_grab_dash")) {
+		if (character.sprite.name.EndsWith("unpo_grab_dash")) {
 			speedModifier = 1.25f;
 			distanceModifier = 1.25f;
 		}
-		if (dashTime > Global.spf * 28 * distanceModifier || stop) {
+		if (dashTime > Global.spf * 32 * distanceModifier || stop) {
 			if (!stop) {
 				dashTime = 0;
-				stop = true;
 				character.frameIndex = 0;
 				character.sprite.frameTime = 0;
 				character.sprite.animTime = 0;
 				character.sprite.frameSpeed = 0.1f;
 				stop = true;
 			} else {
-				character.changeState(new Fall());
+				if (inputXDir != 0 && character.grounded) {
+					character.changeState(new Run(), true);
+				} else {
+					character.changeToIdleOrFall();
+				}
+				return;
 			}
 		}
-		// TO make it so people that aren't X get Vanilla Dash
-		if (player.isX){
-			if (dashTime > Global.spf * 3 || stop) {
+		if (dashTime > Global.spf * 3 || stop) {
 			var move = new Point(0, 0);
 			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
 			character.move(move);
-			} else {
+		} else {
 			var move = new Point(0, 0);
-			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier;
+			move.x = Physics.DashStartSpeed * character.getRunDebuffs() * initialDashDir * speedModifier; ;
 			character.move(move);
+		}
+		if (dashTime <= Global.spf * 3 || stop) {
+			if (inputXDir != 0 && inputXDir != initialDashDir) {
+				character.xDir = (int)inputXDir;
+				initialDashDir = (int)inputXDir;
 			}
 		}
-		if (!player.isX){
-			if (dashTime > Global.spf * 3 || stop) {
-			var move = new Point(0, 0);
-			move.x = character.getDashSpeed() * initialDashDir * speedModifier;
-			character.move(move);
-			} else {
-			var move = new Point(0, 0);
-			move.x = character.getDashSpeed() * character.getRunDebuffs() * initialDashDir * speedModifier;
-			character.move(move);
-			}
+		dashTime += Global.spf;
+		if (stateTime > 0.1 && !character.isUnderwater()) {
+			stateTime = 0;
+			new Anim(
+				character.getDashDustEffectPos(initialDashDir),
+				"dust", initialDashDir, player.getNextActorNetId(), true,
+				sendRpc: true
+			);
 		}
-
-
+	
 		dashTime += Global.spf;
 	}
 

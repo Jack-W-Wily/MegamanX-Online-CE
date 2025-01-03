@@ -161,35 +161,35 @@ public class FakeZero : Maverick {
 		if (sprite.name.Contains("trippleslash")) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.ZSaber1,
-					player, damage: 2, flinch: 12, hitCooldown: 0.1f
+					player, damage: 2, flinch: 12, 5
 				);
 			
 		}
 		if (sprite.name.Contains("shoot2")) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.FireWave,
-					player, damage: 2, flinch: Global.defFlinch, hitCooldown: 0.1f
+					player, damage: 2, flinch: Global.defFlinch, 5
 				);
 			
 		}
 		if (sprite.name.Contains("ground")) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.VileSuperKick,
-					player, damage: 1, flinch: 0, hitCooldown: 0.1f
+					player, damage: 1, flinch: 0, 2
 				);
 			
 		}
 		if (sprite.name.Contains("rising")) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.ZSaber1,
-					player, damage: 1, flinch: 4, hitCooldown: 0.1f,
+					player, damage: 1, flinch: 4, 5,
 					isJuggleProjectile : true
 				);	
 		}
 		if (sprite.name.Contains("air")) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.ZSaber1,
-					player, damage: 2, flinch: 20, hitCooldown: 0.1f,
+					player, damage: 2, flinch: 20, 2,
 					isJuggleProjectile : true
 				);	
 		}

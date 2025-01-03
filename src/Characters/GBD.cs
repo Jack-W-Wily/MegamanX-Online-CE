@@ -42,14 +42,6 @@ public override bool normalCtrl() {
 
 		Helpers.decrementTime(ref TPCooldown);
 
-
-		if (isOnBike){
-			if ((!player.input.isHeld(Control.Down, player))){
-			slideVel = xDir * getDashSpeed();			
-			}
-		}
-
-
 		if (grounded) {
 			if (player.input.isPressed(Control.Jump, player) ) {
 				vel.y = -getJumpPower();
@@ -78,15 +70,11 @@ public override bool normalCtrl() {
 	//	} 
 
 
-		if (charState.attackCtrl && shiningSparkStacks > 10){
-			if ((charState is Dash || charState is AirDash) && (player.input.isPressed(Control.Special1, player)
-			|| player.input.isPressed(Control.Shoot, player)
-			|| player.input.isPressed(Control.WeaponLeft, player)
-			|| player.input.isPressed(Control.WeaponRight, player)
-			) ){
-			slideVel = xDir * getDashSpeed();			
-			}
-		}
+		//if (shiningSparkStacks > 0){
+		//{
+			slideVel = xDir * shiningSparkStacks;			
+		//	}
+		//}
 		
 			flameCreateTime += Global.spf;
 			SuperGBDCreateTime += Global.spf;
@@ -133,9 +121,9 @@ public override bool normalCtrl() {
 					shiningSparkStacks = 40;
 				}
 			}
-		} else {
-			shiningSparkStacks = 0;
-		}
+		} //else {
+	//		shiningSparkStacks = 0;
+		//}
 		if (shiningSparkStacks < 0) {
 					shiningSparkStacks = 0;
 				}
@@ -250,7 +238,7 @@ public override bool normalCtrl() {
 			else if (sprite.name.Contains("dash") && (isOnBike || shiningSparkStacks > 10 ))
 		{
 			return  new GenericMeleeProj(new GBDKick(), centerPoint,
-			 ProjIds.SigmaSwordBlock, player, 2f, 20, 0.5f, null, 
+			 ProjIds.SigmaSwordBlock, player, 2f, 20, 15f, null, 
 			 isShield: false, isDeflectShield: true,
 			 isJuggleProjectile : true, ShouldClang : true);
 		}
@@ -268,50 +256,50 @@ public override bool normalCtrl() {
 		else if (  sprite.name.Contains("wall_kick") )
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.MechFrogStompShockwave, player, 2f, 0, 0.5f);
+			ProjIds.MechFrogStompShockwave, player, 2f, 0, 15f);
 		}
 	
 		if (  sprite.name.Contains("spear_1"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.Raijingeki2, player, 2f, 30, 0.14f,
+			ProjIds.Raijingeki2, player, 2f, 30, 14f,
 			isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("spear_up"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.Raijingeki2, player, 2f, 30,0.15f,
+			ProjIds.Raijingeki2, player, 2f, 30,15f,
 			isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("spear_rising"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint,
-			 ProjIds.Raijingeki2, player, 2f, 30, 0.3f,
+			 ProjIds.Raijingeki2, player, 2f, 30, 30f,
 			isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("spear_spin"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.Raijingeki2, player, 1f, 10, 0.15f,
+			ProjIds.Raijingeki2, player, 1f, 10, 15f,
 			isJuggleProjectile : true, ShouldClang : true);
 		}
 
 		if (  sprite.name.Contains("tonfa_1"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.UPPunch, player, 1f, 10, 0.15f,
+			ProjIds.UPPunch, player, 1f, 10, 15f,
 			 ShouldClang : true);
 		}
 		if (  sprite.name.Contains("tonfa_2"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.UPPunch, player, 1f, 10, 0.15f,
+			ProjIds.UPPunch, player, 1f, 10, 15f,
 			 ShouldClang : true);
 		}
 		if (  sprite.name.Contains("tonfa_3"))
 		{
 			return new GenericMeleeProj(new GBDKick(), centerPoint, 
-			ProjIds.UPPunch, player, 2f, 10, 0.15f,
+			ProjIds.UPPunch, player, 2f, 10, 15f,
 			isJuggleProjectile : true, ShouldClang : true);
 		}
 		return null;

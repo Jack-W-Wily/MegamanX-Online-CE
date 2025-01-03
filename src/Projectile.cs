@@ -19,6 +19,9 @@ public class Projectile : Actor {
 	public float maxDistance = float.MaxValue;
 
 	public Weapon weapon;
+
+		public bool releasePlasma = false;
+	public bool hasReleasedPlasma = false;
 	public bool destroyOnHit = true;
 	public bool destroyOnHitWall = false;
 	public bool reflectable = false;

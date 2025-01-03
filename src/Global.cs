@@ -17,8 +17,8 @@ namespace MMXOnline;
 public partial class Global {
 	public static decimal version = 20m;
 	public static string versionName = "WILY's CUT";
-	public static string subVersionName = "BETA #26";
-	public static string subVersionShortName = "TEST 26 [DYNAMO UPDATE!!!!]";
+	public static string subVersionName = "BETA #27";
+	public static string subVersionShortName = "TEST 27 [NEW YEAR UPDATE!!!!]";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.

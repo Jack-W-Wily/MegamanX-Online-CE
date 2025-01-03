@@ -57,7 +57,6 @@ public class SelectWeaponMenu : IMainMenu {
 	public string error = "";
 
 	public static List<Weapon> SpecialWeapon1 = new List<Weapon>() {
-
 				new XBuster(),
 				new HomingTorpedo(),
 				new ChameleonSting(),
@@ -83,13 +82,19 @@ public class SelectWeaponMenu : IMainMenu {
 				new GravityWell(),
 				new FrostShield(),
 				new TornadoFang(),
+				new LightningWeb(),
+				new	FrostTower(),
+				new	SoulBody(),
+				new	RisingFire(),
+				new	GroundHunter(),
+				new	AimingLaser(),
+				new	DoubleCyclone(),
+				new	TwinSlasher(),				
 				new ZXSaber(),
-				new DoubleCyclone(),
 				new DarkHoldWeapon()
 	};
 
 	public static List<Weapon> SpecialWeapon2 = new List<Weapon>() {
-
 				new XBuster(),
 				new HomingTorpedo(),
 				new ChameleonSting(),
@@ -115,14 +120,20 @@ public class SelectWeaponMenu : IMainMenu {
 				new GravityWell(),
 				new FrostShield(),
 				new TornadoFang(),
+				new LightningWeb(),
+				new	FrostTower(),
+				new	SoulBody(),
+				new	RisingFire(),
+				new	GroundHunter(),
+				new	AimingLaser(),
+				new	DoubleCyclone(),
+				new	TwinSlasher(),				
 				new ZXSaber(),
-				new DoubleCyclone(),
 				new DarkHoldWeapon()
 	};
 
 	public static List<Weapon> SpecialWeapon3 = new List<Weapon>() {
-
-				new XBuster(),
+new XBuster(),
 				new HomingTorpedo(),
 				new ChameleonSting(),
 				new RollingShield(),
@@ -147,9 +158,15 @@ public class SelectWeaponMenu : IMainMenu {
 				new GravityWell(),
 				new FrostShield(),
 				new TornadoFang(),
+				new LightningWeb(),
+				new	FrostTower(),
+				new	SoulBody(),
+				new	RisingFire(),
+				new	GroundHunter(),
+				new	AimingLaser(),
+				new	DoubleCyclone(),
+				new	TwinSlasher(),				
 				new ZXSaber(),
-				new DoubleCyclone(),
-				
 				new DarkHoldWeapon()
 	};
 

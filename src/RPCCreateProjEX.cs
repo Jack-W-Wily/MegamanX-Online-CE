@@ -86,8 +86,36 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.TornadoFangCharged, TornadoFangProjCharged.rpcInvoke },
 		{ (int)ProjIds.XSaberProj, XSaberProj.rpcInvoke },
 
-		// X4 Projs
+		// X4 Stuff Projs
+				
+		{ (int)ProjIds.LightningWebProj, LightningWebProj.rpcInvoke },
+		{ (int)ProjIds.LightningWeb, LightningWebProjWeb.rpcInvoke },
+		{ (int)ProjIds.LightningWebChargedProj, LightningWebProjCharged.rpcInvoke },
+		{ (int)ProjIds.LightningWebCharged, LightningWebProjWebCharged.rpcInvoke },
+		{ (int)ProjIds.FrostTower, FrostTowerProj.rpcInvoke },
+		{ (int)ProjIds.FrostTowerCharged, FrostTowerProjCharged.rpcInvoke },
+		{ (int)ProjIds.SoulBodyHologram, SoulBodyHologram.rpcInvoke },
+		{ (int)ProjIds.SoulBodyHologram2, SoulBodyHologram.rpcInvoke },
+		{ (int)ProjIds.SoulBodyX5, SoulBodyX5.rpcInvoke },
+		{ (int)ProjIds.RisingFire, RisingFireProj.rpcInvoke },
+		{ (int)ProjIds.RisingFireChargedStart, RisingFireProjChargedStart.rpcInvoke },
+		{ (int)ProjIds.RisingFireCharged, RisingFireProjCharged.rpcInvoke },
+		{ (int)ProjIds.RisingFireUnderwater, RisingFireWaterProj.rpcInvoke },
+		{ (int)ProjIds.RisingFireUnderwaterCharged, RisingFireWaterProjCharged.rpcInvoke },
+		{ (int)ProjIds.GroundHunter, GroundHunterProj.rpcInvoke },
+		{ (int)ProjIds.GroundHunterCharged, GroundHunterChargedProj.rpcInvoke },
+		{ (int)ProjIds.GroundHunterSmall, GroundHunterSmallProj.rpcInvoke },
+		{ (int)ProjIds.AimingLaser, AimingLaserProj.rpcInvoke },
+		{ (int)ProjIds.AimingLaserCharged, AimingLaserChargedProj.rpcInvoke },
+		{ (int)ProjIds.AimingLaserMissle, PeacockMissle.rpcInvoke },
+		
 		{ (int)ProjIds.DoubleCyclone, DoubleCycloneProj.rpcInvoke },
+		{ (int)ProjIds.TwinSlasher, TwinSlasherProj.rpcInvoke },
+		{ (int)ProjIds.TwinSlasher2, TwinSlasherProj.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged, TwinSlasherProjCharged.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged2, TwinSlasherProjCharged.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged3, TwinSlasherProjCharged.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged4, TwinSlasherProjCharged.rpcInvoke },
 	
 
 		//EXTRA

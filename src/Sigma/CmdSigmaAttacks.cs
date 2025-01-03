@@ -268,6 +268,7 @@ public class SigmaSlashProj : Projectile {
 		shouldShieldBlock = false;
 		setIndestructableProperties();
 		isJuggleProjectile = true;
+		ShouldClang = true;
 		isShield = true;
 		isReflectShield = true;
 		maxTime = 0.1f;

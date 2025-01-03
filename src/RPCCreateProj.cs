@@ -472,6 +472,12 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.SigmaSlash:
 				proj = new SigmaSlashProj(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.DragoonSpark:
+				proj = new DragoonSpark(new FireWave(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.AimingLaserBlade:
+				proj = new AimingLaserBlade(new AimingLaser(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.SigmaBall:
 				proj = new SigmaBallProj(new SigmaBallWeapon(), pos, xDir, player, netProjByte);
 				break;

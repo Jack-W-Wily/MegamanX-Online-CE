@@ -1462,6 +1462,7 @@ public partial class Actor : GameObject {
 				Doppma => "doppma",
 				Zain => "zain",
 				Dynamo => "Dynamo",
+				Dragoon => "highmax",
 				_ => "error"
 			};
 

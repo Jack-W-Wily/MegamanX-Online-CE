@@ -182,12 +182,12 @@ public override bool normalCtrl() {
 		
 		if (  sprite.name.Contains("rising"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.BlockableLaunch, player, 2f, 0, 1f, null, isShield: true, isDeflectShield: true);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.BlockableLaunch, player, 2f, 0, 10f, null, isShield: true, isDeflectShield: true);
 		}
 		if (  sprite.name.Contains("spinslash"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.ZSaberRollingSlash, player,
-				1, 10, 0.125f, isDeflectShield: true,
+				1, 10, 5f, isDeflectShield: true,
 				isJuggleProjectile: true,
 				ShouldClang : true
 			);
@@ -195,36 +195,36 @@ public override bool normalCtrl() {
 		if (  sprite.name.Contains("projswing_air"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 4f, 30, 0.15f, ShouldClang : true);
+			 ProjIds.ZSaber3, player, 4f, 30, 15f, ShouldClang : true);
 		}
 		if (  sprite.name.Contains("jab"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.UPPunch, player, 2f, 10, 0.15f, ShouldClang : true);
+			 ProjIds.UPPunch, player, 2f, 10, 15f, ShouldClang : true);
 		}
 		if (  sprite.name.Contains("slash") && !sprite.name.Contains("uppercut"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber2, player, 3f, 20, 0.15f, ShouldClang : true);
+			 ProjIds.ZSaber2, player, 3f, 20, 15f, ShouldClang : true);
 		}
 		if (  sprite.name.Contains("uppercut"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber1, player, 3f, 20, 0.15f, ShouldClang : true,
+			 ProjIds.ZSaber1, player, 3f, 20, 15f, ShouldClang : true,
 			 isJuggleProjectile : true);
 		}
 		if (  sprite.name.Contains("projswing") && !sprite.name.Contains("air"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound , player, 5f, 20, 0.15f, ShouldClang : true);
+			 ProjIds.MechFrogGroundPound , player, 5f, 20, 15f, ShouldClang : true);
 		}
 		if (  sprite.name.Contains("parry"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, player, 1f, 0, 0.15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f);
 		}
 		if (  sprite.name.Contains("thrust"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.NormalPush, player, 2f, 0, 0.15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.NormalPush, player, 2f, 0, 15f);
 		}
 		return null;
 	}

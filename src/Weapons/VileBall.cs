@@ -151,10 +151,11 @@ public class PeaceOutRollerProj : Projectile {
 	public PeaceOutRollerProj(
 		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 75, 3, player, "ball_por_proj", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 75, 1, player, "ball_por_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.PeaceOutRoller;
 		maxTime = 0.5f;
+		isJuggleProjectile = true;
 		if (type == 1) {
 		maxTime = 0.4f;
 		projId = (int)ProjIds.PeaceOutRoller2;

@@ -277,13 +277,22 @@ label:
 		}
 		changeWeaponSlot(ws);
 	}
+	
+	public void clearXWeapons() {
+		preXWeapons = new List<Weapon>(weapons);
+		weapons.Clear();
+	}
 
 	public void clearSigmaWeapons() {
 		preSigmaReviveWeapons = new List<Weapon>(weapons);
 		weapons.Clear();
 	}
 
+
 	public List<Weapon>? preSigmaReviveWeapons;
+	public List<Weapon>? preXWeapons;
+
+	
 	public void configureWeapons() {
 		// Save weapons for cross-life maverick HP if not an Axl.
 		var weapons = character.weapons;

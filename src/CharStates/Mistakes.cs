@@ -50,6 +50,11 @@ public class GlobalParryState : CharState {
 			}
 		}
 		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
+
+		if (Helpers.randomRange(0,5) == 5){
+			character.addHealth(1);
+			character.changeState(new ParriedState(), true);
+		}
 		character.changeState(new Idle(), true);
 	}
 
@@ -62,6 +67,8 @@ public class GlobalParryState : CharState {
 			return false;
 		}
 		if (player.isVile)return character.frameIndex < 5;
+		if (player.isDragoon)return character.frameIndex < 5;
+		
 		return character.frameIndex == 0;
 	}
 

@@ -116,8 +116,15 @@ public class CutterAttackState : CharState {
 		var player = vile.player;
 		Point muzzlePos = vile.pos.add(poi);
 		vile.playSound("frontrunner", sendRpc: true);
-
-		proj = new VileCutterProj(vile.cutterWeapon, muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
+		if (player.input.isHeld(Control.Up, player)){
+		proj = new VileCutterProj(new VileCutter(VileCutterType.ParasiteSword), muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
+		}
+		else if (player.input.isHeld(Control.Down, player)){
+		proj = new VileCutterProj(new VileCutter(VileCutterType.QuickHomesick), muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
+		}
+		else {
+		proj = new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), muzzlePos, vile.getShootXDir(), player, player.getNextActorNetId(), shootVel, rpc: true);
+		}
 	}
 
 	public override void onEnter(CharState oldState) {

@@ -1315,6 +1315,8 @@ public class GameMode {
 		}
 	}
 
+
+
 	public void renderHealthAndWeapons() {
 		bool is1v1OrTraining = level.is1v1() || level.levelData.isTraining();
 		if (!is1v1OrTraining) {
@@ -1341,9 +1343,12 @@ public class GameMode {
 		//Health
 		renderHealth(player, position, false);
 		bool mechBarExists = renderHealth(player, position, true);
+		bool sbc = player.sClone != null;
 
 		//Weapon
-		if (!mechBarExists) renderWeapon(player, position);
+		if (!mechBarExists && !sbc) renderWeapon(player, position);
+		//Soul Body clone health
+		else if (sbc) renderSBodyHealth(player, position);
 	}
 
 	public Point getHUDHealthPosition(HUDHealthPosition position, bool isHealth) {
@@ -1441,7 +1446,7 @@ public class GameMode {
 
 		baseY += 25;
 		var healthBaseSprite = spriteName;
-		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
+		Global.sprites["hud_health_base"].drawToHUD(frameIndex, baseX, baseY);
 		baseY -= 16;
 		int barIndex = 0;
 
@@ -1475,6 +1480,46 @@ public class GameMode {
 		return mechBarExists;
 	}
 
+
+	public void renderSBodyHealth(Player player, HUDHealthPosition position) {
+		if (player.sClone == null) return;
+
+		string spriteName = "hud_health_base_sbody";
+		float health = player.sClone.health;
+		float maxHealth = player.sClone.maxHealth;
+		float damageSavings = 0;
+
+		if (player.sClone.health > 0 && player.sClone.health < player.sClone.maxHealth) {
+			//damageSavings = MathInt.Floor(player.sClone.damageSavings);
+		}
+
+		int frameIndex = player.charNum;
+
+		var hudHealthPosition = getHUDHealthPosition(position, false);
+		float baseX = hudHealthPosition.x;
+		float baseY = hudHealthPosition.y;
+
+		baseY += 25;
+		string healthBaseSprite = spriteName;
+		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
+		baseY -= 16;
+		int barIndex = 0;
+
+		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
+			// Draw HP
+			if (i < MathF.Ceiling(health)) {
+				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
+			} else if (i < MathInt.Ceiling(health) + damageSavings) {
+				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
+			} else {
+				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+			}
+
+			baseY -= 2;
+		}
+
+		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+	}
 	const int grayAmmoIndex = 30;
 	public void renderAmmo(
 		float baseX, ref float baseY, int baseIndex,
@@ -2110,6 +2155,10 @@ public class GameMode {
 			}
 		}
 		if (!mainPlayer.isSpectator && mainPlayer.character is MegamanX mmx) {
+			
+			if (weapon is AimingLaser && mmx.aLaserTargets.Count >= 1) {
+				drawWeaponText(x, y, mmx.aLaserTargets.Count.ToString());
+			}
 			if (weapon is MagnetMine && mmx.magnetMines.Count > 0) {
 				drawWeaponText(x, y, mmx.magnetMines.Count.ToString());
 			}
@@ -2243,19 +2292,6 @@ public class GameMode {
 
 			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
-		}
-
-		if (weapon is DoubleCyclone dcy) {
-			var sprite = Global.sprites["double_cyclone_proj"];
-
-			float w = sprite.frames[0].rect.w();
-			float h = sprite.frames[0].rect.h();
-
-			float scaleX = Helpers.clampMax(10f / w, 1);
-			float scaleY = Helpers.clampMax(10f / h, 1);
-
-			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
-			Global.sprites["double_cyclone_proj"].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
 
 	}

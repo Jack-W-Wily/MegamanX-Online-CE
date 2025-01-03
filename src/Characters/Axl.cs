@@ -2012,6 +2012,40 @@ public class Axl : Character {
 	}
 
 
+
+
+	
+// This can run on both owners and non-owners. So data used must be in sync
+	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
+		
+		if (sprite.name.Contains("_block")) {
+			return new GenericMeleeProj(
+				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
+			);
+		}
+
+	
+			if (sprite.name.Contains("ocelot"))
+		{
+			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
+			 ProjIds.ZSaber1, player, 1, 0, 4, ShouldClang : true, isJuggleProjectile : true
+			);
+		}
+
+			if (sprite.name.Contains("tail"))
+		{
+			return new GenericMeleeProj(new FireWave(), centerPoint,
+			 ProjIds.FireWave, player, 3, 10, 5, isJuggleProjectile : true
+			);
+		}
+		
+		
+	
+		return null;
+	}
+
+
+
 	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
 		/*if (stealthActive) {

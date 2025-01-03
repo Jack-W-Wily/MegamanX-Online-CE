@@ -14,8 +14,10 @@ public class DoubleCyclone : Weapon {
 		index = (int)WeaponIds.DoubleCyclone;
 		weaponSlotIndex = 118;
 		killFeedIndex = 168;
+		weaponBarBaseIndex = 78;
 		weaponBarIndex = weaponBarBaseIndex;
-		//weaknessIndex = (int)WeaponIds.TriadThunder;
+		
+		weaknessIndex = (int)WeaponIds.AimingLaser;
 		damage = "2/2";
 		effect = ".";
 		hitcooldown = "0/0.5";
@@ -28,8 +30,8 @@ public class DoubleCyclone : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		if (chargeLevel >= 3) { return 4; }
-		return 1;
+		if (chargeLevel >= 3) { return 8; }
+		return 4;
 	}
 
 	public override void shoot(Character character, int[] args) {

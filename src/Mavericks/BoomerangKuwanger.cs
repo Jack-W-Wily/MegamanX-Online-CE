@@ -68,7 +68,18 @@ public class BoomerangKuwanger : Maverick {
 				if (shootPressed() && !bald) {
 					changeState(getShootState());
 				} else if (specialPressed() && !bald) {
+
+					if (input.isHeld(Control.Up,player)){
 					changeState(new BoomerKDeadLiftState());
+					}
+					if (!input.isHeld(Control.Up,player)){
+					changeState(new BoomerKDeadOraState());
+					}
+					if (input.isHeld(Control.Down,player)){
+					changeState(new BoomerKDeadKickState());
+					}
+
+					
 				} else if (player.dashPressed(out string dashControl) && teleportCooldown == 0 && !bald) {
 					if (ammo >= 8) {
 						deductAmmo(8);
@@ -104,7 +115,7 @@ public class BoomerangKuwanger : Maverick {
 
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
-			bald = true;
+		//	bald = true;
 			playSound("boomerkBoomerang", sendRpc: true);
 			float inputAngle = 25;
 			var inputDir = input.getInputDir(player);
@@ -137,12 +148,18 @@ public class BoomerangKuwanger : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		DeadLift,
+		Punch,
+		Kick,
+		SpinSlash,
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"boomerk_deadlift" => MeleeIds.DeadLift,
+			"boomerk_kick" => MeleeIds.Kick,
+			"boomerk_orara" => MeleeIds.Punch,
+			"boomerk_fall" => MeleeIds.SpinSlash,
 			_ => MeleeIds.None
 		});
 	}
@@ -153,6 +170,18 @@ public class BoomerangKuwanger : Maverick {
 			MeleeIds.DeadLift => new GenericMeleeProj(
 				deadLiftWeapon, pos, ProjIds.BoomerangKDeadLift, player,
 				0, 0, 0, addToLevel: addToLevel
+			),
+			MeleeIds.Kick => new GenericMeleeProj(
+				new BoomerangCutter(), pos, ProjIds.NormalPush, player,
+				2, 0, 2, addToLevel: addToLevel
+			),
+			MeleeIds.Punch => new GenericMeleeProj(
+				new BoomerangCutter(), pos, ProjIds.Boomerang, player,
+				1, 1, 2, addToLevel: addToLevel
+			),
+			MeleeIds.SpinSlash => new GenericMeleeProj(
+				new BoomerangCutter(), pos, ProjIds.Boomerang, player,
+				1, 0, 2, addToLevel: addToLevel
 			),
 			_ => null
 		};
@@ -468,6 +497,49 @@ public class BoomerKDeadLiftState : MaverickState {
 		return false;
 	}
 }
+
+
+
+public class BoomerKDeadOraState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	public BoomerKDeadOraState() : base("orara") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+}
+	public class BoomerKDeadKickState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	public BoomerKDeadKickState() : base("kick") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+}
+
 
 public class DeadLiftGrabbed : GenericGrabbedState {
 	public Character? grabbedChar;

@@ -156,11 +156,11 @@ public class CmdSigma : BaseSigma {
 		Projectile? proj = sprite.name switch {
 			"sigma_ladder_attack" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 30, 0.25f
+				3, 30, 25f
 			),
 			"sigma_wall_slide_attack" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 30, 0.25f
+				3, 30, 25f
 			),
 				"sigma_wall_dash" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
@@ -168,27 +168,27 @@ public class CmdSigma : BaseSigma {
 			),
 				"sigma_dash" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				1, 30, 0.25f
+				1, 30, 25f
 			),
 				"sigma_slash_1" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
-				2, Global.defFlinch, 0.15f
+				2, Global.defFlinch, 15f
 			),
 				"sigma_slash_2" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
-				3, Global.superFlinch, 0.15f
+				3, Global.superFlinch, 15f
 			),
 				"sigma_slash_3" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
-				3, Global.defFlinch, 0.15f
+				3, Global.defFlinch, 15f
 			),
 				"sigma_grab" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VileSuperKick, player,
-				2, Global.defFlinch, 0.15f
+				2, Global.defFlinch, 15f
 			),
 				"sigma_block" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				2, Global.defFlinch, 1f
+				2, Global.defFlinch, 60f
 			),
 			_ => null
 		};

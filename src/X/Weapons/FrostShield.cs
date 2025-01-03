@@ -11,6 +11,7 @@ public class FrostShield : Weapon {
 		fireRate = 60;
 		index = (int)WeaponIds.FrostShield;
 		weaponBarBaseIndex = 23;
+		
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 23;
 		killFeedIndex = 46;

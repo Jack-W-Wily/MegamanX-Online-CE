@@ -9,16 +9,11 @@ public class GenericMeleeProj : Projectile {
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
-<<<<<<< HEAD
-		Actor? owningActor = null, bool isShield = false,
-		 bool isDeflectShield = false, bool isReflectShield = false, 
-		 bool isJuggleProjectile = false, bool ShouldClang = false,
-		bool addToLevel = true,
-=======
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
-		bool addToLevel = false, float? hitCooldownSeconds = null,
->>>>>>> 142e736dd7b9412aaba26bbb0398da06e123bbfb
-		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
+		bool addToLevel = true, float? hitCooldownSeconds = null,
+		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false,
+		bool isJuggleProjectile = false,
+		bool ShouldClang = false
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
 	) {

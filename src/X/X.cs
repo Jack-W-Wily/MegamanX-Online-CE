@@ -697,28 +697,28 @@ public class MegamanX : Character {
 		return id switch {
 			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
-				4, Global.defFlinch, 0.5f
+				2, Global.defFlinch, 10, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LigthHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.halfFlinch, 0.5f, addToLevel: addToLevel
+				2, Global.halfFlinch, 10, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LigthHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				4, Global.defFlinch, 10, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
-				1, Global.superFlinch, 0.1f, addToLevel: addToLevel,
+				1, Global.superFlinch, 5, addToLevel: addToLevel,
 				isJuggleProjectile : true
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel, ShouldClang : true
+				4, Global.defFlinch, 15, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 10, 0.5f, addToLevel: addToLevel, ShouldClang : true
+				2, 10, 10, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.XBlock => new GenericMeleeProj(
 				new RCXPunch(), projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
@@ -726,16 +726,17 @@ public class MegamanX : Character {
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, 10, 0.5f, addToLevel: addToLevel, ShouldClang : true
+				2, 10, 10, addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
-				4, Global.defFlinch, 0.5f, addToLevel: addToLevel
+				4, Global.defFlinch, 10, addToLevel: addToLevel
 			),
 			(int)MeleeIds.UPPunch => new GenericMeleeProj(
 				new RCXPunch(), projPos, ProjIds.UPPunch, player,
-			 2, Global.halfFlinch, 0.15f, addToLevel: addToLevel, ShouldClang : true
+			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
 			),
+			
 			_ => null
 		};
 
@@ -876,9 +877,7 @@ public class MegamanX : Character {
 		if (index >= (int)WeaponIds.XSaber) {
 			index = 0;
 		}
-		if (index >= (int)WeaponIds.DoubleCyclone) {
-			index = 0;
-		}
+	
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
 			index = player.weapons[player.hyperChargeSlot].index;
 		}

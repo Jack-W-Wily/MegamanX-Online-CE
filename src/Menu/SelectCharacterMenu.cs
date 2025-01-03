@@ -34,14 +34,16 @@ public enum CharIds {
 	XMID  = 7,
 	Zain  = 8,
 	GBD  = 9,
-
 	Dynamo  = 11,
+	Dragoon = 12,
 	// Non-standard chars start here.
 	WolfSigma = 100,
 	ViralSigma,
 	KaiserSigma,
 
 	RagingChargeX,
+
+	SoulBodyClone,
 	
 	// Non-vanilla chars start here.
 	Rock = 10,
@@ -74,6 +76,7 @@ public class CharSelection {
 		new CharSelection("Dynamo", 11, 1, 0, "smenu_dynamo", 0),
 		new CharSelection("Zain", 8, 1, 0, "smenu_zain", 0),
 		new CharSelection("GBD", 9, 1, 0, "smenu_gbd", 0),
+			new CharSelection("High Max", 12, 1, 0, "smenu_highmx", 0),
 		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];

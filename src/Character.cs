@@ -182,6 +182,8 @@ public partial class Character : Actor, IDamagable {
 	
 	// Disables status.
 	public float paralyzedTime;
+	public float paralyzedTime2;
+	public float paralyzedMaxTime2;
 	public float paralyzedMaxTime;
 	public float frozenTime;
 	public float frozenMaxTime;
@@ -217,6 +219,30 @@ public partial class Character : Actor, IDamagable {
 	public List<RaySplasherTurret> rayTurrets = new();
 	public RaySplasher? shootingRaySplasher = new();
 
+	//Force Armor Stuff
+	public int forceStocks;
+	public float[] forceStocksChargeTimes = new float[4];
+	public float uaStockChargeTime;
+	
+	//X4 Weapons variables
+	public SoulBodyHologram? sBodyHologram;
+
+	public SoulBodyHologram2? sBodyHologram2;
+	public SoulBodyClone? sBodyClone;
+	public List<Character> aLaserTargets = new();
+	public AimingLaserCursor? aLaserCursor;
+	public AimingLaserHud? aLaserHud;
+	public AimingLaserProj? aLaserProj;
+	public List<AimingLaserProj?> aLasers = new();
+	public AimingLaserChargedProj? aLaserChargedProj;
+
+		//Aiming Laser stuff
+	public bool isTargetByALaser;
+	public List<Character> aLaserAttackers = new();
+	public Anim? aLaserTargetAnim;
+	
+	
+
 		// Chamaleon Sting.
 	public float stingActiveTime;
 	public int stingPaletteIndex;
@@ -231,6 +257,12 @@ public partial class Character : Actor, IDamagable {
 	public int leftPressedTimes = 0;
 
 	public int rightPressedTimes = 0;
+	public int shootPressedTimes = 0;
+	public int specialPressedTimes = 0;
+
+	public int wRightPressedTimes = 0;
+
+	public bool stockedBuster;
 
 
 
@@ -600,6 +632,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canCharge() {
+
+		if (sBodyClone != null)return false;
 		return true;
 	}
 
@@ -760,6 +794,20 @@ public partial class Character : Actor, IDamagable {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
+
+	public bool hasBusterProj() {
+		return 
+			chargedSpinningBlade != null || 
+			chargedFrostShield != null || 
+			chargedTornadoFang != null ||
+			strikeChainProj != null ||
+			strikeChainChargedProj != null ||
+			aLaserProj != null ||
+			aLaserChargedProj != null ||
+			aLasers.Count >= 1;
+	}
+
+
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
@@ -865,6 +913,19 @@ public partial class Character : Actor, IDamagable {
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// New Presing system
 		Helpers.decrementTime(ref inputdecreasedCD);
+		if (player.input.isPressed(Control.Shoot, player)){
+		shootPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Special1, player)){
+		specialPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.WeaponRight, player)){
+		wRightPressedTimes += 1;
+		inputdecreasedCD = 0.75f;
+		}
+
 		if (player.input.isPressed(Control.Down, player)){
 		downPressedTimes += 1;
 		inputdecreasedCD = 0.75f;
@@ -910,11 +971,33 @@ public partial class Character : Actor, IDamagable {
 		player.getNextActorNetId(), rpc: true);	
 		playSound("crash", true);
 		}
-	
-		if (charState is not InRideChaser && charState is VileDashState) {
-			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
+
+		
+		//Aiming Laser Hud
+		if (player.weapon is AimingLaser al && !hasBusterProj() && ownedByLocalPlayer) {
+			if (aLaserCursor == null) {
+				new AimingLaserCursor(
+					al, getShootPos(), getShootXDir(),
+					player, player.getNextActorNetId()
+				);
+			}
+
+			if (aLaserHud == null) {
+				for (int i = 0; i < 11; i++) {
+					new AimingLaserHud(
+						getShootPos(), getShootXDir(),
+						player.getNextActorNetId(), player, i
+					);
+				}
+			}
 		}
 
+	
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 		if (!player.input.isWeaponLeftOrRightHeld(player)){
 			getCamCenterPos();
@@ -1038,7 +1121,7 @@ public partial class Character : Actor, IDamagable {
 			if (isUnderwater() || charState.invincible || isStatusImmune()) {
 				acidTime = 0;
 			}
-			if (acidTime <= 0) {
+			if (acidTime <= 1) {
 				removeAcid();
 			}
 		}
@@ -1598,7 +1681,7 @@ public partial class Character : Actor, IDamagable {
 		);
 	}
 
-	public void paralize(float timeToParalize = 180) {
+	public void paralize(float timeToParalize = 280) {
 		if (!ownedByLocalPlayer ||
 			isInvulnerable() ||
 			isVaccinated() ||
@@ -1613,6 +1696,28 @@ public partial class Character : Actor, IDamagable {
 		}
 		paralyzedMaxTime = timeToParalize;
 		paralyzedTime = timeToParalize;
+		if (charState is not GenericStun) {
+			changeState(new GenericStun(), true);
+		}
+	}
+
+
+	
+	public void paralize2(float timeToParalize2 = 180) {
+		//if (!ownedByLocalPlayer ||
+		//	isInvulnerable() ||
+		//	isVaccinated() ||
+		//	isStatusImmune() ||
+		//	charState.invincible ||
+		//	charState.stunResistant ||
+		//	(charState is Die or VileMK2Grabbed) ||
+		//	isStunImmune() ||
+		 //	stunInvulnTime > 0
+		//) {
+		//	return;
+		//}
+		paralyzedMaxTime2 = timeToParalize2;
+		paralyzedTime2 = timeToParalize2;
 		if (charState is not GenericStun) {
 			changeState(new GenericStun(), true);
 		}
@@ -1964,11 +2069,18 @@ public partial class Character : Actor, IDamagable {
 	public virtual void landingCode(bool useSound = true) {
 		if (useSound) {
 
-			if (this is not Vile){
+			if (this is not Vile && this is not Dragoon){
 			playSound("land", sendRpc: true);
 			}
 			if (this is Vile){
 			playSound("vileLand", sendRpc: true);
+			}
+			if (this is Dragoon){
+			playSound("dragoonfall_1", sendRpc: true);
+				new DragoonSpark(
+				new FireWave(), pos,
+				xDir, player, player.getNextActorNetId(),rpc: true
+			);
 			}
 		}
 
@@ -2417,6 +2529,12 @@ public partial class Character : Actor, IDamagable {
 			}
 			if (paralyzedTime > 0) {
 				drawStatusBar(paralyzedTime, gst.getTimerFalloff(), paralyzedMaxTime, new Color(255, 231, 123));
+				deductLabelY(5);
+				iconsToDraw.Add(2);
+				hasDrawn = true;
+			}
+			if (paralyzedTime2 > 0) {
+				drawStatusBar(paralyzedTime, gst.getTimerFalloff(), paralyzedMaxTime2, new Color(255, 231, 123));
 				deductLabelY(5);
 				iconsToDraw.Add(2);
 				hasDrawn = true;
@@ -2923,12 +3041,7 @@ public partial class Character : Actor, IDamagable {
 			if (killer != null && killer != player) {
 				killer.addKill();
 				
-				if  (killer.character.charState is not Die &&player.health > 0 ){
-				killer.character.addHealth(3);
-				if (!killer.isRageX && !killer.isAxl){
-				killer.character.addAmmo(8);
-				}
-				}
+			
 
 
 				if (Global.level.gameMode is TeamDeathMatch) {
@@ -3106,6 +3219,8 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect?.destroy();
 		chargeSound?.destroy();
 		parasiteAnim?.destroySelf();
+			aLaserTargetAnim?.destroySelf();
+
 
 		// This ensures that the "onExit" charState function
 		// Can do any cleanup it needs to do without having to copy-paste that code here too.
@@ -3260,14 +3375,14 @@ public partial class Character : Actor, IDamagable {
 
 		parasiteAnim?.destroySelf();
 		if (ejected) {
-			new Anim(getCenterPos(), "parasitebomb_latch", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer) {
+			new Anim(getCenterPos(), "vileproj_banzai_2", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer) {
 				vel = new Point(50 * xDir, -50),
 				useGravity = true
 			};
 		} else {
 			new Anim(getCenterPos(), "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer);
 			playSound("explosion", sendRpc: true);
-			if (!carried) parasiteDamager.applyDamage(this, player.weapon is FrostShield, new VileMK2Grab(), this, (int)ProjIds.ParasiticBombExplode, overrideDamage: 1, overrideFlinch: Global.superFlinch);
+			if (!carried) parasiteDamager.applyDamage(this, player.weapon is FrostShield, new VileMK2Grab(), this, (int)ProjIds.Tornado, overrideDamage: 1, overrideFlinch: Global.superFlinch);
 		}
 
 		parasiteTime = 0;
@@ -3337,7 +3452,42 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isAttacking() {
 		return sprite.name.Contains("attack")
 		||  sprite.name.Contains("shoot")
-		||  sprite.name.Contains("slash");
+		||  sprite.name.Contains("pipe")
+		||  sprite.name.Contains("punch")
+		||  sprite.name.Contains("kick")
+		||  sprite.name.Contains("swing")
+		||  sprite.name.Contains("proj")
+		||  sprite.name.Contains("shoryuken")
+		||  sprite.name.Contains("hadouken")
+		||  sprite.name.Contains("stab")
+		||  sprite.name.Contains("raijingeki")
+		||  sprite.name.Contains("megapunch")
+		||  sprite.name.Contains("throw")
+		||  sprite.name.Contains("rocket")
+		||  sprite.name.Contains("cannon")
+		||  sprite.name.Contains("spin")
+		||  sprite.name.Contains("air")
+		||  sprite.name.Contains("parry")
+		||  sprite.name.Contains("powerwave")
+		||  sprite.name.Contains("burn")
+		||  sprite.name.Contains("knuckle")
+		||  sprite.name.Contains("missle")
+		||  sprite.name.Contains("launch")
+		||  (player.isX && player.hasHelmetArmor(1) && sprite.name.Contains("jump"))
+		||  sprite.name.Contains("slash")
+		||  sprite.name.Contains("uppercut")
+		||  sprite.name.Contains("spin")
+		||  sprite.name.Contains("ground")
+		||  sprite.name.Contains("speedburner")
+		||  sprite.name.Contains("shot")
+		||  sprite.name.Contains("super")
+		||  sprite.name.Contains("charge")
+		||  sprite.name.Contains("tbreaker")
+		||  sprite.name.Contains("eblade")
+		||  sprite.name.Contains("rising")
+		||  sprite.name.Contains("eblade")
+		||  sprite.name.Contains("bomb")
+		||  sprite.name.Contains("whip");
 	}
 
 	public bool canLandOnRideArmor() {

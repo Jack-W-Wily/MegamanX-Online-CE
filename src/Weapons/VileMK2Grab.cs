@@ -120,7 +120,7 @@ public class VileMK2GrabState : CharState {
 			if (character.isDefenderFavored()) {
 				if (leechTime > 0.5f) {
 					leechTime = 0;
-					character.addHealth(1);
+					character.addHealth(0.5f);
 				}
 				return;
 			}
@@ -247,8 +247,8 @@ public class VileStompState : CharState {
 
 		if (leechTime > 0.10f && character.frameIndex == 2) {
 			leechTime = 0;
-			if (!character.sprite.name.Contains("mk5"))character.addHealth(1);
-			if (character.sprite.name.Contains("mk5"))character.addHealth(0.33f);
+			if (!character.sprite.name.Contains("mk5"))character.addHealth(0.5f);
+			if (character.sprite.name.Contains("mk5"))character.addHealth(0.13f);
 			character.shakeCamera(sendRpc: true);
 		//	var damager = new Damager(player, 1f, 0, 0);
 		//	damager.applyDamage(victim, false, new XUPGrab(), character, (int)ProjIds.UPGrab);

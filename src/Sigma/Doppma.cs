@@ -117,14 +117,7 @@ public class Doppma : BaseSigma {
 			changeState(new SigmaThrowShieldState(), true);
 			return true;
 		}
-		if (player.input.isHeld(Control.Down, player) &&
-		player.input.isHeld(Control.Dash, player) &&
-			charState is not BurnerPunch && shieldCooldown == 0
-		) {
-			shieldCooldown = maxShieldCooldown;
-			changeState(new BurnerPunch(), true);
-			return true;
-		}
+	
 
 		return base.attackCtrl();
 	}
@@ -146,21 +139,21 @@ public class Doppma : BaseSigma {
 		if (sprite.name.Contains("punch")) {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.FireWave, player,
-				damage: 2, flinch: 20, hitCooldown: 1, isDeflectShield: true, isShield: true
+				damage: 2, flinch: 20, 30, isDeflectShield: true, isShield: true
 			);
 		}
 
 		if (sprite.name.Contains("dash")) {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.UPPunch, player,
-				damage: 2, flinch: 20, hitCooldown: 1, isDeflectShield: true, isShield: true
+				damage: 2, flinch: 20, 30, isDeflectShield: true, isShield: true
 			);
 		}
 
 		if (sprite.name.Contains("throw")) {
 			return new GenericMeleeProj(
 				new Weapon(), centerPoint, ProjIds.NormalPush, player,
-				damage: 2, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true
+				damage: 2, flinch: 0, 30, isDeflectShield: true, isShield: true
 			);
 		}
 

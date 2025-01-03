@@ -39,9 +39,9 @@ public class Damager {
 		{ (int)ProjIds.MechChain, 60 },
 		{ (int)ProjIds.TornadoFangCharged, 60 },
 		{ (int)ProjIds.Headbutt, 60 },
-		{ (int)ProjIds.RocketPunch, 60 },
-		{ (int)ProjIds.InfinityGig, 60 },
-		{ (int)ProjIds.SpoiledBrat, 60 },
+	//	{ (int)ProjIds.RocketPunch, 60 },
+	//	{ (int)ProjIds.InfinityGig, 60 },
+	//	{ (int)ProjIds.SpoiledBrat, 60 },
 		{ (int)ProjIds.SpinningBladeCharged, 60 },
 		{ (int)ProjIds.Shingetsurin, 60 },
 		{ (int)ProjIds.MagnetMineCharged, 60 },
@@ -63,7 +63,7 @@ public class Damager {
 		{ (int)ProjIds.VoltCTriadThunder, 60 },
 		{ (int)ProjIds.Rekkoha, 60 },
 		{ (int)ProjIds.HexaInvolute, 60 },
-		{ (int)ProjIds.ZSaber3, 60 },
+		//{ (int)ProjIds.ZSaber3, 60 },
 	};
 
 	public Damager(Player owner, float damage, int flinch, float hitCooldown, float knockback = 0) {
@@ -96,7 +96,7 @@ public class Damager {
 			}
 // Counter system aka Frail guy
 			if (chr.isAttacking()
-			 && newFlinch > 0) {
+			 && newFlinch >= 0) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
 				}
@@ -106,7 +106,9 @@ public class Damager {
 				else {
 					newFlinch = Global.superFlinch;
 				}
-				chr.addDamageText("COUNTER!!!", 1);		
+				chr.addDamageText("COUNTER!!!", 1);	
+				chr.shakeCamera(sendRpc: true);
+				chr.playSound("weakness");		
 			}
 		}
 
@@ -253,12 +255,12 @@ public class Damager {
 					maverick?.crystalize();
 					break;
 				case (int)ProjIds.SpreadShot:
-					character?.crystalize();
-					maverick?.crystalize();
+					character?.paralize2();
+		//			maverick?.crystalize();
 					break;
 				case (int)ProjIds.MK2StunShot:
-					character?.crystalize();
-					maverick?.crystalize();
+					character?.paralize2();
+		//			maverick?.crystalize();
 					break;
 				case (int)ProjIds.CSnailCrystalHunter:
 					character?.crystalize();
@@ -298,6 +300,9 @@ public class Damager {
 				case (int)ProjIds.MorphMPowder:
 				case (int)ProjIds.Raijingeki:
 				case (int)ProjIds.Raijingeki2:
+				case (int)ProjIds.PeaceOutRoller:
+				case (int)ProjIds.PeaceOutRoller2:
+				
 					character?.paralize();
 					maverick?.paralize();
 					break;
@@ -425,6 +430,16 @@ public class Damager {
 			)){
 			owner.character.changeState(new VileAirRaid(character), true);
 			}
+
+
+			// Vile Air Raid 
+			if (owner.isDragoon && 
+			(
+				projId == (int)ProjIds.VileAirRaidStart
+			|| projId == (int)ProjIds.VileAirRaidPlusKnock
+			)){
+			owner.character.changeState(new VileAirRaid(character), true);
+			}
 			
 			// Vile Blockable Grab
 			if (!character.sprite.name.Contains("block") &&
@@ -451,6 +466,8 @@ public class Damager {
 		if (((projId == (int)ProjIds.ForceGrabState) &&	 !victim.sprite.name.Contains("knocked"))
 		&& !character.isStatusImmune()) {		
 		character.changeState(new VileMK2Grabbed(owner.character), true);
+		
+		if (owner.isDragoon)owner.character.changeState(new DragoonGrab(), true);
 		}
 
 
@@ -1095,7 +1112,7 @@ public class Damager {
 			(int)ProjIds.DistanceNeedler => true,
 			(int)ProjIds.Raijingeki => true,
 			(int)ProjIds.Raijingeki2 => true,
-			(int)ProjIds.CFlasher => true,
+			(int)ProjIds.Rakuhouha => true,
 			(int)ProjIds.AcidBurstPoison => true,
 			(int)ProjIds.MetteurCrash => true,
 			_ => false

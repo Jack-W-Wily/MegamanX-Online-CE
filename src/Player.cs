@@ -134,6 +134,8 @@ public partial class Player {
 
 	public bool isDynamo { get { return charNum == (int)CharIds.Dynamo; } }
 
+	public bool isDragoon { get { return charNum == (int)CharIds.Dragoon; } }
+
 
 	public float healthBackup;
 
@@ -228,6 +230,7 @@ public partial class Player {
 		{ (int)CharIds.Zain, new List<SubTank>() },
 		{ (int)CharIds.GBD, new List<SubTank>() },
 		{ (int)CharIds.Dynamo, new List<SubTank>() },
+		{ (int)CharIds.Dragoon, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -244,6 +247,7 @@ public partial class Player {
 		{ (int)CharIds.Zain, new() },
 		{ (int)CharIds.GBD, new() },
 		{ (int)CharIds.Dynamo, new() },
+		{ (int)CharIds.Dragoon, new() },
 	};
 
 	// Getter functions.
@@ -430,7 +434,7 @@ public partial class Player {
 	// Projectile shaders.
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
-
+	
 	public ShaderWrapper darkHoldDScreenShader = Helpers.cloneShaderSafe("trail");
 
 	// Character specific data populated on RPC request
@@ -459,6 +463,8 @@ public partial class Player {
 	public List<ChillPIceStatueProj> iceStatues = new List<ChillPIceStatueProj>();
 	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
 	public List<Actor> mechaniloids = new List<Actor>();
+	public SoulBodyClone? sClone;
+
 
 	ExplodeDieEffect explodeDieEffect;
 	public Character limboChar;
@@ -682,7 +688,7 @@ public partial class Player {
 	//	}
 		int bonus = 0;
 		if (isRageX) {
-			bonus = 20;
+			bonus = 12;
 		}
 		if (isX) {
 			bonus = 12;
@@ -707,6 +713,9 @@ public partial class Player {
 			bonus = 8;
 		}
 		if (isDynamo) {
+			bonus = 12;
+		}
+		if (isDragoon) {
 			bonus = 12;
 		}
 		return MathF.Ceiling(
@@ -1230,6 +1239,12 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
+		else if (charNum == (int)CharIds.Dragoon) {
+			character = new Dragoon(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
 		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
@@ -1453,6 +1468,12 @@ public partial class Player {
 				true, data.dnaNetId, false, isWarpIn: false
 			);
 		}
+		else if (data.charNum == (int)CharIds.Dragoon) {
+			retChar = new Dragoon(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}
 		 else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
@@ -1633,6 +1654,12 @@ public partial class Player {
 		}
 		else if (charNum == (int)CharIds.Dynamo) {
 			retChar = new Dynamo(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (charNum == (int)CharIds.Dragoon) {
+			retChar = new Dragoon(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
@@ -2308,20 +2335,21 @@ public partial class Player {
 	}
 
 	public void forceKill() {
-		if (maverick1v1 != null && Global.level.is1v1()) {
+		//if (maverick1v1 != null && Global.level.is1v1()) {
 			//character?.applyDamage(null, null, 1000, null);
 			currentMaverick?.applyDamage(1000, this, character, null, null);
-			return;
-		}
+				character?.applyDamage(1000, this, character, null, null);
+	
+		//}
 
-		if (currentMaverick != null && isTagTeam()) {
-			destroyCharacter();
-		} else {
-			character?.applyDamage(1000, this, character, null, null);
-		}
-		foreach (var maverick in mavericks) {
-			maverick.applyDamage(1000, this, character, null, null);
-		}
+//		if (currentMaverick != null && isTagTeam()) {
+//			destroyCharacter();
+//		} else {
+//			character?.applyDamage(1000, this, character, null, null);
+//		}
+//		foreach (var maverick in mavericks) {
+//			maverick.applyDamage(1000, this, character, null, null);
+//		}
 	}
 
 	public bool isGridModeEnabled() {

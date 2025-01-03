@@ -704,12 +704,7 @@ public class StrikeChainProjCharged : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		if (player.isX){
-		mmx = player.character as MegamanX;
-		}
-		if (player.isRageX){
-		mmx = player.character as XMID;
-		}
+	
 		mmx.strikeChainChargedProj = this;
 		this.player = player;
 
@@ -836,7 +831,7 @@ public class StrikeChainProjCharged : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (hookedActor != null) hookedActor.useGravity = true;
-		if (mmx != null && mmx.strikeChainProj == this) {
+		if (mmx != null ){// mmx.strikeChainProj == this) {
 			mmx.strikeChainProj = null;
 		}
 	}
