@@ -1704,18 +1704,13 @@ public partial class Character : Actor, IDamagable {
 
 	
 	public void paralize2(float timeToParalize2 = 180) {
-		//if (!ownedByLocalPlayer ||
-		//	isInvulnerable() ||
-		//	isVaccinated() ||
-		//	isStatusImmune() ||
-		//	charState.invincible ||
-		//	charState.stunResistant ||
-		//	(charState is Die or VileMK2Grabbed) ||
-		//	isStunImmune() ||
-		 //	stunInvulnTime > 0
-		//) {
-		//	return;
-		//}
+		if (!ownedByLocalPlayer 
+		// || isInvulnerable() || isVaccinated() ||isStatusImmune() || charState.invincible
+		// || charState.stunResistant ||(charState is Die or VileMK2Grabbed) || isStunImmune()
+		// || stunInvulnTime > 0
+		) {
+			return;
+		}
 		paralyzedMaxTime2 = timeToParalize2;
 		paralyzedTime2 = timeToParalize2;
 		if (charState is not GenericStun) {
@@ -2534,7 +2529,7 @@ public partial class Character : Actor, IDamagable {
 				hasDrawn = true;
 			}
 			if (paralyzedTime2 > 0) {
-				drawStatusBar(paralyzedTime, gst.getTimerFalloff(), paralyzedMaxTime2, new Color(255, 231, 123));
+				drawStatusBar(paralyzedTime2, gst.getTimerFalloff(), paralyzedMaxTime2, new Color(255, 231, 123));
 				deductLabelY(5);
 				iconsToDraw.Add(2);
 				hasDrawn = true;
