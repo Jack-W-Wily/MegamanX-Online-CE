@@ -987,7 +987,7 @@ public class Zero : Character {
 			),
 			(int)MeleeIds.AwakenedAura => new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player,
-				0, 0, 30f,
+				0, 0, 80,
 				addToLevel: addToLevel
 			),
 			_ => null

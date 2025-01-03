@@ -37,9 +37,14 @@ public class FlameMammoth : Maverick {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {
 					changeState(new FlameMOilState());
+				} else if (input.isPressed(Control.Dash, player)) {
+					changeState(new MammothGrabState());
 				}
+				
+				
+				
 			} else if (state is MJump || state is MFall) {
-				if (input.isPressed(Control.Dash, player) && getDistFromGround() > 75) {
+				if (input.isPressed(Control.Dash, player)) {
 					changeState(new FlameMJumpPressState());
 				}
 			}
@@ -86,14 +91,17 @@ public class FlameMammoth : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		Fall,
+		Grab,
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"flamem_fall" => MeleeIds.Fall,
+			"flamem_grab" => MeleeIds.Grab,
 			_ => MeleeIds.None
 		});
+		
 	}
 
 	// This can be called from a RPC, so make sure there is no character conditionals here.
@@ -102,6 +110,10 @@ public class FlameMammoth : Maverick {
 			MeleeIds.Fall => new GenericMeleeProj(
 				stompWeapon, pos, ProjIds.FlameMStomp, player,
 				6, Global.defFlinch, addToLevel: addToLevel
+			),
+				MeleeIds.Grab => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.FlameMSlam, player,
+				0, 0, addToLevel: addToLevel
 			),
 			_ => null
 		};
@@ -420,4 +432,97 @@ public class FlameMJumpPressState : MaverickState {
 		maverick.vel = new Point(0, 300);
 	}
 }
+
+
+
+public class MammothGrabState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	public MammothGrabState() : base("grab") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
+		if (grabbedChar != null && grabbedChar.sprite.name.EndsWith("_grabbed")
+		&& !maverick.sprite.name.Contains("finisher")) {
+			grabbedOnce = true;
+					maverick.changeSpriteFromName("grab_finisher", true);	
+	
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+	public override bool trySetGrabVictim(Character grabbed) {
+		if (grabbedChar == null) {
+			grabbedChar = grabbed;
+			return true;
+		}
+		return false;
+	}
+}
+
+
+public class FlameMSlamWeapon : Weapon {
+	public FlameMSlamWeapon(Player player) {
+		index = (int)WeaponIds.FlameMSlam;
+		killFeedIndex = 97;
+		damager = new Damager(player, 8, Global.defFlinch, 0.5f);
+	}
+}
+
+
+public class MammothSlammed : GenericGrabbedState {
+	public Character? grabbedChar;
+	public bool launched;
+	float launchTime;
+	public MammothSlammed(FlameMammoth grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.ownedByLocalPlayer) { return; }
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+				character.changeToIdleOrFall();
+				return;
+			}
+			if (launchTime > 0.1f && character.grounded) {
+				new FlameMSlamWeapon((grabber as Maverick).player).applyDamage(character, false, character, (int)ProjIds.MechFrogStompShockwave);
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(sendRpc: true);
+			}
+		}
+
+		if (grabber.sprite?.name.EndsWith("grab_finisher") == true) {
+			if (grabber.frameIndex < 2) {
+				trySnapToGrabPoint(true);
+			} else if (!launched) {
+				launched = true;
+				character.unstickFromGround();
+				character.vel.y = 600;
+			}
+		} else {
+			notGrabbedTime += Global.spf;
+		}
+
+		if (notGrabbedTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
+
 #endregion

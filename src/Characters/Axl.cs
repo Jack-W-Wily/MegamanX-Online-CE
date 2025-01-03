@@ -1608,6 +1608,7 @@ public class Axl : Character {
 		|| sprite.name.Contains("lose") 
 		|| ladderClimb 
 		|| charState is DeadLiftGrabbed 
+		|| charState is MammothSlammed
 		|| charState is UPGrabbed 
 		|| charState is WhirlpoolGrabbed 
 		|| charState is RainStorm 

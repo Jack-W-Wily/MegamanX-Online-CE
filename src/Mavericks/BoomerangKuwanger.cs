@@ -173,15 +173,15 @@ public class BoomerangKuwanger : Maverick {
 			),
 			MeleeIds.Kick => new GenericMeleeProj(
 				new BoomerangCutter(), pos, ProjIds.NormalPush, player,
-				2, 0, 2, addToLevel: addToLevel
+				2, 0, 15, addToLevel: addToLevel
 			),
 			MeleeIds.Punch => new GenericMeleeProj(
 				new BoomerangCutter(), pos, ProjIds.Boomerang, player,
-				1, 1, 2, addToLevel: addToLevel
+				1, 4,8, addToLevel: addToLevel
 			),
 			MeleeIds.SpinSlash => new GenericMeleeProj(
 				new BoomerangCutter(), pos, ProjIds.Boomerang, player,
-				1, 0, 2, addToLevel: addToLevel
+				1, 10, 8, addToLevel: addToLevel
 			),
 			_ => null
 		};

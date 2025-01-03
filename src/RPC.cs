@@ -1748,6 +1748,8 @@ public enum CommandGrabScenario {
 	UPGrab,
 	WhirlpoolGrab,
 	DeadLiftGrab,
+
+	MammothSlam,
 	WSpongeChain,
 	WheelGGrab,
 	FStagGrab,
@@ -1852,7 +1854,16 @@ public class RPCCommandGrabPlayer : RPC {
 					new DeadLiftGrabbed(boomerangKuwanger),
 					isDefenderFavored
 				);
-			} else if (hookScenario == CommandGrabScenario.WheelGGrab && grabber is WheelGator wheelGator) {
+			} 
+			
+			 else if (hookScenario == CommandGrabScenario.MammothSlam && grabber is FlameMammoth flameMammoth) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new MammothSlammed(flameMammoth),
+					isDefenderFavored
+				);
+			}
+			else if (hookScenario == CommandGrabScenario.WheelGGrab && grabber is WheelGator wheelGator) {
 				maverickGrabCode(
 					grabberMaverick, victimChar,
 					new WheelGGrabbed(wheelGator), isDefenderFavored

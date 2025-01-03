@@ -16,12 +16,12 @@ public class BlizzardBuffalo : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(BBuffaloDashState), new MaverickStateCooldown(false, true, 1.25f));
-		stateCooldowns.Add(typeof(BBuffaloShootBeamState), new MaverickStateCooldown(false, false, 2));
+		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.15f));
+		stateCooldowns.Add(typeof(BBuffaloDashState), new MaverickStateCooldown(false, true, 0.05f));
+		stateCooldowns.Add(typeof(BBuffaloShootBeamState), new MaverickStateCooldown(false, false, 0));
 
-		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
-		spriteFrameToSounds["bbuffalo_run/6"] = "walkStomp";
+		spriteFrameToSounds["bbuffalo_run/2"] = "buffalowalk";
+		spriteFrameToSounds["bbuffalo_run/6"] = "buffalowalk";
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
@@ -52,6 +52,9 @@ public class BlizzardBuffalo : Maverick {
 					changeState(new BBuffaloDashState());
 				}
 			} else if (state is MJump || state is MFall) {
+				if (input.isPressed(Control.Dash, player)) {
+					changeState(new FlameMJumpPressState());
+				}
 			}
 		}
 	}
@@ -465,7 +468,7 @@ public class BBuffaloDashState : MaverickState {
 
 		if (!player.ownedByLocalPlayer) return;
 
-		var move = new Point(150 * maverick.xDir, 0);
+		var move = new Point(350 * maverick.xDir, 0);
 
 		var hitGround = Global.level.checkTerrainCollisionOnce(maverick, move.x * Global.spf * 5, 20);
 		if (hitGround == null) {
@@ -486,7 +489,7 @@ public class BBuffaloDashState : MaverickState {
 			maverick.changeToIdleOrFall();
 			return;
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isHeld(Control.Up, player)) {
 			maverick.changeSpriteFromName("dash_grab", false);
 		}
 	}

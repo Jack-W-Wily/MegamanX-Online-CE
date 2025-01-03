@@ -248,6 +248,8 @@ public enum WeaponIds {
 	StormEEgg,
 	FlameMFireball,
 	FlameMStomp,
+
+	FlameMSlam,
 	FlameMOil,
 	FlameMOilFire,
 	VelGFire,
@@ -612,6 +614,7 @@ public enum ProjIds {
 	StormEBird,
 	FlameMFireball,
 	FlameMStomp,
+	FlameMSlam,
 	FlameMStompShockwave,
 	FlameMOil,
 	FlameMOilSpill,

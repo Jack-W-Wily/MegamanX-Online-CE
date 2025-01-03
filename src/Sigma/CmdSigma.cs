@@ -164,7 +164,7 @@ public class CmdSigma : BaseSigma {
 			),
 				"sigma_wall_dash" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				1, 30, 0.25f, isDeflectShield : true, isJuggleProjectile : true
+				1, 30, 25f, isDeflectShield : true, isJuggleProjectile : true
 			),
 				"sigma_dash" => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,

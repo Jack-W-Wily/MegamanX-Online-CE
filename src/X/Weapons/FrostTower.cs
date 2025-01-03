@@ -184,8 +184,8 @@ public class FrostTowerChargedState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
-		mmx.shootCooldown = 60;
+		//MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+		//mmx.shootCooldown = 60;
 	}
 
 	public override void update() {

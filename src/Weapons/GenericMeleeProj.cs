@@ -144,6 +144,9 @@ public class GenericMeleeProj : Projectile {
 			case (int)ProjIds.BoomerangKDeadLift when owningActor is BoomerangKuwanger bk:
 				maverickGrabCode(CommandGrabScenario.DeadLiftGrab, bk, damagable, new DeadLiftGrabbed(bk));
 				break;
+			case (int)ProjIds.FlameMSlam when owningActor is FlameMammoth fm:
+				maverickGrabCode(CommandGrabScenario.MammothSlam, fm, damagable, new MammothSlammed(fm));
+				break;
 			case (int)ProjIds.GBeetleLift when owningActor is GravityBeetle gb:
 				maverickGrabCode(CommandGrabScenario.BeetleLiftGrab, gb, damagable, new BeetleGrabbedState(gb));
 				break;

@@ -127,7 +127,7 @@ public class BaseSigma : Character {
 		// "Global" command prototype
 		if (player.weapon is SigmaMenuWeapon &&
 			player.currentMaverick == null && player.mavericks.Count > 0 &&
-			grounded && player.input.isHeld(Control.Down, player) &&
+			player.input.isHeld(Control.Down, player) &&
 			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand) {
 			if (player.input.isCommandButtonPressed(player)) {
 				Global.level.gameMode.hudErrorMsgTime = 0;
@@ -147,7 +147,7 @@ public class BaseSigma : Character {
 			}
 		} else if (player.weapon is SigmaMenuWeapon &&
 			player.currentMaverick == null && player.mavericks.Count > 0 &&
-			grounded && player.input.isHeld(Control.Up, player) &&
+			player.input.isHeld(Control.Up, player) &&
 			(isPuppeteer || isSummoner) && charState is not IssueGlobalCommand
 		) {
 			if (player.input.isCommandButtonPressed(player)) {
@@ -347,18 +347,6 @@ public class BaseSigma : Character {
 		) {
 			return;
 		}
-		/*
-		if (charState.canAttack() &&
-			player.input.isHeld(Control.Shoot, player) &&
-			player.weapon is not MaverickWeapon && !isAttacking() &&
-			player.isSigma2() && saberCooldown == 0
-		) {
-			saberCooldown = 0.2f;
-			changeState(new SigmaClawState(charState, !grounded), true);
-			playSound("sigma2slash", sendRpc: true);
-			return;
-		}
-		*/
 		if (player.weapon is MaverickWeapon mw2 && player.input.isPressed(Control.Special2, player)) {
 			mw2.isMenuOpened = true;
 		}

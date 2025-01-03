@@ -14,10 +14,10 @@ public class BlastHornet : Maverick {
 
 	public BlastHornet(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 2f));
-		stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.25f));
+		stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 0.1f));
+		stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.05f));
 		stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
-		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
+		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.2f));
 
 		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 		wings = new Sprite("bhornet_wings");
@@ -326,13 +326,17 @@ public class BHornetShootState : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			//maverick.playSound("???", sendRpc: true);
+
+			if (maverick.grounded){
+			new ParasiticBombProj(maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), true);
+			} else{
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 0.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 1.5f).normalize(), player, player.getNextActorNetId(), rpc: true);
 			new BHornetBeeProj(maverick.weapon, shootPos.Value, maverick.xDir, new Point(maverick.xDir, 2).normalize(), player, player.getNextActorNetId(), rpc: true);
+			}
 		}
-
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleFallOrFly();
 		}

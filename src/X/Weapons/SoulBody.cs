@@ -127,7 +127,7 @@ float distance;
 
 	public override void onDestroy() {
 		base.onDestroy();
-		owner.character.sBodyHologram = null!;
+		owner.character.sBodyHologram = null;
 	}
 }
 
@@ -210,7 +210,7 @@ float distance;
 
 	public override void onDestroy() {
 		base.onDestroy();
-		owner.character.sBodyHologram2 = null!;
+		owner.character.sBodyHologram2 = null;
 	}
 }
 
@@ -229,7 +229,7 @@ public class ControlClone : CharState {
 		normalCtrl = false;
 		attackCtrl = false;
 		useDashJumpSpeed = true;
-		invincible = true;
+	//	invincible = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -276,7 +276,7 @@ public class SoulBodyEX : CharState {
 		normalCtrl = false;
 		attackCtrl = false;
 		useDashJumpSpeed = true;
-		superArmor = true;
+	//	superArmor = true;
 	}
 
 	public override void onEnter(CharState oldState) {

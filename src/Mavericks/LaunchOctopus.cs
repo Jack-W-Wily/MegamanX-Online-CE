@@ -66,7 +66,7 @@ public class LaunchOctopus : Maverick {
 					if (ammo > 0) {
 						changeState(new LaunchOShoot(grounded));
 					}
-				} else if (input.isPressed(Control.Dash, player) && getDistFromGround() > 75) {
+				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new LaunchOWhirlpoolState());
 				}
 			}
@@ -174,7 +174,7 @@ public class LaunchOMissile : Projectile, IDamagable {
 		int unitVel, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 100, 3, player, "launcho_proj_missile",
-		0, 0.15f, netProjId, player.ownedByLocalPlayer
+		4, 0.15f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.LaunchOMissle;
 		maxTime = 0.75f;

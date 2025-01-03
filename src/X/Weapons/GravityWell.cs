@@ -267,7 +267,7 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		GravityWell.netWeapon, pos, xDir, 0, 0, player, "gravitywell_charged", 
-		0, 0, netProjId, player.ownedByLocalPlayer
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 4;
 		projId = (int)ProjIds.GravityWellCharged;
@@ -275,6 +275,12 @@ public class GravityWellProjCharged : Projectile, IDamagable {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		this.yDir = yDir;
+
+		if (owner.isSigma){
+		changeSprite("gbeetle_proj_finalgwell", false);
+		damager.damage = 2;
+		damager.flinch = 5;
+		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)yDir);
 		}

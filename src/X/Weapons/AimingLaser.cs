@@ -165,7 +165,7 @@ Player player;
 		base.update();
 		if (!ownedByLocalPlayer) return;
 		if (player.character.destroyed || player.character.charState is Die
-		|| player.health < 2) {
+		|| player.health < 1) {
 			destroySelf();
 			return;
 		}

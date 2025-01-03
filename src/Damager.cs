@@ -96,7 +96,10 @@ public class Damager {
 			}
 // Counter system aka Frail guy
 			if (chr.isAttacking()
-			 && newFlinch >= 0) {
+			 && newFlinch >= 0 && (
+			projId != (int)ProjIds.HexaInvolute &&
+			projId != (int)ProjIds.AwakenedAura
+			 )) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
 				}

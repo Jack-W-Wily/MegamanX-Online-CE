@@ -979,14 +979,14 @@ public partial class Character : Actor, IDamagable {
 		
 		//Aiming Laser Hud
 		if (player.weapon is AimingLaser al && !hasBusterProj() && ownedByLocalPlayer) {
-			if (aLaserCursor == null) {
+			if (aLaserCursor == null && player.health > 0) {
 				new AimingLaserCursor(
 					al, getShootPos(), getShootXDir(),
 					player, player.getNextActorNetId()
 				);
 			}
 
-			if (aLaserHud == null) {
+			if (aLaserHud == null && player.health > 0) {
 				for (int i = 0; i < 11; i++) {
 					new AimingLaserHud(
 						getShootPos(), getShootXDir(),

@@ -718,7 +718,7 @@ public class PunchyZero : Character {
 					}
 					Projectile proj = new GenericMeleeProj(
 						awakenedAuraWeapon, centerPoint,
-						ProjIds.AwakenedAura, player, damage, flinch, 0.5f
+						ProjIds.AwakenedAura, player, damage, flinch, 80
 					) {
 						globalCollider = globalCollider.clone(),
 						meleeId = (int)MeleeIds.AwakenedAura

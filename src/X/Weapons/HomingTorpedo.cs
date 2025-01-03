@@ -97,6 +97,9 @@ public class TorpedoProj : Projectile, IDamagable {
 		else if (type == 3) {
 			projId = (int)ProjIds.LaunchOTorpedo;
 			changeSprite("launcho_proj_ht", true);
+			maxTime = 3f;
+			maxSpeed = 350;
+			damager.flinch = Global.defFlinch;
 		}
 		else if (type == 5) {
 			projId = (int)ProjIds.SigmaHeadProjectile;
@@ -108,7 +111,7 @@ public class TorpedoProj : Projectile, IDamagable {
 		fadeOnAutoDestroy = true;
 		reflectableFBurner = true;
 		customAngleRendering = true;
-		if (type == 1 || type == 3 || type == 5) {
+		if (type == 1 || type == 5) {
 			damager.damage = (type == 1 ? 1 : 2);
 			damager.flinch = Global.halfFlinch;
 		} else if (type == 2) {
