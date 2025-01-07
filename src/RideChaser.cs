@@ -605,6 +605,10 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
 	public void creditKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			killer.addKill();
@@ -630,6 +634,17 @@ public class RideChaser : Actor, IDamagable {
 		if (ownedByLocalPlayer) {
 			RPC.creditPlayerKillVehicle.sendRpc(killer, assister, this, weaponIndex);
 		}
+	}
+
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > timeStopThreshold) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [Player.darkHoldShader];
+			}
+		}
+		return null;
 	}
 
 	public override List<byte> getCustomActorNetData() {

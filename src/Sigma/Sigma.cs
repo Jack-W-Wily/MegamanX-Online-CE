@@ -97,7 +97,7 @@ public class BaseSigma : Character {
 			spcPressed = false;
 		}
 
-		if (player.isAI && charState.attackCtrl) {
+		if (player.isAI && charState.attackCtrl && AI.trainingBehavior == AITrainingBehavior.Default) {
 			foreach (Weapon weapon in weapons) {
 				if (weapon is MaverickWeapon mw && mw.maverick == null) {
 					if (mw.summonedOnce) {
@@ -218,7 +218,7 @@ public class BaseSigma : Character {
 						changeState(new CallDownMaverick(maverick, true, false), true);
 
 						if (isSummoner) {
-							maverick.aiCooldown = 1f;
+							maverick.aiCooldown = 60;
 						}
 
 						if (!isPuppeteer) {

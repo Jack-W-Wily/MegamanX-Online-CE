@@ -283,12 +283,6 @@ label:
 		weapons.Clear();
 	}
 
-	public void clearSigmaWeapons() {
-		preSigmaReviveWeapons = new List<Weapon>(weapons);
-		weapons.Clear();
-	}
-
-
 	public List<Weapon>? preSigmaReviveWeapons;
 	public List<Weapon>? preXWeapons;
 

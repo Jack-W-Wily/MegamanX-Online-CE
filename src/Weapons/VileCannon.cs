@@ -191,9 +191,9 @@ public class CannonAttack : CharState {
 	bool isGizmo;
 	private Vile vile = null!;
 
-	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
-		this.isGizmo = false;
-		normalCtrl = true;
+	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
+		this.isGizmo = isGizmo;
+		normalCtrl = !isGizmo;
 	}
 
 	public static string getSprite(bool isGizmo, bool grounded) {

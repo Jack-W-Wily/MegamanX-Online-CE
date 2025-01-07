@@ -5,12 +5,8 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class BlizzardBuffalo : Maverick {
-	public static Weapon getWeapon() { return new Weapon(WeaponIds.BBuffaloGeneric, 151); }
-	public static Weapon getMeleeWeapon(Player player) {
-		return new Weapon(WeaponIds.BBuffaloGeneric, 151, new Damager(player, 4, Global.defFlinch, 1));
-	}
+	public static Weapon netWeapon = new Weapon(WeaponIds.BBuffaloGeneric, 151);
 
-	public Weapon meleeWeapon;
 	public BlizzardBuffalo(
 		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
@@ -22,9 +18,7 @@ public class BlizzardBuffalo : Maverick {
 
 		spriteFrameToSounds["bbuffalo_run/2"] = "buffalowalk";
 		spriteFrameToSounds["bbuffalo_run/6"] = "buffalowalk";
-
-		weapon = getWeapon();
-		meleeWeapon = getMeleeWeapon(player);
+		weapon = netWeapon;
 
 		awardWeaponId = WeaponIds.FrostShield;
 		weakWeaponId = WeaponIds.ParasiticBomb;
@@ -81,22 +75,24 @@ public class BlizzardBuffalo : Maverick {
 	}
 
 	public MaverickState getShootState(bool isAI) {
-		var mshoot = new MShoot((Point pos, int xDir) => {
-			playSound("bbuffaloShoot", sendRpc: true);
+		var mshoot = new MShoot(
+			(Point pos, int xDir) => {
+				playSound("bbuffaloShoot", sendRpc: true);
 
-			Point unitDir = new Point(xDir, -1);
-			var inputDir = input.getInputDir(player);
-			if (inputDir.y == -1) unitDir.y = -2;
-			if (inputDir.y == 1) unitDir.y = 0;
-			if (inputDir.x == xDir) unitDir.x = xDir * 2;
-			int shootFramesHeld = (state as MShoot)?.shootFramesHeld ?? 0;
-			float speedModifier = Helpers.clamp((shootFramesHeld + 3) / 10f, 0.5f, 1.5f);
+				Point unitDir = new Point(xDir, -1);
+				var inputDir = input.getInputDir(player);
+				if (inputDir.y == -1) unitDir.y = -2;
+				if (inputDir.y == 1) unitDir.y = 0;
+				if (inputDir.x == xDir) unitDir.x = xDir * 2;
+				int shootFramesHeld = (int)MathF.Ceiling((state as MShoot)?.shootFramesHeld ?? 0);
 
-			new BBuffaloIceProj(
-				weapon, pos, xDir, unitDir.normalize(),
-				speedModifier, player, player.getNextActorNetId(), sendRpc: true
-			);
-		}, null);
+				new BBuffaloIceProj(
+					pos, xDir, (int)unitDir.x,  (int)unitDir.y, shootFramesHeld,
+					this, player.getNextActorNetId(), sendRpc: true
+				);
+			},
+			null
+		);
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
 		}
@@ -151,47 +147,63 @@ public class BlizzardBuffalo : Maverick {
 
 public class BBuffaloIceProj : Projectile {
 	public BBuffaloIceProj(
-		Weapon weapon, Point pos, int xDir, Point unitDir,
-		float speedModifier, Player player, ushort netProjId, bool sendRpc = false
+		Point pos, int xDir, int shootDirX, int shootDirY, int shootFramesHeld,
+		Actor owner, ushort netProjId, bool sendRpc = false, Player? player = null
 	) : base(
-		weapon, pos, xDir, 150, 3, player, "bbuffalo_proj_iceball",
-		Global.defFlinch, 0.01f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "bbuffalo_proj_iceball", netProjId, player
 	) {
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = BlizzardBuffalo.netWeapon;
 		projId = (int)ProjIds.BBuffaloIceProj;
 		maxTime = 1.5f;
 		useGravity = true;
 
+		if (shootFramesHeld >= 255) {
+			shootFramesHeld = 255;
+		}
+		Point unitDir = new Point(shootDirX, shootDirY).normalize();
+		float speedModifier = Helpers.clamp((shootFramesHeld + 3) / 10f, 0.5f, 1.5f);
 		vel = new Point(unitDir.x * 200 * speedModifier, unitDir.y * 250 * speedModifier);
 
 		collider.wallOnly = true;
 		destroyOnHit = true;
 
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(
+				pos, ownerPlayer, netProjId, xDir,
+				[(byte)(shootDirX + 128), (byte)(shootDirY + 128), (byte)shootFramesHeld]
+			);
 		}
-		// ToDo: Make local.
-		canBeLocal = false;
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BBuffaloIceProj(
+			args.pos, args.xDir,
+			args.extraData[0] - 128, args.extraData[1] - 128, args.extraData[2],
+			args.owner, args.netId, player: args.player
+		);
 	}
 
 	public override void onStart() {
 		base.onStart();
-		if (!ownedByLocalPlayer) return;
 
 		if (checkCollision(0, 0) != null) {
 			destroySelf();
-			Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner, sendRpc: true);
-			playSound("iceBreak", sendRpc: true);
+			Anim.createGibEffect("bbuffalo_proj_ice_gibs", getCenterPos(), owner);
+			playSound("iceBreak");
 		}
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
-		if (!ownedByLocalPlayer) return;
 
-		var hitNormal = other.getNormalSafe();
 		destroySelf();
+		if (!ownedByLocalPlayer) return;
+		var hitNormal = other.getNormalSafe();
 		new BBuffaloIceProjGround(
-			weapon, other.getHitPointSafe(), hitNormal.angle,
+			weapon, other.getHitPointSafe(), hitNormal.byteAngle,
 			owner, owner.getNextActorNetId(), sendRpc: true
 		);
 	}
@@ -210,21 +222,21 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	float health = 6;
 
 	public BBuffaloIceProjGround(
-		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool sendRpc = false
+		Weapon weapon, Point pos, float byteAngle, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
 		weapon, pos, 1, 0, 3, player, "bbuffalo_proj_ice",
 		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
 		maxTime = 5;
 		projId = (int)ProjIds.BBuffaloIceProjGround;
 		destroyOnHit = true;
 		playSound("frostShield");
-		this.angle = angle;
 		updateHitboxes();
 		if (sendRpc) {
-			rpcCreateByteAngle(pos, player, netProjId, angle);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
-		canBeLocal = false;
 	}
 
 	public override void preUpdate() {
@@ -241,8 +253,8 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 	public void updateHitboxes() {
 		if (angle == null || collider?._shape == null) return;
 
-		float angle360 = Helpers.to360(angle.Value);
-		if (angle360 >= 0 && angle360 <= 45) {
+		float angle360 = Helpers.to256(byteAngle.Value);
+		if (angle360 >= 0 && angle360 <= 32) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(-9, 0),
@@ -250,7 +262,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 					new Point(26, 30),
 					new Point(-9, 30),
 				};
-		} else if (angle360 > 45 && angle360 <= 135) {
+		} else if (angle360 > 32 && angle360 <= 96) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(0 - 12, 0 + 12),
@@ -258,7 +270,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 					new Point(30 - 12, 35 + 12),
 					new Point(0 - 12, 35 + 12),
 				};
-		} else if (angle360 > 135 && angle360 <= 225) {
+		} else if (angle360 > 96 && angle360 <= 160) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(-9 - 18, 0),
@@ -266,7 +278,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 					new Point(26 - 18, 30),
 					new Point(-9 - 18, 30),
 				};
-		} else if (angle360 > 225) {
+		} else if (angle360 > 160) {
 			collider._shape.points = new List<Point>()
 			{
 					new Point(0 - 12, 0 - 12),
@@ -295,6 +307,7 @@ public class BBuffaloIceProjGround : Projectile, IDamagable {
 		//if (projId == null) return true;
 		//return !Damager.canDamageFrostShield(projId.Value);
 	}
+	public bool isPlayableDamagable() { return false; }
 
 	public override void onDestroy() {
 		base.onDestroy();

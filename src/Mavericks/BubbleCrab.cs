@@ -231,7 +231,7 @@ public class BCrabShootState : MaverickState {
 	bool secondAnim;
 	float shootCooldown;
 	int num;
-	public BCrabShootState() : base("ring_attack_start", "") {
+	public BCrabShootState() : base("ring_attack_start") {
 	}
 
 	public override void update() {
@@ -275,7 +275,7 @@ public class BCrabShootState : MaverickState {
 }
 
 public class BCrabClawState : MaverickState {
-	public BCrabClawState() : base("jump_attack_start", "") {
+	public BCrabClawState() : base("jump_attack_start") {
 	}
 
 	public override void update() {
@@ -301,7 +301,7 @@ public class BCrabClawState : MaverickState {
 }
 
 public class BCrabClawJumpState : MaverickState {
-	public BCrabClawJumpState() : base("jump_attack", "") {
+	public BCrabClawJumpState() : base("jump_attack") {
 	}
 
 	public override void update() {
@@ -403,10 +403,14 @@ public class BCrabShieldProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class BCrabShieldStartState : MaverickState {
-	public BCrabShieldStartState() : base("shield_start", "") {
+	public BCrabShieldStartState() : base("shield_start") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -494,6 +498,9 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		}
 	}
 	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+	public bool isPlayableDamagable() {
 		return false;
 	}
 }
@@ -648,10 +655,13 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
+	public bool isPlayableDamagable() {
+		return true;
+	}
 }
 
 public class BCrabSummonState : MaverickState {
-	public BCrabSummonState() : base("summon", "") {
+	public BCrabSummonState() : base("summon") {
 	}
 
 	public override void update() {

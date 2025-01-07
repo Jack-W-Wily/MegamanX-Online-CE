@@ -739,7 +739,6 @@ public class Crouch : CharState {
 public class SwordBlock : CharState {
 	public SwordBlock() : base("block") {
 		immuneToWind = true;
-	//	superArmor = true;
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;

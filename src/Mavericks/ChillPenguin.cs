@@ -359,6 +359,10 @@ public class ChillPIceStatueProj : Projectile, IDamagable {
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class ChillPBlizzardProj : Projectile {
@@ -395,17 +399,17 @@ public class ChillPBlizzardProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable is not Character character) return;
-		if (character.charState.invincible) return;
-		if (character.charState.immuneToWind) return;
-		if (immuneToKnockback) return;
-		if (character.isStatusImmune()) return;
-
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
 		float modifier = 1;
-		if (character.grounded) modifier = 0.5f;
-		if (character.charState is Crouch) modifier = 0.25f;
-		character.move(new Point(pushSpeed * xDir * modifier, 0));
-		character.pushedByTornadoInFrame = true;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
+		}
+		actor.move(new Point(pushSpeed * xDir * modifier, 0));
 	}
 }
 #endregion
@@ -415,7 +419,7 @@ public class ChillPIceBlowState : MaverickState {
 	float shootTime;
 	bool soundOnce;
 	bool statueOnce;
-	public ChillPIceBlowState() : base("blow", "") {
+	public ChillPIceBlowState() : base("blow") {
 	}
 
 	public override void update() {
@@ -484,7 +488,7 @@ public class ChillPBlizzardState : MaverickState {
 	int state;
 	new bool isAI;
 	public const float switchSpriteHeight = 60;
-	public ChillPBlizzardState(bool isAI) : base("jump", "") {
+	public ChillPBlizzardState(bool isAI) : base("jump") {
 		this.isAI = isAI;
 	}
 
@@ -562,7 +566,7 @@ public class ChillPSlideState : MaverickState {
 	const float timeBeforeSlow = 0.75f;
 	const float slowTime = 0.5f;
 	bool soundOnce;
-	public ChillPSlideState(bool isAI) : base("slide", "") {
+	public ChillPSlideState(bool isAI) : base("slide") {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -625,6 +629,7 @@ public class ChillPSlideState : MaverickState {
 public class ChillPBurnState : MaverickState {
 	Point pushDir;
 	public ChillPBurnState() : base("burn") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

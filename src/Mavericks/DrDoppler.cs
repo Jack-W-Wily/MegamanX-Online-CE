@@ -183,7 +183,7 @@ public class DrDopplerBallProj : Projectile {
 }
 
 public class DrDopplerDashStartState : MaverickState {
-	public DrDopplerDashStartState() : base("dash_charge", "") {
+	public DrDopplerDashStartState() : base("dash_charge") {
 		stopMovingOnEnter = true;
 		enterSound = "ryuenjin";
 	}
@@ -267,7 +267,7 @@ public class DrDopplerDashState : MaverickState {
 public class DrDopplerAbsorbState : MaverickState {
 	float soundTime = 119f/60f;
 	public SoundWrapper? sound;
-	public DrDopplerAbsorbState() : base("absorb", "") {
+	public DrDopplerAbsorbState() : base("absorb") {
 		exitOnAnimEnd = true;
 		superArmor = true;
 		enterSound = "bcrabShield";
@@ -302,9 +302,10 @@ public class DrDopplerAbsorbState : MaverickState {
 }
 
 public class DrDopplerUncoatState : MaverickState {
-	public DrDopplerUncoatState() : base("uncoat", "") {
+	public DrDopplerUncoatState() : base("uncoat") {
 		exitOnAnimEnd = true;
 		enterSound = "transform";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

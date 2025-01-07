@@ -508,7 +508,7 @@ public class Damager {
 			if (character.isAlwaysHeadshot() && (projId == (int)ProjIds.RevolverBarrel || projId == (int)ProjIds.AncientGun)) {
 				damage *= 1.5f;
 			}
-			if (character.ownedByLocalPlayer && character.charState.superArmor) {
+			if (character.ownedByLocalPlayer && character.isFlinchImmune()) {
 				flinch = 0;
 			}
 			//if ((owner?.character as Zero)?.isViral == true) {
@@ -738,8 +738,8 @@ public class Damager {
 				}
 			}
 
-			if (!character.charState.superArmor &&
-				!character.isInvulnerable(true, true) &&
+			if (!character.isFlinchImmune() &&
+				!character.isInvulnerable(false, true) &&
 				!isDot(projId) && (
 				owner?.character is Zero zero && zero.isBlack ||
 				owner?.character is PunchyZero pzero && pzero.isViral
@@ -769,7 +769,7 @@ public class Damager {
 				}
 			}
 
-			if (flinchCooldown > 0) {
+			if (flinchCooldown > 0 && flinch > 0) {
 				int flinchKey = getFlinchKeyFromProjId(projId);
 				if (!character.flinchCooldown.ContainsKey(flinchKey)) {
 					character.flinchCooldown[flinchKey] = 0;
@@ -807,7 +807,7 @@ public class Damager {
 				// Weakness is true and character is not frozen in Shotgun Ice.
 				else if (weakness && !isShotgunIceAndFrozen && mmx?.weaknessCooldown <= 0) {
 					victim?.playSound("weakness");
-					if (!character.charState.superArmor) {
+					if (!character.isFlinchImmune()) {
 						// Put a cooldown of 0.75s minimum.
 						if (flinchCooldown * 60 < 45) {
 							mmx.weaknessCooldown = 45;

@@ -641,9 +641,9 @@ public class GameMode {
 					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			if (drawPlayer.character is RagingChargeX mmx && mmx.unpoShotCount > 0) {
+			if (drawPlayer.character is RagingChargeX mmx && mmx.shotCount > 0) {
 				int x = 10, y = 156;
-				int count = mmx.unpoShotCount;
+				int count = mmx.shotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
 				if (count >= 2) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y);
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
@@ -2405,10 +2405,11 @@ public class GameMode {
 				Global.sprites["menu_megaman"].drawToHUD(4, x, sy + 4);
 			} else {
 				Global.sprites["menu_megaman_armors"].drawToHUD(0, x, sy + 4);
-				int boots = Player.getArmorNum(dnaCore.armorFlag, 0, true);
-				int body = Player.getArmorNum(dnaCore.armorFlag, 1, true);
-				int helmet = Player.getArmorNum(dnaCore.armorFlag, 2, true);
-				int arm = Player.getArmorNum(dnaCore.armorFlag, 3, true);
+				int[] armorVals = MegamanX.getArmorVals(dnaCore.armorFlag);
+				int boots = armorVals[2];
+				int body = armorVals[0];
+				int helmet = armorVals[3];
+				int arm = armorVals[1];
 
 				if (helmet == 1) Global.sprites["menu_megaman_armors"].drawToHUD(1, x, sy + 4);
 				if (helmet == 2) Global.sprites["menu_megaman_armors"].drawToHUD(2, x, sy + 4);

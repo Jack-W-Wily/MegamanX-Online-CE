@@ -188,7 +188,7 @@ public class NeonTRaySplasherProj : Projectile {
 
 public class NeonTWallShootState : MaverickState {
 	MaverickState prevState;
-	public NeonTWallShootState(MaverickState prevState) : base("wall_shoot", "") {
+	public NeonTWallShootState(MaverickState prevState) : base("wall_shoot") {
 		useGravity = false;
 		this.prevState = prevState;
 	}
@@ -212,7 +212,7 @@ public class NeonTWallShootState : MaverickState {
 
 public class NeonTWallClawState : MaverickState {
 	MaverickState prevState;
-	public NeonTWallClawState(MaverickState prevState) : base("wall_slash", "") {
+	public NeonTWallClawState(MaverickState prevState) : base("wall_slash") {
 		useGravity = false;
 		this.prevState = prevState;
 		enterSound = "neontSlash";
@@ -229,7 +229,7 @@ public class NeonTWallClawState : MaverickState {
 public class NeonTClawState : MaverickState {
 	bool isSecond;
 	bool shootPressed;
-	public NeonTClawState(bool isSecond) : base(isSecond ? "slash2" : "slash", "") {
+	public NeonTClawState(bool isSecond) : base(isSecond ? "slash2" : "slash") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
 		canEnterSelf = true;
@@ -257,7 +257,7 @@ public class NeonTClawState : MaverickState {
 public class NeonTAirClawState : MaverickState {
 	bool wasPounce;
 	bool wasWallPounce;
-	public NeonTAirClawState() : base("jump_slash", "") {
+	public NeonTAirClawState() : base("jump_slash") {
 		exitOnAnimEnd = true;
 		enterSound = "neontSlash";
 	}
@@ -281,7 +281,7 @@ public class NeonTAirClawState : MaverickState {
 
 public class NeonTDashClawState : MaverickState {
 	float velX;
-	public NeonTDashClawState() : base("dash_slash", "") {
+	public NeonTDashClawState() : base("dash_slash") {
 		exitOnAnimEnd = true;
 		enterSound = "neontSlash";
 	}
@@ -300,8 +300,11 @@ public class NeonTDashClawState : MaverickState {
 
 public class NeonTDashState : MaverickState {
 	float dustTime;
-	public NeonTDashState() : base("dash", "") {
+	public NeonTDashState() : base("dash") {
 		enterSound = "dashX3";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -351,6 +354,9 @@ public class NeonTPounceState : MaverickState {
 	public bool isWallPounce;
 	public NeonTPounceState() : base("fall") {
 		enterSound = "jump";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

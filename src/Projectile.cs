@@ -117,20 +117,23 @@ public class Projectile : Actor {
 
 	public Projectile(
 		Point pos, int xDir, Actor owner, string sprite,
-		ushort? netId, bool? ownedByLocalPlayer, bool addToLevel = true
+		ushort? netId, Player? player = null, bool? ownedByLocalPlayer = null, bool addToLevel = true
 	) : base(
-		sprite, pos, netId, ownedByLocalPlayer ?? owner.ownedByLocalPlayer, !addToLevel
+		sprite, pos, netId,
+		ownedByLocalPlayer ?? player?.ownedByLocalPlayer ?? owner?.ownedByLocalPlayer ??
+		(netId != null ? Global.level.getPlayerById(netId.Value).ownedByLocalPlayer : true),
+		!addToLevel
 	) {
-		weapon = Weapon.netWeapon;
+		weapon = Weapon.baseNetWeapon;
 		useGravity = false;
-		damager = new Damager(owner.netOwner, 0, 0, 0);
-		ownerPlayer = owner.netOwner;
+		ownerPlayer = player ?? owner?.netOwner ?? Global.level.getPlayerById(netId!.Value);
+		damager = new Damager(ownerPlayer, 0, 0, 0);
 		owningActor = owner;
 		this.xDir = xDir;
-		if ((Global.level.gameMode.isTeamMode && Global.level.mainPlayer != owner.netOwner) &&
+		if ((Global.level.gameMode.isTeamMode && Global.level.mainPlayer != ownerPlayer) &&
 			this is not NapalmPartProj or FlameBurnerProj
 		) {
-			RenderEffectType? allianceEffect = owner.netOwner.alliance switch {
+			RenderEffectType? allianceEffect = ownerPlayer.alliance switch {
 				0 => RenderEffectType.BlueShadow,
 				1 => RenderEffectType.RedShadow,
 				2 => RenderEffectType.GreenShadow,
@@ -750,7 +753,7 @@ public class Projectile : Actor {
 
 	private void rpcCreateHelper(
 		Point pos, Player player, ushort? netProjId,
-		int xDirOrAngle, bool isAngle,
+		int xDirOrAngle, bool isAngle, Actor? owner,
 		params byte[] extraData
 	) {
 		if (netProjId == null) {
@@ -763,6 +766,7 @@ public class Projectile : Actor {
 		// Create bools of data.
 		byte dataInf = Helpers.boolArrayToByte(new bool[] {
 			isAngle,
+			owner?.netId != null,
 			extraData != null && extraData.Length > 0
 		});
 		if (!isAngle) {
@@ -778,6 +782,9 @@ public class Projectile : Actor {
 			netProjIdByte[0], netProjIdByte[1],
 			(byte)xDirOrAngle
 		};
+		if (owner?.netId != null) {
+			bytes.AddRange(BitConverter.GetBytes(owner.netId.Value));
+		}
 		if (extraData != null && extraData.Length > 0) {
 			bytes.AddRange(extraData);
 		}
@@ -788,7 +795,7 @@ public class Projectile : Actor {
 		Point pos, Player player, ushort? netProjId,
 		int xDir, params byte[] extraData
 	) {
-		rpcCreateHelper(pos, player, netProjId, xDir, false, extraData);
+		rpcCreateHelper(pos, player, netProjId, xDir, false, null, extraData);
 	}
 
 	public virtual void rpcCreateAngle(
@@ -796,7 +803,7 @@ public class Projectile : Actor {
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round((angle / 1.40625f) % 256f);
-		rpcCreateHelper(pos, player, netProjId, byteAngle, true, extraData);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, null, extraData);
 	}
 
 	public virtual void rpcCreateByteAngle(
@@ -804,7 +811,14 @@ public class Projectile : Actor {
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round(angle % 256f);
-		rpcCreateHelper(pos, player, netProjId, byteAngle, true, extraData);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, null, extraData);
+	}
+
+	public virtual void rpcCreate(
+		Point pos, Actor owner, Player player, ushort? netProjId,
+		int xDir, params byte[] extraData
+	) {
+		rpcCreateHelper(pos, player, netProjId, xDir, false, owner, extraData);
 	}
 
 	public void acidFadeEffect() {

@@ -200,6 +200,7 @@ public class TSeahorseAcidProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) => false;
 	public bool canBeHealed(int healerAlliance) => false;
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class TSeahorseAcid2Proj : Projectile {
@@ -283,7 +284,7 @@ public class TSeahorseAcid2Proj : Projectile {
 
 public class TSeahorseShoot2State : MaverickState {
 	bool shotOnce;
-	public TSeahorseShoot2State() : base("shoot2", "") {
+	public TSeahorseShoot2State() : base("shoot2") {
 		exitOnAnimEnd = true;
 	}
 
@@ -294,8 +295,8 @@ public class TSeahorseShoot2State : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("acidBurst", sendRpc: true);
-		//	new TSeahorseAcid2Proj(maverick.weapon, shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId());
-		//	new TSeahorseAcid2Proj(maverick.weapon, shootPos.Value, maverick.xDir, 1, player, player.getNextActorNetId());
+			new TSeahorseAcid2Proj(shootPos.Value, maverick.xDir, 0, player, player.getNextActorNetId(), rpc: true);
+			new TSeahorseAcid2Proj(shootPos.Value, maverick.xDir, 1, player, player.getNextActorNetId(), rpc: true);
 		}
 	}
 }
@@ -303,7 +304,7 @@ public class TSeahorseShoot2State : MaverickState {
 public class TSeahorseTeleportState : MaverickState {
 	int state = 0;
 	float shootCooldown;
-	public TSeahorseTeleportState() : base("teleport", "") {
+	public TSeahorseTeleportState() : base("teleport") {
 		enterSound = "tseahorseTeleportOut";
 	}
 

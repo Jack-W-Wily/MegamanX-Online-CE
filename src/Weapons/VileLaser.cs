@@ -93,7 +93,7 @@ public class RisingSpecterState : CharState {
 	bool shot = false;
 	bool grounded;
 
-	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall", "", "", "") {
+	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall") {
 		this.grounded = grounded;
 	}
 
@@ -232,7 +232,7 @@ public class NecroBurstAttack : CharState {
 	bool shot = false;
 	Vile vile = null!;
 
-	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
+	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 	}
 
 	public override void update() {
@@ -426,7 +426,7 @@ public class RAShrapnelProj : Projectile {
 
 public class StraightNightmareAttack : CharState {
 	bool shot = false;
-	public StraightNightmareAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
+	public StraightNightmareAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 		enterSound = "straightNightmareShoot";
 	}
 
@@ -527,19 +527,19 @@ public class StraightNightmareProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (damagable is not Character character) return;
-		if (character.charState.invincible) return;
-		if (character.isImmuneToKnockback()) return;
-
-		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		if (character.isClimbingLadder()) {
-			character.setFall();
-		} else if (!character.pushedByTornadoInFrame) {
-			float modifier = 1;
-			if (character.grounded) modifier = 0.5f;
-			if (character.charState is Crouch) modifier = 0.25f;
-			character.move(new Point(maxSpeed * 0.9f * xDir * modifier * blowModifier, 0));
+		base.onHitDamagable(damagable);
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
 			character.pushedByTornadoInFrame = true;
 		}
+		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
+		actor.move(new Point(maxSpeed * 0.9f * xDir * modifier * blowModifier, 0));
 	}
 }

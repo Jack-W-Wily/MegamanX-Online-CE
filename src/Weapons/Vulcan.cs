@@ -159,7 +159,7 @@ public class VulcanMuzzleAnim : Anim {
 
 public class VulcanCharState : CharState {
 	bool isCrouch;
-	public VulcanCharState(bool isCrouch) : base(isCrouch ? "crouch_shoot" : "idle_shoot", "", "", "") {
+	public VulcanCharState(bool isCrouch) : base(isCrouch ? "crouch_shoot" : "idle_shoot") {
 		useDashJumpSpeed = true;
 		this.isCrouch = isCrouch;
 	}

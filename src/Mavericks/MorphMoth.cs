@@ -325,7 +325,8 @@ public class MorphMSweepState : MaverickState {
 
 public class MorphMHatchState : MaverickState {
 	float riseDist;
-	public MorphMHatchState() : base("fly", "") {
+	public MorphMHatchState() : base("fly") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

@@ -552,6 +552,7 @@ public enum ProjIds {
 	SplashLaser,
 	DoubleBullet,
 	BlackArrow,
+	BlackArrow2,
 	BlackArrowGround,
 	WindCutter,
 	SpiralMagnum,

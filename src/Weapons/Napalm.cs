@@ -716,13 +716,19 @@ public class MK2NapalmFlame : Projectile {
 	
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -200));
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
 		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune() || character.isFlinchImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
+		}
+		if (actor.isUnderwater()) { modifier = 2; }
+		float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
+		actor.move(new Point(xMoveVel * 50 * modifier, 0));
 	}
 
 }
@@ -749,13 +755,19 @@ public class MK2NapalmWallProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -600));
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
 		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune() || character.isFlinchImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
+		}
+		if (actor.isUnderwater()) { modifier = 2; }
+		float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
+		actor.move(new Point(xMoveVel * 50 * modifier, 0));
 	}
 }
 
@@ -835,12 +847,18 @@ public class SplashHitProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -600));
+		if (damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
 		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune() || character.isFlinchImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
+		}
+		if (actor.isUnderwater()) { modifier = 2; }
+		float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
+		actor.move(new Point(xMoveVel * 50 * modifier, 0));
 	}
 }

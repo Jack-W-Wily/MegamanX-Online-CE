@@ -46,7 +46,7 @@ public class Hadouken : CharState {
 	bool fired = false;
 	//MegamanX? mmx;
 
-	public Hadouken() : base("hadouken", "", "", "") {
+	public Hadouken() : base("hadouken") {
 		superArmor = true;
 	}
 

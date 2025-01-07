@@ -18,9 +18,8 @@ public class Vile : Character {
 	public bool isShootingLongshotGizmo;
 	public int longshotGizmoCount;
 	public float gizmoCooldown;
-	public bool hasFrozenCastleBarrier() {
-		return player.frozenCastle;
-	}
+	public bool hasFrozenCastle;
+	public bool hasSpeedDevil;
 	public bool summonedGoliath;
 	public int vileForm;
 	public bool isVileMK1 { get { return vileForm == 0; } }
@@ -110,10 +109,10 @@ public class Vile : Character {
 		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 
-
 		//Vile Cooldowns
 		stateCooldowns.Add(typeof(AirSplashHitGranadeLaunch), new CharStateCooldown(false, true, 1f));
-		
+		hasFrozenCastle = player.frozenCastle;
+		hasSpeedDevil = player.speedDevil;
 	}
 
 	public Sprite? getCannonSprite(out Point poiPos, out int zIndexDir) {
@@ -1072,7 +1071,7 @@ public class Vile : Character {
 	}
 
 	public override void render(float x, float y) {
-		if (player.speedDevil) {
+		if (hasSpeedDevil) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
@@ -1129,7 +1128,7 @@ public class Vile : Character {
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> shaders = base.getShaders();
 
-		if (player.frozenCastle && player.frozenCastleShader != null) {
+		if (hasFrozenCastle && player.frozenCastleShader != null) {
 			shaders.Add(player.frozenCastleShader);
 		}
 
@@ -1137,19 +1136,16 @@ public class Vile : Character {
 	}
 
 	public override float getRunSpeed() {
-		if (player.speedDevil) {
+		if (hasSpeedDevil) {
 			return base.getRunSpeed() * 1.1f;
 		}
 		return base.getRunSpeed();
 	}
 
 	public override float getDashSpeed() {
-		if (flag != null || !isDashing) {
-			return getRunSpeed();
-		}
 		float dashSpeed = 3.45f * 60f;
-		
-		if (player.speedDevil) {
+
+		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;
 		}
 	
@@ -1170,8 +1166,8 @@ public class Vile : Character {
 		List<byte> customData = base.getCustomActorNetData();
 
 		customData.Add(Helpers.boolArrayToByte([
-			player.frozenCastle,
-			player.speedDevil
+			hasFrozenCastle,
+			hasSpeedDevil
 		]));
 
 		return customData;
@@ -1184,8 +1180,8 @@ public class Vile : Character {
 
 		// Per-character data.
 		bool[] boolData = Helpers.byteToBoolArray(data[0]);
-		player.frozenCastle = boolData[0];
-		player.speedDevil = boolData[1];
+		hasFrozenCastle = boolData[0];
+		hasSpeedDevil = boolData[1];
 	}
 
 

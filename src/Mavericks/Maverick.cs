@@ -116,7 +116,7 @@ public class Maverick : Actor, IDamagable {
 	public MaverickAIBehavior aiBehavior;
 	public Actor target;
 	public float aiCooldown;
-	public float maxAICooldown = 1.25f;
+	public float maxAICooldown = 60;
 	public string startMoveControl;
 
 	public Weapon weapon;
@@ -537,7 +537,7 @@ public class Maverick : Actor, IDamagable {
 		input.keyPressed.Clear();
 		input.keyHeld.Clear();
 
-		Helpers.decrementTime(ref aiCooldown);
+		Helpers.decrementFrames(ref aiCooldown);
 
 		bool isSummonerOrStrikerDoppler = (player.isSummoner() || player.isStriker()) && this is DrDoppler;
 		bool isSummonerCocoon = player.isSummoner() && this is MorphMothCocoon;
@@ -563,7 +563,7 @@ public class Maverick : Actor, IDamagable {
 			);
 		}
 
-		bool isAIState = (state is MIdle or MRun or MLand);
+		bool isAIState = state.attackCtrl;
 		if (canFly) isAIState = isAIState || state is MFly;
 
 		if (target != null && (isAIState || state is MShoot)) {
@@ -632,12 +632,13 @@ public class Maverick : Actor, IDamagable {
 			}
 		} else if (aiBehavior == MaverickAIBehavior.Attack) {
 			float raycastDist = (width / 2) + 5;
-			var hit = Global.level.raycastAll(getCenterPos(), getCenterPos().addxy(attackDir * raycastDist, 0), new List<Type>() { typeof(Wall) });
+			var hit = Global.level.raycastAll(
+				getCenterPos(), getCenterPos().addxy(attackDir * raycastDist, 0), new List<Type>() { typeof(Wall) }
+			);
 			if (hit.Count == 0) {
 				if (attackDir < 0) press(Control.Left);
 				else press(Control.Right);
 			}
-
 			var jumpZones = Global.level.getTerrainTriggerList(
 				this, Point.zero, typeof(JumpZone)
 			);
@@ -1089,6 +1090,10 @@ public class Maverick : Actor, IDamagable {
 		this.healAmount = healAmount;
 	}
 
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
 	public virtual float getAirSpeed() {
 		return 1;
 	}
@@ -1252,11 +1257,11 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public override List<ShaderWrapper>? getShaders() {
-		if (timeStopTime > 10) {
+		if (timeStopTime > timeStopThreshold) {
 			if (!Global.level.darkHoldProjs.Any(
 				dhp => dhp.screenShader != null && dhp.inRange(this))
 			) {
-				return [player.darkHoldShader];
+				return [Player.darkHoldShader];
 			}
 		}
 		return null;

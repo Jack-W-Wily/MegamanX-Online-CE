@@ -195,7 +195,7 @@ public class OverdriveOSonicSlicerProj : Projectile {
 
 public class OverdriveOShootState : MaverickState {
 	bool shotOnce;
-	public OverdriveOShootState() : base("attack", "") {
+	public OverdriveOShootState() : base("attack") {
 	}
 
 	public override void update() {
@@ -266,7 +266,7 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 
 public class OverdriveOShoot2State : MaverickState {
 	bool shotOnce;
-	public OverdriveOShoot2State() : base("attack2", "") {
+	public OverdriveOShoot2State() : base("attack2") {
 	}
 
 	public override void update() {
@@ -317,8 +317,10 @@ public class OverdriveOJumpKickState : MaverickState {
 
 public class OverdriveOSkidState : MaverickState {
 	float dustTime;
-	public OverdriveOSkidState() : base("skid", "") {
+	public OverdriveOSkidState() : base("skid") {
 		enterSound = "overdriveoSkid";
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -364,6 +366,7 @@ public class OverdriveOSkidState : MaverickState {
 public class OverdriveOCrystalizedState : MaverickState {
 	public OverdriveOCrystalizedState() : base("hurt_weakness") {
 		enterSound = "crystalize";
+		aiAttackCtrl = true;
 	}
 
 	public override bool canEnter(Maverick maverick) {

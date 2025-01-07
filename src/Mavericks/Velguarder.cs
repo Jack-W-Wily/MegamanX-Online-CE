@@ -203,7 +203,7 @@ public class VelGIceProj : Projectile {
 #region states
 public class VelGShootFireState : MaverickState {
 	float shootTime;
-	public VelGShootFireState() : base("shoot2", "") {
+	public VelGShootFireState() : base("shoot2") {
 
 	}
 
@@ -230,7 +230,7 @@ public class VelGShootFireState : MaverickState {
 public class VelGShootIceState : MaverickState {
 	bool shot;
 	int index = 0;
-	public VelGShootIceState() : base("shoot", "") {
+	public VelGShootIceState() : base("shoot") {
 
 	}
 

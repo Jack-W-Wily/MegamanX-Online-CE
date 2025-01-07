@@ -334,7 +334,7 @@ public class TriadThunderQuake : Projectile {
 public class TriadThunderChargedState : CharState {
 	bool fired = false;
 	bool groundedOnce;
-	public TriadThunderChargedState(bool grounded) : base(!grounded ? "fall" : "punch_ground", "", "", "") {
+	public TriadThunderChargedState(bool grounded) : base(!grounded ? "fall" : "punch_ground") {
 		superArmor = true;
 	}
 

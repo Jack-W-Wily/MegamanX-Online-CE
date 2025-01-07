@@ -200,7 +200,7 @@ public class SigmaSlashState : CharState {
 	CharState prevCharState;
 	int attackFrame = 2;
 	bool fired;
-	public SigmaSlashState(CharState prevCharState) : base(prevCharState.attackSprite, "", "", "") {
+	public SigmaSlashState(CharState prevCharState) : base(prevCharState.attackSprite) {
 		this.prevCharState = prevCharState;
 		if (prevCharState is Dash || prevCharState is AirDash) {
 			attackFrame = 1;
@@ -304,23 +304,90 @@ public class SigmaBallWeapon : Weapon {
 
 public class SigmaBallProj : Projectile {
 	public SigmaBallProj(
-		Weapon weapon, Point pos, int xDir, Player player,
-		ushort netProjId, Point? vel = null, bool rpc = false
+		Weapon weapon, Point pos, float byteAngle, Player player,
+		ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 400, 1, player, "sigma_proj_ball",
-		8, 0.2f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 400, 2, player, "sigma_proj_ball",
+		0, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = 400 * Helpers.cosb(byteAngle);
+		vel.y = 400 * Helpers.sinb(byteAngle);
 		projId = (int)ProjIds.SigmaBall;
 		maxTime = 0.5f;
 		destroyOnHit = true;
-		if (vel != null) {
-			this.vel = vel.Value.times(speed);
-		}
-
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
 		}
-		canBeLocal = false;
+	}
+}
+public class SigmaBallShootEX : CharState {
+	public CmdSigma? Sigma;
+	public SigmaBallProj? SigmaBallsProjHead;
+	public Anim? anim;
+	public bool shoot;
+	public float angle;
+	public SigmaBallShootEX() : base("shoot") {
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		Sigma = character as CmdSigma;
+	}
+	public override void update() {
+		character.turnToInput(player.input, player);
+		if (character.frameIndex >= 1 && !shoot) {
+			shoot = true;
+			ammoReduction();
+			shootProjectiles();
+		} else if (character.sprite.frameIndex == 0) {
+			shoot = false;
+		}
+		if (player.sigmaAmmo <= 0 || character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		//By disabling the code bellow, you can sort of make it MMX1 Accurate
+		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
+			character.changeToIdleOrFall();
+			return;
+		}
+		base.update();
+	}
+	public void shootProjectiles() {
+		character.playSound("energyBall", sendRpc: true);
+		Point shootPos = character.getFirstPOI() ?? character.getCenterPos();
+		angleShoot();
+		SigmaBallsProjHead = new SigmaBallProj(
+			SigmaBallWeapon.netWeapon, shootPos, angle,
+			player, player.getNextActorNetId(), rpc: true);
+		anim = new Anim(shootPos, "sigma_proj_ball_muzzle", character.xDir,
+			player.getNextActorNetId(), true, sendRpc: true);
+	}
+	public void ammoReduction() {
+		player.sigmaAmmo -= 4;
+		if (player.sigmaAmmo < 0) player.sigmaAmmo = 0;
+		if (Sigma != null) {
+			Sigma.sigmaAmmoRechargeCooldown = Sigma.sigmaHeadBeamTimeBeforeRecharge;
+		}
+	}
+	public void angleShoot() {
+		if (character.xDir == 1) {
+			if (player.input.isHeld(Control.Down, player)) {
+				angle = 42;
+			} else if (player.input.isHeld(Control.Up, player)) {
+				angle = 216;
+			} else {
+				angle = 8;
+			}
+		} else if (character.xDir == -1) {
+			if (player.input.isHeld(Control.Down, player)) {
+				angle = 94;
+			} else if (player.input.isHeld(Control.Up, player)) {
+				angle = 164;
+			} else {
+				angle = 120;
+			}
+		}
 	}
 }
 
@@ -392,18 +459,24 @@ public class SigmaBallShoot : CharState {
 			character.playSound("energyBall", sendRpc: true);
 
 			if (!isSuperSigmaproj){
-			new SigmaBallProj(
-				SigmaBallWeapon.netWeapon, poi, character.xDir, player,
-				player.getNextActorNetId(), vel.normalize(), rpc: true
-			);} 
+				new SigmaBallProj(
+					SigmaBallWeapon.netWeapon, poi, character.xDir, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			} 
 			if (isSuperSigmaproj){
 				new TorpedoProj(SigmaBallWeapon.netWeapon , poi, character.xDir, player, 5, player.getNextActorNetId(), 0, rpc: true);
-			
-			 }
+			}
+			/*
+			new SigmaBallProj(
+				SigmaBallWeapon.netWeapon, poi, character.xDir, player,
+				player.getNextActorNetId(), rpc: true
+			);
 			new Anim(
 				poi, "sigma_proj_ball_muzzle", character.xDir,
 				player.getNextActorNetId(), true, sendRpc: true
 			);
+			*/
 		}
 
 		if (character.sprite.loopCount > 5 || player.sigmaAmmo <= 0) {
@@ -421,7 +494,7 @@ public class SigmaWallDashState : CharState {
 	bool fromGround;
 	public CmdSigma sigma;
 
-	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash", "", "", "") {
+	public SigmaWallDashState(int yDir, bool fromGround) : base("wall_dash") {
 		this.yDir = yDir;
 		this.fromGround = fromGround;
 		superArmor = true;

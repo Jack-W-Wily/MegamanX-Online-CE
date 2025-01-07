@@ -427,7 +427,7 @@ public class Rekkoha : CharState {
 	int loop;
 	public RekkohaEffect? effect;
 	public Weapon weapon;
-	public Rekkoha(Weapon weapon) : base("rekkoha", "", "", "") {
+	public Rekkoha(Weapon weapon) : base("rekkoha") {
 		this.weapon = weapon;
 		invincible = true;
 	}
@@ -887,10 +887,17 @@ public class DarkHoldProj : Projectile {
 							chara.addDarkHoldTime(150 - timeInFrames, damager.owner);
 							chara.darkHoldInvulnTime = (150 - timeInFrames) * 60f;
 						}
+						// We freeze the player in the same way we freeze the armor if inside of it.
+						if (chara.charState is InRideArmor or InRideChaser) {
+							if (actor.timeStopTime <= 0) {
+								actor.timeStopTime = 120 - timeInFrames;
+							}
+							continue;
+						}
 						continue;
 					}
 					// For maverick and rides
-					if (actor is RideArmor or Maverick or Mechaniloid) {
+					if (actor is RideArmor or Maverick or Mechaniloid or RideChaser) {
 						if (actor.timeStopTime > 0) {
 							continue;
 						}
@@ -987,7 +994,7 @@ public class DarkHoldState : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.darkHoldInvulnTime > 0 || character.isTrueStatusImmune()) {
+		if (character.darkHoldInvulnTime > 0 || character.isTimeImmune()) {
 			return false;
 		}
 		return base.canEnter(character);

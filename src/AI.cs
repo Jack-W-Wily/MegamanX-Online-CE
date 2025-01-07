@@ -25,7 +25,11 @@ public class AI {
 	public int framesChargeHeld = 0;
 	public float jumpZoneTime = 0;
 	public bool flagger = false; //Will this ai aggressively capture the flag?
-	public static AITrainingBehavior trainingBehavior;
+	private static AITrainingBehavior _trainingBehavior = AITrainingBehavior.Default;
+	public static AITrainingBehavior trainingBehavior {
+		set { _trainingBehavior = value; }
+		get => Global.level.isTraining() ? _trainingBehavior : AITrainingBehavior.Default; 
+	}
 	public int axlAccuracy;
 	public int mashType; //0=no mash, 1 = light, 2 = heavy
 
@@ -385,6 +389,7 @@ public class AI {
 		if (character is Zero || player.isSigma || character is PunchyZero) return 80;
 		return maxDist;
 	}
+
 	public void buySection() {
 		if (!player.isMainPlayer && character is MegamanX &&
 			player.aiArmorUpgradeIndex < player.aiArmorUpgradeOrder.Count && !Global.level.is1v1()
@@ -404,13 +409,15 @@ public class AI {
 				player.aiArmorUpgradeIndex++;
 			}
 		}
-		if (!player.isMainPlayer && character is Vile) {
+		if (!player.isMainPlayer && character is Vile vile) {
 			if (player.currency >= 3 && !player.frozenCastle) {
 				player.frozenCastle = true;
+				vile.hasFrozenCastle = true;
 				player.currency -= Vile.frozenCastleCost;
 			}
 			if (player.currency >= 3 && !player.speedDevil) {
 				player.speedDevil = true;
+				vile.hasSpeedDevil = true;
 				player.currency -= Vile.speedDevilCost;
 			}
 		}

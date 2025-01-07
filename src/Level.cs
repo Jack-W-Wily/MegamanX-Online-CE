@@ -957,10 +957,18 @@ public partial class Level {
 			player.armorFlag = hostPlayer.armorFlag;
 			player.loadout = hostPlayer.loadoutData;
 			player.disguise = hostPlayer.disguise;
+			player.atransLoadout = hostPlayer.atransLoadout;
 
-			if (hostPlayer.charNetId != null && hostPlayer.charNetId != 0 && player.character == null) {
+			if (hostPlayer.currentCharNum != null && hostPlayer.charNetId != null &&
+				hostPlayer.charNetId != 0 && player.character == null
+			) {
+				int targetCharNum = hostPlayer.currentCharNum.Value;
+				LoadoutData currentLoadout = player.loadout;
+				if (player.atransLoadout != null) {
+					player.loadout = player.atransLoadout;
+				}
 				player.spawnCharAtPoint(
-					player.newCharNum, player.getCharSpawnData(player.newCharNum),
+					targetCharNum, player.getCharSpawnData(targetCharNum),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
 					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
 				);
@@ -970,6 +978,9 @@ public partial class Level {
 						player.character.xDir, player, hostPlayer.charRollingShieldNetId.Value
 					);
 				}
+				player.loadout = currentLoadout;
+			} else {
+				player.atransLoadout = null;
 			}
 		}
 	}
@@ -1680,8 +1691,8 @@ public partial class Level {
 		var actor = go as Actor;
 		if (actor == null) return false;
 
-		if (actor.timeStopTime > 10) {
-			slowAmount = 0.0625f;
+		if (actor.timeStopTime > 15) {
+			slowAmount = 0.125f;
 			return true;
 		}
 
@@ -1691,7 +1702,7 @@ public partial class Level {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
 				if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
-				if (chr != null && chr.isStatusImmune()) continue;
+				if (chr != null && chr.isTimeImmune()) continue;
 
 				var proj = go as Projectile;
 				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) {

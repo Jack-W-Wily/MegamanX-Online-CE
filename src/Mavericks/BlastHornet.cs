@@ -207,7 +207,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable is Character chr && chr.ownedByLocalPlayer) {
+		if (damagable is Character chr && chr.ownedByLocalPlayer && !chr.isSlowImmune()) {
 			chr.slowdownTime = Math.Max(0.05f, chr.slowdownTime);
 		}
 
@@ -237,6 +237,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return false; }
 
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = new();
@@ -311,11 +312,12 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class BHornetShootState : MaverickState {
 	bool shotOnce;
-	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack", "") {
+	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
 	}
 
 	public override void update() {
@@ -355,7 +357,7 @@ public class BHornetShootState : MaverickState {
 
 public class BHornetShootCursorState : MaverickState {
 	bool shotOnce;
-	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack", "") {
+	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
 	}
 
 	public override void update() {
@@ -485,7 +487,7 @@ public class BHornetShoot2State : MaverickState {
 	bool shotOnce;
 	Actor? target;
 	bool isAIRise;
-	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn", "") {
+	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn") {
 		this.target = target;
 	}
 

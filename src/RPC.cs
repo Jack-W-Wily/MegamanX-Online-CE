@@ -1400,18 +1400,17 @@ public class RPCAxlShoot : RPC {
 public class RPCAxlDisguiseJson {
 	public int playerId;
 	public ushort dnaNetId;
-	public ushort axlNetId;
 	public string targetName;
 	public int charNum;
 	public byte[] extraData;
-	public LoadoutData? loadout;
+	public LoadoutData loadout;
 
 	public RPCAxlDisguiseJson() { }
 
 	public RPCAxlDisguiseJson(
 		int playerId, string targetName, int charNum,
-		LoadoutData? loadout = null,
-		ushort dnaNetId = 0, byte[]? extraData = null
+		LoadoutData loadout,
+		ushort dnaNetId, byte[]? extraData = null
 	) {
 		this.playerId = playerId;
 		this.targetName = targetName;
@@ -1437,7 +1436,7 @@ public class RPCAxlDisguise : RPC {
 			return;
 		}
 		if (axlDisguiseData.charNum == -1) {
-			player.revertToAxl(axlDisguiseData.axlNetId);
+			player.revertToAxl(axlDisguiseData.dnaNetId);
 		} else if (axlDisguiseData.charNum  == -2) {
 			player.revertToAxlDeath();
 		} else {

@@ -296,6 +296,10 @@ public class RaySplasherTurret : Actor, IDamagable {
 
 		renderDamageText(10);
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 
@@ -336,7 +340,7 @@ public class RaySplasherChargedState : CharState {
 
 	XMID mmx2;
 	bool fired = false;
-	public RaySplasherChargedState() : base("point_up", "", "", "") {
+	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;
 	}
 
