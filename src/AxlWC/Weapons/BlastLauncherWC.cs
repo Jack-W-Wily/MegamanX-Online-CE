@@ -6,14 +6,20 @@ public class BlastLauncherWC : AxlWeaponWC {
 	public static BlastLauncherWC netWeapon = new();
 
 	public BlastLauncherWC() {
-		shootSounds = [ "grenadeShoot", "rocketShoot", "rocketShoot", "rocketShoot" ];
-		fireRate = 20;
-		altFireCooldown = 48;
-		index = (int)WeaponIds.BlackArrow;
-		weaponBarBaseIndex = 33;
-		weaponSlotIndex = 53;
-		killFeedIndex = 68;
-		sprite = "axl_arm_blackarrow";
+		shootSounds = [ "grenadeShoot", "rocketShoot" ];
+		index = (int)WeaponIds.BlastLauncher;
+		weaponBarBaseIndex = 29;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = 29;
+		killFeedIndex = 29;
+		fireRate = 45;
+		altFireRate = 48;
+
+		sprite = "axl_arm_blastlauncher";
+		flashSprite = "axl_pistol_flash_charged";
+		chargedFlashSprite = "axl_pistol_flash_charged";
+		isTwoHanded = true;
+
 		maxAmmo = 10;
 		ammo = maxAmmo;
 	}
@@ -21,7 +27,7 @@ public class BlastLauncherWC : AxlWeaponWC {
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		ushort netId = axl.player.getNextActorNetId();
-		new GrenadeWCProj(axl, pos, byteAngle, netId, sendRpc: true);
+		new BlastLauncherWCProj(axl, pos, byteAngle, netId, sendRpc: true);
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
@@ -39,11 +45,11 @@ public class BlastLauncherWC : AxlWeaponWC {
 }
 
 
-public class GrenadeWCProj : Projectile, IDamagable {
+public class BlastLauncherWCProj : Projectile, IDamagable {
 	Player player;
 	float health = 3;
 
-	public GrenadeWCProj(
+	public BlastLauncherWCProj(
 		Actor owner, Point pos,
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
@@ -63,6 +69,10 @@ public class GrenadeWCProj : Projectile, IDamagable {
 		reflectableFBurner = true;
 		maxTime = 2;
 		player = this.player;
+
+		if (sendRpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+		}
 	}
 
 	public override void preUpdate() {
@@ -146,27 +156,18 @@ public class GreenSpinnerWCProj : Projectile {
 		pos, 1, owner, "axl_rocket", netProjId, player
 	) {
 		weapon = BlastLauncherWC.netWeapon;
+		projId = (int)ProjIds.GreenSpinner;
 		this.byteAngle = byteAngle;
 		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		vel.x = 400 * bulletDir.x;
 		vel.y = 400 * bulletDir.y;
 		collider.wallOnly = true;
 		destroyOnHit = false;
-		projId = (int)ProjIds.GreenSpinner;
 		maxTime = 0.35f;
 		shouldShieldBlock = false;
 
 		if (sendRpc) {
-			rpcCreate(pos, owner, player, netProjId, xDir);
-		}
-	}
-
-	public override void update() {
-		base.update();
-
-		if (grounded) {
-			destroySelf(disableRpc: true);
-			return;
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
 		}
 	}
 

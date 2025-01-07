@@ -8,7 +8,18 @@ using SFML.Window;
 namespace MMXOnline;
 
 public class AxlWC : Character {
-	public AxlWeapon mainWeapon;
+	// Weapon data.
+	public AxlWeaponWC mainWeapon;
+	public List<AxlWeaponWC> axlWeapons = new();
+	public AxlWeaponWC? axlWeapon {
+		get {
+			if (weaponSlot < 0 || weaponSlot >= weapons.Count) {
+				return null;
+			}
+			return axlWeapons[weaponSlot];
+		}
+	}
+	// Other variables.
 	public const int WhiteAxlCost = 5;
 	public bool isWhite;
 	public float whiteTime;
@@ -16,7 +27,7 @@ public class AxlWC : Character {
 	public float aiAttackCooldown;
 	public float shootCooldown;
 	public float recoilTime;
-	public int axlArmDir => charState is WallSlide ? -xDir : xDir;
+	public int armDir => charState is WallSlide ? -xDir : xDir;
 	public float armAngle = 0;
 	public bool wasMainWeapon;
 	public bool wasSpecialPressed;
@@ -36,7 +47,6 @@ public class AxlWC : Character {
 		muzzleFlash.visible = false;
 		muzzleFlash.frameIndex = muzzleFlash.sprite.totalFrameNum - 1;
 		muzzleFlash.frameTime = currentFrame.duration;
-		mainWeapon = (weapons.First((Weapon w) => w is AxlBullet or DoubleBullet) as AxlWeapon)!;
 	}
 
 	public override void preUpdate() {
@@ -45,10 +55,9 @@ public class AxlWC : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref recoilTime);
-		if (currentWeapon != mainWeapon) {
+		if (axlWeapon != mainWeapon) {
 			wasMainWeapon = false;
-		}
-		else if (!wasMainWeapon) {
+		} else if (!wasMainWeapon) {
 			wasMainWeapon = player.input.isPressed(Control.Special1, player);
 		}
 	}
@@ -71,52 +80,7 @@ public class AxlWC : Character {
 		updateArmAngle();
 		// Charge and release charge logic.
 		chargeLogic(chargeShoot);
-		// Weapon swap cooldown reload.
-		foreach (Weapon weapon in weapons) {
-			if (weapon == mainWeapon || weapon is not AxlWeapon axlWeapon) {
-				continue;
-			}
-			if (axlWeapon.swapCooldown == 0) {
-				continue;
-			}
-			axlWeapon.swapCooldown -= speedMul;
-			axlWeapon.ammo = axlWeapon.maxAmmo * (1 - axlWeapon.swapCooldown / axlWeapon.maxSwapCooldown);
-			if (axlWeapon.swapCooldown <= 0) {
-				axlWeapon.swapCooldown = 0;
-				axlWeapon.ammo = axlWeapon.maxAmmo;
-			}
-		}
-		// Weapon swap.
-		if (currentWeapon == null) {
-			weaponSlot = 0;
-			return;
-		}
-		if (!charState.attackCtrl) {
-			return;
-		}
-		int swapDir = 0;
-		if (player.input.isPressed(Control.WeaponLeft, player)) {
-			swapDir--;
-		}
-		if (player.input.isPressed(Control.WeaponRight, player)) {
-			swapDir++;
-		}
-		if (swapDir == 0) {
-			return;
-		}
-		// Do Weapon switch.
-		if (swapDir == -1 && weaponSlot == 0 || swapDir == 1 && weaponSlot == 2) {
-			Weapon oldWeapon = currentWeapon;
-			weaponSlot = 1;
-			onWeaponChange(oldWeapon, currentWeapon);
-		} else {
-			Weapon targetWeapon = weapons[1 + swapDir];
-			if (targetWeapon is AxlWeapon axlWeapon && axlWeapon.swapCooldown <= 0) {
-				Weapon oldWeapon = currentWeapon;
-				weaponSlot = 1 + swapDir;
-				onWeaponChange(oldWeapon, currentWeapon);
-			}
-		}
+		weaponSwapLogic();
 	}
 
 	public override void postUpdate() {
@@ -126,10 +90,10 @@ public class AxlWC : Character {
 			if (recoilTime > 0) {
 				armAngle = MathF.Round(armAngle - recoilTime);
 			}
-			muzzleFlash.pos = getAxlBulletPos();
-			muzzleFlash.xDir = axlArmDir;
+			muzzleFlash.pos = getAxlBulletPos(axlWeapon);
+			muzzleFlash.xDir = armDir;
 			muzzleFlash.visible = true;
-			muzzleFlash.byteAngle = armAngle * axlArmDir;
+			muzzleFlash.byteAngle = armAngle * armDir;
 			muzzleFlash.zIndex = ZIndex.Default;
 			if (muzzleFlash.sprite.name == "axl_raygun_flash") {
 				muzzleFlash.zIndex = zIndex - 100;
@@ -139,18 +103,18 @@ public class AxlWC : Character {
 			muzzleFlash.visible = false;
 		}
 		// For negative edge.
-		if (currentWeapon == mainWeapon && wasMainWeapon) {
+		if (axlWeapon == mainWeapon && wasMainWeapon) {
 			wasSpecialPressed = player.input.isHeld(Control.Special1, player);
 		} else {
 			wasSpecialPressed = false;
 		}
 		// Swap on ammo empitiying.
-		if (currentWeapon != mainWeapon && currentWeapon is AxlWeapon axlWP &&
-			axlWP.ammo <= 0 && recoilTime <= 0
+		if (axlWeapon != mainWeapon &&
+			axlWeapon.ammo <= 0 && recoilTime <= 0
 		) {
-			Weapon oldWeapon = currentWeapon;
+			Weapon oldWeapon = axlWeapon;
 			weaponSlot = 1;
-			onWeaponChange(oldWeapon, currentWeapon);
+			onWeaponChange(oldWeapon, axlWeapon);
 			return;
 		}
 	}
@@ -177,7 +141,56 @@ public class AxlWC : Character {
 	}
 
 	public override bool canCharge() {
-		return (currentWeapon is AxlBullet or DoubleBullet && charState is not OcelotSpin);
+		return (axlWeapon is AxlBulletWC && charState is not OcelotSpin);
+	}
+
+	public void weaponSwapLogic() {
+		// Weapon swap cooldown reload.
+		foreach (AxlWeaponWC weapon in axlWeapons) {
+			if (weapon == mainWeapon) {
+				continue;
+			}
+			if (weapon.swapCooldown == 0) {
+				continue;
+			}
+			weapon.swapCooldown -= speedMul;
+			weapon.ammo = weapon.maxAmmo * (1 - weapon.swapCooldown / weapon.maxSwapCooldown);
+			if (weapon.swapCooldown <= 0) {
+				weapon.swapCooldown = 0;
+				weapon.ammo = weapon.maxAmmo;
+			}
+		}
+		// Weapon swap.
+		if (axlWeapon == null) {
+			weaponSlot = 0;
+			return;
+		}
+		if (!charState.attackCtrl) {
+			return;
+		}
+		int swapDir = 0;
+		if (player.input.isPressed(Control.WeaponLeft, player)) {
+			swapDir--;
+		}
+		if (player.input.isPressed(Control.WeaponRight, player)) {
+			swapDir++;
+		}
+		if (swapDir == 0) {
+			return;
+		}
+		// Do Weapon switch.
+		if (swapDir == -1 && weaponSlot == 0 || swapDir == 1 && weaponSlot == 2) {
+			Weapon oldWeapon = axlWeapon;
+			weaponSlot = 1;
+			onWeaponChange(oldWeapon, axlWeapon);
+		} else {
+			AxlWeaponWC targetWeapon = axlWeapons[1 + swapDir];
+			if (targetWeapon.swapCooldown <= 0) {
+				Weapon oldWeapon = axlWeapon;
+				weaponSlot = 1 + swapDir;
+				onWeaponChange(oldWeapon, axlWeapon);
+			}
+		}
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
@@ -186,8 +199,12 @@ public class AxlWC : Character {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
 		}
+		
 		// Set cooldown if leaving special weapon.
-		else if (oldWeapon is AxlWeapon axlWeapon) {
+		if (oldWeapon is not AxlWeaponWC axlWeapon) {
+			return;
+		}
+		if (oldWeapon != mainWeapon) {
 			axlWeapon.swapCooldown = axlWeapon.maxSwapCooldown;
 			axlWeapon.shootCooldown = 2;
 			axlWeapon.ammo = 0;
@@ -203,13 +220,13 @@ public class AxlWC : Character {
 			// Create the weapon object.
 			new AxlDiscrardedWeapon(
 				oldWeapon.index - (int)WeaponIds.AxlBullet,
-				getAxlBulletPos(), axlArmDir, throwSpeed,
+				getAxlBulletPos(axlWeapon), armDir, throwSpeed,
 				player, player.getNextActorNetId(), true, sendRpc: true
 			);
 		}
 		// Set up the arm angle to look like if it's pulling a weapon.
 		armAngle = -64;
-		shootCooldown = 64/7;
+		shootCooldown = 64 / 7;
 	}
 
 	// Non-attack inputs.
@@ -237,7 +254,7 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Block.
-		if (grounded && player.input.isHeld(Control.Down, player) && charState is not AxlBlock and not Dash)  {
+		if (grounded && player.input.isHeld(Control.Down, player) && charState is not AxlBlock and not Dash) {
 			changeState(new AxlBlock(), true);
 			return true;
 		}
@@ -246,31 +263,31 @@ public class AxlWC : Character {
 
 	// Attack inputs.
 	public override bool attackCtrl() {
-		if (isCharging() || currentWeapon == null) {
+		if (isCharging() || axlWeapon == null) {
 			return base.attackCtrl();
 		}
-		if (currentWeapon == mainWeapon) {
+		if (axlWeapon == mainWeapon) {
 			Point inputDir = player.input.getInputDir(player);
 			bool specialPressed = wasSpecialPressed && !player.input.isHeld(Control.Special1, player);
 			// Shoryken does not use negative edge at all.
-			if (player.input.checkShoryuken(player, xDir, Control.Special1) && currentWeapon.ammo > 0) {
+			if (player.input.checkShoryuken(player, xDir, Control.Special1) && axlWeapon.ammo > 0) {
 				changeState(new RainStorm(), true);
 				return true;
 			}
 			// Negative edge inputs.
-			if (inputDir.y == 1 && charState is Dash && currentWeapon.ammo > 0) {
+			if (inputDir.y == 1 && charState is Dash && axlWeapon.ammo > 0) {
 				changeState(new RisingBarrage(), true);
 				return true;
 			}
-			if (specialPressed && inputDir.y == -1 && currentWeapon.ammo > 0) {
+			if (specialPressed && inputDir.y == -1 && axlWeapon.ammo > 0) {
 				changeState(new TailShot(), true);
 				return true;
 			}
-			if (specialPressed && (inputDir.y == 1 || currentWeapon.ammo == 0)) {
+			if (specialPressed && (inputDir.y == 1 || axlWeapon.ammo == 0)) {
 				changeState(new OcelotSpin(), true);
 				return true;
 			}
-			if (specialPressed && currentWeapon.ammo > 0) {
+			if (specialPressed && axlWeapon.ammo > 0) {
 				vel.y = -getJumpPower() * 2f;
 				changeState(new EvasionBarrage(), true);
 				return true;
@@ -280,108 +297,97 @@ public class AxlWC : Character {
 		if (charState is AxlBlock) {
 			return false;
 		}
-		if ((player.input.isHeld(Control.Shoot, player) || currentWeapon is PlasmaGun) &&
+		if ((player.input.isHeld(Control.Shoot, player) || axlWeapon.autoFire) &&
 			shootCooldown <= 0 &&
-			currentWeapon.shootCooldown <= 0 &&
-			currentWeapon.ammo > 0
+			axlWeapon.shootCooldown <= 0 &&
+			axlWeapon.ammo > 0
 		) {
-			shootMain();
+			shootMain(axlWeapon);
 			return true;
 		}
 		if (player.input.isHeld(Control.Special1, player) &&
-			shootCooldown <= 0 && currentWeapon.shootCooldown <= 0 &&
-			currentWeapon is not AxlBullet &&
-			currentWeapon.ammo > 0
+			shootCooldown <= 0 && axlWeapon.shootCooldown <= 0 &&
+			axlWeapon is not AxlBulletWC &&
+			axlWeapon.ammo > 0
 		) {
-			shootAlt();
+			shootAlt(axlWeapon);
 			return true;
 		}
 		return base.attackCtrl();
 	}
 
 	// Shoots stuff.
-	public void shootMain() {
-		if (currentWeapon is AxlWeapon axlWeapon) {
-			float shootAngle = armAngle;
-			if (axlArmDir < 0) {
-				shootAngle = shootAngle * -1 + 128;
-			}
-			axlWeapon.axlGetProjectile(
-				axlWeapon, getAxlBulletPos(), axlArmDir, player, Helpers.byteToDegree(shootAngle),
-				null, null, pos, 0, player.getNextActorNetId()
-			);
-			axlWeapon.shootCooldown = axlWeapon.fireRate;
-			recoilTime = axlWeapon.fireRate - 4;
-			axlWeapon.addAmmo(-axlWeapon.getAmmoUsage(0), player);
-			if (recoilTime > 12) {
-				recoilTime = 12;
-			}
-			if (axlWeapon.shootSounds[0] != "") {
-				playSound(axlWeapon.shootSounds[0], true, true);
-			}
-			if (axlWeapon.flashSprite != "") {
-				muzzleFlash.changeSprite(axlWeapon.flashSprite, true);
-				muzzleFlash.visible = true;
-			} 
+	public void shootMain(AxlWeaponWC? weapon) {
+		if (weapon == null) {
+			return;
+		}
+		float shootAngle = armAngle;
+		if (armDir < 0) {
+			shootAngle = shootAngle * -1 + 128;
+		}
+		weapon.shootMain(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
+		weapon.shootCooldown = weapon.fireRate;
+		recoilTime = weapon.fireRate - 4;
+		weapon.addAmmo(-weapon.getAmmoUsage(0), player);
+		if (recoilTime > 12) {
+			recoilTime = 12;
+		}
+		if (weapon.shootSounds[0] != "") {
+			playSound(weapon.shootSounds[0], true, true);
+		}
+		if (weapon.flashSprite != "") {
+			muzzleFlash.changeSprite(weapon.flashSprite, true);
+			muzzleFlash.visible = true;
 		}
 	}
 
-	public void shootAlt() {
-		if (currentWeapon is AxlWeapon axlWeapon) {
-			float shootAngle = armAngle;
-			if (axlArmDir < 0) {
-				shootAngle = shootAngle * -1 + 128;
-			}
-			axlWeapon.axlGetProjectile(
-				axlWeapon, getAxlBulletPos(), axlArmDir,
-				player, Helpers.byteToDegree(shootAngle),
-				null, null, pos, axlWeapon is AxlBullet ? 1 : 3, player.getNextActorNetId()
-			);
-			axlWeapon.shootCooldown = axlWeapon.altFireCooldown;
-			recoilTime = axlWeapon.altFireCooldown - 4;
-			axlWeapon.addAmmo(-axlWeapon.getAmmoUsage(3), player);
-			if (recoilTime > 12) {
-				recoilTime = 12;
-			}
-			if (axlWeapon.shootSounds[3] != "") {
-				playSound(axlWeapon.shootSounds[3], true, true);
-			}
-			if (axlWeapon.chargedFlashSprite != "") {
-				muzzleFlash.changeSprite(axlWeapon.flashSprite, true);
-				muzzleFlash.visible = true;
-			}
-			else if (axlWeapon.chargedFlashSprite != "") {
-				muzzleFlash.changeSprite(axlWeapon.flashSprite, true);
-				muzzleFlash.visible = true;
-			}
+	public void shootAlt(AxlWeaponWC? weapon) {
+		if (weapon == null) {
+			return;
+		}
+		float shootAngle = armAngle;
+		if (armDir < 0) {
+			shootAngle = shootAngle * -1 + 128;
+		}
+		weapon.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
+		weapon.shootCooldown = weapon.altFireRate;
+		recoilTime = weapon.altFireRate - 4;
+		weapon.addAmmo(-weapon.getAmmoUsage(3), player);
+		if (recoilTime > 12) {
+			recoilTime = 12;
+		}
+		if (weapon.shootSounds[1] != "") {
+			playSound(weapon.shootSounds[1], true, true);
+		}
+		if (weapon.chargedFlashSprite != "") {
+			muzzleFlash.changeSprite(weapon.chargedFlashSprite, true);
+			muzzleFlash.visible = true;
 		}
 	}
 
 	public void chargeShoot(int chargeLevel) {
-		if (currentWeapon is AxlBullet axlBullet) {
-			float shootAngle = armAngle;
-			if (axlArmDir < 0) {
-				shootAngle = shootAngle * -1 + 128;
-			}
-			axlBullet.axlGetProjectile(
-				axlBullet, getAxlBulletPos(), axlArmDir, player, Helpers.byteToDegree(shootAngle),
-				null, null, pos, chargeLevel + 1, player.getNextActorNetId()
-			);
-			axlBullet.shootCooldown = axlBullet.altFireCooldown;
-			recoilTime = axlBullet.altFireCooldown - 4;
-			axlBullet.addAmmo(-axlBullet.getAmmoUsage(chargeLevel + 1), player);
-			if (recoilTime > 12) {
-				recoilTime = 12;
-			}
-			if (axlBullet.shootSounds[3] != "") {
-				playSound(axlBullet.shootSounds[3], true, true);
-			}
+		if (axlWeapon is not AxlBulletWC axlBullet) {
+			return;
+		}
+		float shootAngle = armAngle;
+		if (armDir < 0) {
+			shootAngle = shootAngle * -1 + 128;
+		}
+		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
+		axlBullet.shootCooldown = axlBullet.altFireRate;
+		recoilTime = axlBullet.altFireRate - 4;
+		axlBullet.addAmmo(-axlBullet.getAmmoUsage(chargeLevel), player);
+		if (recoilTime > 12) {
+			recoilTime = 12;
+		}
+		if (axlBullet.shootSounds[1] != "") {
+			playSound(axlBullet.shootSounds[3], true, true);
+		}
+		muzzleFlash.visible = true;
+		muzzleFlash.frameIndex = 0;
+		if (axlBullet.chargedFlashSprite != "") {
+			muzzleFlash.changeSprite(axlBullet.chargedFlashSprite, true);
 			muzzleFlash.visible = true;
-			muzzleFlash.frameIndex = 0;
-			if (axlBullet.chargedFlashSprite != "") {
-				muzzleFlash.changeSprite(axlBullet.flashSprite, true);
-				muzzleFlash.visible = true;
-			}
 		}
 	}
 
@@ -390,14 +396,14 @@ public class AxlWC : Character {
 	}
 
 	public override bool canAddAmmo() {
-		if (mainWeapon.ammo < mainWeapon.maxAmmo && currentWeapon == mainWeapon) {
+		if (mainWeapon.ammo < mainWeapon.maxAmmo && axlWeapon == mainWeapon) {
 			return true;
 		}
 		return false;
 	}
 
 	public override void addAmmo(float amount) {
-		if (currentWeapon != mainWeapon) {
+		if (axlWeapon != mainWeapon) {
 			mainWeapon.addAmmo(amount, player);
 			playSound("subtankFill", true);
 		}
@@ -405,25 +411,28 @@ public class AxlWC : Character {
 	}
 
 	public override void addPercentAmmo(float amount) {
-		if (currentWeapon != mainWeapon) {
+		if (axlWeapon != mainWeapon) {
 			mainWeapon.addAmmoPercent(amount);
 			playSound("subtankFill", true);
 		}
 		mainWeapon.addAmmoPercentHeal(amount);
 	}
-	
-	public Point getAxlBulletPos() {
-		AnimData animData = Global.sprites[player.axlWeapon?.sprite ?? "axl_arm_pistol"];;
-		Point shootOrigin = getAxlArmOrigin();
+
+	public Point getAxlBulletPos(AxlWeaponWC? weapon) {
+		if (weapon == null) {
+			return pos;
+		}
+		AnimData animData = Global.sprites[weapon.sprite];
+		Point shootOrigin = getAxlArmOrigin(weapon);
 		if (animData.frames[0].POIs.Length == 0) {
 			return shootOrigin;
 		}
 		float angle = armAngle;
-		if (axlArmDir < 0) {
+		if (armDir < 0) {
 			angle = (angle * -1) % 256;
 		}
 		Point poi = animData.frames[0].POIs[0];
-		poi.x *= axlArmDir;
+		poi.x *= armDir;
 		Point angleDir = Point.createFromByteAngle(
 			angle + poi.byteAngle
 		).times(
@@ -433,17 +442,20 @@ public class AxlWC : Character {
 		return shootOrigin.addxy(angleDir.x, angleDir.y);
 	}
 
-	public Point getAxlArmOrigin() {
+	public Point getAxlArmOrigin(AxlWeaponWC? weapon) {
+		if (weapon == null) {
+			return pos;
+		}
 		Point retPoint;
 		var pois = sprite.getCurrentFrame().POIs;
 		Point roundPos = new Point(MathInt.Round(pos.x), MathInt.Round(pos.y));
 		if (pois.Length > 0) {
-			retPoint = roundPos.addxy((pois[0].x + 2) * axlArmDir, pois[0].y);
+			retPoint = roundPos.addxy((pois[0].x + 2) * armDir, pois[0].y);
 		} else {
-			retPoint = roundPos.addxy(6 * axlArmDir, -21);
+			retPoint = roundPos.addxy(6 * armDir, -21);
 		}
-		if ((currentWeapon as AxlWeapon)?.isTwoHanded(true) == true) {
-			retPoint = retPoint.addxy(-7 * axlArmDir, 2);
+		if (axlWeapon.isTwoHanded) {
+			retPoint = retPoint.addxy(-7 * armDir, 2);
 		}
 		return retPoint;
 	}
@@ -495,32 +507,27 @@ public class AxlWC : Character {
 	}
 
 	public void configureWeapons() {
-		if (Global.level.isTraining() && !Global.level.server.useLoadout) {
-			weapons = Weapon.getAllAxlWeapons(player.axlLoadout).Select(w => w.clone()).ToList();
-			weapons[0] = new AxlBullet(0);
-		} else if (Global.level.is1v1()) {
-			weapons.Add(new AxlBullet());
-			weapons.Add(new RayGun(player.axlLoadout.rayGunAlt));
-			weapons.Add(new BlastLauncher(player.axlLoadout.blastLauncherAlt));
-			weapons.Add(new BlackArrow(player.axlLoadout.blackArrowAlt));
-			weapons.Add(new SpiralMagnum(player.axlLoadout.spiralMagnumAlt));
-			weapons.Add(new BoundBlaster(player.axlLoadout.boundBlasterAlt));
-			weapons.Add(new PlasmaGun(player.axlLoadout.plasmaGunAlt));
-			weapons.Add(new IceGattling(player.axlLoadout.iceGattlingAlt));
-			weapons.Add(new FlameBurner(player.axlLoadout.flameBurnerAlt));
-		} else {
-			weapons = player.loadout.axlLoadout.getWeaponsFromLoadout();
-			weapons.Insert(1, new AxlBullet(0));
-			weaponSlot = 1;
-		}
-		if (ownedByLocalPlayer) {
-			foreach (var dnaCore in player.savedDNACoreWeapons) {
-				weapons.Add(dnaCore);
-			}
-		}
-		if (weapons[0].type > 0) {
-			weapons[0].ammo = player.axlBulletTypeLastAmmo[weapons[0].type];
-		}
+		AxlLoadout axlLoadout = player.loadout.axlLoadout;
+		axlWeapons.Add(getWeaponFromIndex(axlLoadout.weapon2));
+		axlWeapons.Add(new AxlBulletWC());
+		axlWeapons.Add(getWeaponFromIndex(axlLoadout.weapon3));
+		mainWeapon = axlWeapons[1];
+		weaponSlot = 1;
+		weapons = axlWeapons.Cast<Weapon>().ToList();
+	}
+
+	public AxlWeaponWC getWeaponFromIndex(int index) {
+		return index switch {
+			1 => new RayGunWC(),
+			2 => new BlastLauncherWC(),
+			3 => new BlackArrowWC(),
+			4 => new SpiralMagnumWC(),
+			5 => new BoundBlasterWC(),
+			6 => new PlasmaGunWC(),
+			7 => new IceGattlingWC(),
+			8 => new FlameBurnerWC(),
+			_ => new AxlBulletWC()
+		};
 	}
 
 	public override string getSprite(string spriteName) {
@@ -557,7 +564,7 @@ public class AxlWC : Character {
 			not RisingBarrage and
 			not OcelotSpin and
 			not TailShot and
-			not InRideChaser and 
+			not InRideChaser and
 			not LadderEnd
 		);
 	}
@@ -579,19 +586,19 @@ public class AxlWC : Character {
 
 	public void drawArm(float armAngle) {
 		long armZIndex = zIndex - 1;
-		if ((currentWeapon as AxlWeapon)?.isTwoHanded(true) == true) {
+		if (axlWeapon?.isTwoHanded == true) {
 			armZIndex = zIndex + 1;
 		}
-		if (axlArmDir < 0) {
+		if (armDir < 0) {
 			armAngle = armAngle * -1;
 		}
-		Point gunOrigin = getAxlArmOrigin();
+		Point gunOrigin = getAxlArmOrigin(axlWeapon);
 
-		AnimData axlSprite = Global.sprites[player.axlWeapon?.sprite ?? "axl_arm_pistol"];
+		AnimData axlSprite = Global.sprites[axlWeapon?.sprite ?? "axl_arm_pistol"];
 		Point offsets = new Point(axlSprite.frames[0].offset.x, axlSprite.frames[0].offset.y);
 
 		axlSprite.draw(
-			0, gunOrigin.x + offsets.x * axlArmDir, gunOrigin.y + offsets.y, axlArmDir, 1,
+			axlWeapon.spriteFrameIndex, gunOrigin.x + offsets.x * armDir, gunOrigin.y + offsets.y, armDir, 1,
 			getRenderEffectSet(), 1, 1, 1, armZIndex, angle: Helpers.byteToDegree(armAngle), shaders: getShaders()
 		);
 	}
@@ -601,9 +608,9 @@ public class AxlWC : Character {
 		var pois = sprite.getCurrentFrame().POIs;
 		Point roundPos = new Point(MathInt.Round(pos.x), MathInt.Round(pos.y));
 		if (pois.Length > 0) {
-			retPoint = roundPos.addxy(pois[0].x * axlArmDir, pois[0].y);
+			retPoint = roundPos.addxy(pois[0].x * armDir, pois[0].y);
 		} else {
-			retPoint = roundPos.addxy(3 * axlArmDir, -21);
+			retPoint = roundPos.addxy(3 * armDir, -21);
 		}
 		return retPoint;
 	}
@@ -616,7 +623,7 @@ public class AxlWC : Character {
 
 	public override void updateCustomActorNetData(byte[] data) {
 		base.updateCustomActorNetData(data);
-		armAngle =data[0];
+		armAngle = data[0];
 	}
 }
 
@@ -642,7 +649,7 @@ public class AxlDiscrardedWeapon : Actor {
 		this.xDir = xDir;
 
 		if (sprite.getCurrentFrame().POIs.Length > 0) {
-			Point offset =  sprite.getCurrentFrame().POIs[0];
+			Point offset = sprite.getCurrentFrame().POIs[0];
 			offset.x *= xDir;
 			this.pos -= offset;
 		}

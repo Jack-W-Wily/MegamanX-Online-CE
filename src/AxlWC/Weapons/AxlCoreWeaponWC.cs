@@ -2,8 +2,8 @@ namespace MMXOnline;
 
 public class AxlWeaponWC : Weapon {
 	// Controls the cooldown and other stuff.
-	public int altFire;
-	public float altFireCooldown;
+	public int altFireSelected;
+	public float altFireRate;
 	public bool autoFire;
 	// Sprite definitions.
 	public bool isTwoHanded;
@@ -13,6 +13,7 @@ public class AxlWeaponWC : Weapon {
 	// Defaults to 3. Can be changed per weapon.
 	public float maxSwapCooldown = 60 * 3;
 	public float swapCooldown;
+	public int spriteFrameIndex;
 
 	public AxlWeaponWC() {}
 
@@ -20,7 +21,7 @@ public class AxlWeaponWC : Weapon {
 		return fireRate;
 	}
 	public virtual float getAltFireRate(AxlWC axl, int chargeLevel) {
-		return altFireCooldown;
+		return altFireRate;
 	}
 	public virtual float getAmmoUse(AxlWC axl, int chargeLevel) {
 		return 1;

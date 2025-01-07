@@ -1,10 +1,11 @@
 namespace MMXOnline;
 
-public class BlackArrowtWC : AxlWeaponWC {
-	public BlackArrowtWC() {
+public class BlackArrowWC : AxlWeaponWC {
+	public BlackArrowWC() {
 		shootSounds = [ "blackArrow", "blackArrow", "blackArrow", "blackArrow" ];
+		isTwoHanded = true;
 		fireRate = 24;
-		altFireCooldown = 48;
+		altFireRate = 48;
 		index = (int)WeaponIds.BlackArrow;
 		weaponBarBaseIndex = 33;
 		weaponSlotIndex = 53;

@@ -171,6 +171,9 @@ public class Sprite {
 			if (character.player.isAxl && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
+			else if (character is AxlWC axlWC) {
+				drawAxlArms = axlWC.axlWeapon?.isTwoHanded != true;
+			}
 			isUPX = character is RagingChargeX;
 			isUltX = character is XMID { hasUltimateArmor: true };
 		}

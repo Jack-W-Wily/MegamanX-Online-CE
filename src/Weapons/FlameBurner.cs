@@ -60,7 +60,7 @@ public class FlameBurnerProj : Projectile {
 	public FlameBurnerProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 150, 1, player, "flameburner_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FlameBurner;
-		maxTime = 0.1f;
+		maxTime = 0.15f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			projId = (int)ProjIds.FlameBurnerHyper;
 		}

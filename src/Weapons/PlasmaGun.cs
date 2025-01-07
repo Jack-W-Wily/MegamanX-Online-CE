@@ -27,11 +27,11 @@ public class PlasmaGun : AxlWeapon {
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel == 3) {
 			if (altFire == 0) {
-				return 999;
+				return 8;
 			}
-			return 999;
+			return 0.5f;
 		}
-		return 999;
+		return 4;
 	}
 
 	public override float whiteAxlFireRateMod() {
