@@ -9,7 +9,7 @@ public enum ZeroAttackLoadoutType {
 }
 
 public class ZSaber : Weapon {
-	public static ZSaber staticWeapon = new();
+	public static ZSaber netWeapon = new();
 
 	public ZSaber() : base() {
 		//damager = new Damager(player, 3, 0, 0.5f);

@@ -277,10 +277,6 @@ public partial class KaiserSigma : Character {
 		return true;
 	}
 
-	public override bool isCCImmuneHyperMode() {
-		return true;
-	}
-
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([

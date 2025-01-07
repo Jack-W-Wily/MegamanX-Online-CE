@@ -238,7 +238,7 @@ public class DynamoCrossProj : Projectile {
 		if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
+			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 50 * modifier, -300));
 		}
@@ -1100,7 +1100,7 @@ public class DynamoBeam : Projectile {
 		if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
+			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 50 * modifier, -600));
 		}

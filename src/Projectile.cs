@@ -706,7 +706,7 @@ public class Projectile : Actor {
 		if (isJuggleProjectile && damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
+			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 0 * modifier, -300));
 		}
@@ -819,6 +819,14 @@ public class Projectile : Actor {
 		int xDir, params byte[] extraData
 	) {
 		rpcCreateHelper(pos, player, netProjId, xDir, false, owner, extraData);
+	}
+
+	public virtual void rpcCreateByteAngle(
+		Point pos, Actor owner, Player player, ushort? netProjId,
+		float angle, params byte[] extraData
+	) {
+		int byteAngle = MathInt.Round(angle % 256f);
+		rpcCreateHelper(pos, player, netProjId, xDir, true, owner, extraData);
 	}
 
 	public void acidFadeEffect() {

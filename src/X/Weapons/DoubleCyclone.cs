@@ -223,7 +223,7 @@ public class DoubleCycloneCharged : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		if (damagable is not Character character) return;
 		if (character.charState.invincible) return;
-		if (character.isImmuneToKnockback()) return;
+		if (character.isPushImmune()) return;
 
 		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
 		if (character.isClimbingLadder()) {

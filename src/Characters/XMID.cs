@@ -689,13 +689,6 @@ public override bool normalCtrl() {
 //		);
 	}
 
-
-
-
-	public override bool isCCImmuneHyperMode() {
-		return false;
-	}
-
 	public override string getSprite(string spriteName) {
 		return "rmx_" + spriteName;
 	}

@@ -114,7 +114,7 @@ public class GenericMeleeProj : Projectile {
 		if (isJuggleProjectile && damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
+			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 0 * modifier, -200));
 		}

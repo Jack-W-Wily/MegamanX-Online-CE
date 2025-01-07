@@ -152,6 +152,7 @@ public class FrostTowerProj : Projectile, IDamagable
 	}
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {}
+	public bool isPlayableDamagable() { return false; }
 
 	public override void onDestroy() {
 		base.onDestroy();
@@ -271,8 +272,8 @@ public class FrostTowerProjCharged : Projectile, IDamagable {
 		return false;
 	}
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {}
+	public bool isPlayableDamagable() { return false; }
 
-	
 	/*public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 

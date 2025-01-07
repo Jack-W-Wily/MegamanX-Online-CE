@@ -18,7 +18,6 @@ public class BlackArrow : AxlWeapon {
 		maxAmmo = 12;
 		ammo = maxAmmo;
 
-
 		sprite = "axl_arm_blackarrow";
 	}
 

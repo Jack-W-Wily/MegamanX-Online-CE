@@ -662,6 +662,8 @@ public class PeacockMissle : Projectile, IDamagable {
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 	}
+
+	public bool isPlayableDamagable() { return false; }
 }
 
 
