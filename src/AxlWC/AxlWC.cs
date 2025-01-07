@@ -9,6 +9,7 @@ namespace MMXOnline;
 
 public class AxlWC : Character {
 	public AxlWeapon mainWeapon;
+	public const int WhiteAxlCost;
 	public bool isWhite;
 	public float whiteTime;
 	public float dodgeRollCooldown;
@@ -205,7 +206,7 @@ public class AxlWC : Character {
 	// Non-attack inputs.
 	public override bool normalCtrl() {
 		// Handles Standard Hypermode Activations.
-		if (player.currency >= Player.zBusterZeroHyperCost && !isWhite &&
+		if (player.currency >= WhiteAxlCost && !isWhite &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart and not WarpIn
 		) {
@@ -213,7 +214,7 @@ public class AxlWC : Character {
 		} else {
 			hyperProgress = 0;
 		}
-		if (hyperProgress >= 1 && player.currency >= Player.zBusterZeroHyperCost) {
+		if (hyperProgress >= 1 && player.currency >= WhiteAxlCost) {
 			hyperProgress = 0;
 			changeState(new HyperAxlWcStart(grounded), true);
 			return true;

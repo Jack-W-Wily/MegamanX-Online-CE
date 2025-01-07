@@ -28,7 +28,7 @@ public class HyperAxlWcStart : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		axl = character as AxlWC ?? throw new NullReferenceException();;
-		axl.player.currency -= 10;
+		axl.player.currency -= AxlWC.WhiteAxlCost;
 		axl.useGravity = false;
 		axl.stopMoving();
 		axl.fillHealthToMax();
@@ -75,7 +75,7 @@ public class HoverAxlWC : CharState {
 	}
 
 	public Point exhaustPos() {
-		if (character.currentFrame.POIs.Length == 0) { return character.pos };
+		if (character.currentFrame.POIs.Length == 0) { return character.pos; };
 		Point exhaustPOI = character.currentFrame.POIs.Last();
 		return character.pos.addxy(exhaustPOI.x * axl.xDir, exhaustPOI.y);
 	}
