@@ -9,7 +9,7 @@ namespace MMXOnline;
 
 public class AxlWC : Character {
 	public AxlWeapon mainWeapon;
-	public const int WhiteAxlCost;
+	public const int WhiteAxlCost = 5;
 	public bool isWhite;
 	public float whiteTime;
 	public float dodgeRollCooldown;
@@ -445,6 +445,7 @@ public class AxlWC : Character {
 		Block,
 		OcelotSpin,
 		TailShot,
+		RisingBarrage
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
@@ -453,6 +454,7 @@ public class AxlWC : Character {
 			"axl_block" => MeleeIds.Block,
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
 			"axl_tailshot" => MeleeIds.TailShot,
+			"axl_risingbarrage" => MeleeIds.TailShot,
 			_ => MeleeIds.None
 		});
 	}
@@ -472,6 +474,11 @@ public class AxlWC : Character {
 			MeleeIds.TailShot => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.FireWave, player,
 				3, Global.halfFlinch, 5, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.RisingBarrage => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				3, 0, 8, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			_ => null
