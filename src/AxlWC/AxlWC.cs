@@ -328,7 +328,7 @@ public class AxlWC : Character {
 		weapon.shootMain(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
 		weapon.shootCooldown = weapon.fireRate;
 		recoilTime = weapon.fireRate - 4;
-		weapon.addAmmo(-weapon.getAmmoUsage(0), player);
+		weapon.addAmmo(-weapon.getAmmoUse(this, 0), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}
@@ -352,7 +352,7 @@ public class AxlWC : Character {
 		weapon.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
 		weapon.shootCooldown = weapon.altFireRate;
 		recoilTime = weapon.altFireRate - 4;
-		weapon.addAmmo(-weapon.getAmmoUsage(3), player);
+		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}
@@ -376,7 +376,7 @@ public class AxlWC : Character {
 		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
 		axlBullet.shootCooldown = axlBullet.altFireRate;
 		recoilTime = axlBullet.altFireRate - 4;
-		axlBullet.addAmmo(-axlBullet.getAmmoUsage(chargeLevel), player);
+		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}
