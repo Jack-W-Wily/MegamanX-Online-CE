@@ -71,6 +71,7 @@ public partial class Character : Actor, IDamagable {
 	public bool isCrystalized;
 	public bool insideCharacter;
 	public float invulnTime = 0;
+	public float iframesTime = 0;
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;

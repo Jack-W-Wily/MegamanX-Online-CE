@@ -286,6 +286,37 @@ public partial class Actor : GameObject {
 		Global.serverClient?.rpc(RPC.createActor, bytes.ToArray());
 	}
 
+	public virtual void rpcCreateActor(
+		ProjIds projId, Point pos, Player player, ushort? netProjId,
+		int xDir, params byte[] extraData
+	) {
+		if (netProjId == null) {
+			throw new Exception($"Attempt to create RPC of projectile type {this.GetType().ToString()} with null ID");
+		}
+		byte[] projIdBytes = BitConverter.GetBytes((ushort)projId);
+		byte[] xBytes = BitConverter.GetBytes(pos.x);
+		byte[] yBytes = BitConverter.GetBytes(pos.y);
+		byte[] netProjIdByte = BitConverter.GetBytes(netProjId.Value);
+		// Create bools of data.
+		byte dataInf = Helpers.boolArrayToByte(new bool[] {
+			false,
+			extraData != null && extraData.Length > 0
+		});
+		// Create byte list.
+		List<byte> bytes = new List<byte>() {
+			dataInf, (byte)player.id,
+			projIdBytes[0], projIdBytes[1],
+			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
+			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
+			netProjIdByte[0], netProjIdByte[1],
+			0
+		};
+		if (extraData != null && extraData.Length > 0) {
+			bytes.AddRange(extraData);
+		}
+		Global.serverClient?.rpc(RPC.createProj, bytes.ToArray());
+	}
+
 	public void changeSpriteIfDifferent(string spriteName, bool resetFrame) {
 		if (sprite.name == spriteName) return;
 		changeSprite(spriteName, resetFrame);

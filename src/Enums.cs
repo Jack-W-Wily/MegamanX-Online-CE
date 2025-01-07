@@ -847,6 +847,9 @@ public enum ProjIds {
 	TwinSlasherCharged7,
 	TwinSlasherCharged8,
 
+	// Random non-projectiles.
+	AxlDiscardedWeapon,
+
 	// Special damage types.
 	SelfDmg = 30000,
 

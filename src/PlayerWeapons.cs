@@ -305,7 +305,6 @@ label:
 				preSigmaReviveWeapons = null;
 			}
 		}
-		weaponSlot = 0;
 		if (ownedByLocalPlayer && isSigma && weapons.Count == 3) {
 			weaponSlot = Options.main.sigmaWeaponSlot;
 		}

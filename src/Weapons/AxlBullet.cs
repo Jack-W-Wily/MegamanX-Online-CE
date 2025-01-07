@@ -29,6 +29,8 @@ public class AxlBullet : AxlWeapon {
 		altFireCooldown = 18;
 		displayName = "Axl Bullets";
 		canHealAmmo = true;		
+		maxAmmo = 20;
+		ammo = 20;
 	}
 	public override float getAmmoUsage(int chargeLevel) {
 		switch (chargeLevel) {

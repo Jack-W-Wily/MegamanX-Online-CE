@@ -15,6 +15,9 @@ public class BlackArrow : AxlWeapon {
 		weaponBarBaseIndex = 33;
 		weaponSlotIndex = 53;
 		killFeedIndex = 68;
+		maxAmmo = 12;
+		ammo = maxAmmo;
+
 
 		sprite = "axl_arm_blackarrow";
 	}
@@ -22,11 +25,11 @@ public class BlackArrow : AxlWeapon {
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel == 3) {
 			if (altFire == 1) {
-				return 6;
+				return 32;
 			}
-			return 4;
+			return 6;
 		}
-		return 2;
+		return 4;
 	}
 
 	public override float whiteAxlFireRateMod() {

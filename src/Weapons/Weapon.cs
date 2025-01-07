@@ -338,6 +338,13 @@ public class Weapon {
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 	}
 
+	public void addAmmoPercent(float ammoAdd) {
+		float weaponHealAmount = MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
+		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
+		ammo += ammoAdd;
+		ammo = Helpers.clamp(ammo, 0, maxAmmo);
+	}
+
 	public virtual bool noAmmo() {
 		return ammo <= 0;
 	}

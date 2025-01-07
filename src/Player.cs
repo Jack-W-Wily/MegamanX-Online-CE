@@ -1178,7 +1178,7 @@ public partial class Player {
 				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
 			);
 		} else if (charNum == (int)CharIds.Axl) {
-			character = new Axl(
+			character = new AxlWC(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
@@ -1412,7 +1412,7 @@ public partial class Player {
 				mk2VileOverride: data.extraData[0] == 1, mk5VileOverride: data.extraData[0] == 2
 			);
 		} else if (data.charNum == (int)CharIds.Axl) {
-			retChar = new Axl(
+			retChar = new AxlWC(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
@@ -1522,6 +1522,9 @@ public partial class Player {
 	}
 
 	public void transformAxl(DNACore dnaCore, ushort dnaNetId) {
+		if (character == null) {
+			return;
+		}
 		// Reload weapons at transform if not used before.
 		if (!dnaCore.usedOnce && weapons != null) {
 			foreach (var weapon in weapons) {
@@ -1603,7 +1606,7 @@ public partial class Player {
 			);
 
 		} else if (charNum == (int)CharIds.Axl) {
-			retChar = new Axl(
+			retChar = new AxlWC(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
@@ -1781,7 +1784,7 @@ public partial class Player {
 			if (backupNetId == null) {
 				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
 			}
-			preTransformedAxl = new Axl(this, oldPos.x, oldPos.y, oldDir, true, backupNetId, ownedByLocalPlayer, false);
+			preTransformedAxl = new AxlWC(this, oldPos.x, oldPos.y, oldDir, true, backupNetId, ownedByLocalPlayer, false);
 		} else {
 			Global.level.addGameObject(preTransformedAxl);
 		}
@@ -1822,6 +1825,9 @@ public partial class Player {
 
 	// If you change this method change revertToAxl() too
 	public void revertToAxlDeath() {
+		if (character == null) {
+			return;
+		}
 		disguise = null;
 
 		if (ownedByLocalPlayer) {

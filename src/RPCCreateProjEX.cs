@@ -121,6 +121,7 @@ public partial class RPCCreateProj : RPC {
 		//EXTRA
 		{ (int)ProjIds.UPParryMelee, UPParryMeleeProj.rpcInvoke },
 		{ (int)ProjIds.UPParryProj, UPParryRangedProj.rpcInvoke },
+		{ (int)ProjIds.AxlDiscardedWeapon, AxlDiscrardedWeapon.rpcInvoke},
 		
 		// Vile stuff.
 		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },

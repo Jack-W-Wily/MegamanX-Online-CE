@@ -7,13 +7,16 @@ namespace MMXOnline;
 public class PlasmaGun : AxlWeapon {
 	public PlasmaGun(int altFire) : base(altFire) {
 		shootSounds = new string[] { "plasmaGun", "plasmaGun", "plasmaGun", "plasmaGun" };
-		fireRate = 120;
+		fireRate = 60;
 		altFireCooldown = 150;
 		index = (int)WeaponIds.PlasmaGun;
 		weaponBarBaseIndex = 36;
 		weaponSlotIndex = 56;
 		killFeedIndex = 71;
 		sprite = "axl_arm_plasmagun";
+		maxSwapCooldown = 120;
+		maxAmmo = 4;
+		ammo = 4;
 
 		if (altFire == 1) {
 			altFireCooldown = 10;
@@ -24,11 +27,11 @@ public class PlasmaGun : AxlWeapon {
 	public override float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel == 3) {
 			if (altFire == 0) {
-				return 8;
+				return 999;
 			}
-			return 0.5f;
+			return 999;
 		}
-		return 4;
+		return 999;
 	}
 
 	public override float whiteAxlFireRateMod() {
@@ -40,7 +43,6 @@ public class PlasmaGun : AxlWeapon {
 	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
 		if (!player.ownedByLocalPlayer) return;
-		if (player?.character is not Axl axl) return;
 
 		Point? bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
@@ -56,8 +58,10 @@ public class PlasmaGun : AxlWeapon {
 				new VoltTornadoProj(weapon, player.character.pos, xDir, player, netId, sendRpc: true);
 				RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
 			} else {
+				var proj = new PlasmaGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId, sendRpc: true);
+				if (player?.character is not Axl axl) return;
 				if (axl.plasmaGunAltProj == null) {
-					axl.plasmaGunAltProj = new PlasmaGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId, sendRpc: true);
+					axl.plasmaGunAltProj = proj;
 				}
 				return;
 			}

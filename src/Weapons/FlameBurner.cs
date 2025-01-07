@@ -11,6 +11,8 @@ public class FlameBurner : AxlWeapon {
 		weaponBarBaseIndex = 38;
 		weaponSlotIndex = 58;
 		killFeedIndex = 73;
+		maxAmmo = 8;
+		ammo = maxAmmo;
 
 		sprite = "axl_arm_flameburner";
 

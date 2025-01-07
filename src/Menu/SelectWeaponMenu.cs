@@ -50,7 +50,7 @@ public class XWeaponCursor {
 
 
 public class SelectWeaponMenu : IMainMenu {
-	
+
 	public WeaponCursor[] cursors;
 	public int selCursorIndex;
 	public bool inGame;
@@ -83,13 +83,13 @@ public class SelectWeaponMenu : IMainMenu {
 		new FrostShield(),
 		new TornadoFang(),
 		new LightningWeb(),
-		new	FrostTower(),
-		new	SoulBody(),
-		new	RisingFire(),
-		new	GroundHunter(),
-		new	AimingLaser(),
-		new	DoubleCyclone(),
-		new	TwinSlasher(),				
+		new FrostTower(),
+		new SoulBody(),
+		new RisingFire(),
+		new GroundHunter(),
+		new AimingLaser(),
+		new DoubleCyclone(),
+		new TwinSlasher(),
 		new ZXSaber(),
 		new DarkHoldWeapon()
 	};
@@ -121,13 +121,13 @@ public class SelectWeaponMenu : IMainMenu {
 		new FrostShield(),
 		new TornadoFang(),
 		new LightningWeb(),
-		new	FrostTower(),
-		new	SoulBody(),
-		new	RisingFire(),
-		new	GroundHunter(),
-		new	AimingLaser(),
-		new	DoubleCyclone(),
-		new	TwinSlasher(),				
+		new FrostTower(),
+		new SoulBody(),
+		new RisingFire(),
+		new GroundHunter(),
+		new AimingLaser(),
+		new DoubleCyclone(),
+		new TwinSlasher(),
 		new ZXSaber(),
 		new DarkHoldWeapon()
 	};
@@ -159,13 +159,13 @@ public class SelectWeaponMenu : IMainMenu {
 		new FrostShield(),
 		new TornadoFang(),
 		new LightningWeb(),
-		new	FrostTower(),
-		new	SoulBody(),
-		new	RisingFire(),
-		new	GroundHunter(),
-		new	AimingLaser(),
-		new	DoubleCyclone(),
-		new	TwinSlasher(),				
+		new FrostTower(),
+		new SoulBody(),
+		new RisingFire(),
+		new GroundHunter(),
+		new AimingLaser(),
+		new DoubleCyclone(),
+		new TwinSlasher(),
 		new ZXSaber(),
 		new DarkHoldWeapon()
 	};
@@ -190,58 +190,51 @@ public class SelectWeaponMenu : IMainMenu {
 		this.inGame = inGame;
 
 		cursors = new WeaponCursor[] {
-			new WeaponCursor( Options.main.xLoadout.weapon1),
-			new WeaponCursor( Options.main.xLoadout.weapon2),
-			new WeaponCursor( Options.main.xLoadout.weapon3),
-			new WeaponCursor( Options.main.xLoadout.melee)
+			new WeaponCursor(Options.main.xLoadout.weapon1),
+			new WeaponCursor(Options.main.xLoadout.weapon2),
+			new WeaponCursor(Options.main.xLoadout.weapon3),
+			new WeaponCursor(Options.main.xLoadout.melee)
 		};
 	}
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
 			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-				error = null;
+				error = "";
 			}
 			return;
 		}
 
-		int maxCatCount = 3;
-	//	if (selCursorIndex < 4) {
-			maxCatCount = xWeaponCategories[selCursorIndex].Item2.Count;
-	//	}
+		int maxCatCount = xWeaponCategories[selCursorIndex].Item2.Count;
 
 		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, maxCatCount - 1, wrap: true, playSound: true);
 		Helpers.menuUpDown(ref selCursorIndex, 0, cursors.Length - 1);
 
 		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
 		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
-		
-		if (selectPressed) {
-	
 
+		if (selectPressed) {
 			int[] oldArray = {
+				Options.main.xLoadout.weapon1,
+				Options.main.xLoadout.weapon2,
 				Options.main.xLoadout.weapon3,
 				Options.main.xLoadout.melee,
-				Options.main.xLoadout.weapon1,
-				Options.main.xLoadout.weapon2
 			};
-
 			Options.main.xLoadout.weapon1 = xWeaponCategories[0].Item2[cursors[0].index].type;
 			Options.main.xLoadout.weapon2 = xWeaponCategories[1].Item2[cursors[1].index].type;
 			Options.main.xLoadout.weapon3 = xWeaponCategories[2].Item2[cursors[2].index].type;
 			Options.main.xLoadout.melee = xWeaponCategories[3].Item2[cursors[3].index].type;
-			int[] newArray = {	
+			int[] newArray = {
+				Options.main.xLoadout.weapon1,
+				Options.main.xLoadout.weapon2,
 				Options.main.xLoadout.weapon3,
 				Options.main.xLoadout.melee,
-				Options.main.xLoadout.weapon1,
-				Options.main.xLoadout.weapon2
 			};
-		
 			if (!Enumerable.SequenceEqual(oldArray, newArray)) {
 				Options.main.saveToFile();
-				
-			if (inGame) {
-				Global.level.mainPlayer.syncLoadout();
+
+				if (inGame) {
+					Global.level.mainPlayer.syncLoadout();
 					if (Options.main.killOnLoadoutChange) {
 						Global.level.mainPlayer.forceKill();
 					} else if (!Global.level.mainPlayer.isDead) {
@@ -288,7 +281,7 @@ public class SelectWeaponMenu : IMainMenu {
 				yPos, selected: selCursorIndex == i
 			);
 			var weapon = xWeaponCategories[i].Item2[cursors[i].index];
-			Fonts.drawText(FontType.Purple, weapon.displayName, wepTextX, yPos,selected: selCursorIndex == i);
+			Fonts.drawText(FontType.Purple, weapon.displayName, wepTextX, yPos, selected: selCursorIndex == i);
 			Global.sprites["hud_killfeed_weapon"].drawToHUD(weapon.killFeedIndex, wepPosX, yPos + 3, alpha);
 		}
 		color = Color.White;
@@ -299,12 +292,12 @@ public class SelectWeaponMenu : IMainMenu {
 			int posY = 6;
 			foreach (string description in wep.description) {
 				Fonts.drawText(
-					FontType.RedishOrange, wep.description[0], 28, wsy-8, Alignment.Left
+					FontType.RedishOrange, wep.description[0], 28, wsy - 8, Alignment.Left
 				);
 				posY += 9;
 			}
-		} 
-		
+		}
+
 		if (!string.IsNullOrEmpty(error)) {
 			float top = Global.screenH * 0.4f;
 			DrawWrappers.DrawRect(
@@ -337,20 +330,20 @@ public class SelectWeaponMenu : IMainMenu {
 		1, ZIndex.HUD, false, outlineColor: outlineColor); //Weapon Stats Rectangle	
 		DrawWrappers.DrawRect(25, 118, 359, 192, true, DefaultColor,
 		1, ZIndex.HUD, false, outlineColor: outlineColor); // Bottom Rectangle
-		DrawWrappers.DrawRect(25, 133, 148, 147, true, DefaultColor, 
+		DrawWrappers.DrawRect(25, 133, 148, 147, true, DefaultColor,
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //DMG Rectangle
-		DrawWrappers.DrawRect(25, 147, 148, 158, true, DefaultColor, 
+		DrawWrappers.DrawRect(25, 147, 148, 158, true, DefaultColor,
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
-		DrawWrappers.DrawRect(25, 158, 148, 170, true, DefaultColor, 
+		DrawWrappers.DrawRect(25, 158, 148, 170, true, DefaultColor,
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FireRate Rectangle
-		DrawWrappers.DrawRect(148, 133, 288, 147, true, DefaultColor, 
+		DrawWrappers.DrawRect(148, 133, 288, 147, true, DefaultColor,
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
-		DrawWrappers.DrawRect(148, 147, 288, 158, true, DefaultColor, 
+		DrawWrappers.DrawRect(148, 147, 288, 158, true, DefaultColor,
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FlinchCD Rectangle
-		DrawWrappers.DrawRect(148, 158, 288, 170, true, DefaultColor, 
+		DrawWrappers.DrawRect(148, 158, 288, 170, true, DefaultColor,
 		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
-		Fonts.drawText(FontType.Purple, "Weapon Stats",Global.halfScreenW, 122, Alignment.Center);
-		
+		Fonts.drawText(FontType.Purple, "Weapon Stats", Global.halfScreenW, 122, Alignment.Center);
+
 		if (selCursorIndex < 5) {
 			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 138);
 			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 26, 150);
@@ -364,7 +357,7 @@ public class SelectWeaponMenu : IMainMenu {
 					case (int)ArmorId.Light:
 						effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
 						break;
-					
+
 					case (int)ArmorId.Giga:
 						effect = "Mega Buster Mark 17 with Double Charge Shot.";
 						break;
@@ -381,11 +374,11 @@ public class SelectWeaponMenu : IMainMenu {
 			if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasUltimateArmor == true) {
 				effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
 				Fonts.drawText(FontType.Blue, effect, 26, 172);
-			}			
+			}
 			if (wep1 is FrostShield) {
 				if (Global.frameCount % 600 < 80) {
-					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon"; } 
-				else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it.";}	
+					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon";
+				} else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it."; }
 				Fonts.drawText(FontType.Blue, effect, 26, 172);
 			}
 		}
@@ -485,7 +478,7 @@ public class SelectWeaponMenuOLD : IMainMenu {
 				if (cursors[selCursorIndex].index == 9) cursors[selCursorIndex].index = 9; //0;
 				else if (cursors[selCursorIndex].index == 17) cursors[selCursorIndex].index = 17; //9;
 				else if (cursors[selCursorIndex].index == 26) cursors[selCursorIndex].index = 0; //17;
-				
+
 				Global.playSound("menuX2");
 			}
 			if (Global.input.isPressedMenu(Control.WeaponLeft)) {
@@ -566,7 +559,7 @@ public class SelectWeaponMenuOLD : IMainMenu {
 		float rightArrowPos = 224;
 		float leftArrowPos = startX2 - 15;
 
-		Global.sprites["cursor"].drawToHUD(0, startX-6, startY + (selCursorIndex * wepH));
+		Global.sprites["cursor"].drawToHUD(0, startX - 6, startY + (selCursorIndex * wepH));
 		for (int i = 0; i < 4; i++) {
 			float yPos = startY - 6 + (i * wepH);
 
@@ -696,7 +689,7 @@ public class SelectWeaponMenuOLD : IMainMenu {
 				FontType.Orange, weaponNames[selectedWeaponIndices[selCursorIndex]],
 				303, 42, Alignment.Center
 			); // up right name
-			//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
+			   //Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, Global.halfScreenW + 75, 148);
 			Fonts.drawText(FontType.Green, "Counters: ", 305, 58, Alignment.Right);
 			if (strongAgainstIndex > 0) {
 				Global.sprites["hud_weapon_icon"].drawToHUD(strongAgainstIndex, 308, 62);
@@ -718,17 +711,17 @@ public class SelectWeaponMenuOLD : IMainMenu {
 			if (weakAgainstMaverickIndex > 0) {
 				Global.sprites["hud_weapon_icon"].drawToHUD(weakAgainstMaverickIndex, 325, 82);
 			}
-			DrawWrappers.DrawRect(25, 133, 148, 147, true, new Color(0, 0, 0, 100), 
+			DrawWrappers.DrawRect(25, 133, 148, 147, true, new Color(0, 0, 0, 100),
 			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //DMG Rectangle
-			DrawWrappers.DrawRect(25, 147, 148, 158, true, new Color(0, 0, 0, 100), 
+			DrawWrappers.DrawRect(25, 147, 148, 158, true, new Color(0, 0, 0, 100),
 			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
-			DrawWrappers.DrawRect(25, 158, 148, 170, true, new Color(0, 0, 0, 100), 
+			DrawWrappers.DrawRect(25, 158, 148, 170, true, new Color(0, 0, 0, 100),
 			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FireRate Rectangle
-			DrawWrappers.DrawRect(148, 133, 288, 147, true, new Color(0, 0, 0, 100), 
+			DrawWrappers.DrawRect(148, 133, 288, 147, true, new Color(0, 0, 0, 100),
 			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
-			DrawWrappers.DrawRect(148, 147, 288, 158, true, new Color(0, 0, 0, 100), 
+			DrawWrappers.DrawRect(148, 147, 288, 158, true, new Color(0, 0, 0, 100),
 			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FlinchCD Rectangle
-			DrawWrappers.DrawRect(148, 158, 288, 170, true, new Color(0, 0, 0, 100), 
+			DrawWrappers.DrawRect(148, 158, 288, 170, true, new Color(0, 0, 0, 100),
 			0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
 
 			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 138);
@@ -738,34 +731,34 @@ public class SelectWeaponMenuOLD : IMainMenu {
 			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 151, 150);
 			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
 			Fonts.drawText(FontType.Blue, effect, 26, 172);
-				if (weapon is XBuster) {
-						switch (Global.level?.mainPlayer.armArmorNum) {
-							case (int)ArmorId.Light:
-								effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
-								break;
-							
-							case (int)ArmorId.Giga:
-								effect = "Mega Buster Mark 17 with Double Charge Shot.";
-								break;
+			if (weapon is XBuster) {
+				switch (Global.level?.mainPlayer.armArmorNum) {
+					case (int)ArmorId.Light:
+						effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+						break;
 
-							case (int)ArmorId.Max:
-								effect = "Mega Buster Mark 17 with Cross Charge Shot.";
-								break;
-							default:
-								effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
-								break;
-						}
-						Fonts.drawText(FontType.Blue, effect, 26, 172);
-					}
-					if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasUltimateArmor == true) {
-						effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
-						Fonts.drawText(FontType.Blue, effect, 26, 172);
-					}			
+					case (int)ArmorId.Giga:
+						effect = "Mega Buster Mark 17 with Double Charge Shot.";
+						break;
+
+					case (int)ArmorId.Max:
+						effect = "Mega Buster Mark 17 with Cross Charge Shot.";
+						break;
+					default:
+						effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
+						break;
+				}
+				Fonts.drawText(FontType.Blue, effect, 26, 172);
+			}
+			if (Global.level?.mainPlayer.character is MegamanX mmx && mmx?.hasUltimateArmor == true) {
+				effect = "Mega Buster Mark 17 with Plasma Charge Shot + Bonus.";
+				Fonts.drawText(FontType.Blue, effect, 26, 172);
+			}
 			if (weapon is FrostShield) {
 				if (Global.frameCount % 600 < 80) {
-					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon"; } 
-				else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it.";}	
-				Fonts.drawText(FontType.Blue, 
+					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon";
+				} else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it."; }
+				Fonts.drawText(FontType.Blue,
 				effect, 26, 172);
 			}
 		}

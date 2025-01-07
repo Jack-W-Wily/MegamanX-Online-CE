@@ -10,9 +10,11 @@ public enum AxlBulletType {
 public class AxlWeapon : Weapon {
 	public int altFire;
 	public float altFireCooldown;
-	public string? flashSprite;
-	public string? chargedFlashSprite;
+	public string flashSprite = "";
+	public string chargedFlashSprite = "";
 	public string? sprite;
+	public float maxSwapCooldown = 60 * 3;
+	public float swapCooldown;
 
 	public AxlWeapon(int altFire) {
 		this.altFire = altFire;
@@ -20,7 +22,7 @@ public class AxlWeapon : Weapon {
 
 	public bool isTwoHanded(bool includeDoubleBullet) {
 		if (includeDoubleBullet && this is DoubleBullet) return true;
-		return this is BlastLauncher || this is IceGattling || this is FlameBurner;
+		return this is BlastLauncher or IceGattling or FlameBurner or BlackArrow or PlasmaGun;
 	}
 	public bool isSecondShot;
 

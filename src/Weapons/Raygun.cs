@@ -18,6 +18,9 @@ public class RayGun : AxlWeapon {
 		weaponSlotIndex = 34;
 		killFeedIndex = 33;
 		fireRate = 6;
+		altFireCooldown = 6;
+		maxAmmo = 16;
+		ammo = maxAmmo;
 
 		if (altFire == 1) {
 			shootSounds[3] = "";
@@ -50,9 +53,6 @@ public class RayGun : AxlWeapon {
 	    Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
 	 	IDamagable? target, Character? headshotTarget, Point cursorPos, int chargeLevel, ushort netId
 	) {
-		if (player.character is not Axl axl) {
-			return;
-		}
 		if (!player.ownedByLocalPlayer) return;
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
@@ -67,6 +67,9 @@ public class RayGun : AxlWeapon {
 				}
 				return;
 			} else {
+				if (player.character is not Axl axl) {
+					return;
+				}
 				if (axl.rayGunAltProj == null) {
 					axl.rayGunAltProj = new RayGunAltProj(weapon, bulletPos, cursorPos, 1, player, netId);
 				} else {
@@ -480,7 +483,7 @@ public class SplashLaserProj : Projectile {
 		fadeSprite = "splashlaser_fade";
 		projId = (int)ProjIds.SplashLaser;
 		maxTime = 0.4f;
-		useGravity = false;
+		useGravity = true;
 		gravityModifier = 0.5f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;

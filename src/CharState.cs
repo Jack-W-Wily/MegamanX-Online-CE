@@ -715,6 +715,10 @@ public class Crouch : CharState {
 		}
 
 		if (!character.grounded || !player.isCrouchHeld()) {
+			if (character is Axl) {
+				character.changeToIdleOrFall();
+				return;
+			}
 			character.changeToIdleOrFall("crouch_start");
 			return;
 		}

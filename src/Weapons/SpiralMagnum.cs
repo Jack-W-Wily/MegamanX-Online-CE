@@ -37,10 +37,19 @@ public class SpiralMagnum : AxlWeapon {
 	) {
 		if (!player.ownedByLocalPlayer) return;
 		if (player.character == null) return;
-		if (player.character is not Axl axl) return;
 		Point? bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		Point? origPos = bulletPos;
+		
+		if (player.character is not Axl axl) {
+			Point? bulletDir1 = Point.createFromAngle(angle);
+			float jumpDist = 0;
+			bullet = new SpiralMagnumProj(
+				weapon, bulletPos, jumpDist, 1, player, bulletDir1.Value, target, headshotTarget, netId
+			);
+			AssassinBulletTrailAnim trail = new AssassinBulletTrailAnim(origPos.Value, bullet);
+			return;
+		}
 
 		if (chargeLevel == 3 && altFire == 0) {
 			axl.sniperMissileProj = new SniperMissileProj(weapon, bulletPos, player, bulletDir.Value, netId, rpc: true);

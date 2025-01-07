@@ -23,18 +23,20 @@ public class IceGattling : AxlWeapon {
 		return 0.5f;
 	}
 
-	public override void axlGetProjectile(Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
-				IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId) {
+	public override void axlGetProjectile(
+		Weapon weapon, Point bulletPos, int xDir, Player player, float angle,
+		IDamagable target, Character headshotTarget, Point cursorPos, int chargeLevel, ushort netId
+	) {
 		if (!player.ownedByLocalPlayer) { return; }
-		if (player.character is not Axl axl) {
-			return;
-		}
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		if (chargeLevel == 0) {
 			bullet = new IceGattlingProj(weapon, bulletPos, xDir, player, bulletDir, netId);
 			RPC.axlShoot.sendRpc(player.id, bullet.projId, netId, bulletPos, xDir, angle);
 		} else if (chargeLevel == 3) {
+			if (player.character is not Axl axl) {
+				return;
+			}
 			axl.gaeaShield = new GaeaShieldProj(weapon, bulletPos, xDir, player, netId, rpc: true);
 			RPC.playSound.sendRpc(shootSounds[3], player.character?.netId);
 		}

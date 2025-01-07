@@ -328,9 +328,9 @@ public class Axl : Character {
 
 
 		if (whiteAxlTime > 0) {
-				if (musicSource == null) {
-					addMusicSource("wildFang", getCenterPos(), true);
-				}
+			if (musicSource == null) {
+				addMusicSource("wildFang", getCenterPos(), true);
+			}
 		}
 
 		if (whiteAxlTime > 0) {
@@ -377,7 +377,7 @@ public class Axl : Character {
 
 		if (linkedRideArmor != null &&
 			player.input.isHeld(Control.Down, player) &&
-			player.input.isHeld(Control.Special2, player) && 
+			player.input.isHeld(Control.Special2, player) &&
 			linkedRideArmor.rideArmorState is not RACalldown
 		) {
 			linkedRideArmor.changeState(new RACalldown(pos, false), true);
@@ -459,62 +459,59 @@ public class Axl : Character {
 		// AXl Attacks
 
 
-	if ((player.weapon is AxlBullet || player.weapon is DoubleBullet) &&
-	  !sprite.name.Contains("hurt")
-		 && !sprite.name.Contains("grabbed")
-		  && !sprite.name.Contains("frozen")){	
-		if (!isAttacking() || ComboTimer > 0){
-			if (player.input.isPressed(Control.Special1, player) 
-			&& !player.input.isHeld(Control.Up, player) 
-			&& !player.input.isHeld(Control.Down, player)
-			&& !player.input.isLeftOrRightHeld(player)
-			&& charState is not EvasionBarrage
-			){
-				vel.y = -getJumpPower() * 2f;
-			changeState(new EvasionBarrage(), true);
-		if (charState is Crouch)invulnTime = 0.2f;
+		if ((player.weapon is AxlBullet || player.weapon is DoubleBullet) &&
+		  !sprite.name.Contains("hurt")
+			 && !sprite.name.Contains("grabbed")
+			  && !sprite.name.Contains("frozen")) {
+			if (!isAttacking() || ComboTimer > 0) {
+				if (player.input.isPressed(Control.Special1, player)
+					&& !player.input.isHeld(Control.Up, player)
+					&& !player.input.isHeld(Control.Down, player)
+					&& !player.input.isLeftOrRightHeld(player)
+					&& charState is not EvasionBarrage
+				) {
+					vel.y = -getJumpPower() * 2f;
+					changeState(new EvasionBarrage(), true);
+					//if (charState is Crouch) invulnTime = 0.2f;
+				}
+				if (player.input.isPressed(Control.Special1, player)
+					&& !player.input.isHeld(Control.Up, player)
+					&& !player.input.isHeld(Control.Down, player)
+					&& player.input.isLeftOrRightHeld(player)
+					&& charState is not OcelotSpin
+				) {
+					changeState(new OcelotSpin(), true);
+					//if (charState is Crouch) invulnTime = 0.2f;
+				}
+				if (player.input.isPressed(Control.Down, player)
+					&& charState is Dash
+					&& charState is not RisingBarrage
+				) {
+					changeState(new RisingBarrage(), true);
+					//if (charState is Crouch) invulnTime = 0.2f;
+				}
+				if (player.input.isPressed(Control.Special1, player)
+					&& player.input.isHeld(Control.Up, player)
+					&& !player.input.isHeld(Control.Down, player)
+					&& !player.input.isLeftOrRightHeld(player)
+					&& charState is not TailShot
+				) {
+					changeState(new TailShot(), true);
+					//if (charState is Crouch) invulnTime = 0.25f;
+				}
 			}
-			if (player.input.isPressed(Control.Special1, player) 
-			&& !player.input.isHeld(Control.Up, player) 
-			&& !player.input.isHeld(Control.Down, player)
-			&& player.input.isLeftOrRightHeld(player)
-			&& charState is not OcelotSpin
-			
-			){
-			changeState(new OcelotSpin(), true);
-		if (charState is Crouch)invulnTime = 0.2f;
-			}
-			if (player.input.isPressed(Control.Down, player) 
-			&&  charState is  Dash
+			if (RainstormCooldown == 0 && charState is not RainStorm
+			 && player.canControl
+			 && !sprite.name.Contains("hurt")
+			 && !sprite.name.Contains("grabbed")) {
 
-			&& charState is not RisingBarrage
-			){
-			changeState(new RisingBarrage(), true);
-		if (charState is Crouch)	invulnTime = 0.2f;
+				if (player.input.checkHadoken(player, xDir, Control.Special1)) {
+					changeState(new RainStorm(), true);
+					//invulnTime = 0.5f;
+					RainstormCooldown = 2.5f;
+				}
 			}
-			if (player.input.isPressed(Control.Special1, player) 
-			&& player.input.isHeld(Control.Up, player) 
-			&& !player.input.isHeld(Control.Down, player)
-			&& !player.input.isLeftOrRightHeld(player)
-			&& charState is not TailShot
-			){
-		changeState(new TailShot(), true);
-		if (charState is Crouch)	invulnTime = 0.25f;
-			}
-	
 		}
-		if ( RainstormCooldown == 0  && charState is not RainStorm 
-		 && player.canControl
-		 && !sprite.name.Contains("hurt")
-		 && !sprite.name.Contains("grabbed")) {
-			
-			if (player.input.checkShoryuken(player, xDir , Control.Special1)) {
-		changeState(new RainStorm(isUnderwater()), true);
-				invulnTime = 0.5f;
-				 RainstormCooldown = 2.5f;
-			}
-		 }
-	}
 
 
 		Helpers.decrementTime(ref RainstormCooldown);
@@ -573,15 +570,15 @@ public class Axl : Character {
 
 		bool bothHeld = shootHeld && altShootHeld;
 
-	//	if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
-			(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
-	//	} else {
-	//		foreach (var weapon in player.weapons) {
-	//			if (weapon is AxlBullet || weapon is DoubleBullet) {
-	//				(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
-	//			}
-	//		}
-	//	}
+		//	if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+		(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
+		//	} else {
+		//		foreach (var weapon in player.weapons) {
+		//			if (weapon is AxlBullet || weapon is DoubleBullet) {
+		//				(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
+		//			}
+		//		}
+		//	}
 
 		if (player.weapons.Count > 0 && player.weapons[0].type > 0) {
 			player.axlBulletTypeLastAmmo[player.weapons[0].type] = player.weapons[0].ammo;
@@ -589,7 +586,7 @@ public class Axl : Character {
 
 		if (player.weapon is not AssassinBullet) {
 			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
-			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
 			player.weapon is RevolverBarrel || player.weapon is AncientGun) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
@@ -613,7 +610,7 @@ public class Axl : Character {
 					playSound("stingCharge", sendRpc: true);
 				} else if (isCharging()) {
 					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
-						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
 						player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 						recoilTime = 0.2f;
 						if (!isWhiteAxl()) {
@@ -676,9 +673,9 @@ public class Axl : Character {
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
-				switch(player.weapon) {
+				switch (player.weapon) {
 					case MettaurCrash:
-					case BeastKiller: 
+					case BeastKiller:
 					case MachineBullets:
 					case RevolverBarrel:
 					case AncientGun:
@@ -691,7 +688,7 @@ public class Axl : Character {
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
 						}
-						break; 
+						break;
 				}
 				// Double bullet
 				if (player.weapon is DoubleBullet && canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
@@ -1594,28 +1591,28 @@ public class Axl : Character {
 			}
 		} else if (charState is LadderEnd) ladderClimb = true;
 
-		return !(charState is HyperAxlStart 
-		|| isWarpIn() 
-		|| charState is Hurt 
-		|| charState is Die 
-		|| charState is GenericStun 
-		|| charState is InRideArmor 
-		|| charState is DodgeRoll 
-		|| charState is VileMK2Grabbed 
+		return !(charState is HyperAxlStart
+		|| isWarpIn()
+		|| charState is Hurt
+		|| charState is Die
+		|| charState is GenericStun
+		|| charState is InRideArmor
+		|| charState is DodgeRoll
+		|| charState is VileMK2Grabbed
 		|| charState is KnockedDown
 		|| charState is Crouch
-		|| sprite.name.Contains("win") 
-		|| sprite.name.Contains("lose") 
-		|| ladderClimb 
-		|| charState is DeadLiftGrabbed 
+		|| sprite.name.Contains("win")
+		|| sprite.name.Contains("lose")
+		|| ladderClimb
+		|| charState is DeadLiftGrabbed
 		|| charState is MammothSlammed
-		|| charState is UPGrabbed 
-		|| charState is WhirlpoolGrabbed 
-		|| charState is RainStorm 
-		|| charState is EvasionBarrage 
-		|| charState is RisingBarrage 
-		|| charState is OcelotSpin 
-		|| charState is TailShot  
+		|| charState is UPGrabbed
+		|| charState is WhirlpoolGrabbed
+		|| charState is RainStorm
+		|| charState is EvasionBarrage
+		|| charState is RisingBarrage
+		|| charState is OcelotSpin
+		|| charState is TailShot
 		|| charState is InRideChaser);
 	}
 
@@ -2015,33 +2012,31 @@ public class Axl : Character {
 
 
 
-	
-// This can run on both owners and non-owners. So data used must be in sync
+
+	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		
+
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
 
-	
-			if (sprite.name.Contains("ocelot"))
-		{
+
+		if (sprite.name.Contains("ocelot")) {
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
-			 ProjIds.ZSaber1, player, 1, 0, 4, ShouldClang : true, isJuggleProjectile : true
+			 ProjIds.ZSaber1, player, 1, 0, 4, ShouldClang: true, isJuggleProjectile: true
 			);
 		}
 
-			if (sprite.name.Contains("tail"))
-		{
+		if (sprite.name.Contains("tail")) {
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 3, 10, 5, isJuggleProjectile : true
+			 ProjIds.FireWave, player, 3, 10, 5, isJuggleProjectile: true
 			);
 		}
-		
-		
-	
+
+
+
 		return null;
 	}
 
@@ -2071,7 +2066,7 @@ public class Axl : Character {
 		return base.canMove();
 	}
 
-	
+
 	public bool isAimLocked() {
 		if (player.input.isPositionLocked(player) && Options.main.axlAimMode == 0) {
 			return true;
@@ -2173,11 +2168,11 @@ public class Axl : Character {
 		netAxlArmSpriteIndex = BitConverter.ToUInt16(data[5..7]);
 	}
 	public override void aiAttack(Actor? target) {
-		if (axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+		if (axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !isInvulnerable()
 			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
 			changeState(new HyperAxlStart(grounded), true);
 		}
-		if (axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+		if (axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !isInvulnerable()
 			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
 			stingChargeTime = 12;
 		}

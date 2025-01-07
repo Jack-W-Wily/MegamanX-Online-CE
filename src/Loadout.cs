@@ -44,10 +44,10 @@ public class XLoadout {
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
 		var indices = new List<byte>();
 		if (player.isX){
-		indices.Add((int)WeaponIds.Buster);
+			indices.Add((int)WeaponIds.Buster);
 		}
 		if (player.isRageX){
-		indices.Add((int)WeaponIds.RagingChargeBuster);
+			indices.Add((int)WeaponIds.RagingChargeBuster);
 		}
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
