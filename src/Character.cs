@@ -107,6 +107,7 @@ public partial class Character : Actor, IDamagable {
 
 	// Some things previously in other char files used by multiple characters.
 	public RideArmor? linkedRideArmor;
+	public RideChaser? linkedRideChaser;
 	public RideArmor? rideArmorPlatform;
 	public bool alreadySummonedNewMech;
 
@@ -200,6 +201,7 @@ public partial class Character : Actor, IDamagable {
 	// Etc.
 	public int camOffsetX;
 
+	public ChainrodProj? ChainrodProj;
 
 	// Made it so That X and XMID share stuff
 		// Weapon-specific.
@@ -948,6 +950,9 @@ public partial class Character : Actor, IDamagable {
 		upPressedTimes = 0;
 		leftPressedTimes = 0;
 		rightPressedTimes = 0;
+		shootPressedTimes = 0;
+		specialPressedTimes = 0;
+		wRightPressedTimes = 0;
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -1687,7 +1692,7 @@ public partial class Character : Actor, IDamagable {
 			isVaccinated() ||
 			isStatusImmune() ||
 			charState.invincible ||
-			charState.stunResistant ||
+		//	charState.stunResistant ||
 			(charState is Die or VileMK2Grabbed) ||
 			isStunImmune() ||
 		 	stunInvulnTime > 0
@@ -3059,8 +3064,9 @@ public partial class Character : Actor, IDamagable {
 
 			if (assister != null && assister != player) {
 				assister.addAssist();
+				if (Global.level.gameMode is TeamDeathMatch) {
 				assister.addKill();
-
+				}
 				assister.awardCurrency();
 			}
 			//bool isSuicide = killer == null || killer == player;
@@ -3713,11 +3719,15 @@ public partial class Character : Actor, IDamagable {
 		chargedTornadoFang?.destroySelf();
 		chargedTornadoFang = null;
 		strikeChainProj?.destroySelf();
+	
 		strikeChainProj = null;
 		strikeChainChargedProj?.destroySelf();
 		strikeChainSemiChargedProj?.destroySelf();
 		strikeChainSemiChargedProj = null;
 		strikeChainChargedProj = null;
+
+		ChainrodProj?.destroySelf();
+		ChainrodProj = null;
 	}
 	
 	public void popAllBubbles() {

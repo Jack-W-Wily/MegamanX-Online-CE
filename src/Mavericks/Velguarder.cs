@@ -148,6 +148,23 @@ public class VelGFireProj : Projectile {
 		}
 	}
 
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer) {
+			playSound("flamemOilBurn", sendRpc: true);
+			new FlameMBigFireProj(
+				new FlameMOilFireWeapon(), oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle ?? 0, owner, owner.getNextActorNetId(), rpc: true
+			);
+			// oilSpill.time = 0;
+			oilSpill.destroySelf(doRpcEvenIfNotOwned: true);
+			destroySelf();
+		}
+	}
+
+
+
 	public override void update() {
 		base.update();
 		if (MathF.Abs(vel.y) < 600) vel.y -= Global.spf * 600;

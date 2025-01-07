@@ -66,10 +66,7 @@ public override bool normalCtrl() {
 		bool senpukiakuCheck = player.input.checkHadoken(player, xDir, Control.WeaponRight);
 		
 
-		if (player.input.isPressed(Control.Special1,player) && 
-		!player.input.isHeld(Control.Down,player)){
-			changeState(new DragoonPunchState2(), true);
-		}
+		
 		
 		if (hadokenCheck) {
 			changeState(new DragoonHadoukenCrouch(), true);	
@@ -130,6 +127,8 @@ public override bool attackCtrl() {
 	public override void update(){
 		base.update();
 
+
+		if (sprite.name.Contains("air_raid"))invulnTime = 2;
 
 
 
@@ -195,7 +194,7 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("punch") && !sprite.name.Contains("2"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 10, 15, ShouldClang : true
+			 ProjIds.FireWave, player, 2, 20, 15, ShouldClang : true
 			);
 		}
 			if (sprite.name.Contains("punch") && sprite.name.Contains("2"))
@@ -225,14 +224,14 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("shoryuken") && charState is DragoonRising)
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 0.5f, 20, 12, ShouldClang : true, isJuggleProjectile : true
+			 ProjIds.FireWave, player, 1f, 20, 12, ShouldClang : true, isJuggleProjectile : true
 			);
 		}
 
 			if (sprite.name.Contains("shoryuken") && charState is not DragoonRising )
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 20, 8, ShouldClang : true, isJuggleProjectile : true
+			 ProjIds.FireWave, player, 2, 20, 6, ShouldClang : true, isJuggleProjectile : true
 			);
 		}
 		
@@ -253,7 +252,7 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("air_raid"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 15, 30, 1
+			 ProjIds.DistanceNeedler, player, 15, 30, 1
 			);
 		}
 		

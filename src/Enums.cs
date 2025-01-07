@@ -781,6 +781,7 @@ public enum ProjIds {
 	GBDKick,
 	ShieldBoomerang,
 	ShieldBoomerang2,
+	ChainrodProj,
 
 
 	// Dynamo Stuff
@@ -789,6 +790,7 @@ public enum ProjIds {
 	DynamoAirBuster,
 	DynamoAirBuster2,
 	DynamoBeam,
+	DynamoDropSlash,
 	DynamoBoomerangProj,
 	DynamoIceDagger,
 

@@ -15,6 +15,8 @@ public class NeutralEnemy : Actor, IDamagable {
 
 	public NeutralEnemyState state;
 
+	public float attackCooldown;
+
 	public NeutralEnemy(
 		Point pos, ushort netId, bool isLocal, int alliance = 150, bool addToLevel = true
 	) : base(
@@ -34,6 +36,14 @@ public class NeutralEnemy : Actor, IDamagable {
 
 		this.alliance = alliance;
 	}
+
+		public override void update() {
+		base.update();
+		Helpers.decrementTime(ref attackCooldown);
+
+	}
+
+	
 
 	public override void preUpdate() {
 		base.preUpdate();
@@ -60,11 +70,36 @@ public class NeutralEnemy : Actor, IDamagable {
 	}
 
 
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (other.otherCollider.flag == (int)HitboxFlag.Hitbox) return;
+
+		if (other.gameObject is Character chr) {
+			if (!chr.ownedByLocalPlayer && chr.invulnTime > 0) return;
+		chr.applyDamage(2, null, null, null, null);
+		chr.changeState(new HurtByEnemy(chr.pos.x < this.pos.x ? -1 : 1), true);
+								
+			
+		} else if (other.gameObject is RideArmor rideArmor) {
+			if (!rideArmor.ownedByLocalPlayer) return;
+
+			
+		} else if (other.gameObject is RideChaser rideChaser) {
+			if (!rideChaser.ownedByLocalPlayer) return;
+
+
+		} else if (other.gameObject is Maverick maverick && maverick.ownedByLocalPlayer) {
+	
+		}
+	}
+
+
+
 	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		
 			return new GenericMeleeProj(
 					new FireWave(), centerPoint, ProjIds.BBuffaloStomp,
-					null, damage: 4 , flinch: Global.defFlinch, hitCooldown: 0.5f
+					Global.level.mainPlayer, damage: 4 , flinch: Global.defFlinch, hitCooldown: 0.5f
 				);
 		}
 		

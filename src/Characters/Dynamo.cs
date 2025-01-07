@@ -85,6 +85,7 @@ public override bool attackCtrl() {
 		uppercutCount == 0 &&
 		player.input.isHeld(Control.Up,player)){
 			changeState(new DynamoUpperCut(), true);
+			uppercutCount = 1;
 		}
 
 
@@ -238,7 +239,7 @@ public override bool attackCtrl() {
 		if (  sprite.name.Contains("blade_attack_air"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 3f, 25,15f, ShouldClang : true);
+			 ProjIds.DynamoDropSlash, player, 3f, 25,15f, ShouldClang : true);
 		}
 		
 		if (  sprite.name.Contains("whipattack"))

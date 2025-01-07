@@ -634,6 +634,8 @@ public class Vile : Character {
 	public override bool canCharge() {
 		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
 	}
+
+	
 	public override int getMaxChargeLevel() {
 		if (isVileMK5 || player.loadout.vileLoadout.cannon  == 2){
 			return 4;

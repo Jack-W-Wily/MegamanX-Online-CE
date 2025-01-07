@@ -90,6 +90,12 @@ float distance;
 		base.update();
 		if (!ownedByLocalPlayer) return;
 		
+		if (owner.character.destroyed || owner.character.charState is Die
+		|| owner.health < 1) {
+			destroySelf();
+			return;
+		}
+
 		globalCollider = new Collider(new Rect(0,0, 18, 34).getPoints(), 
 			true, this, false, false, HitboxFlag.Hitbox, Point.zero);
 
@@ -175,6 +181,13 @@ float distance;
 		base.update();
 		if (!ownedByLocalPlayer) return;
 		
+
+		if (owner.character.destroyed || owner.character.charState is Die
+		|| owner.health < 1) {
+			destroySelf();
+			return;
+		}
+
 		if (owner.character.sBodyClone == null) destroySelf();
 		if (distance < maxDist) distance += 4;
 		else distance = maxDist;

@@ -8,7 +8,7 @@ public class AxlBulletProj : Projectile {
 		angle = bulletDir.angle;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		maxTime = 0.17f;
+		maxTime = 0.1f;
 		reflectable = true;
 		isJuggleProjectile = true;
 

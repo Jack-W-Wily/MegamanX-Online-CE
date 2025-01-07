@@ -227,7 +227,7 @@ public class RideArmor : Actor, IDamagable {
 
 		if (rideArmorState is RADeactive && regentime > 0.5){
 		regentime = 0;
-		addHealth(1);
+		addHealth(0.5f);
 		}
 		if (raNum == 5) {
 			if (!ownedByLocalPlayer) {
@@ -913,10 +913,10 @@ public class RideArmor : Actor, IDamagable {
 		} else if (raNum == 2) {
 			return 80;
 		} else if (raNum == 1) {
-			if (isNeutral) return 50;
+		//	if (isNeutral) return 50;
 			return 70;
 		} else {
-			if (isNeutral) return 60;
+		//	if (isNeutral) return 60;
 			return 80;
 		}
 	}
@@ -2277,19 +2277,19 @@ public class InRideArmor : CharState {
 		if (!isHiding) {
 			if (character.rideArmor != null && character.rideArmor.isAttacking()) {
 				character.changeSpriteFromName("ra_attack", true);
-				character.frameSpeed = 0;
-				var mapping = new List<int>() { 0, 1, 1, 1, 0 };
+				//character.frameSpeed = 0;
+				//var mapping = new List<int>() { 0, 1, 1, 1, 0 };
 
 				//if (mapping.Count >= character.rideArmor.sprite.frameIndex) character.frameIndex = mapping[4];
 				//else
-				{
-					if (mapping.InRange(character.rideArmor.sprite.frameIndex)) {
-						character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
-					}
-				}
-			} else if (!character.sprite.name.Contains("ra_bomb") ||
-				!character.sprite.name.Contains("ra_taunt") ||
-				!character.sprite.name.Contains("ra_show") ||
+				//{
+				//	if (mapping.InRange(character.rideArmor.sprite.frameIndex)) {
+				//		character.frameIndex = mapping[character.rideArmor.sprite.frameIndex];
+				//	}
+				//}
+			} else if (!character.sprite.name.Contains("ra_bomb") &&
+				!character.sprite.name.Contains("ra_taunt") &&
+				!character.sprite.name.Contains("ra_show") &&
 			 character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
 			}
@@ -2298,6 +2298,17 @@ public class InRideArmor : CharState {
 				tossGrenade(vile);
 			}
 	//	}
+
+
+		//Blow Up Ride as vile Again
+		if (player.isVile){
+			if (character.rideArmor != null && character.rideArmor.isNeutral &&
+			 player.input.isHeld(Control.Down,player)
+		&& player.input.isPressed(Control.Taunt,player)){
+			character.rideArmor.selfDestructTime = Global.spf;
+		}
+		
+		}
 
 		bool ejectInput = character.player.input.isHeld(Control.Up, player) && character.player.input.isPressed(Control.Jump, player);
 		if (ejectInput) {

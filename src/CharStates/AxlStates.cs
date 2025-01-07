@@ -35,7 +35,7 @@ public class HyperAxlStart : CharState {
 		axl = character as Axl;
 		if (!axl.hyperAxlUsed) {
 			axl.hyperAxlUsed = true;
-			axl.player.currency -= 10;
+			axl.player.currency -= 5;
 		}
 		axl.useGravity = false;
 		axl.vel = new Point();
@@ -549,7 +549,7 @@ public class BlueBulletProj : Projectile {
 		destroyOnHit = true;
 		this.groundedVariant = groundedVariant;
 
-		maxTime = 1f;
+		maxTime = 0.17f;
 	
 		
 		if (!groundedVariant) {

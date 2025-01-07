@@ -721,6 +721,7 @@ public class DragoonDiveKick : CharState {
 	
 
 	public DragoonDiveKick() : base("dropkick") {
+		superArmor = true;
 	}
 
 	public override void update() {

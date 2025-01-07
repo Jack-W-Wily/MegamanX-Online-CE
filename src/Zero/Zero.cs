@@ -553,12 +553,12 @@ public class Zero : Character {
 					}
 					return true;
 				}
-				 if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= 10 &&
-				player.input.isPressed(Control.WeaponLeft, player)) {
-					gigaAttack.addAmmo(-10, player);
-					changeState(new ZeroRocks( new FakeZeroWeapon(player)), true);
-					return true;
-				}
+			//	 if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= 10 &&
+			///	player.input.isPressed(Control.WeaponLeft, player)) {
+			//		gigaAttack.addAmmo(-10, player);
+			//		changeState(new ZeroRocks( new FakeZeroWeapon(player)), true);
+			//		return true;
+			//	}
 			
 			if (!shootPressed) {
 				return true;
@@ -896,20 +896,20 @@ public class Zero : Character {
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, Global.miniFlinch, 5f, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, Global.miniFlinch, 7f, isReflectShield: true,
 				isJuggleProjectile: true,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
-				1, 10, 5, isDeflectShield: true,
+				1, 10, 10, isDeflectShield: true,
 				isJuggleProjectile: true,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
-				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 5f,
+				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 10f,
 				
 				addToLevel: addToLevel
 			),
@@ -934,7 +934,7 @@ public class Zero : Character {
 			),
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
-				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 3, Global.defFlinch, 5f,
+				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 3, Global.defFlinch, 55f,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
@@ -945,7 +945,7 @@ public class Zero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 1, 20, 10f,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 1, 20, 25f,
 				ShouldClang : true,
 				isJuggleProjectile: true,
 				addToLevel: addToLevel
@@ -956,12 +956,12 @@ public class Zero : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Danchien => new GenericMeleeProj(
-				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 10, 10f,
+				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 10, 60f,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
-				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 30f,
+				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 60f,
 				ShouldClang : true,
 				addToLevel: addToLevel
 			),

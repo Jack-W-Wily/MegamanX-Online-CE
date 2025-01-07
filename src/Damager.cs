@@ -56,7 +56,7 @@ public class Damager {
 		{ (int)ProjIds.WheelGSpinWheel, 60 },
 		{ (int)ProjIds.Sigma3KaiserStomp, 60 },
 		{ (int)ProjIds.Sigma3KaiserBeam, 60 },
-		{ (int)ProjIds.UPPunch, 60 },
+	//	{ (int)ProjIds.UPPunch, 60 },
 		{ (int)ProjIds.CopyShot, 60 },
 		{ (int)ProjIds.NeonTClawAir, 60 },
 		{ (int)ProjIds.NeonTClawDash, 60 },
@@ -378,8 +378,7 @@ public class Damager {
 
 			if ( projId == (int)ProjIds.GBDKick){
 			
-				owner.character.isDashing = true;
-			
+			owner.character.isDashing = true;
 			owner.character.vel.y = -owner.character.getJumpPower();
 			owner.character.changeState(new WallKick() ,true);
 			}
@@ -665,6 +664,12 @@ public class Damager {
 						character.changeState(new PushedOver2(character.pos.x < damagingActor?.pos.x ? 1 : -1), true);
 					}
 						break;
+				case (int)ProjIds.DynamoDropSlash:
+				if (!character.grounded && character.isAttacking()) {
+						character.vel.y += 300;
+						spiked = true;
+					}
+				break;
 				case (int)ProjIds.MechFrogGroundPound:
 					if (!character.grounded) {
 						character.vel.y += 300;
