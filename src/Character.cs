@@ -813,6 +813,7 @@ public partial class Character : Actor, IDamagable {
 
 	public override void preUpdate() {
 		base.preUpdate();
+		Helpers.decrementFrames(ref iframesTime);
 		updateProjectileCooldown();
 		insideCharacter = false;
 		changedStateInFrame = false;

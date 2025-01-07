@@ -55,6 +55,15 @@ public class AxlWC : Character {
 
 	public override void update() {
 		base.update();
+		// Hypermode music.
+		if (isWhite) {
+			if (musicSource == null) {
+				addMusicSource("wildFang", getCenterPos(), true);
+			}
+		} else if (musicSource != null) {
+			musicSource.stop();
+			musicSource = null;
+		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}
