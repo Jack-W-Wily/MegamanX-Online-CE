@@ -454,7 +454,7 @@ public class AxlWC : Character {
 			"axl_block" => MeleeIds.Block,
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
 			"axl_tailshot" => MeleeIds.TailShot,
-			"axl_risingbarrage" => MeleeIds.TailShot,
+			"axl_risingbarrage" => MeleeIds.RisingBarrage,
 			_ => MeleeIds.None
 		});
 	}
