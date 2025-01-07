@@ -688,6 +688,10 @@ public class MegamanX : Character {
 			// Light Helmet when it up-dashes.
 			"mmx_up_dash" or "mmx_up_dash_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbuttEX,
+			// Light Helmet when it Enemy Steps.
+			"mmx_fall" 
+			when legArmor == ArmorId.Light && player.input.isPressed(Control.Jump,player) => MeleeIds.EnemyStep,
+			
 			// Nothing.
 			_ => MeleeIds.None
 		});
@@ -736,6 +740,10 @@ public class MegamanX : Character {
 				new RCXPunch(), projPos, ProjIds.UPPunch, player,
 			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
 			),
+			(int)MeleeIds.EnemyStep => new GenericMeleeProj(
+				new RCXPunch(), projPos, ProjIds.GBDKick, player,
+			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
+			),
 			
 			_ => null
 		};
@@ -759,6 +767,8 @@ public class MegamanX : Character {
 		NovaStrike,
 		XBlock,
 		UPPunch,
+
+		EnemyStep,
 
 	}
 

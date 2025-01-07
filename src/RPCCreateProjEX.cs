@@ -54,6 +54,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.SonicSlicerCharged, SonicSlicerProjCharged.rpcInvoke },
 		{ (int)ProjIds.StrikeChain, StrikeChainProj.rpcInvoke },
 		{ (int)ProjIds.StrikeChainCharged, StrikeChainProjCharged.rpcInvoke },
+		
 		{ (int)ProjIds.MagnetMine, MagnetMineProj.rpcInvoke },
 		{ (int)ProjIds.MagnetMineCharged, MagnetMineProjCharged.rpcInvoke },
 		{ (int)ProjIds.SpeedBurner, SpeedBurnerProj.rpcInvoke },
@@ -116,12 +117,16 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.TwinSlasherCharged2, TwinSlasherProjCharged.rpcInvoke },
 		{ (int)ProjIds.TwinSlasherCharged3, TwinSlasherProjCharged.rpcInvoke },
 		{ (int)ProjIds.TwinSlasherCharged4, TwinSlasherProjCharged.rpcInvoke },
+
+
+	
 	
 
 		//EXTRA
 		{ (int)ProjIds.UPParryMelee, UPParryMeleeProj.rpcInvoke },
 		{ (int)ProjIds.UPParryProj, UPParryRangedProj.rpcInvoke },
 		{ (int)ProjIds.AxlDiscardedWeapon, AxlDiscrardedWeapon.rpcInvoke},
+		{ (int)ProjIds.ChainrodProj, ChainrodProj.rpcInvoke },
 		
 		// Vile stuff.
 		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },

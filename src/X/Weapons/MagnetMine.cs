@@ -73,6 +73,12 @@ public class MagnetMineProj : Projectile, IDamagable {
 		}
 		canBeLocal = false;
 		destroyOnHit = true;
+
+
+		if (owner.isGBD){
+	damager.damage = 1;
+		damager.flinch = 4;
+		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
@@ -93,12 +99,16 @@ public class MagnetMineProj : Projectile, IDamagable {
 			moveWithMovingPlatform();
 		}
 
+			if (owner.isGBD){
+		changeSprite("tgbd_mine_proj", true);
+		}
+
 		if (ownedByLocalPlayer && owner != null && !landed) {
 			vel.x += xDir * 600 * Global.spf;
 			if (vel.x > maxSpeed) vel.x = maxSpeed;
 			if (vel.x < -maxSpeed) vel.x = -maxSpeed;
 
-			if (!owner.isDead) {
+			if (!owner.isDead && !owner.isGBD) {
 				if (owner.input.isHeld(Control.Up, owner)) {
 					vel.y = Helpers.clampMin(vel.y - Global.spf * 2000, -300);
 				}
@@ -106,6 +116,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 					vel.y = Helpers.clampMax(vel.y + Global.spf * 2000, 300);
 				}
 			}
+			if (owner.isGBD)vel.y = Helpers.clampMax(vel.y + Global.spf * 2000, 300);
 		}
 	}
 
@@ -133,7 +144,7 @@ public class MagnetMineProj : Projectile, IDamagable {
 			}
 
 			vel = new Point();
-			changeSprite("magnetmine_landed", true);
+		if (!owner.isGBD)changeSprite("magnetmine_landed", true);
 			playSound("minePlant");
 			maxTime = 300;
 
@@ -272,12 +283,12 @@ public class MagnetMineProjCharged : Projectile {
 		}
 	}
 
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = base.getCustomActorNetData();
-		customData.Add((byte)MathF.Floor(size));
-
-		return customData;
-	}
+//	public override List<byte> getCustomActorNetData() {
+//		List<byte> customData = base.getCustomActorNetData();
+//		customData.Add((byte)MathF.Floor(size));
+//
+//		return customData;
+//	}
 
 	public override void updateCustomActorNetData(byte[] data) {
 		size = data[0];

@@ -456,6 +456,9 @@ public class Axl : Character {
 		player.changeWeaponControls();
 		updateAxlAim();
 
+
+		// New Hover
+		if (charState is Idle or WallSlide)hoverCount = 0;
 		// AXl Attacks
 
 
@@ -625,14 +628,14 @@ public class Axl : Character {
 				// Handles Hyper activation.
 
 				if (player.input.isHeld(Control.Special2, player) &&
-					player.currency >= 10 && (!(charState is HyperAxlStart)) &&
+					player.currency >= 5 && (!(charState is HyperAxlStart)) &&
 					(!hyperAxlUsed) && (!(charState is WarpIn))
 				) {
 					hyperProgress += Global.spf;
 				} else {
 					hyperProgress = 0;
 				}
-				if (hyperProgress >= 1 && player.currency >= 10) {
+				if (hyperProgress >= 1 && player.currency >= 5) {
 					hyperProgress = 0;
 					if (axlHyperMode == 0) {
 						changeState(new HyperAxlStart(grounded), true);
@@ -908,11 +911,15 @@ public class Axl : Character {
 		}
 	}
 
+	public int hoverCount = 0;
+
 	public override bool normalCtrl() {
 		if (player.input.isPressed(Control.Jump, player) &&
-			canJump() && !grounded && !isDashing && canAirDash() && flag == null
+		player.input.isHeld(Control.Up, player) &&
+			canJump() && !grounded && !isDashing && (hoverCount == 0
+			|| isWhiteAxl()) && flag == null
 		) {
-			dashedInAir++;
+			hoverCount++;
 			changeState(new Hover(), true);
 			return true;
 		}
@@ -2022,21 +2029,35 @@ public class Axl : Character {
 			);
 		}
 
+		 if (  sprite.name.Contains("fall") &&
+		 player.input.isPressed("jump", player))
+		{
+			return new GenericMeleeProj(new GBDKick(), centerPoint, 
+			ProjIds.GBDKick, player, 1f, 0, 20f);
+		}
 
-		if (sprite.name.Contains("ocelot")) {
+
+			if (sprite.name.Contains("ocelot"))
+		{
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
-			 ProjIds.ZSaber1, player, 1, 0, 4, ShouldClang: true, isJuggleProjectile: true
+			 ProjIds.ZSaber1, player, 1, 0, 8, ShouldClang : true, isJuggleProjectile : true
 			);
 		}
 
 		if (sprite.name.Contains("tail")) {
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 3, 10, 5, isJuggleProjectile: true
+			 ProjIds.FireWave, player, 3, 10, 8, isJuggleProjectile : true
 			);
 		}
 
-
-
+		if (sprite.name.Contains("risingbarrage"))
+		{
+		return new GenericMeleeProj(new FireWave(), centerPoint,
+		 ProjIds.BlockableLaunch, player, 3, 0, 8, isJuggleProjectile : true);
+		}
+		
+		
+	
 		return null;
 	}
 

@@ -209,12 +209,7 @@ public class StrikeChainProj : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		if (player.isX){
-		mmx = player.character as MegamanX;
-		}
-		if (player.isRageX){
-		mmx = player.character as XMID;
-		}
+		mmx = player.character;
 		mmx.strikeChainProj = this;
 		this.player = player;
 
@@ -456,12 +451,7 @@ public class StrikeChainSemiCharged : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		if (player.isX){
-		mmx = player.character as MegamanX;
-		}
-		if (player.isRageX){
-		mmx = player.character as XMID;
-		}
+		mmx = player.character;
 		mmx.strikeChainSemiChargedProj = this;
 		this.player = player;
 
@@ -702,6 +692,8 @@ public class StrikeChainProjCharged : Projectile {
 		maxTime = 4;
 		startDir = xDir;
 		//xScale = 1;
+
+		mmx = player.character;
 
 		//Set character and player
 	

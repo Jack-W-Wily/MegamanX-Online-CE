@@ -112,6 +112,7 @@ public class LargeHealthPickup : Pickup {
 	public float timer;
 
 	public NeutralEnemy enemy;
+
 	public LargeHealthPickup(
 		Player owner, Point pos, ushort? netId,
 		bool ownedByLocalPlayer, bool sendRpc = false
@@ -121,10 +122,16 @@ public class LargeHealthPickup : Pickup {
 	) {
 		healAmount = 8;
 		pickupType = PickupType.Health;
-	//	if (enemy == null){
+
+
+
+		//		if (enemy == null){
 	//	enemy = new NeutralEnemy(
 	//			 pos, 0, true, 150, true);
 	//	}
+
+
+
 	}	
 
 
@@ -132,6 +139,10 @@ public class LargeHealthPickup : Pickup {
 }
 
 public class SmallHealthPickup : Pickup {
+
+	public NeutralEnemy enemy;
+
+
 	public SmallHealthPickup(
 		Player owner, Point pos, ushort? netId,
 		bool ownedByLocalPlayer, bool sendRpc = false
@@ -141,10 +152,18 @@ public class SmallHealthPickup : Pickup {
 	) {
 		healAmount = 4;
 		pickupType = PickupType.Health;
+
+			//		if (enemy == null){
+	//	enemy = new NeutralEnemy(
+	//			 pos, 0, true, 150, true);
+	//	}
+
 	}
 }
 
 public class LargeAmmoPickup : Pickup {
+
+		public NeutralEnemy enemy;
 	public LargeAmmoPickup(
 		Player owner, Point pos, ushort? netId,
 		bool ownedByLocalPlayer, bool sendRpc = false
@@ -154,10 +173,18 @@ public class LargeAmmoPickup : Pickup {
 	) {
 		healAmount = 50;
 		pickupType = PickupType.Ammo;
+
+		//		if (enemy == null){
+	//	enemy = new NeutralEnemy(
+	//			 pos, 0, true, 150, true);
+	//	}
+
 	}
 }
 
 public class SmallAmmoPickup : Pickup {
+
+		public NeutralEnemy enemy;
 	public SmallAmmoPickup(
 		Player owner, Point pos, ushort? netId,
 		bool ownedByLocalPlayer, bool sendRpc = false
@@ -167,5 +194,14 @@ public class SmallAmmoPickup : Pickup {
 	) {
 		healAmount = 25;
 		pickupType = PickupType.Ammo;
+
+
+
+	//		if (enemy == null){
+	//	enemy = new NeutralEnemy(
+	//			 pos, 0, true, 150, true);
+	//	}
+
+
 	}
 }

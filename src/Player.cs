@@ -1688,6 +1688,21 @@ public partial class Player {
 		if (charNum == (int)CharIds.PunchyZero) {
 			retChar.weapons.Add(new ZeroBuster());
 		}
+			if (charNum == (int)CharIds.Dragoon) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
+			if (charNum == (int)CharIds.Vile) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
+			if (charNum == (int)CharIds.Dynamo) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
+			if (charNum == (int)CharIds.Zain) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
+			if (charNum == (int)CharIds.GBD) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
 		if (charNum == (int)CharIds.Sigma) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}

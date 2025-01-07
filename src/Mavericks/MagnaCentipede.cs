@@ -281,6 +281,9 @@ public class MagnaCMagnetMineProj : Projectile {
 		}
 		// ToDo: Make local.
 		canBeLocal = false;
+
+
+		
 	}
 }
 

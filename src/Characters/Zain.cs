@@ -224,7 +224,7 @@ public override bool normalCtrl() {
 		}
 		if (  sprite.name.Contains("thrust"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.NormalPush, player, 2f, 0, 15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.SpreadShot, player, 2f, 0, 15f);
 		}
 		return null;
 	}

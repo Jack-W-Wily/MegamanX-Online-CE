@@ -153,8 +153,8 @@ public class CharState {
 			 this is PushedOver || 
 			  this is PushedOver2 || 
 			 this is KnockedDown || 
-			 this is GenericStun ||
-			  this is Hurt ||
+			// this is GenericStun ||
+			 // this is Hurt ||
 			 this is Die || this is Idle || this is Jump || this is Fall || 
 			 this is StrikeChainHooked || this is ParasiteCarry || 
 			 this is VileMK2Grabbed || 

@@ -682,7 +682,7 @@ public class AimingLaserBlade : Projectile {
 		isShield = true;
 		isReflectShield = true;
 		maxTime = 0.3f;
-		projId = (int)ProjIds.SigmaSlash;
+		projId = (int)ProjIds.AimingLaserBlade;
 		isMelee = true;
 		if (player.character != null) {
 			owningActor = player.character;
