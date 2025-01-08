@@ -42,7 +42,7 @@ public class AxlBulletWC : AxlWeaponWC {
 		};
 	}
 
-	public override void updateAxl(AxlWC axl, bool isSelected) {
+	public override void axlUpdate(AxlWC axl, bool isSelected) {
 		if (isSelected) {
 			wasSpecialHeld = false;
 			specialActive = false;

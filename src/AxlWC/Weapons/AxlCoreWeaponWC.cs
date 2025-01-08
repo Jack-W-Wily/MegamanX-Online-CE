@@ -17,6 +17,8 @@ public class AxlWeaponWC : Weapon {
 
 	public AxlWeaponWC() {}
 
+	public virtual void axlUpdate(AxlWC axl, bool isSelected) {
+	}
 	public virtual bool attackCtrl(AxlWC axl) {
 		return false;
 	}

@@ -74,6 +74,10 @@ public class AxlWC : Character {
 		// Charge and release charge logic.
 		chargeLogic(chargeShoot);
 		weaponSwapLogic();
+		// Weapon input logic.
+		foreach (AxlWeaponWC weapon in axlWeapons) {
+			weapon.axlUpdate(this, weapon == axlWeapon);
+		}
 	}
 
 	public override void postUpdate() {
@@ -254,7 +258,7 @@ public class AxlWC : Character {
 			return base.attackCtrl();
 		}
 		// Custom inputs.
-		bool customImputUsed = axlWeapon.attackCtrl();
+		bool customImputUsed = axlWeapon.attackCtrl(this);
 		if (customImputUsed) {
 			return true;
 		}
