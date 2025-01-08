@@ -16,7 +16,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		shootSounds = [ "iceGattling", "gaeaShield" ];
 		isTwoHanded = true;
 		fireRate = minFireRate;
-		altFireRate = 60;
+		altFireRate = 2;
 		index = (int)WeaponIds.IceGattling;
 		weaponBarBaseIndex = 37;
 		weaponSlotIndex = 57;

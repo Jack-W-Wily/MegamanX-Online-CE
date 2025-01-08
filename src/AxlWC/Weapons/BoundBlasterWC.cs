@@ -6,7 +6,7 @@ public class BoundBlasterWC : AxlWeaponWC {
 	public BoundBlasterWC() {
 		shootSounds = [ "boundBlaster", "movingWheel" ];
 		fireRate = 9;
-		altFireRate = 60;
+		altFireRate = 30;
 		index = (int)WeaponIds.BoundBlaster;
 		weaponBarBaseIndex = 35;
 		weaponSlotIndex = 55;
@@ -37,6 +37,6 @@ public class BoundBlasterWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return 4;
+		return 8;
 	}
 }

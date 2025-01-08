@@ -13,7 +13,7 @@ public class BlastLauncherWC : AxlWeaponWC {
 		weaponSlotIndex = 29;
 		killFeedIndex = 29;
 		fireRate = 45;
-		altFireRate = 48;
+		altFireRate = 14;
 
 		sprite = "axl_arm_blastlauncher";
 		flashSprite = "axl_pistol_flash_charged";
@@ -22,6 +22,7 @@ public class BlastLauncherWC : AxlWeaponWC {
 
 		maxAmmo = 10;
 		ammo = maxAmmo;
+		maxSwapCooldown = 60 * 4;
 	}
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
@@ -62,13 +63,15 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 		vel.x = 300 * bulletDir.x;
 		vel.y = 300 * bulletDir.y;
 		projId = (int)ProjIds.BlastLauncherGrenadeProj;
+		damager.damage = 2;
+		damager.hitCooldown = 15;
 		useGravity = true;
 		collider.wallOnly = true;
-		destroyOnHit = false;
+		destroyOnHit = true;
 		shouldShieldBlock = false;
 		reflectableFBurner = true;
 		maxTime = 2;
-		player = this.player;
+		this.player = ownerPlayer;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
@@ -101,13 +104,6 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
-		if (ownedByLocalPlayer) {
-			var damagable = other.gameObject as IDamagable;
-			if (damagable != null && damagable.canBeDamaged(owner.alliance, owner.id, projId) && !vel.isZero()) {
-				destroySelf();
-				return;
-			}
-		}
 		if (other.gameObject is Wall wall) {
 			Point? normal = other.hitData.normal;
 			if (normal != null) {
@@ -119,7 +115,9 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 
 	public override void onDestroy() {
 		if (!ownedByLocalPlayer) return;
-		detonate();
+		if (health > 0) {
+			detonate();
+		}
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {

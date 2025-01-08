@@ -9,8 +9,8 @@ public class RayGunWC : AxlWeaponWC {
 
 	public RayGunWC() {
 		shootSounds = ["raygun", "splashLaser"];
-		fireRate = 6;
-		altFireRate = 8;
+		fireRate = 14;
+		altFireRate = 14;
 		sprite = "axl_arm_raygun";
 		flashSprite = "axl_raygun_flash";
 		chargedFlashSprite = "axl_raygun_flash";
@@ -22,6 +22,7 @@ public class RayGunWC : AxlWeaponWC {
 
 		maxAmmo = 16;
 		ammo = maxAmmo;
+		maxSwapCooldown = 60 * 4;
 	}
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {

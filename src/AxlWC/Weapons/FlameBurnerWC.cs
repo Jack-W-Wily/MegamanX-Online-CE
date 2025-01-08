@@ -7,7 +7,7 @@ public class FlameBurnerWC : AxlWeaponWC {
 		shootSounds = [ "flameBurner", "circleBlaze" ];
 		isTwoHanded = true;
 		fireRate = 5;
-		altFireRate = 30;
+		altFireRate = 14;
 		index = (int)WeaponIds.FlameBurner;
 		weaponBarBaseIndex = 38;
 		weaponSlotIndex = 58;

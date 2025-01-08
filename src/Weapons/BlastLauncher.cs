@@ -222,7 +222,7 @@ public class GrenadeExplosionProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player, int type,
 		IDamagable directHit, int directHitXDir, ushort netProjId
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "axl_grenade_explosion2", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 1, player, "axl_grenade_explosion2", 0, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		this.xDir = xDir;
 		this.directHit = directHit;
@@ -242,6 +242,7 @@ public class GrenadeExplosionProj : Projectile {
 		if (ownedByLocalPlayer) {
 			rpcCreate(pos, owner, netProjId, xDir);
 		}
+		projId = (int)ProjIds.BlastLauncherGrenadeProj;
 	}
 
 	public override void update() {

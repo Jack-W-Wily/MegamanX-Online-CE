@@ -5,7 +5,7 @@ public class BlackArrowWC : AxlWeaponWC {
 		shootSounds = [ "blackArrow", "blackArrow", "blackArrow", "blackArrow" ];
 		isTwoHanded = true;
 		fireRate = 24;
-		altFireRate = 48;
+		altFireRate = 14;
 		index = (int)WeaponIds.BlackArrow;
 		weaponBarBaseIndex = 33;
 		weaponSlotIndex = 53;

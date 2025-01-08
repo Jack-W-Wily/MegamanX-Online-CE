@@ -8,7 +8,7 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 	public  SpiralMagnumWC() {
 		shootSounds = [ "spiralMagnum", "sniperMissile" ];
 		fireRate = 45;
-		altFireRate = 90;
+		altFireRate = 45;
 		index = (int)WeaponIds.SpiralMagnum;
 		weaponBarBaseIndex = 34;
 		weaponSlotIndex = 54;
@@ -48,7 +48,7 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return 4;
+		return 5;
 	}
 }
 
