@@ -363,26 +363,18 @@ public class AxlWC : Character {
 	}
 
 	public override bool canAddAmmo() {
-		if (mainWeapon.ammo < mainWeapon.maxAmmo && axlWeapon.canHealAmmo) {
+		if (axlWeapon.ammo < axlWeapon.maxAmmo && axlWeapon.canHealAmmo) {
 			return true;
 		}
 		return false;
 	}
 
 	public override void addAmmo(float amount) {
-		if (axlWeapon != mainWeapon) {
-			mainWeapon.addAmmo(amount, player);
-			playSound("subtankFill", true);
-		}
-		mainWeapon.addAmmoHeal(amount);
+		axlWeapon.addAmmoHeal(amount);
 	}
 
 	public override void addPercentAmmo(float amount) {
-		if (axlWeapon != mainWeapon) {
-			mainWeapon.addAmmoPercent(amount);
-			playSound("subtankFill", true);
-		}
-		mainWeapon.addAmmoPercentHeal(amount);
+		axlWeapon.addAmmoPercentHeal(amount);
 	}
 
 	public Point getAxlBulletPos(AxlWeaponWC? weapon) {

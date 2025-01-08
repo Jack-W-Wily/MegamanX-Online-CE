@@ -77,9 +77,10 @@ public class SpiralMagnumWCProj : Projectile {
 		weapon = SpiralMagnumWC.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 15;
+		damager.flinch = Global.halfFlinch;
 
-		destroyOnHit = false;
-		reflectable = true;
+		destroyOnHit = true;
+		reflectable = false;
 
 		vel = Point.createFromByteAngle(byteAngle) * 600;
 		this.byteAngle = byteAngle;

@@ -6,7 +6,7 @@ public class IceGattlingWC : AxlWeaponWC {
 	public static IceGattlingWC netWeapon = new();
 	public float targetFireRate;
 	public float fireRateReduceCooldown = 0;
-	public float minFireRate = 4;
+	public float minFireRate = 6;
 	public float maxFireRate = 14;
 	public float animFrames;
 	public float fireRateStacks;
@@ -25,7 +25,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash";
 
-		maxAmmo = 20;
+		maxAmmo = 22;
 		ammo = maxAmmo;
 		maxSwapCooldown = 60 * 5;
 	}

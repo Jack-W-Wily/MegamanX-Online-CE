@@ -82,7 +82,7 @@ public class PlasmaGunProj : Projectile {
 		projId = (int)ProjIds.PlasmaGunProj;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-		destroyOnHit = false;
+		destroyOnHit = true;
 		maxTime = 0.125f;
 		axl = (player.character as Axl);
 		vel.x = 600 * bulletDir.x;
