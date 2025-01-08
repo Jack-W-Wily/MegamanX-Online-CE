@@ -41,21 +41,6 @@ public class AxlBulletWC : AxlWeaponWC {
 			_ => 8,
 		};
 	}
-
-	public override void axlUpdate(AxlWC axl, bool isSelected) {
-		if (isSelected) {
-			wasSpecialHeld = false;
-			specialActive = false;
-			return;
-		}
-		if (!specialActive) {
-			specialActive = axl.player.input.isPressed(Control.Special1, axl.player);
-		}
-		if (specialActive) {
-			wasSpecialHeld = axl.player.input.isHeld(Control.Special1, axl.player);
-		}
-	}
-
 	public override bool attackCtrl(AxlWC axl) {
 		Point inputDir = axl.player.input.getInputDir(axl.player);
 		bool specialPressed = wasSpecialHeld && !axl.player.input.isHeld(Control.Special1, axl.player);
@@ -88,5 +73,22 @@ public class AxlBulletWC : AxlWeaponWC {
 			return true;
 		}
 		return false;
+	}
+
+	// Negative edge input shenanigans.
+	public override void preAxlUpdate(AxlWC axl, bool isSelected) {
+		if (!isSelected) {
+			wasSpecialHeld = false;
+			specialActive = false;
+			return;
+		}
+		if (!specialActive) {
+			specialActive = axl.player.input.isPressed(Control.Special1, axl.player);
+		}
+	}
+	public override void postAxlUpdate(AxlWC axl, bool isSelected) {
+		if (specialActive && isSelected) {
+			wasSpecialHeld = axl.player.input.isHeld(Control.Special1, axl.player);
+		}
 	}
 }

@@ -53,6 +53,10 @@ public class AxlWC : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref recoilTime);
+		// Weapon input logic.
+		foreach (AxlWeaponWC weapon in axlWeapons) {
+			weapon.preAxlUpdate(this, weapon == axlWeapon);
+		}
 	}
 
 	public override void update() {
@@ -74,10 +78,6 @@ public class AxlWC : Character {
 		// Charge and release charge logic.
 		chargeLogic(chargeShoot);
 		weaponSwapLogic();
-		// Weapon input logic.
-		foreach (AxlWeaponWC weapon in axlWeapons) {
-			weapon.axlUpdate(this, weapon == axlWeapon);
-		}
 	}
 
 	public override void postUpdate() {
@@ -107,6 +107,10 @@ public class AxlWC : Character {
 			weaponSlot = 1;
 			onWeaponChange(oldWeapon, axlWeapon);
 			return;
+		}
+		// Weapon input logic.
+		foreach (AxlWeaponWC weapon in axlWeapons) {
+			weapon.postAxlUpdate(this, weapon == axlWeapon);
 		}
 	}
 
