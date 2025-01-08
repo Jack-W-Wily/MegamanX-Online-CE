@@ -84,7 +84,7 @@ public class SpiralMagnumWCProj : Projectile {
 
 		vel = Point.createFromByteAngle(byteAngle) * 600;
 		this.byteAngle = byteAngle;
-		maxTime = 0.4f;
+		maxTime = 0.3f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
@@ -114,42 +114,5 @@ public class SpiralMagnumWCProj : Projectile {
 			playedSoundOnce = true;
 			playSound("zing1");
 		}
-	}
-
-	public void increasePassCount(int amount) {
-		if (!ownedByLocalPlayer) return;
-
-		bool damageChanged = false;
-		if (doubleDamageBonus) {
-			doubleDamageBonus = false;
-			damager.damage /= 2;
-			damageChanged = true;
-		}
-		passCount += amount;
-		if (passCount >= 5) {
-			passCount = 0;
-			powerDecrements++;
-			damager.damage *= 0.5f;
-			damageChanged = true;
-			vel = vel.times(0.5f);
-		}
-
-		if (damageChanged) {
-			updateDamager();
-		}
-
-		if (powerDecrements > 2) {
-			destroySelf();
-		}
-	}
-
-	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
-		increasePassCount(1);
-	}
-
-	public override void onHitWall(CollideData other) {
-		base.onHitWall(other);
-		increasePassCount(1);
 	}
 }
