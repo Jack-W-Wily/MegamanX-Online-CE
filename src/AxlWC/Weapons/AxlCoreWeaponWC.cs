@@ -17,11 +17,22 @@ public class AxlWeaponWC : Weapon {
 
 	public AxlWeaponWC() {}
 
+	public virtual bool attackCtrl(AxlWC axl) {
+		return false;
+	}
 	public virtual float getFireRate(AxlWC axl, int chargeLevel) {
 		return fireRate;
 	}
 	public virtual float getAltFireRate(AxlWC axl, int chargeLevel) {
 		return altFireRate;
+	}
+	public virtual float getRecoil(AxlWC axl, int chargeLevel) {
+		float recoil = fireRate - 2;
+		return Helpers.lerp(recoil, 0, 12);
+	}
+	public virtual float getAltRecoil(AxlWC axl, int chargeLevel) {
+		float recoil = altFireRate - 2;
+		return Helpers.lerp(recoil, 0, 12);
 	}
 	public virtual float getAmmoUse(AxlWC axl, int chargeLevel) {
 		return 1;

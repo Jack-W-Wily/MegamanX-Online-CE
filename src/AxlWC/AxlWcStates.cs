@@ -445,8 +445,8 @@ public class AxlBlock : CharState {
 
 	public override void update() {
 		base.update();
+		axl.armAngle = 0;
 		if (!player.input.isHeld(Control.Down, player) || player.input.isHeld(Control.Jump, player) ) {
-			axl.armAngle = -32;
 			character.changeToIdleOrFall();
 			return;
 		}

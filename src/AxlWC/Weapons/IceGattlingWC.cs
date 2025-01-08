@@ -4,7 +4,6 @@ namespace MMXOnline;
 
 public class IceGattlingWC : AxlWeaponWC {
 	public static IceGattlingWC netWeapon = new();
-
 	public float targetFireRate;
 	public float fireRateReduceCooldown = 0;
 	public float minFireRate = 4;
@@ -26,7 +25,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash";
 
-		maxAmmo = 28;
+		maxAmmo = 20;
 		ammo = maxAmmo;
 		maxSwapCooldown = 60 * 5;
 	}
@@ -35,10 +34,10 @@ public class IceGattlingWC : AxlWeaponWC {
 		base.update();
 		// Fire rate auto-reduction.
 		if (fireRateReduceCooldown <= 0) {
-			if (fireRate < maxFireRate) {
-				fireRate++;
+			if (targetFireRate < maxFireRate) {
+				targetFireRate++;
 			} else {
-				fireRate = 14;
+				targetFireRate = 14;
 			}
 			fireRateReduceCooldown = 4;
 			fireRateStacks = 0;
@@ -46,9 +45,9 @@ public class IceGattlingWC : AxlWeaponWC {
 			fireRateReduceCooldown -= Global.speedMul;
 		}
 		// Animation.
-		if (fireRate < maxFireRate) {
+		if (targetFireRate < maxFireRate) {
 			animFrames += Global.speedMul;
-			if (animFrames >= fireRate / 3f) {
+			if (animFrames >= targetFireRate / 3f) {
 				spriteFrameIndex++;
 				animFrames = 0;
 				if (spriteFrameIndex > 2) { spriteFrameIndex = 0; }
@@ -59,13 +58,20 @@ public class IceGattlingWC : AxlWeaponWC {
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
 		new IceGattlingWCProj(axl, pos, byteAngle, netId, sendRpc: true);
-		if (fireRate > minFireRate && fireRateStacks >= 2) {
-			fireRate -= 1;
-			if (fireRate < minFireRate) { fireRate = minFireRate; }
+		if (targetFireRate > minFireRate && fireRateStacks >= 2) {
+			targetFireRate -= 1;
+			if (targetFireRate < minFireRate) { targetFireRate = minFireRate; }
 		} else {
 			fireRateStacks++;
 		}
 		fireRateReduceCooldown = 18;
+	}
+
+	public override float getFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return MathF.Ceiling(targetFireRate * 0.75f);
+		}
+		return targetFireRate;
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {

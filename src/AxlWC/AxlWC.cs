@@ -29,8 +29,6 @@ public class AxlWC : Character {
 	public float recoilTime;
 	public int armDir => charState is WallSlide ? -xDir : xDir;
 	public float armAngle = 0;
-	public bool wasMainWeapon;
-	public bool wasSpecialPressed;
 	public Anim muzzleFlash;
 
 	public AxlWC(
@@ -55,11 +53,6 @@ public class AxlWC : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref recoilTime);
-		if (axlWeapon != mainWeapon) {
-			wasMainWeapon = false;
-		} else if (!wasMainWeapon) {
-			wasMainWeapon = player.input.isPressed(Control.Special1, player);
-		}
 	}
 
 	public override void update() {
@@ -101,12 +94,6 @@ public class AxlWC : Character {
 			armAngle = oldByteArmAngle;
 		} else {
 			muzzleFlash.visible = false;
-		}
-		// For negative edge.
-		if (axlWeapon == mainWeapon && wasMainWeapon) {
-			wasSpecialPressed = player.input.isHeld(Control.Special1, player);
-		} else {
-			wasSpecialPressed = false;
 		}
 		// Swap on ammo empitiying.
 		if (axlWeapon != mainWeapon &&
@@ -154,9 +141,6 @@ public class AxlWC : Character {
 				continue;
 			}
 			weapon.swapCooldown -= speedMul;
-			if (isWhite) {
-				weapon.swapCooldown -= speedMul;
-			}
 			weapon.ammo = weapon.maxAmmo * (1 - weapon.swapCooldown / weapon.maxSwapCooldown);
 			if (weapon.swapCooldown <= 0) {
 				weapon.swapCooldown = 0;
@@ -269,32 +253,10 @@ public class AxlWC : Character {
 		if (isCharging() || axlWeapon == null) {
 			return base.attackCtrl();
 		}
-		if (axlWeapon == mainWeapon) {
-			Point inputDir = player.input.getInputDir(player);
-			bool specialPressed = wasSpecialPressed && !player.input.isHeld(Control.Special1, player);
-			// Shoryken does not use negative edge at all.
-			if (player.input.checkShoryuken(player, xDir, Control.Special1) && axlWeapon.ammo > 0) {
-				changeState(new RainStorm(), true);
-				return true;
-			}
-			// Negative edge inputs.
-			if (inputDir.y == 1 && charState is Dash && axlWeapon.ammo > 0) {
-				changeState(new RisingBarrage(), true);
-				return true;
-			}
-			if (specialPressed && inputDir.y == -1 && axlWeapon.ammo > 0) {
-				changeState(new TailShot(), true);
-				return true;
-			}
-			if (specialPressed && (inputDir.y == 1 || axlWeapon.ammo == 0)) {
-				changeState(new OcelotSpin(), true);
-				return true;
-			}
-			if (specialPressed && axlWeapon.ammo > 0) {
-				vel.y = -getJumpPower() * 2f;
-				changeState(new EvasionBarrage(), true);
-				return true;
-			}
+		// Custom inputs.
+		bool customImputUsed = axlWeapon.attackCtrl();
+		if (customImputUsed) {
+			return true;
 		}
 		// For stuff we do not want to do mid guard animation.
 		if (charState is AxlBlock) {
@@ -329,13 +291,9 @@ public class AxlWC : Character {
 			shootAngle = shootAngle * -1 + 128;
 		}
 		weapon.shootMain(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
-		weapon.shootCooldown = weapon.fireRate;
-		recoilTime = weapon.fireRate - 4;
-		float ammoMod = isWhite ? 0.5f : 1;
-		weapon.addAmmo(-weapon.getAmmoUse(this, 0) * ammoMod, player);
-		if (recoilTime > 12) {
-			recoilTime = 12;
-		}
+		weapon.shootCooldown = weapon.getFireRate(this, 0);
+		recoilTime = weapon.getRecoil(this, 0);
+		weapon.addAmmo(-weapon.getAmmoUse(this, 0), player);
 		if (weapon.shootSounds[0] != "") {
 			playSound(weapon.shootSounds[0], true, true);
 		}
@@ -354,13 +312,9 @@ public class AxlWC : Character {
 			shootAngle = shootAngle * -1 + 128;
 		}
 		weapon.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
-		weapon.shootCooldown = weapon.altFireRate;
-		recoilTime = weapon.altFireRate - 4;
-		float ammoMod = isWhite ? 0.5f : 1;
-		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0) * ammoMod, player);
-		if (recoilTime > 12) {
-			recoilTime = 12;
-		}
+		weapon.shootCooldown = weapon.getAltFireRate(this, 0);
+		recoilTime = weapon.getAltRecoil(this, 0);
+		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0), player);
 		if (weapon.shootSounds[1] != "") {
 			playSound(weapon.shootSounds[1], true, true);
 		}
@@ -379,10 +333,9 @@ public class AxlWC : Character {
 			shootAngle = shootAngle * -1 + 128;
 		}
 		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
-		axlBullet.shootCooldown = axlBullet.altFireRate;
-		recoilTime = axlBullet.altFireRate - 4;
-		float ammoMod = isWhite ? 0.5f : 1;
-		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel) * ammoMod, player);
+		axlBullet.shootCooldown = axlBullet.getAltFireRate(this, 0);
+		recoilTime = axlBullet.getAltFireRate(this, 0);
+		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}

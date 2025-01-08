@@ -33,7 +33,7 @@ public class PlasmaGunWC : AxlWeaponWC {
 			host = axl
 		};
 		// Projectile itself.
-		new PlasmaGunProj(this, pos, axl.armDir, axl.player, bulletDir, netId, sendRpc: true);
+		new PlasmaGunProj(this, pos, 1, axl.player, bulletDir, netId, sendRpc: true);
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
@@ -41,6 +41,9 @@ public class PlasmaGunWC : AxlWeaponWC {
 	}
 
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 1;
+		}
 		return 2;
 	}
 

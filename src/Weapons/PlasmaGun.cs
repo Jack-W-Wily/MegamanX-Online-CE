@@ -77,7 +77,7 @@ public class PlasmaGunProj : Projectile {
 		Point bulletDir, ushort netProjId, bool sendRpc = false
 	) : base(
 		weapon, pos, 1, 600, 3, player, "plasmagun_proj",
-		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+		Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.PlasmaGunProj;
 		shouldShieldBlock = false;
@@ -85,6 +85,8 @@ public class PlasmaGunProj : Projectile {
 		destroyOnHit = false;
 		maxTime = 0.125f;
 		axl = (player.character as Axl);
+		vel.x = 600 * bulletDir.x;
+		vel.y = 600 * bulletDir.y;
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
