@@ -16,9 +16,10 @@ public class HyperAxlWcStart : CharState {
 		base.update();
 		if (character.loopCount > 8) {
 			axl.whiteTime = 1200;
+			axl.isWhite = true;
 			axl.playSound("ching");
-			if (player.input.isHeld(Control.Jump, player)) {
-				axl.changeState(new Hover(), true);
+			if (player.input.isHeld(Control.Jump, player) && !character.grounded) {
+				axl.changeState(new HoverAxlWC(), true);
 			} else {
 				character.changeToIdleOrFall();
 			}

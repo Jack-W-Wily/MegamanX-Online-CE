@@ -154,6 +154,9 @@ public class AxlWC : Character {
 				continue;
 			}
 			weapon.swapCooldown -= speedMul;
+			if (isWhite) {
+				weapon.swapCooldown -= speedMul;
+			}
 			weapon.ammo = weapon.maxAmmo * (1 - weapon.swapCooldown / weapon.maxSwapCooldown);
 			if (weapon.swapCooldown <= 0) {
 				weapon.swapCooldown = 0;
@@ -328,7 +331,8 @@ public class AxlWC : Character {
 		weapon.shootMain(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
 		weapon.shootCooldown = weapon.fireRate;
 		recoilTime = weapon.fireRate - 4;
-		weapon.addAmmo(-weapon.getAmmoUse(this, 0), player);
+		float ammoMod = isWhite ? 0.5f : 1;
+		weapon.addAmmo(-weapon.getAmmoUse(this, 0) * ammoMod, player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}
@@ -352,7 +356,8 @@ public class AxlWC : Character {
 		weapon.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
 		weapon.shootCooldown = weapon.altFireRate;
 		recoilTime = weapon.altFireRate - 4;
-		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0), player);
+		float ammoMod = isWhite ? 0.5f : 1;
+		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0) * ammoMod, player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}
@@ -376,7 +381,8 @@ public class AxlWC : Character {
 		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
 		axlBullet.shootCooldown = axlBullet.altFireRate;
 		recoilTime = axlBullet.altFireRate - 4;
-		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
+		float ammoMod = isWhite ? 0.5f : 1;
+		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel) * ammoMod, player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
 		}
@@ -535,8 +541,20 @@ public class AxlWC : Character {
 	}
 
 	public override List<ShaderWrapper> getShaders() {
-		List<ShaderWrapper> baseShaders = base.getShaders();
-		List<ShaderWrapper> shaders = new();
+		var shaders = new List<ShaderWrapper>();
+		ShaderWrapper? palette = null;
+
+		int paletteNum = 0;
+		if (isWhite) { paletteNum = 1; }
+		palette = player.axlPaletteShader;
+		palette?.SetUniform("palette", paletteNum);
+		palette?.SetUniform("paletteTexture", Global.textures["hyperAxlPalette"]);
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		shaders.AddRange(base.getShaders());
+
 		return shaders;
 	}
 

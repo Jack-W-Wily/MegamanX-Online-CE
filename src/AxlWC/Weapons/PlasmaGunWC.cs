@@ -6,8 +6,8 @@ public class PlasmaGunWC : AxlWeaponWC {
 	public PlasmaGunWC() {
 		shootSounds = [ "plasmaGun", "" ];
 		isTwoHanded = true;
-		fireRate = 45;
-		altFireRate = 10;
+		fireRate = 14;
+		altFireRate = 2;
 		index = (int)WeaponIds.PlasmaGun;
 		weaponBarBaseIndex = 36;
 		weaponSlotIndex = 56;

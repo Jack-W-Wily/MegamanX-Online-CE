@@ -9,8 +9,8 @@ public class RayGunWC : AxlWeaponWC {
 
 	public RayGunWC() {
 		shootSounds = ["raygun", "splashLaser"];
-		fireRate = 14;
-		altFireRate = 14;
+		fireRate = 6;
+		altFireRate = 8;
 		sprite = "axl_arm_raygun";
 		flashSprite = "axl_raygun_flash";
 		chargedFlashSprite = "axl_raygun_flash";
