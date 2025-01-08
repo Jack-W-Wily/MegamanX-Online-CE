@@ -125,11 +125,11 @@ public class RayGunWCProj : Projectile {
 
 		DrawWrappers.DrawLine(
 			pos.x + xOff1, pos.y + yOff1, pos.x, pos.y,
-			new Color(74, 78, 221), 4 + sin, zIndex + 4, true
+			new Color(74, 78, 221), 4 + sin, zIndex - 4, true
 		);
 		DrawWrappers.DrawLine(
 			pos.x + xOff1, pos.y + yOff1, pos.x, pos.y,
-			new Color(61, 113, 255), 2 + sin, zIndex + 2, true
+			new Color(61, 113, 255), 2 + sin, zIndex - 2, true
 		);
 		DrawWrappers.DrawLine(
 			pos.x + xOff1, pos.y + yOff1, pos.x, pos.y,
