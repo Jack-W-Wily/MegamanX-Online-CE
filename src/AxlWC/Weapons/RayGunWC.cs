@@ -19,6 +19,7 @@ public class RayGunWC : AxlWeaponWC {
 		weaponBarIndex = 28;
 		weaponSlotIndex = 34;
 		killFeedIndex = 33;
+		canHealAmmo = false;
 
 		maxAmmo = 16;
 		ammo = maxAmmo;

@@ -30,12 +30,12 @@ public class AxlWeaponWC : Weapon {
 		return altFireRate;
 	}
 	public virtual float getRecoil(AxlWC axl, int chargeLevel) {
-		float recoil = fireRate - 2;
-		return Helpers.lerp(recoil, 0, 12);
+		float recoil = getFireRate(axl, chargeLevel) - 2;
+		return Helpers.clamp(recoil, 0, 12);
 	}
 	public virtual float getAltRecoil(AxlWC axl, int chargeLevel) {
-		float recoil = altFireRate - 2;
-		return Helpers.lerp(recoil, 0, 12);
+		float recoil = getAltFireRate(axl, chargeLevel) - 2;
+		return Helpers.clamp(recoil, 0, 12);
 	}
 	public virtual float getAmmoUse(AxlWC axl, int chargeLevel) {
 		return 1;

@@ -16,7 +16,6 @@ public class AxlBulletWC : AxlWeaponWC {
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireRate = 18;
 		displayName = "Axl Bullets";
-		canHealAmmo = true;
 		maxAmmo = 20;
 		ammo = maxAmmo;
 	}

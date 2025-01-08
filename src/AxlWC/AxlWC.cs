@@ -342,7 +342,7 @@ public class AxlWC : Character {
 		}
 		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
 		axlBullet.shootCooldown = axlBullet.getAltFireRate(this, 0);
-		recoilTime = axlBullet.getAltFireRate(this, 0);
+		recoilTime = axlBullet.getAltRecoil(this, 0);
 		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
@@ -363,7 +363,7 @@ public class AxlWC : Character {
 	}
 
 	public override bool canAddAmmo() {
-		if (mainWeapon.ammo < mainWeapon.maxAmmo && axlWeapon == mainWeapon) {
+		if (mainWeapon.ammo < mainWeapon.maxAmmo && axlWeapon.canHealAmmo) {
 			return true;
 		}
 		return false;
