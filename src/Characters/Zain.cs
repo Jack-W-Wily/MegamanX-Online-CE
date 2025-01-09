@@ -94,7 +94,7 @@ public override bool normalCtrl() {
 		}
 
 		if (player.input.isHeld(Control.Special1,player)
-		&& charState.attackCtrl && 
+		&& charState.attackCtrl && charState is not Dash or AirDash &&
 		!sprite.name.Contains("jab")){
 		changeSpriteFromName("jab", true);
 		}

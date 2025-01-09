@@ -346,7 +346,7 @@ public class ShieldBoomerangProj2 : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!owner.isGBD)destroySelf();
+		if (!owner.isGBD || owner.character.sprite.name.Contains("hurt"))destroySelf();
 		if (!destroyed && pickup != null) {
 			pickup.collider.isTrigger = true;
 			pickup.useGravity = false;

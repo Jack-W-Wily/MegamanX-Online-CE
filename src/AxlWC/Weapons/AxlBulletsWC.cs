@@ -51,7 +51,7 @@ public class AxlBulletWC : AxlWeaponWC {
 		// Negative edge inputs.
 		if (axl.grounded && axl.axlWeapon.ammo > 0 &&
 			inputDir.y == 1 && (
-				axl.charState is Dash ||
+				axl.charState is Dash or AirDash || 
 				axl.player.input.isPressed(Control.Dash, axl.player)
 			)
 		) {

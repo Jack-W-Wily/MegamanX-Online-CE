@@ -61,6 +61,12 @@ public class AxlWC : Character {
 
 	public override void update() {
 		base.update();
+		// For Microdashes
+		if ((charState is Dash || charState is AirDash)){
+			slideVel = xDir * getDashSpeed();			
+		}
+
+
 		// Hypermode music.
 		if (isWhite) {
 			if (musicSource == null) {
@@ -425,6 +431,7 @@ public class AxlWC : Character {
 		Block,
 		OcelotSpin,
 		TailShot,
+		EnemyStep,
 		RisingBarrage
 	}
 
@@ -435,6 +442,8 @@ public class AxlWC : Character {
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
 			"axl_tailshot" => MeleeIds.TailShot,
 			"axl_risingbarrage" => MeleeIds.RisingBarrage,
+			"axl_fall" when player.input.isPressed(Control.Jump,player) => MeleeIds.EnemyStep,
+		
 			_ => MeleeIds.None
 		});
 	}
@@ -445,6 +454,10 @@ public class AxlWC : Character {
 				ZSaber.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true,
 				addToLevel: addToLevel
+			),
+			MeleeIds.EnemyStep => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.GBDKick, player,
+			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
 			),
 			MeleeIds.OcelotSpin => new GenericMeleeProj(
 				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
@@ -642,6 +655,8 @@ public class AxlDiscrardedWeapon : Actor {
 		if (grounded) {
 			vel.x = 0;
 		}
+
+		
 
 		if (blinkTime == 0) {
 			if (blinkMaxTime > 3) {

@@ -951,13 +951,13 @@ public class Vile : Character {
 		if (sprite.name.Contains("punch")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1f, 22,  15f, isDeflectShield: true, ShouldClang : true
+				1f, 25,  15f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 			if (sprite.name.Contains("kick") &&  !sprite.name.Contains("kick_3") &&  !sprite.name.Contains("super")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1, 22,  15f, isDeflectShield: true, ShouldClang : true
+				1, 25,  15f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 		if (sprite.name.EndsWith("superkick_up") 
@@ -979,7 +979,7 @@ public class Vile : Character {
 		if (sprite.name.Contains("hyperdash")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
-				3, 0,  10f, isDeflectShield: true, ShouldClang : true
+				2, 0,  10f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 

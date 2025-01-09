@@ -434,8 +434,8 @@ public class VileAirRaid : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.grabCooldown = 0.5f;
-		victim.grabInvulnTime = 0.5f;
+	//	character.grabCooldown = 0.5f;
+	//	victim.grabInvulnTime = 0.5f;
 		victim?.releaseGrab(character);
 	}
 }
