@@ -91,10 +91,10 @@ public class BlackArrowProj : Projectile {
 		if (lastPoses.Count > 5) lastPoses.RemoveAt(0);
 
 		if (ownedByLocalPlayer) {
-			target = Global.level.getClosestTarget(pos, damager.owner.alliance, true);
+			/*target = Global.level.getClosestTarget(pos, damager.owner.alliance, true);
 			if (!Global.level.gameObjects.Contains(target)) {
 				target = null;
-			}
+			}*/
 			if (target != null) {
 				useGravity = false;
 				var dTo = pos.directionTo(target.getCenterPos()).normalize();

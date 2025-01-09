@@ -301,6 +301,7 @@ public partial class Actor : GameObject {
 		// Create bools of data.
 		byte dataInf = Helpers.boolArrayToByte(new bool[] {
 			false,
+			false,
 			extraData != null && extraData.Length > 0
 		});
 		// Create byte list.

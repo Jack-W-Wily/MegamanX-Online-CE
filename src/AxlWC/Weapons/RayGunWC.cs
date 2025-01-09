@@ -59,7 +59,7 @@ public class RayGunWCProj : Projectile {
 		pos, 1, owner, "spiralmagnum_proj", netProjId, player
 	) {
 		weapon = RayGunWC.netWeapon;
-		projId = (int)ProjIds.RayGun;
+		projId = (int)ProjIds.RayGunWC;
 		damager.damage = 0.5f;
 		damager.hitCooldown = 1;
 
@@ -72,6 +72,13 @@ public class RayGunWCProj : Projectile {
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new RayGunWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
 	}
 
 	public void updateAngle() {

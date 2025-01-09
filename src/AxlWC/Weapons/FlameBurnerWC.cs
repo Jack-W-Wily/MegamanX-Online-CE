@@ -22,12 +22,12 @@ public class FlameBurnerWC : AxlWeaponWC {
 	}
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
-		Point bulletDir = Point.createFromByteAngle(byteAngle);
-		Point bulletDir1 = Point.createFromByteAngle(byteAngle - 16);
-		Point bulletDir2 = Point.createFromByteAngle(byteAngle + 16);
+		Point bulletDir = Point.createFromByteAngle(byteAngle + Helpers.randomRange(0, 10) - 5);
+		Point bulletDir1 = Point.createFromByteAngle(byteAngle - Helpers.randomRange(2, 16));
+		Point bulletDir2 = Point.createFromByteAngle(byteAngle + Helpers.randomRange(2, 16));
 		new FlameBurnerProj(this, pos, 1, axl.player, bulletDir1, axl.player.getNextActorNetId(), sendRpc: true);
-		new FlameBurnerProj(this, pos, 1, axl.player, bulletDir, axl.player.getNextActorNetId(), sendRpc: true);
 		new FlameBurnerProj(this, pos, 1, axl.player, bulletDir2, axl.player.getNextActorNetId(), sendRpc: true);
+		new FlameBurnerProj(this, pos, 1, axl.player, bulletDir, axl.player.getNextActorNetId(), sendRpc: true);
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {

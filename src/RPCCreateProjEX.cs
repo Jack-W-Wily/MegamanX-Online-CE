@@ -126,8 +126,17 @@ public partial class RPCCreateProj : RPC {
 		//EXTRA
 		{ (int)ProjIds.UPParryMelee, UPParryMeleeProj.rpcInvoke },
 		{ (int)ProjIds.UPParryProj, UPParryRangedProj.rpcInvoke },
-		{ (int)ProjIds.AxlDiscardedWeapon, AxlDiscrardedWeapon.rpcInvoke},
 		{ (int)ProjIds.ChainrodProj, ChainrodProj.rpcInvoke },
+
+		// Wily Cut Axl.
+		{ (int)ProjIds.AxlDiscardedWeapon, AxlDiscrardedWeapon.rpcInvoke},
+		{ (int)ProjIds.BlastLauncherWC, BlastLauncherWCProj.rpcInvoke},
+		{ (int)ProjIds.GreenSpinnerWC, GreenSpinnerWCProj.rpcInvoke},
+		{ (int)ProjIds.RayGunWC, RayGunWCProj.rpcInvoke},
+		{ (int)ProjIds.IceGattlingWC, IceGattlingWCProj.rpcInvoke},
+		{ (int)ProjIds.IceGattlingAltWC, IceGattlingAltWCProj.rpcInvoke},
+		{ (int)ProjIds.SpiralMagnumWC, SpiralMagnumWCProj.rpcInvoke},
+		
 		
 		// Vile stuff.
 		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },
