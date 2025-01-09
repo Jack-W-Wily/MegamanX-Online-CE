@@ -240,6 +240,14 @@ public class AxlWC : Character {
 			changeState(new HyperAxlWcStart(grounded), true);
 			return true;
 		}
+		// Dodge.
+		if (grounded && player.input.checkDoubleTap(Control.Dash) &&
+			player.input.isPressed(Control.Dash, player) && canDash() && flag == null
+		) {
+			dashedInAir++;
+			changeState(new DodgeRollAxlWC(), true);
+			return true;
+		}
 		// Hover.
 		if (!grounded && player.input.isPressed(Control.Jump, player) &&
 			canJump() && !isDashing && canAirDash() && flag == null
@@ -249,7 +257,9 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Block.
-		if (grounded && player.input.isHeld(Control.Down, player) && charState is not AxlBlock and not Dash) {
+		if (grounded && player.input.isHeld(Control.Down, player) &&
+			charState is not AxlBlock and not Dash && axlWeapon?.autoFire == false
+		) {
 			changeState(new AxlBlock(), true);
 			return true;
 		}
@@ -523,7 +533,7 @@ public class AxlWC : Character {
 			not Die and
 			not GenericStun and
 			not InRideArmor and
-			not DodgeRoll and
+			not DodgeRollAxlWC and
 			not VileMK2Grabbed and
 			not KnockedDown and
 			not DeadLiftGrabbed and
@@ -589,12 +599,23 @@ public class AxlWC : Character {
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add((byte)armAngle);
+		customData.Add((byte)weaponSlot);
+
+		customData.Add(Helpers.boolArrayToByte([
+			isWhite,
+		]));
 		return customData;
 	}
 
 	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
 		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
 		armAngle = data[0];
+		weaponSlot = data[1];
+
+		bool[] flags = Helpers.byteToBoolArray(data[2]);
+		isWhite = flags[0];
 	}
 }
 

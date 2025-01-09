@@ -73,7 +73,7 @@ public class SpiralMagnumWCProj : Projectile {
 	) : base(
 		pos, 1, owner, "spiralmagnum_proj", netProjId, player
 	) {
-		projId = (int)ProjIds.SpiralMagnum;
+		projId = (int)ProjIds.SpiralMagnumWC;
 		weapon = SpiralMagnumWC.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 15;
@@ -114,5 +114,12 @@ public class SpiralMagnumWCProj : Projectile {
 			playedSoundOnce = true;
 			playSound("zing1");
 		}
+	}
+	
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new SpiralMagnumWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
 	}
 }

@@ -1,7 +1,9 @@
 namespace MMXOnline;
 
 public class AxlBulletWC : AxlWeaponWC {
-	public bool wasSpecialHeld;
+	public static AxlBulletWC netWeapon = new();
+
+	private bool wasSpecialHeld;
 	private bool specialActive;
 
 	public AxlBulletWC() {
@@ -21,15 +23,13 @@ public class AxlBulletWC : AxlWeaponWC {
 	}
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
-		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		ushort netId = axl.player.getNextActorNetId();
-		new AxlBulletProj(this, pos, axl.player, bulletDir, netId);
+		new AxlBulletWCProj(axl, pos, byteAngle, netId, sendRpc: true);
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
-		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		ushort netId = axl.player.getNextActorNetId();
-		new CopyShotProj(this, pos, chargeLevel, axl.player, bulletDir, netId);
+		new CopyShotWCProj(axl, pos, chargeLevel, byteAngle, netId, sendRpc: true);
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
@@ -91,3 +91,82 @@ public class AxlBulletWC : AxlWeaponWC {
 		}
 	}
 }
+
+public class AxlBulletWCProj : Projectile {
+	public AxlBulletWCProj(
+		Actor owner, Point pos,
+		float byteAngle, ushort netProjId,
+		bool sendRpc = false, Player? player = null
+	) : base(
+		pos, 1, owner, "axl_bullet", netProjId, player
+	) {
+		fadeSprite = "axl_bullet_fade";
+		projId = (int)ProjIds.AxlBulletWC;
+		weapon = AxlBulletWC.netWeapon;
+		damager.damage = 12f / 60f;
+		reflectable = true;
+
+		vel = Point.createFromByteAngle(byteAngle) * 500;
+		this.byteAngle = byteAngle;
+		maxTime = 0.225f;
+
+		if (sendRpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new AxlBulletWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
+	}
+}
+
+public class CopyShotWCProj : Projectile {
+	public CopyShotWCProj(
+		Actor owner, Point pos, int chargeLevel,
+		float byteAngle, ushort netProjId,
+		bool sendRpc = false, Player? player = null
+	) : base(
+		pos, 1, owner, "axl_bullet_charged", netProjId, player
+	) {
+		fadeSprite = "buster4_fade";
+		fadeOnAutoDestroy = true;
+		projId = (int)ProjIds.CopyShotWC;
+		weapon = AxlBulletWC.netWeapon;
+		damager.damage = 12f / 60f;
+		reflectable = true;
+
+		vel = Point.createFromByteAngle(byteAngle) * 500;
+		this.byteAngle = byteAngle;
+		maxTime = 0.225f;
+
+		if (sendRpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+		}
+
+		if (chargeLevel == 2) {
+			damager.damage = 3;
+			vel *= 1.25f;
+			maxTime /= 1.25f;
+			xScale = 1.25f;
+			yScale = 1.25f;
+		}
+		else if (chargeLevel >= 3) {
+			damager.damage = 4;
+			vel *= 1.5f;
+			maxTime /= 1.5f;
+			xScale = 1.5f;
+			yScale = 1.5f;
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new CopyShotWCProj(
+			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
+	}
+}
+

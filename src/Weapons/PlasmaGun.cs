@@ -76,22 +76,21 @@ public class PlasmaGunProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player,
 		Point bulletDir, ushort netProjId, bool sendRpc = false
 	) : base(
-		weapon, pos, 1, 600, 3, player, "plasmagun_proj",
+		weapon, pos, 1, 400, 3, player, "plasmagun_proj",
 		Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.PlasmaGunProj;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		destroyOnHit = true;
-		maxTime = 0.125f;
+		maxTime = 7 / 60f;
 		axl = (player.character as Axl);
-		vel.x = 600 * bulletDir.x;
-		vel.y = 600 * bulletDir.y;
+		vel.x = 400 * bulletDir.x;
+		vel.y = 400 * bulletDir.y;
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
-		canBeLocal = false;
 
 		isMelee = true;
 		if (player?.character != null) {

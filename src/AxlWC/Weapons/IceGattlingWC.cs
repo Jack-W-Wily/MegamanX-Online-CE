@@ -6,8 +6,8 @@ public class IceGattlingWC : AxlWeaponWC {
 	public static IceGattlingWC netWeapon = new();
 	public float targetFireRate;
 	public float fireRateReduceCooldown = 0;
-	public float minFireRate = 6;
-	public float maxFireRate = 14;
+	public float minFireRate = 5;
+	public float maxFireRate = 9;
 	public float animFrames;
 	public float fireRateStacks;
 
@@ -15,7 +15,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		shootSounds = [ "iceGattling", "gaeaShield" ];
 		isTwoHanded = true;
 		fireRate = minFireRate;
-		altFireRate = 2;
+		altFireRate = 18;
 		index = (int)WeaponIds.IceGattling;
 		weaponBarBaseIndex = 37;
 		weaponSlotIndex = 57;
@@ -58,7 +58,7 @@ public class IceGattlingWC : AxlWeaponWC {
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
 		new IceGattlingWCProj(axl, pos, byteAngle, netId, sendRpc: true);
-		if (targetFireRate > minFireRate && fireRateStacks >= 2) {
+		if (targetFireRate > minFireRate && fireRateStacks >= 1) {
 			targetFireRate -= 1;
 			if (targetFireRate < minFireRate) { targetFireRate = minFireRate; }
 		} else {
@@ -75,11 +75,12 @@ public class IceGattlingWC : AxlWeaponWC {
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
-
+		ushort netId = axl.player.getNextActorNetId();
+		new IceGattlingAltWCProj(axl, pos, byteAngle, netId, sendRpc: true);
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return maxAmmo;
+		return 6;
 	}
 }
 
@@ -91,7 +92,7 @@ public class IceGattlingWCProj : Projectile {
 	) : base(
 		pos, 1, owner, "icegattling_proj", netProjId, player
 	) {
-		projId = (int)ProjIds.IceGattling;
+		projId = (int)ProjIds.IceGattlingWC;
 		weapon = IceGattlingWC.netWeapon;
 		damager.damage = 0.5f;
 		reflectable = true;
@@ -103,5 +104,52 @@ public class IceGattlingWCProj : Projectile {
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new IceGattlingWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
+	}
+}
+
+public class IceGattlingAltWCProj : Projectile {
+	public IceGattlingAltWCProj(
+		Actor owner, Point pos,
+		float byteAngle, ushort netProjId,
+		bool sendRpc = false, Player? player = null
+	) : base(
+		pos, 1, owner, "frosttowercharged_proj", netProjId, player
+	) {
+		projId = (int)ProjIds.IceGattlingAltWC;
+		weapon = IceGattlingWC.netWeapon;
+		damager.damage = 2f;
+		damager.flinch = Global.halfFlinch;
+		sprite.frameIndex = 7;
+		sprite.tempOffX = -20;
+		xScale = 0.5f;
+		yScale = 0.5f;
+
+		vel = Point.createFromByteAngle(byteAngle) * 300;
+		this.byteAngle = byteAngle + 64;
+		maxTime = 0.3f;
+
+		if (sendRpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+		}
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		playSound("iceBreak");
+		Anim.createGibEffect("hyoroga_proj_pieces", getCenterPos(), owner);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new IceGattlingAltWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
 	}
 }

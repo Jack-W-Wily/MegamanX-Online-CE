@@ -60,7 +60,7 @@ public class FlameBurnerProj : Projectile {
 	public FlameBurnerProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 150, 1, player, "flameburner_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FlameBurner;
-		maxTime = 0.15f;
+		maxTime = 0.3f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			projId = (int)ProjIds.FlameBurnerHyper;
 		}
@@ -217,8 +217,8 @@ public class CircleBlazeProj : Projectile {
 		base(weapon, pos, 1, 250, 0, player, "circleblaze_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.CircleBlaze;
 		//fadeSprite = "circleblaze_fade";
-		fadeSound = "circleBlazeExplosion";
-		maxTime = 0.2f;
+		//fadeSound = "circleBlazeExplosion";
+		maxTime = 0.25f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		if (isUnderwater()) {
@@ -255,11 +255,15 @@ public class CircleBlazeProj : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
+		if (ownedByLocalPlayer && !exploded) {
+			explode();
+		}
 	}
 
 	public void explode() {
 		if (!ownedByLocalPlayer) return;
 		if (exploded) return;
+		playSound("circleBlazeExplosion", true, true);
 		exploded = true;
 		new CircleBlazeExplosionProj(weapon, pos, xDir, owner, owner.getNextActorNetId(), sendRpc: true);
 		/*

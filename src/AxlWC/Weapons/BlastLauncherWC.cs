@@ -62,7 +62,7 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		vel.x = 300 * bulletDir.x;
 		vel.y = 300 * bulletDir.y;
-		projId = (int)ProjIds.BlastLauncherGrenadeProj;
+		projId = (int)ProjIds.BlastLauncherWC;
 		damager.damage = 2;
 		damager.hitCooldown = 15;
 		useGravity = true;
@@ -76,6 +76,13 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new BlastLauncherWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
 	}
 
 	public override void preUpdate() {
@@ -154,7 +161,7 @@ public class GreenSpinnerWCProj : Projectile {
 		pos, 1, owner, "axl_rocket", netProjId, player
 	) {
 		weapon = BlastLauncherWC.netWeapon;
-		projId = (int)ProjIds.GreenSpinner;
+		projId = (int)ProjIds.GreenSpinnerWC;
 		this.byteAngle = byteAngle;
 		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		vel.x = 400 * bulletDir.x;
@@ -167,6 +174,13 @@ public class GreenSpinnerWCProj : Projectile {
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		new GreenSpinnerWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+		return null!;
 	}
 
 	public override void onCollision(CollideData other) {

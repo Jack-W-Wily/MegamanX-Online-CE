@@ -850,6 +850,16 @@ public enum ProjIds {
 	TwinSlasherCharged7,
 	TwinSlasherCharged8,
 
+	// Wily Cut Axl.
+	AxlBulletWC,
+	CopyShotWC,
+	BlastLauncherWC,
+	GreenSpinnerWC,
+	IceGattlingWC,
+	IceGattlingAltWC,
+	RayGunWC,
+	SpiralMagnumWC,
+
 	// Random non-projectiles.
 	AxlDiscardedWeapon,
 
