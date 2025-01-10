@@ -31,6 +31,8 @@ public class AxlWC : Character {
 	public float armAngle = 0;
 	public Anim muzzleFlash;
 
+	public int HoverTimes = 0;
+
 	public AxlWC(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
@@ -61,6 +63,8 @@ public class AxlWC : Character {
 
 	public override void update() {
 		base.update();
+		// For Hover
+		if (charState is Idle or WallSlide){HoverTimes = 0;}
 		// For Microdashes
 		if ((charState is Dash || charState is AirDash)){
 			slideVel = xDir * getDashSpeed();			
@@ -247,7 +251,7 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Dodge.
-		if (grounded && player.input.checkDoubleTap(Control.Dash) &&
+		if (player.input.checkDoubleTap(Control.Dash) &&
 			player.input.isPressed(Control.Dash, player) && canDash() && flag == null
 		) {
 			dashedInAir++;
@@ -255,10 +259,11 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Hover.
-		if (!grounded && player.input.isPressed(Control.Jump, player) &&
-			canJump() && !isDashing && canAirDash() && flag == null
+		if (!grounded && player.input.isPressed(Control.Jump, player) 
+			&& !player.input.isHeld(Control.Down, player) && HoverTimes == 0 &&
+			canJump() && !isDashing && flag == null
 		) {
-			dashedInAir++;
+			HoverTimes++;
 			changeState(new HoverAxlWC(), true);
 			return true;
 		}

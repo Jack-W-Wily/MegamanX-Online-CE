@@ -145,7 +145,10 @@ public class OcelotSpin : CharState {
 	public float soundTimer;
 	private AxlWC axl = null!;
 
-	public OcelotSpin() : base("ocelotspin") {}
+	public OcelotSpin() : base("ocelotspin") {
+	airMove = true;
+	normalCtrl = true;
+	}
 
 	public override void update() {
 		if (character.frameIndex >= 1 && character.frameIndex <= 10 && soundTimer <= 0) {
