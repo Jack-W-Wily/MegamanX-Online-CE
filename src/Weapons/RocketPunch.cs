@@ -99,8 +99,8 @@ public class RocketPunchProj : Projectile {
 		RocketPunch weapon, Point pos, int xDir, Player player,
 		ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, getSpeed(weapon.type), 2,
-		player, weapon.projSprite, Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, getSpeed(weapon.type), 1,
+		player, weapon.projSprite, Global.defFlinch, 0.3f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.RocketPunch;
 		destroyOnHit = false;
@@ -112,8 +112,8 @@ public class RocketPunchProj : Projectile {
 		damager.flinch = Global.halfFlinch;
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
-			damager.damage = 1;
-			damager.hitCooldown = 6;
+			damager.damage = 0.5f;
+			//damager.hitCooldown = 6;
 			maxTime = 0.25f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBrat;
@@ -508,6 +508,7 @@ public class SpoiledBratPunch : CharState {
 	public SpoiledBratPunch(string transitionSprite = "") : base("spoiled_brat", "", "", transitionSprite) {
 	this.grounded = grounded;
 	airMove = true;
+
 	}
 
 	public override void update() {

@@ -190,8 +190,16 @@ public class VileMK2GrabState : CharState {
 
 public class VileMK2Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 6;
-	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
+	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
 	}
+
+		public override void update() {
+		base.update();
+			if (grabber.sprite.name.Contains("idle")){
+			character.changeToIdleOrFall();
+			}
+		}
+	
 }
 
 
@@ -434,8 +442,8 @@ public class VileAirRaid : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.grabCooldown = 0.5f;
-		victim.grabInvulnTime = 0.5f;
+	//	character.grabCooldown = 0.5f;
+	//	victim.grabInvulnTime = 0.5f;
 		victim?.releaseGrab(character);
 	}
 }

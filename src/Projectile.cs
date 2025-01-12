@@ -35,6 +35,8 @@ public class Projectile : Actor {
 	public bool isShield;
 	public bool isReflectShield;
 	public bool isJuggleProjectile;
+
+	public bool isPushProjectile;
 	public bool ShouldClang;
 	public bool isDeflectShield;
 	//Hit sprites effect stuff
@@ -709,6 +711,17 @@ public class Projectile : Actor {
 			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 0 * modifier, -300));
+		}
+
+		if (isPushProjectile){
+
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			character.pushedByTornadoInFrame = true;
+			character.move(new Point(500 * 0.9f * xDir * 1 * 0.25f, 0));
+	
+		}
+	
 		}
 	
 

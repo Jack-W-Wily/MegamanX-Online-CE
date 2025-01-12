@@ -59,6 +59,55 @@ public class CallDownMech : CharState {
 }
 
 
+
+
+
+
+public class VavaVSlashRun : CharState {
+	Anim? proj;
+
+	public VavaVSlashRun() : base("slashrun", "", "", "") {
+		enterSound = "vileMk5Walk";
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.ComboTimer > 0){
+		normalCtrl = true;
+		}
+		character.move(new Point(character.xDir * 150, 0));
+	   if (character.sprite.name.Contains("slashrun")
+	  	&& character.isAnimOver()) {
+			character.changeSpriteFromName("air_bomb_attack", true);	
+		}
+	  if (character.sprite.name.Contains("air_bomb_attack")
+	 	 && character.isAnimOver()) {
+			character.changeToIdleOrFall();	
+		}
+
+
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+		character.vel.y = 0;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+
 public class VileDodge : CharState {
 	public float dashTime = 0;
 	public int initialDashDir;
@@ -179,6 +228,18 @@ public class VileDashState : CharState {
 	//		character.changeState(new FStagGrabState(true));
 	//		return;
 	//	}
+
+
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (character.sprite.name.Contains("2") &&
+			collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+			new DynamoBeam(new ElectricSpark(), character.pos.addxy(20 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+			character.changeToIdleOrFall();
+			character.playSound("hurt", sendRpc: true);
+			return;
+		} 
 
 		character.move(new Point(character.xDir * 400, 0));
 

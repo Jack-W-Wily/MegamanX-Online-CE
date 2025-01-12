@@ -145,7 +145,10 @@ public class OcelotSpin : CharState {
 	public float soundTimer;
 	private AxlWC axl = null!;
 
-	public OcelotSpin() : base("ocelotspin") {}
+	public OcelotSpin() : base("ocelotspin") {
+	airMove = true;
+	attackCtrl = true;
+	}
 
 	public override void update() {
 		if (character.frameIndex >= 1 && character.frameIndex <= 10 && soundTimer <= 0) {
@@ -181,6 +184,7 @@ public class TailShot : CharState {
 
 	public TailShot() : base("tailshot") {
 		useGravity = false;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -213,7 +217,7 @@ public class EvasionBarrage : CharState {
 	public EvasionBarrage(string transitionSprite = "")
 		: base("evasionshot", "", "", transitionSprite) {
 		airMove = true;
-
+		attackCtrl = true;
 	}
 
 	float projTime;
@@ -272,7 +276,9 @@ public class RisingBarrage : CharState {
 	public float pushBackSpeed;
 	float projTime;
 
-	public RisingBarrage() : base("risingbarrage") {}
+	public RisingBarrage() : base("risingbarrage") {
+	attackCtrl = true;
+	}
 
 	public override void update() {
 		base.update();

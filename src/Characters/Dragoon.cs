@@ -155,7 +155,7 @@ public override bool attackCtrl() {
 
 		// MicroDash
 			if ((charState is Dash || charState is AirDash)){
-			slideVel = xDir * getDashSpeed();			
+			slideVel = xDir * getDashSpeed() *  0.5f;			
 			}
 		
 		

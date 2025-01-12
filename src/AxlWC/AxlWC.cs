@@ -31,6 +31,8 @@ public class AxlWC : Character {
 	public float armAngle = 0;
 	public Anim muzzleFlash;
 
+	public int HoverTimes = 0;
+
 	public AxlWC(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
@@ -61,6 +63,14 @@ public class AxlWC : Character {
 
 	public override void update() {
 		base.update();
+		// For Hover
+		if (charState is Idle or WallSlide){HoverTimes = 0;}
+		// For Microdashes
+		if ((charState is Dash || charState is AirDash)){
+			slideVel = xDir * getDashSpeed();			
+		}
+
+
 		// Hypermode music.
 		if (isWhite) {
 			if (musicSource == null) {
@@ -241,7 +251,7 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Dodge.
-		if (grounded && player.input.checkDoubleTap(Control.Dash) &&
+		if (player.input.checkDoubleTap(Control.Dash) &&
 			player.input.isPressed(Control.Dash, player) && canDash() && flag == null
 		) {
 			dashedInAir++;
@@ -249,10 +259,11 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Hover.
-		if (!grounded && player.input.isPressed(Control.Jump, player) &&
-			canJump() && !isDashing && canAirDash() && flag == null
+		if (!grounded && player.input.isPressed(Control.Jump, player) 
+			&& !player.input.isHeld(Control.Down, player) && HoverTimes == 0 &&
+			canJump() && !isDashing && flag == null
 		) {
-			dashedInAir++;
+			HoverTimes++;
 			changeState(new HoverAxlWC(), true);
 			return true;
 		}
@@ -435,6 +446,7 @@ public class AxlWC : Character {
 		Block,
 		OcelotSpin,
 		TailShot,
+		EnemyStep,
 		RisingBarrage
 	}
 
@@ -445,6 +457,8 @@ public class AxlWC : Character {
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
 			"axl_tailshot" => MeleeIds.TailShot,
 			"axl_risingbarrage" => MeleeIds.RisingBarrage,
+			"axl_fall" when player.input.isPressed(Control.Jump,player) => MeleeIds.EnemyStep,
+		
 			_ => MeleeIds.None
 		});
 	}
@@ -455,6 +469,10 @@ public class AxlWC : Character {
 				ZSaber.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true,
 				addToLevel: addToLevel
+			),
+			MeleeIds.EnemyStep => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.GBDKick, player,
+			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
 			),
 			MeleeIds.OcelotSpin => new GenericMeleeProj(
 				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
@@ -467,7 +485,7 @@ public class AxlWC : Character {
 				addToLevel: addToLevel
 			),
 			MeleeIds.RisingBarrage => new GenericMeleeProj(
-				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				FireWave.netWeapon, pos, ProjIds.BlockableLaunch, player,
 				3, 0, 8, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
@@ -663,6 +681,8 @@ public class AxlDiscrardedWeapon : Actor {
 		if (grounded) {
 			vel.x = 0;
 		}
+
+		
 
 		if (blinkTime == 0) {
 			if (blinkMaxTime > 3) {
