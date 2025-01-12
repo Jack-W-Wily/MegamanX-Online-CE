@@ -589,6 +589,12 @@ public class Damager {
 				case (int)ProjIds.IceGattling:
 					character.addIgFreezeProgress(1);
 					break;
+				case (int)ProjIds.IceGattlingWC:
+					character.addIgFreezeProgress(1);
+					break;
+				case (int)ProjIds.IceGattlingAltWC:
+					character.addIgFreezeProgress(4);
+					break;
 				case (int)ProjIds.IceGattlingHeadshot:
 					character.addIgFreezeProgress(2);
 					break;
