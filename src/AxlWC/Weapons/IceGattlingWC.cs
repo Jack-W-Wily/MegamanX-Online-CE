@@ -27,7 +27,7 @@ public class IceGattlingWC : AxlWeaponWC {
 
 		maxAmmo = 22;
 		ammo = maxAmmo;
-		maxSwapCooldown = 60 * 5;
+		maxSwapCooldown = 20 * 5;
 	}
 
 	public override void update() {

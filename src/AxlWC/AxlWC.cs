@@ -230,7 +230,7 @@ public class AxlWC : Character {
 			return;
 		}
 		if (oldWeapon != mainWeapon) {
-			axlWeapon.swapCooldown = 0;//axlWeapon.maxSwapCooldown;
+			axlWeapon.swapCooldown = axlWeapon.maxSwapCooldown;
 			axlWeapon.shootCooldown = 2;
 			axlWeapon.ammo = 0;
 		}
