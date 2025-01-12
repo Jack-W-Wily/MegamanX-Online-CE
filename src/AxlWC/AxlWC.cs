@@ -485,7 +485,7 @@ public class AxlWC : Character {
 				addToLevel: addToLevel
 			),
 			MeleeIds.RisingBarrage => new GenericMeleeProj(
-				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				FireWave.netWeapon, pos, ProjIds.BlockableLaunch, player,
 				3, 0, 8, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),

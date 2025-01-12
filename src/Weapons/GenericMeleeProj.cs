@@ -12,7 +12,7 @@ public class GenericMeleeProj : Projectile {
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = true, float? hitCooldownSeconds = null,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false,
-		bool isJuggleProjectile = false,
+		bool isJuggleProjectile = false, bool isPushProjectile = false,
 		bool ShouldClang = false
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
@@ -45,6 +45,7 @@ public class GenericMeleeProj : Projectile {
 		this.isZSaberEffect2B = isZSaberEffect2B;
 		this.isZSaberClang = isZSaberClang;
 		this.isJuggleProjectile = isJuggleProjectile;
+		this.isPushProjectile = isPushProjectile;
 		this.ShouldClang = ShouldClang;
 		isMelee = true;
 	}

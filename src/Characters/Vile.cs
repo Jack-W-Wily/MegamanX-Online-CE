@@ -92,9 +92,10 @@ public class Vile : Character {
 		spriteFrameToSounds["vile_run/4"] = "vileWalk";
 		spriteFrameToSounds["vile_run/8"] = "vileWalk";
 		spriteFrameToSounds["vilemk2_run/2"] = "vileMk2Walk";
-		spriteFrameToSounds["vilemk2_run/7"] = "vileMk2Walk";
+		spriteFrameToSounds["vilemk2_run/5"] = "vileMk2Walk";
 		spriteFrameToSounds["vilemk5_run/4"] = "vileMk5Walk";
 		spriteFrameToSounds["vilemk5_run/7"] = "vileMk5Walk";
+		spriteFrameToSounds["vilemk5_slashrun/3"] = "vileMk5Walk";
 
 		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
 
@@ -201,6 +202,7 @@ public class Vile : Character {
 		bool PressL = player.input.isPressed(Control.WeaponLeft, player);
 		bool PressA = player.input.isPressed(Control.Shoot, player);
 		bool PressS = player.input.isPressed(Control.Special1, player);
+		
 		bool HoldA = player.input.isHeld(Control.Shoot, player);
 		bool HoldR = player.input.isHeld(Control.WeaponRight, player);
 	
@@ -339,19 +341,20 @@ public class Vile : Character {
 		&& VileMode == 0){
 		VileMode = 1;
 		ModeCD = 0.01f;
-		Global.level.gameMode.setHUDErrorMessage(player, 
-		"Strategy Type: Beatdown", playSound: false);
+		addDamageText("Beatdown", 0);	
 			
-		playSound("vileModule", sendRpc: true);	
+
+			
+		playSound("vileModule", sendRpc: false);	
 		}
 		if (player.input.isPressed(Control.WeaponLeft, player)
 		&&	ModeCD == 0
 	 && VileMode == 1){
 		VileMode = 0;
 			ModeCD = 0.01f;
-		Global.level.gameMode.setHUDErrorMessage(player, 
-		"Strategy Type: Trash Metal", playSound: false);
-		playSound("vileModule", sendRpc: true);
+		addDamageText("Trash Metal", 3);	
+		
+		playSound("vileModule", sendRpc: false);
 		}
 
 
@@ -398,6 +401,7 @@ public class Vile : Character {
 
 
 		bool WPLeftPressed = player.input.isPressed(Control.WeaponLeft, player);
+		bool WPRightPressed = player.input.isPressed(Control.WeaponRight, player);
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool shootHeld = player.input.isHeld(Control.Shoot, player);
@@ -424,6 +428,12 @@ public class Vile : Character {
 		}
 		if (WeaponRightHeld && VileMode == 0) {
 			vulcanWeapon.vileShoot(0, this);
+		}
+
+
+		if (player.input.isLeftOrRightHeld(player) &&
+			WPRightPressed && player.loadout.vileLoadout.cannon == 2) {
+			changeState(new VavaVSlashRun(), true);
 		}
 		
 		return base.attackCtrl();
@@ -948,6 +958,17 @@ public class Vile : Character {
 			);
 		}
 
+
+		if (sprite.name.Contains("slashrun")) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.ZSaber1, player,
+				2f, 25,  15f, isDeflectShield: true, ShouldClang : true,
+				isPushProjectile : true,
+				 isZSaberEffect : true
+			);
+		}
+
+
 		if (sprite.name.Contains("punch")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
@@ -976,10 +997,17 @@ public class Vile : Character {
 		}
 
 
-		if (sprite.name.Contains("hyperdash")) {
+		if (sprite.name.Contains("hyperdash") && !sprite.name.Contains("2")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
 				2, 0,  10f, isDeflectShield: true, ShouldClang : true
+			);
+		}
+
+			if (sprite.name.Contains("hyperdash") && sprite.name.Contains("2")) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
+				0.5f, 0,  10f, isDeflectShield: true, ShouldClang : true
 			);
 		}
 
