@@ -1830,6 +1830,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
 		if (invulnTime > 0) return true;
+		if (iframesTime > 0) return true;
 		if (!ignoreRideArmorHide) {
 			if (ownedByLocalPlayer && charState is InRideArmor { isHiding: true }) {
 				return true;
