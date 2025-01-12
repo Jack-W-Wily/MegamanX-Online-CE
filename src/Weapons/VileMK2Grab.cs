@@ -91,8 +91,12 @@ public class VileMK2GrabState : CharState {
 					}
 				}
 
-
+				if (player.input.isPressed(Control.Jump,player)){
+					character.vel.y = -character.getJumpPower();
+				}
+				
 				if (player.input.isHeld(Control.Jump, player)) {
+				
 				Point moveAmount = new Point(character.xDir * 50, -100);
 				character.move(moveAmount);
 				character.useGravity = false;

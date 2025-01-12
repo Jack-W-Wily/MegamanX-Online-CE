@@ -3464,6 +3464,16 @@ public partial class Character : Actor, IDamagable {
 		return false;
 	}
 
+
+	public virtual bool isInDamageSprite() {
+		return sprite.name.Contains("hurt")
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("lose")
+		|| sprite.name.Contains("knocked")
+		|| sprite.name.Contains("grabbed")
+		|| sprite.name.Contains("stunned")
+		|| sprite.name.Contains("pushed");
+	}
 	public virtual bool isAttacking() {
 		return sprite.name.Contains("attack")
 		|| sprite.name.Contains("shoot")

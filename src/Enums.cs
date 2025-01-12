@@ -851,6 +851,9 @@ public enum ProjIds {
 	TwinSlasherCharged8,
 
 	// Wily Cut Axl.
+
+	AxlMeleeBullet,
+	AxlFlashKickProj,
 	AxlBulletWC,
 	CopyShotWC,
 	BlastLauncherWC,

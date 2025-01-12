@@ -400,7 +400,7 @@ public class AwakenedZeroHadangeki : CharState {
 		airSprite = "projswing_air";
 		useDashJumpSpeed = true;
 		airMove = true;
-		superArmor = true;
+		//superArmor = true;
 	}
 
 	public override void update() {

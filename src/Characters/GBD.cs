@@ -269,8 +269,9 @@ public override bool normalCtrl() {
             //new MagnetMine().getProjectile(getShootPos(), getShootXDir(), player, 0, player.getNextActorNetId());
 					}
 
-		
+		if (!isInDamageSprite()){
 		chargeLogic(shoot);
+		}
 	}
 
 

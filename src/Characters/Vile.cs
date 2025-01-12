@@ -167,7 +167,9 @@ public class Vile : Character {
 			return;
 		}
 
+		if (!isInDamageSprite()){
 		chargeLogic(shoot);
+		}
 
 
 		if (isVileMK5) {
@@ -360,7 +362,9 @@ public class Vile : Character {
 
 		if (charState is not VileStationaryHover &&
 			dodgeRollCooldown == 0 && player.canControl) {
-		 if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+		 if (!isInDamageSprite() &&
+			player.input.isPressed(Control.Dash, player)
+		  && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new VileDodge(), true);
 				rideArmorPlatform = null;
 			}

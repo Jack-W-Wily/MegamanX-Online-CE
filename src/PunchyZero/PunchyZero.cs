@@ -206,10 +206,12 @@ public class PunchyZero : Character {
 			donutTimer = 9;
 		}
 		// Charge and release charge logic.
+		if (!isInDamageSprite()){
 		if (isAwakened) {
 			chargeLogic(shootDonuts);
 		} else {
 			chargeLogic(shoot);
+		}
 		}
 	}
 
@@ -680,12 +682,13 @@ public class PunchyZero : Character {
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
+			/*
 			(int)MeleeIds.AwakenedAura => (new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 0, 0, 50f,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
-			}),
+			}),*/
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
 				3, Global.defFlinch, 5f, isReflectShield: true,

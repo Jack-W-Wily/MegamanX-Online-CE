@@ -18,7 +18,7 @@ public class BoundBlasterWC : AxlWeaponWC {
 
 		maxAmmo = 16;
 		ammo = maxAmmo;
-		maxSwapCooldown = 60 * 4;
+		maxSwapCooldown = 20 * 4;
 	}
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {

@@ -13,13 +13,13 @@ public class PlasmaGunWC : AxlWeaponWC {
 		weaponSlotIndex = 56;
 		killFeedIndex = 71;
 		sprite = "axl_arm_plasmagun";
-		maxSwapCooldown = 120;
+		maxSwapCooldown = 60;
 		maxAmmo = 4;
 		ammo = 4;
 
 		maxAmmo = 2;
 		ammo = maxAmmo;
-		maxSwapCooldown = 60 * 2;
+		maxSwapCooldown = 20 * 2;
 		autoFire = true;
 	}
 

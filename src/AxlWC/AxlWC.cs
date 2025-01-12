@@ -65,6 +65,27 @@ public class AxlWC : Character {
 		base.update();
 		// For Hover
 		if (grounded || charState is WallSlide) { HoverTimes = 0; }
+
+		// For String Cancels
+		if (sprite.name.Contains("string")) {
+			if (player.input.checkDoubleTap(Control.Dash) &&
+				player.input.isPressed(Control.Dash, player) && canDash() && flag == null
+			) {
+				changeState(new DodgeRollAxlWC(), true);
+			}
+			if (player.input.isHeld(Control.Up, player) &&
+				player.input.isPressed(Control.Jump, player)) {
+				changeState(new AxlFlashKick(), true);
+			}
+		}
+		// For Cancels on Dodgeroll
+		if (charState is DodgeRollAxlWC) {
+			if (player.input.isHeld(Control.Up, player)
+				&& player.input.isPressed(Control.Jump, player)) {
+				changeState(new AxlFlashKick(), true);
+			}
+		}
+
 		// Hypermode music.
 		if (isWhite) {
 			if (musicSource == null) {
@@ -80,7 +101,9 @@ public class AxlWC : Character {
 		// Arm angle.
 		updateArmAngle();
 		// Charge and release charge logic.
-		chargeLogic(chargeShoot);
+		if (!isInDamageSprite()) {
+			chargeLogic(chargeShoot);
+		}
 		weaponSwapLogic();
 	}
 
@@ -256,14 +279,13 @@ public class AxlWC : Character {
 		if (player.input.checkDoubleTap(Control.Dash) &&
 			player.input.isPressed(Control.Dash, player) && canDash() && flag == null
 		) {
-			dashedInAir++;
 			changeState(new DodgeRollAxlWC(), true);
 			return true;
 		}
 		// Hover.
 		if (!grounded && player.input.isPressed(Control.Jump, player)
 			&& !player.input.isHeld(Control.Down, player) && HoverTimes == 0 &&
-			canJump() && !isDashing && flag == null
+			canJump() && flag == null
 		) {
 			HoverTimes++;
 			changeState(new HoverAxlWC(), true);
@@ -446,9 +468,15 @@ public class AxlWC : Character {
 	public enum MeleeIds {
 		None = -1,
 		Block,
+		String1,
+		String2,
+		String3,
+		String4,
+		String5,
 		OcelotSpin,
 		TailShot,
 		EnemyStep,
+		RainStorm,
 		RisingBarrage
 	}
 
@@ -457,10 +485,15 @@ public class AxlWC : Character {
 		return (int)(sprite.name switch {
 			"axl_block" => MeleeIds.Block,
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
+			"axl_string_1" => MeleeIds.String1,
+			"axl_string_2" => MeleeIds.String2,
+			"axl_string_3" => MeleeIds.String3,
+			"axl_string_4" => MeleeIds.String4,
+			"axl_string_5" => MeleeIds.String5,
 			"axl_tailshot" => MeleeIds.TailShot,
-			"axl_risingbarrage" => MeleeIds.RisingBarrage,
-			"axl_fall" when player.input.isPressed(Control.Jump, player) => MeleeIds.EnemyStep,
-
+			"axl_risingbarrage" or "axl_flashkick" => MeleeIds.RisingBarrage,
+			"axl_rainstorm" => MeleeIds.RainStorm,
+			"axl_fall_step" => MeleeIds.EnemyStep,
 			_ => MeleeIds.None
 		});
 	}
@@ -474,21 +507,50 @@ public class AxlWC : Character {
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,
-			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang: true
+			 2, Global.halfFlinch, addToLevel: addToLevel, ShouldClang: true
+			),
+			MeleeIds.RainStorm => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.ForceGrabState, player,
+			 2, 0, addToLevel: addToLevel, ShouldClang: true
 			),
 			MeleeIds.OcelotSpin => new GenericMeleeProj(
 				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
-				1, 0, 4, ShouldClang: true, isJuggleProjectile: true,
+				1, Global.halfFlinch, 4, ShouldClang: true, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			MeleeIds.TailShot => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.FireWave, player,
-				3, Global.halfFlinch, 5, isJuggleProjectile: true,
+				3, Global.halfFlinch, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String1 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				2, Global.defFlinch,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String2 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				2, Global.defFlinch,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String3 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				2, Global.defFlinch, 5,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String4 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.Raijingeki2, player,
+				2, 0,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String5 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.HeavyPush, player,
+				2, 0,
 				addToLevel: addToLevel
 			),
 			MeleeIds.RisingBarrage => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.BlockableLaunch, player,
-				3, 0, 8, isJuggleProjectile: true,
+				3, 0, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -565,6 +627,11 @@ public class AxlWC : Character {
 			not RisingBarrage and
 			not OcelotSpin and
 			not TailShot and
+			not AxlString1 and
+			not AxlString2 and
+			not AxlString3 and
+			not AxlString4 and
+			not AxlString5 and
 			not InRideChaser and
 			not LadderEnd
 		);

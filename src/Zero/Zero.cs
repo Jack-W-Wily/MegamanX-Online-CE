@@ -248,10 +248,12 @@ public class Zero : Character {
 			donutTimer = 9;
 		}
 		// Charge and release charge logic.
+		if (!isInDamageSprite()){
 		if (isAwakened) {
 			chargeLogic(shootDonuts);
 		} else {
 			chargeLogic(shoot);
+		}
 		}
 	}
 
@@ -384,12 +386,13 @@ public class Zero : Character {
 			donutTimer = 9;
 			donutsPending = (chargeLevel - 1);
 		}
-		currencyUse = 1;
+		currencyUse = 0;
 		if (currencyUse > 0) {
 			if (freeBusterShots > 0) {
 				freeBusterShots--;
 			} else if (player.currency > 0) {
-				player.currency--;
+			//	player.currency--;
+				gigaAttack.ammo -= 6;
 			}
 		}
 	}
@@ -495,7 +498,7 @@ public class Zero : Character {
 		if (donutsPending != 0) {
 			return false;
 		}
-		if (isAwakened && swingPressTime > 0 && hadangekiCooldown == 0) {
+		if (isAwakened && swingPressTime > 0 && hadangekiCooldown == 0 && isGenmuZero) {
 			hadangekiCooldown = 60;
 			if (charState is WallSlide wallSlide) {
 				changeState(new AwakenedZeroHadangekiWall(wallSlide.wallDir, wallSlide.wallCollider), true);
@@ -985,11 +988,12 @@ public class Zero : Character {
 				3, Global.defFlinch, 30, isReflectShield: true,
 				addToLevel: addToLevel
 			),
+			/* AZ nerf
 			(int)MeleeIds.AwakenedAura => new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player,
 				0, 0, 80,
 				addToLevel: addToLevel
-			),
+			),*/
 			_ => null
 		};
 	}

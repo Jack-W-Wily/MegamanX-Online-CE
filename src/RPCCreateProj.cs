@@ -485,6 +485,12 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.DragoonSpark:
 				proj = new DragoonSpark(new FireWave(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.AxlMeleeBullet:
+				proj = new AxlMeleeBullet(new FireWave(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.AxlFlashKickProj:
+				proj = new AxlFlashKickProj(new StormTornado(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.AimingLaserBlade:
 				proj = new AimingLaserBlade(new AimingLaser(), pos, xDir, player, netProjByte);
 				break;
