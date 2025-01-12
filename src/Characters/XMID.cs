@@ -284,7 +284,9 @@ public override bool normalCtrl() {
 		shootingRaySplasher?.burstLogic2(this);
 
 		// Charge and release charge logic.
+		if (!isInDamageSprite()){
 		chargeLogic(shoot);
+		}
 		player.changeWeaponControls();
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref upPunchCooldown);

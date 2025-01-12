@@ -39,7 +39,8 @@ public class CmdSigma : BaseSigma {
 			}
 		}
 
-		if (dodgeRollCooldown == 0 && player.canControl) {
+		if (!isInDamageSprite() &&
+			dodgeRollCooldown == 0 && player.canControl) {
 		 if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
 				changeState(new SigDodge(), true);
 				rideArmorPlatform = null;
