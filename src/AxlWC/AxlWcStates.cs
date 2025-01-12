@@ -28,7 +28,7 @@ public class HyperAxlWcStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as AxlWC ?? throw new NullReferenceException();;
+		axl = character as AxlWC ?? throw new NullReferenceException(); ;
 		axl.player.currency -= AxlWC.WhiteAxlCost;
 		axl.useGravity = false;
 		axl.stopMoving();
@@ -146,8 +146,10 @@ public class OcelotSpin : CharState {
 	private AxlWC axl = null!;
 
 	public OcelotSpin() : base("ocelotspin") {
-	airMove = true;
-	attackCtrl = true;
+		airMove = true;
+		canStopJump = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -183,8 +185,8 @@ public class TailShot : CharState {
 	private bool shot;
 
 	public TailShot() : base("tailshot") {
-		useGravity = false;
-		attackCtrl = true;
+		canStopJump = true;
+		canJump = true;
 	}
 
 	public override void update() {
@@ -277,7 +279,6 @@ public class RisingBarrage : CharState {
 	float projTime;
 
 	public RisingBarrage() : base("risingbarrage") {
-	attackCtrl = true;
 	}
 
 	public override void update() {
@@ -288,8 +289,7 @@ public class RisingBarrage : CharState {
 				character.move(new Point(-90 * character.xDir, -25));
 				pushBackSpeed = -character.speedMul;
 			}
-		}
-		else if (pushBackSpeed > 0) {
+		} else if (pushBackSpeed > 0) {
 			character.useGravity = true;
 			if (pushBackSpeed > 0) {
 				character.move(new Point(-90 * character.xDir, 0));
@@ -378,63 +378,7 @@ public class RainStorm : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		axl = character as AxlWC ?? throw new NullReferenceException();
-	}
-}
-
-public class BlueBulletProj : Projectile {
-	bool groundedVariant;
-
-	public BlueBulletProj(
-		DoubleBullet weapon, Point pos, int xDir,
-		bool groundedVariant, Player player, ushort netProjId, bool sendRpc = false
-	) : base(
-		weapon, pos, xDir, 0, 1, player, "axl_bullet_blue", 4, 0.1f, netProjId, player.ownedByLocalPlayer
-	) {
-		projId = (int)ProjIds.BlueBullet;
-		fadeSprite = "axl_bullet_fade";
-		destroyOnHit = true;
-		this.groundedVariant = groundedVariant;
-
-		maxTime = 1f;
-
-
-		if (!groundedVariant) {
-			vel = new Point(xDir, 2f);
-			vel = vel.normalize().times(350);
-
-		} else {
-			vel = new Point(xDir, -0.5f);
-			vel = vel.normalize().times(350);
-
-		}
-		angle = vel.angle;
-
-		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir, (byte)(groundedVariant ? 1 : 0));
-		}
-	}
-
-	public override void update() {
-		base.update();
-
-		if (owner.isAxl && owner.character != null && owner.character.charState is RisingBarrage) {
-			this.vel.y = -250;
-		}
-
-
-		if (!groundedVariant) {
-
-			vel.x *= 0.9f;
-
-		} else {
-
-			vel.y *= 0.9f;
-
-		}
-	}
-
-	public override void onHitWall(CollideData other) {
-		destroySelf(fadeSprite, disableRpc: true);
+		axl.isDashing = true;
 	}
 }
 
@@ -452,7 +396,7 @@ public class AxlBlock : CharState {
 	public override void update() {
 		base.update();
 		axl.armAngle = 0;
-		if (!player.input.isHeld(Control.Down, player) || player.input.isHeld(Control.Jump, player) ) {
+		if (!player.input.isHeld(Control.Down, player) || player.input.isHeld(Control.Jump, player)) {
 			character.changeToIdleOrFall();
 			return;
 		}

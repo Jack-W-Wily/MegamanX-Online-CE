@@ -1,3 +1,5 @@
+using System;
+
 namespace MMXOnline;
 
 public class AxlBulletWC : AxlWeaponWC {
@@ -103,12 +105,12 @@ public class AxlBulletWCProj : Projectile {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBulletWC;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 12f / 60f;
+		damager.damage = 1;
 		reflectable = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;
 		this.byteAngle = byteAngle;
-		maxTime = 0.225f;
+		maxTime = 12f / 60f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
@@ -135,7 +137,7 @@ public class CopyShotWCProj : Projectile {
 		fadeOnAutoDestroy = true;
 		projId = (int)ProjIds.CopyShotWC;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 12f / 60f;
+		damager.damage = 2;
 		reflectable = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;

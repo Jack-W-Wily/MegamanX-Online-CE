@@ -64,13 +64,7 @@ public class AxlWC : Character {
 	public override void update() {
 		base.update();
 		// For Hover
-		if (charState is Idle or WallSlide){HoverTimes = 0;}
-		// For Microdashes
-		if ((charState is Dash || charState is AirDash)){
-			slideVel = xDir * getDashSpeed();			
-		}
-
-
+		if (grounded || charState is WallSlide) { HoverTimes = 0; }
 		// Hypermode music.
 		if (isWhite) {
 			if (musicSource == null) {
@@ -126,6 +120,14 @@ public class AxlWC : Character {
 
 	public override bool canCrouch() {
 		return false;
+	}
+
+
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		if (charState is Dash or AirDash) {
+			slideVel = xDir * getDashSpeed() * 0.8f;
+		}
+		return base.changeState(newState, forceChange);
 	}
 
 	public void updateArmAngle() {
@@ -204,7 +206,7 @@ public class AxlWC : Character {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
 		}
-		
+
 		// Set cooldown if leaving special weapon.
 		if (oldWeapon is not AxlWeaponWC axlWeapon) {
 			return;
@@ -259,7 +261,7 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Hover.
-		if (!grounded && player.input.isPressed(Control.Jump, player) 
+		if (!grounded && player.input.isPressed(Control.Jump, player)
 			&& !player.input.isHeld(Control.Down, player) && HoverTimes == 0 &&
 			canJump() && !isDashing && flag == null
 		) {
@@ -457,8 +459,8 @@ public class AxlWC : Character {
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
 			"axl_tailshot" => MeleeIds.TailShot,
 			"axl_risingbarrage" => MeleeIds.RisingBarrage,
-			"axl_fall" when player.input.isPressed(Control.Jump,player) => MeleeIds.EnemyStep,
-		
+			"axl_fall" when player.input.isPressed(Control.Jump, player) => MeleeIds.EnemyStep,
+
 			_ => MeleeIds.None
 		});
 	}
@@ -472,7 +474,7 @@ public class AxlWC : Character {
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,
-			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
+			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang: true
 			),
 			MeleeIds.OcelotSpin => new GenericMeleeProj(
 				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
@@ -682,7 +684,7 @@ public class AxlDiscrardedWeapon : Actor {
 			vel.x = 0;
 		}
 
-		
+
 
 		if (blinkTime == 0) {
 			if (blinkMaxTime > 3) {
