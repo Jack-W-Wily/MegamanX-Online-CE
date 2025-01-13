@@ -13,7 +13,7 @@ public class BlueBulletProj : Projectile {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.BlueBullet;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 1;
+		damager.damage = 0.5f;
 		damager.flinch = Global.miniFlinch;
 		reflectable = true;
 		destroyOnHitWall = true;
