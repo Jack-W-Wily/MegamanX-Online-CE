@@ -15,7 +15,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		shootSounds = [ "iceGattling", "gaeaShield" ];
 		isTwoHanded = true;
 		fireRate = minFireRate;
-		altFireRate = 18;
+		altFireRate = 25;
 		index = (int)WeaponIds.IceGattling;
 		weaponBarBaseIndex = 37;
 		weaponSlotIndex = 57;
@@ -80,7 +80,7 @@ public class IceGattlingWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return 6;
+		return 11;
 	}
 }
 
