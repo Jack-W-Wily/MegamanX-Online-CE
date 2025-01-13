@@ -20,7 +20,7 @@ public class AxlBulletWC : AxlWeaponWC {
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireRate = 18;
 		displayName = "Axl Bullets";
-		maxAmmo = 20;
+		maxAmmo = 16;
 		ammo = maxAmmo;
 	}
 
@@ -36,10 +36,10 @@ public class AxlBulletWC : AxlWeaponWC {
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
 		return chargeLevel switch {
-			1 => 4,
-			2 => 6,
-			3 => 8,
-			_ => 8,
+			1 => 2,
+			2 => 3,
+			3 => 4,
+			_ => 4,
 		};
 	}
 	public override bool attackCtrl(AxlWC axl) {
