@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MMXOnline;
 public class SpiralMagnumShoot : CharState {
-	public EarlyAxl axl = null!;
+	public AxlX8 axl = null!;
 	public bool shoot;
 	public Point shootPOI = new Point(-1, -1);
 
@@ -17,8 +17,8 @@ public class SpiralMagnumShoot : CharState {
 		Point poi = character.getFirstPOI() ?? character.pos;
 		if (character.sprite.frameIndex == 0 && !shoot) {
 			shoot = true;
-			new ESpiralMagnumProj(poi, axl.xDir, player, player.getNextActorNetId(), rpc: true);
-			new EarlyAxlSpiralMagnumShell(poi.addxy(-15 * axl.xDir, 0), -axl.xDir, player.getNextActorNetId(), sendRpc: true);
+			new X8AxlSpiralMagnumProj(poi, axl.xDir, player, player.getNextActorNetId(), rpc: true);
+			new X8AxlSpiralMagnumShell(poi.addxy(-15 * axl.xDir, 0), -axl.xDir, player.getNextActorNetId(), sendRpc: true);
 			axl.flashAnim = new FlashAnim(poi, 0, player.getNextActorNetId(), true);
 			axl.flashAnim.xDir = character.xDir;
 		character.playSound("axlBullet", sendRpc: true);
@@ -31,7 +31,7 @@ public class SpiralMagnumShoot : CharState {
 		if (character.isAnimOver()) {
 			if(character.grounded){
 			character.changeState(new Idle());}else{
-				character.changeState(new AxlEHover());
+				character.changeState(new X8AxlHover());
 			}
 		}
 	}
@@ -40,7 +40,7 @@ public class SpiralMagnumShoot : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.stopMovingWeak();
-		axl = character as EarlyAxl ?? throw new NullReferenceException();
+		axl = character as AxlX8 ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState newState) {
@@ -48,12 +48,12 @@ public class SpiralMagnumShoot : CharState {
 		character.useGravity = true;
 	}
 }
-public class AxlEHover : CharState {
+public class X8AxlHover : CharState {
 	public SoundWrapper? sound;
 	Anim hoverExhaust = null!;
-	public EarlyAxl axl = null!;
+	public AxlX8 axl = null!;
 
-	public AxlEHover() : base("hover","hover_shoot") {
+	public X8AxlHover() : base("hover","hover_shoot") {
 		useGravity = false;
 		exitOnLanding = true;
 		airMove = true;
@@ -72,7 +72,7 @@ public class AxlEHover : CharState {
 		}
 		axl.hoverTime += Global.spf;
 		/*if(axl.hoverTime <= 1){
-			hoverExhaust.changeSprite("early_axl_hover_anim_low", true);
+			hoverExhaust.changeSprite("x8_axl_hover_anim_low", true);
 		}*/
 		hoverExhaust.changePos(exhaustPos());
 		hoverExhaust.xDir = axl.xDir;
@@ -90,14 +90,14 @@ public class AxlEHover : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		
-		axl = character as EarlyAxl ?? throw new NullReferenceException();
+		axl = character as AxlX8 ?? throw new NullReferenceException();
 		character.vel = new Point();
 		hoverExhaust = new Anim(
-			exhaustPos(), "early_axl_hover_anim", axl.xDir, player.getNextActorNetId(), false, sendRpc: true
+			exhaustPos(), "x8_axl_hover_anim", axl.xDir, player.getNextActorNetId(), false, sendRpc: true
 		);
 		hoverExhaust.setzIndex(ZIndex.Character + 1);
 		if (character.ownedByLocalPlayer) {
-			sound = character.playSound("earlyAxlHover", forcePlay: false, sendRpc: true);
+			sound = character.playSound("x8AxlHover", forcePlay: false, sendRpc: true);
 		}
 	}
 
@@ -107,14 +107,14 @@ public class AxlEHover : CharState {
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
-		RPC.stopSound.sendRpc("earlyAxlHover", character.netId);
+		RPC.stopSound.sendRpc("x8AxlHover", character.netId);
 	}
 }
 
 
-public class AxlEDodgeRoll : CharState {
+public class X8AxlDodgeRoll : CharState {
 	int initialDashDir;
-	public AxlEDodgeRoll() : base("roll") {
+	public X8AxlDodgeRoll() : base("roll") {
 		attackCtrl = true;
 		normalCtrl = true;
 		specialId = SpecialStateIds.AxlRoll;
@@ -132,7 +132,7 @@ public class AxlEDodgeRoll : CharState {
 		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 		new Anim(
-			character.getDashDustEffectPos(initialDashDir),"early_axl_roll_dust", initialDashDir, 
+			character.getDashDustEffectPos(initialDashDir),"x8_axl_roll_dust", initialDashDir, 
 			player.getNextActorNetId(), true, true);
 	}
 

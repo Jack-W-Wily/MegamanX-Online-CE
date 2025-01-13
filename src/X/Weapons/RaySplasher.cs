@@ -41,7 +41,7 @@ public class RaySplasher : Weapon {
 	public void burstLogic(MegamanX mmx) {
 	}
 
-	public void burstLogic2(XMID mmx2) {
+	public void burstLogic2(XAnother mmx2) {
 	}
 }
 
@@ -338,7 +338,7 @@ public class RaySplasherTurretProj : Projectile {
 public class RaySplasherChargedState : CharState {
 	MegamanX mmx;
 
-	XMID mmx2;
+	XAnother mmx2;
 	bool fired = false;
 	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;

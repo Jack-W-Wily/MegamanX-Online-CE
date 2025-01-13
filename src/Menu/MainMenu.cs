@@ -72,7 +72,7 @@ public class MainMenu : IMainMenu {
 			return;
 		}
 		
-		if (Time == 0) Helpers.menuUpDown(ref selectY, 0, 5);
+		if (Time == 0) Helpers.menuUpDown(ref selectY, 0, 4);
 		TimeUpdate();
 		if (Time >= 1) {
 			Time = 0;
@@ -82,16 +82,23 @@ public class MainMenu : IMainMenu {
 				Menu.change(new PreJoinOrHostMenu(this, selectY == 0));
 			} else if (selectY == 2) {
 				Menu.change(new HostMenu(this, null, true, true));
-			} else if (selectY == 3) {
+			} 
+			else if (selectY == 3) {
+				Menu.change(new PreOptionsMenu(this, false));
+			}
+			else if (selectY == 4) {
+				System.Environment.Exit(1);
+			}
+			/*else if (selectY == 3) {
 				selectY = 4;
-			//	Menu.change(new PreLoadoutMenu(this));
+				//Menu.change(new PreLoadoutMenu(this));
 			//} else if (selectY == 4) {
 			//	Menu.change(new PreControlMenu(this, false));
 			} else if (selectY == 4) {
 				Menu.change(new PreOptionsMenu(this, false));
 			} else if (selectY == 5) {
 				System.Environment.Exit(1);
-			}
+			}*/
 		}
 		MenuConfirmSound();
 		DebugVoid();
@@ -120,10 +127,10 @@ public class MainMenu : IMainMenu {
 		Fonts.drawText(FontType.BlueMenu, "JOIN MATCH", WD, optionPos[0].y, Alignment.Center, selected: selectY == 0);
 		Fonts.drawText(FontType.BlueMenu, "CREATE MATCH", WD, optionPos[1].y,  Alignment.Center, selected: selectY == 1);
 		Fonts.drawText(FontType.BlueMenu, "VS. CPU", WD, optionPos[2].y,  Alignment.Center, selected: selectY == 2);
-		Fonts.drawText(FontType.BlueMenu, "LOADOUT", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
+	//	Fonts.drawText(FontType.BlueMenu, "LOADOUT", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
 	//	Fonts.drawText(FontType.BlueMenu, "Controls", WD, optionPos[4].y, selected: selectY == 4);
-		Fonts.drawText(FontType.BlueMenu, "OPTION MODE", WD, optionPos[4].y, Alignment.Center, selected: selectY == 4);
-		Fonts.drawText(FontType.BlueMenu, "QUIT", WD, optionPos[5].y, Alignment.Center, selected: selectY == 5);
+		Fonts.drawText(FontType.BlueMenu, "OPTION MODE", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
+		Fonts.drawText(FontType.BlueMenu, "QUIT", WD, optionPos[4].y, Alignment.Center, selected: selectY == 4);
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Change selection, [OK]: Choose",
@@ -202,18 +209,34 @@ public class MainMenu : IMainMenu {
 				Global.sprites["menu_megaman"].drawToHUD(0,WD - 42, startPos - 3 + (selectY * yDistance));
 				break;
 			case 1:
-				Global.sprites["menu_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				Global.sprites["menu_megaman"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
 			case 2:
-				Global.sprites["menu_vile"].drawToHUD(0,WD - 42,  selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				Global.sprites["menu_x1_zero"].drawToHUD(0,WD - 42,  selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
 			case 3:
+				Global.sprites["menu_x2_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;
+		/*	case 4:
+				Global.sprites["menu_x6_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;*/
+			case 5:
+				Global.sprites["menu_vile"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;
+			case 6:
 				Global.sprites["menu_axl"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 4:
+			case 7:
+				Global.sprites["menu_x8_axl"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;
+			case 8:
 				switch (Options.main.sigmaLoadout.sigmaForm) {
 					case 0:
 						Global.sprites["menu_sigma"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 16 + (selectY * yDistance) 
@@ -228,6 +251,22 @@ public class MainMenu : IMainMenu {
 						: startPos + (selectY * yDistance));
 						break;
 				}
+				break;
+			case 9:
+				Global.sprites["menu_zain"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;
+			case 10:
+				Global.sprites["menu_gbd"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;
+			case 11:
+				Global.sprites["menu_dynamo"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
+				break;
+			case 12:
+				Global.sprites["menu_higmax"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+				: startPos + (selectY * yDistance));
 				break;
 			default:
 				Global.sprites["menu_megaman"].drawToHUD(0,WD - 42, startPos - 2 + (selectY * yDistance));
@@ -250,7 +289,20 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 1: //Z
+				case 1: //XA
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3", false);
+							break;
+						case 1:
+							Global.playSound("buster2", false);
+							break;
+						case 2:
+							Global.playSound("buster4", false);
+							break;
+					}
+					break;
+				case 2: //ZX1
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -263,7 +315,33 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 2: //V
+				case 3: //ZX2
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3X3", false);
+							break;
+						case 1:
+							Global.playSound("zerosaberx3", false);
+							break;
+						case 2:
+							Global.playSound("raijingeki", false);
+							break;
+					}
+					break;
+				case 4: //ZX6
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3X3", false);
+							break;
+						case 1:
+							Global.playSound("zerosaberx3", false);
+							break;
+						case 2:
+							Global.playSound("raijingeki", false);
+							break;
+					}
+					break;
+				case 5: //V
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("frontrunner", false);
@@ -276,7 +354,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 3: //Axl
+				case 6: //AxlWC
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("assassinate", false);
@@ -289,7 +367,20 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 4:
+				case 7: //AxlX8
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("assassinate", false);
+							break;
+						case 1:
+							Global.playSound("axlBulletCharged", false);
+							break;
+						case 2:
+							Global.playSound("rocketShoot", false);
+							break;
+					}
+					break;
+				case 8:
 					switch (Options.main.sigmaLoadout.sigmaForm) {
 						case 0: //Commander
 							switch (Helpers.randomRange(0,3)) {
@@ -330,6 +421,58 @@ public class MainMenu : IMainMenu {
 									break;
 							}
 						break;
+					}
+					break;
+				case 9: //Zain2
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3X3", false);
+							break;
+						case 1:
+							Global.playSound("zerosaberx3", false);
+							break;
+						case 2:
+							Global.playSound("raijingeki", false);
+							break;
+					}
+					break;
+				case 10: //GBD
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3X3", false);
+							break;
+						case 1:
+							Global.playSound("zerosaberx3", false);
+							break;
+						case 2:
+							Global.playSound("raijingeki", false);
+							break;
+					}
+					break;
+				case 11: //D
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3X3", false);
+							break;
+						case 1:
+							Global.playSound("zerosaberx3", false);
+							break;
+						case 2:
+							Global.playSound("raijingeki", false);
+							break;
+					}
+					break;
+				case 12: //H
+					switch (Helpers.randomRange(0,2)) {
+						case 0:
+							Global.playSound("buster3X3", false);
+							break;
+						case 1:
+							Global.playSound("zerosaberx3", false);
+							break;
+						case 2:
+							Global.playSound("raijingeki", false);
+							break;
 					}
 					break;
 				default:

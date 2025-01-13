@@ -74,7 +74,7 @@ public class GlobalParryState : CharState {
 
 		public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (player.isX || player.isRageX) {
+		if (player.isX || player.isXAnother) {
 		character.changeSpriteFromName("unpo_parry_start", true);
 		}
 		//if (player.isVile){

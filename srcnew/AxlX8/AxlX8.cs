@@ -1,18 +1,18 @@
 namespace MMXOnline;
 
-public class EarlyAxl : Character {
+public class AxlX8 : Character {
 	public Anim flashAnim;
 	public float magnumCooldown;
 	public float hoverTime;
 	float shootTime;
-	public EarlyAxl(
+	public AxlX8(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		charId = CharIds.EAxl;
+		charId = CharIds.AxlX8;
 	}
 
 	public override void update() {
@@ -37,7 +37,7 @@ public class EarlyAxl : Character {
 			shoot();
 		}
 		if(magnumCooldown == 0 && canShoot() && player.input.isPressed(Control.Special1, player)){
-			magnumCooldown = 12;
+			magnumCooldown = 60;
 			changeState(new SpiralMagnumShoot());
 		}
 		return base.attackCtrl();
@@ -47,7 +47,7 @@ public class EarlyAxl : Character {
 			canJump() && !grounded && flag == null
 		) {
 			if(hoverTime <= 1){
-			changeState(new AxlEHover(), true);}
+			changeState(new X8AxlHover(), true);}
 			return true;
 		}
 
@@ -60,11 +60,11 @@ public class EarlyAxl : Character {
 
 		if (player.canControl && grounded) {
 			if(charState is Dash && player.input.isPressed(Control.Down, player) ) {
-				changeState(new AxlEDodgeRoll(), true);
+				changeState(new X8AxlDodgeRoll(), true);
 				return true;
 			}
 			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
-				changeState(new AxlEDodgeRoll(), true);
+				changeState(new X8AxlDodgeRoll(), true);
 				return true;
 			}
 		}
@@ -87,15 +87,15 @@ public class EarlyAxl : Character {
 		playSound("buster", sendRpc: true);
 		flashAnim = new FlashAnim(shootPos, 0, player.getNextActorNetId(), true);
 		flashAnim.xDir = xDir;
-		new EarlyAxlProj(
+		new X8AxlProj(
 			shootPos, xDir, player, player.getNextActorNetId(), rpc: true
 		);}
 	}
 	public void setShootAnim() {
 		string shootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
-			if (grounded) { shootSprite = "early_axl_shoot"; }
-			else { shootSprite = "early_axl_fall_shoot"; }
+			if (grounded) { shootSprite = "x8_axl_shoot"; }
+			else { shootSprite = "x8_axl_fall_shoot"; }
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
@@ -113,7 +113,7 @@ public class EarlyAxl : Character {
 		shootAnimTime = DefaultShootAnimTime;
 	}
 	public override void render(float x, float y) {
-		if (charState is AxlEDodgeRoll) {
+		if (charState is X8AxlDodgeRoll) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
@@ -132,6 +132,6 @@ public class EarlyAxl : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "early_axl_" + spriteName;
+		return "x8_axl_" + spriteName;
 	}
 }

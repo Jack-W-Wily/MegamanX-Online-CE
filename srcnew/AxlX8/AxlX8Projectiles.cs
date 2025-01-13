@@ -3,15 +3,15 @@ using System.Linq;
 
 namespace MMXOnline;
 
-public class EarlyAxlProj : Projectile {
-	public EarlyAxlProj(
+public class X8AxlProj : Projectile {
+	public X8AxlProj(
 		Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 1, player, "early_axl_bullet_proj",
+		ZeroBuster.netWeapon, pos, xDir, 350, 1, player, "x8_axl_bullet_proj",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 	//	fadeOnAutoDestroy = true;
-		fadeSprite = "early_axl_bullet_fade";
+		fadeSprite = "x8_axl_bullet_fade";
 		reflectable = true;
 		projId = (int)ProjIds.ZBuster3;
 		if (rpc) {
@@ -19,22 +19,22 @@ public class EarlyAxlProj : Projectile {
 		}
 	}
 }
-public class ESpiralMagnumProj : Projectile {
+public class X8AxlSpiralMagnumProj : Projectile {
 	
 	public Anim exhaust;
-	public ESpiralMagnumProj(
+	public X8AxlSpiralMagnumProj(
 		Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		ZeroBuster.netWeapon, pos, xDir, 350, 2, player, "early_axl_magnum_proj",
+		ZeroBuster.netWeapon, pos, xDir, 350, 2, player, "x8_axl_magnum_proj",
 		Global.defFlinch, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
 		destroyOnHit = false;
 		maxTime = 0.2f;
 	//	fadeOnAutoDestroy = true;
-		//fadeSprite = "early_axl_bullet_fade";
+		//fadeSprite = "x8_axl_bullet_fade";
 		reflectable = true;
 		projId = (int)ProjIds.ZBuster3;
-		exhaust = new Anim(pos, "early_axl_magnum_spiral", xDir, null, true);
+		exhaust = new Anim(pos, "x8_axl_magnum_spiral", xDir, null, true);
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -54,11 +54,11 @@ public class ESpiralMagnumProj : Projectile {
 public class FlashAnim : Anim {
 	//int type;
 	public FlashAnim(Point pos, int type, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
-		base(pos, "early_axl_bullet_flash", 1, netId, false, sendRpc, ownedByLocalPlayer) {
+		base(pos, "x8_axl_bullet_flash", 1, netId, false, sendRpc, ownedByLocalPlayer) {
 		if(type == 1){
-			changeSprite("early_axl_bullet_flash2", true);
+			changeSprite("x8_axl_bullet_flash2", true);
 		}if(type == 2){
-			changeSprite("early_axl_bullet_flash3", true);
+			changeSprite("x8_axl_bullet_flash3", true);
 		}
 	}
 
@@ -69,14 +69,14 @@ public class FlashAnim : Anim {
 		}
 	}}
 	
-public class EarlyAxlSpiralMagnumShell : Anim {
+public class X8AxlSpiralMagnumShell : Anim {
 	public int bounces;
 	float angularVel = 0;
 	bool stopped;
 	float bounceCooldown;
 	float timeNoYVel;
-	public EarlyAxlSpiralMagnumShell(Point pos, int xDir, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
-		base(pos, "early_axl_magnum_shell", 1, netId, false, sendRpc, ownedByLocalPlayer) {
+	public X8AxlSpiralMagnumShell(Point pos, int xDir, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
+		base(pos, "x8_axl_magnum_shell", 1, netId, false, sendRpc, ownedByLocalPlayer) {
 		vel = new Point(xDir * 75, -150);
 		collider.wallOnly = true;
 		useGravity = true;

@@ -40,7 +40,7 @@ public class AxlWC : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		charId = CharIds.Axl;
+		charId = CharIds.AxlWC;
 		spriteFrameToSounds["axl_run/4"] = "run";
 		spriteFrameToSounds["axl_run/8"] = "run";
 		configureWeapons();

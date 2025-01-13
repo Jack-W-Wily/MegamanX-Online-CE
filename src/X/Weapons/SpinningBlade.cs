@@ -50,7 +50,7 @@ public class SpinningBlade : Weapon {
 				mmx.chargedSpinningBlade = csb;
 			}
 			}
-		 if (character is XMID mmx2) {
+		 if (character is XAnother mmx2) {
 			var csb = new SpinningBladeProjCharged(this, pos, xDir, player, player.getNextActorNetId(), true);
 			if (mmx2.ownedByLocalPlayer) {
 				mmx2.chargedSpinningBlade = csb;

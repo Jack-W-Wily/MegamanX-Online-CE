@@ -369,8 +369,8 @@ public class BeeCursorAnim : Anim {
 		if (player.isX){
 		this.character = character as MegamanX;
 		}
-		if (player.isX){
-		this.character = character as XMID;
+		if (player.isXAnother){
+		this.character = character as XAnother;
 		}
 	}
 

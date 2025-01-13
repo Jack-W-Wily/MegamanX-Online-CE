@@ -388,7 +388,7 @@ public class OptionsMenu : IMainMenu {
 				new MenuOption(
 					30, startY,
 					() => {
-						Helpers.menuLeftRightInc(ref Options.main.preferredCharacter, 0, 4);
+						Helpers.menuLeftRightInc(ref Options.main.preferredCharacter, 0, 12);
 					},
 					(Point pos, int index) => {
 						string preferredChar = Character.charDisplayNames[Options.main.preferredCharacter];

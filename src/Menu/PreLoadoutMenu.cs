@@ -38,22 +38,22 @@ public class PreLoadoutMenu : IMainMenu {
 		Helpers.menuUpDown(ref selectY, 0, 5);
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-			if (selectY == 0) {
+			if (selectY == (int)CharIds.X) {
 				Menu.change(new SelectWeaponMenu(this, false));
 			}
-			if (selectY == 1) {
+			if (selectY == (int)CharIds.ZeroX2) {
 				Menu.change(new SelectZeroWeaponMenu(this, false));
 			}
-			if (selectY == 2) {
+			if (selectY == (int)CharIds.Vile) {
 				Menu.change(new SelectVileWeaponMenu(this, false));
 			}
-			if (selectY == 3) {
+			if (selectY == (int)CharIds.AxlWC) {
 				Menu.change(new SelectAxlWeaponMenu(this, false));
 			}
-			if (selectY == 4) {
+			if (selectY == (int)CharIds.Sigma) {
 				Menu.change(new SelectSigmaWeaponMenu(this, false));
 			}
-			if (selectY == (int)CharIds.PunchyZero) {
+			if (selectY == (int)CharIds.ZeroX1) {
 				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
 			}
 		} 

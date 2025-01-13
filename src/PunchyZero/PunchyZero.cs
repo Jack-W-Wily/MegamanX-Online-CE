@@ -63,7 +63,7 @@ public class PunchyZero : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		charId = CharIds.PunchyZero;
+		charId = CharIds.ZeroX1;
 		// Loadout stuff.
 		PZeroLoadout pzeroLoadout = player.loadout.pzeroLoadout;
 
