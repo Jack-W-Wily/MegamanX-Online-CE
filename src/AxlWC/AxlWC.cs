@@ -60,6 +60,15 @@ public class AxlWC : Character {
 		foreach (AxlWeaponWC weapon in axlWeapons) {
 			weapon.preAxlUpdate(this, weapon == axlWeapon);
 		}
+		// Lock dir logic.
+		if (lockDir && (
+				turnCooldown <= 0 || !player.input.isHeld(Control.Shoot, player) ||
+				charState is Dash or AirDash
+			)
+		) {
+			lockDir = false;
+			turnCooldown = 0;
+		}
 	}
 
 	public override void update() {
@@ -172,7 +181,9 @@ public class AxlWC : Character {
 	}
 
 	public override bool canTurn() {
-		if (lockDir && turnCooldown > 0 && charState is not Dash and not AirDash) {
+		if (ownedByLocalPlayer && !player.isAI && Options.main.axlDirLock &&
+			lockDir && turnCooldown > 0 && charState is not Dash and not AirDash
+		) {
 			return false;
 		}
 		return base.canTurn();
@@ -239,6 +250,7 @@ public class AxlWC : Character {
 			stopCharge();
 		}
 		turnCooldown = 0;
+		lockDir = false;
 
 		// Set cooldown if leaving special weapon.
 		if (oldWeapon is not AxlWeaponWC axlWeapon) {
@@ -359,6 +371,7 @@ public class AxlWC : Character {
 		weapon.shootCooldown = weapon.getFireRate(this, 0);
 		recoilTime = weapon.getRecoil(this, 0);
 		turnCooldown = weapon.shootCooldown + 2;
+		lockDir = true;
 		weapon.addAmmo(-weapon.getAmmoUse(this, 0), player);
 		if (weapon.shootSounds[0] != "") {
 			playSound(weapon.shootSounds[0], true, true);
@@ -384,6 +397,7 @@ public class AxlWC : Character {
 		weapon.shootCooldown = weapon.getAltFireRate(this, 0);
 		recoilTime = weapon.getAltRecoil(this, 0);
 		turnCooldown = weapon.shootCooldown + 2;
+		lockDir = true;
 		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0), player);
 		if (weapon.shootSounds[1] != "") {
 			playSound(weapon.shootSounds[1], true, true);
@@ -409,6 +423,7 @@ public class AxlWC : Character {
 		axlBullet.shootCooldown = axlBullet.getAltFireRate(this, 0);
 		recoilTime = axlBullet.getAltRecoil(this, 0);
 		turnCooldown = axlBullet.shootCooldown + 2;
+		lockDir = true;
 		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;

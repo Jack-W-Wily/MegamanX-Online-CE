@@ -945,7 +945,7 @@ public class OptionsMenu : IMainMenu {
 					"If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot."
 				),
 			};
-		} else if (charNum == 3) {
+		} else if (charNum == 3000) {
 			menuOptions = new List<MenuOption>() {
 				// Axl Use Mouse Aim
 				new MenuOption(
@@ -1153,6 +1153,32 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If enabled, shows a cooldown circle above Axl's head\n" +
 					"indicating Dodge Roll cooldown."
+				),
+			};
+		} else if (charNum == 3) {
+			menuOptions = new List<MenuOption>() {
+				// Axl Use Mouse Aim
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.axlDirLock = false;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.axlDirLock = true;
+						}
+					},
+					(Point pos, int index) => {
+						//ToDo: Add an actual option for the sound.
+						Fonts.drawText(
+							optionFontText, "Aim lock:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.axlDirLock),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Lock Axl direction when shooting."
 				),
 			};
 		} else if (charNum == 4) {

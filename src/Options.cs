@@ -81,6 +81,7 @@ public class Options {
 
 	// Axl
 	public int gridModeAxl;
+	public bool axlDirLock;
 	public bool aimAnalog = false;
 	public float aimSensitivity = 0.5f;
 	public int axlAimMode = 0;
