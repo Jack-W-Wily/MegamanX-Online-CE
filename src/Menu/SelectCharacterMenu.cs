@@ -36,6 +36,7 @@ public enum CharIds {
 	GBD  = 9,
 	Dynamo  = 11,
 	Dragoon = 12,
+	EAxl = 13,
 	// Non-standard chars start here.
 	WolfSigma = 100,
 	ViralSigma,
@@ -71,6 +72,7 @@ public class CharSelection {
 		//	offset = new Point(2, 45)
 		//},
 		new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
+		new CharSelection("Axl (Early)", 13, 1, 0, "early_axl_idle", 0),
 		new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
 		new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
 		new CharSelection("Dynamo", 11, 1, 0, "smenu_dynamo", 0),

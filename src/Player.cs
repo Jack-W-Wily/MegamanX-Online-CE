@@ -223,6 +223,7 @@ public partial class Player {
 		{ (int)CharIds.Zero, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
 		{ (int)CharIds.Axl, new List<SubTank>() },
+		{ (int)CharIds.EAxl, new List<SubTank>() },
 		{ (int)CharIds.Sigma, new List<SubTank>() },
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
@@ -240,6 +241,7 @@ public partial class Player {
 		{ (int)CharIds.Zero, new() },
 		{ (int)CharIds.Vile, new() },
 		{ (int)CharIds.Axl, new() },
+		{ (int)CharIds.EAxl, new () },
 		{ (int)CharIds.Sigma, new() },
 		{ (int)CharIds.PunchyZero, new() },
 		{ (int)CharIds.BusterZero, new() },
@@ -1228,6 +1230,12 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
+		else if (charNum == (int)CharIds.EAxl) {
+			character = new EarlyAxl(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
 		else if (charNum == (int)CharIds.GBD) {
 			character = new GBD(
 				this, pos.x, pos.y, xDir,
@@ -1495,6 +1503,12 @@ public partial class Player {
 		
 		else if (data.charNum == (int)CharIds.GBD) {
 			retChar = new GBD(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}
+		else if (data.charNum == (int)CharIds.EAxl) {
+			retChar = new EarlyAxl(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
