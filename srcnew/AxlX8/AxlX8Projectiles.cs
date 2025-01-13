@@ -13,6 +13,7 @@ public class X8AxlProj : Projectile {
 	//	fadeOnAutoDestroy = true;
 		fadeSprite = "x8_axl_bullet_fade";
 		reflectable = true;
+			maxTime = 0.5f;
 		projId = (int)ProjIds.ZBuster3;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);

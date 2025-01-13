@@ -944,7 +944,7 @@ public class Vile : Character {
 
 		if (sprite.name.Contains("air_bomb_attack")) {
 			proj = new GenericMeleeProj( new MechFrogStompWeapon(player), 
-			centerPoint, ProjIds.MechFrogStompShockwave, player, 0, 0, 0);
+			centerPoint, ProjIds.MechFrogStompShockwave, player, 0, 30, 0);
 		}
 		if (sprite.name.Contains("violentcrusher_grab")) {
 			proj = new GenericMeleeProj( new MechFrogStompWeapon(player), 
@@ -965,10 +965,10 @@ public class Vile : Character {
 
 		if (sprite.name.Contains("slashrun")) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.ZSaber1, player,
+				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
 				2f, 25,  15f, isDeflectShield: true, ShouldClang : true,
 				isPushProjectile : true,
-				 isZSaberEffect : true
+				 isZSaberEffect2 : true
 			);
 		}
 

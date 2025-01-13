@@ -68,9 +68,9 @@ public class CharSelection {
 		new CharSelection("Zero (X1 - MHX)", 2, 1, 0, "smenu_zero", 0),
 		new CharSelection("Zero (X2 - X5)", 3, 1, 0, "smenu_zero_2", 0),
 		//new CharSelection("Zero (X6 - X8)", 4, 1, 0, "menu_bzero", 0),
-		new CharSelection("Vile", 5, 1, 0, "smenu_vile", 0),
-		new CharSelection("Axl (WC)", 6, 1, 0, "smenu_axl", 0),
-		new CharSelection("Axl (X8 - CM)", 7, 1, 0, "smenu_axl", 0),
+		new CharSelection("VAVA", 5, 1, 0, "smenu_vile", 0),
+		new CharSelection("Axl ", 6, 1, 0, "smenu_axl", 0),
+		new CharSelection("Axl", 7, 1, 0, "smenu_axl", 0),
 		new CharSelection("Sigma", 8, 1, 0, "smenu_sigma", 0),
 		new CharSelection("Dynamo", 11, 1, 0, "smenu_dynamo", 0),
 		new CharSelection("Zain", 9, 1, 0, "smenu_zain", 0),
@@ -326,43 +326,43 @@ public class SelectCharacterMenu : IMainMenu {
 
 		string[] description = playerData.charNum switch {
 			(int)CharIds.X => new string[]{
-				"INSERT DESCRIPTION JACK"
+				"X, Standard Zoner that can use Armors and mix them"
 			},
 			(int)CharIds.XAnother => new string[]{
-				"INSERT DESCRIPTION JACK"
+				"Lacks ability to mix armors but has a bigger moveset"
 			},
 			(int)CharIds.ZeroX1 => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"High Damage Melee fighter but weak midair"
 			},
 			(int)CharIds.ZeroX2 => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Combomad Rushdown fighter with a variety of combo routes and hypermodes"
 			},
 			(int)CharIds.ZeroX6 => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"NOT CREATED YET"
 			},
 			(int)CharIds.Vile => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Multiarchetype Fighter that can adapt to any strategy but lacks HP"
 			},
 			(int)CharIds.AxlWC => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Gunslinger Rushdown Zoner hybrid with access to iframes"
 			},
 			(int)CharIds.AxlX8 => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"? ? ? ? ? ? ?"
 			},
 			(int)CharIds.Sigma => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Commander type unit that can use mavericks to assist his kit"
 			},
 			(int)CharIds.Zain => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"High Damage Fighter with Defensive skill but can't combo without resoruces"
 			},
 			(int)CharIds.GBD => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Hit and run type Trickster that can summon ride chasers"
 			},
 			(int)CharIds.Dynamo => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Multi strategy fighter with great mobility options"
 			},
 			(int)CharIds.Dragoon => new string[] {
-				"INSERT DESCRIPTION JACK"
+				"Shoto styled fighter with burning damage passive"
 			},
 			_ => new string[] { "ERROR" }
 		};
