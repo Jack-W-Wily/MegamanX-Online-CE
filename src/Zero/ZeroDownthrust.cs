@@ -224,7 +224,7 @@ public class DanchienExplosionProj : Projectile {
 		projId = (int)ProjIds.QuakeBlazer;
 		shouldShieldBlock = false;
 		if (sendRpc) {
-			rpcCreate(pos, owner, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 

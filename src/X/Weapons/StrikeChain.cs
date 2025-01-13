@@ -204,7 +204,7 @@ public class StrikeChainProj : Projectile {
 		projId = (int)ProjIds.StrikeChain;
 		destroyOnHit = false;
 		maxTime = 4;
-		ShouldClang = true;
+		shouldClang = true;
 		startDir = xDir;
 		//xScale = 1;
 

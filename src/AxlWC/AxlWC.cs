@@ -148,7 +148,7 @@ public class AxlWC : Character {
 
 	public override bool changeState(CharState newState, bool forceChange = false) {
 		if (charState is Dash or AirDash) {
-			slideVel = xDir * getDashSpeed() * 0.8f;
+			slideVel = xDir * getDashSpeed() * 0.3f;
 		}
 		return base.changeState(newState, forceChange);
 	}
@@ -171,7 +171,7 @@ public class AxlWC : Character {
 	}
 
 	public override bool canCharge() {
-		return (axlWeapon is AxlBulletWC && charState is not OcelotSpin);
+		return (axlWeapon is AxlBulletWC && charState is not OcelotSpin && charState.attackCtrl);
 	}
 
 	public void weaponSwapLogic() {
@@ -224,7 +224,8 @@ public class AxlWC : Character {
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
-		// Stop charge if leaving Axl bullets.
+		// Stop charge if leaving Axl bullets
+		bool bulletWasFullAmmo = (mainWeapon.ammo >= mainWeapon.maxAmmo);
 		if (oldWeapon == mainWeapon) {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
@@ -240,7 +241,7 @@ public class AxlWC : Character {
 			axlWeapon.ammo = 0;
 		}
 		// Throw the weapon away. Except if it's a full ammo main weapon.
-		if (oldWeapon != mainWeapon || mainWeapon.ammo < mainWeapon.maxAmmo) {
+		if (oldWeapon != mainWeapon || !bulletWasFullAmmo) {
 			// Speed * 4 with a 255 limit. For netcode.
 			int throwSpeed = 0;
 			if (vel.y < 0) {
@@ -248,6 +249,7 @@ public class AxlWC : Character {
 				if (throwSpeed > 255) { throwSpeed = 255; }
 			}
 			// Create the weapon object.
+			armAngle = 0;
 			new AxlDiscrardedWeapon(
 				oldWeapon.index - (int)WeaponIds.AxlBullet,
 				getAxlBulletPos(axlWeapon), armDir, throwSpeed,
@@ -293,7 +295,7 @@ public class AxlWC : Character {
 		}
 		// Block.
 		if (grounded && player.input.isHeld(Control.Down, player) &&
-			charState is not AxlBlock and not Dash && axlWeapon?.autoFire == false
+			charState is not AxlBlock and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
 		) {
 			changeState(new AxlBlock(), true);
 			return true;
@@ -633,7 +635,9 @@ public class AxlWC : Character {
 			not AxlString4 and
 			not AxlString5 and
 			not InRideChaser and
-			not LadderEnd
+			not LadderEnd and
+			not InRideChaser and
+			not AxlFlashKick
 		);
 	}
 
@@ -706,9 +710,9 @@ public class AxlWC : Character {
 	}
 }
 
-
 public class AxlDiscrardedWeapon : Actor {
 	public float time;
+	public float currentAngle;
 	public float blinkActiveTime = 6;
 	public float blinkMaxTime = 11;
 	public float blinkTime = 11;
@@ -749,10 +753,14 @@ public class AxlDiscrardedWeapon : Actor {
 		base.update();
 		if (grounded) {
 			vel.x = 0;
+			byteAngle = 0;
+		} else {
+			if (currentAngle < 12) {
+				currentAngle += 1;
+				if (currentAngle > 12) { currentAngle = 12; }
+			}
+			byteAngle = -currentAngle * xDir;
 		}
-
-
-
 		if (blinkTime == 0) {
 			if (blinkMaxTime > 3) {
 				blinkActiveTime--;

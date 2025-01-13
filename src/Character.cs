@@ -1589,7 +1589,7 @@ public partial class Character : Actor, IDamagable {
 		if (!wallKickMove && xDpadDir != 0) {
 			Point moveSpeed = new Point();
 			if (canMove()) { moveSpeed.x = getDashOrRunSpeed() * xDpadDir; }
-			if (canTurn()) { xDir = xDpadDir; }
+			if (canTurn() && charState.airMoveTurn) { xDir = xDpadDir; }
 			if (moveSpeed.magnitude > 0) { move(moveSpeed); }
 		}
 	}

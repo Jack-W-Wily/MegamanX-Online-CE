@@ -70,6 +70,7 @@ public class CharState {
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
+	public bool airMoveTurn = true;
 	public bool canJump;
 	public bool canStopJump;
 	public bool exitOnLanding;

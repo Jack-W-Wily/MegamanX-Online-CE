@@ -46,7 +46,7 @@ public class GenericMeleeProj : Projectile {
 		this.isZSaberClang = isZSaberClang;
 		this.isJuggleProjectile = isJuggleProjectile;
 		this.isPushProjectile = isPushProjectile;
-		this.ShouldClang = ShouldClang;
+		this.shouldClang = ShouldClang;
 		isMelee = true;
 	}
 

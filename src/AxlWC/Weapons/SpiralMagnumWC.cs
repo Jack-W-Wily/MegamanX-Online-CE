@@ -117,9 +117,8 @@ public class SpiralMagnumWCProj : Projectile {
 	}
 	
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new SpiralMagnumWCProj(
+		return new SpiralMagnumWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }

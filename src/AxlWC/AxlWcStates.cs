@@ -146,15 +146,11 @@ public class OcelotSpin : CharState {
 	private AxlWC axl = null!;
 
 	public OcelotSpin() : base("ocelotspin") {
-		airMove = true;
-		canStopJump = true;
+		exitOnAirborne = true;
 		normalCtrl = true;
-		attackCtrl = true;
 	}
 
 	public override void update() {
-
-		
 		if (character.frameIndex >= 1 && character.frameIndex <= 10 && soundTimer <= 0) {
 			character.playSound("cutter");
 			soundTimer = 20;
@@ -182,52 +178,39 @@ public class OcelotSpin : CharState {
 	}
 }
 
-
-
-
 public class AxlFlashKick : CharState {
 	public AxlWC axl = null!;
 	private bool shot;
 
-	public AxlFlashKick() : base("flashkick") {
-		useGravity = true;
-		//attackCtrl = true;
-	}
+	public AxlFlashKick() : base("flashkick") {}
 
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 3) {
-		
 			character.move(new Point(-80 * character.xDir, 0));
 		}
 		if (character.frameIndex >= 4 && !shot) {
 			shot = true;
 			character.vel.y = -character.getJumpPower();
-				new AxlFlashKickProj(
-				new StormTornado(), character.pos.addxy(15 * character.xDir,-26),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new AxlFlashKickProj(
+			new StormTornado(), character.pos.addxy(15 * character.xDir, -26),
+			character.xDir, player, player.getNextActorNetId(), rpc: true);
 
 			character.playSound("genocideCutter2", sendRpc: true);
 		}
 
-
-
 		if (character.isAnimOver()) {
-			axl.armAngle = 32;
+			axl.armAngle = 0;
 			character.changeToIdleOrFall();
 		}
 	}
 
-
-		public override void onEnter(CharState oldState) {
+	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.invulnTime = 0.2f;
-		
+		character.iframesTime = 6;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
-
-
 
 public class AxlFlashKickProj : Projectile {
 	public AxlFlashKickProj(
@@ -239,7 +222,7 @@ public class AxlFlashKickProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
-		ShouldClang = true;
+		shouldClang = true;
 		isJuggleProjectile = true;
 		isDeflectShield = true;
 		maxTime = 0.1f;
@@ -260,11 +243,7 @@ public class AxlFlashKickProj : Projectile {
 			incPos(owner.character.deltaPos);
 		}
 	}
-
-	
 }
-
-
 
 public class TailShot : CharState {
 	public AxlWC axl = null!;
@@ -279,18 +258,13 @@ public class TailShot : CharState {
 		base.update();
 		if (character.frameIndex <= 3) {
 			character.move(new Point(-80 * character.xDir, 0));
+			axl.iframesTime = 2;
 		}
 		if (character.frameIndex >= 3 && !shot) {
 			shot = true;
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
-
 		}
-
-		if (character.frameIndex > 3 && player.input.isPressed(Control.Shoot,player)){
-			character.changeState(new AxlString1(), true);
-			}
-
 
 		if (character.isAnimOver()) {
 			axl.armAngle = 32;
@@ -300,95 +274,50 @@ public class TailShot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.invulnTime = 0.1f;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
-
-
-
-
-
-public class AxlMeleeBullet : Projectile {
-	public AxlMeleeBullet(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
-	) : base(
-		weapon, pos, xDir, 0, 1, player, "axl_meleeshot_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer
-	) {
-		reflectable = false;
-		destroyOnHit = false;
-		shouldShieldBlock = false;
-		setIndestructableProperties();
-		ShouldClang = true;
-		maxTime = 0.1f;
-		projId = (int)ProjIds.AxlMeleeBullet;
-		isMelee = true;
-		if (player.character != null) {
-			owningActor = player.character;
-		}
-
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
-	}
-
-	public override void postUpdate() {
-		base.postUpdate();
-		if (owner?.character != null) {
-			incPos(owner.character.deltaPos);
-		}
-	}
-
-	
-}
-
-
-
 
 public class AxlString1 : CharState {
 	public AxlWC axl = null!;
 	private bool shot;
 
 	public AxlString1() : base("string_1") {
-		useGravity = false;
-	//	attackCtrl = true;
+		canJump = true;
+		canStopJump = true;
+		airMove = true;
+		airMoveTurn = false;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 3) {
-		//	character.move(new Point(-80 * character.xDir, 0));
-		
-		}
 		if (character.frameIndex >= 3 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
-				new AxlMeleeBullet(
-				new FireWave(), character.pos.addxy(25 * character.xDir,-26),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
-
+			new AxlMeleeBullet(
+				axl, gunpos, character.xDir,
+				player.getNextActorNetId(), sendRpc: true
+			);
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
-
-		
 		}
 
-		if (character.frameIndex > 3 && player.input.isPressed(Control.Shoot,player)){
+		if (character.frameIndex >= 4 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString2(), true);
 		}
 		if (character.isAnimOver()) {
-			axl.armAngle = 32;
+			axl.armAngle = 16;
 			character.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.invulnTime = 0.1f;
+		canStopJump = true;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
-
-
 
 
 public class AxlString2 : CharState {
@@ -396,199 +325,203 @@ public class AxlString2 : CharState {
 	private bool shot;
 
 	public AxlString2() : base("string_2") {
-		useGravity = false;
-	//	attackCtrl = true;
+		canJump = true;
+		canStopJump = true;
+		airMove = true;
+		airMoveTurn = false;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 3) {
-
-			if (player.input.isHeld(Control.Right,player)){
-			character.move(new Point(80, 0));
-			} else if (player.input.isHeld(Control.Left,player)){
-			character.move(new Point(-80, 0));
-			} else {
-				character.move(new Point(-80 * character.xDir, 0));		
+		if (character.frameIndex <= 0) {
+			character.iframesTime = 2;
+		}
+		if (character.frameIndex < 3 && axl.grounded) {
+			float xInput = player.input.getXDir(player);
+			float moveSpeed = 80 * axl.getRunDebuffs();
+			if (xInput == 0) {
+				xInput = -axl.xDir * 0.5f;
 			}
-	
-		
+			character.move(new Point(moveSpeed * xInput, 0));
 		}
 		if (character.frameIndex >= 3 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
-				new AxlMeleeBullet(
-				new FireWave(), character.pos.addxy(30 * character.xDir,-26),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
-
+			new AxlMeleeBullet(
+				axl, character.pos.addxy(30 * character.xDir, -26),
+				character.xDir, player.getNextActorNetId(), sendRpc: true
+			);
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
-
-	
 		}
 
-		if (character.frameIndex > 3 && player.input.isPressed(Control.Shoot,player)){
+		if (character.frameIndex >= 4 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString3(), true);
 		}
 		if (character.isAnimOver()) {
-			axl.armAngle = 32;
+			axl.armAngle = 48;
 			character.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.invulnTime = 0.1f;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
-
-
-
 
 public class AxlString3 : CharState {
 	public AxlWC axl = null!;
 	private bool shot;
 
 	public AxlString3() : base("string_3") {
-		useGravity = false;
-	//	attackCtrl = true;
+		canJump = true;
+		canStopJump = true;
+		airMove = true;
+		airMoveTurn = false;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 3) {
-			if (player.input.isHeld(Control.Right,player)){
-			character.move(new Point(80, 0));
-			} else if (player.input.isHeld(Control.Left,player)){
-			character.move(new Point(-80, 0));
-			} else {
-				character.move(new Point(80 * character.xDir, 0));		
+		if (character.frameIndex <= 0) {
+			character.iframesTime = 2;
+		}
+		if (character.frameIndex < 3 && axl.grounded) {
+			float xInput = player.input.getXDir(player);
+			float moveSpeed = 80 * axl.getRunDebuffs();
+			if (xInput == 0) {
+				xInput = -axl.xDir * 0.5f;
 			}
-	
+			character.move(new Point(moveSpeed * xInput, 0));
 		}
 		if (character.frameIndex >= 3 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
-				new AxlMeleeBullet(
-				new FireWave(), character.pos.addxy(33 * character.xDir,-21),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
-
+			new AxlMeleeBullet(
+				axl, gunpos, character.xDir,
+				player.getNextActorNetId(), sendRpc: true
+			);
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
 		}
 		if (character.isAnimOver()) {
-			axl.armAngle = 32;
+			axl.armAngle = -32;
 			character.changeToIdleOrFall();
 		}
 
-		if (character.frameIndex > 3 && player.input.isPressed(Control.Shoot,player)){
+		if (character.frameIndex >= 5 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString4(), true);
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.invulnTime = 0.1f;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
-
-
 
 public class AxlString4 : CharState {
 	public AxlWC axl = null!;
 	private bool shot;
 
 	public AxlString4() : base("string_4") {
-		useGravity = false;
-	//	attackCtrl = true;
+		canJump = true;
+		canStopJump = true;
+		airMove = true;
+		airMoveTurn = false;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 3) {
-			if (player.input.isHeld(Control.Right,player)){
-			character.move(new Point(80, 0));
-			}  if (player.input.isHeld(Control.Left,player)){
-			character.move(new Point(-80, 0));
-			} 
-			
+		if (character.frameIndex <= 0 && axl.grounded) {
+			character.iframesTime = 2;
+		}
+		if (character.frameIndex < 3) {
+			float xInput = player.input.getXDir(player);
+			float moveSpeed = 80 * axl.getRunDebuffs();
+			if (xInput == 0) {
+				xInput = -axl.xDir * 0.5f;
+			}
+			character.move(new Point(moveSpeed * xInput, 0));
 		}
 		if (character.frameIndex >= 3 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
-				new AxlMeleeBullet(
-				new FireWave(), character.pos.addxy(33 * character.xDir,-21),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
+			new AxlMeleeBullet(
+				axl, gunpos, character.xDir,
+				player.getNextActorNetId(), sendRpc: true
+			);
 
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
 		}
+
 		if (character.isAnimOver()) {
-			axl.armAngle = 32;
 			character.changeToIdleOrFall();
 		}
 
-		if (character.frameIndex > 3 && player.input.isPressed(Control.Shoot,player)){
+		if (character.frameIndex >= 4 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString5(), true);
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.invulnTime = 0.1f;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
-
-
-
 
 public class AxlString5 : CharState {
 	public AxlWC axl = null!;
 	private bool shot;
 
 	public AxlString5() : base("string_5") {
-		useGravity = false;
-	//	attackCtrl = true;
+		canJump = true;
+		canStopJump = true;
+		airMove = true;
+		airMoveTurn = false;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 3) {
-			if (player.input.isHeld(Control.Right,player)){
-			character.move(new Point(80, 0));
-			} else if (player.input.isHeld(Control.Left,player)){
-			character.move(new Point(-80, 0));
-			} else {
-				character.move(new Point(80 * character.xDir, 0));		
-			}
+		if (character.frameIndex <= 3 && axl.grounded) {
+			character.iframesTime = 2;
 		}
-		if (character.frameIndex >= 10 && !shot) {
-			shot = true;
-				new AxlMeleeBullet(
-				new FireWave(), character.pos.addxy(15 * character.xDir,-21),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
-				new AxlMeleeBullet(
-				new FireWave(), character.pos.addxy(12 * character.xDir,-18),
-				character.xDir, player, player.getNextActorNetId(), rpc: true);
 
+		if (character.frameIndex <= 4) {
+			float xInput = player.input.getXDir(player);
+			float moveSpeed = 80 * axl.getRunDebuffs();
+			if (xInput == 0) {
+				xInput = -axl.xDir * 0.5f;
+			}
+			character.move(new Point(moveSpeed * xInput, 0));
+		}
+
+		if (character.frameIndex >= 10 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
+			shot = true;
+			new AxlMeleeBullet(
+				axl, gunpos.addxy(1 * character.xDir, -1),
+				character.xDir, player.getNextActorNetId(), sendRpc: true
+			);
+			new AxlMeleeBullet(
+				axl, gunpos.addxy(-1 * character.xDir, 1),
+				character.xDir, player.getNextActorNetId(), sendRpc: true
+			);
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
 		}
+
 		if (character.isAnimOver()) {
-			axl.armAngle = 32;
 			character.changeToIdleOrFall();
 		}
 	}
-
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-			character.invulnTime = 0.1f;
-	
-			new AxlMeleeBullet(
-			new FireWave(), character.pos.addxy(33 * character.xDir,-21),
-			character.xDir, player, player.getNextActorNetId(), rpc: true);
-			character.playSound("axlBulletCharged", sendRpc: true);
-		
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
@@ -596,15 +529,9 @@ public class AxlString5 : CharState {
 public class EvasionBarrage : CharState {
 	public AxlWC axl = null!;
 	public float pushBackSpeed;
-	public Point shootPOI = new Point(-1, -1);
-
-	public EvasionBarrage(string transitionSprite = "")
-		: base("evasionshot", "", "", transitionSprite) {
-		airMove = true;
-		attackCtrl = true;
-	}
-
 	float projTime;
+
+	public EvasionBarrage(): base("evasionshot") { }
 
 	public override void update() {
 		base.update();
@@ -626,13 +553,12 @@ public class EvasionBarrage : CharState {
 			projTime += character.speedMul;
 			if (projTime >= 4) {
 				projTime = 0;
-
-				new AxlMeleeBullet(
-					new FireWave(), gunpos,
-					character.xDir, player, player.getNextActorNetId(), rpc: true
-				);
 				BlueBulletProj.newWithDir(
 					axl, gunpos, character.xDir,
+					player.getNextActorNetId(), sendRpc: true
+				);
+				new AxlMeleeBullet(
+					axl, gunpos.addxy(axl.xDir * -2, -4), character.xDir,
 					player.getNextActorNetId(), sendRpc: true
 				);
 				character.playSound("axlBullet", sendRpc: true);
@@ -662,27 +588,14 @@ public class EvasionBarrage : CharState {
 
 public class RisingBarrage : CharState {
 	public AxlWC axl = null!;
-	public float pushBackSpeed;
 	float projTime;
 
 	public RisingBarrage() : base("risingbarrage") {
+		exitOnAirborne = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (!character.grounded) {
-			character.useGravity = false;
-			if (pushBackSpeed > 0) {
-				character.move(new Point(-90 * character.xDir, -25));
-				pushBackSpeed = -character.speedMul;
-			}
-		} else if (pushBackSpeed > 0) {
-			character.useGravity = true;
-			if (pushBackSpeed > 0) {
-				character.move(new Point(-90 * character.xDir, 0));
-				pushBackSpeed = -character.speedMul;
-			}
-		}
 		Point? gunpos = character.getFirstPOI();
 		if (character.sprite.frameIndex >= 2 && gunpos != null) {
 			character.move(new Point(character.xDir * 150, 0));
@@ -695,8 +608,8 @@ public class RisingBarrage : CharState {
 					player.getNextActorNetId(), true, sendRpc: true
 				);
 				anim.vel = new Point(-character.xDir * 50, 25);
-				BlueBulletProj.newWithDir(
-					axl, gunpos.Value, character.xDir,
+				new BlueBulletProj(
+					axl, gunpos.Value, axl.armDir == 1 ? -32 : 160,
 					player.getNextActorNetId(), sendRpc: true
 				);
 				axl.mainWeapon.addAmmo(-0.5f, player);
@@ -710,7 +623,6 @@ public class RisingBarrage : CharState {
 	}
 
 	public override void onEnter(CharState oldState) {
-		pushBackSpeed = 12;
 		base.onEnter(oldState);
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
@@ -746,7 +658,7 @@ public class RainStorm : CharState {
 			projTime += character.speedMul;
 			if (projTime >= 4) {
 				projTime = 0;
-				new BlueBulletProj (
+				new BlueBulletProj(
 					axl, gunpos, 64,
 					player.getNextActorNetId(), sendRpc: true
 				);

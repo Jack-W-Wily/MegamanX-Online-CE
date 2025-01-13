@@ -286,7 +286,7 @@ public class CircleBlazeExplosionProj : Projectile {
 		projId = (int)ProjIds.CircleBlazeExplosion;
 		shouldShieldBlock = false;
 		if (sendRpc) {
-			rpcCreate(pos, owner, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 

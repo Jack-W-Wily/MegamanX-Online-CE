@@ -138,7 +138,8 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.SpiralMagnumWC, SpiralMagnumWCProj.rpcInvoke},
 		{ (int)ProjIds.AxlBulletWC, AxlBulletWCProj.rpcInvoke},
 		{ (int)ProjIds.CopyShotWC, CopyShotWCProj.rpcInvoke},
-		
+		{ (int)ProjIds.BlueBullet, BlueBulletProj.rpcInvoke},
+		{ (int)ProjIds.AxlMeleeBullet, AxlMeleeBullet.rpcInvoke},
 		
 		// Vile stuff.
 		{ (int)ProjIds.FrontRunner, VileCannonProj.rpcInvoke },

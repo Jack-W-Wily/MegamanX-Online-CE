@@ -37,7 +37,7 @@ public class Projectile : Actor {
 	public bool isJuggleProjectile;
 
 	public bool isPushProjectile;
-	public bool ShouldClang;
+	public bool shouldClang;
 	public bool isDeflectShield;
 	//Hit sprites effect stuff
 	public bool isZSaberEffect;
@@ -425,7 +425,7 @@ public class Projectile : Actor {
 	//	var isSaber = GenericMeleeProj.isZSaberClang(projId)  ;
 		if (otherProj is GenericMeleeProj otherGmp1 &&
 		  owner.character?.isStatusImmune() != true
-		&& ShouldClang == true) {
+		&& shouldClang == true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
 				otherProj != null && otherProj.owner.alliance != owner.alliance

@@ -107,10 +107,9 @@ public class IceGattlingWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new IceGattlingWCProj(
+		return new IceGattlingWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }
 
@@ -147,9 +146,8 @@ public class IceGattlingAltWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new IceGattlingAltWCProj(
+		return new IceGattlingAltWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }

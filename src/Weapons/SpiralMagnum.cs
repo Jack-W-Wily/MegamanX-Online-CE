@@ -554,7 +554,7 @@ public class SniperMissileExplosionProj : Projectile {
 		axl = player.character as Axl;
 
 		if (ownedByLocalPlayer) {
-			rpcCreate(pos, owner, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 

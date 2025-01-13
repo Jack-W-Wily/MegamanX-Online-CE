@@ -51,8 +51,7 @@ public class AxlBulletWC : AxlWeaponWC {
 			return true;
 		}
 		// Negative edge inputs.
-		if (axl.grounded && axl.axlWeapon.ammo > 0 &&
-			inputDir.y == 1 && (
+		if (axl.grounded && ammo > 0 && inputDir.y == 1 && (
 				axl.charState is Dash or AirDash || 
 				axl.player.input.isPressed(Control.Dash, axl.player)
 			)
@@ -64,8 +63,12 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new TailShot(), true);
 			return true;
 		}
-		if (specialPressed && (inputDir.y == 1 || ammo == 0)) {
+		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
 			axl.changeState(new OcelotSpin(), true);
+			return true;
+		}
+		if (specialPressed && inputDir.x != 0 && ammo > 0) {
+			axl.changeState(new AxlString1(), true);
 			return true;
 		}
 		if (specialPressed && ammo > 0) {
@@ -118,10 +121,9 @@ public class AxlBulletWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new AxlBulletWCProj(
+		return new AxlBulletWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }
 
@@ -133,7 +135,7 @@ public class CopyShotWCProj : Projectile {
 	) : base(
 		pos, 1, owner, "axl_bullet_charged", netProjId, player
 	) {
-		fadeSprite = "buster4_fade";
+		fadeSprite = "axl_bullet_charged_fade";
 		fadeOnAutoDestroy = true;
 		projId = (int)ProjIds.CopyShotWC;
 		weapon = AxlBulletWC.netWeapon;
@@ -165,10 +167,9 @@ public class CopyShotWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new CopyShotWCProj(
+		return new CopyShotWCProj(
 			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }
 
