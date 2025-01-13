@@ -62,7 +62,9 @@ public class BusterZero : Character {
 			}
 		}
 		// Charge and release charge logic.
+		if (!isInDamageSprite()){
 		chargeLogic(shoot);
+		}
 	}
 
 	public override void chargeGfx() {

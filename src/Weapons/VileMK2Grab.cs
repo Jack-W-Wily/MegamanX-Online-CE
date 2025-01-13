@@ -91,8 +91,12 @@ public class VileMK2GrabState : CharState {
 					}
 				}
 
-
+				if (player.input.isPressed(Control.Jump,player)){
+					character.vel.y = -character.getJumpPower();
+				}
+				
 				if (player.input.isHeld(Control.Jump, player)) {
+				
 				Point moveAmount = new Point(character.xDir * 50, -100);
 				character.move(moveAmount);
 				character.useGravity = false;
@@ -190,8 +194,16 @@ public class VileMK2GrabState : CharState {
 
 public class VileMK2Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 6;
-	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
+	public VileMK2Grabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
 	}
+
+		public override void update() {
+		base.update();
+			if (grabber.sprite.name.Contains("idle")){
+			character.changeToIdleOrFall();
+			}
+		}
+	
 }
 
 

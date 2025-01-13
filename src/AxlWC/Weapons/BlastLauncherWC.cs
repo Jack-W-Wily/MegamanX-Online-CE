@@ -22,7 +22,7 @@ public class BlastLauncherWC : AxlWeaponWC {
 
 		maxAmmo = 10;
 		ammo = maxAmmo;
-		maxSwapCooldown = 60 * 4;
+		maxSwapCooldown = 20 * 4;
 	}
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
@@ -79,10 +79,9 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new BlastLauncherWCProj(
+		return new BlastLauncherWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 
 	public override void preUpdate() {
@@ -177,10 +176,9 @@ public class GreenSpinnerWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new GreenSpinnerWCProj(
+		return new GreenSpinnerWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 
 	public override void onCollision(CollideData other) {
@@ -201,9 +199,9 @@ public class GreenSpinnerWCProj : Projectile {
 
 	public override void onDestroy() {
 		if (!ownedByLocalPlayer) return;
-		if (time >= maxTime) return;
 		var netId = owner.getNextActorNetId();
-		if (angle != null)
-		new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle.Value, null, Math.Sign(vel.x), netId);
+		if (angle != null) {
+			new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle.Value, null, Math.Sign(vel.x), netId);
+		}
 	}
 }

@@ -15,7 +15,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		shootSounds = [ "iceGattling", "gaeaShield" ];
 		isTwoHanded = true;
 		fireRate = minFireRate;
-		altFireRate = 18;
+		altFireRate = 25;
 		index = (int)WeaponIds.IceGattling;
 		weaponBarBaseIndex = 37;
 		weaponSlotIndex = 57;
@@ -27,7 +27,7 @@ public class IceGattlingWC : AxlWeaponWC {
 
 		maxAmmo = 22;
 		ammo = maxAmmo;
-		maxSwapCooldown = 60 * 5;
+		maxSwapCooldown = 20 * 5;
 	}
 
 	public override void update() {
@@ -80,7 +80,7 @@ public class IceGattlingWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return 6;
+		return 11;
 	}
 }
 
@@ -107,10 +107,9 @@ public class IceGattlingWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new IceGattlingWCProj(
+		return new IceGattlingWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }
 
@@ -147,9 +146,8 @@ public class IceGattlingAltWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new IceGattlingAltWCProj(
+		return new IceGattlingAltWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }

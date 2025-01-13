@@ -1,3 +1,5 @@
+using System;
+
 namespace MMXOnline;
 
 public class AxlBulletWC : AxlWeaponWC {
@@ -18,7 +20,7 @@ public class AxlBulletWC : AxlWeaponWC {
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireRate = 18;
 		displayName = "Axl Bullets";
-		maxAmmo = 20;
+		maxAmmo = 16;
 		ammo = maxAmmo;
 	}
 
@@ -34,10 +36,10 @@ public class AxlBulletWC : AxlWeaponWC {
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
 		return chargeLevel switch {
-			1 => 4,
-			2 => 6,
-			3 => 8,
-			_ => 8,
+			1 => 2,
+			2 => 3,
+			3 => 4,
+			_ => 4,
 		};
 	}
 	public override bool attackCtrl(AxlWC axl) {
@@ -49,8 +51,7 @@ public class AxlBulletWC : AxlWeaponWC {
 			return true;
 		}
 		// Negative edge inputs.
-		if (axl.grounded && axl.axlWeapon.ammo > 0 &&
-			inputDir.y == 1 && (
+		if (axl.grounded && ammo > 0 && inputDir.y == 1 && (
 				axl.charState is Dash or AirDash || 
 				axl.player.input.isPressed(Control.Dash, axl.player)
 			)
@@ -62,8 +63,12 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new TailShot(), true);
 			return true;
 		}
-		if (specialPressed && (inputDir.y == 1 || ammo == 0)) {
+		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
 			axl.changeState(new OcelotSpin(), true);
+			return true;
+		}
+		if (specialPressed && inputDir.x != 0 && ammo > 0) {
+			axl.changeState(new AxlString1(), true);
 			return true;
 		}
 		if (specialPressed && ammo > 0) {
@@ -103,12 +108,13 @@ public class AxlBulletWCProj : Projectile {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.AxlBulletWC;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 12f / 60f;
+		damager.damage = 1;
 		reflectable = true;
+		destroyOnHitWall = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;
 		this.byteAngle = byteAngle;
-		maxTime = 0.225f;
+		maxTime = 12f / 60f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
@@ -116,10 +122,9 @@ public class AxlBulletWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new AxlBulletWCProj(
+		return new AxlBulletWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }
 
@@ -131,11 +136,12 @@ public class CopyShotWCProj : Projectile {
 	) : base(
 		pos, 1, owner, "axl_bullet_charged", netProjId, player
 	) {
-		fadeSprite = "buster4_fade";
+		fadeSprite = "axl_bullet_charged_fade";
 		fadeOnAutoDestroy = true;
 		projId = (int)ProjIds.CopyShotWC;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 12f / 60f;
+		damager.damage = 2;
+		damager.flinch = Global.miniFlinch;
 		reflectable = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;
@@ -163,10 +169,9 @@ public class CopyShotWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new CopyShotWCProj(
+		return new CopyShotWCProj(
 			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 }
 

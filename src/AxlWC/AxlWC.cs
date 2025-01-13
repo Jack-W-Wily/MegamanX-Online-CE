@@ -27,11 +27,12 @@ public class AxlWC : Character {
 	public float aiAttackCooldown;
 	public float shootCooldown;
 	public float recoilTime;
+	public float turnCooldown;
+	public bool lockDir;
 	public int armDir => charState is WallSlide ? -xDir : xDir;
 	public float armAngle = 0;
 	public Anim muzzleFlash;
-
-	public int HoverTimes = 0;
+	public int hoverTimes = 0;
 
 	public AxlWC(
 		Player player, float x, float y, int xDir, bool isVisible,
@@ -45,13 +46,16 @@ public class AxlWC : Character {
 		configureWeapons();
 		muzzleFlash = new Anim(pos, "axl_pistol_flash", xDir, null, false);
 		muzzleFlash.visible = false;
-		muzzleFlash.frameIndex = muzzleFlash.sprite.totalFrameNum - 1;
-		muzzleFlash.frameTime = currentFrame.duration;
+		muzzleFlash.destroySelf();
 	}
 
 	public override void preUpdate() {
 		base.preUpdate();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		// Cooldowns.
+		Helpers.decrementFrames(ref turnCooldown);
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref recoilTime);
@@ -59,18 +63,20 @@ public class AxlWC : Character {
 		foreach (AxlWeaponWC weapon in axlWeapons) {
 			weapon.preAxlUpdate(this, weapon == axlWeapon);
 		}
+		// Lock dir logic.
+		if (lockDir && (
+				!(player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player)) ||
+				turnCooldown <= 0 || charState is Dash or AirDash
+			)
+		) {
+			lockDir = false;
+			turnCooldown = 0;
+		}
 	}
 
 	public override void update() {
+		bool wasGrounded = grounded;
 		base.update();
-		// For Hover
-		if (charState is Idle or WallSlide){HoverTimes = 0;}
-		// For Microdashes
-		if ((charState is Dash || charState is AirDash)){
-			slideVel = xDir * getDashSpeed();			
-		}
-
-
 		// Hypermode music.
 		if (isWhite) {
 			if (musicSource == null) {
@@ -83,16 +89,44 @@ public class AxlWC : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		// For Hover
+		if (grounded || charState is WallSlide) { hoverTimes = 0; }
+
+		// For String Cancels
+		if (sprite.name.Contains("string")) {
+			if (player.input.checkDoubleTap(Control.Dash) &&
+				player.input.isPressed(Control.Dash, player) && canDash() && flag == null
+			) {
+				changeState(new DodgeRollAxlWC(), true);
+			}
+			if ((wasGrounded || grounded) && player.input.isHeld(Control.Up, player) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				changeState(new AxlFlashKick(), true);
+			}
+		}
+		// For Cancels on Dodgeroll
+		if (charState is DodgeRollAxlWC) {
+			if (player.input.isHeld(Control.Up, player)
+				&& player.input.isPressed(Control.Jump, player)) {
+				changeState(new AxlFlashKick(), true);
+			}
+		}
 		// Arm angle.
 		updateArmAngle();
 		// Charge and release charge logic.
-		chargeLogic(chargeShoot);
+		if (!isInDamageSprite()) {
+			chargeLogic(chargeShoot);
+		}
 		weaponSwapLogic();
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
-		if (!muzzleFlash.isAnimOver()) {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (!muzzleFlash.destroyed) {
 			float oldByteArmAngle = armAngle;
 			if (recoilTime > 0) {
 				armAngle = MathF.Round(armAngle - recoilTime);
@@ -106,8 +140,6 @@ public class AxlWC : Character {
 				muzzleFlash.zIndex = zIndex - 100;
 			}
 			armAngle = oldByteArmAngle;
-		} else {
-			muzzleFlash.visible = false;
 		}
 		// Swap on ammo empitiying.
 		if (axlWeapon != mainWeapon &&
@@ -128,6 +160,14 @@ public class AxlWC : Character {
 		return false;
 	}
 
+
+	public override bool changeState(CharState newState, bool forceChange = false) {
+		if (charState is Dash or AirDash) {
+			slideVel = xDir * getDashSpeed() * 0.3f;
+		}
+		return base.changeState(newState, forceChange);
+	}
+
 	public void updateArmAngle() {
 		Point inputDir = new Point();
 		inputDir.y = player.input.getYDir(player);
@@ -145,8 +185,17 @@ public class AxlWC : Character {
 		}
 	}
 
+	public override bool canTurn() {
+		if (ownedByLocalPlayer && !player.isAI && Options.main.axlDirLock &&
+			lockDir && turnCooldown > 0 && charState is not Dash and not AirDash
+		) {
+			return false;
+		}
+		return base.canTurn();
+	}
+
 	public override bool canCharge() {
-		return (axlWeapon is AxlBulletWC && charState is not OcelotSpin);
+		return (axlWeapon is AxlBulletWC && charState is not OcelotSpin && charState.attackCtrl);
 	}
 
 	public void weaponSwapLogic() {
@@ -199,12 +248,15 @@ public class AxlWC : Character {
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {
-		// Stop charge if leaving Axl bullets.
+		// Stop charge if leaving Axl bullets
+		bool bulletWasFullAmmo = (mainWeapon.ammo >= mainWeapon.maxAmmo);
 		if (oldWeapon == mainWeapon) {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
 		}
-		
+		turnCooldown = 0;
+		lockDir = false;
+
 		// Set cooldown if leaving special weapon.
 		if (oldWeapon is not AxlWeaponWC axlWeapon) {
 			return;
@@ -215,7 +267,7 @@ public class AxlWC : Character {
 			axlWeapon.ammo = 0;
 		}
 		// Throw the weapon away. Except if it's a full ammo main weapon.
-		if (oldWeapon != mainWeapon || mainWeapon.ammo < mainWeapon.maxAmmo) {
+		if (oldWeapon != mainWeapon || !bulletWasFullAmmo) {
 			// Speed * 4 with a 255 limit. For netcode.
 			int throwSpeed = 0;
 			if (vel.y < 0) {
@@ -223,6 +275,7 @@ public class AxlWC : Character {
 				if (throwSpeed > 255) { throwSpeed = 255; }
 			}
 			// Create the weapon object.
+			armAngle = 0;
 			new AxlDiscrardedWeapon(
 				oldWeapon.index - (int)WeaponIds.AxlBullet,
 				getAxlBulletPos(axlWeapon), armDir, throwSpeed,
@@ -254,22 +307,21 @@ public class AxlWC : Character {
 		if (player.input.checkDoubleTap(Control.Dash) &&
 			player.input.isPressed(Control.Dash, player) && canDash() && flag == null
 		) {
-			dashedInAir++;
 			changeState(new DodgeRollAxlWC(), true);
 			return true;
 		}
 		// Hover.
-		if (!grounded && player.input.isPressed(Control.Jump, player) 
-			&& !player.input.isHeld(Control.Down, player) && HoverTimes == 0 &&
-			canJump() && !isDashing && flag == null
+		if (!grounded && player.input.isPressed(Control.Jump, player)
+			&& !player.input.isHeld(Control.Down, player) && hoverTimes == 0 &&
+			canJump() && flag == null
 		) {
-			HoverTimes++;
+			hoverTimes++;
 			changeState(new HoverAxlWC(), true);
 			return true;
 		}
 		// Block.
 		if (grounded && player.input.isHeld(Control.Down, player) &&
-			charState is not AxlBlock and not Dash && axlWeapon?.autoFire == false
+			charState is not AxlBlock and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
 		) {
 			changeState(new AxlBlock(), true);
 			return true;
@@ -319,16 +371,21 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		weapon.shootMain(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
+		Point shootPos = getAxlBulletPos(axlWeapon);
+		weapon.shootMain(this, shootPos, shootAngle, 0);
 		weapon.shootCooldown = weapon.getFireRate(this, 0);
 		recoilTime = weapon.getRecoil(this, 0);
+		turnCooldown = weapon.shootCooldown + 2;
+		lockDir = true;
 		weapon.addAmmo(-weapon.getAmmoUse(this, 0), player);
 		if (weapon.shootSounds[0] != "") {
 			playSound(weapon.shootSounds[0], true, true);
 		}
 		if (weapon.flashSprite != "") {
-			muzzleFlash.changeSprite(weapon.flashSprite, true);
-			muzzleFlash.visible = true;
+			muzzleFlash = new Anim(
+				shootPos, weapon.flashSprite, xDir,
+				player.getCharActorNetId(), true, sendRpc: true
+			);
 		}
 	}
 
@@ -340,16 +397,21 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		weapon.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
+		Point shootPos = getAxlBulletPos(axlWeapon);
+		weapon.shootAlt(this, shootPos, shootAngle, 0);
 		weapon.shootCooldown = weapon.getAltFireRate(this, 0);
 		recoilTime = weapon.getAltRecoil(this, 0);
+		turnCooldown = weapon.shootCooldown + 2;
+		lockDir = true;
 		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0), player);
 		if (weapon.shootSounds[1] != "") {
 			playSound(weapon.shootSounds[1], true, true);
 		}
 		if (weapon.chargedFlashSprite != "") {
-			muzzleFlash.changeSprite(weapon.chargedFlashSprite, true);
-			muzzleFlash.visible = true;
+			muzzleFlash = new Anim(
+				shootPos, weapon.chargedFlashSprite, xDir,
+				player.getCharActorNetId(), true, sendRpc: true
+			);
 		}
 	}
 
@@ -361,9 +423,12 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
+		Point shootPos = getAxlBulletPos(axlWeapon);
+		axlBullet.shootAlt(this, shootPos, shootAngle, chargeLevel);
 		axlBullet.shootCooldown = axlBullet.getAltFireRate(this, 0);
 		recoilTime = axlBullet.getAltRecoil(this, 0);
+		turnCooldown = axlBullet.shootCooldown + 2;
+		lockDir = true;
 		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
@@ -371,11 +436,11 @@ public class AxlWC : Character {
 		if (axlBullet.shootSounds[1] != "") {
 			playSound(axlBullet.shootSounds[3], true, true);
 		}
-		muzzleFlash.visible = true;
-		muzzleFlash.frameIndex = 0;
 		if (axlBullet.chargedFlashSprite != "") {
-			muzzleFlash.changeSprite(axlBullet.chargedFlashSprite, true);
-			muzzleFlash.visible = true;
+			muzzleFlash = new Anim(
+				shootPos, axlBullet.chargedFlashSprite, xDir,
+				player.getCharActorNetId(), true, sendRpc: true
+			);
 		}
 	}
 
@@ -444,9 +509,15 @@ public class AxlWC : Character {
 	public enum MeleeIds {
 		None = -1,
 		Block,
+		String1,
+		String2,
+		String3,
+		String4,
+		String5,
 		OcelotSpin,
 		TailShot,
 		EnemyStep,
+		RainStorm,
 		RisingBarrage
 	}
 
@@ -455,10 +526,15 @@ public class AxlWC : Character {
 		return (int)(sprite.name switch {
 			"axl_block" => MeleeIds.Block,
 			"axl_ocelotspin" => MeleeIds.OcelotSpin,
+			"axl_string_1" => MeleeIds.String1,
+			"axl_string_2" => MeleeIds.String2,
+			"axl_string_3" => MeleeIds.String3,
+			"axl_string_4" => MeleeIds.String4,
+			"axl_string_5" => MeleeIds.String5,
 			"axl_tailshot" => MeleeIds.TailShot,
-			"axl_risingbarrage" => MeleeIds.RisingBarrage,
-			"axl_fall" when player.input.isPressed(Control.Jump,player) => MeleeIds.EnemyStep,
-		
+			"axl_risingbarrage" or "axl_flashkick" => MeleeIds.RisingBarrage,
+			"axl_rainstorm" => MeleeIds.RainStorm,
+			"axl_fall_step" => MeleeIds.EnemyStep,
 			_ => MeleeIds.None
 		});
 	}
@@ -472,21 +548,50 @@ public class AxlWC : Character {
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,
-			 2, Global.halfFlinch, 15f, addToLevel: addToLevel, ShouldClang : true
+			 2, Global.halfFlinch, addToLevel: addToLevel, ShouldClang: true
+			),
+			MeleeIds.RainStorm => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.ForceGrabState, player,
+			 2, 0, addToLevel: addToLevel, ShouldClang: true
 			),
 			MeleeIds.OcelotSpin => new GenericMeleeProj(
 				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
-				1, 0, 4, ShouldClang: true, isJuggleProjectile: true,
+				1, Global.halfFlinch, 4, ShouldClang: true, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			MeleeIds.TailShot => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.FireWave, player,
-				3, Global.halfFlinch, 5, isJuggleProjectile: true,
+				3, Global.halfFlinch, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String1 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				2, Global.defFlinch,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String2 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				2, Global.defFlinch,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String3 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				2, Global.defFlinch, 5,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String4 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.Raijingeki2, player,
+				2, 0,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String5 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.HeavyPush, player,
+				2, 0,
 				addToLevel: addToLevel
 			),
 			MeleeIds.RisingBarrage => new GenericMeleeProj(
-				FireWave.netWeapon, pos, ProjIds.FireWave, player,
-				3, 0, 8, isJuggleProjectile: true,
+				FireWave.netWeapon, pos, ProjIds.BlockableLaunch, player,
+				3, 0, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -563,8 +668,15 @@ public class AxlWC : Character {
 			not RisingBarrage and
 			not OcelotSpin and
 			not TailShot and
+			not AxlString1 and
+			not AxlString2 and
+			not AxlString3 and
+			not AxlString4 and
+			not AxlString5 and
 			not InRideChaser and
-			not LadderEnd
+			not LadderEnd and
+			not InRideChaser and
+			not AxlFlashKick
 		);
 	}
 
@@ -618,6 +730,7 @@ public class AxlWC : Character {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add((byte)armAngle);
 		customData.Add((byte)weaponSlot);
+		customData.Add((byte)recoilTime);
 
 		customData.Add(Helpers.boolArrayToByte([
 			isWhite,
@@ -631,15 +744,16 @@ public class AxlWC : Character {
 		data = data[data[0]..];
 		armAngle = data[0];
 		weaponSlot = data[1];
+		recoilTime = data[2];
 
 		bool[] flags = Helpers.byteToBoolArray(data[2]);
 		isWhite = flags[0];
 	}
 }
 
-
 public class AxlDiscrardedWeapon : Actor {
 	public float time;
+	public float currentAngle;
 	public float blinkActiveTime = 6;
 	public float blinkMaxTime = 11;
 	public float blinkTime = 11;
@@ -680,10 +794,14 @@ public class AxlDiscrardedWeapon : Actor {
 		base.update();
 		if (grounded) {
 			vel.x = 0;
+			byteAngle = 0;
+		} else {
+			if (currentAngle < 12) {
+				currentAngle += 1;
+				if (currentAngle > 12) { currentAngle = 12; }
+			}
+			byteAngle = -currentAngle * xDir;
 		}
-
-		
-
 		if (blinkTime == 0) {
 			if (blinkMaxTime > 3) {
 				blinkActiveTime--;

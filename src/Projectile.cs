@@ -35,7 +35,9 @@ public class Projectile : Actor {
 	public bool isShield;
 	public bool isReflectShield;
 	public bool isJuggleProjectile;
-	public bool ShouldClang;
+
+	public bool isPushProjectile;
+	public bool shouldClang;
 	public bool isDeflectShield;
 	//Hit sprites effect stuff
 	public bool isZSaberEffect;
@@ -423,7 +425,7 @@ public class Projectile : Actor {
 	//	var isSaber = GenericMeleeProj.isZSaberClang(projId)  ;
 		if (otherProj is GenericMeleeProj otherGmp1 &&
 		  owner.character?.isStatusImmune() != true
-		&& ShouldClang == true) {
+		&& shouldClang == true) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && owner.character != null &&
 				otherProj != null && otherProj.owner.alliance != owner.alliance
@@ -709,6 +711,17 @@ public class Projectile : Actor {
 			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 0 * modifier, -300));
+		}
+
+		if (isPushProjectile){
+
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			character.pushedByTornadoInFrame = true;
+			character.move(new Point(500 * 0.9f * xDir * 1 * 0.25f, 0));
+	
+		}
+	
 		}
 	
 

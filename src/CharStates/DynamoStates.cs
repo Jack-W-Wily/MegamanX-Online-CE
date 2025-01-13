@@ -1403,14 +1403,14 @@ public class DynamoKnifeProj : Projectile {
 	) {
 		projId = (int)ProjIds.DynamoIceDagger;
 		maxTime = 0.4f;
-		ShouldClang = true;
+		shouldClang = true;
 		this.hitChar = hitChar;
 		if (type == 1) {
 			damager.damage = 3;
 			changeSprite("dynamo_dagger_proj", true);
 			damager.flinch = Global.defFlinch;
 			maxTime = 0.8f;
-			ShouldClang = false;
+			shouldClang = false;
 		}
 
 		fadeSprite = "buster1_fade";

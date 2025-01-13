@@ -75,10 +75,9 @@ public class RayGunWCProj : Projectile {
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
-		new RayGunWCProj(
+		return new RayGunWCProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
-		return null!;
 	}
 
 	public void updateAngle() {

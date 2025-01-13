@@ -100,6 +100,13 @@ public class Damager {
 			projId != (int)ProjIds.HexaInvolute &&
 			projId != (int)ProjIds.AwakenedAura
 			 )) {
+
+				if (projId != (int)ProjIds.BlockableLaunch
+				&& projId != (int)ProjIds.NormalPush
+				&& projId != (int)ProjIds.MechFrogStompShockwave
+				&& projId != (int)ProjIds.HeavyPush
+				&& projId != (int)ProjIds.VileSuperKick	
+				){
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
 				}
@@ -108,6 +115,7 @@ public class Damager {
 				}
 				else {
 					newFlinch = Global.superFlinch;
+				}
 				}
 				chr.addDamageText("COUNTER!!!", 1);	
 				chr.shakeCamera(sendRpc: true);
@@ -358,9 +366,9 @@ public class Damager {
 			}
 
 
-			if (owner.health > 0){
+			if (owner.health > 0 && projId >= 0){
 			// Combotimer
-			owner.character.ComboTimer = 0.25f;;
+			owner.character.ComboTimer += 0.25f;
 			}
 			
 
@@ -588,6 +596,12 @@ public class Damager {
 				//Freeze effects	
 				case (int)ProjIds.IceGattling:
 					character.addIgFreezeProgress(1);
+					break;
+				case (int)ProjIds.IceGattlingWC:
+					character.addIgFreezeProgress(1);
+					break;
+				case (int)ProjIds.IceGattlingAltWC:
+					character.addIgFreezeProgress(4);
 					break;
 				case (int)ProjIds.IceGattlingHeadshot:
 					character.addIgFreezeProgress(2);

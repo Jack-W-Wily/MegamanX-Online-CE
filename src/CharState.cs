@@ -70,6 +70,7 @@ public class CharState {
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;
+	public bool airMoveTurn = true;
 	public bool canJump;
 	public bool canStopJump;
 	public bool exitOnLanding;
@@ -296,12 +297,15 @@ public class CharState {
 	}
 
 	public void groundCodeWithMove() {
+		int xInput = player.input.getXDir(player);
+		if (xInput == 0) {
+			return;
+		}
 		if (player.character.canTurn()) {
-			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (player.character.canMove()) character.changeState(new Run());
-			}
+			character.xDir = xInput;
+		}
+		if (player.character.canMove()) {
+			character.changeState(new Run());
 		}
 	}
 
@@ -630,15 +634,16 @@ public class Idle : CharState {
 				if (character.wasFightingX)sprite = "idle_vsx";
 				if (character.wasFightingZeroEarly )sprite = "idle_vszero";
 				if (character.wasFightingSigma)sprite = "idle_vssigma";
-			
 			character.changeSpriteFromName(sprite, true);				
 		}
-		
-		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
-			if (!character.isSoftLocked() && character.canTurn()) {
-				if (player.input.isHeld(Control.Left, player)) character.xDir = -1;
-				if (player.input.isHeld(Control.Right, player)) character.xDir = 1;
-				if (player.character.canMove()) character.changeState(new Run());
+
+		int xInput = player.input.getXDir(player);
+		if (xInput != 0) {
+			if (player.character.canTurn()) {
+				character.xDir = xInput;
+			}
+			if (player.character.canMove()) {
+				character.changeState(new Run());
 			}
 		}
 
@@ -672,12 +677,19 @@ public class Run : CharState {
 		if (stateFrames <= 4) {
 			runSpeed = 60 * character.getRunDebuffs();
 		}
-		if (player.input.isHeld(Control.Left, player)) {
-			character.xDir = -1;
-			if (player.character.canMove()) move.x = -runSpeed;
-		} else if (player.input.isHeld(Control.Right, player)) {
-			character.xDir = 1;
-			if (player.character.canMove()) move.x = runSpeed;
+		var dpadXDir = player.input.getXDir(player);
+		if (dpadXDir != 0) {
+			if (character.sprite.frameSpeed < 0) {
+				character.sprite.frameSpeed = 1;
+			}
+			if (character.canTurn()) {
+				character.xDir = dpadXDir;
+			} else if (character.xDir != dpadXDir) {
+				character.sprite.frameSpeed = -1;
+			}
+			if (player.character.canMove()) {
+				move.x = runSpeed * dpadXDir;
+			}
 		}
 		if (move.magnitude > 0) {
 			character.move(move);
@@ -706,7 +718,7 @@ public class Crouch : CharState {
 		base.update();
 
 		var dpadXDir = player.input.getXDir(player);
-		if (dpadXDir != 0) {
+		if (dpadXDir != 0 && character.canTurn()) {
 			character.xDir = dpadXDir;
 		}
 
@@ -902,10 +914,10 @@ public class Dash : CharState {
 		base.onEnter(oldState);
 
 		initialDashDir = character.xDir;
-		//if (player.isAxl && player.axlWeapon?.isTwoHanded(false) == true) {
+		if (character is not AxlWC) {
 			if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 			else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
-		//}
+		}
 
 		character.isDashing = true;
 		character.globalCollider = character.getDashingCollider();
@@ -924,7 +936,7 @@ public class Dash : CharState {
 	}
 
 	public static void dashBackwardsCode(Character character, int initialDashDir) {
-		//if (character.player.isAxl ) {
+		if (character is not AxlWC) {
 			if (character.xDir != initialDashDir) {
 				if (!character.sprite.name.EndsWith("backwards")) {
 					character.changeSpriteFromName("dash_backwards", false);
@@ -934,7 +946,11 @@ public class Dash : CharState {
 					character.changeSpriteFromName("dash", false);
 				}
 			}
-		//}
+		} else {
+			if (character.xDir != initialDashDir) {
+				character.xDir = initialDashDir;
+			}
+		}
 	}
 
 	public override void update() {

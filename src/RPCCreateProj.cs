@@ -485,6 +485,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.DragoonSpark:
 				proj = new DragoonSpark(new FireWave(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.AxlFlashKickProj:
+				proj = new AxlFlashKickProj(new StormTornado(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.AimingLaserBlade:
 				proj = new AimingLaserBlade(new AimingLaser(), pos, xDir, player, netProjByte);
 				break;
@@ -537,13 +540,6 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.ShieldBoomerang2:
 				proj = new ShieldBoomerangProj2(new ShieldBoomerang(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.BlueBullet:
-				proj = new BlueBulletProj(
-					new DoubleBullet(),
-					pos, xDir, extraData[0] == 1, player, netProjByte
-				);
-				break;
-
 			case (int)ProjIds.SeaDragonRage:
 				proj = new FlamethrowerProj(
 					SeaDragonRage.netWeapon,

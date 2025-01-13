@@ -9,6 +9,8 @@ public class WheelGator : Maverick {
 	public WheelGatorFallWeapon GatorFallWeapon = new WheelGatorFallWeapon();
 	public WheelGatorGrabWeapon GatorGrabWeapon = new WheelGatorGrabWeapon();
 
+		public bool lastFrameWasUnderwater;
+
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.WheelGGeneric, 142); }
 	public static Weapon getUpBiteWeapon(Player player) { return new Weapon(WeaponIds.WheelGGeneric, 142, new Damager(player, 4, Global.defFlinch, 0.25f)); }
 	public Weapon upBiteWeapon;
@@ -21,8 +23,8 @@ public class WheelGator : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 1.25f));
-		stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 2f));
+		stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 0.25f));
+		stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 0f));
 
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
@@ -47,12 +49,16 @@ public class WheelGator : Maverick {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
+		if (isUnderwater() && !grounded){
+		state.airCode();
+		}
+		lastFrameWasUnderwater = isUnderwater();
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || isUnderwater()) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
-						changeState(new WheelGUpBiteState());
+						changeState(new WheelGClawState());
 					} else {
 						if (damageEaten > 0) {
 							changeState(new WheelGSpitState(damageEaten));
@@ -66,7 +72,21 @@ public class WheelGator : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new WheelGSpinState());
 				}
-			} else if (state is MJump || state is MFall) {
+			} else if (state is MJump || state is MFall || state is WheelGClawState ) {
+					if (input.isPressed(Control.Shoot, player)) {
+					if (input.isHeld(Control.Up, player)) {
+						changeState(new WheelGUpBiteState());
+					}
+				}
+					if (isUnderwater()) {
+					if (input.isHeld(Control.Jump, player) && vel.y > -106) {
+						vel.y = -106;
+					}
+				} else {
+					if (lastFrameWasUnderwater && input.isHeld(Control.Jump, player) && input.isHeld(Control.Up, player)) {
+						vel.y = -425;
+					}
+				}
 			}
 		}
 	}
@@ -81,6 +101,7 @@ public class WheelGator : Maverick {
 	}
 
 	public override float getRunSpeed() {
+		if (isUnderwater()) return 185;
 		return 85;
 	}
 
@@ -98,6 +119,7 @@ public class WheelGator : Maverick {
 		None = -1,
 		Drill,
 		Eat,
+		Claw,
 		Fall,
 		Grab,
 
@@ -107,6 +129,7 @@ public class WheelGator : Maverick {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"wheelg_drill_loop" => MeleeIds.Drill,
+			"wheelg_slash" => MeleeIds.Claw,
 			"wheelg_eat_start" => MeleeIds.Eat,
 			"wheelg_fall" => MeleeIds.Fall,
 			"wheelg_grab_start" => MeleeIds.Grab,
@@ -123,12 +146,17 @@ public class WheelGator : Maverick {
 			),
 			MeleeIds.Eat => new GenericMeleeProj(
 				GatorEatWeapon, pos, ProjIds.WheelGEat, player,
-				6, Global.defFlinch, addToLevel: addToLevel
+				4, Global.superFlinch, addToLevel: addToLevel
+			),
+				MeleeIds.Claw => new GenericMeleeProj(
+				GatorEatWeapon, pos, ProjIds.HeavyPush, player,
+				3, Global.defFlinch, addToLevel: addToLevel
 			),
 			MeleeIds.Fall => new GenericMeleeProj(
-				GatorFallWeapon, pos, ProjIds.WheelGStomp, player,
-				4, Global.defFlinch, 60, addToLevel: addToLevel
+				GatorFallWeapon, pos, ProjIds.DynamoDropSlash, player,
+				1, Global.defFlinch, 8, addToLevel: addToLevel
 			),
+			
 			MeleeIds.Grab => new GenericMeleeProj(
 				GatorGrabWeapon, pos, ProjIds.WheelGGrab, player,
 				0, 0, 0, addToLevel: addToLevel
@@ -150,6 +178,7 @@ public class WheelGator : Maverick {
 				new WheelGBiteState(),
 				new WheelGShootState(),
 				new WheelGSpinState(),
+				new WheelGClawState(),
 		};
 		return attacks;
 	}
@@ -160,6 +189,7 @@ public class WheelGator : Maverick {
 				new WheelGBiteState(),
 				new WheelGShootState(),
 				new WheelGUpBiteState(),
+				new WheelGClawState(),
 		};
 		return attacks.GetRandomItem();
 	}
@@ -272,6 +302,31 @@ public class WheelGSpinWheelProj : Projectile {
 	}
 }
 
+
+
+
+	public class WheelGClawState : MaverickState {
+	private Character grabbedChar;
+	float timeWaiting;
+	bool grabbedOnce;
+	public WheelGClawState() : base("slash") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+}
+
+
 public class WheelGShootState : MaverickState {
 	int state;
 	bool shotOnce;
@@ -315,6 +370,8 @@ public class WheelGShootState : MaverickState {
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleOrFall();;
 		}
+
+	
 	}
 }
 
@@ -498,7 +555,9 @@ public class WheelGUpBiteState : MaverickState {
 
 	public override void update() {
 		base.update();
-
+		if (!maverick.grounded){
+		airCode();
+		}
 		if (input.isHeld(Control.Shoot, player) && !shootReleased) {
 			shootFramesHeld++;
 		} else {

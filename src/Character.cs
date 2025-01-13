@@ -1589,7 +1589,7 @@ public partial class Character : Actor, IDamagable {
 		if (!wallKickMove && xDpadDir != 0) {
 			Point moveSpeed = new Point();
 			if (canMove()) { moveSpeed.x = getDashOrRunSpeed() * xDpadDir; }
-			if (canTurn()) { xDir = xDpadDir; }
+			if (canTurn() && charState.airMoveTurn) { xDir = xDpadDir; }
 			if (moveSpeed.magnitude > 0) { move(moveSpeed); }
 		}
 	}
@@ -1830,6 +1830,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
 		if (invulnTime > 0) return true;
+		if (iframesTime > 0) return true;
 		if (!ignoreRideArmorHide) {
 			if (ownedByLocalPlayer && charState is InRideArmor { isHiding: true }) {
 				return true;
@@ -3463,6 +3464,16 @@ public partial class Character : Actor, IDamagable {
 		return false;
 	}
 
+
+	public virtual bool isInDamageSprite() {
+		return sprite.name.Contains("hurt")
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("lose")
+		|| sprite.name.Contains("knocked")
+		|| sprite.name.Contains("grabbed")
+		|| sprite.name.Contains("stunned")
+		|| sprite.name.Contains("pushed");
+	}
 	public virtual bool isAttacking() {
 		return sprite.name.Contains("attack")
 		|| sprite.name.Contains("shoot")
@@ -3742,7 +3753,8 @@ public partial class Character : Actor, IDamagable {
 			invulnTime > 0,
 			isDarkHoldState,
 			isStrikeChainState,
-			charState.immuneToWind
+			charState.immuneToWind,
+			iframesTime > 0,
 		]));
 
 		// Bool mask. Pos 5.
@@ -3811,10 +3823,11 @@ public partial class Character : Actor, IDamagable {
 		bool[] boolData = Helpers.byteToBoolArray(data[5]);
 
 		player.isDefenderFavoredNonOwner = boolData[0];
-		invulnTime = (boolData[1] ? 1 : 0);
+		invulnTime = (boolData[1] ? 4 : 0);
 		isDarkHoldState = boolData[2];
 		isStrikeChainState = boolData[3];
 		charState.immuneToWind = boolData[4];
+		iframesTime = (boolData[5] ? 4 : 0);
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);

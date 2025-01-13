@@ -240,7 +240,7 @@ public class GrenadeExplosionProj : Projectile {
 			damager.damage = 4;
 		}
 		if (ownedByLocalPlayer) {
-			rpcCreate(pos, owner, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir);
 		}
 		projId = (int)ProjIds.BlastLauncherGrenadeProj;
 	}
@@ -384,7 +384,7 @@ public class GreenSpinnerExplosionProj : Projectile {
 		projId = (int)ProjIds.GreenSpinnerSplash;
 		shouldShieldBlock = false;
 		if (ownedByLocalPlayer) {
-			rpcCreate(pos, owner, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
