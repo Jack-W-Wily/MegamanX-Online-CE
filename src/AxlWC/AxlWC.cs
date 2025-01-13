@@ -51,6 +51,9 @@ public class AxlWC : Character {
 
 	public override void preUpdate() {
 		base.preUpdate();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		// Cooldowns.
 		Helpers.decrementFrames(ref turnCooldown);
 		Helpers.decrementFrames(ref shootCooldown);
@@ -62,7 +65,7 @@ public class AxlWC : Character {
 		}
 		// Lock dir logic.
 		if (lockDir && (
-				!player.input.isHeld(Control.Shoot, player) && !player.input.isHeld(Control.Special1, player) ||
+				!(player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player)) ||
 				turnCooldown <= 0 || charState is Dash or AirDash
 			)
 		) {
@@ -74,6 +77,18 @@ public class AxlWC : Character {
 	public override void update() {
 		bool wasGrounded = grounded;
 		base.update();
+		// Hypermode music.
+		if (isWhite) {
+			if (musicSource == null) {
+				addMusicSource("wildFang", getCenterPos(), true);
+			}
+		} else if (musicSource != null) {
+			musicSource.stop();
+			musicSource = null;
+		}
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		// For Hover
 		if (grounded || charState is WallSlide) { hoverTimes = 0; }
 
@@ -97,19 +112,6 @@ public class AxlWC : Character {
 				changeState(new AxlFlashKick(), true);
 			}
 		}
-
-		// Hypermode music.
-		if (isWhite) {
-			if (musicSource == null) {
-				addMusicSource("wildFang", getCenterPos(), true);
-			}
-		} else if (musicSource != null) {
-			musicSource.stop();
-			musicSource = null;
-		}
-		if (!ownedByLocalPlayer) {
-			return;
-		}
 		// Arm angle.
 		updateArmAngle();
 		// Charge and release charge logic.
@@ -121,6 +123,9 @@ public class AxlWC : Character {
 
 	public override void postUpdate() {
 		base.postUpdate();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (!muzzleFlash.destroyed) {
 			float oldByteArmAngle = armAngle;
 			if (recoilTime > 0) {
@@ -725,6 +730,7 @@ public class AxlWC : Character {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add((byte)armAngle);
 		customData.Add((byte)weaponSlot);
+		customData.Add((byte)recoilTime);
 
 		customData.Add(Helpers.boolArrayToByte([
 			isWhite,
@@ -738,6 +744,7 @@ public class AxlWC : Character {
 		data = data[data[0]..];
 		armAngle = data[0];
 		weaponSlot = data[1];
+		recoilTime = data[2];
 
 		bool[] flags = Helpers.byteToBoolArray(data[2]);
 		isWhite = flags[0];
