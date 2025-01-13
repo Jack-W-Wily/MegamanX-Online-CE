@@ -518,6 +518,28 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Adjust the game sound volume."
 				),
+				// Disable Chat
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.enableVoices = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.enableVoices = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Enable Voices:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enableVoices),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If yes, characters will play voices when doing an action."
+				),
 				// Multiplayer Name
 				new MenuOption(
 					30, startY,
