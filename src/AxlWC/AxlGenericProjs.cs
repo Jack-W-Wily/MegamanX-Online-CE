@@ -16,6 +16,7 @@ public class BlueBulletProj : Projectile {
 		damager.damage = 1;
 		damager.flinch = Global.miniFlinch;
 		reflectable = true;
+		destroyOnHitWall = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 60 * 6;
 		this.byteAngle = byteAngle;

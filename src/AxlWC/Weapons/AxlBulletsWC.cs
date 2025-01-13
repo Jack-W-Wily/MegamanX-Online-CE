@@ -110,6 +110,7 @@ public class AxlBulletWCProj : Projectile {
 		weapon = AxlBulletWC.netWeapon;
 		damager.damage = 1;
 		reflectable = true;
+		destroyOnHitWall = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;
 		this.byteAngle = byteAngle;

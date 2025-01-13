@@ -187,9 +187,11 @@ public class AxlFlashKick : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 3) {
+			useGravity = false;
 			character.move(new Point(-80 * character.xDir, 0));
 		}
 		if (character.frameIndex >= 4 && !shot) {
+			useGravity = true;
 			shot = true;
 			character.vel.y = -character.getJumpPower();
 			new AxlFlashKickProj(
@@ -207,6 +209,7 @@ public class AxlFlashKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.vel.y = 0;
 		character.iframesTime = 6;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}

@@ -27,11 +27,12 @@ public class AxlWC : Character {
 	public float aiAttackCooldown;
 	public float shootCooldown;
 	public float recoilTime;
+	public float turnCooldown;
+	public bool lockDir;
 	public int armDir => charState is WallSlide ? -xDir : xDir;
 	public float armAngle = 0;
 	public Anim muzzleFlash;
-
-	public int HoverTimes = 0;
+	public int hoverTimes = 0;
 
 	public AxlWC(
 		Player player, float x, float y, int xDir, bool isVisible,
@@ -45,13 +46,13 @@ public class AxlWC : Character {
 		configureWeapons();
 		muzzleFlash = new Anim(pos, "axl_pistol_flash", xDir, null, false);
 		muzzleFlash.visible = false;
-		muzzleFlash.frameIndex = muzzleFlash.sprite.totalFrameNum - 1;
-		muzzleFlash.frameTime = currentFrame.duration;
+		muzzleFlash.destroySelf();
 	}
 
 	public override void preUpdate() {
 		base.preUpdate();
 		// Cooldowns.
+		Helpers.decrementFrames(ref turnCooldown);
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref recoilTime);
@@ -62,9 +63,10 @@ public class AxlWC : Character {
 	}
 
 	public override void update() {
+		bool wasGrounded = grounded;
 		base.update();
 		// For Hover
-		if (grounded || charState is WallSlide) { HoverTimes = 0; }
+		if (grounded || charState is WallSlide) { hoverTimes = 0; }
 
 		// For String Cancels
 		if (sprite.name.Contains("string")) {
@@ -73,8 +75,9 @@ public class AxlWC : Character {
 			) {
 				changeState(new DodgeRollAxlWC(), true);
 			}
-			if (player.input.isHeld(Control.Up, player) &&
-				player.input.isPressed(Control.Jump, player)) {
+			if ((wasGrounded || grounded) && player.input.isHeld(Control.Up, player) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
 				changeState(new AxlFlashKick(), true);
 			}
 		}
@@ -109,7 +112,7 @@ public class AxlWC : Character {
 
 	public override void postUpdate() {
 		base.postUpdate();
-		if (!muzzleFlash.isAnimOver()) {
+		if (!muzzleFlash.destroyed) {
 			float oldByteArmAngle = armAngle;
 			if (recoilTime > 0) {
 				armAngle = MathF.Round(armAngle - recoilTime);
@@ -123,8 +126,6 @@ public class AxlWC : Character {
 				muzzleFlash.zIndex = zIndex - 100;
 			}
 			armAngle = oldByteArmAngle;
-		} else {
-			muzzleFlash.visible = false;
 		}
 		// Swap on ammo empitiying.
 		if (axlWeapon != mainWeapon &&
@@ -168,6 +169,13 @@ public class AxlWC : Character {
 		} else {
 			armAngle = targetAngle;
 		}
+	}
+
+	public override bool canTurn() {
+		if (lockDir && turnCooldown > 0 && charState is not Dash and not AirDash) {
+			return false;
+		}
+		return base.canTurn();
 	}
 
 	public override bool canCharge() {
@@ -230,6 +238,7 @@ public class AxlWC : Character {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
 		}
+		turnCooldown = 0;
 
 		// Set cooldown if leaving special weapon.
 		if (oldWeapon is not AxlWeaponWC axlWeapon) {
@@ -286,10 +295,10 @@ public class AxlWC : Character {
 		}
 		// Hover.
 		if (!grounded && player.input.isPressed(Control.Jump, player)
-			&& !player.input.isHeld(Control.Down, player) && HoverTimes == 0 &&
+			&& !player.input.isHeld(Control.Down, player) && hoverTimes == 0 &&
 			canJump() && flag == null
 		) {
-			HoverTimes++;
+			hoverTimes++;
 			changeState(new HoverAxlWC(), true);
 			return true;
 		}
@@ -345,16 +354,20 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		weapon.shootMain(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
+		Point shootPos = getAxlBulletPos(axlWeapon);
+		weapon.shootMain(this, shootPos, shootAngle, 0);
 		weapon.shootCooldown = weapon.getFireRate(this, 0);
 		recoilTime = weapon.getRecoil(this, 0);
+		turnCooldown = weapon.shootCooldown + 2;
 		weapon.addAmmo(-weapon.getAmmoUse(this, 0), player);
 		if (weapon.shootSounds[0] != "") {
 			playSound(weapon.shootSounds[0], true, true);
 		}
 		if (weapon.flashSprite != "") {
-			muzzleFlash.changeSprite(weapon.flashSprite, true);
-			muzzleFlash.visible = true;
+			muzzleFlash = new Anim(
+				shootPos, weapon.flashSprite, xDir,
+				player.getCharActorNetId(), true, sendRpc: true
+			);
 		}
 	}
 
@@ -366,16 +379,20 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		weapon.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, 0);
+		Point shootPos = getAxlBulletPos(axlWeapon);
+		weapon.shootAlt(this, shootPos, shootAngle, 0);
 		weapon.shootCooldown = weapon.getAltFireRate(this, 0);
 		recoilTime = weapon.getAltRecoil(this, 0);
+		turnCooldown = weapon.shootCooldown + 2;
 		weapon.addAmmo(-weapon.getAltAmmoUse(this, 0), player);
 		if (weapon.shootSounds[1] != "") {
 			playSound(weapon.shootSounds[1], true, true);
 		}
 		if (weapon.chargedFlashSprite != "") {
-			muzzleFlash.changeSprite(weapon.chargedFlashSprite, true);
-			muzzleFlash.visible = true;
+			muzzleFlash = new Anim(
+				shootPos, weapon.chargedFlashSprite, xDir,
+				player.getCharActorNetId(), true, sendRpc: true
+			);
 		}
 	}
 
@@ -387,9 +404,11 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		axlBullet.shootAlt(this, getAxlBulletPos(axlWeapon), shootAngle, chargeLevel);
+		Point shootPos = getAxlBulletPos(axlWeapon);
+		axlBullet.shootAlt(this, shootPos, shootAngle, chargeLevel);
 		axlBullet.shootCooldown = axlBullet.getAltFireRate(this, 0);
 		recoilTime = axlBullet.getAltRecoil(this, 0);
+		turnCooldown = axlBullet.shootCooldown + 2;
 		axlBullet.addAmmo(-axlBullet.getAltAmmoUse(this, chargeLevel), player);
 		if (recoilTime > 12) {
 			recoilTime = 12;
@@ -397,11 +416,11 @@ public class AxlWC : Character {
 		if (axlBullet.shootSounds[1] != "") {
 			playSound(axlBullet.shootSounds[3], true, true);
 		}
-		muzzleFlash.visible = true;
-		muzzleFlash.frameIndex = 0;
 		if (axlBullet.chargedFlashSprite != "") {
-			muzzleFlash.changeSprite(axlBullet.chargedFlashSprite, true);
-			muzzleFlash.visible = true;
+			muzzleFlash = new Anim(
+				shootPos, axlBullet.chargedFlashSprite, xDir,
+				player.getCharActorNetId(), true, sendRpc: true
+			);
 		}
 	}
 
