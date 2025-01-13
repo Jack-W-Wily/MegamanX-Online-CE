@@ -1004,10 +1004,8 @@ public class Dash : CharState {
 		dashTime += Global.spf;
 		if (stateTime > 0.1 && !character.isUnderwater()) {
 			stateTime = 0;
-			new Anim(
-				character.getDashDustEffectPos(initialDashDir),
-				"dust", initialDashDir, player.getNextActorNetId(), true,
-				sendRpc: true
+			new DashDustAnim(
+				character.getDashDustEffectPos(initialDashDir), player.getNextActorNetId(), true, true
 			);
 		}
 		if (!character.grounded) {
@@ -1109,16 +1107,7 @@ public class AirDash : CharState {
 				initialDashDir = (int)inputXDir;
 			}
 		}
-		dashTime += Global.spf;
-		if (stateTime > 0.1 && !character.isUnderwater()) {
-			stateTime = 0;
-			new Anim(
-				character.getDashDustEffectPos(initialDashDir),
-				"dust", initialDashDir, player.getNextActorNetId(), true,
-				sendRpc: true
-			);
-		}
-	
+		
 		dashTime += Global.spf;
 	}
 
@@ -1137,7 +1126,7 @@ public class AirDash : CharState {
 		character.vel = new Point(0, 0);
 		character.dashedInAir++;
 		character.globalCollider = character.getDashingCollider();
-		new Anim(character.getDashSparkEffectPos(initialDashDir), "dash_sparks", initialDashDir, null, true);
+		new Anim(character.getDashSparkEffectPos(initialDashDir), "air_dash_sparks", initialDashDir, null, true);
 	}
 
 	public override void onExit(CharState newState) {
