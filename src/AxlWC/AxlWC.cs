@@ -62,8 +62,8 @@ public class AxlWC : Character {
 		}
 		// Lock dir logic.
 		if (lockDir && (
-				turnCooldown <= 0 || !player.input.isHeld(Control.Shoot, player) ||
-				charState is Dash or AirDash
+				!player.input.isHeld(Control.Shoot, player) && !player.input.isHeld(Control.Special1, player) ||
+				turnCooldown <= 0 || charState is Dash or AirDash
 			)
 		) {
 			lockDir = false;
