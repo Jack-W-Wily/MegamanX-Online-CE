@@ -141,6 +141,7 @@ public class CopyShotWCProj : Projectile {
 		projId = (int)ProjIds.CopyShotWC;
 		weapon = AxlBulletWC.netWeapon;
 		damager.damage = 2;
+		damager.flinch = Global.miniFlinch;
 		reflectable = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;
