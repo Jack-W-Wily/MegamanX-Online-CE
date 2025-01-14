@@ -224,7 +224,7 @@ public class AxlFlashKickProj : Projectile {
 	public AxlFlashKickProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "axl_flashkick_proj", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 3, player, "axl_flashkick_proj", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = false;
 		destroyOnHit = false;
@@ -277,7 +277,7 @@ public class TailShot : CharState {
 			// erhm STOP changing the inputs of my stuff without asking
 			//GRRRRRRRRRRRRR 
 			// - W
-			if (character.frameIndex >= 3) {
+			if (character.frameIndex >= 4) {
 				if (player.input.isPressed(Control.Shoot,player)){
 				character.changeState(new AxlString1(), true);
 				}
@@ -366,7 +366,7 @@ public class AxlString2 : CharState {
 			}
 			character.move(new Point(moveSpeed * xInput, 0));
 		}
-		if (character.frameIndex >= 3 && !shot) {
+		if (character.frameIndex >= 4 && !shot) {
 			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
 			new AxlMeleeBullet(
@@ -634,6 +634,10 @@ public class RisingBarrage : CharState {
 					axl, gunpos.Value, axl.armDir == 1 ? -32 : 160,
 					player.getNextActorNetId(), sendRpc: true
 				);
+					new AxlMeleeBullet(
+				axl, gunpos.Value, character.xDir,
+				player.getNextActorNetId(), sendRpc: true
+			);
 				axl.mainWeapon.addAmmo(-0.5f, player);
 				character.playSound("axlBullet", sendRpc: true);
 			}
@@ -664,6 +668,10 @@ public class AxlRainDrop : CharState {
 
 	public bool LandedOnce;
 
+	public bool shot;
+
+	public AxlWC axl = null!;
+
 
 
 	public AxlRainDrop()
@@ -686,6 +694,22 @@ public class AxlRainDrop : CharState {
 				character.move(new Point(-30 * character.xDir, 0));
 			}
 			character.useGravity = true;
+		}
+
+
+		if (character.frameIndex >= 4 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
+			shot = true;
+			new AxlMeleeBullet(
+				axl, gunpos.addxy(1 * character.xDir, -1),
+				character.xDir, player.getNextActorNetId(), sendRpc: true
+			);
+			new AxlMeleeBullet(
+				axl, gunpos.addxy(-1 * character.xDir, 1),
+				character.xDir, player.getNextActorNetId(), sendRpc: true
+			);
+			character.playSound("axlBulletCharged", sendRpc: true);
+			axl.mainWeapon.addAmmo(-2, player);
 		}
 
 		if (character.grounded && !LandedOnce){
@@ -713,6 +737,7 @@ public class AxlRainDrop : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		axl = character as AxlWC ?? throw new NullReferenceException();
 		if (!character.grounded) {
 			character.stopMovingWeak();
 			pushBackSpeed = 100;
@@ -737,7 +762,7 @@ public class AxlSpinKick : CharState {
 		: base("spinkick", "", "", transitionSprite)
 	{
 	airMove = true;
-
+	enterSound = "punch1";
 	}
 
 	public override void update()
@@ -899,10 +924,8 @@ public class AxlRollBump : CharState {
 			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
 				new AxlFlashKickProj(
-			new StormTornado(), character.pos.addxy(15 * character.xDir, -26),
+			new StormTornado(), character.pos.addxy(15 * character.xDir, 0),
 			character.xDir, player, player.getNextActorNetId(), true);
-
-
 			character.playSound("punch1", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
 		}
@@ -954,6 +977,10 @@ public class RainStorm : CharState {
 					axl, gunpos, 64,
 					player.getNextActorNetId(), sendRpc: true
 				);
+					new AxlMeleeBullet(
+				axl, gunpos, character.xDir,
+				player.getNextActorNetId(), sendRpc: true
+			);
 				character.playSound("axlBullet", sendRpc: true);
 				axl.mainWeapon.addAmmo(-0.5f, player);
 			}

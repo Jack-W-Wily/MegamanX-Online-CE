@@ -59,13 +59,37 @@ public class AxlMeleeBullet : Projectile {
 		setIndestructableProperties();
 		reflectable = false;
 		destroyOnHit = false;
-		maxTime = 0.1f;
+		maxTime = 0.2f;
 		isMelee = true;
-		
+	
 		if (sendRpc) {
 			rpcCreate(pos, owningActor, ownerPlayer, netProjId, xDir);
 		}
 	}
+
+
+
+		public override void update() {
+		base.update();
+		if (owner.character != null){
+			if (owner.character.sprite.name.Contains("rain")) {
+			xDir = 1;
+			angle = 90;
+			incPos(new Point(0, 10));
+			//vel.y = Math.Abs(vel.x);
+			//vel.x = 0;
+			}
+			if (owner.character.sprite.name.Contains("rising") ) {
+			xDir = 1;
+			angle = -90;
+			incPos(new Point(0, -10));
+			//vel.y = Math.Abs(vel.x);
+			//vel.x = 0;
+			}
+		}
+	}
+
+
 
 	public override void postUpdate() {
 		base.postUpdate();

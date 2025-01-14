@@ -555,7 +555,7 @@ public class AxlWC : Character {
 			"axl_rainstorm" => MeleeIds.RainStorm,
 			"axl_fall_step" => MeleeIds.EnemyStep,
 			"axl_rollbump" => MeleeIds.RollBump,
-			"axl_SpinKick" => MeleeIds.SpinKick,
+			"axl_spinkick" => MeleeIds.SpinKick,
 			"axl_raindrop" => MeleeIds.RainDrop,
 			_ => MeleeIds.None
 		});

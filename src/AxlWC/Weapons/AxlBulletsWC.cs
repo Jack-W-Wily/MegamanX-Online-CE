@@ -48,6 +48,10 @@ public class AxlBulletWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite){
+		return 0;
+		}
+	
 		return chargeLevel switch {
 			1 => 2,
 			2 => 3,
@@ -175,7 +179,7 @@ public class CopyShotWCProj : Projectile {
 		projId = (int)ProjIds.CopyShotWC;
 		weapon = AxlBulletWC.netWeapon;
 		damager.damage = 2;
-		damager.flinch = Global.miniFlinch;
+		damager.flinch = Global.halfFlinch;
 		reflectable = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 500;
@@ -188,6 +192,7 @@ public class CopyShotWCProj : Projectile {
 
 		if (chargeLevel == 2) {
 			damager.damage = 3;
+			damager.flinch = Global.defFlinch;
 			vel *= 1.25f;
 			maxTime /= 1.25f;
 			xScale = 1.25f;
@@ -195,6 +200,7 @@ public class CopyShotWCProj : Projectile {
 		}
 		else if (chargeLevel >= 3) {
 			damager.damage = 4;
+				damager.flinch = Global.superFlinch;
 			vel *= 1.5f;
 			maxTime /= 1.5f;
 			xScale = 1.5f;
