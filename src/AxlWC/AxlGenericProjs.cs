@@ -46,14 +46,13 @@ public class AxlMeleeBullet : Projectile {
 	public AxlMeleeBullet(
 		Actor owner, Point pos,
 		int xDir, ushort netProjId,
-		bool sendRpc = false, Player? player = null
+		bool sendRpc = false, Player? player = null, float byteAngle = 0
 	) : base(
 		pos, 1, owner, "axl_meleeshot_proj", netProjId, player
 	) {
 		weapon = AxlBulletWC.netWeapon;
 		projId = (int)ProjIds.AxlMeleeBullet;
 		this.xDir = xDir;
-
 		damager.damage = 1;
 		damager.hitCooldown = 30;
 		setIndestructableProperties();
@@ -61,40 +60,16 @@ public class AxlMeleeBullet : Projectile {
 		destroyOnHit = false;
 		maxTime = 0.2f;
 		isMelee = true;
-	
+
 		if (sendRpc) {
-			rpcCreate(pos, owningActor, ownerPlayer, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir);
 		}
 	}
-
-
-
-		public override void update() {
-		base.update();
-		if (owner.character != null){
-			if (owner.character.sprite.name.Contains("rain")) {
-			xDir = 1;
-			angle = 90;
-			incPos(new Point(0, 10));
-			//vel.y = Math.Abs(vel.x);
-			//vel.x = 0;
-			}
-			if (owner.character.sprite.name.Contains("rising") ) {
-			xDir = 1;
-			angle = -90;
-			incPos(new Point(0, -10));
-			//vel.y = Math.Abs(vel.x);
-			//vel.x = 0;
-			}
-		}
-	}
-
-
 
 	public override void postUpdate() {
 		base.postUpdate();
 		if (owningActor != null) {
-			incPos(owner.character.deltaPos);
+			incPos(owningActor.deltaPos);
 		}
 	}
 

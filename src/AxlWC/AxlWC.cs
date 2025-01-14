@@ -346,7 +346,7 @@ public class AxlWC : Character {
 			return true;
 		}
 		// For stuff we do not want to do mid guard animation.
-		if (charState is AxlBlock) {
+		if (charState is AxlBlock or RisingBarrage) {
 			return false;
 		}
 		if ((player.input.isHeld(Control.Shoot, player) || axlWeapon.autoFire) &&

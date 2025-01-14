@@ -12,9 +12,6 @@ public class FlameBurnerWC : AxlWeaponWC {
 		weaponBarBaseIndex = 38;
 		weaponSlotIndex = 58;
 		killFeedIndex = 73;
-		maxAmmo = 8;
-		ammo = maxAmmo;
-
 		sprite = "axl_arm_flameburner";
 
 		maxAmmo = 16;
@@ -37,10 +34,16 @@ public class FlameBurnerWC : AxlWeaponWC {
 	}
 
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 0.75f;
+		}
 		return 1;
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 8;
+		}
 		return 16;
 	}
 }

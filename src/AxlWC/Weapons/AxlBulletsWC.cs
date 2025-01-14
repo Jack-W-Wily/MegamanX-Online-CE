@@ -28,8 +28,15 @@ public class AxlBulletWC : AxlWeaponWC {
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
 		int type = 0;
+		// Random values and WA versions.
+		int treshold = 4;
+		int randRange = 0;
+		if (axl.isWhite) {
+			treshold = 2;
+			randRange = 1;
+		}
 		// Pseudo-random to guarantee at least every 4 shots.
-		if (ammoUsedSinceBlue >= 4 || Helpers.randomRange(0, 4) == 0 || ammo <= 1) {
+		if (ammoUsedSinceBlue >= treshold || Helpers.randomRange(0, 3) <= randRange || ammo <= 1) {
 			// if less than 4 shots were fire increase the threshold..
 			if (ammoUsedSinceBlue < 4) {
 				ammoUsedSinceBlue *= -1;
@@ -48,10 +55,6 @@ public class AxlBulletWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		if (axl.isWhite){
-		return 0;
-		}
-	
 		return chargeLevel switch {
 			1 => 2,
 			2 => 3,
@@ -72,13 +75,13 @@ public class AxlBulletWC : AxlWeaponWC {
 		Point inputDir = axl.player.input.getInputDir(axl.player);
 		bool specialPressed = wasSpecialHeld && !axl.player.input.isHeld(Control.Special1, axl.player);
 		// Shoryken does not use negative edge at all.
-		if (axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && axl.axlWeapon.ammo > 0) {
+		if (axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && ammo > 0) {
 			axl.changeState(new RainStorm(), true);
 			return true;
 		}
 		// Negative edge inputs.
 		if (axl.grounded && ammo > 0 && inputDir.y == 1 && (
-				axl.charState is Dash or AirDash || 
+				axl.charState is Dash or AirDash ||
 				axl.player.input.isPressed(Control.Dash, axl.player)
 			)
 		) {
@@ -86,10 +89,10 @@ public class AxlBulletWC : AxlWeaponWC {
 			return true;
 		}
 		if (specialPressed && inputDir.y == -1 && ammo > 0) {
-			if (axl.grounded){
-			axl.changeState(new TailShot(), true);
+			if (axl.grounded) {
+				axl.changeState(new TailShot(), true);
 			} else {
-			axl.changeState(new AxlRainDrop(), true);
+				axl.changeState(new AxlRainDrop(), true);
 			}
 			return true;
 		}
@@ -197,10 +200,9 @@ public class CopyShotWCProj : Projectile {
 			maxTime /= 1.25f;
 			xScale = 1.25f;
 			yScale = 1.25f;
-		}
-		else if (chargeLevel >= 3) {
+		} else if (chargeLevel >= 3) {
 			damager.damage = 4;
-				damager.flinch = Global.superFlinch;
+			damager.flinch = Global.superFlinch;
 			vel *= 1.5f;
 			maxTime /= 1.5f;
 			xScale = 1.5f;

@@ -15,7 +15,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		shootSounds = [ "iceGattling", "gaeaShield" ];
 		isTwoHanded = true;
 		fireRate = minFireRate;
-		altFireRate = 25;
+		altFireRate = 24;
 		index = (int)WeaponIds.IceGattling;
 		weaponBarBaseIndex = 37;
 		weaponSlotIndex = 57;
@@ -72,6 +72,13 @@ public class IceGattlingWC : AxlWeaponWC {
 			return MathF.Ceiling(targetFireRate * 0.75f);
 		}
 		return targetFireRate;
+	}
+
+	public override float getAltFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 14;
+		}
+		return altFireRate;
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {

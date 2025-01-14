@@ -78,7 +78,7 @@ public class BoundBlasterProj : Projectile {
 	public BoundBlasterProj(
 		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 250, 1, player, "boundblaster_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 250, 1, player, "boundblaster_proj", 0, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = true;
 		Point anglePoint = Point.createFromAngle(angle);

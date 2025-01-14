@@ -30,11 +30,22 @@ public class BlackArrowWC : AxlWeaponWC {
 		new BlackArrowProj2(this, pos, axl.player, bulletDir2, axl.player.getNextActorNetId(), rpc: true);
 	}
 
+	public override float getFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 12;
+		}
+		return fireRate;
+	}
+
+
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {
 		return 2;
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 4;
+		}
 		return maxAmmo;
 	}
 }

@@ -12,7 +12,7 @@ public class BlastLauncherWC : AxlWeaponWC {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 29;
 		killFeedIndex = 29;
-		fireRate = 45;
+		fireRate = 28;
 		altFireRate = 14;
 
 		sprite = "axl_arm_blastlauncher";
@@ -36,11 +36,21 @@ public class BlastLauncherWC : AxlWeaponWC {
 		new GreenSpinnerWCProj(axl, pos, byteAngle, netId, sendRpc: true);
 	}
 
+	public override float getFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 14;
+		}
+		return fireRate;
+	}
+
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {
 		return 2;
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return maxAmmo / 2f;
+		}
 		return maxAmmo;
 	}
 }

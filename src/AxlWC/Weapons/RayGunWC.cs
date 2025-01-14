@@ -9,7 +9,7 @@ public class RayGunWC : AxlWeaponWC {
 
 	public RayGunWC() {
 		shootSounds = ["raygun", "splashLaser"];
-		fireRate = 6;
+		fireRate = 5;
 		altFireRate = 8;
 		sprite = "axl_arm_raygun";
 		flashSprite = "axl_raygun_flash";
@@ -37,6 +37,20 @@ public class RayGunWC : AxlWeaponWC {
 		new SplashLaserProj(this, pos, axl.player, bulletDir, netId, sendRpc: true);
 	}
 
+	public override float getFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 5;
+		}
+		return fireRate;
+	}
+
+	public override float getAltFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 7;
+		}
+		return altFireRate;
+	}
+
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {
 		return 1;
 	}
@@ -61,7 +75,6 @@ public class RayGunWCProj : Projectile {
 		weapon = RayGunWC.netWeapon;
 		projId = (int)ProjIds.RayGunWC;
 		damager.damage = 0.5f;
-		damager.hitCooldown = 1;
 
 		vel = Point.createFromByteAngle(byteAngle) * 400;
 		this.byteAngle = byteAngle;

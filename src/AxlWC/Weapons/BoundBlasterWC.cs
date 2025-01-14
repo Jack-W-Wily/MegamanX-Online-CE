@@ -6,7 +6,7 @@ public class BoundBlasterWC : AxlWeaponWC {
 	public BoundBlasterWC() {
 		shootSounds = [ "boundBlaster", "movingWheel" ];
 		fireRate = 9;
-		altFireRate = 30;
+		altFireRate = 24;
 		index = (int)WeaponIds.BoundBlaster;
 		weaponBarBaseIndex = 35;
 		weaponSlotIndex = 55;
@@ -30,6 +30,20 @@ public class BoundBlasterWC : AxlWeaponWC {
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
 		new MovingWheelProj(this, pos, axl.armDir, axl.player, netId, rpc: true);
+	}
+
+	public override float getFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 6;
+		}
+		return fireRate;
+	}
+
+	public override float getAltFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 14;
+		}
+		return altFireRate;
 	}
 
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {

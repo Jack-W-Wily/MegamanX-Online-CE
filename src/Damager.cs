@@ -453,14 +453,11 @@ public class Damager {
 
 
 			// Axl Air Raid 
-			if (owner.isAxlWC && 
-			(
-				projId == (int)ProjIds.VileAirRaidStart
-			|| projId == (int)ProjIds.VileAirRaidPlusKnock
-			)){
-			owner.character.changeState(new AxlAirRaid(character), true);
+			if (owner.ownedByLocalPlayer && owner.character is AxlWC && 
+				((ProjIds)projId) is ProjIds.VileAirRaidStart or ProjIds.VileAirRaidPlusKnock
+			) {
+				owner.character.changeState(new AxlAirRaid(character), true);
 			}
-			
 			// Vile Blockable Grab
 			if (!character.sprite.name.Contains("block") &&
 			 projId == (int)ProjIds.VileGrab
