@@ -68,21 +68,19 @@ public class CharSelection {
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
 	public static CharSelection[] selections => [
-		new CharSelection("X", 0, 1, 0, "smenu_x", 0),
-		new CharSelection("X (Another)", 1, 1, 0, "smenu_x", 0),
-		new CharSelection("Zero (X1 - MHX)", 2, 1, 0, "smenu_zero", 0),
-		new CharSelection("Zero (X2 - X5)", 3, 1, 0, "smenu_zero_2", 0),
-		//new CharSelection("Zero (X6 - X8)", 4, 1, 0, "menu_bzero", 0),
-		new CharSelection("VAVA", 5, 1, 0, "smenu_vile", 0),
-		new CharSelection("Axl ", 6, 1, 0, "smenu_axl", 0),
-		new CharSelection("Axl", 7, 1, 0, "smenu_axl", 0),
-		new CharSelection("Sigma", 8, 1, 0, "smenu_sigma", 0),
-		new CharSelection("Dynamo", 11, 1, 0, "smenu_dynamo", 0),
-		new CharSelection("Zain", 9, 1, 0, "smenu_zain", 0),
-		new CharSelection("GBD", 10, 1, 0, "smenu_gbd", 0),
-		new CharSelection("High Max", 12, 1, 0, "smenu_highmx", 0),
-		
-		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
+		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
+		new CharSelection("X (Awakened)", (int)CharIds.XAnother, sprite: "empty"),
+		new CharSelection("Zero (Late)", (int)CharIds.ZeroX6, sprite: "smenu_zero_2"),
+		//new CharSelection("Zero (Mid)", (int)CharIds.ZeroX2, sprite: "smenu_zero"),
+		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
+		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
+		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
+		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
+		new CharSelection("Zain", (int)CharIds.Zain, sprite: "smenu_zain"),
+		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "empty"),
+		new CharSelection("Dynamo", (int)CharIds.Dynamo, sprite: "smenu_dynamo"),
+		//new CharSelection("High Max", (int)CharIds.Highmax, sprite: "smenu_highmax"),
 	];
 
 	public static CharSelection[] selections1v1 => [
@@ -129,8 +127,8 @@ public class CharSelection {
 	];
 
 	public CharSelection(
-		string name, int mappedCharNum, int mappedCharArmor,
-		int mappedCharMaverick, string sprite, int frameIndex
+		string name, int mappedCharNum, int mappedCharArmor = 0,
+		int mappedCharMaverick = 0, string sprite = "", int frameIndex = 0
 	) {
 		this.name = name;
 		this.mappedCharNum = mappedCharNum;
@@ -302,7 +300,7 @@ public class SelectCharacterMenu : IMainMenu {
 		// Draw character + box
 		var charPosX1 = Global.halfScreenW;
 		var charPosY1 = 85;
-		Global.sprites["playerbox"].drawToHUD(0, charPosX1, charPosY1+2);
+		//Global.sprites["playerbox"].drawToHUD(0, charPosX1, charPosY1+2);
 		string sprite = charSelection.sprite;
 		int frameIndex = charSelection.frameIndex;
 		float yOff = sprite.EndsWith("_idle") ? (Global.sprites[sprite].frames[0].rect.h() * 0.5f) : 0;
@@ -331,43 +329,43 @@ public class SelectCharacterMenu : IMainMenu {
 
 		string[] description = playerData.charNum switch {
 			(int)CharIds.X => new string[]{
-				"X, Standard Zoner that can use Armors and mix them"
+				"X, Standard Zoner that can use Armors and mix them."
 			},
 			(int)CharIds.XAnother => new string[]{
-				"Lacks ability to mix armors but has a bigger moveset"
+				"Lacks ability to mix armors but has a bigger moveset."
 			},
 			(int)CharIds.ZeroX1 => new string[] {
-				"High Damage Melee fighter but weak midair"
+				"High Damage Melee fighter but weak midair."
 			},
 			(int)CharIds.ZeroX2 => new string[] {
-				"Combomad Rushdown fighter with a variety of combo routes and hypermodes"
+				"Long range figther with a powerfull buster."
 			},
 			(int)CharIds.ZeroX6 => new string[] {
-				"NOT CREATED YET"
+				"Combo & Rushdown fighter\nwith a variety of combo routes and hypermodes."
 			},
 			(int)CharIds.Vile => new string[] {
-				"Multiarchetype Fighter that can adapt to any strategy but lacks HP"
+				"Multiarchetype Fighter that can adapt\nto any strategy but lacks HP."
 			},
 			(int)CharIds.AxlWC => new string[] {
-				"Gunslinger Rushdown Zoner hybrid with access to iframes"
+				"Gunslinger Rushdown Zoner hybrid\nwith access to i-frames."
 			},
 			(int)CharIds.AxlX8 => new string[] {
-				"? ? ? ? ? ? ?"
+				"???"
 			},
 			(int)CharIds.Sigma => new string[] {
-				"Commander type unit that can use mavericks to assist his kit"
+				"Commander type unit that can\nuse mavericks to assist his kit."
 			},
 			(int)CharIds.Zain => new string[] {
-				"High Damage Fighter with Defensive skill but can't combo without resoruces"
+				"High Damage Fighter with Defensive skills\nbut can't combo without resoruces."
 			},
 			(int)CharIds.GBD => new string[] {
-				"Hit and run type Trickster that can summon ride chasers"
+				"Hit and run type Trickster\nthat can summon ride chasers."
 			},
 			(int)CharIds.Dynamo => new string[] {
-				"Multi strategy fighter with great mobility options"
+				"Multi strategy fighter with great mobility options."
 			},
 			(int)CharIds.Dragoon => new string[] {
-				"Shoto styled fighter with burning damage passive"
+				"Shoto styled fighter with burning damage passive."
 			},
 			_ => new string[] { "ERROR" }
 		};
