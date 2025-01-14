@@ -4,7 +4,7 @@ namespace MMXOnline;
 
 public class AxlBulletWC : AxlWeaponWC {
 	public static AxlBulletWC netWeapon = new();
-	public float ammotUsedSinceBlue = 1600;
+	public float ammoUsedSinceBlue = 4;
 
 	private bool wasSpecialHeld;
 	private bool specialActive;
@@ -28,9 +28,13 @@ public class AxlBulletWC : AxlWeaponWC {
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
 		int type = 0;
-		// Pseudo-random to guarantee at least every 8 shots.
-		if (ammotUsedSinceBlue >= 8 || Helpers.randomRange(0, 8) == 0) {
-			ammotUsedSinceBlue = 0;
+		// Pseudo-random to guarantee at least every 4 shots.
+		if (ammoUsedSinceBlue >= 4 || Helpers.randomRange(0, 4) == 0 || ammo <= 1) {
+			if (ammoUsedSinceBlue < 4) {
+				ammoUsedSinceBlue *= -1;
+			} else {
+				ammoUsedSinceBlue = 0;
+			}
 			type = 1;
 		}
 		new AxlBulletWCProj(axl, pos, type, byteAngle, netId, sendRpc: true);
@@ -50,11 +54,12 @@ public class AxlBulletWC : AxlWeaponWC {
 		};
 	}
 
-	public override void addAmmo(float amount, Player player) {
-		if (amount < 0) {
-			ammotUsedSinceBlue -= amount;
+	public override void onAmmoChange(float amount) {
+		if (amount <= 0) {
+			ammoUsedSinceBlue -= amount;
+		} else {
+			ammoUsedSinceBlue = 1600;
 		}
-		base.addAmmo(amount, player);
 	}
 
 	public override bool attackCtrl(AxlWC axl) {
@@ -108,7 +113,7 @@ public class AxlBulletWC : AxlWeaponWC {
 
 	public override void axlUpdate(AxlWC axl, bool isSelected) {
 		if (ammo >= maxAmmo) {
-			ammotUsedSinceBlue = 1600;
+			ammoUsedSinceBlue = 1600;
 		}
 	}
 

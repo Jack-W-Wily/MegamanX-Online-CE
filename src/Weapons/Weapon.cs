@@ -332,8 +332,12 @@ public class Weapon {
 		return (shootCooldown / fireRate) <= (1 - percent);
 	}
 
+	public virtual void onAmmoChange(float amount) {
+	}
+
 	public virtual void addAmmo(float amount, Player player) {
 		if (player.character is MegamanX mmx && mmx.hyperArmArmor == ArmorId.Max && amount < 0) amount *= 0.5f;
+		onAmmoChange(amount);
 		ammo += amount;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 	}
@@ -341,6 +345,7 @@ public class Weapon {
 	public void addAmmoPercent(float ammoAdd) {
 		float weaponHealAmount = MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
 		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
+		onAmmoChange(weaponHealAmount);
 		ammo += ammoAdd;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 	}
@@ -410,6 +415,7 @@ public class Weapon {
 		}
 		weaponHealAmount += MathF.Ceiling(ammoAdd * ammoGainMultiplier);
 		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
+		onAmmoChange(weaponHealAmount);
 	}
 
 	public void addAmmoPercentHeal(float ammoAdd) {
@@ -418,6 +424,7 @@ public class Weapon {
 		}
 		weaponHealAmount += MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
 		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
+		onAmmoChange(weaponHealAmount);
 	}
 
 	public static void gigaAttackSoundLogic(

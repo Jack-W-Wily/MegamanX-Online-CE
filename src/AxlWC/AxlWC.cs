@@ -110,6 +110,10 @@ public class AxlWC : Character {
 				changeState(new AxlFlashKick(), true);
 			}
 		}
+		// Weapon logic.
+		foreach (AxlWeaponWC weapon in axlWeapons) {
+			weapon.axlUpdate(this, weapon == axlWeapon);
+		}
 		// Arm angle.
 		updateArmAngle();
 		// Charge and release charge logic.
