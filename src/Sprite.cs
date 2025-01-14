@@ -399,15 +399,27 @@ public class Sprite {
 						bitmap,
 						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
 						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
+						x, y, zIndex - 10,
+						cx - (frameOffsetX - (1 * xDirArg)) * xDirArg,
+						cy - (frameOffsetY - (1 * yDirArg)) * yDirArg,
+						xDirArg, yDirArg, angle, alpha,
 						[outlineShader], true
 					);
+					if (animData.isAxlSprite && drawAxlArms) {
+						DrawWrappers.DrawTexture(
+							axlArmBitmap,
+							currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
+							currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
+							x, y, zIndex - 10,
+							cx - (frameOffsetX - (1 * xDirArg)) * xDirArg,
+							cy - (frameOffsetY - (1 * yDirArg)) * yDirArg,
+							xDirArg, yDirArg, angle, alpha,
+							[outlineShader], true
+						);
+					}
 				}
 			}
-		
+
 			if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
 					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
@@ -1010,58 +1022,33 @@ public class AnimData {
 		Texture bitmap = this.bitmap;
 
 		if (renderEffects != null && !renderEffects.Contains(RenderEffectType.Invisible)) {
-			if (renderEffects.Contains(RenderEffectType.BlueShadow) && alpha >= 1) {
-				var blueShader = Helpers.cloneShaderSafe("outline_blue");
-				if (blueShader != null) {
-					blueShader.SetUniform(
+			if (alpha >= 1 && (
+				renderEffects.Contains(RenderEffectType.BlueShadow) ||
+				renderEffects.Contains(RenderEffectType.RedShadow) ||
+				renderEffects.Contains(RenderEffectType.GreenShadow)
+			)) {
+				ShaderWrapper? outlineShader = null;
+				if (renderEffects.Contains(RenderEffectType.BlueShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_blue");
+				} else if (renderEffects.Contains(RenderEffectType.RedShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_red");
+				} else if (renderEffects.Contains(RenderEffectType.GreenShadow)) {
+					outlineShader = Helpers.cloneShaderSafe("outline_green");
+				}
+				if (outlineShader != null) {
+					outlineShader.SetUniform(
 						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
+						new SFML.Graphics.Glsl.Vec2(currentFrame.rect.w() + 2, currentFrame.rect.h() + 2)
 					);
 					DrawWrappers.DrawTexture(
 						bitmap,
 						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
 						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x, y, zIndex,
-						cx - frameOffsetX * xDirArg,
-						cy - frameOffsetY * yDirArg,
+						x, y, zIndex - 10,
+						cx - (frameOffsetX - (1 * xDirArg)) * xDirArg,
+						cy - (frameOffsetY - (1 * yDirArg)) * yDirArg,
 						xDirArg, yDirArg, angle, alpha,
-						new List<ShaderWrapper>() { blueShader }, true
-					);
-				}
-			} else if (renderEffects.Contains(RenderEffectType.RedShadow) && alpha >= 1) {
-				var redShader = Helpers.cloneShaderSafe("outline_red");
-				if (redShader != null) {
-					redShader.SetUniform(
-						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
-					);
-					DrawWrappers.DrawTexture(
-						bitmap,
-						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex - 10,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
-						new List<ShaderWrapper>() { redShader }, true
-					);
-				}
-			} else if (renderEffects.Contains(RenderEffectType.GreenShadow) && alpha >= 1) {
-				var greenShader = Helpers.cloneShaderSafe("outline_green");
-				if (greenShader != null) {
-					greenShader.SetUniform(
-						"textureSize",
-						new SFML.Graphics.Glsl.Vec2(bitmap.Size.X, bitmap.Size.Y)
-					);
-					DrawWrappers.DrawTexture(
-						bitmap,
-						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
-						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
-						new List<ShaderWrapper>() { greenShader }, true
+						[outlineShader], true
 					);
 				}
 			}

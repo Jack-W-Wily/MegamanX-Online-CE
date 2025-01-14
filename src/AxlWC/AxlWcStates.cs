@@ -551,14 +551,12 @@ public class EvasionBarrage : CharState {
 
 	public override void update() {
 		base.update();
-		if (!character.grounded && pushBackSpeed > 0) {
+		if (pushBackSpeed > 0) {
+			character.vel.y = 0;
 			character.useGravity = false;
-			character.move(new Point(-90 * character.xDir, -pushBackSpeed * 2f));
+			character.move(new Point(-80 * character.xDir, -pushBackSpeed * 2f));
 			pushBackSpeed -= 7.5f;
 		} else {
-			if (!character.grounded) {
-				character.move(new Point(-80 * character.xDir, 0));
-			}
 			character.useGravity = true;
 		}
 		Point gunpos = character.getFirstPOI() ?? character.pos;
@@ -577,12 +575,11 @@ public class EvasionBarrage : CharState {
 					player.getNextActorNetId(), sendRpc: true
 				);
 				character.playSound("axlBullet", sendRpc: true);
-				axl.mainWeapon.addAmmo(-3f, player);
+				axl.mainWeapon.addAmmo(-0.75f, player);
 			}
 		}
-		if (stateFrames >= 30) {
+		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
 			axl.armAngle = 0;
-			character.vel.y = 0;
 			character.xPushVel = -100 * character.xDir;
 			character.changeToLandingOrFall();
 		}
@@ -642,7 +639,7 @@ public class RisingBarrage : CharState {
 				character.playSound("axlBullet", sendRpc: true);
 			}
 		}
-		if (stateFrames >= 30) {
+		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
 			axl.armAngle = -64;
 			character.changeToIdleOrFall();
 		}
