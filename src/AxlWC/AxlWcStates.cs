@@ -160,8 +160,8 @@ public class OcelotSpin : CharState {
 			specialPressed = true;
 		}
 
-		if (specialPressed && character.frameIndex == 11) {
-			character.frameIndex = 7;
+		if (specialPressed && character.frameIndex == 8) {
+			character.frameIndex = 3;
 			specialPressed = false;
 		}
 
