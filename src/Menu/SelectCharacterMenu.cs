@@ -25,19 +25,21 @@ public class PlayerCharData {
 
 public enum CharIds {
 	X = 0,
-	Zero  = 1,
-	Vile  = 2,
-	Axl  = 3,
-	Sigma  = 4,
-	PunchyZero  = 5,
-	BusterZero  = 6,
-	XMID  = 7,
-	Zain  = 8,
-	GBD  = 9,
+	XAnother = 1,
+	ZeroX1  = 2,
+	ZeroX2  = 3,
+	ZeroX6  = 4,
+	Vile  = 5,
+	AxlWC  = 6,
+	AxlX8 = 7,
+	Sigma  = 8,
+	Zain  = 9,
+	GBD  = 10,
 	Dynamo  = 11,
 	Dragoon = 12,
 	// Non-standard chars start here.
 	WolfSigma = 100,
+	Axl = 200,
 	ViralSigma,
 	KaiserSigma,
 
@@ -46,7 +48,7 @@ public enum CharIds {
 	SoulBodyClone,
 	
 	// Non-vanilla chars start here.
-	Rock = 10,
+	Rock = 10000,
 }
 
 public class CharSelection {
@@ -62,21 +64,18 @@ public class CharSelection {
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", 0, 1, 0, "smenu_x", 0),
-		new CharSelection("X (Rage)", 7, 1, 0, "smenu_x", 0),
-		
-		new CharSelection("Zero (Early)", 5, 1, 0, "smenu_zero", 0) {
-		},
-		new CharSelection("Zero (Mid)", 1, 1, 0, "smenu_zero_2", 0),
-		//new CharSelection("Zero (End)", 6, 1, 0, "menu_bzero", 0) {
-		//	offset = new Point(2, 45)
-		//},
-		new CharSelection("Vile", 2, 1, 0, "smenu_vile", 0),
-		new CharSelection("Axl", 3, 1, 0, "smenu_axl", 0),
-		new CharSelection("Sigma", 4, 1, 0, "smenu_sigma", 0),
+		new CharSelection("X (Another)", 1, 1, 0, "smenu_x", 0),
+		new CharSelection("Zero (X1 - MHX)", 2, 1, 0, "smenu_zero", 0),
+		new CharSelection("Zero (X2 - X5)", 3, 1, 0, "smenu_zero_2", 0),
+		//new CharSelection("Zero (X6 - X8)", 4, 1, 0, "menu_bzero", 0),
+		new CharSelection("VAVA", 5, 1, 0, "smenu_vile", 0),
+		new CharSelection("Axl ", 6, 1, 0, "smenu_axl", 0),
+		new CharSelection("Axl", 7, 1, 0, "smenu_axl", 0),
+		new CharSelection("Sigma", 8, 1, 0, "smenu_sigma", 0),
 		new CharSelection("Dynamo", 11, 1, 0, "smenu_dynamo", 0),
-		new CharSelection("Zain", 8, 1, 0, "smenu_zain", 0),
-		new CharSelection("GBD", 9, 1, 0, "smenu_gbd", 0),
-			new CharSelection("High Max", 12, 1, 0, "smenu_highmx", 0),
+		new CharSelection("Zain", 9, 1, 0, "smenu_zain", 0),
+		new CharSelection("GBD", 10, 1, 0, "smenu_gbd", 0),
+		new CharSelection("High Max", 12, 1, 0, "smenu_highmx", 0),
 		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
@@ -327,26 +326,43 @@ public class SelectCharacterMenu : IMainMenu {
 
 		string[] description = playerData.charNum switch {
 			(int)CharIds.X => new string[]{
-				"A versatile marksman whose arsenal can",
-				"accommodate a variety of different play styles."
+				"X, Standard Zoner that can use Armors and mix them"
 			},
-			(int)CharIds.Zero => new string[] {
-				"Powerful melee warrior", "with high damage combos."
+			(int)CharIds.XAnother => new string[]{
+				"Lacks ability to mix armors but has a bigger moveset"
+			},
+			(int)CharIds.ZeroX1 => new string[] {
+				"High Damage Melee fighter but weak midair"
+			},
+			(int)CharIds.ZeroX2 => new string[] {
+				"Combomad Rushdown fighter with a variety of combo routes and hypermodes"
+			},
+			(int)CharIds.ZeroX6 => new string[] {
+				"NOT CREATED YET"
 			},
 			(int)CharIds.Vile => new string[] {
-				"Unpredictable threat that can self-revive", "and call down Ride Armors."
+				"Multiarchetype Fighter that can adapt to any strategy but lacks HP"
 			},
-			(int)CharIds.Axl => new string[] {
-				"Precise and deadly close range assassin", "with aiming and rapid fire capabilities."
+			(int)CharIds.AxlWC => new string[] {
+				"Gunslinger Rushdown Zoner hybrid with access to iframes"
+			},
+			(int)CharIds.AxlX8 => new string[] {
+				"? ? ? ? ? ? ?"
 			},
 			(int)CharIds.Sigma => new string[] {
-				"A fearsome military commander that can", "summon Mavericks on the battlefield."
+				"Commander type unit that can use mavericks to assist his kit"
 			},
-			(int)CharIds.BusterZero => new string[] {
-				"Fast ranged marksman", "with a simple but strong buster combo."
+			(int)CharIds.Zain => new string[] {
+				"High Damage Fighter with Defensive skill but can't combo without resoruces"
 			},
-			(int)CharIds.PunchyZero => new string[] {
-				"Close range melee brawler", "that can counter the enemy attacks."
+			(int)CharIds.GBD => new string[] {
+				"Hit and run type Trickster that can summon ride chasers"
+			},
+			(int)CharIds.Dynamo => new string[] {
+				"Multi strategy fighter with great mobility options"
+			},
+			(int)CharIds.Dragoon => new string[] {
+				"Shoto styled fighter with burning damage passive"
 			},
 			_ => new string[] { "ERROR" }
 		};

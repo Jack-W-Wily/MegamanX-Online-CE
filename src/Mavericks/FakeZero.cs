@@ -189,7 +189,7 @@ public class FakeZero : Maverick {
 		if (sprite.name.Contains("air")) {
 				return new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.ZSaber1,
-					player, damage: 2, flinch: 20, 2,
+					player, damage: 2, flinch: 20, 20,
 					isJuggleProjectile : true
 				);	
 		}
@@ -583,7 +583,7 @@ public class FakeZeroRockProj : Projectile {
 
 public class FakeZeroGuardState : MaverickState {
 	public FakeZeroGuardState() : base("guard") {
-		superArmor = true;
+	//	superArmor = true;
 		aiAttackCtrl = true;
 	}
 

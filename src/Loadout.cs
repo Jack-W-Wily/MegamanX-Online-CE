@@ -46,7 +46,7 @@ public class XLoadout {
 		if (player.isX){
 			indices.Add((int)WeaponIds.Buster);
 		}
-		if (player.isRageX){
+		if (player.isX1Zero){
 			indices.Add((int)WeaponIds.RagingChargeBuster);
 		}
 		indices.Add((byte)weapon1);

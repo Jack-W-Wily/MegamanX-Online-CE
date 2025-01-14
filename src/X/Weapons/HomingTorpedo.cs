@@ -97,8 +97,8 @@ public class TorpedoProj : Projectile, IDamagable {
 		else if (type == 3) {
 			projId = (int)ProjIds.LaunchOTorpedo;
 			changeSprite("launcho_proj_ht", true);
-			maxTime = 1f;
-			maxSpeed = 250;
+	//		maxTime = 1f;
+			//maxSpeed = 250;
 			damager.flinch = Global.defFlinch;
 		}
 		else if (type == 5) {

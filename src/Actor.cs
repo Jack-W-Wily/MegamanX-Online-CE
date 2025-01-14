@@ -373,8 +373,8 @@ public partial class Actor : GameObject {
 		}
 
 		Global.level.addToGrid(this);
-
-		if ((this is Character || this is Maverick) && spriteName != oldSpriteName) {
+		
+		if ((this is Character || this is Maverick) && spriteName != oldSpriteName && Options.main.enableVoices == true) {
 			if (spriteName.EndsWith("_warp_in") && !Global.level.mainPlayer.readyTextOver) {
 				Global.level.delayedActions.Add(new DelayedAction(() => {
 					playOverrideVoice(spriteName);

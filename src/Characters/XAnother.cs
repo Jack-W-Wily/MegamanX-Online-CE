@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace MMXOnline;
 
-public class XMID : Character {
+public class XAnother : Character {
 
 	// Armor variables.
 	public ArmorId chestArmor;
@@ -136,14 +136,14 @@ public class XMID : Character {
 
 
 	public Projectile? unpoAbsorbedProj;
-	public XMID(
+	public XAnother(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		charId = CharIds.XMID;
+		charId = CharIds.XAnother;
 		weapons = XLoadoutSetup.getLoadout(player);
 		// Link X-Buster or create one.
 		XBuster? tempBuster = weapons.Find((Weapon w) => w is XBuster) as XBuster;
