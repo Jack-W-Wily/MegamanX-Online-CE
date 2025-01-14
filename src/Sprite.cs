@@ -441,8 +441,9 @@ public class Sprite {
 							animData.frames[1].rect.y1,
 							animData.frames[1].rect.w(),
 							animData.frames[1].rect.h(),
-							x + frameOffsetX, y + frameOffsetY,
-							zIndex, cx, cy,
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - (frameOffsetY - extraYOff) * yDirArg,
 							xDirArg, yDirArg,
 							angle, alpha,
 							shaderList, true
@@ -467,7 +468,14 @@ public class Sprite {
 				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
 				lastFiveTrailDraws.Add(new Trail() {
 					action = (float time) => {
-						DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
+						DrawWrappers.DrawTexture(
+							bitmap, currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - (frameOffsetY - extraYOff) * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
 					},
 					time = 0.25f
 				});
@@ -492,7 +500,15 @@ public class Sprite {
 				character.lastFiveTrailDraws.Add(new Trail() {
 					action = (float time) => {
 						speedDevilShader?.SetUniform("alpha", time * 2);
-						DrawWrappers.DrawTexture(bitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaderList, true);
+						DrawWrappers.DrawTexture(
+							bitmap, currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - (frameOffsetY - extraYOff) * yDirArg,
+							xDirArg, yDirArg,
+							angle, alpha, shaderList, true
+						);
 					},
 					time = 0.125f
 				});
@@ -505,9 +521,10 @@ public class Sprite {
 				currentFrame.rect.y1 - extraYOff,
 				currentFrame.rect.w(),
 				currentFrame.rect.h() + extraY,
-				x + frameOffsetX,
-				y + frameOffsetY - extraYOff,
-				zIndex, cx, cy, xDirArg, yDirArg,
+				x, y, zIndex,
+				cx - frameOffsetX * xDirArg,
+				cy - (frameOffsetY - extraYOff) * yDirArg,
+				xDirArg, yDirArg,
 				angle, alpha, shaders, true
 			);
 		} else {
@@ -517,9 +534,10 @@ public class Sprite {
 				currentFrame.rect.y1 - extraYOff,
 				currentFrame.rect.w() + extraW,
 				currentFrame.rect.h() + extraY,
-				x + frameOffsetX + extraXOff,
-				y + frameOffsetY,
-				zIndex, cx, cy, xDirArg, yDirArg,
+				x, y, zIndex,
+				cx - frameOffsetX * xDirArg,
+				cy - (frameOffsetY - extraYOff) * yDirArg,
+				xDirArg, yDirArg,
 				angle, alpha, shaders, true
 			);
 		}
@@ -530,10 +548,25 @@ public class Sprite {
 					upShaders.Add(Global.shaderWrappers["hit"]);
 				}
 			}
-			DrawWrappers.DrawTexture(Global.textures["XUPGlow"], currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, upShaders, true);
+			DrawWrappers.DrawTexture(
+				Global.textures["XUPGlow"],
+				currentFrame.rect.x1, currentFrame.rect.y1,
+				currentFrame.rect.w(), currentFrame.rect.h(),
+				x, y, zIndex,
+				cx - frameOffsetX * xDirArg,
+				cy - (frameOffsetY - extraYOff) * yDirArg,
+				xDirArg, yDirArg, angle, alpha, upShaders, true
+			);
 		}
 		if (animData.isAxlSprite && drawAxlArms) {
-			DrawWrappers.DrawTexture(axlArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1, currentFrame.rect.w(), currentFrame.rect.h(), x + frameOffsetX, y + frameOffsetY, zIndex, cx, cy, xDirArg, yDirArg, 0, alpha, shaders, true);
+			DrawWrappers.DrawTexture(
+				axlArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1,
+				currentFrame.rect.w(), currentFrame.rect.h(),
+				x, y, zIndex,
+				cx - frameOffsetX * xDirArg,
+				cy - (frameOffsetY - extraYOff) * yDirArg,
+				xDirArg, yDirArg, 0, alpha, shaders, true
+			);
 		}
 	}
 
@@ -661,8 +694,9 @@ public class Sprite {
 			bitmap,
 			drawRect.x1, drawRect.y1,
 			drawRect.w(), drawRect.h(),
-			x + frameOffsetX, y + frameOffsetY,
-			zIndex, cx, cy,
+			x, y, zIndex,
+			cx - frameOffsetX * xDirArg,
+			cy - frameOffsetY * yDirArg,
 			xDirArg, yDirArg,
 			0, alpha, null, true
 		);
@@ -987,10 +1021,10 @@ public class AnimData {
 						bitmap,
 						currentFrame.rect.x1 - 1, currentFrame.rect.y1 - 1,
 						currentFrame.rect.w() + 2, currentFrame.rect.h() + 2,
-						x + frameOffsetX - (1 * xDirArg),
-						y + frameOffsetY - (1 * yDirArg),
-						zIndex,
-						cx, cy, xDirArg, yDirArg, angle, alpha,
+						x, y, zIndex,
+						cx - frameOffsetX * xDirArg,
+						cy - frameOffsetY * yDirArg,
+						xDirArg, yDirArg, angle, alpha,
 						new List<ShaderWrapper>() { blueShader }, true
 					);
 				}
@@ -1038,8 +1072,10 @@ public class AnimData {
 			bitmap, currentFrame.rect.x1,
 			currentFrame.rect.y1 - extraYOff,
 			currentFrame.rect.w(), currentFrame.rect.h() + extraYOff,
-			x + frameOffsetX, y + frameOffsetY - extraYOff,
-			zIndex, cx, cy, xDirArg, yDirArg, angle, alpha, shaders, true
+			x, y, zIndex,
+			cx - frameOffsetX * xDirArg,
+			cy - (frameOffsetY - extraYOff) * yDirArg,
+			xDirArg, yDirArg, angle, alpha, shaders, true
 		);
 	}
 

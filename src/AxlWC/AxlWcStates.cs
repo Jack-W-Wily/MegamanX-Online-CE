@@ -631,11 +631,13 @@ public class RisingBarrage : CharState {
 					axl, gunpos.Value, axl.armDir == 1 ? -32 : 160,
 					player.getNextActorNetId(), sendRpc: true
 				);
-				new AxlMeleeBullet(
-					axl, gunpos.Value, character.xDir,
-					player.getNextActorNetId(),
-					byteAngle: -90, sendRpc: true
-				);
+				if (axl.frameIndex >= 4) {
+					new AxlMeleeBullet(
+						axl, gunpos.Value, character.xDir,
+						player.getNextActorNetId(),
+						byteAngle: -64 * axl.xDir, sendRpc: true
+					);
+				}
 				axl.mainWeapon.addAmmo(-0.5f, player);
 				character.playSound("axlBullet", sendRpc: true);
 			}
@@ -916,7 +918,6 @@ public class RainStorm : CharState {
 	}
 
 	public override void update() {
-		base.update();
 		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
@@ -930,12 +931,13 @@ public class RainStorm : CharState {
 			if (projTime >= 4) {
 				projTime = 0;
 				new BlueBulletProj(
-					axl, gunpos, 64,
+					axl, gunpos.addxy(0, -20), 64,
 					player.getNextActorNetId(), sendRpc: true
 				);
 				new AxlMeleeBullet(
-					axl, gunpos, character.xDir,
-					player.getNextActorNetId(), sendRpc: true
+					axl, gunpos.addxy(0, -20), character.xDir,
+					player.getNextActorNetId(), sendRpc: true,
+					byteAngle: 64 * axl.xDir
 				);
 				character.playSound("axlBullet", sendRpc: true);
 				axl.mainWeapon.addAmmo(-0.5f, player);

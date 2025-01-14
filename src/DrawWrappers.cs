@@ -122,14 +122,14 @@ public class DrawLayer : Transformable, Drawable {
 				}
 			}
 			// One shader.
-			else if (oneOff.shaders.Count == 1 && oneOff.color == Color.White || oneOff.size == null) {
+			/*else if (oneOff.shaders.Count == 1 && oneOff.color == Color.White || oneOff.size == null) {
 				RenderStates renderStates = new RenderStates(states);
 				renderStates.Shader = oneOff.shaders[0].getShader();
 				target.Draw(oneOff.drawable, renderStates);
 				if (oneOff.drawable is SFML.Graphics.Sprite sprite) {
 					sprite.Dispose();
 				}
-			}
+			}*/
 			// Multi-shader.
 			else {
 				var sprite = oneOff.drawable as SFML.Graphics.Sprite;
@@ -165,11 +165,10 @@ public class DrawLayer : Transformable, Drawable {
 				// Create a clear texture first.
 				back.Clear(new Color(0, 0, 0, 0));
 				back.Display();
-				renderStates.Shader = oneOff.shaders[0].getShader();
 				back.Draw(sprite, renderStates);
 				sprite.Dispose();
 				// Iterate shaders.
-				for (int num = 1; num < oneOff.shaders.Count; num++) {
+				for (int num = 0; num < oneOff.shaders.Count; num++) {
 					// Clear image.
 					renderStates = new RenderStates(states);
 					front.Clear(new Color(0, 0, 0, 0));

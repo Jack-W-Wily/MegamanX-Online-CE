@@ -43,6 +43,8 @@ public class BlueBulletProj : Projectile {
 }
 
 public class AxlMeleeBullet : Projectile {
+	Point offset = new();
+
 	public AxlMeleeBullet(
 		Actor owner, Point pos,
 		int xDir, ushort netProjId,
@@ -53,6 +55,7 @@ public class AxlMeleeBullet : Projectile {
 		weapon = AxlBulletWC.netWeapon;
 		projId = (int)ProjIds.AxlMeleeBullet;
 		this.xDir = xDir;
+		this.byteAngle = byteAngle;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
 		setIndestructableProperties();
@@ -64,12 +67,16 @@ public class AxlMeleeBullet : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir, (byte)byteAngle);
 		}
+
+		if (owningActor != null) {
+			offset = pos - owningActor.pos;
+		}
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
 		if (owningActor != null) {
-			incPos(owningActor.deltaPos);
+			changePos(owningActor.pos + offset);
 		}
 	}
 
