@@ -82,7 +82,11 @@ public class AxlBulletWC : AxlWeaponWC {
 			return true;
 		}
 		if (specialPressed && inputDir.y == -1 && ammo > 0) {
+			if (axl.grounded){
 			axl.changeState(new TailShot(), true);
+			} else {
+			axl.changeState(new AxlRainDrop(), true);
+			}
 			return true;
 		}
 		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {

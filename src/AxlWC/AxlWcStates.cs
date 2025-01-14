@@ -146,6 +146,7 @@ public class OcelotSpin : CharState {
 	private AxlWC axl = null!;
 
 	public OcelotSpin() : base("ocelotspin") {
+		exitOnAirborne = true;
 		normalCtrl = true;
 	}
 
@@ -160,8 +161,13 @@ public class OcelotSpin : CharState {
 			specialPressed = true;
 		}
 
-		if (specialPressed && character.frameIndex == 8) {
-			character.frameIndex = 3;
+		if (specialPressed && character.frameIndex == 11) {
+
+			if (!player.input.isHeld(Control.Down,player)){
+				character.changeState(new AxlSpinKick(), true);
+			} else {
+			character.frameIndex = 7;
+			}
 			specialPressed = false;
 		}
 
@@ -195,7 +201,7 @@ public class AxlFlashKick : CharState {
 			character.vel.y = -character.getJumpPower();
 			new AxlFlashKickProj(
 			new StormTornado(), character.pos.addxy(15 * character.xDir, -26),
-			character.xDir, player, player.getNextActorNetId(), rpc: true);
+			character.xDir, player, player.getNextActorNetId(), true);
 
 			character.playSound("genocideCutter2", sendRpc: true);
 		}
@@ -271,9 +277,13 @@ public class TailShot : CharState {
 			// erhm STOP changing the inputs of my stuff without asking
 			//GRRRRRRRRRRRRR 
 			// - W
-			if (character.frameIndex >= 3 && 
-			player.input.isPressed(Control.Shoot,player)) {
-			character.changeState(new AxlString1(), true);
+			if (character.frameIndex >= 3) {
+				if (player.input.isPressed(Control.Shoot,player)){
+				character.changeState(new AxlString1(), true);
+				}
+				if (player.input.isPressed(Control.Special1,player)){
+				character.changeState(new AxlSpinKick(), true);
+				}
 			}
 			//>>>>>>>>>>>>>>>>>>>>
 
@@ -573,10 +583,10 @@ public class EvasionBarrage : CharState {
 					player.getNextActorNetId(), sendRpc: true
 				);
 				character.playSound("axlBullet", sendRpc: true);
-				axl.mainWeapon.addAmmo(-0.75f, player);
+				axl.mainWeapon.addAmmo(-3f, player);
 			}
 		}
-		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
+		if (stateFrames >= 30) {
 			axl.armAngle = 0;
 			character.vel.y = 0;
 			character.xPushVel = -100 * character.xDir;
@@ -603,6 +613,7 @@ public class RisingBarrage : CharState {
 
 	public RisingBarrage() : base("risingbarrage") {
 		exitOnAirborne = true;
+		attackCtrl = true; // Keep this, it's funny as hell
 	}
 
 	public override void update() {
@@ -627,7 +638,7 @@ public class RisingBarrage : CharState {
 				character.playSound("axlBullet", sendRpc: true);
 			}
 		}
-		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
+		if (stateFrames >= 30) {
 			axl.armAngle = -64;
 			character.changeToIdleOrFall();
 		}
@@ -643,6 +654,276 @@ public class RisingBarrage : CharState {
 		character.useGravity = true;
 	}
 }
+
+
+
+
+public class AxlRainDrop : CharState {
+	
+	public float pushBackSpeed;
+
+	public bool LandedOnce;
+
+
+
+	public AxlRainDrop()
+		: base("raindrop", "", "")
+	{
+	airMove = true;
+
+	}
+
+	public override void update()
+	{
+	
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.grounded && !LandedOnce){
+		character.changeSpriteFromName("raindrop_land", true);
+		LandedOnce = true;
+		}
+
+		if (LandedOnce){
+			if (player.input.isPressed(Control.Shoot,player)){
+				character.changeState(new AxlString1(), true);
+			}
+			if (player.input.isPressed(Control.Special1,player)){
+				character.changeState(new AxlSpinKick(), true);
+			}
+		}
+	
+
+		base.update();
+	
+		if (character.isAnimOver()
+		&& character.sprite.name.Contains("raindrop_land")) {
+			character.changeToIdleOrFall();
+		}	
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+}
+
+
+
+
+
+
+public class AxlSpinKick : CharState {
+	
+	public float pushBackSpeed;
+
+	
+
+
+
+	public AxlSpinKick(string transitionSprite = "")
+		: base("spinkick", "", "", transitionSprite)
+	{
+	airMove = true;
+
+	}
+
+	public override void update()
+	{
+		if (character.frameIndex <= 0) {
+			character.iframesTime = 5;
+		}
+		if (character.frameIndex < 3 && character.grounded) {
+			float xInput = player.input.getXDir(player);
+			float moveSpeed = 100 * character.getRunDebuffs();
+			if (xInput == 0) {
+				xInput = -character.xDir * 0.5f;
+			}
+			character.move(new Point(moveSpeed * xInput, 0));
+		}
+	
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+	
+
+		if (character.frameIndex > 4){
+			if (player.input.isPressed(Control.Shoot,player)){
+				character.changeState(new AxlString1(), true);
+			}
+			if (player.input.isPressed(Control.Special1,player)){
+				character.changeState(new AxlRollBump(), true);
+			}
+		}
+	
+
+		base.update();
+	
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}	
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+}
+
+
+
+
+public class AxlAirRaid : CharState {
+	public Character? victim;
+	public BanzaiBeetleProj Banzai;
+	float leechTime = 1;
+	public bool victimWasGrabbedSpriteOnce;
+	float timeWaiting;
+	public AxlAirRaid(Character? victim) : base("air_raid", "", "", "") {
+		this.victim = victim;
+		grabTime = 3;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+
+
+		if (victim.sprite.name.EndsWith("knocked_down") ||
+		 victim.sprite.name.EndsWith("_die")) {
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+			if (character.isDefenderFavored()) {
+				if (leechTime > 0.33f) {
+					leechTime = 0;
+				}
+				return;
+			}
+		}
+
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+
+			if (player.input.isPressed(Control.Shoot, player)) {
+			character.changeState(new AxlString1(), true);
+			}
+			if (player.input.isPressed(Control.Special1, player)) {
+			character.changeState(new AxlRollBump(), true);
+			}
+
+		if (player.input.isPressed(Control.Jump, player)) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+		if (grabTime <= 0) {
+			character.changeToIdleOrFall();
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		victim?.releaseGrab(character);
+	}
+}
+
+
+
+
+
+public class AxlRollBump : CharState {
+	public AxlWC axl = null!;
+	private bool shot;
+
+	public AxlRollBump() : base("rollbump") {
+		canJump = true;
+		canStopJump = true;
+		airMove = true;
+		airMoveTurn = false;
+		canStopJump = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex <= 0 && axl.grounded) {
+			character.iframesTime = 2;
+		}
+		if (character.frameIndex < 3) {
+			float xInput = player.input.getXDir(player);
+			float moveSpeed = 90 * axl.getRunDebuffs();
+			if (xInput == 0) {
+				xInput = -axl.xDir * 0.5f;
+			}
+			character.move(new Point(moveSpeed * xInput, 0));
+		}
+		if (character.frameIndex >= 3 && !shot) {
+			Point gunpos = character.getFirstPOI() ?? axl.pos;
+			shot = true;
+				new AxlFlashKickProj(
+			new StormTornado(), character.pos.addxy(15 * character.xDir, -26),
+			character.xDir, player, player.getNextActorNetId(), true);
+
+
+			character.playSound("punch1", sendRpc: true);
+			axl.mainWeapon.addAmmo(-2, player);
+		}
+
+		if (player.input.isPressed(Control.Special1,player) 
+		&& character.frameIndex >= 3){
+				character.changeState(new AxlFlashKick(), true);
+			}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		axl = character as AxlWC ?? throw new NullReferenceException();
+	}
+}
+
+
 
 public class RainStorm : CharState {
 	bool jumpedYet;

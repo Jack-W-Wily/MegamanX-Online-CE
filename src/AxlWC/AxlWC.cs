@@ -105,10 +105,6 @@ public class AxlWC : Character {
 				changeState(new AxlFlashKick(), true);
 			}
 
-			if 	(player.input.isPressed(Control.Special1, player)
-			&& mainWeapon.ammo > 2){
-			changeState(new EvasionBarrage(), true);
-			}
 		}
 		// For Cancels on Dodgeroll
 		if (charState is DodgeRollAxlWC) {
@@ -116,10 +112,11 @@ public class AxlWC : Character {
 				&& player.input.isPressed(Control.Jump, player)) {
 				changeState(new AxlFlashKick(), true);
 			}
-		}
-		// Weapon logic.
-		foreach (AxlWeaponWC weapon in axlWeapons) {
-			weapon.axlUpdate(this, weapon == axlWeapon);
+
+			if 	(player.input.isPressed(Control.Special1, player)
+			&& mainWeapon.ammo > 2){
+			changeState(new EvasionBarrage(), true);
+			}
 		}
 		// Arm angle.
 		updateArmAngle();
@@ -537,6 +534,9 @@ public class AxlWC : Character {
 		TailShot,
 		EnemyStep,
 		RainStorm,
+		RainDrop,
+		SpinKick,
+		RollBump,
 		RisingBarrage
 	}
 
@@ -554,6 +554,9 @@ public class AxlWC : Character {
 			"axl_risingbarrage" or "axl_flashkick" => MeleeIds.RisingBarrage,
 			"axl_rainstorm" => MeleeIds.RainStorm,
 			"axl_fall_step" => MeleeIds.EnemyStep,
+			"axl_rollbump" => MeleeIds.RollBump,
+			"axl_SpinKick" => MeleeIds.SpinKick,
+			"axl_raindrop" => MeleeIds.RainDrop,
 			_ => MeleeIds.None
 		});
 	}
@@ -611,6 +614,21 @@ public class AxlWC : Character {
 			MeleeIds.RisingBarrage => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.BlockableLaunch, player,
 				3, 0, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.RainDrop => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.SpreadShot, player,
+				3, 0,
+				addToLevel: addToLevel
+			),
+			MeleeIds.SpinKick => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.VileAirRaidStart, player,
+				2, 30,
+				addToLevel: addToLevel
+			),
+			MeleeIds.RollBump => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.MechFrogStompShockwave, player,
+				2, 0,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -692,6 +710,9 @@ public class AxlWC : Character {
 			not AxlString3 and
 			not AxlString4 and
 			not AxlString5 and
+			not AxlRainDrop and
+			not AxlSpinKick and
+			not AxlRollBump and
 			not InRideChaser and
 			not LadderEnd and
 			not InRideChaser and
