@@ -1476,7 +1476,7 @@ public class Taunt : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (player.charNum == (int)CharIds.ZeroX2 && player.input.isHeld(Control.Up, player)) {
+		if (player.charNum == (int)CharIds.Zero && player.input.isHeld(Control.Up, player)) {
 			character.changeSprite("zero_win2", true);
 			if (character.isAnimOver()) {
 				character.changeToIdleOrFall();

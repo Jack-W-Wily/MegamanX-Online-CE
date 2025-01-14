@@ -1390,7 +1390,7 @@ public class GameMode {
 		if (player.charNum == (int)CharIds.ZeroX1) {
 			frameIndex = 1;
 		}
-		if (player.charNum == (int)CharIds.ZeroX6) {
+		if (player.charNum == (int)CharIds.ZeroX2) {
 			frameIndex = 1;
 		}
 		if (player.isDisguisedAxl) frameIndex = 3;
@@ -2461,7 +2461,7 @@ public class GameMode {
 		for (int i = 0; i < dnaCore.weapons.Count && i < 6; i++) {
 			weapons.Add(dnaCore.weapons[i]);
 		}
-		if (dnaCore.charNum == (int)CharIds.ZeroX2) {
+		if (dnaCore.charNum == (int)CharIds.Zero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {

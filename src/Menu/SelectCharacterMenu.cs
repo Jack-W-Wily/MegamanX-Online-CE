@@ -25,7 +25,7 @@ public class PlayerCharData {
 
 public enum CharIds {
 	X,
-	ZeroX6,
+	Zero,
 	Vile,
 	AxlWC,
 	Sigma,
@@ -70,8 +70,8 @@ public class CharSelection {
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Awakened)", (int)CharIds.XAnother, sprite: "empty"),
-		new CharSelection("Zero (Late)", (int)CharIds.ZeroX6, sprite: "smenu_zero_2"),
-		//new CharSelection("Zero (Mid)", (int)CharIds.ZeroX2, sprite: "smenu_zero"),
+		new CharSelection("Zero (Late)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
+		//new CharSelection("Zero (Mid)", (int)CharIds.ZeroX2, sprite: "empty"),
 		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
@@ -340,7 +340,7 @@ public class SelectCharacterMenu : IMainMenu {
 			(int)CharIds.ZeroX2 => new string[] {
 				"Long range figther with a powerfull buster."
 			},
-			(int)CharIds.ZeroX6 => new string[] {
+			(int)CharIds.Zero => new string[] {
 				"Combo & Rushdown fighter\nwith a variety of combo routes and hypermodes."
 			},
 			(int)CharIds.Vile => new string[] {
