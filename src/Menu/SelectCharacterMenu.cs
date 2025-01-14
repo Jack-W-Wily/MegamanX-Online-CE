@@ -69,9 +69,8 @@ public class CharSelection {
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
-		new CharSelection("X (Awakened)", (int)CharIds.XAnother, sprite: "empty"),
-		new CharSelection("Zero (Late)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
-		//new CharSelection("Zero (Mid)", (int)CharIds.ZeroX2, sprite: "empty"),
+		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
+		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
 		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
@@ -84,19 +83,18 @@ public class CharSelection {
 	];
 
 	public static CharSelection[] selections1v1 => [
-		new CharSelection("X(X1)", 0, 1, 0, "menu_megaman", 1),
-		new CharSelection("X(X2)", 0, 2, 0, "menu_megaman", 2),
-		new CharSelection("X(X3)", 0, 3, 0, "menu_megaman", 3),
-		new CharSelection("Zero", 1, 1, 0, "menu_zero", 0),
-		new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
-		new CharSelection("Axl", 3, 1, 0, "menu_axl", 0),
-		new CharSelection("Sigma", 4, 1, 0, "menu_sigma", sigmaIndex),
-		new CharSelection("Kaiser Zero", 5, 1, 0, "zero_megapunch", 5) {
-			offset = new Point(0, 22)
-		},
-		new CharSelection("Buster Zero", 6, 1, 0, "zero_shoot", 0) {
-			offset = new Point(-4, 22)
-		},
+		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
+		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
+		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
+		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
+		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
+		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
+		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
+		new CharSelection("Zain", (int)CharIds.Zain, sprite: "smenu_zain"),
+		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "empty"),
+		new CharSelection("Dynamo", (int)CharIds.Dynamo, sprite: "smenu_dynamo"),
+	
 		new CharSelection("C.Penguin", 210, 1, 0, "chillp_idle", 0),
 		new CharSelection("S.Mandrill", 212, 1, 1, "sparkm_idle", 0),
 		new CharSelection("A.Armadillo", 213, 1, 2, "armoreda_idle", 0),

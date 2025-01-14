@@ -97,10 +97,17 @@ public class AxlWC : Character {
 			) {
 				changeState(new DodgeRollAxlWC(), true);
 			}
-			if ((wasGrounded || grounded) && player.input.isHeld(Control.Up, player) &&
+			if (//(wasGrounded || grounded) && 
+			// There's no need for this move to be Grounded only 
+			 player.input.isHeld(Control.Up, player) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
 				changeState(new AxlFlashKick(), true);
+			}
+
+			if 	(player.input.isPressed(Control.Special1, player)
+			&& mainWeapon.ammo > 2){
+			changeState(new EvasionBarrage(), true);
 			}
 		}
 		// For Cancels on Dodgeroll

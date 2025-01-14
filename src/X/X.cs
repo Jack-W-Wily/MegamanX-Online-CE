@@ -690,7 +690,7 @@ public class MegamanX : Character {
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbuttEX,
 			// Light Helmet when it Enemy Steps.
 			"mmx_fall" 
-			when legArmor == ArmorId.Light && player.input.isPressed(Control.Jump,player) => MeleeIds.EnemyStep,
+			when legArmor == ArmorId.Light && player.input.isHeld(Control.Jump,player) => MeleeIds.EnemyStep,
 			
 			// Nothing.
 			_ => MeleeIds.None

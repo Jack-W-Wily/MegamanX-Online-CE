@@ -966,7 +966,7 @@ public class Vile : Character {
 		if (sprite.name.Contains("slashrun")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				2f, 25,  15f, isDeflectShield: true, ShouldClang : true,
+				2f, 0,  15f, isDeflectShield: true, ShouldClang : true,
 				isPushProjectile : true,
 				 isZSaberEffect2 : true
 			);
