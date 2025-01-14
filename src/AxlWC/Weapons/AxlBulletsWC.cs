@@ -138,6 +138,7 @@ public class AxlBulletWCProj : Projectile {
 
 		if (type >= 1) {
 			changeSprite("axl_bullet_blue", true);
+			damager.damage = 2;
 			damager.flinch = Global.miniFlinch;
 		}
 
