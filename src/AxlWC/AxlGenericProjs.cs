@@ -13,14 +13,14 @@ public class BlueBulletProj : Projectile {
 		fadeSprite = "axl_bullet_fade";
 		projId = (int)ProjIds.BlueBullet;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 0.5f;
+		damager.damage = 1;
 		damager.flinch = Global.miniFlinch;
 		reflectable = true;
 		destroyOnHitWall = true;
 
 		vel = Point.createFromByteAngle(byteAngle) * 60 * 6;
 		this.byteAngle = byteAngle;
-		maxTime = 20f / 60f;
+		maxTime = 16f / 60f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);

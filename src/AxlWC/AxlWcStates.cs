@@ -565,7 +565,7 @@ public class EvasionBarrage : CharState {
 					player.getNextActorNetId(), sendRpc: true
 				);
 				character.playSound("axlBullet", sendRpc: true);
-				axl.mainWeapon.addAmmo(-0.5f, player);
+				axl.mainWeapon.addAmmo(-1f, player);
 			}
 		}
 		if (stateFrames >= 30) {

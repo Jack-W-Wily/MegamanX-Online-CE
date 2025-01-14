@@ -112,9 +112,9 @@ public class AxlBulletWCProj : Projectile {
 		reflectable = true;
 		destroyOnHitWall = true;
 
-		vel = Point.createFromByteAngle(byteAngle) * 500;
+		vel = Point.createFromByteAngle(byteAngle) * 8.5f * 60f;
 		this.byteAngle = byteAngle;
-		maxTime = 12f / 60f;
+		maxTime = 14f / 60f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
