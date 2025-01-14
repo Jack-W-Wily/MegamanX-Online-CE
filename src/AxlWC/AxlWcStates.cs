@@ -269,6 +269,15 @@ public class TailShot : CharState {
 			axl.mainWeapon.addAmmo(-2, player);
 		}
 
+			// erhm STOP changing the inputs of my stuff without asking
+			//GRRRRRRRRRRRRR 
+			// - W
+			if (character.frameIndex >= 3 && 
+			player.input.isPressed(Control.Shoot,player)) {
+			character.changeState(new AxlString1(), true);
+			}
+			//>>>>>>>>>>>>>>>>>>>>
+
 		if (character.isAnimOver()) {
 			axl.armAngle = 32;
 			character.changeToIdleOrFall();
@@ -306,7 +315,7 @@ public class AxlString1 : CharState {
 			axl.mainWeapon.addAmmo(-2, player);
 		}
 
-		if (character.frameIndex >= 4 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
+		if (character.frameIndex >= 4 && player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString2(), true);
 		}
 		if (character.isAnimOver()) {
@@ -359,7 +368,7 @@ public class AxlString2 : CharState {
 			axl.mainWeapon.addAmmo(-2, player);
 		}
 
-		if (character.frameIndex >= 4 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
+		if (character.frameIndex >= 4 && player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString3(), true);
 		}
 		if (character.isAnimOver()) {
@@ -414,7 +423,7 @@ public class AxlString3 : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (character.frameIndex >= 5 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
+		if (character.frameIndex >= 5 && player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString4(), true);
 		}
 	}
@@ -466,7 +475,7 @@ public class AxlString4 : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (character.frameIndex >= 4 && player.input.isPressed(Control.Special1, player) && axl.mainWeapon.ammo > 0) {
+		if (character.frameIndex >= 4 && player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
 			character.changeState(new AxlString5(), true);
 		}
 	}
@@ -565,7 +574,7 @@ public class EvasionBarrage : CharState {
 					player.getNextActorNetId(), sendRpc: true
 				);
 				character.playSound("axlBullet", sendRpc: true);
-				axl.mainWeapon.addAmmo(-1f, player);
+				axl.mainWeapon.addAmmo(-3f, player);
 			}
 		}
 		if (stateFrames >= 30) {

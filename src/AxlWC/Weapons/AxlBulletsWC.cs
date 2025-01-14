@@ -87,15 +87,8 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new OcelotSpin(), true);
 			return true;
 		}
-		if (specialPressed && inputDir.x != 0 && ammo > 0) {
-			axl.changeState(new AxlString1(), true);
-			return true;
-		}
-		if (specialPressed && ammo > 0) {
-			axl.vel.y = -axl.getJumpPower() * 2f;
-			axl.changeState(new EvasionBarrage(), true);
-			return true;
-		}
+	
+
 		return false;
 	}
 
