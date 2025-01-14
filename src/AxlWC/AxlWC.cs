@@ -9,7 +9,7 @@ namespace MMXOnline;
 
 public class AxlWC : Character {
 	// Weapon data.
-	public AxlWeaponWC mainWeapon;
+	public AxlWeaponWC mainWeapon = null!;
 	public List<AxlWeaponWC> axlWeapons = new();
 	public AxlWeaponWC? axlWeapon {
 		get {
@@ -140,7 +140,7 @@ public class AxlWC : Character {
 			armAngle = oldByteArmAngle;
 		}
 		// Swap on ammo empitiying.
-		if (axlWeapon != mainWeapon &&
+		if (axlWeapon != null && axlWeapon != mainWeapon &&
 			axlWeapon.ammo <= 0 && recoilTime <= 0
 		) {
 			Weapon oldWeapon = axlWeapon;
@@ -457,18 +457,18 @@ public class AxlWC : Character {
 	}
 
 	public override bool canAddAmmo() {
-		if (axlWeapon.ammo < axlWeapon.maxAmmo && axlWeapon.canHealAmmo) {
+		if (axlWeapon != null && axlWeapon.ammo < axlWeapon.maxAmmo && axlWeapon.canHealAmmo) {
 			return true;
 		}
 		return false;
 	}
 
 	public override void addAmmo(float amount) {
-		axlWeapon.addAmmoHeal(amount);
+		axlWeapon?.addAmmoHeal(amount);
 	}
 
 	public override void addPercentAmmo(float amount) {
-		axlWeapon.addAmmoPercentHeal(amount);
+		axlWeapon?.addAmmoPercentHeal(amount);
 	}
 
 	public Point getAxlBulletPos(AxlWeaponWC? weapon) {
@@ -507,7 +507,7 @@ public class AxlWC : Character {
 		} else {
 			retPoint = roundPos.addxy(6 * armDir, -21);
 		}
-		if (axlWeapon.isTwoHanded) {
+		if (axlWeapon?.isTwoHanded == true) {
 			retPoint = retPoint.addxy(-7 * armDir, 2);
 		}
 		return retPoint;
@@ -716,7 +716,7 @@ public class AxlWC : Character {
 		Point offsets = new Point(axlSprite.frames[0].offset.x, axlSprite.frames[0].offset.y);
 
 		axlSprite.draw(
-			axlWeapon.spriteFrameIndex, gunOrigin.x + offsets.x * armDir, gunOrigin.y + offsets.y, armDir, 1,
+			axlWeapon?.spriteFrameIndex ?? 0, gunOrigin.x + offsets.x * armDir, gunOrigin.y + offsets.y, armDir, 1,
 			getRenderEffectSet(), 1, 1, 1, armZIndex, angle: Helpers.byteToDegree(armAngle), shaders: getShaders()
 		);
 	}
@@ -738,6 +738,7 @@ public class AxlWC : Character {
 		customData.Add((byte)armAngle);
 		customData.Add((byte)weaponSlot);
 		customData.Add((byte)recoilTime);
+		customData.Add((byte)(axlWeapon?.spriteFrameIndex ?? 0));
 
 		customData.Add(Helpers.boolArrayToByte([
 			shouldDrawArm(),
@@ -753,8 +754,11 @@ public class AxlWC : Character {
 		armAngle = data[0];
 		weaponSlot = data[1];
 		recoilTime = data[2];
+		if (axlWeapon != null) {
+			axlWeapon.spriteFrameIndex = data[3];
+		}
 
-		bool[] flags = Helpers.byteToBoolArray(data[3]);
+		bool[] flags = Helpers.byteToBoolArray(data[4]);
 		shouldDrawArmNet = flags[0];
 		isWhite = flags[1];
 	}
