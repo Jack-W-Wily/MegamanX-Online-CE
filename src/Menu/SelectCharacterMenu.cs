@@ -27,7 +27,7 @@ public enum CharIds {
 	X,
 	ZeroX6,
 	Vile,
-	AxlOld,
+	AxlWC,
 	Sigma,
 	ZeroX1,
 	ZeroX2,
@@ -38,8 +38,10 @@ public enum CharIds {
 	GBD,
 	Dynamo,
 	Dragoon,
-	AxlWC,
 	AxlX8,
+
+	// Old stuff.
+	AxlOld,
 
 	// Non-standard chars start here.
 	WolfSigma = 100,

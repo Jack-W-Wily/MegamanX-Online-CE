@@ -5,7 +5,7 @@
 		<AssemblyName>MMXOD</AssemblyName>
 		<OutputType>WinExe</OutputType>
 		<!--Nullable>annotations</Nullable-->
-		<Nullable>enable</Nullable>
+		<Nullable>annotations</Nullable>
 		<Version>20</Version>
 		<AssemblyVersion>20.0</AssemblyVersion>
 		<ApplicationIcon>app.ico</ApplicationIcon>
