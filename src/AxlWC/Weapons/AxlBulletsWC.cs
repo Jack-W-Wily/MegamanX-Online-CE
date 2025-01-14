@@ -4,6 +4,7 @@ namespace MMXOnline;
 
 public class AxlBulletWC : AxlWeaponWC {
 	public static AxlBulletWC netWeapon = new();
+	public float ammotUsedSinceBlue = 1600;
 
 	private bool wasSpecialHeld;
 	private bool specialActive;
@@ -26,7 +27,13 @@ public class AxlBulletWC : AxlWeaponWC {
 
 	public override void shootMain(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
-		new AxlBulletWCProj(axl, pos, byteAngle, netId, sendRpc: true);
+		int type = 0;
+		// Pseudo-random to guarantee at least every 8 shots.
+		if (ammotUsedSinceBlue >= 8 || Helpers.randomRange(0, 8) == 0) {
+			ammotUsedSinceBlue = 0;
+			type = 1;
+		}
+		new AxlBulletWCProj(axl, pos, type, byteAngle, netId, sendRpc: true);
 	}
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
@@ -42,6 +49,14 @@ public class AxlBulletWC : AxlWeaponWC {
 			_ => 4,
 		};
 	}
+
+	public override void addAmmo(float amount, Player player) {
+		if (amount < 0) {
+			ammotUsedSinceBlue -= amount;
+		}
+		base.addAmmo(amount, player);
+	}
+
 	public override bool attackCtrl(AxlWC axl) {
 		Point inputDir = axl.player.input.getInputDir(axl.player);
 		bool specialPressed = wasSpecialHeld && !axl.player.input.isHeld(Control.Special1, axl.player);
@@ -90,6 +105,13 @@ public class AxlBulletWC : AxlWeaponWC {
 			specialActive = axl.player.input.isPressed(Control.Special1, axl.player);
 		}
 	}
+
+	public override void axlUpdate(AxlWC axl, bool isSelected) {
+		if (ammo >= maxAmmo) {
+			ammotUsedSinceBlue = 1600;
+		}
+	}
+
 	public override void postAxlUpdate(AxlWC axl, bool isSelected) {
 		if (specialActive && isSelected) {
 			wasSpecialHeld = axl.player.input.isHeld(Control.Special1, axl.player);
@@ -99,7 +121,7 @@ public class AxlBulletWC : AxlWeaponWC {
 
 public class AxlBulletWCProj : Projectile {
 	public AxlBulletWCProj(
-		Actor owner, Point pos,
+		Actor owner, Point pos, int type,
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
@@ -116,14 +138,19 @@ public class AxlBulletWCProj : Projectile {
 		this.byteAngle = byteAngle;
 		maxTime = 14f / 60f;
 
+		if (type >= 1) {
+			changeSprite("axl_bullet_blue", true);
+			damager.flinch = Global.miniFlinch;
+		}
+
 		if (sendRpc) {
-			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle, (byte)type);
 		}
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new AxlBulletWCProj(
-			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
 		);
 	}
 }
