@@ -236,6 +236,7 @@ public class Control {
 									{ MenuBack, (int)Key.C },
 							   }
 							},
+							/*
 							// Axl directional aim controls
 							{
 							   getCharSpecificName(KeyboardName, 3, 0),
@@ -282,6 +283,7 @@ public class Control {
 									{ Special2, (int)Key.C },
 							   }
 							}
+							*/
 						};
 				} else {
 					try {
