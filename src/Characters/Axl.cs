@@ -112,7 +112,7 @@ public class Axl : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		charId = CharIds.Axl;
+		charId = CharIds.AxlOld;
 		iceGattlingSound = new LoopingSound("iceGattlingLoopStart", "iceGattlingLoopStop", "iceGattlingLoop", this);
 		spriteFrameToSounds["axl_run/4"] = "run";
 		spriteFrameToSounds["axl_run/8"] = "run";
@@ -152,7 +152,7 @@ public class Axl : Character {
 	}
 
 	public bool isZooming() {
-		return _zoom && player.isAxl;
+		return _zoom && player.isAxlXOD;
 	}
 
 	public bool isAnyZoom() {
@@ -1132,7 +1132,7 @@ public class Axl : Character {
 		assassinCursorPos = null;
 
 		if (!Options.main.lockOnSound) return;
-		if (player.isDisguisedAxl && !player.isAxl && player.axlWeapon is not AssassinBullet) return;
+		if (player.isDisguisedAxl && !player.isAxlXOD && player.axlWeapon is not AssassinBullet) return;
 		if (player.isDisguisedAxl && player.axlWeapon is UndisguiseWeapon) return;
 		if (player.input.isCursorLocked(player)) return;
 
@@ -1761,7 +1761,7 @@ public class Axl : Character {
 
 	public void addDNACore(Character hitChar) {
 		if (!player.ownedByLocalPlayer) return;
-		if (!player.isAxl) return;
+		if (!player.isAxlXOD) return;
 		if (Global.level.is1v1()) return;
 
 		if (player.weapons.Count((Weapon weapon) => weapon is DNACore) < 4) {
@@ -1784,11 +1784,11 @@ public class Axl : Character {
 	}
 
 	public bool isWhiteAxl() {
-		return player.isAxl && whiteAxlTime > 0;
+		return player.isAxlXOD && whiteAxlTime > 0;
 	}
 
 	public bool isStealthMode() {
-		return player.isAxl && isInvisible();
+		return player.isAxlXOD && isInvisible();
 	}
 
 	float stealthCurrencyTime;
@@ -1862,7 +1862,7 @@ public class Axl : Character {
 
 	public override float getRunSpeed() {
 		float runSpeed = 90;
-		if (player.isAxl && shootTime > 0) {
+		if (player.isAxlXOD && shootTime > 0) {
 			runSpeed = 90 - getAimBackwardsAmount() * 25;
 		}
 		return runSpeed * getRunDebuffs();

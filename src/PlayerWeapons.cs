@@ -113,7 +113,7 @@ public partial class Player {
 			return;
 		}
 
-		if ((isAxl || isDisguisedAxl) && isMainPlayer) {
+		if ((isAxlXOD || isDisguisedAxl) && isMainPlayer) {
 			if (Input.mouseScrollUp) {
 				weaponLeft();
 				return;

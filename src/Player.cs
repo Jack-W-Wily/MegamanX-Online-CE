@@ -125,7 +125,8 @@ public partial class Player {
 	public bool isZero { get { return charNum == (int)CharIds.ZeroX2; } }
 	public bool isX1Zero { get { return charNum == (int)CharIds.ZeroX1; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
-	public bool isAxl { get { return charNum == (int)CharIds.AxlWC; } }
+	public bool isAxlXOD { get { return charNum == (int)CharIds.AxlOld; } }
+	public bool isAxlWC { get { return charNum == (int)CharIds.AxlOld; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
@@ -206,7 +207,7 @@ public partial class Player {
 
 	public int realCharNum {
 		get {
-			if (isAxl || isDisguisedAxl) return 3;
+			if (isAxlXOD || isDisguisedAxl) return 3;
 			return charNum;
 		}
 	}
@@ -222,7 +223,7 @@ public partial class Player {
 		{ (int)CharIds.XAnother, new() },
 		{ (int)CharIds.ZeroX2, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
-		{ (int)CharIds.Axl, new List<SubTank>() },
+		{ (int)CharIds.AxlOld, new List<SubTank>() },
 		{ (int)CharIds.AxlWC, new List<SubTank>() },
 		{ (int)CharIds.AxlX8, new List<SubTank>() },
 		{ (int)CharIds.Sigma, new List<SubTank>() },
@@ -241,7 +242,7 @@ public partial class Player {
 		{ (int)CharIds.XAnother, new() },
 		{ (int)CharIds.ZeroX2, new() },
 		{ (int)CharIds.Vile, new() },
-		{ (int)CharIds.Axl, new() },
+		{ (int)CharIds.AxlOld, new() },
 		{ (int)CharIds.AxlWC, new() },
 		{ (int)CharIds.AxlX8, new () },
 		{ (int)CharIds.Sigma, new() },
@@ -683,10 +684,6 @@ public partial class Player {
 	}
 
 	public float getMaxHealth() {
-	//	// 1v1 is the only mode without possible heart tanks/sub tanks
-	//	if (Global.level.is1v1()) {
-	//		return getModifiedHealth(28);
-	//	}
 		int bonus = 0;
 		if (isXAnother) {
 			bonus = 12;
@@ -694,10 +691,12 @@ public partial class Player {
 		if (isX) {
 			bonus = 12;
 		}
-		if (isAxl) {
+		if (isAxlXOD) {
 			bonus = 8;
 		}
-	
+		if (charNum == (int)CharIds.AxlWC) {
+			bonus = 8;
+		}
 		if (isZero) {
 			bonus = 12;
 		}
@@ -1798,7 +1797,7 @@ public partial class Player {
 				zero.isViral = true;
 				zero.hyperMode = 2;
 			}
-		} else if (charNum == (int)CharIds.Axl && character is Axl axl) {
+		} else if (charNum == (int)CharIds.AxlOld && character is Axl axl) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
@@ -1850,7 +1849,7 @@ public partial class Player {
 		character = preTransformedAxl;
 		character.addTransformAnim();
 		preTransformedAxl = null;
-		charNum = 3;
+		charNum = (int)CharIds.AxlWC;
 		character.pos = oldPos;
 		character.xDir = oldDir;
 		maxHealth = getMaxHealth();
@@ -1908,7 +1907,7 @@ public partial class Player {
 			}
 		}
 		preTransformedAxl = null;
-		charNum = 3;
+		charNum = charNum = (int)CharIds.AxlWC;;
 		if (ownedByLocalPlayer) {
 			maxHealth = getMaxHealth();
 			health = 0;
@@ -2048,12 +2047,12 @@ public partial class Player {
 	public void awardCurrency() {
 		// Cannot gain scrap or ST.
 		if (Global.level.is1v1()) return;
-		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxl) return;
+		if (axlBulletType == (int)AxlBulletWeaponType.AncientGun && isAxlXOD) return;
 
 		// First we fill ST.
 		if (isVile) {
 			fillSubtank(1);
-		} else if (isAxl) {
+		} else if (isAxlXOD) {
 			fillSubtank(3);
 		} else {
 			fillSubtank(4);
@@ -2345,7 +2344,7 @@ public partial class Player {
 			return;
 		}
 
-		if (isAxl) {
+		if (isAxlXOD) {
 			//axlBulletTypeBought[6] = false;
 			//if (axlBulletType == (int)AxlBulletWeaponType.AncientGun) axlBulletType = 0;
 		}
@@ -2416,7 +2415,7 @@ public partial class Player {
 	}
 
 	public bool isGridModeEnabled() {
-		if (isAxl || isDisguisedAxl) {
+		if (isAxlXOD || isDisguisedAxl) {
 			if (Options.main.useMouseAim) return false;
 			if (Global.level.is1v1()) return Options.main.gridModeAxl > 0;
 			return Options.main.gridModeAxl > 1;

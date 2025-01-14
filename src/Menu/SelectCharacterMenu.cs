@@ -24,22 +24,25 @@ public class PlayerCharData {
 }
 
 public enum CharIds {
-	X = 0,
-	XAnother = 1,
-	ZeroX1  = 2,
-	ZeroX2  = 3,
-	ZeroX6  = 4,
-	Vile  = 5,
-	AxlWC  = 6,
-	AxlX8 = 7,
-	Sigma  = 8,
-	Zain  = 9,
-	GBD  = 10,
-	Dynamo  = 11,
-	Dragoon = 12,
+	X,
+	ZeroX6,
+	Vile,
+	AxlOld,
+	Sigma,
+	ZeroX1,
+	ZeroX2,
+
+	// Wily Cut chars.
+	XAnother,
+	Zain,
+	GBD,
+	Dynamo,
+	Dragoon,
+	AxlWC,
+	AxlX8,
+
 	// Non-standard chars start here.
 	WolfSigma = 100,
-	Axl = 200,
 	ViralSigma,
 	KaiserSigma,
 

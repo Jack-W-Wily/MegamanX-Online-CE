@@ -609,7 +609,7 @@ public partial class Character : Actor, IDamagable {
 
 
 	public virtual bool canControlAirDash() {
-		return player.isAxl || player.isGBD;
+		return false;
 	}
 
 	public virtual bool canAirJump() {
@@ -2392,7 +2392,7 @@ public partial class Character : Actor, IDamagable {
 				);
 
 				int label = 125;
-				if (player.isAxl || player.isDisguisedAxl) {
+				if (player.isAxlXOD || player.isDisguisedAxl) {
 					label = 123;
 				}
 				Global.sprites["hud_killfeed_weapon"].draw(

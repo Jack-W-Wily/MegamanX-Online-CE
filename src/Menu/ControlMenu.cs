@@ -76,7 +76,7 @@ public class ControlMenu : IMainMenu {
 				
 		}
 		// Axl specific settings
-		if (charNum == 3) {
+		if (charNum == (int)CharIds.AxlOld) {
 			if (axlAimMode == 0) {
 				bindableControls.Add(new string[] { Control.AimUp, "Aim Up" });
 				bindableControls.Add(new string[] { Control.AimDown, "Aim Down" });

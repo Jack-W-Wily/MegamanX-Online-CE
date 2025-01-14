@@ -184,7 +184,7 @@ public class Sprite {
 			if (character.flattenedTime > 0) {
 				scaleY = 0.5f;
 			}
-			if (character.player.isAxl && character.player.axlWeapon != null) {
+			if (character.player.isAxlXOD && character.player.axlWeapon != null) {
 				drawAxlArms = !character.player.axlWeapon.isTwoHanded(true);
 			}
 			else if (character is AxlWC axlWC) {

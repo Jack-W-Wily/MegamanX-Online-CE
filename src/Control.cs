@@ -109,9 +109,11 @@ public class Control {
 		if (charNum == 2) baseStr += "vile";
 		if (charNum == 3) {
 			baseStr += "axl";
+			/*
 			if (aimMode == 0) baseStr += "_dir";
 			if (aimMode == 1) baseStr += "_ang";
 			if (aimMode == 2) baseStr += "_cur";
+			*/
 		}
 		if (charNum == 4) baseStr += "sigma";
 		return baseStr;

@@ -320,7 +320,7 @@ public class GameMode {
 			}
 		}
 
-		if ((Global.level.mainPlayer.isAxl || Global.level.mainPlayer.isDisguisedAxl) && Options.main.useMouseAim && overTime < secondsBeforeLeave && !Menu.inMenu && !Global.level.mainPlayer.isSpectator) {
+		if ((Global.level.mainPlayer.isAxlXOD || Global.level.mainPlayer.isDisguisedAxl) && Options.main.useMouseAim && overTime < secondsBeforeLeave && !Menu.inMenu && !Global.level.mainPlayer.isSpectator) {
 			Global.window.SetMouseCursorVisible(false);
 			Global.window.SetMouseCursorGrabbed(true);
 			Global.isMouseLocked = true;
@@ -906,7 +906,7 @@ public class GameMode {
 
 		drawDiagnostics();
 
-		if (Global.level.mainPlayer.isAxl && Global.level.mainPlayer.character != null) {
+		if (Global.level.mainPlayer.isAxlXOD && Global.level.mainPlayer.character != null) {
 			//Global.sprites["axl_cursor"].drawImmediate(0, Global.level.mainPlayer.character.axlCursorPos.x, Global.level.mainPlayer.character.axlCursorPos.y);
 		}
 
@@ -991,7 +991,7 @@ public class GameMode {
 		//	return true;
 		//}
 
-		if (level.mainPlayer.isAxl && level.boundBlasterAltProjs.Any(b => b.state == 1)) {
+		if (level.mainPlayer.isAxlXOD && level.boundBlasterAltProjs.Any(b => b.state == 1)) {
 			return true;
 		}
 		if (level.mainPlayer.isSigma && level.mainPlayer.currentMaverick == null) {
@@ -2875,7 +2875,7 @@ public class GameMode {
 			return FontType.Blue;
 		} else if (player.isZero) {
 			return FontType.Red;
-		} else if (player.isAxl) {
+		} else if (player.charNum == (int)CharIds.AxlWC || player.charNum == (int)CharIds.AxlX8) {
 			return FontType.Yellow;
 		} else if (player.isVile) {
 			return FontType.Pink;
@@ -3235,7 +3235,7 @@ public class GameMode {
 			}
 		} else if (charNum == 1) charName = "Zero";
 		else if (charNum == 2) charName = "Vile";
-		else if (charNum == 3) {
+		else if (charNum == (int)CharIds.AxlOld) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";
 			else if (Options.main.axlAimMode == 1) charName = "AxlAngular";
 			else charName = "AxlDirectional";
