@@ -149,7 +149,7 @@ public class CopyShotWCProj : Projectile {
 		maxTime = 0.225f;
 
 		if (sendRpc) {
-			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle, [(byte)chargeLevel]);
 		}
 
 		if (chargeLevel == 2) {
