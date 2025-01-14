@@ -1469,14 +1469,16 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 		}
-		if (charState.normalCtrl) {
-			normalCtrl();
-		}
-		if (charState.attackCtrl && invulnTime <= 0) {
-			return attackCtrl();
-		}
-		if (charState.altCtrls.Any(b => b)) {
-			return altCtrl(charState.altCtrls);
+		if (ownedByLocalPlayer) {
+			if (charState.normalCtrl) {
+				normalCtrl();
+			}
+			if (charState.attackCtrl && invulnTime <= 0) {
+				return attackCtrl();
+			}
+			if (charState.altCtrls.Any(b => b)) {
+				return altCtrl(charState.altCtrls);
+			}
 		}
 		return false;
 	}

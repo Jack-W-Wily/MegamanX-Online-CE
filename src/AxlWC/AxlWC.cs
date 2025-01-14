@@ -21,6 +21,7 @@ public class AxlWC : Character {
 	}
 	// Other variables.
 	public const int WhiteAxlCost = 5;
+	public bool? shouldDrawArmNet = null;
 	public bool isWhite;
 	public float whiteTime;
 	public float dodgeRollCooldown;
@@ -31,7 +32,7 @@ public class AxlWC : Character {
 	public bool lockDir;
 	public int armDir => charState is WallSlide ? -xDir : xDir;
 	public float armAngle = 0;
-	public Anim muzzleFlash;
+	public Anim? muzzleFlash;
 	public int hoverTimes = 0;
 
 	public AxlWC(
@@ -44,9 +45,6 @@ public class AxlWC : Character {
 		spriteFrameToSounds["axl_run/4"] = "run";
 		spriteFrameToSounds["axl_run/8"] = "run";
 		configureWeapons();
-		muzzleFlash = new Anim(pos, "axl_pistol_flash", xDir, null, false);
-		muzzleFlash.visible = false;
-		muzzleFlash.destroySelf();
 	}
 
 	public override void preUpdate() {
@@ -126,7 +124,7 @@ public class AxlWC : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if (!muzzleFlash.destroyed) {
+		if (muzzleFlash?.destroyed == false) {
 			float oldByteArmAngle = armAngle;
 			if (recoilTime > 0) {
 				armAngle = MathF.Round(armAngle - recoilTime);
@@ -382,9 +380,12 @@ public class AxlWC : Character {
 			playSound(weapon.shootSounds[0], true, true);
 		}
 		if (weapon.flashSprite != "") {
+			if (muzzleFlash?.destroyed == false) {
+				muzzleFlash.destroySelf();
+			}
 			muzzleFlash = new Anim(
 				shootPos, weapon.flashSprite, xDir,
-				player.getCharActorNetId(), true, sendRpc: true
+				player.getNextActorNetId(), true, sendRpc: true
 			);
 		}
 	}
@@ -408,9 +409,12 @@ public class AxlWC : Character {
 			playSound(weapon.shootSounds[1], true, true);
 		}
 		if (weapon.chargedFlashSprite != "") {
+			if (muzzleFlash?.destroyed == false)  {
+				muzzleFlash.destroySelf();
+			}
 			muzzleFlash = new Anim(
 				shootPos, weapon.chargedFlashSprite, xDir,
-				player.getCharActorNetId(), true, sendRpc: true
+				player.getNextActorNetId(), true, sendRpc: true
 			);
 		}
 	}
@@ -437,11 +441,15 @@ public class AxlWC : Character {
 			playSound(axlBullet.shootSounds[3], true, true);
 		}
 		if (axlBullet.chargedFlashSprite != "") {
+			if (muzzleFlash?.destroyed == false)  {
+				muzzleFlash.destroySelf();
+			}
 			muzzleFlash = new Anim(
 				shootPos, axlBullet.chargedFlashSprite, xDir,
-				player.getCharActorNetId(), true, sendRpc: true
+				player.getNextActorNetId(), true, sendRpc: true
 			);
 		}
+		stopCharge();
 	}
 
 	public override bool chargeButtonHeld() {
@@ -689,8 +697,7 @@ public class AxlWC : Character {
 		if (recoilTime > 0) {
 			angleOffset = -recoilTime;
 		}
-
-		if (shouldDrawArm()) {
+		if (ownedByLocalPlayer && shouldDrawArm() || !ownedByLocalPlayer && shouldDrawArmNet == true) {
 			drawArm(armAngle + angleOffset);
 		}
 	}
@@ -733,6 +740,7 @@ public class AxlWC : Character {
 		customData.Add((byte)recoilTime);
 
 		customData.Add(Helpers.boolArrayToByte([
+			shouldDrawArm(),
 			isWhite,
 		]));
 		return customData;
@@ -746,8 +754,9 @@ public class AxlWC : Character {
 		weaponSlot = data[1];
 		recoilTime = data[2];
 
-		bool[] flags = Helpers.byteToBoolArray(data[2]);
-		isWhite = flags[0];
+		bool[] flags = Helpers.byteToBoolArray(data[3]);
+		shouldDrawArmNet = flags[0];
+		isWhite = flags[1];
 	}
 }
 

@@ -839,7 +839,7 @@ public class Projectile : Actor {
 		float angle, params byte[] extraData
 	) {
 		int byteAngle = MathInt.Round(angle % 256f);
-		rpcCreateHelper(pos, player, netProjId, xDir, true, owner, extraData);
+		rpcCreateHelper(pos, player, netProjId, byteAngle, true, owner, extraData);
 	}
 
 	public void acidFadeEffect() {
