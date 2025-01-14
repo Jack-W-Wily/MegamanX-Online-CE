@@ -62,7 +62,7 @@ public class AxlMeleeBullet : Projectile {
 		isMelee = true;
 
 		if (sendRpc) {
-			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir, (byte)byteAngle);
 		}
 	}
 
@@ -75,7 +75,7 @@ public class AxlMeleeBullet : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new AxlMeleeBullet(
-			args.owner, args.pos, args.xDir, args.netId, player: args.player
+			args.owner, args.pos, args.xDir, args.netId, player: args.player, byteAngle: args.extraData[0]
 		);
 	}
 }
