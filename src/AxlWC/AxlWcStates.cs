@@ -146,7 +146,6 @@ public class OcelotSpin : CharState {
 	private AxlWC axl = null!;
 
 	public OcelotSpin() : base("ocelotspin") {
-		exitOnAirborne = true;
 		normalCtrl = true;
 	}
 
@@ -574,10 +573,10 @@ public class EvasionBarrage : CharState {
 					player.getNextActorNetId(), sendRpc: true
 				);
 				character.playSound("axlBullet", sendRpc: true);
-				axl.mainWeapon.addAmmo(-3f, player);
+				axl.mainWeapon.addAmmo(-0.75f, player);
 			}
 		}
-		if (stateFrames >= 30) {
+		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
 			axl.armAngle = 0;
 			character.vel.y = 0;
 			character.xPushVel = -100 * character.xDir;
@@ -628,7 +627,7 @@ public class RisingBarrage : CharState {
 				character.playSound("axlBullet", sendRpc: true);
 			}
 		}
-		if (stateFrames >= 30) {
+		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
 			axl.armAngle = -64;
 			character.changeToIdleOrFall();
 		}

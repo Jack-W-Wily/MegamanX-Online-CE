@@ -30,11 +30,13 @@ public class AxlBulletWC : AxlWeaponWC {
 		int type = 0;
 		// Pseudo-random to guarantee at least every 4 shots.
 		if (ammoUsedSinceBlue >= 4 || Helpers.randomRange(0, 4) == 0 || ammo <= 1) {
+			// if less than 4 shots were fire increase the threshold..
 			if (ammoUsedSinceBlue < 4) {
 				ammoUsedSinceBlue *= -1;
 			} else {
 				ammoUsedSinceBlue = 0;
 			}
+			// Activate crit.
 			type = 1;
 		}
 		new AxlBulletWCProj(axl, pos, type, byteAngle, netId, sendRpc: true);
@@ -87,8 +89,10 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new OcelotSpin(), true);
 			return true;
 		}
-	
-
+		if (specialPressed && ammo > 0) {
+			axl.changeState(new EvasionBarrage(), true);
+			return true;
+		}
 		return false;
 	}
 
