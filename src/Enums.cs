@@ -862,6 +862,8 @@ public enum ProjIds {
 	IceGattlingAltWC,
 	RayGunWC,
 	SpiralMagnumWC,
+	FormicAcidWC,
+	FormicAcidSmallWC,
 
 	// Random non-projectiles.
 	AxlDiscardedWeapon,

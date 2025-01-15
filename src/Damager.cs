@@ -292,6 +292,9 @@ public class Damager {
 				case (int)ProjIds.TSeahorseAcid2:
 					damagerMessage = onAcidDamage(damagable, owner, 2);
 					break;
+				case (int)ProjIds.FormicAcidWC:
+					damagerMessage = onAcidDamage(damagable, owner, 2);
+					break;
 				/*
 				case (int)ProjIds.TSeahorsePuddle:
 					damagerMessage = onAcidDamage(damagable, owner, 1);

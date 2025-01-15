@@ -852,14 +852,14 @@ public class Projectile : Actor {
 		new Anim(pos.addxy(3, -3), "acidburst_fade", 1, owner.getNextActorNetId(), true, true, ownedByLocalPlayer);
 	}
 
-	public void acidSplashEffect(CollideData other, ProjIds projId) {
+	public void acidSplashEffect(CollideData? other, ProjIds projId) {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		Point hitPoint = other.hitData.hitPoint ?? pos;
+		Point hitPoint = other?.hitData.hitPoint ?? pos;
 		int yDir = 1;
 		int downY = 1;
-		Point norm = other.hitData.normal ?? new Point(0, -1);
+		Point norm = other?.hitData.normal ?? new Point(0, -1);
 		bool isSide = norm.isSideways();
 		if (!isSide && norm.y > 0) {
 			yDir = -1;

@@ -6,9 +6,9 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 	public static SpiralMagnumWC netWeapon = new();
 
 	public  SpiralMagnumWC() {
-		shootSounds = [ "spiralMagnum", "sniperMissile" ];
-		fireRate = 45;
-		altFireRate = 45;
+		shootSounds = [ "spiralMagnum", "acidBurst" ];
+		fireRate = 30;
+		altFireRate = 40;
 		index = (int)WeaponIds.SpiralMagnum;
 		weaponBarBaseIndex = 34;
 		weaponSlotIndex = 54;
@@ -40,7 +40,21 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		ushort netId = axl.player.getNextActorNetId();
-		new SniperMissileProj(this, pos, axl.player, bulletDir, netId, rpc: true);
+		new FormidAcidProj(axl, pos, byteAngle, netId, sendRpc: true);
+	}
+
+	public override float getFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 20;
+		}
+		return fireRate;
+	}
+
+	public override float getAltFireRate(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 30;
+		}
+		return altFireRate;
 	}
 
 	public override float getAmmoUse(AxlWC axl, int chargeLevel) {
@@ -48,7 +62,10 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return 5;
+		if (axl.isWhite) {
+			return 2;
+		}
+		return 3;
 	}
 }
 
@@ -75,8 +92,7 @@ public class SpiralMagnumWCProj : Projectile {
 	) {
 		projId = (int)ProjIds.SpiralMagnumWC;
 		weapon = SpiralMagnumWC.netWeapon;
-		damager.damage = 2;
-		damager.hitCooldown = 15;
+		damager.damage = 2.5f;
 		damager.flinch = Global.halfFlinch;
 
 		destroyOnHit = true;
@@ -84,7 +100,7 @@ public class SpiralMagnumWCProj : Projectile {
 
 		vel = Point.createFromByteAngle(byteAngle) * 600;
 		this.byteAngle = byteAngle;
-		maxTime = 0.3f;
+		maxTime = 0.325f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
@@ -118,6 +134,95 @@ public class SpiralMagnumWCProj : Projectile {
 	
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SpiralMagnumWCProj(
+			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
+		);
+	}
+}
+
+public class FormidAcidProj : Projectile {
+	bool acidSplashOnce;
+	int bounces = 0;
+	int type;
+	bool once;
+	float yBounce;
+	float xDistTraveled;
+
+	public FormidAcidProj(
+		Actor owner, Point pos,
+		float byteAngle, ushort netProjId,
+		bool sendRpc = false, Player? player = null
+	) : base(
+		pos, 1, owner, "tseahorse_proj_acid", netProjId, player
+	) {
+		projId = (int)ProjIds.FormicAcidWC;
+		weapon = SpiralMagnumWC.netWeapon;
+		damager.damage = 1;
+		damager.flinch = Global.miniFlinch;
+
+		destroyOnHit = true;
+		vel = Point.createFromByteAngle(byteAngle) * 300;
+		this.byteAngle = byteAngle;
+		maxTime = 1.25f;
+		useGravity = true;
+		fadeSound = "acidBurst";
+		vel.y *= 1.5f;
+		yBounce = MathF.Abs(vel.y) * -1;
+		if (yBounce > -150) {
+			yBounce = -150;
+		}
+
+		if (sendRpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+		}
+	}
+
+	public override void update() {
+		base.update();
+		xDistTraveled += MathF.Abs(deltaPos.x);
+		if (xDistTraveled > 200) {
+			destroySelf();
+		}
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (!acidSplashOnce) {
+			acidSplashEffect(null, ProjIds.FormicAcidSmallWC);
+		}
+	}
+
+	public override void onHitWall(CollideData other) {
+		acidSplashEffect(other, ProjIds.FormicAcidSmallWC);
+		bounces++;
+		if (bounces > 3) {
+			destroySelf();
+			return;
+		}
+		var normal = other.hitData.normal ?? new Point(0, -1);
+		if (normal.isSideways()) {
+			vel.x *= -1;
+			incPos(new Point(5 * MathF.Sign(vel.x), 0));
+		} else {
+			vel.y = MathF.Sign(vel.y) * yBounce;
+			if (vel.y == 0) vel.y = yBounce;
+			incPos(new Point(0, 5 * MathF.Sign(vel.y)));
+		}
+		playSound("acidBurst");
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		if (ownedByLocalPlayer) {
+			if (!acidSplashOnce) {
+				acidSplashOnce = true;
+				acidSplashParticles(pos, false, 1, 1, ProjIds.TSeahorseAcid2);
+				acidFadeEffect();
+			}
+		}
+		base.onHitDamagable(damagable);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FormidAcidProj(
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
 	}

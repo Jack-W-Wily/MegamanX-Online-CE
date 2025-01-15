@@ -136,6 +136,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.IceGattlingWC, IceGattlingWCProj.rpcInvoke},
 		{ (int)ProjIds.IceGattlingAltWC, IceGattlingAltWCProj.rpcInvoke},
 		{ (int)ProjIds.SpiralMagnumWC, SpiralMagnumWCProj.rpcInvoke},
+		{ (int)ProjIds.FormicAcidWC, FormidAcidProj.rpcInvoke},
 		{ (int)ProjIds.AxlBulletWC, AxlBulletWCProj.rpcInvoke},
 		{ (int)ProjIds.CopyShotWC, CopyShotWCProj.rpcInvoke},
 		{ (int)ProjIds.BlueBullet, BlueBulletProj.rpcInvoke},
