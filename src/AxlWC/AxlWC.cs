@@ -118,6 +118,10 @@ public class AxlWC : Character {
 			changeState(new EvasionBarrage(), true);
 			}
 		}
+		// Weapon update.
+		foreach (AxlWeaponWC weapon in axlWeapons) {
+			weapon.axlUpdate(this, weapon == axlWeapon);
+		}
 		// Arm angle.
 		updateArmAngle();
 		// Charge and release charge logic.
@@ -203,6 +207,14 @@ public class AxlWC : Character {
 	public override bool canCharge() {
 		return (axlWeapon is AxlBulletWC && charState is not OcelotSpin && charState.attackCtrl);
 	}
+
+	public override void increaseCharge() {
+		if (isWhite) {
+			chargeTime += Global.speedMul * 1.5f;
+		}
+		chargeTime += Global.speedMul;
+	}
+
 
 	public void weaponSwapLogic() {
 		// Weapon swap cooldown reload.

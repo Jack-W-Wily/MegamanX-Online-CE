@@ -76,7 +76,7 @@ public class IceGattlingWC : AxlWeaponWC {
 
 	public override float getAltFireRate(AxlWC axl, int chargeLevel) {
 		if (axl.isWhite) {
-			return 14;
+			return 20;
 		}
 		return altFireRate;
 	}
@@ -87,6 +87,9 @@ public class IceGattlingWC : AxlWeaponWC {
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
+		if (axl.isWhite) {
+			return 8;
+		}
 		return 11;
 	}
 }
@@ -133,13 +136,12 @@ public class IceGattlingAltWCProj : Projectile {
 		damager.damage = 2f;
 		damager.flinch = Global.halfFlinch;
 		sprite.frameIndex = 7;
-		sprite.tempOffX = -20;
 		xScale = 0.5f;
 		yScale = 0.5f;
 
-		vel = Point.createFromByteAngle(byteAngle) * 300;
+		vel = Point.createFromByteAngle(byteAngle) * 400;
 		this.byteAngle = byteAngle + 64;
-		maxTime = 0.3f;
+		maxTime = 0.35f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);

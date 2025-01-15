@@ -5,7 +5,7 @@ public class BlackArrowWC : AxlWeaponWC {
 		shootSounds = [ "blackArrow", "blackArrow", "blackArrow", "blackArrow" ];
 		isTwoHanded = true;
 		fireRate = 20;
-		altFireRate = 20;
+		altFireRate = 24;
 		index = (int)WeaponIds.BlackArrow;
 		weaponBarBaseIndex = 33;
 		weaponSlotIndex = 53;
@@ -37,9 +37,13 @@ public class BlackArrowWC : AxlWeaponWC {
 	public override void axlUpdate(AxlWC axl, bool isSelected) {
 		if (axl.isWhite && maxAmmo < 12) {
 			maxAmmo = 12;
+			if (!isSelected && swapCooldown <= 0) {
+				ammo = maxAmmo;
+			}
 		}
 		else if (!axl.isWhite && maxAmmo > 8) {
 			maxAmmo = 8;
+			if (ammo > maxAmmo) { ammo = maxAmmo; }
 		}
 	}
 
@@ -52,7 +56,7 @@ public class BlackArrowWC : AxlWeaponWC {
 
 	public override float getAltFireRate(AxlWC axl, int chargeLevel) {
 		if (axl.isWhite) {
-			return 12;
+			return 16;
 		}
 		return fireRate;
 	}
