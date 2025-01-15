@@ -554,8 +554,10 @@ public class EvasionBarrage : CharState {
 		if (pushBackSpeed > 0) {
 			character.vel.y = 0;
 			character.useGravity = false;
-			character.move(new Point(-80 * character.xDir, -pushBackSpeed * 2f));
-			pushBackSpeed -= 7.5f;
+			if (!character.grounded || character.frameIndex >= 2) {
+				character.move(new Point(-80 * character.xDir, -pushBackSpeed));
+			}
+			pushBackSpeed -= 3.75f;
 		} else {
 			character.useGravity = true;
 		}
@@ -581,6 +583,12 @@ public class EvasionBarrage : CharState {
 		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
 			axl.armAngle = 0;
 			character.xPushVel = -100 * character.xDir;
+			if (pushBackSpeed > 0) {
+				character.vel.y = -pushBackSpeed;
+			}
+			else if (character.vel.y > 0) {
+				character.vel.y *= 0.5f;
+			}
 			character.changeToLandingOrFall();
 		}
 	}
@@ -588,7 +596,7 @@ public class EvasionBarrage : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
-		pushBackSpeed = 100;
+		pushBackSpeed = 50;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 
@@ -632,7 +640,7 @@ public class RisingBarrage : CharState {
 					new AxlMeleeBullet(
 						axl, gunpos.Value, character.xDir,
 						player.getNextActorNetId(),
-						byteAngle: -64 * axl.xDir, sendRpc: true
+						byteAngle: -48 * axl.xDir, sendRpc: true
 					);
 				}
 				axl.mainWeapon.addAmmo(-0.5f, player);
@@ -923,19 +931,25 @@ public class RainStorm : CharState {
 		Point gunpos = character.getFirstPOI() ?? character.pos;
 
 		if (character.sprite.frameIndex >= 2) {
-			character.move(new Point(character.xDir * 150, -120f));
+			float xSpeed = 0;
+			if (player.input.getXDir(player) == 0) {
+				xSpeed = 60;
+			}
+			character.move(new Point(xSpeed * axl.xDir, -120f));
 			projTime += character.speedMul;
-			if (projTime >= 4) {
+			if (projTime >= 4 && character.frameIndex >= 6) {
 				projTime = 0;
 				new BlueBulletProj(
 					axl, gunpos.addxy(0, -20), 64,
 					player.getNextActorNetId(), sendRpc: true
 				);
-				new AxlMeleeBullet(
-					axl, gunpos.addxy(0, -20), character.xDir,
-					player.getNextActorNetId(), sendRpc: true,
-					byteAngle: 64 * axl.xDir
-				);
+				if (character.frameIndex >= 7) {
+					new AxlMeleeBullet(
+						axl, gunpos.addxy(0, -20), character.xDir,
+						player.getNextActorNetId(), sendRpc: true,
+						byteAngle: 64 * axl.xDir
+					);
+				}
 				character.playSound("axlBullet", sendRpc: true);
 				axl.mainWeapon.addAmmo(-0.5f, player);
 			}

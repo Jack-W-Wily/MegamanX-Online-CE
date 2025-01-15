@@ -824,15 +824,11 @@ public partial class Actor : GameObject {
 				move(new Point(0, yPushVel), true, false, false);
 			}
 		}
-
 		float yMod = reversedGravity ? -1 : 1;
 		if (chr?.charState is VileMK2Grabbed) {
 			grounded = false;
 		} else if (physicsCollider != null && !isStatic && (canBeGrounded || useGravity)) {
 			float yDist = 1;
-			if (grounded) {
-				yDist = 300 * Global.spf;
-			}
 			yDist *= yMod;
 
 			CollideData? collideData = Global.level.checkTerrainCollisionOnce(this, 0, yDist, checkPlatforms: true);
