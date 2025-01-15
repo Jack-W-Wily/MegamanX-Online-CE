@@ -117,7 +117,7 @@ public class BlackArrowProj : Projectile {
 		var hitNormal = other.getNormalSafe();
 		destroySelf();
 		new BlackArrowGrounded(
-			weapon, other.getHitPointSafe(), owner, hitNormal.byteAngle,
+			weapon, other.getHitPointSafe(), owner, byteAngle ?? hitNormal.byteAngle,
 			owner.getNextActorNetId(), true
 		);
 	}
@@ -179,7 +179,7 @@ public class BlackArrowProj2 : Projectile {
 		var hitNormal = other.getNormalSafe();
 		destroySelf();
 		new BlackArrowGrounded(
-			weapon, other.getHitPointSafe(), owner, hitNormal.byteAngle,
+			weapon, other.getHitPointSafe(), owner, byteAngle ?? hitNormal.byteAngle,
 			owner.getNextActorNetId(), true
 		);
 	}
