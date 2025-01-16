@@ -205,38 +205,38 @@ public class MainMenu : IMainMenu {
 	public void RenderCharacters() {
 		float WD = Global.halfScreenW-46;
 		switch (Options.main.preferredCharacter) {
-			case 0:
+			case (int)CharIds.X:
 				Global.sprites["menu_megaman"].drawToHUD(0,WD - 42, startPos - 3 + (selectY * yDistance));
 				break;
-			case 1:
+			case (int)CharIds.XAnother:
 				Global.sprites["menu_megaman"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
-			case 2:
+			case (int)CharIds.ZeroX1:
 				Global.sprites["menu_x1_zero"].drawToHUD(0,WD - 42,  selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
-			case 3:
+			case (int)CharIds.ZeroX2:
 				Global.sprites["menu_x2_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-		/*	case 4:
+		/*	case (int)CharIds.Zero:
 				Global.sprites["menu_x6_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;*/
-			case 5:
+			case (int)CharIds.Vile:
 				Global.sprites["menu_vile"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 6:
+			case (int)CharIds.AxlWC:
 				Global.sprites["menu_axl"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 7:
-				Global.sprites["menu_x8_axl"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
+			case (int)CharIds.AxlX8:
+				Global.sprites["menu_axl_x8"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 8:
+			case (int)CharIds.Sigma:
 				switch (Options.main.sigmaLoadout.sigmaForm) {
 					case 0:
 						Global.sprites["menu_sigma"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 16 + (selectY * yDistance) 
@@ -252,19 +252,19 @@ public class MainMenu : IMainMenu {
 						break;
 				}
 				break;
-			case 9:
+			case (int)CharIds.Zain:
 				Global.sprites["menu_zain"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 10:
+			case (int)CharIds.GBD:
 				Global.sprites["menu_gbd"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 11:
+			case (int)CharIds.Dynamo:
 				Global.sprites["menu_dynamo"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case 12:
+			case (int)CharIds.Dragoon:
 				Global.sprites["menu_higmax"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
@@ -276,7 +276,7 @@ public class MainMenu : IMainMenu {
 	public void MenuConfirmSound() {
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			switch (Options.main.preferredCharacter) {
-				case 0: //X
+				case (int)CharIds.X: //X
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3", false);
@@ -289,7 +289,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 1: //XA
+				case (int)CharIds.XAnother: //XA
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3", false);
@@ -302,7 +302,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 2: //ZX1
+				case (int)CharIds.ZeroX1: //ZX1
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -315,7 +315,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 3: //ZX2
+				case (int)CharIds.ZeroX2: //ZX2
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -328,7 +328,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 4: //ZX6
+				case (int)CharIds.Zero: //ZX6
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -341,7 +341,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 5: //V
+				case (int)CharIds.Vile: //V
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("frontrunner", false);
@@ -354,7 +354,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 6: //AxlWC
+				case (int)CharIds.AxlWC: //AxlWC
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("assassinate", false);
@@ -367,7 +367,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 7: //AxlX8
+				case (int)CharIds.AxlX8: //AxlX8
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("assassinate", false);
@@ -380,7 +380,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 8:
+				case (int)CharIds.Sigma:
 					switch (Options.main.sigmaLoadout.sigmaForm) {
 						case 0: //Commander
 							switch (Helpers.randomRange(0,3)) {
@@ -423,7 +423,7 @@ public class MainMenu : IMainMenu {
 						break;
 					}
 					break;
-				case 9: //Zain2
+				case (int)CharIds.Zain: //Zain2
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -436,7 +436,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 10: //GBD
+				case (int)CharIds.GBD: //GBD
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -449,7 +449,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 11: //D
+				case (int)CharIds.Dynamo: //D
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -462,7 +462,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case 12: //H
+				case (int)CharIds.Dragoon: //H
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
