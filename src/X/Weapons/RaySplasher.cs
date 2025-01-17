@@ -28,6 +28,7 @@ public class RaySplasher : Weapon {
 		if (chargeLevel < 3) {
 			if (character is MegamanX mmx) {
 				mmx.shootingRaySplasher = this;
+				mmx.setShootRaySplasher(isShooting: true);
 			}
 		} else {
 			if (character.ownedByLocalPlayer) {

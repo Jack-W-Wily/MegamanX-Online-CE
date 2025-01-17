@@ -172,6 +172,29 @@ public class MegamanX : Character {
 		}
 	}
 
+
+	// For Shotgun ice And Raypslasher
+	public float shotgunIceChargeTime = 0;
+	public float shotgunIceChargeCooldown = 0;
+	public int shotgunIceChargeMod = 0;
+
+	// RAY SPLASHER SECTION
+
+	public bool isShootingRaySplasher;
+	public float raySplasherCooldown;
+	public int raySplasherMod;
+	public float raySplasherCooldown2;
+
+	public void setShootRaySplasher(bool isShooting) {
+		isShootingRaySplasher = isShooting;
+		if (!isShooting) {
+			raySplasherCooldown = 0;
+			raySplasherMod = 0;
+			raySplasherCooldown2 = 0;
+			//if (ownedByLocalPlayer) RPC.playerToggle.sendRpc(player.id, RPCToggleType.StopRaySplasher);
+		}
+	}
+
 	// General update.
 	public override void update() {
 		base.update();
@@ -191,7 +214,69 @@ public class MegamanX : Character {
 		// Charge and release charge logic.
 		chargeLogic(shoot);
 		player.changeWeaponControls();
+
+
+		// For Shotgunice and Raysplasher
+			if (shotgunIceChargeTime > 0 && ownedByLocalPlayer) {
+			changeSprite("mmx_" + charState.shootSprite, true);
+			shotgunIceChargeTime -= Global.spf;
+			var busterPos = getShootPos().addxy(xDir * 10, 0);
+			if (shotgunIceChargeCooldown == 0) {
+				new ShotgunIceProjCharged(
+					player.weapon, busterPos, xDir,
+					player, shotgunIceChargeMod % 2, false,
+					player.getNextActorNetId(), rpc: true
+				);
+				shotgunIceChargeMod++;
+			}
+			shotgunIceChargeCooldown += Global.spf;
+			if (shotgunIceChargeCooldown > 0.1) {
+				shotgunIceChargeCooldown = 0;
+			}
+			if (shotgunIceChargeTime < 0) {
+				shotgunIceChargeTime = 0;
+				shotgunIceChargeCooldown = 0;
+				changeSprite("mmx_" + charState.defaultSprite, true);
+			}
+		}
+
+		if (isShootingRaySplasher && ownedByLocalPlayer) {
+			changeSprite("mmx_" + charState.shootSprite, true);
+
+			if (raySplasherCooldown > 0) {
+				raySplasherCooldown += Global.spf;
+				if (raySplasherCooldown >= 0.03f) {
+					raySplasherCooldown = 0;
+				}
+			} else {
+				var busterPos = getShootPos();
+				if (raySplasherCooldown2 == 0) {
+					player.weapon.addAmmo(-0.15f, player);
+					raySplasherCooldown2 = 0.03f;
+					new RaySplasherProj(
+						player.weapon, busterPos,
+						getShootXDir(), raySplasherMod % 3, (raySplasherMod / 3) % 3,
+						player, player.getNextActorNetId(), rpc: true
+					);
+					raySplasherMod++;
+					if (raySplasherMod % 3 == 0) {
+						if (raySplasherMod >= 21) {
+							setShootRaySplasher(false);
+							changeSprite("mmx_" + charState.defaultSprite, true);
+						} else {
+							raySplasherCooldown = Global.spf;
+						}
+					}
+				} else {
+					raySplasherCooldown2 -= Global.spf;
+					if (raySplasherCooldown2 <= 0) {
+						raySplasherCooldown2 = 0;
+					}
+				}
+			}
+		}
 	}
+	
 
 	// Late updates. Before render.
 	public override void postUpdate() {
@@ -350,6 +435,7 @@ public class MegamanX : Character {
 		if (chargeLevel >= 1) {
 			stopCharge();
 		}
+		
 	}
 
 	// Movement related stuff.

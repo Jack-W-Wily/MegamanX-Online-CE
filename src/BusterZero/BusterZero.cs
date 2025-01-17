@@ -95,7 +95,7 @@ public class BusterZero : Character {
 		if (Global.level.isBonusMatch()){
 			if (charState.attackCtrl && charState is not Dash && grounded && (
 				player.input.isHeld(Control.WeaponLeft, player) ||
-				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
+				(player.input.isHeld(Control.WeaponRight, player))
 			) && (
 				!player.isDisguisedAxl ||
 				player.input.isHeld(Control.Down, player)
