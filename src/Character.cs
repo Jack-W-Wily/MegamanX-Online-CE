@@ -2885,9 +2885,6 @@ public partial class Character : Actor, IDamagable {
 			if (charState is SwordBlock) {
 				damageSavings += (originalDamage * 0.5m);
 			}
-			if (charState is SigmaAutoBlock) {
-				damageSavings += (originalDamage * 0.25m);
-			}
 			if (charState is SigmaBlock) {
 				damageSavings += (originalDamage * 0.5m);
 			}

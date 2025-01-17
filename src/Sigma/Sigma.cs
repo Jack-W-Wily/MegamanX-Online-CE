@@ -354,7 +354,7 @@ public class BaseSigma : Character {
 
 	public override bool normalCtrl() {
 		if (grounded && player.isControllingPuppet()) {
-			changeState(new SigmaAutoBlock());
+			changeState(new SigmaBlock());
 			return true;
 		}
 		bool changedState = base.normalCtrl();
