@@ -20,6 +20,7 @@ public class CustomMatchSettings {
 	[ProtoMember(12)] public int currencyGain;
 	[ProtoMember(13)] public int respawnTime;
 	[ProtoMember(14)] public bool pickupItems;
+	[ProtoMember(15)] public bool bonusMatch;
 
 	public CustomMatchSettings() {
 	}
@@ -74,6 +75,23 @@ public class CustomMatchSettingsMenu : IMainMenu {
 						FontType.Blue,
 						"1v1 or Hypermode Match : " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.hyperModeMatch),
+						pos.x, pos.y, selected: selectArrowPosY == 0
+					);
+				}
+			)
+		);
+
+		menuOptions.Add(
+			new MenuOption(
+				startX, currentY,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.bonusMatch);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Blue,
+						"Bonus Mode Match : " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.bonusMatch),
 						pos.x, pos.y, selected: selectArrowPosY == 0
 					);
 				}
