@@ -145,11 +145,9 @@ public enum WeaponIds {
 	KKnuckleParry,
 	ZeroShoryuken,
 	MegaPunchWeapon,
-	
 	DropKick,
 	DarkHold,
 
-	//Vile Weapons
 	MechMenuWeapon,
 	MechBuster,
 	MechPunch,
@@ -177,7 +175,6 @@ public enum WeaponIds {
 	VileCutter,
 	VileLaser,
 	VileMK2Grab,
-	VileGrab,
 	NecroBurst,
 	RisingSpecter,
 	VileFlamethrower,
@@ -287,60 +284,10 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
-
-	// WEAPONS (WCUT)
-
-
-	// Generalized 
-    Blocking,
-	BlockableLaunch,
-
-
-	//RMX 
-
-	//ZEROX1 
-
-	//ZEROMID 
-
-	//ZEROEND 
-
-	//NIGHTMARE 
-
-	//AXL 
-
-	//
-
-	//VAVA 
-	
-	Houtenjin,
-	HoutenjinF,
-
-	//Dynamo 
-	DynamoBoomerang,
-	DynamoTrick,
-	DynamoRoyal,
-	DynamoSword,
-
-	//Iris 
-	IrisCrystal,
-
-
-
-
-	// GBD 
-	ShieldBoomerang,
-	GBDKick,
-
-	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
 	DNACore = 250
-
-
-
 }
 
 public enum ProjIds {
-	//Vanilla ProjIDS
 	Buster,
 	Buster2,
 	Buster3,
@@ -762,44 +709,6 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
-
-	//WCUT ProjIDS
-
-	//GBD
-	ShieldBoomerang,
-	ShieldBoomerang2,
-	//Iris
-	IrisCrystal,
-
-
-	
-	//Dynamo
-	HolyCross,
-	DynamoDagger,
-	HolyWaterGranade,
-	HolyBible,
-	DynamoBoomerang,
-	DynamoBeam,
-	DynamoDownShoot,
-
-
-	//VAVA
-	HotIcecle,
-	Houtenjin,
-	HoutenjinF,
-	BlockableLaunch,
-
-	// Highmax
-	HighmaxPunch,
-	HighmaxStun,
-	HighmaxBall1,
-	HighmaxBall2,
-	HighmaxBall3,
-	DesmumeProj2,
-	DesmumeProj3,
-	DesmumeProj1,
-
-	//
 
 	// Special damage types.
 	SelfDmg = 30000,
