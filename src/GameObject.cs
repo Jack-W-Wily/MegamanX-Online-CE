@@ -3,8 +3,9 @@
 namespace MMXOnline;
 
 public interface GameObject {
+	bool iDestroyed { get; }
 	string name { get; set; }
-	float localSpeedMul { get; set; }
+	float speedMul { get; set; }
 	bool useTerrainGrid { get; set; }
 	bool useActorGrid { get; set; }
 	void onStart();

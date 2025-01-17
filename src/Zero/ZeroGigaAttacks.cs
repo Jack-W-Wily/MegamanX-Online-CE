@@ -19,7 +19,7 @@ public class RakuhouhaWeapon : Weapon {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
 		maxAmmo = 28;
-		rateOfFire = 1;
+		fireRate = 60;
 		index = (int)WeaponIds.Rakuhouha;
 		weaponBarBaseIndex = 27;
 		weaponBarIndex = 33;
@@ -30,6 +30,7 @@ public class RakuhouhaWeapon : Weapon {
 		description = new string[] { "Channels stored energy in one blast. Energy cost: 14." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		allowSmallBar = false;
 		damage = "4";
 		hitcooldown = "1";
 		Flinch = "26";
@@ -57,7 +58,7 @@ public class RekkohaWeapon : Weapon {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
 		maxAmmo = 28;
-		rateOfFire = 2;
+		fireRate = 120;
 		index = (int)WeaponIds.Rekkoha;
 		weaponBarBaseIndex = 40;
 		weaponBarIndex = 34;
@@ -68,6 +69,7 @@ public class RekkohaWeapon : Weapon {
 		description = new string[] { "Summon down pillars of light energy. Energy cost: 28." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		allowSmallBar = false;
 		damage = "3";
 		hitcooldown = "0.5";
 		Flinch = "26";
@@ -86,7 +88,7 @@ public class CFlasher : Weapon {
 		//damager = new Damager(player, 2, 0, 0.5f);
 		ammo = 0;
 		maxAmmo = 28;
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.CFlasher;
 		weaponBarBaseIndex = 41;
 		weaponBarIndex = 35;
@@ -97,6 +99,7 @@ public class CFlasher : Weapon {
 		description = new string[] { "A weak blast that can pierce enemies. Energy cost: 7." };
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		allowSmallBar = false;
 		damage = "2";
 		hitcooldown = "0.5";
 		Flinch = "0";
@@ -113,7 +116,7 @@ public class ShinMessenkou : Weapon {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
 		maxAmmo = 28;
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.ShinMessenkou;
 		killFeedIndex = 86;
 		type = (int)ZeroGigaType.ShinMessenkou;
@@ -122,6 +125,7 @@ public class ShinMessenkou : Weapon {
 		weaponSlotIndex = 64;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		allowSmallBar = false;
 		damage = "4";
 		hitcooldown = "1";
 		Flinch = "26";
@@ -239,7 +243,7 @@ public class Rakuhouha : CharState {
 	}
 
 	public override void onExit(CharState newState) {
-		weapon.shootTime = weapon.rateOfFire;
+		weapon.shootCooldown = weapon.fireRate;
 		base.onExit(newState);
 	}
 }
@@ -274,7 +278,7 @@ public class RakuhouhaProj : Projectile {
 			fadeSprite = "rakuhouha_fade";
 		} else {
 			damager.damage = 2;
-			damager.hitCooldown = 0.5f;
+			damager.hitCooldown = 30;
 			damager.flinch = 0;
 			destroyOnHit = false;
 		}
@@ -334,9 +338,10 @@ public class Rekkoha : CharState {
 	int loop;
 	public RekkohaEffect? effect;
 	public Weapon weapon;
-	public Rekkoha(Weapon weapon) : base("rekkoha", "", "", "") {
+	public Rekkoha(Weapon weapon) : base("rekkoha") {
 		this.weapon = weapon;
 		invincible = true;
+		immuneToWind = true;
 	}
 
 	public override void update() {
@@ -394,7 +399,7 @@ public class Rekkoha : CharState {
 	}
 
 	public override void onExit(CharState newState) {
-		weapon.shootTime = weapon.rateOfFire;
+		weapon.shootCooldown = weapon.fireRate;
 		base.onExit(newState);
 	}
 }
@@ -572,7 +577,7 @@ public class DarkHoldWeapon : Weapon {
 	public DarkHoldWeapon() : base() {
 		ammo = 0;
 		maxAmmo = 28;
-		rateOfFire = 3f;
+		fireRate = 60 * 3;
 		index = (int)WeaponIds.DarkHold;
 		type = (int)ZeroGigaType.DarkHold;
 		killFeedIndex = 175;
@@ -581,6 +586,7 @@ public class DarkHoldWeapon : Weapon {
 		weaponSlotIndex = 122;
 		drawGrayOnLowAmmo = true;
 		drawRoundedDown = true;
+		allowSmallBar = false;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -629,18 +635,27 @@ public class DarkHoldProj : Projectile {
 							chara.addDarkHoldTime(150 - timeInFrames, damager.owner);
 							chara.darkHoldInvulnTime = (150 - timeInFrames) * 60f;
 						}
+						// We freeze the player in the same way we freeze the armor if inside of it.
+						if (chara.charState is InRideArmor or InRideChaser) {
+							if (actor.timeStopTime <= 0) {
+								actor.timeStopTime = 120 - timeInFrames;
+							}
+							continue;
+						}
 						continue;
 					}
 					// For maverick and rides
-					if (actor is RideArmor or Maverick or Mechaniloid) {
-						if (actor.timeStopTime <= 0) {
+					if (actor is RideArmor or Maverick or Mechaniloid or RideChaser) {
+						if (actor.timeStopTime > 0) {
 							continue;
 						}
 						IDamagable? damagable = actor as IDamagable;
-						if (damagable?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) == true) {
+						if (damagable?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) != true) {
 							continue;
 						}
-						actor.timeStopTime = 160 - timeInFrames;
+						if (120 - timeInFrames > 0) {
+							actor.timeStopTime = 120 - timeInFrames;
+						}
 					}
 				}
 			}
@@ -677,11 +692,7 @@ public class DarkHoldProj : Projectile {
 			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);
-			if (Global.viewSize == 2) {
-				screenShader.SetUniform("r", normalizedRadius * 0.5f);
-			} else {
-				screenShader.SetUniform("r", normalizedRadius);
-			}
+			screenShader.SetUniform("r", normalizedRadius / Global.viewSize);
 		}
 	}
 
@@ -708,7 +719,7 @@ public class DarkHoldState : CharState {
 	public bool shouldDrawAxlArm = true;
 	public float lastArmAngle = 0;
 
-	public DarkHoldState(Character character, float time) : base(character?.sprite?.name ?? "grabbed") {
+	public DarkHoldState(Character character, float time) : base(character.sprite.name) {
 		immuneToWind = true;
 		stunTime = time;
 
@@ -731,12 +742,7 @@ public class DarkHoldState : CharState {
 	}
 
 	public override bool canEnter(Character character) {
-		if (character.darkHoldInvulnTime > 0 ||
-			character.isInvulnerable() ||
-			character.isVaccinated() ||
-			character.isCCImmune() ||
-			character.charState.invincible
-		) {
+		if (character.darkHoldInvulnTime > 0 || character.isTimeImmune()) {
 			return false;
 		}
 		return base.canEnter(character);
@@ -749,6 +755,8 @@ public class DarkHoldState : CharState {
 		character.frameIndex = frameIndex;
 		character.stopMoving();
 		character.isDarkHoldState = true;
+		invincible = oldState.invincible;
+		specialId = oldState.specialId;
 	}
 
 	public override void onExit(CharState newState) {

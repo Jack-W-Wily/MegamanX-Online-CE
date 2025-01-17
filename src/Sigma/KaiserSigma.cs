@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
@@ -26,7 +27,7 @@ public partial class KaiserSigma : Character {
 
 	public KaiserSigma(
 		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false, bool isRevive = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) { 
@@ -43,6 +44,25 @@ public partial class KaiserSigma : Character {
 		) {
 			visible = false
 		};
+		maxHealth = (decimal)Player.getModifiedHealth(32);
+		if (!ownedByLocalPlayer || isRevive) {
+			health = maxHealth;
+		}
+		if (!ownedByLocalPlayer) {
+			visible = true;
+			return;
+		}
+		if (isRevive) {
+			useGravity = false;
+			changeSprite("kaisersigma_enter", true);
+			changeState(new KaiserSigmaRevive(player.explodeDieEffect), true);
+		} else {
+			visible = true;
+			changeSprite("kaisersigma_idle", true);
+			changeState(new KaiserSigmaIdleState(), true);
+		}
+		grounded = false;
+		canBeGrounded = false;
 	}
 
 	public override void update() {
@@ -79,6 +99,10 @@ public partial class KaiserSigma : Character {
 		} else {
 			kaiserExhaustL.visible = false;
 			kaiserExhaustR.visible = false;
+		}
+
+		if (weapons.Count > 0 && player.input.isHeld(Control.Down, player)) {
+			player.changeWeaponControls();
 		}
 	}
 
@@ -212,28 +236,60 @@ public partial class KaiserSigma : Character {
 		return "kaisersigma_" + spriteName;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (sprite.name == "kaisersigma_fall" && collider.isAttack()) {
-			return new GenericMeleeProj(
-				new KaiserStompWeapon(player), centerPoint, ProjIds.Sigma3KaiserStomp, player,
-				damage: 12 * getKaiserStompDamage(), flinch: Global.defFlinch, hitCooldown: 1f
-			);
-		} else if (collider.name == "body") {
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3KaiserSuit, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isShield: true
-			);
+		// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Suit,
+		Stomp,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		if (hitbox.name == "body") {
+			return (int)MeleeIds.Suit;
 		}
-		return null;
+		if (sprite.name == "kaisersigma_fall") {
+			return (int)MeleeIds.Stomp;
+		}
+		return (int)MeleeIds.None;
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Suit => new GenericMeleeProj(
+				new Weapon(), pos, ProjIds.Sigma3KaiserSuit, player,
+				damage: 0, flinch: 0, hitCooldown: 60, isShield: true,
+				addToLevel: addToLevel
+			) {
+				lowPiority = true
+			},
+			MeleeIds.Stomp => new GenericMeleeProj(
+				new KaiserStompWeapon(player), pos, ProjIds.Sigma3KaiserStomp, player,
+				damage: 12, flinch: Global.defFlinch, hitCooldown: 60,
+				addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.Sigma3KaiserStomp) {
-			float damagePercent = getKaiserStompDamage();
-			if (damagePercent > 0) {
-				proj.damager.damage = 12 * damagePercent;
-			}
+			proj.damager.damage = getKaiserStompDamage();
 		}
+	}
+
+	public float getKaiserStompDamage() {
+		if (deltaPos.y >= 5) {
+			return 12;
+		}
+		if (deltaPos.y >= 3.5) {
+			return 9;
+		}
+		if (deltaPos.y >= 2.5) {
+			return 6;
+		}
+		return 3;
 	}
 
 	public override bool canPickupFlag() {
@@ -272,5 +328,20 @@ public partial class KaiserSigma : Character {
 
 	public override Collider? getTerrainCollider() {
 		return null;
+	}
+
+	public override Point getCamCenterPos(bool ignoreZoom = false) {
+		if (sprite.name.StartsWith("kaisersigma_virus")) {
+			return pos.addxy(camOffsetX, -12);
+		}
+		return pos.round().addxy(camOffsetX, -55);
+	}
+
+	public override bool isNonDamageStatusImmune() {
+		return true;
+	}
+
+	public override bool isPushImmune() {
+		return true;
 	}
 }

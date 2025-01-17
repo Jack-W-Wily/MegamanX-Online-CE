@@ -28,6 +28,11 @@ public class VileLaser : Weapon {
 			description = new string[] { "It cannot be aimed,", "but its wide shape covers a large area." };
 			killFeedIndex = 120;
 			vileWeight = 3;
+			ammousage = 24;
+			damage = "6";
+			hitcooldown = "0.5";
+			Flinch = "26";
+			effect = "Insane Hitbox.";
 		} else if (vileLaserType == VileLaserType.NecroBurst) {
 			index = (int)WeaponIds.NecroBurst;
 			displayName = "Necro Burst";
@@ -35,6 +40,11 @@ public class VileLaser : Weapon {
 			description = new string[] { "Use up all your energy at once to", "unleash a powerful energy burst." };
 			killFeedIndex = 75;
 			vileWeight = 3;
+			ammousage = 32;
+			damage = "6";
+			hitcooldown = "0.5";
+			Flinch = "26";
+			effect = "No DMG inside Ride.";
 		} else if (vileLaserType == VileLaserType.StraightNightmare) {
 			index = (int)WeaponIds.StraightNightmare;
 			displayName = "Straight Nightmare";
@@ -42,6 +52,10 @@ public class VileLaser : Weapon {
 			description = new string[] { "Though slow, this laser can burn", "through multiple enemies in a row." };
 			killFeedIndex = 171;
 			vileWeight = 3;
+			ammousage = 24;
+			damage = "1";
+			hitcooldown = "0.15";
+			effect = "Won't destroy on hit.";
 		}
 	}
 
@@ -73,7 +87,7 @@ public class RisingSpecterState : CharState {
 	bool shot = false;
 	bool grounded;
 
-	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall", "", "", "") {
+	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall") {
 		this.grounded = grounded;
 	}
 
@@ -211,7 +225,7 @@ public class NecroBurstAttack : CharState {
 	bool shot = false;
 	Vile vile = null!;
 
-	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
+	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 	}
 
 	public override void update() {
@@ -324,7 +338,7 @@ public class RAShrapnelProj : Projectile {
 
 public class StraightNightmareAttack : CharState {
 	bool shot = false;
-	public StraightNightmareAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air", "", "", "") {
+	public StraightNightmareAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 		enterSound = "straightNightmareShoot";
 	}
 
@@ -425,19 +439,19 @@ public class StraightNightmareProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (damagable is not Character character) return;
-		if (character.charState.invincible) return;
-		if (character.isImmuneToKnockback()) return;
-
-		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		if (character.isClimbingLadder()) {
-			character.setFall();
-		} else if (!character.pushedByTornadoInFrame) {
-			float modifier = 1;
-			if (character.grounded) modifier = 0.5f;
-			if (character.charState is Crouch) modifier = 0.25f;
-			character.move(new Point(maxSpeed * 0.9f * xDir * modifier * blowModifier, 0));
+		base.onHitDamagable(damagable);
+		if (!damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
 			character.pushedByTornadoInFrame = true;
 		}
+		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
+		actor.move(new Point(maxSpeed * 0.9f * xDir * modifier * blowModifier, 0));
 	}
 }

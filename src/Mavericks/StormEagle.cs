@@ -17,8 +17,8 @@ public class StormEagle : Maverick {
 
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 
-		awardWeaponId = WeaponIds.Tornado;
-		weakWeaponId = WeaponIds.Sting;
+		awardWeaponId = WeaponIds.StormTornado;
+		weakWeaponId = WeaponIds.ChameleonSting;
 		weakMaverickWeaponId = WeaponIds.StingChameleon;
 
 		netActorCreateId = NetActorCreateId.StormEagle;
@@ -108,11 +108,29 @@ public class StormEagle : Maverick {
 		}
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("dive")) {
-			return new GenericMeleeProj(diveWeapon, centerPoint, ProjIds.StormEDive, player);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Dive,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"storme_dive" or "storme_dive2" => MeleeIds.Dive,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Dive => new GenericMeleeProj(
+				diveWeapon, pos, ProjIds.StormEDive, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
@@ -231,6 +249,15 @@ public class StormEBirdProj : Projectile, IDamagable {
 		return false;
 	}
 
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 		if (time > 0.25f) {
@@ -259,21 +286,19 @@ public class StormEGustProj : Projectile {
 
 
 	public override void onHitDamagable(IDamagable damagable) {
-		var character = damagable as Character;
-		if (character == null) return;
-		if (character.charState.invincible) return;
-		if (character.isImmuneToKnockback()) return;
-
-		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		if (character.isClimbingLadder()) {
-			character.setFall();
-		} else if (!character.pushedByTornadoInFrame) {
-			float modifier = 1;
-			if (character.grounded) modifier = 0.5f;
-			if (character.charState is Crouch) modifier = 0.25f;
-			character.move(new Point(maxSpeed * 0.9f * xDir * modifier, 0));
+		if (!damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
+		float modifier = 1;
+		if (actor.grounded) { modifier = 0.5f; };
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			if (character.charState is Crouch) { modifier = 0.25f; }
 			character.pushedByTornadoInFrame = true;
 		}
+		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
+		actor.move(new Point(maxSpeed * 0.9f * xDir * modifier, 0));
 	}
 }
 #endregion
@@ -284,7 +309,7 @@ public class StormEDiveState : MaverickState {
 	bool reverse;
 	float incAmount;
 	bool wasPrevStateFly;
-	public StormEDiveState() : base("dive", "") {
+	public StormEDiveState() : base("dive") {
 	}
 
 	public override void update() {
@@ -356,7 +381,8 @@ public class StormEDiveState : MaverickState {
 public class StormEGustState : MaverickState {
 	float soundTime = 0.5f;
 	float gustTime;
-	public StormEGustState() : base("flap", "") {
+	public StormEGustState() : base("flap") {
+		aiAttackCtrl = true;
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -400,7 +426,7 @@ public class StormEGustState : MaverickState {
 
 public class StormEEggState : MaverickState {
 	bool isGrounded;
-	public StormEEggState(bool isGrounded) : base(isGrounded ? "air_eggshoot" : "air_eggshoot", "") {
+	public StormEEggState(bool isGrounded) : base(isGrounded ? "air_eggshoot" : "air_eggshoot") {
 		this.isGrounded = isGrounded;
 	}
 
@@ -434,7 +460,7 @@ public class StormEEggState : MaverickState {
 
 public class StormEAirShootState : MaverickState {
 	bool shotOnce;
-	public StormEAirShootState() : base("air_shoot", "") {
+	public StormEAirShootState() : base("air_shoot") {
 	}
 
 	public override void update() {

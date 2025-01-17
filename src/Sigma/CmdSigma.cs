@@ -1,9 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
 
 public class CmdSigma : BaseSigma {
+	public float saberCooldown;
 	public float leapSlashCooldown;
 	public float sigmaAmmoRechargeCooldown = 0;
 	public float sigmaAmmoRechargeTime;
@@ -28,8 +29,10 @@ public class CmdSigma : BaseSigma {
 			return;
 		}
 		// Cooldowns.
+		Helpers.decrementTime(ref saberCooldown);
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementFrames(ref sigmaAmmoRechargeTime);
@@ -54,9 +57,6 @@ public class CmdSigma : BaseSigma {
 	}
 
 	public override bool attackCtrl() {
-		if (isAttacking()) {
-			return false;
-		}
 		if (isInvulnerableAttack() || player.weapon is MaverickWeapon) {
 			return false;
 		}
@@ -99,7 +99,7 @@ public class CmdSigma : BaseSigma {
 		if (grounded && charState is Idle || charState is Run || charState is Crouch) {
 			if (player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
 				sigmaAmmoRechargeCooldown = 0.5f;
-				changeState(new SigmaBallShoot(), true);
+				changeState(new SigmaBallShootEX(), true);
 				return true;
 			}
 		}
@@ -115,23 +115,36 @@ public class CmdSigma : BaseSigma {
 		return "sigma_" + spriteName;
 	}
 
-	// This can run on both owners and non-owners. So data used must be in sync
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		Projectile? proj = sprite.name switch {
-			"sigma_ladder_attack" => new GenericMeleeProj(
-				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 0, 0.25f
-			),
-			"sigma_wall_slide_attack" => new GenericMeleeProj(
-				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
-				3, 0, 0.25f
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Guard,
+		GenericSlash,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"sigma_block" => MeleeIds.Guard,
+			"sigma_ladder_attack" or "sigma_wall_slide_attack" => MeleeIds.GenericSlash,
+			_ => MeleeIds.None
+		});
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Guard => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
+			) {
+				highPiority = true
+			},
+			MeleeIds.GenericSlash => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 3, 0,
+				addToLevel: addToLevel
 			),
 			_ => null
 		};
-		if (proj != null) {
-			return proj;
-		}
-		return base.getProjFromHitbox(collider, centerPoint);
 	}
 
 	public override void addAmmo(float amount) {
@@ -160,5 +173,59 @@ public class CmdSigma : BaseSigma {
 
 		// Per-player data.
 		player.sigmaAmmo = data[0];
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		if (currentWeapon is MaverickWeapon mw &&
+			mw.maverick == null && canAffordMaverick(mw)
+		) {
+			buyMaverick(mw);
+			if (mw.maverick != null) {
+				changeState(new CallDownMaverick(mw.maverick, true, false), true);
+			}
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			player.changeToSigmaSlot();
+		}
+		if (charState is not LadderClimb) {
+			int Sattack = Helpers.randomRange(0, 5);
+			if (charState?.isGrabbedState == false && !player.isDead
+				&& !isInvulnerable() && !(charState is CallDownMaverick or SigmaSlashState)
+				&& aiAttackCooldown <= 0) {
+				switch (Sattack) {
+					case 0 when isTargetClose:
+						changeState(new SigmaSlashState(charState), true);
+						break;
+					case 1 when isTargetInAir:
+						changeState(new SigmaBallShootEX(), true);
+						break;
+					case 2 when charState is Dash && grounded:
+						changeState(new SigmaWallDashState(xDir, true), true);
+						break;
+					case 3:
+						player.changeWeaponSlot(1);						
+						break;
+					case 4:
+						player.changeWeaponSlot(2);
+						break;
+					case 5:
+						player.changeWeaponSlot(0);
+						break;
+				}
+				aiAttackCooldown = 18;
+			}
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
+				if (!(proj.projId == (int)ProjIds.SwordBlock)) {
+						changeState(new SigmaBlock(), true);
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

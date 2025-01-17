@@ -210,6 +210,7 @@ public class RideArmor : Actor, IDamagable {
 	public override void preUpdate() {
 		base.preUpdate();
 		changedStateInFrame = false;
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
@@ -278,11 +279,8 @@ public class RideArmor : Actor, IDamagable {
 
 	public override void postUpdate() {
 		Player? player = this.player ?? netOwner;
-		MegamanX? mmx = character as MegamanX;
-
+		RagingChargeX? rcx = character as RagingChargeX;
 		base.postUpdate();
-
-		updateProjectileCooldown();
 
 		if (grounded && flyTime > 0) {
 			flyTime -= Global.spf * 6;
@@ -360,7 +358,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 		if (punchCooldown > 0) {
 			punchCooldown -= Global.spf;
-			if (mmx?.isHyperX == true) punchCooldown -= Global.spf;
+			if (rcx != null) punchCooldown -= Global.spf;
 			if (punchCooldown < 0) punchCooldown = 0;
 		}
 
@@ -398,8 +396,9 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		Helpers.decrementTime(ref missileCooldown);
-		if (mmx?.isHyperX == true) Helpers.decrementTime(ref missileCooldown);
-
+		if (rcx != null) {
+			Helpers.decrementTime(ref missileCooldown);
+		}
 		if (consecutiveJumpTimeout > 0) {
 			consecutiveJumpTimeout -= Global.spf;
 			if (consecutiveJumpTimeout <= 0) {
@@ -472,7 +471,7 @@ public class RideArmor : Actor, IDamagable {
 				character is Vile vile &&
 				punchCooldown == 0 &&
 				raNum == 2 &&
-				vile.napalmWeapon.shootTime == 0 &&
+				vile.napalmWeapon.shootCooldown == 0 &&
 				player.input.isPressed(Control.Special1, player) &&
 				player.input.isHeld(Control.Down, player) &&
 				!rideArmorState.inTransition()
@@ -603,7 +602,7 @@ public class RideArmor : Actor, IDamagable {
 						} else if (!(ownedByLocalPlayer && chr.ownedByLocalPlayer)) {
 							return;
 						}
-					} else if (chr?.startRideArmor != this || selfDestructTime > 0) {
+					} else if (chr?.linkedRideArmor != this || selfDestructTime > 0) {
 						return;
 					}
 				} else {
@@ -691,7 +690,7 @@ public class RideArmor : Actor, IDamagable {
 		chr.changeState(new InRideArmor(), true);
 		changeState(new RAIdle("ridearmor_activating"), true);
 		if (character != null) {
-			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.startRideArmor == this) {
+			if (!healedOnEnter && raNum == 4 && character.ownedByLocalPlayer && character.linkedRideArmor == this) {
 				healedOnEnter = true;
 				character.fillHealthToMax();
 			}
@@ -742,7 +741,7 @@ public class RideArmor : Actor, IDamagable {
 			health -= damage;
 		}
 
-		if (owner != null && weaponIndex != null) {
+		if ((damage > 0 || Damager.alwaysAssist(projId)) && owner != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));
 		}
 
@@ -750,7 +749,7 @@ public class RideArmor : Actor, IDamagable {
 			health = 0;
 		}
 		if (health <= 0) {
-			if (character != null && !ownedByMK5 && character.startRideArmor == this) {
+			if (character != null && !ownedByMK5 && character.linkedRideArmor == this) {
 				character.invulnTime = 1;
 			}
 
@@ -1004,7 +1003,18 @@ public class RideArmor : Actor, IDamagable {
 		if (colorShader != null) {
 			shaders.Add(colorShader);
 		}
+		if (timeStopTime > timeStopThreshold && player != null) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				shaders.Add(Player.darkHoldShader);
+			}
+		}
 		return shaders;
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
 	}
 
 	public void creditKill(Player? killer, Player? assister, int? weaponIndex) {
@@ -1441,7 +1451,7 @@ public class RAGrab : RideArmorState {
 }
 
 public class RATaunt : RideArmorState {
-	public RATaunt() : base("ridearmor_taunt", "", "", "") {
+	public RATaunt() : base("ridearmor_taunt") {
 	}
 
 	public override void update() {
@@ -1879,7 +1889,7 @@ public class RACalldown : RideArmorState {
 }
 
 public class RAChainCharge : RideArmorState {
-	public RAChainCharge() : base("ridearmor_charge", "", "") {
+	public RAChainCharge() : base("ridearmor_charge") {
 	}
 
 	public override void onEnter(RideArmorState? oldState) {
@@ -1927,7 +1937,7 @@ public class RAChainChargeDash : RideArmorState {
 	string dashControl;
 	public float dashTime;
 	public bool isSlow;
-	public RAChainChargeDash(string dashControl, bool isSlow) : base("ridearmor_charge_dash", "", "") {
+	public RAChainChargeDash(string dashControl, bool isSlow) : base("ridearmor_charge_dash") {
 		this.dashControl = dashControl;
 		this.isSlow = isSlow;
 		enterSound = "dash";
@@ -1988,7 +1998,7 @@ public class RAChainAttack : RideArmorState {
 	float frame5Time;
 	MechChainProj? mcp;
 	int once;
-	public RAChainAttack() : base("ridearmor_chain", "", "") {
+	public RAChainAttack() : base("ridearmor_chain") {
 	}
 
 	public Point chainOrigin() {
@@ -2047,7 +2057,7 @@ public class RAChainAttack : RideArmorState {
 public class RAGoliathShoot : RideArmorState {
 	bool grounded;
 	bool once;
-	public RAGoliathShoot(bool grounded) : base(grounded ? "ridearmor_shoot" : "ridearmor_jump_shoot", "", "") {
+	public RAGoliathShoot(bool grounded) : base(grounded ? "ridearmor_shoot" : "ridearmor_jump_shoot") {
 		this.grounded = grounded;
 	}
 
@@ -2199,7 +2209,7 @@ public class InRideArmor : CharState {
 
 	public void tossGrenade(Vile vile) {
 		Projectile? grenade = null;
-		if (vile.napalmWeapon.shootTime > 0) {
+		if (vile.napalmWeapon.shootCooldown > 0) {
 			return;
 		}
 		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {

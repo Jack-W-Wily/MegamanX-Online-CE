@@ -127,13 +127,29 @@ public class CrystalSnail : Maverick {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		Projectile? proj = null;
-		if (sprite.name.EndsWith("shell_dash")) {
-			proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.CSnailMelee, player, 3, Global.defFlinch, 0.5f);
-		}
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		ShellDash,
+	}
 
-		return proj;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"csnail_shell_dash" => MeleeIds.ShellDash,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.ShellDash => new GenericMeleeProj(
+				weapon, pos, ProjIds.CSnailMelee, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void onCollision(CollideData other) {
@@ -149,7 +165,7 @@ public class CrystalSnail : Maverick {
 			character.isCrystalized && character.player.alliance != player.alliance
 		) {
 			Damager.applyDamage(
-				player, 3, 1f, Global.defFlinch, character,
+				player, 3, 60, Global.defFlinch, character,
 				false, (int)WeaponIds.CrystalHunter, 20, player.character, (int)ProjIds.CrystalHunterDash
 			);
 		}
@@ -299,7 +315,7 @@ public class CSnailCrystalHunterProj : Projectile {
 
 public class CSnailShootState : MaverickState {
 	bool shotOnce;
-	public CSnailShootState() : base("spit", "") {
+	public CSnailShootState() : base("spit") {
 	}
 
 	public override void update() {
@@ -342,6 +358,8 @@ public class CSnailShellState : MaverickState {
 	int aiChoice;
 	public CSnailShellState(bool isFirstTime) : base("shell", isFirstTime ? "shell_enter" : "") {
 		this.isFirstTime = isFirstTime;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -433,7 +451,7 @@ public class CSnailShellSpinDashState : MaverickState {
 	Anim shell;
 	int state;
 	float exhaustTime;
-	public CSnailShellSpinDashState() : base("shell", "") {
+	public CSnailShellSpinDashState() : base("shell") {
 	}
 
 	public override void update() {
@@ -525,7 +543,7 @@ public class CSnailShellSpinSlowState : MaverickState {
 	int state;
 	float soundTime;
 	float ammoTime;
-	public CSnailShellSpinSlowState() : base("shell", "") {
+	public CSnailShellSpinSlowState() : base("shell") {
 	}
 
 	public override void update() {
@@ -640,7 +658,8 @@ public class CSnailTimeStopState : MaverickState {
 public class CSnailWeaknessState : MaverickState {
 	float hurtSpeed;
 	float soundTime;
-	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt", "") {
+	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt") {
+		aiAttackCtrl = true;
 		if (!wasMagnetMine) {
 			once = true;
 			stateTime = 1;
@@ -700,7 +719,8 @@ public class CSnailWeaknessState : MaverickState {
 }
 
 public class CSnailDashState : MaverickState {
-	public CSnailDashState() : base("dash", "") {
+	public CSnailDashState() : base("dash") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

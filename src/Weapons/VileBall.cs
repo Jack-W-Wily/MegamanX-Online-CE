@@ -14,7 +14,7 @@ public enum VileBallType {
 public class VileBall : Weapon {
 	public float vileAmmoUsage;
 	public VileBall(VileBallType vileBallType) : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileBomb;
 		weaponBarBaseIndex = 27;
 		weaponBarIndex = weaponBarBaseIndex;
@@ -34,19 +34,31 @@ public class VileBall : Weapon {
 			vileAmmoUsage = 8;
 			description = new string[] { "These bombs split into two", "upon contact with the ground." };
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.2";
+			effect = "Splits on ground.";
 		} else if (vileBallType == VileBallType.SpreadShot) {
 			displayName = "Spread Shot";
 			vileAmmoUsage = 5;
 			description = new string[] { "Unleash a fan of energy shots", "that stun enemies in their tracks." };
 			killFeedIndex = 55;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "1";
+			effect = "Stuns Enemies. CD: 2";
 		} else if (vileBallType == VileBallType.PeaceOutRoller) {
 			displayName = "Peace Out Roller";
 			vileAmmoUsage = 16;
-			rateOfFire = 1.25f;
+			fireRate = 75;
 			description = new string[] { "This electric bombs splits into two upon", "upon contact with the ground." };
 			killFeedIndex = 80;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			Flinch = "6";
+			effect = "Splits,no destroy on hit.";
 		}
 	}
 
@@ -56,7 +68,7 @@ public class VileBall : Weapon {
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (type == (int)VileBallType.NoneNapalm || type == (int)VileBallType.NoneFlamethrower) return;
-		if (shootTime == 0) {
+		if (shootCooldown == 0) {
 			if (weaponInput == WeaponIds.VileBomb) {
 				var ground = Global.level.raycast(vile.pos, vile.pos.addxy(0, 25), new List<Type>() { typeof(Wall) });
 				if (ground == null) {
@@ -104,6 +116,7 @@ public class VileBombProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -155,6 +168,7 @@ public class PeaceOutRollerProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -344,7 +358,7 @@ public class AirBombAttack : CharState {
 
 public class VileElectricBomb : Weapon {
 	public VileElectricBomb() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileBomb;
 		weaponBarBaseIndex = 55;
 		weaponBarIndex = 55;

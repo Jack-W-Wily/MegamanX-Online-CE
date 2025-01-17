@@ -546,8 +546,8 @@ public class GameMode {
 			if (axl.isZooming() && !axl.isZoomOutPhase1Done) {
 				Point charPos = axl.getCenterPos();
 
-				float xOff = level.mainPlayer.axlScopeCursorWorldPos.x - level.camCenterX;
-				float yOff = level.mainPlayer.axlScopeCursorWorldPos.y - level.camCenterY;
+				float xOff = axl.axlScopeCursorWorldPos.x - level.camCenterX;
+				float yOff = axl.axlScopeCursorWorldPos.y - level.camCenterY;
 
 				Point bulletPos = axl.getAxlBulletPos();
 				Point scopePos = axl.getAxlScopePos();
@@ -633,9 +633,9 @@ public class GameMode {
 					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			if (drawPlayer.character is MegamanX mmx && mmx.unpoShotCount > 0) {
+			if (drawPlayer.character is RagingChargeX mmx && mmx.shotCount > 0) {
 				int x = 10, y = 156;
-				int count = mmx.unpoShotCount;
+				int count = mmx.shotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
 				if (count >= 2) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y);
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
@@ -652,7 +652,7 @@ public class GameMode {
 					yStart += 12;
 				}
 				int xStart = 11;
-				if (zero.gigaAttack.shootTime > 0) {
+				if (zero.gigaAttack.shootCooldown > 0) {
 					drawZeroGigaCooldown(zero.gigaAttack, y: yStart);
 					xStart += 15;
 				}
@@ -684,7 +684,7 @@ public class GameMode {
 					);
 					yStart += 12;
 				}
-				if (punchyZero.gigaAttack.shootTime > 0) {
+				if (punchyZero.gigaAttack.shootCooldown > 0) {
 					drawZeroGigaCooldown(punchyZero.gigaAttack, xStart, yStart);
 					xStart += 15;
 				}
@@ -703,7 +703,10 @@ public class GameMode {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
-			if (drawPlayer.weapons.Count > 1) {
+			if (drawPlayer.weapons == null) {
+				return;
+			}
+			if (drawPlayer.weapons!.Count > 1) {
 				drawWeaponSwitchHUD(drawPlayer);
 			} else if (drawPlayer.weapons.Count == 1 && drawPlayer.weapons[0] is MechMenuWeapon mmw) {
 				drawWeaponSwitchHUD(drawPlayer);
@@ -974,58 +977,119 @@ public class GameMode {
 		if (Global.level.isRace()) {
 			revealedSpots.Add(new Point(level.camX, level.camY));
 			revealedRadius = float.MaxValue;
-			borderThickness = 0.5f;
+			borderThickness = 1;
 			dotRadius = 0.75f;
 		}
 
-		Global.radarRenderTexture.Clear(Color.Transparent);
+		Global.radarRenderTexture.Clear(new Color(33, 33, 74));
+		Global.radarRenderTextureB.Clear();
 		RenderStates states = new RenderStates(Global.radarRenderTexture.Texture);
-		states.BlendMode = new BlendMode(BlendMode.Factor.SrcColor, BlendMode.Factor.Zero, BlendMode.Equation.Add);
+		RenderStates statesB = new RenderStates(Global.radarRenderTextureB.Texture);
+		RenderStates statesB2 = new RenderStates(Global.radarRenderTextureB.Texture);
+		states.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add) {
+			AlphaEquation = BlendMode.Equation.Max
+		};
+		statesB.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Add) {
+			AlphaEquation = BlendMode.Equation.Max
+		};
+		statesB2.BlendMode = new BlendMode(BlendMode.Factor.SrcAlpha, BlendMode.Factor.OneMinusSrcAlpha, BlendMode.Equation.Min);
 
 		float scaleW = level.scaleW;
 		float scaleH = level.scaleH;
 		float scaledW = level.scaledW;
 		float scaledH = level.scaledH;
 
-		float radarX = Global.screenW - 6 - scaledW;
-		float radarY = Global.screenH - 6 - scaledH;
+		float radarX = MathF.Floor(Global.screenW - 6 - scaledW);
+		float radarY = MathF.Floor(Global.screenH - 6 - scaledH);
 
 		// The "fog of war" rect
-		RectangleShape rect = new RectangleShape(new Vector2f(scaledW * 4, scaledH * 4));
+		RectangleShape rect = new RectangleShape(new Vector2f(scaledW + 20, scaledH + 20));
 		rect.Position = new Vector2f(0, 0);
-		rect.FillColor = new Color(0, 0, 0, 224);
-		Global.radarRenderTexture.Draw(rect, states);
+		rect.FillColor = new Color(0, 0, 0, 128);
+		Global.radarRenderTextureB.Draw(rect, statesB2);
 
-		float camStartX = level.camX * scaleW;
-		float camStartY = level.camY * scaleH;
-		float camEndX = (level.camX + Global.viewScreenW) * scaleW;
-		float camEndY = (level.camY + Global.viewScreenH) * scaleH;
+		float camStartX = MathF.Floor((level.camX - Global.halfScreenW) * scaleW);
+		float camStartY = MathF.Floor((level.camY - Global.halfScreenH) * scaleH);
+		if (camStartX < 0) {
+			camStartX = 0;
+		}
+		if (camStartY < 0) {
+			camStartY = 0;
+		}
+		float camEndX = MathF.Floor(Global.viewScreenW * 2 * scaleW);
+		float camEndY = MathF.Floor(Global.viewScreenH * 2 * scaleH);
+		if (camEndX > scaledW) {
+			camStartX -= camEndY - scaledH;
+			camEndX = scaledW;
+		}
+		if (camEndY > scaledH) {
+			camStartY -= camEndY - scaledH;
+			camEndY = scaledH;
+		}
 
 		// The visible area circles
 		foreach (var spot in revealedSpots) {
-			float pxPos = spot.x * scaleW * 4;
-			float pyPos = spot.y * scaleH * 4;
-			float radius = revealedRadius * scaleW * 4;
+			float pxPos = spot.x * scaleW;
+			float pyPos = spot.y * scaleH;
+			float radius = revealedRadius * scaleW;
 			CircleShape circle1 = new CircleShape(radius);
-			circle1.FillColor = new Color(128, 128, 128, 192);
+			circle1.FillColor = new Color(0, 0, 0, 0);
 			circle1.Position = new Vector2f(pxPos - radius, pyPos - radius);
-			Global.radarRenderTexture.Draw(circle1, states);
+			Global.radarRenderTextureB.Draw(circle1, statesB2);
 		}
 
+		var sprite = new SFML.Graphics.Sprite(Global.radarRenderTextureB.Texture);
+		Global.radarRenderTextureB.Display();
+
+		foreach (GameObject gameObject in Global.level.gameObjects) {
+			if (gameObject is not Geometry geometry) {
+				continue;
+			}
+			Color blockColor = new Color(128, 128, 255);
+			if (gameObject is not Wall and not KillZone) {
+				continue;
+			}
+			if (gameObject is KillZone) {
+				blockColor = new Color(255, 128, 128);
+			}
+			Shape shape = geometry.collider.shape;
+			float pxPos = shape.minX * scaleH;
+			float pyPos = shape.minY * scaleH + 1;
+			float mxPos = shape.maxX * scaleH - pxPos;
+			float myPos = shape.maxY * scaleH - pyPos + 1;
+			if (mxPos <= 1) {
+				mxPos = 1;
+			}
+			if (myPos <= 1) {
+				myPos = 1;
+			}
+			RectangleShape wRect = new RectangleShape();
+			wRect.FillColor = blockColor;
+			wRect.Position = new Vector2f(pxPos, pyPos);
+			wRect.Size = new Vector2f(mxPos, myPos);
+			Global.radarRenderTexture.Draw(wRect);
+		}
 		Global.radarRenderTexture.Display();
-		var sprite = new SFML.Graphics.Sprite(Global.radarRenderTexture.Texture);
-		sprite.Position = new Vector2f(radarX, radarY);
-		sprite.Scale = new Vector2f(0.25f, 0.25f);
+		Global.radarRenderTexture.Draw(sprite);
+		Global.radarRenderTexture.Display();
+		var sprite2 = new SFML.Graphics.Sprite(Global.radarRenderTexture.Texture);
+		sprite2.Position = new Vector2f(radarX, radarY);
+
 		Global.window.SetView(DrawWrappers.hudView);
-		Global.window.Draw(sprite);
+		Global.window.Draw(sprite2);
 		sprite.Dispose();
+		sprite2.Dispose();
 
 		if (level.mainPlayer.isSigma) {
 			foreach (Maverick maverick in level.mainPlayer.mavericks) {
 				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
 				float xPos = maverick.pos.x * scaleW;
 				float yPos = maverick.pos.y * scaleH;
-				DrawWrappers.DrawCircle(radarX + xPos, radarY + yPos, dotRadius, true, new Color(255, 128, 0), 0, ZIndex.HUD, isWorldPos: false);
+				DrawWrappers.DrawRect(
+					radarX + xPos, radarY + yPos,
+					radarX + xPos, radarY + yPos,
+					true, new Color(255, 128, 0), 0, ZIndex.HUD, isWorldPos: false
+				);
 			}
 		}
 
@@ -1036,7 +1100,7 @@ public class GameMode {
 		}
 
 		foreach (var player in level.nonSpecPlayers()) {
-			if (player.character == null) continue;
+			if (player.character == null || player.character.destroyed) continue;
 			if (player.character.isStealthy(level.mainPlayer.alliance)) continue;
 			if (player.isMainPlayer && player.isDead) continue;
 
@@ -1053,17 +1117,34 @@ public class GameMode {
 
 			foreach (var spot in revealedSpots) {
 				if (player.isMainPlayer || new Point(xPos, yPos).distanceTo(new Point(spot.x * scaleW, spot.y * scaleH)) < revealedRadius * scaleW) {
-					DrawWrappers.DrawCircle(radarX + xPos, radarY + yPos, dotRadius, true, color, 0, ZIndex.HUD, isWorldPos: false);
+					DrawWrappers.DrawRectWH(
+						radarX + MathF.Round(xPos),
+						radarY + MathF.Round(yPos),
+						1, 1,
+						true, color, 0,
+						ZIndex.HUD, isWorldPos: false
+					);
 					break;
 				}
 			}
 		}
 
 		// Radar rectangle itself (with border)
-		DrawWrappers.DrawRect(radarX, radarY, Global.screenW - 6, Global.screenH - 6, true, Color.Transparent, borderThickness, ZIndex.HUD, isWorldPos: false, outlineColor: Color.White);
+		DrawWrappers.DrawRectWH(
+			radarX, radarY,
+			scaledW, scaledH,
+			true, Color.Transparent, 1,
+			ZIndex.HUD, isWorldPos: false,
+			outlineColor: Color.White
+		);
 
 		// Camera
-		DrawWrappers.DrawRect(radarX + camStartX, radarY + camStartY, radarX + camEndX, radarY + camEndY, true, new Color(0, 0, 0, 0), borderThickness * 0.5f, ZIndex.HUD, isWorldPos: false, outlineColor: new Color(255, 255, 255));
+		DrawWrappers.DrawRectWH(
+			radarX + camStartX, radarY + camStartY,
+			camEndX, camEndY,
+			true, new Color(0, 0, 0, 0), 1,
+			ZIndex.HUD, isWorldPos: false, outlineColor: new Color(255, 255, 255, 128)
+		);
 	}
 
 	public void draw1v1PlayerTopHUD(Player? player, HUDHealthPosition position) {
@@ -1304,9 +1385,7 @@ public class GameMode {
 		baseY -= 16;
 		int barIndex = 0;
 
-		if (player.character is MegamanX mmx &&
-			(mmx.isHyperX == true || player.character?.charState is XRevive)
-		) {
+		if (player.character is RagingChargeX mmx) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
 			if (hpPercent >= 75) barIndex = 1;
 			else if (hpPercent >= 50) barIndex = 3;
@@ -1372,8 +1451,8 @@ public class GameMode {
 	public bool shouldDrawWeaponAmmo(Player player, Weapon weapon) {
 		if (weapon == null) return false;
 		if (weapon.weaponSlotIndex == 0) return false;
-		if (!player.weapon.drawAmmo) return false;
-		if (weapon is NovaStrike && level.isHyper1v1()) return false;
+		if (!weapon.drawAmmo) return false;
+		if (weapon is HyperNovaStrike && level.isHyper1v1()) return false;
 
 		return true;
 	}
@@ -1384,9 +1463,21 @@ public class GameMode {
 		float baseY = hudHealthPosition.y;
 		bool forceSmallBarsOff = false;
 
+		// This runs once per character.
+		Weapon? weapon = player.lastHudWeapon;
+		if (player.character != null) {
+			weapon = player.weapon;
+			if (player.character is Zero zero) {
+				weapon = zero.gigaAttack;
+			}
+			if (player.character is PunchyZero punchyZero) {
+				weapon = punchyZero.gigaAttack;
+			}
+			player.lastHudWeapon = weapon;
+		}
 		// Small Bars option.
 		float ammoDisplayMultiplier = 1;
-		if (player.weapon.allowSmallBar && Options.main.enableSmallBars && !forceSmallBarsOff) {
+		if (weapon?.allowSmallBar == true && Options.main.enableSmallBars && !forceSmallBarsOff) {
 			ammoDisplayMultiplier = 0.5f;
 		}
 
@@ -1422,6 +1513,7 @@ public class GameMode {
 			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
 				int hudWeaponBaseIndex = 50;
 				int hudWeaponFullIndex = 39;
+				ammoDisplayMultiplier = 1;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
 					hudWeaponBaseIndex = 51;
@@ -1461,17 +1553,9 @@ public class GameMode {
 			return;
 		}
 
-		// This runs once per character.
-		Weapon weapon = player.lastHudWeapon;
-		if (player.character != null) {
-			weapon = player.weapon;
-			if (player.character is Zero zero) {
-				weapon = zero.gigaAttack;
-			}
-			if (player.character is PunchyZero punchyZero) {
-				weapon = punchyZero.gigaAttack;
-			}
-			player.lastHudWeapon = weapon;
+		// Return if there is no weapon to ren
+		if (weapon == null) {
+			return;
 		}
 
 		if (shouldDrawWeaponAmmo(player, weapon)) {
@@ -1488,14 +1572,14 @@ public class GameMode {
 					int spriteIndex = weapon.weaponBarIndex;
 					if (weapon.drawGrayOnLowAmmo && weapon.ammo < weapon.getAmmoUsage(0) ||
 						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
-						(weapon is NovaStrike && !weapon.canShoot(0, player)) ||
-						(weapon is HyperBuster hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
+						(weapon is HyperNovaStrike && !weapon.canShoot(0, player)) ||
+						(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
 						spriteIndex = grayAmmoIndex;
 					}
 					if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
 						spriteIndex = 0;
 					}
-					Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);
+					Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);	
 				} else {
 					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 				}
@@ -1503,6 +1587,9 @@ public class GameMode {
 			}
 			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 		}
+		//if (shouldDrawWeaponAmmo(player, weapon) && player.isIris) {
+		//	Global.sprites["iris_hud"].drawToHUD(0, 25, 125);
+		//}
 	}
 
 	public void addKillFeedEntry(KillFeedEntry killFeed, bool sendRpc = false) {
@@ -1744,7 +1831,7 @@ public class GameMode {
 
 		if (player.character is Vile vilePilot &&
 			vilePilot.rideArmor != null &&
-			vilePilot.rideArmor == vilePilot.startRideArmor
+			vilePilot.rideArmor == vilePilot.linkedRideArmor
 			&& vilePilot.rideArmor.raNum == 2
 		) {
 			int x = 10, y = 155;
@@ -1752,7 +1839,7 @@ public class GameMode {
 			if (napalmNum < 0) napalmNum = 0;
 			if (napalmNum > 2) napalmNum = 0;
 			Global.sprites["hud_hawk_bombs"].drawToHUD(
-				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootTime == 0 ? 1 : 0.5f
+				napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
 			);
 			Fonts.drawText(
 				FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
@@ -1780,7 +1867,7 @@ public class GameMode {
 			}
 		}
 		if (player.isX && Options.main.novaStrikeSpecial) {
-			Weapon? novaStrike = player.weapons.FirstOrDefault((Weapon w) => w is NovaStrike);
+			Weapon? novaStrike = player.weapons.FirstOrDefault((Weapon w) => w is HyperNovaStrike);
 			if (novaStrike != null) {
 				drawWeaponSlot(novaStrike, gigaWeaponX, 159);
 				gigaWeaponX += 18;
@@ -1789,7 +1876,7 @@ public class GameMode {
 		if (player.character is MegamanX mmx && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
 			int x = gigaWeaponX, y = 159;
 			Global.sprites["hud_weapon_icon"].drawToHUD(mmx.hasHadoukenEquipped() ? 112 : 113, x, y);
-			float cooldown = Helpers.progress(player.fgMoveAmmo, 32f);
+			float cooldown = Helpers.progress(player.fgMoveAmmo, 1920f);
 			drawWeaponSlotCooldown(x, y, cooldown);
 		}
 
@@ -1846,7 +1933,7 @@ public class GameMode {
 			var weapon = player.weapons[i];
 			var x = startX + (i * width);
 			var y = startY;
-			if (weapon is HyperBuster hb) {
+			if (weapon is HyperCharge hb) {
 				bool canShootHyperBuster = hb.canShootIncludeCooldown(player);
 				Color lineColor = canShootHyperBuster ? Color.White : Helpers.Gray;
 
@@ -1893,7 +1980,7 @@ public class GameMode {
 				offsetX -= width;
 				continue;
 			}
-			if (player.isX && Options.main.novaStrikeSpecial && weapon is NovaStrike) {
+			if (player.isX && Options.main.novaStrikeSpecial && weapon is HyperNovaStrike) {
 				offsetX -= width;
 				continue;
 			}
@@ -1915,10 +2002,10 @@ public class GameMode {
 
 	public void drawZeroGigaCooldown(Weapon weapon, int x = 11, int y = 159) {
 		// This runs once per character.
-		if (weapon == null || weapon.shootTime <= 0) {
+		if (weapon == null || weapon.shootCooldown <= 0) {
 			return;
 		}
-		float cooldown = Helpers.progress(weapon.shootTime, weapon.rateOfFire);
+		float cooldown = Helpers.progress(weapon.shootCooldown, weapon.fireRate);
 		drawGigaWeaponCooldown(weapon.weaponSlotIndex, 1 - cooldown, x, y);
 	}
 
@@ -1928,8 +2015,8 @@ public class GameMode {
 	}
 
 	public void drawWeaponSlot(Weapon weapon, float x, float y, bool selected = false) {
-		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.startRideArmor != null) {
-			int index = 37 + level.mainPlayer.character.startRideArmor.raNum;
+		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.linkedRideArmor != null) {
+			int index = 37 + level.mainPlayer.character.linkedRideArmor.raNum;
 			if (index == 42) index = 119;
 			Global.sprites["hud_weapon_icon"].drawToHUD(index, x, y);
 		} else if (weapon is MechMenuWeapon && level.mainPlayer.isSelectingRA()) {
@@ -1940,7 +2027,7 @@ public class GameMode {
 		if (selected) {
 			if (!weapon.canShoot(0, mainPlayer)) {
 				drawWeaponStateOverlay(x, y, 2);
-			} else if (weapon.shootTime > 0 && weapon.rateOfFire > 10f/60f && weapon.drawCooldown) {
+			} else if (weapon.shootCooldown > 0 && weapon.fireRate > 10 && weapon.drawCooldown) {
 				drawWeaponStateOverlay(x, y, 1);
 			} else if (selected) {
 				drawWeaponStateOverlay(x, y, 0);
@@ -1961,14 +2048,24 @@ public class GameMode {
 				drawWeaponText(x, y, level.mainPlayer.fishMechaniloidCount().ToString());
 			}
 		}
-
-		if (weapon is MagnetMine && level.mainPlayer.magnetMines.Count > 0) {
-			drawWeaponText(x, y, level.mainPlayer.magnetMines.Count.ToString());
+		if (!mainPlayer.isSpectator && mainPlayer.character is MegamanX mmx) {
+			if (weapon is MagnetMine && mmx.magnetMines.Count > 0) {
+				drawWeaponText(x, y, mmx.magnetMines.Count.ToString());
+			}
+			if (weapon is HyperCharge hc) {
+				if (level.mainPlayer.hyperChargeSlot >= 0 &&
+					mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
+				) {
+					drawWeaponSlotAmmo(x, y, 0);
+				} else {
+					drawWeaponSlotCooldown(x, y, hc.shootCooldown / hc.fireRate);
+				}
+			}
+			else if (weapon is HyperNovaStrike ns) {
+				drawWeaponSlotCooldown(x, y, ns.shootCooldown / ns.fireRate);
+			}
 		}
 
-		if (weapon is RaySplasher && level.mainPlayer.turrets.Count > 0) {
-			// drawWeaponText(x, y, level.mainPlayer.turrets.Count.ToString());
-		}
 
 		if (weapon is BlastLauncher && level.mainPlayer.axlLoadout.blastLauncherAlt == 1 && level.mainPlayer.grenades.Count > 0) {
 			drawWeaponText(x, y, level.mainPlayer.grenades.Count.ToString());
@@ -1977,24 +2074,14 @@ public class GameMode {
 		if (weapon is DNACore dnaCore && level.mainPlayer.weapon == weapon && level.mainPlayer.input.isHeld(Control.Special1, level.mainPlayer)) {
 			drawTransformPreviewInfo(dnaCore, x, y);
 		}
-
-		if (weapon is HyperBuster &&
-			!mainPlayer.isSpectator &&
-			mainPlayer.weapons[level.mainPlayer.hyperChargeSlot].ammo == 0
-		) {
-			drawWeaponSlotAmmo(x, y, 0);
-		} else if (weapon is HyperBuster hb) {
-			drawWeaponSlotCooldown(x, y, hb.shootTime / hb.getRateOfFire(level.mainPlayer));
-		} else if (weapon is NovaStrike ns) {
-			drawWeaponSlotCooldown(x, y, ns.shootTime / ns.rateOfFire);
-		}
+		 
 		if (weapon is SigmaMenuWeapon) {
-			drawWeaponSlotCooldown(x, y, weapon.shootTime / 4);
+			drawWeaponSlotCooldown(x, y, weapon.shootCooldown / 4);
 		}
 
 		if (Global.debug && Global.quickStart && weapon is AxlWeapon aw2 && weapon is not DNACore) {
-			drawWeaponSlotCooldownBar(x, y, aw2.shootTime / aw2.rateOfFire);
-			drawWeaponSlotCooldownBar(x, y, aw2.altShootTime / aw2.altFireCooldown, true);
+			drawWeaponSlotCooldownBar(x, y, aw2.shootCooldown / aw2.fireRate);
+			drawWeaponSlotCooldownBar(x, y, aw2.altShotCooldown / aw2.altFireCooldown, true);
 		}
 
 		MaverickWeapon? mw = weapon as MaverickWeapon;
@@ -2005,7 +2092,7 @@ public class GameMode {
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-				drawWeaponSlotCooldown(x, y, mw.shootTime / MaverickWeapon.summonerCooldown);
+				drawWeaponSlotCooldown(x, y, mw.shootCooldown / MaverickWeapon.summonerCooldown);
 			} else if (level.mainPlayer.isPuppeteer()) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
@@ -2207,10 +2294,11 @@ public class GameMode {
 				Global.sprites["menu_megaman"].drawToHUD(4, x, sy + 4);
 			} else {
 				Global.sprites["menu_megaman_armors"].drawToHUD(0, x, sy + 4);
-				int boots = Player.getArmorNum(dnaCore.armorFlag, 0, true);
-				int body = Player.getArmorNum(dnaCore.armorFlag, 1, true);
-				int helmet = Player.getArmorNum(dnaCore.armorFlag, 2, true);
-				int arm = Player.getArmorNum(dnaCore.armorFlag, 3, true);
+				int[] armorVals = MegamanX.getArmorVals(dnaCore.armorFlag);
+				int boots = armorVals[2];
+				int body = armorVals[0];
+				int helmet = armorVals[3];
+				int arm = armorVals[1];
 
 				if (helmet == 1) Global.sprites["menu_megaman_armors"].drawToHUD(1, x, sy + 4);
 				if (helmet == 2) Global.sprites["menu_megaman_armors"].drawToHUD(2, x, sy + 4);
@@ -2273,12 +2361,12 @@ public class GameMode {
 			if (sigmaForm == 0) weapons.Add(new Weapon() {
 				weaponSlotIndex = 111,
 				ammo = dnaCore.rakuhouhaAmmo,
-				maxAmmo = 32,
+				maxAmmo = 20,
 			});
 			if (sigmaForm == 1) weapons.Add(new Weapon() {
 				weaponSlotIndex = 110,
 				ammo = dnaCore.rakuhouhaAmmo,
-				maxAmmo = 32,
+				maxAmmo = 28,
 			});
 		}
 		int counter = 0;
@@ -2872,7 +2960,7 @@ public class GameMode {
 						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 					);
 					string reviveText2 = Helpers.controlText(
-						$"[CMD]: Revive as MK-V (5 {Global.nameCoins})"
+						$"[CMD]: Revive as Vile V (5 {Global.nameCoins})"
 					);
 					Fonts.drawText(
 						FontType.Green, reviveText2,
@@ -3030,9 +3118,9 @@ public class GameMode {
 		if (charNum == 0) {
 			charName = "X";
 			if (is1v1) {
-				if (player.bootsArmorNum == 1) charName += "1";
-				else if (player.bootsArmorNum == 2) charName += "2";
-				else if (player.bootsArmorNum == 3) charName += "3";
+				if (player.legArmorNum == 1) charName += "1";
+				else if (player.legArmorNum == 2) charName += "2";
+				else if (player.legArmorNum == 3) charName += "3";
 			}
 		} else if (charNum == 1) charName = "Zero";
 		else if (charNum == 2) charName = "Vile";
@@ -3103,11 +3191,11 @@ public class GameMode {
 			var dirTo = playerPos.directionTo(objPos).normalize();
 
 			//a = arrow, l = length, m = minus
-			int al = 10 / Global.viewSize;
-			int alm1 = 9 / Global.viewSize;
-			int alm2 = 8 / Global.viewSize;
-			int alm3 = 7 / Global.viewSize;
-			int alm4 = 5 / Global.viewSize;
+			float al = 10 / Global.viewSize;
+			float alm1 = 9 / Global.viewSize;
+			float alm2 = 8 / Global.viewSize;
+			float alm3 = 7 / Global.viewSize;
+			float alm4 = 5 / Global.viewSize;
 
 			intersectPoint.inc(dirTo.times(-10));
 			var posX = intersectPoint.x - Global.level.camX;

@@ -144,11 +144,29 @@ public class BubbleCrab : Maverick {
 		return aiAttackStates().GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("jump_attack")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.BCrabClaw, player, 1, Global.defFlinch, 0.15f);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		JumpAttack,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"bcrab_jump_attack" or "bcrab_jump_attack_start" => MeleeIds.JumpAttack,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.JumpAttack => new GenericMeleeProj(
+				weapon, pos, ProjIds.BCrabClaw, player,
+				1, Global.defFlinch, 9, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void onDestroy() {
@@ -213,7 +231,7 @@ public class BCrabShootState : MaverickState {
 	bool secondAnim;
 	float shootCooldown;
 	int num;
-	public BCrabShootState() : base("ring_attack_start", "") {
+	public BCrabShootState() : base("ring_attack_start") {
 	}
 
 	public override void update() {
@@ -257,7 +275,7 @@ public class BCrabShootState : MaverickState {
 }
 
 public class BCrabClawState : MaverickState {
-	public BCrabClawState() : base("jump_attack_start", "") {
+	public BCrabClawState() : base("jump_attack_start") {
 	}
 
 	public override void update() {
@@ -283,7 +301,7 @@ public class BCrabClawState : MaverickState {
 }
 
 public class BCrabClawJumpState : MaverickState {
-	public BCrabClawJumpState() : base("jump_attack", "") {
+	public BCrabClawJumpState() : base("jump_attack") {
 	}
 
 	public override void update() {
@@ -332,9 +350,13 @@ public class BCrabShieldProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (!ownedByLocalPlayer) return;
 
@@ -381,10 +403,14 @@ public class BCrabShieldProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class BCrabShieldStartState : MaverickState {
-	public BCrabShieldStartState() : base("shield_start", "") {
+	public BCrabShieldStartState() : base("shield_start") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -431,6 +457,11 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
@@ -467,6 +498,9 @@ public class BCrabSummonBubbleProj : Projectile, IDamagable {
 		}
 	}
 	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+	public bool isPlayableDamagable() {
 		return false;
 	}
 }
@@ -508,6 +542,11 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 		base.onStart();
 		if (!ownedByLocalPlayer) return;
 		shield = new BCrabSummonBubbleProj(maverick.weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
@@ -616,10 +655,13 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) {
 		return false;
 	}
+	public bool isPlayableDamagable() {
+		return true;
+	}
 }
 
 public class BCrabSummonState : MaverickState {
-	public BCrabSummonState() : base("summon", "") {
+	public BCrabSummonState() : base("summon") {
 	}
 
 	public override void update() {

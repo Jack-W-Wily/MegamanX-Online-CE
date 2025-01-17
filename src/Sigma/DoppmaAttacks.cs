@@ -143,7 +143,7 @@ public class SigmaShieldProj : Projectile {
 
 public class SigmaThrowShieldState : CharState {
 	SigmaShieldProj? proj;
-	public SigmaThrowShieldState() : base("throw", "", "", "") {
+	public SigmaThrowShieldState() : base("throw") {
 	}
 
 	public override void update() {
@@ -199,7 +199,7 @@ public class Sigma3FireProj : Projectile {
 
 		wallCrawlSpeed = 250;
 		wallCrawlUpdateAngle = true;
-
+		canBeLocal = false;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -278,7 +278,7 @@ public class Sigma3Shoot : CharState {
 		Point? shootPOI = character.getFirstPOI();
 		if (!hasShot && shootPOI != null) {
 			hasShot = true;
-			doppma.fireballWeapon.shootTime = 0.15f;
+			doppma.fireballWeapon.shootCooldown = 0.15f;
 			int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 			float ang = character.getShootXDir() == 1 ? 0 : 180;
 			if (character.sprite.name.EndsWith("jump_shoot_downdiag")) {

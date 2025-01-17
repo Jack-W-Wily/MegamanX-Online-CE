@@ -13,6 +13,12 @@ public class RaycastHitData {
 }
 
 public class Axl : Character {
+	public float stingChargeTime;
+	public int lastXDir;
+	public float shootTime {
+		get { return player.weapon?.shootCooldown ?? 0; }
+		set { if (player.weapon != null) { player.weapon.shootCooldown = value; } }
+	}
 	public bool aiming;
 	public IDamagable? axlCursorTarget = null;
 	public Character? axlHeadshotTarget = null;
@@ -68,6 +74,23 @@ public class Axl : Character {
 	public RayGunAltProj? rayGunAltProj;
 	public GaeaShieldProj? gaeaShield;
 
+	// Cursor stuff.
+	public Point axlCursorPos;
+	public Point? assassinCursorPos;
+	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camX, Global.level.camY);
+	public Point axlScopeCursorWorldPos;
+	public Point axlScopeCursorWorldLerpPos;
+	public Point axlZoomOutCursorDestPos;
+	public Point axlLockOnCursorPos;
+	public Point axlGenericCursorWorldPos {
+		get {
+			if (!isZooming() || isZoomingIn || isZoomOutPhase1Done) {
+				return axlCursorWorldPos;
+			}
+			return axlScopeCursorWorldPos;
+		}
+	}
+
 	// Used to be 0.5, 100
 	public const float maxStealthRevealTime = 0.25f;
 	// The ping divided by this number indicates stealth reveal time in online
@@ -94,6 +117,8 @@ public class Axl : Character {
 		muzzleFlash = new Anim(new Point(), "axl_pistol_flash", xDir, null, false);
 		muzzleFlash.visible = false;
 		axlHyperMode = player.loadout?.axlLoadout?.hyperMode ?? 0;
+
+		configureWeapons();
 	}
 
 	public void zoomIn() {
@@ -102,12 +127,12 @@ public class Axl : Character {
 
 		_zoom = true;
 		if (isWhiteAxl()) hyperAxlStillZoomed = true;
-		player.axlCursorPos.x = Helpers.clamp(player.axlCursorPos.x, 0, Global.viewScreenW);
-		player.axlCursorPos.y = Helpers.clamp(player.axlCursorPos.y, 0, Global.viewScreenH);
+		axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+		axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
 		savedCamX = Global.level.camX;
 		savedCamY = Global.level.camY;
-		player.axlScopeCursorWorldPos = player.character.getCamCenterPos(ignoreZoom: true);
-		player.axlScopeCursorWorldLerpPos = player.axlCursorWorldPos;
+		axlScopeCursorWorldPos = player.character.getCamCenterPos(ignoreZoom: true);
+		axlScopeCursorWorldLerpPos = axlCursorWorldPos;
 		isZoomingIn = true;
 		isZoomingOut = false;
 	}
@@ -117,8 +142,8 @@ public class Axl : Character {
 		if (!_zoom) return;
 
 		zoomCharge = 0;
-		player.axlZoomOutCursorDestPos = player.character.getCamCenterPos(ignoreZoom: true);
-		player.axlCursorPos = getAxlBulletPos().add(getAxlBulletDir().times(50)).addxy(-savedCamX, -savedCamY);
+		axlZoomOutCursorDestPos = player.character.getCamCenterPos(ignoreZoom: true);
+		axlCursorPos = getAxlBulletPos().add(getAxlBulletDir().times(50)).addxy(-savedCamX, -savedCamY);
 
 		isZoomingOut = true;
 		isZoomingIn = false;
@@ -261,6 +286,40 @@ public class Axl : Character {
 	float assassinSmokeTime;
 	float lastAltShootPressedTime;
 	float voltTornadoTime;
+
+
+	public override void preUpdate() {
+		lastXDir = xDir;
+		base.preUpdate();
+
+		if (player.weapon is MaverickWeapon mw2 && mw2.maverick != null) {
+			if (mw2.maverick.aiBehavior != MaverickAIBehavior.Control && mw2.maverick.state is not MExit) {
+				foreach (var weapon in player.weapons) {
+					if (weapon is MaverickWeapon mw) {
+						if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
+							mw.maverick.aiBehavior = player.currentMaverickCommand;
+						}
+						if (mw.isMenuOpened) {
+							mw.isMenuOpened = false;
+						}
+					}
+				}
+				mw2.maverick.aiBehavior = MaverickAIBehavior.Control;
+			}
+		} else if (player.currentMaverick != null) {
+			foreach (var weapon in player.weapons) {
+				if (weapon is MaverickWeapon mw) {
+					if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
+						mw.maverick.aiBehavior = player.currentMaverickCommand;
+					}
+					if (mw.isMenuOpened) {
+						mw.isMenuOpened = false;
+					}
+				}
+			}
+		}
+	}
+
 	public override void update() {
 		base.update();
 
@@ -304,6 +363,24 @@ public class Axl : Character {
 				}
 			}
 			return;
+		}
+
+		if (linkedRideArmor != null &&
+			player.input.isHeld(Control.Down, player) &&
+			player.input.isHeld(Control.Special2, player) && 
+			linkedRideArmor.rideArmorState is not RACalldown
+		) {
+			linkedRideArmor.changeState(new RACalldown(pos, false), true);
+			linkedRideArmor.xDir = xDir;
+		}
+
+		if (stingChargeTime > 0) {
+			stingChargeTime -= Global.spf;
+
+			if (stingChargeTime <= 0) {
+				player.delaySubtank();
+				stingChargeTime = 0;
+			}
 		}
 
 		isRevving = false;
@@ -367,20 +444,11 @@ public class Axl : Character {
 		}
 
 		player.changeWeaponControls();
-
 		updateAxlAim();
-		//somehow you could do air dodge roll, added "grounded" to fix that "bug"
-		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
-			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
-				changeState(new DodgeRoll(), true);
-			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
-				changeState(new DodgeRoll(), true);
-			}
-		}
 
 		sprite.reversed = false;
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false) || isZooming()) && canChangeDir() && charState is not WallSlide) {
-			int newXDir = (pos.x > player.axlGenericCursorWorldPos.x ? -1 : 1);
+			int newXDir = (pos.x > axlGenericCursorWorldPos.x ? -1 : 1);
 			if (charState is Run && xDir != newXDir) {
 				sprite.reversed = true;
 			}
@@ -430,11 +498,15 @@ public class Axl : Character {
 
 		bool bothHeld = shootHeld && altShootHeld;
 
-		if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+		if (player.weapon is AxlBullet || player.weapon is DoubleBullet || 
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 			(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
 		} else {
 			foreach (var weapon in player.weapons) {
-				if (weapon is AxlBullet || weapon is DoubleBullet) {
+				if (weapon is AxlBullet || weapon is DoubleBullet || 
+					weapon is MettaurCrash || weapon is BeastKiller || weapon is MachineBullets || 
+					weapon is RevolverBarrel || weapon is AncientGun) {
 					(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
 				}
 			}
@@ -445,7 +517,9 @@ public class Axl : Character {
 		}
 
 		if (player.weapon is not AssassinBullet) {
-			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet) && invulnTime == 0 && flag == null) {
+			if (altShootHeld && !bothHeld && (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+			player.weapon is RevolverBarrel || player.weapon is AncientGun) && invulnTime == 0 && flag == null) {
 				increaseCharge();
 			} else {
 				/* if (isCharging() && getChargeLevel() >= 3 && player.scrap >= 10 && !isWhiteAxl() && !hyperAxlUsed && (player.axlHyperMode > 0 || player.axlBulletType == 0)) {
@@ -467,7 +541,9 @@ public class Axl : Character {
 					stingChargeTime = 0;
 					playSound("stingCharge", sendRpc: true);
 				} else if (isCharging()) {
-					if (player.weapon is AxlBullet || player.weapon is DoubleBullet) {
+					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
+						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
+						player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 						recoilTime = 0.2f;
 						if (!isWhiteAxl()) {
 							player.axlWeapon?.axlShoot(player, AxlBulletType.AltFire);
@@ -516,46 +592,61 @@ public class Axl : Character {
 			}
 		}
 		chargeGfx();
-
-		bool canShoot = (undisguiseTime == 0 && assassinTime == 0);
-		if (canShoot) {
+		bool weCanShoot = (undisguiseTime == 0 && assassinTime == 0);
+		if (weCanShoot) {
 			// Axl bullet
 			if (!isCharging() && player.axlWeapon != null) {
-				if (player.weapon is AxlBullet && charState.canShoot() && !player.weapon.noAmmo()) {
-					if (shootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+				if (player.weapon is AxlBullet && canShoot() && !player.weapon.noAmmo()) {
+					if (shootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShootTime == 0 && player.weapon.ammo >= 4) {
+					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
-
+				switch(player.weapon) {
+					case MettaurCrash:
+					case BeastKiller: 
+					case MachineBullets:
+					case RevolverBarrel:
+					case AncientGun:
+						if (canShoot() && !player.weapon.noAmmo()) {
+							if (shootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
+								recoilTime = 0.2f;
+								player.axlWeapon.axlShoot(player);
+							} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
+								recoilTime = 0.2f;
+								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
+							}
+						}
+						break; 
+				}
 				// Double bullet
-				if (player.weapon is DoubleBullet && charState.canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
+				if (player.weapon is DoubleBullet && canShoot() && !(charState is LadderClimb) && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-						if (bothHeld) player.axlWeapon.shootTime *= 2f;
+						if (bothHeld) player.axlWeapon.shootCooldown *= 2f;
 					}
-					if (bothHeld && player.weapon.altShootTime == 0) {
+					if (bothHeld && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-						if (bothHeld) player.axlWeapon.altShootTime *= 2f;
-					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShootTime == 0 && player.weapon.ammo >= 4) {
+						if (bothHeld) player.axlWeapon.altShotCooldown *= 2f;
+					} else if ((altShootPressed || altShootRecentlyPressed) && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 4) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
 
-				if (player.weapon is BlastLauncher && charState.canShoot() && !(charState is LadderClimb)) {
+				if (player.weapon is BlastLauncher && canShoot() && !(charState is LadderClimb)) {
 					if (shootHeld && shootTime == 0 && player.weapon.ammo >= 1) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
 					}
 
 					if (player.axlLoadout.blastLauncherAlt == 0) {
-						if (altShootPressed && shootTime == 0 && player.weapon.altShootTime == 0 && player.weapon.ammo >= 1) {
+						if (altShootPressed && shootTime == 0 && player.weapon.altShotCooldown == 0 && player.weapon.ammo >= 1) {
 							recoilTime = 0.2f;
 							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 						}
@@ -569,7 +660,7 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is RayGun && charState.canShoot() && !player.weapon.noAmmo()) {
+				if (player.weapon is RayGun && canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
@@ -588,17 +679,17 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is BlackArrow && charState.canShoot() && !player.weapon.noAmmo()) {
+				if (player.weapon is BlackArrow && canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-					} else if (altShootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+					} else if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
 
-				if (player.weapon is SpiralMagnum && charState.canShoot()) {
+				if (player.weapon is SpiralMagnum && canShoot()) {
 					if (shootHeld && shootTime == 0) {
 						if (!player.weapon.noAmmo()) {
 							recoilTime = 0.2f;
@@ -606,7 +697,7 @@ public class Axl : Character {
 						}
 					} else {
 						if (player.axlLoadout.spiralMagnumAlt == 0) {
-							if (altShootPressed && player.axlWeapon.ammo > 0 && shootTime == 0 && player.weapon.altShootTime == 0) {
+							if (altShootPressed && player.axlWeapon.ammo > 0 && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
@@ -622,30 +713,30 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is BoundBlaster && charState.canShoot() && !player.weapon.noAmmo()) {
+				if (player.weapon is BoundBlaster && canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player);
-					} else if (altShootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+					} else if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 					}
 				}
 
-				if (player.weapon is PlasmaGun && charState.canShoot() && !player.weapon.noAmmo()) {
+				if (player.weapon is PlasmaGun && canShoot() && !player.weapon.noAmmo()) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.2f;
-						player.axlWeapon.altShootTime = player.axlWeapon.altFireCooldown;
+						player.axlWeapon.altShotCooldown = player.axlWeapon.altFireCooldown;
 						player.axlWeapon.axlShoot(player);
 					} else if (altShootHeld) {
 						if (player.axlLoadout.plasmaGunAlt == 0) {
-							if (player.axlWeapon.altShootTime == 0 && grounded) {
+							if (player.axlWeapon.altShotCooldown == 0 && grounded) {
 								recoilTime = 0.2f;
 								voltTornadoTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
 						} else {
-							if (player.axlWeapon.altShootTime == 0) {
+							if (player.axlWeapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
@@ -654,7 +745,7 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is IceGattling && charState.canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
+				if (player.weapon is IceGattling && canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
 					if (altShootPressed && player.axlLoadout.iceGattlingAlt == 0 && gaeaShield == null) {
 						recoilTime = 0.2f;
 						player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
@@ -675,21 +766,21 @@ public class Axl : Character {
 					}
 				}
 
-				if (player.weapon is FlameBurner && charState.canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
+				if (player.weapon is FlameBurner && canShoot() && !(charState is LadderClimb) && player.weapon.ammo > 0) {
 					if (shootHeld && shootTime == 0) {
 						recoilTime = 0.05f;
 						player.axlWeapon.axlShoot(player);
 					}
 
 					if (player.axlLoadout.flameBurnerAlt == 0) {
-						if (altShootHeld && shootTime == 0 && player.weapon.altShootTime == 0) {
+						if (altShootHeld && shootTime == 0 && player.weapon.altShotCooldown == 0) {
 							recoilTime = 0.2f;
 							player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
-							player.axlWeapon.shootTime = 0.5f;
+							player.axlWeapon.shootCooldown = 30;
 						}
 					} else {
 						if (altShootHeld) {
-							if (shootTime == 0 && player.weapon.altShootTime == 0) {
+							if (shootTime == 0 && player.weapon.altShotCooldown == 0) {
 								recoilTime = 0.2f;
 								player.axlWeapon.axlShoot(player, AxlBulletType.AltFire);
 							}
@@ -698,7 +789,7 @@ public class Axl : Character {
 				}
 
 				// DNA Core
-				if (player.weapon is DNACore && charState.canShoot()) {
+				if (player.weapon is DNACore && canShoot()) {
 					AxlWeapon? realWeapon = player.weapons[player.weaponSlot] as AxlWeapon;
 					if (realWeapon != null) {
 						if (shootPressed && shootTime == 0) {
@@ -757,6 +848,15 @@ public class Axl : Character {
 			changeState(new Hover(), true);
 			return true;
 		}
+		if (dodgeRollCooldown == 0 && player.canControl && grounded) {
+			if (charState is Crouch && player.input.isPressed(Control.Dash, player)) {
+				changeState(new DodgeRoll(), true);
+				return true;
+			} else if (player.input.isPressed(Control.Dash, player) && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new DodgeRoll(), true);
+				return true;
+			}
+		}
 		return base.normalCtrl();
 	}
 
@@ -782,21 +882,21 @@ public class Axl : Character {
 				if (!isZoomingIn && !isZoomingOut) {
 					updateAxlScopePos();
 				} else if (isZoomingIn) {
-					player.axlScopeCursorWorldPos = Point.lerp(player.axlScopeCursorWorldPos, player.axlScopeCursorWorldLerpPos, Global.spf * 15);
-					if (player.axlScopeCursorWorldPos.distanceTo(player.axlScopeCursorWorldLerpPos) < 1) {
-						player.axlScopeCursorWorldPos = player.axlScopeCursorWorldLerpPos;
+					axlScopeCursorWorldPos = Point.lerp(axlScopeCursorWorldPos, axlScopeCursorWorldLerpPos, Global.spf * 15);
+					if (axlScopeCursorWorldPos.distanceTo(axlScopeCursorWorldLerpPos) < 1) {
+						axlScopeCursorWorldPos = axlScopeCursorWorldLerpPos;
 						isZoomingIn = false;
 					}
 				} else if (isZoomingOut) {
-					Point destPos = player.axlZoomOutCursorDestPos;
-					player.axlScopeCursorWorldPos = Point.lerp(player.axlScopeCursorWorldPos, destPos, Global.spf * 15);
-					float dist = player.axlScopeCursorWorldPos.distanceTo(destPos);
+					Point destPos = axlZoomOutCursorDestPos;
+					axlScopeCursorWorldPos = Point.lerp(axlScopeCursorWorldPos, destPos, Global.spf * 15);
+					float dist = axlScopeCursorWorldPos.distanceTo(destPos);
 					if (dist < 50 && !isZoomOutPhase1Done) {
-						//player.axlCursorPos = player.axlScopeCursorWorldPos.addxy(-Global.level.camX, -Global.level.camY);
+						//axlCursorPos = axlScopeCursorWorldPos.addxy(-Global.level.camX, -Global.level.camY);
 						isZoomOutPhase1Done = true;
 					}
 					if (dist < 1) {
-						player.axlScopeCursorWorldPos = destPos;
+						axlScopeCursorWorldPos = destPos;
 						isZoomingOut = false;
 						isZoomOutPhase1Done = false;
 						_zoom = false;
@@ -819,7 +919,7 @@ public class Axl : Character {
 	public void updateAxlDirectionalAim() {
 		if (player.input.isCursorLocked(player)) {
 			Point worldCursorPos = pos.add(lastDirToCursor);
-			player.axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
 			lockOn(out _);
 			return;
 		}
@@ -893,7 +993,7 @@ public class Axl : Character {
 		float yOff = -24;
 		if (charState is Crouch) yOff = -16;
 
-		//player.axlCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
+		//axlCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
 		Point destCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
 
 		if (charState is Dash || charState is AirDash) {
@@ -901,23 +1001,23 @@ public class Axl : Character {
 		}
 
 		// Try to see if where cursor will go to has auto-aim target. If it does, make that the dest, not the actual dest
-		Point oldCursorPos = player.axlCursorPos;
-		player.axlCursorPos = destCursorPos;
+		Point oldCursorPos = axlCursorPos;
+		axlCursorPos = destCursorPos;
 		lockOn(out Point? lockOnPoint);
 		if (lockOnPoint != null) {
 			destCursorPos = lockOnPoint.Value;
 		}
-		player.axlCursorPos = oldCursorPos;
+		axlCursorPos = oldCursorPos;
 
 		// Lerp to the new target
-		//player.axlCursorPos = Point.moveTo(player.axlCursorPos, destCursorPos, Global.spf * 1000);
+		//axlCursorPos = Point.moveTo(axlCursorPos, destCursorPos, Global.spf * 1000);
 		if (!Options.main.aimAnalog) {
-			player.axlCursorPos = Point.lerp(player.axlCursorPos, destCursorPos, Global.spf * 15);
+			axlCursorPos = Point.lerp(axlCursorPos, destCursorPos, Global.spf * 15);
 		} else {
-			player.axlCursorPos = destCursorPos;
+			axlCursorPos = destCursorPos;
 		}
 
-		lastDirToCursor = pos.directionTo(player.axlCursorWorldPos);
+		lastDirToCursor = pos.directionTo(axlCursorWorldPos);
 	}
 
 	Point lastDirToCursor;
@@ -933,7 +1033,7 @@ public class Axl : Character {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.pos.distanceTo(pos) < 150 && !enemy.character.isStealthy(player.alliance)) {
 				float distPercent = 1 - (enemy.character.pos.distanceTo(pos) / 150);
 				var dirToEnemy = getAxlBulletPos().directionTo(enemy.character.getAimCenterPos());
-				var dirToCursor = getAxlBulletPos().directionTo(player.axlGenericCursorWorldPos);
+				var dirToCursor = getAxlBulletPos().directionTo(axlGenericCursorWorldPos);
 
 				float angle = dirToEnemy.angleWith(dirToCursor);
 
@@ -954,7 +1054,7 @@ public class Axl : Character {
 		var prevTarget = axlCursorTarget;
 		axlCursorTarget = null;
 		axlHeadshotTarget = null;
-		player.assassinCursorPos = null;
+		assassinCursorPos = null;
 
 		if (!Options.main.lockOnSound) return;
 		if (player.isDisguisedAxl && !player.isAxl && player.axlWeapon is not AssassinBullet) return;
@@ -969,12 +1069,12 @@ public class Axl : Character {
 		}
 
 		if (axlCursorTarget != null) {
-			player.axlLockOnCursorPos = (axlCursorTarget as Character).getAimCenterPos();
-			lockOnPoint = player.axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
-			// player.axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
+			axlLockOnCursorPos = (axlCursorTarget as Character).getAimCenterPos();
+			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			// axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
 
 			if (player.axlWeapon is AssassinBullet) {
-				player.assassinCursorPos = lockOnPoint;
+				assassinCursorPos = lockOnPoint;
 			}
 		}
 	}
@@ -994,36 +1094,36 @@ public class Axl : Character {
 
 		// Controller joystick axis move section
 		if (Input.aimX > aimThreshold && Input.aimX >= Input.lastAimX) {
-			player.axlScopeCursorWorldPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
+			axlScopeCursorWorldPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
 			axisXMoved = true;
 		} else if (Input.aimX < -aimThreshold && Input.aimX <= Input.lastAimX) {
-			player.axlScopeCursorWorldPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
+			axlScopeCursorWorldPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
 			axisXMoved = true;
 		}
 		if (Input.aimY > aimThreshold && Input.aimY >= Input.lastAimY) {
-			player.axlScopeCursorWorldPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
+			axlScopeCursorWorldPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
 			axisYMoved = true;
 		} else if (Input.aimY < -aimThreshold && Input.aimY <= Input.lastAimY) {
-			player.axlScopeCursorWorldPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
+			axlScopeCursorWorldPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
 			axisYMoved = true;
 		}
 
 		// Controller or keyboard button based aim section
 		if (!axisXMoved) {
 			if (player.input.isHeld(Control.AimLeft, player)) {
-				player.axlScopeCursorWorldPos.x -= Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.x -= Global.spf * 200 * sensitivity;
 				axisXMoved = true;
 			} else if (player.input.isHeld(Control.AimRight, player)) {
-				player.axlScopeCursorWorldPos.x += Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.x += Global.spf * 200 * sensitivity;
 				axisXMoved = true;
 			}
 		}
 		if (!axisYMoved) {
 			if (player.input.isHeld(Control.AimUp, player)) {
-				player.axlScopeCursorWorldPos.y -= Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.y -= Global.spf * 200 * sensitivity;
 				axisYMoved = true;
 			} else if (player.input.isHeld(Control.AimDown, player)) {
-				player.axlScopeCursorWorldPos.y += Global.spf * 200 * sensitivity;
+				axlScopeCursorWorldPos.y += Global.spf * 200 * sensitivity;
 				axisYMoved = true;
 			}
 		}
@@ -1031,8 +1131,8 @@ public class Axl : Character {
 		// Mouse based aim
 		if (!Menu.inMenu && !player.isAI) {
 			if (Options.main.useMouseAim) {
-				player.axlScopeCursorWorldPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
-				player.axlScopeCursorWorldPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
+				axlScopeCursorWorldPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
+				axlScopeCursorWorldPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
 			}
 		}
 
@@ -1043,7 +1143,7 @@ public class Axl : Character {
 			float bestDist = float.MaxValue;
 			foreach (var enemy in Global.level.players) {
 				if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && !enemy.character.isStealthy(player.alliance)) {
-					float cursorDist = enemy.character.getAimCenterPos().distanceTo(player.axlScopeCursorWorldPos);
+					float cursorDist = enemy.character.getAimCenterPos().distanceTo(axlScopeCursorWorldPos);
 					if (cursorDist < bestDist) {
 						bestDist = cursorDist;
 						target = enemy.character;
@@ -1053,20 +1153,20 @@ public class Axl : Character {
 			const float aimAssistRange = 25;
 			if (target != null && bestDist < aimAssistRange) {
 				//float aimAssistPower = (float)Math.Pow(1 - (bestDist / aimAssistRange), 2);
-				player.axlScopeCursorWorldPos = Point.lerp(player.axlScopeCursorWorldPos, target.getAimCenterPos(), Global.spf * 5);
-				//player.axlScopeCursorWorldPos = target.getAimCenterPos();
+				axlScopeCursorWorldPos = Point.lerp(axlScopeCursorWorldPos, target.getAimCenterPos(), Global.spf * 5);
+				//axlScopeCursorWorldPos = target.getAimCenterPos();
 			}
 		}
 
 		// Aimbot
 		if (!player.isAI) {
-			//var target = Global.level.getClosestTarget(player.axlScopeCursorWorldPos, player.alliance, true);
-			//if (target != null && target.pos.distanceTo(player.axlScopeCursorWorldPos) < 100) player.axlScopeCursorWorldPos = target.getAimCenterPos();
+			//var target = Global.level.getClosestTarget(axlScopeCursorWorldPos, player.alliance, true);
+			//if (target != null && target.pos.distanceTo(axlScopeCursorWorldPos) < 100) axlScopeCursorWorldPos = target.getAimCenterPos();
 		}
 
 		Point centerPos = getAimCenterPos();
-		if (player.axlScopeCursorWorldPos.distanceTo(centerPos) > player.zoomRange) {
-			player.axlScopeCursorWorldPos = centerPos.add(centerPos.directionTo(player.axlScopeCursorWorldPos).normalize().times(player.zoomRange));
+		if (axlScopeCursorWorldPos.distanceTo(centerPos) > player.zoomRange) {
+			axlScopeCursorWorldPos = centerPos.add(centerPos.directionTo(axlScopeCursorWorldPos).normalize().times(player.zoomRange));
 		}
 
 		getMouseTargets();
@@ -1077,7 +1177,7 @@ public class Axl : Character {
 		axlHeadshotTarget = null;
 
 		int cursorSize = 1;
-		var shape = new Rect(player.axlGenericCursorWorldPos.x - cursorSize, player.axlGenericCursorWorldPos.y - cursorSize, player.axlGenericCursorWorldPos.x + cursorSize, player.axlGenericCursorWorldPos.y + cursorSize).getShape();
+		var shape = new Rect(axlGenericCursorWorldPos.x - cursorSize, axlGenericCursorWorldPos.y - cursorSize, axlGenericCursorWorldPos.x + cursorSize, axlGenericCursorWorldPos.y + cursorSize).getShape();
 		var hit = Global.level.checkCollisionsShape(shape, new List<GameObject>() { this }).FirstOrDefault(c => c.gameObject is IDamagable);
 		if (hit != null) {
 			var target = hit.gameObject as IDamagable;
@@ -1089,7 +1189,7 @@ public class Axl : Character {
 		}
 		foreach (var enemy in Global.level.players) {
 			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.getHeadPos() != null) {
-				if (player.axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
+				if (axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
 					axlCursorTarget = enemy.character;
 					axlHeadshotTarget = enemy.character;
 				}
@@ -1112,55 +1212,55 @@ public class Axl : Character {
 
 		// Controller joystick axis move section
 		if (Input.aimX > aimThreshold && Input.aimX >= Input.lastAimX) {
-			player.axlCursorPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
+			axlCursorPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
 			axisXMoved = true;
 		} else if (Input.aimX < -aimThreshold && Input.aimX <= Input.lastAimX) {
-			player.axlCursorPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
+			axlCursorPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
 			axisXMoved = true;
 		}
 		if (Input.aimY > aimThreshold && Input.aimY >= Input.lastAimY) {
-			player.axlCursorPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
+			axlCursorPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
 			axisYMoved = true;
 		} else if (Input.aimY < -aimThreshold && Input.aimY <= Input.lastAimY) {
-			player.axlCursorPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
+			axlCursorPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
 			axisYMoved = true;
 		}
 
 		// Controller or keyboard button based aim section
 		if (!axisXMoved) {
 			if (player.input.isHeld(Control.AimLeft, player)) {
-				player.axlCursorPos.x -= Global.spf * 200 * sensitivity;
+				axlCursorPos.x -= Global.spf * 200 * sensitivity;
 			} else if (player.input.isHeld(Control.AimRight, player)) {
-				player.axlCursorPos.x += Global.spf * 200 * sensitivity;
+				axlCursorPos.x += Global.spf * 200 * sensitivity;
 			}
 		}
 		if (!axisYMoved) {
 			if (player.input.isHeld(Control.AimUp, player)) {
-				player.axlCursorPos.y -= Global.spf * 200 * sensitivity;
+				axlCursorPos.y -= Global.spf * 200 * sensitivity;
 			} else if (player.input.isHeld(Control.AimDown, player)) {
-				player.axlCursorPos.y += Global.spf * 200 * sensitivity;
+				axlCursorPos.y += Global.spf * 200 * sensitivity;
 			}
 		}
 
 		// Mouse based aim
 		if (!Menu.inMenu && !player.isAI) {
 			if (Options.main.useMouseAim) {
-				player.axlCursorPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
-				player.axlCursorPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
+				axlCursorPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
+				axlCursorPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
 			}
-			player.axlCursorPos.x = Helpers.clamp(player.axlCursorPos.x, 0, Global.viewScreenW);
-			player.axlCursorPos.y = Helpers.clamp(player.axlCursorPos.y, 0, Global.viewScreenH);
+			axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+			axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
 		}
 
 		if (isWarpIn()) {
-			player.axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
+			axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
 		}
 
 		// aimbot
 		if (player.isAI) {
 			var target = Global.level.getClosestTarget(pos, player.alliance, true);
 			if (target != null) {
-				player.axlCursorPos = target.pos.addxy(
+				axlCursorPos = target.pos.addxy(
 					-Global.level.camX,
 					-Global.level.camY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
 				);
@@ -1173,8 +1273,8 @@ public class Axl : Character {
 	public bool isAxlLadderShooting() {
 		if (player.weapon is AssassinBullet) return false;
 		if (recoilTime > 0) return true;
-		bool canShoot = charState.canShoot() && !player.weapon.noAmmo() && player.axlWeapon != null && !player.axlWeapon.isTwoHanded(true) && shootTime == 0;
-		if (player.input.isHeld(Control.Shoot, player) && canShoot) {
+		bool canShootBool = canShoot() && !player.weapon.noAmmo() && player.axlWeapon != null && !player.axlWeapon.isTwoHanded(true) && shootTime == 0;
+		if (player.input.isHeld(Control.Shoot, player) && canShootBool) {
 			return true;
 		}
 		return false;
@@ -1213,7 +1313,7 @@ public class Axl : Character {
 
 		if (charState is LadderClimb) {
 			if (isAxlLadderShooting()) {
-				xDir = (pos.x > player.axlGenericCursorWorldPos.x ? -1 : 1);
+				xDir = (pos.x > axlGenericCursorWorldPos.x ? -1 : 1);
 				changeSprite("axl_ladder_shoot", true);
 			} else {
 				changeSprite("axl_ladder_climb", true);
@@ -1270,8 +1370,8 @@ public class Axl : Character {
 		if (Global.showHitboxes) {
 			Point bulletPos = getAxlBulletPos();
 			DrawWrappers.DrawLine(
-				bulletPos.x, bulletPos.y, player.axlGenericCursorWorldPos.x,
-				player.axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1
+				bulletPos.x, bulletPos.y, axlGenericCursorWorldPos.x,
+				axlGenericCursorWorldPos.y, Color.Magenta, 1, ZIndex.Default + 1
 			);
 		}
 
@@ -1297,9 +1397,9 @@ public class Axl : Character {
 
 		if (Options.main.useMouseAim || Global.showHitboxes) {
 			drawBloom();
-			Global.sprites["axl_cursor"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+			Global.sprites["axl_cursor"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 			if (player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
-				Global.sprites["hud_kill"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+				Global.sprites["hud_kill"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 			}
 		}
 		if (!Options.main.useMouseAim) {
@@ -1311,13 +1411,13 @@ public class Axl : Character {
 				float y = Helpers.sind(ang) * radius * getShootXDir();
 				DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, bulletPos.x + x, bulletPos.y + y, new Color(255, 0, 0, 128), 2, ZIndex.HUD, true);
 				if (axlCursorTarget != null && player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
-					Global.sprites["hud_kill"].draw(0, player.axlLockOnCursorPos.x, player.axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+					Global.sprites["hud_kill"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 				}
 			}
 			if (axlCursorTarget != null && !isAnyZoom()) {
 				axlCursorAngle += Global.spf * 360;
 				if (axlCursorAngle > 360) axlCursorAngle -= 360;
-				Global.sprites["axl_cursor_x7"].draw(0, player.axlLockOnCursorPos.x, player.axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1, angle: axlCursorAngle);
+				Global.sprites["axl_cursor_x7"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1, angle: axlCursorAngle);
 				//drawBloom();
 			}
 		}
@@ -1327,8 +1427,8 @@ public class Axl : Character {
 		{
 			if (player.weapon.rechargeCooldown > 0)
 			{
-				float textPosX = player.axlCursorPos.x;
-				float textPosY = player.axlCursorPos.y - 20;
+				float textPosX = axlCursorPos.x;
+				float textPosY = axlCursorPos.y - 20;
 				if (!Options.main.useMouseAim)
 				{
 					textPosX = pos.x - Global.level.camX / Global.viewSize;
@@ -1348,11 +1448,11 @@ public class Axl : Character {
 	}
 
 	public void drawBloom() {
-		Global.sprites["axl_cursor_top"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_bottom"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y + 1, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_left"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_right"].draw(0, player.axlCursorWorldPos.x + 1, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
-		Global.sprites["axl_cursor_dot"].draw(0, player.axlCursorWorldPos.x, player.axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_top"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_bottom"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y + 1, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_left"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_right"].draw(0, axlCursorWorldPos.x + 1, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_dot"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
 	}
 
 	float mcFrameTime;
@@ -1452,7 +1552,7 @@ public class Axl : Character {
 
 	public Point getCorrectedCursorPos() {
 		if (player.axlWeapon == null) return new Point();
-		Point cursorPos = player.axlGenericCursorWorldPos;
+		Point cursorPos = axlGenericCursorWorldPos;
 		Point gunArmOrigin = getAxlGunArmOrigin();
 
 		Sprite sprite = getAxlArmSprite();
@@ -1519,7 +1619,7 @@ public class Axl : Character {
 		}
 
 		Point gunArmOrigin = getAxlGunArmOrigin();
-		Point cursorPos = player.axlGenericCursorWorldPos;
+		Point cursorPos = axlGenericCursorWorldPos;
 		float angle = gunArmOrigin.directionTo(cursorPos).angle;
 
 		Point adjustedOrigin = gunArmOrigin.add(getMuzzleOffset(angle));
@@ -1572,7 +1672,7 @@ public class Axl : Character {
 			var dnaCoreWeapon = new DNACore(hitChar);
 			dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
 			if (player.isDisguisedAxl) {
-				player.oldWeapons?.Add(dnaCoreWeapon);
+				player.oldWeapons.Add(dnaCoreWeapon);
 			} else {
 				player.weapons.Add(dnaCoreWeapon);
 			}
@@ -1582,7 +1682,7 @@ public class Axl : Character {
 
 	public int getAxlXDir() {
 		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false))) {
-			return pos.x < player.axlGenericCursorWorldPos.x ? 1 : -1;
+			return pos.x < axlGenericCursorWorldPos.x ? 1 : -1;
 		}
 		return xDir;
 	}
@@ -1637,6 +1737,8 @@ public class Axl : Character {
 		if (isAnyZoom() || sniperMissileProj != null) {
 			return true;
 		}
+		if (player.currentMaverick != null) return true;
+
 		return base.isSoftLocked();
 	}
 
@@ -1671,11 +1773,7 @@ public class Axl : Character {
 	}
 
 	public override float getDashSpeed() {
-		if (flag != null || !isDashing) {
-			return getRunSpeed();
-		}
-		float dashSpeed = 210;
-
+		float dashSpeed = 3.45f * 60f;;
 		if (player.axlWeapon != null && player.axlWeapon.isTwoHanded(false)) {
 			dashSpeed *= 0.875f;
 		}
@@ -1702,7 +1800,7 @@ public class Axl : Character {
 			return sniperMissileProj.getCenterPos();
 		}
 		if (isZooming() && !ignoreZoom) {
-			return player.axlScopeCursorWorldPos;
+			return axlScopeCursorWorldPos;
 		}
 		return base.getCamCenterPos(ignoreZoom);
 	}
@@ -1734,7 +1832,7 @@ public class Axl : Character {
 		);
 	}
 
-	public override bool isInvisible() {
+	public bool isInvisible() {
 		return stingChargeTime > 0 && stealthRevealTime == 0;
 	}
 
@@ -1813,7 +1911,7 @@ public class Axl : Character {
 		return (player.alliance != alliance && (stealthActive || player.isDisguisedAxl && !disguiseCoverBlown));
 	}
 
-	public override bool isCCImmuneHyperMode() {
+	public override bool isNonDamageStatusImmune() {
 		return isStealthMode();
 	}
 
@@ -1824,6 +1922,82 @@ public class Axl : Character {
 			return true;
 		}*/
 		return invul;
+	}
+
+	public override void onFlagPickup(Flag flag) {
+		stingChargeTime = 0;
+		base.onFlagPickup(flag);
+	}
+
+	public override bool canMove() {
+		// TODO: Move this to axl.cs
+		if (isAimLocked()) {
+			return false;
+		}
+		if (isSoftLocked()) {
+			return false;
+		}
+		return base.canMove();
+	}
+
+	
+	public bool isAimLocked() {
+		if (player.input.isPositionLocked(player) && Options.main.axlAimMode == 0) {
+			return true;
+		}
+		if (Options.main.axlAimMode == 0 && !Options.main.moveInDiagAim && !isDashing &&
+			(grounded || charState is Hover || player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player)) &&
+			(player.input.isHeld(Control.Up, player) || player.input.isHeld(Control.Down, player))) {
+			return true;
+		}
+		return false;
+	}
+
+	public void configureWeapons() {
+		if (Global.level.isTraining() && !Global.level.server.useLoadout) {
+			weapons = Weapon.getAllAxlWeapons(player.axlLoadout).Select(w => w.clone()).ToList();
+			weapons[0] = getAxlBullet(player.axlBulletType);
+		} else if (Global.level.is1v1()) {
+			weapons.Add(new AxlBullet());
+			weapons.Add(new RayGun(player.axlLoadout.rayGunAlt));
+			weapons.Add(new BlastLauncher(player.axlLoadout.blastLauncherAlt));
+			weapons.Add(new BlackArrow(player.axlLoadout.blackArrowAlt));
+			weapons.Add(new SpiralMagnum(player.axlLoadout.spiralMagnumAlt));
+			weapons.Add(new BoundBlaster(player.axlLoadout.boundBlasterAlt));
+			weapons.Add(new PlasmaGun(player.axlLoadout.plasmaGunAlt));
+			weapons.Add(new IceGattling(player.axlLoadout.iceGattlingAlt));
+			weapons.Add(new FlameBurner(player.axlLoadout.flameBurnerAlt));
+		} else {
+			weapons = player.loadout.axlLoadout.getWeaponsFromLoadout();
+			weapons.Insert(0, getAxlBullet(player.axlBulletType));
+		}
+		if (ownedByLocalPlayer) {
+			foreach (var dnaCore in player.savedDNACoreWeapons) {
+				weapons.Add(dnaCore);
+			}
+		}
+		if (weapons[0].type > 0) {
+			weapons[0].ammo = player.axlBulletTypeLastAmmo[weapons[0].type];
+		}
+	}
+
+	public Weapon getAxlBullet(int axlBulletType) {
+		if (axlBulletType == (int)AxlBulletWeaponType.DoubleBullets) {
+			return new DoubleBullet();
+		}
+		return new AxlBullet((AxlBulletWeaponType)axlBulletType);
+	}
+
+	public Weapon getAxlBulletWeapon() {
+		return getAxlBulletWeapon(player.axlBulletType);
+	}
+
+	public Weapon getAxlBulletWeapon(int type) {
+		if (type == (int)AxlBulletWeaponType.DoubleBullets) {
+			return new DoubleBullet();
+		} else {
+			return new AxlBullet((AxlBulletWeaponType)type);
+		}
 	}
 
 	public override List<byte> getCustomActorNetData() {
@@ -1853,9 +2027,10 @@ public class Axl : Character {
 		data = data[data[0]..];
 
 		// Per-character data.
-		player.changeWeaponFromWi(data[0]);
-		if (player.weapon != null) {
-			player.weapon.ammo = data[1];
+		Weapon? targetWeapon = weapons.Find(w => w.index == data[0]);
+		if (targetWeapon != null) {
+			weaponSlot = weapons.IndexOf(targetWeapon);
+			targetWeapon.ammo = data[1];
 		}
 		netArmAngle = Helpers.byteToDegree(data[2]);
 		player.axlBulletType = data[3];
@@ -1865,5 +2040,42 @@ public class Axl : Character {
 		stealthActive = boolData[1];
 
 		netAxlArmSpriteIndex = BitConverter.ToUInt16(data[5..7]);
+	}
+	public override void aiAttack(Actor? target) {
+		if (axlHyperMode == 0 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
+			changeState(new HyperAxlStart(grounded), true);
+		}
+		if (axlHyperMode == 1 && player.currency >= 10 && !player.isDead && !isInvulnerable() 
+			&& !(isWhiteAxl() || isStealthMode()) && charState.attackCtrl) {
+			stingChargeTime = 12;
+		}
+		int AAttack = Helpers.randomRange(0, 1);
+		if (canShoot() && player?.weapon?.ammo > 0 && player.axlWeapon != null
+			&& !player.isDead && canChangeWeapons() && charState.attackCtrl) {
+			switch (AAttack) {
+				case 0:
+					player.press(Control.Shoot);
+					break;
+				case 1 when player.weapon is not IceGattling or PlasmaGun:
+					player.press(Control.Special1);
+					break;
+			}
+		}
+		base.aiAttack(target);
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player?.alliance) {
+				if (grounded && canDash() && charState is not DodgeRoll && dodgeRollCooldown <= 0 && charState.normalCtrl) {
+					changeState(new DodgeRoll());
+					dodgeRollCooldown = maxDodgeRollCooldown;
+				} else if (currentWeapon is FlameBurner && player?.axlLoadout.flameBurnerAlt == 1 &&
+				 (proj is not GenericMeleeProj || (proj.reflectableFBurner == true)) && player?.weapon?.ammo > 0) {
+					player.press(Control.Special1);
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

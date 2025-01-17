@@ -93,7 +93,7 @@ public class Maverick : Actor, IDamagable {
 	public MaverickAIBehavior aiBehavior;
 	public Actor target;
 	public float aiCooldown;
-	public float maxAICooldown = 1.25f;
+	public float maxAICooldown = 60;
 	public string startMoveControl;
 
 	public Weapon weapon;
@@ -177,7 +177,7 @@ public class Maverick : Actor, IDamagable {
 				_ => null
 			};
 			if (allianceEffect != null) {
-				addRenderEffect(allianceEffect.Value, time: 1/60f);
+				addRenderEffect(allianceEffect.Value, time: 1);
 			}
 		}
 
@@ -226,6 +226,11 @@ public class Maverick : Actor, IDamagable {
 	public void deductAmmo(int v) {
 		ammo -= v;
 		if (ammo < 0) ammo = 0;
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
@@ -284,8 +289,6 @@ public class Maverick : Actor, IDamagable {
 			usedSubtank = null;
 		}
 
-		updateProjectileCooldown();
-
 		foreach (var key in stateCooldowns.Keys) {
 			Helpers.decrementTime(ref stateCooldowns[key].cooldown);
 		}
@@ -322,6 +325,14 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
+	
+	public override void statePreUpdate() {
+		state.stateFrame += 1f * Global.speedMul;
+		base.stateUpdate();
+		state.preUpdate();
+	}
+	
+
 	public override void stateUpdate() {
 		base.stateUpdate();
 		state.update();
@@ -329,7 +340,7 @@ public class Maverick : Actor, IDamagable {
 	
 	public override void statePostUpdate() {
 		base.statePostUpdate();
-		state.stateFrame += 1f * Global.speedMul;
+		state.postUpdate();
 	}
 
 	public override void onCollision(CollideData other) {
@@ -398,7 +409,7 @@ public class Maverick : Actor, IDamagable {
 		input.keyPressed.Clear();
 		input.keyHeld.Clear();
 
-		Helpers.decrementTime(ref aiCooldown);
+		Helpers.decrementFrames(ref aiCooldown);
 
 		bool isSummonerOrStrikerDoppler = (player.isSummoner() || player.isStriker()) && this is DrDoppler;
 		bool isSummonerCocoon = player.isSummoner() && this is MorphMothCocoon;
@@ -424,7 +435,7 @@ public class Maverick : Actor, IDamagable {
 			);
 		}
 
-		bool isAIState = (state is MIdle or MRun or MLand);
+		bool isAIState = state.attackCtrl;
 		if (canFly) isAIState = isAIState || state is MFly;
 
 		if (target != null && (isAIState || state is MShoot)) {
@@ -483,7 +494,9 @@ public class Maverick : Actor, IDamagable {
 					if (dist < 0) press(Control.Left);
 					else press(Control.Right);
 
-					var jumpZones = Global.level.getTriggerList(this, 0, 0, null, typeof(JumpZone));
+					var jumpZones = Global.level.getTerrainTriggerList(
+						this, Point.zero, typeof(JumpZone)
+					);
 					if (jumpZones.Count > 0) {
 						press(Control.Jump);
 					}
@@ -491,13 +504,16 @@ public class Maverick : Actor, IDamagable {
 			}
 		} else if (aiBehavior == MaverickAIBehavior.Attack) {
 			float raycastDist = (width / 2) + 5;
-			var hit = Global.level.raycastAll(getCenterPos(), getCenterPos().addxy(attackDir * raycastDist, 0), new List<Type>() { typeof(Wall) });
+			var hit = Global.level.raycastAll(
+				getCenterPos(), getCenterPos().addxy(attackDir * raycastDist, 0), new List<Type>() { typeof(Wall) }
+			);
 			if (hit.Count == 0) {
 				if (attackDir < 0) press(Control.Left);
 				else press(Control.Right);
 			}
-
-			var jumpZones = Global.level.getTriggerList(this, 0, 0, null, typeof(JumpZone));
+			var jumpZones = Global.level.getTerrainTriggerList(
+				this, Point.zero, typeof(JumpZone)
+			);
 			if (jumpZones.Count > 0) {
 				press(Control.Jump);
 			}
@@ -583,7 +599,7 @@ public class Maverick : Actor, IDamagable {
 				Point centerPoint = globalCollider.shape.getRect().center();
 				float damage = 3;
 				int flinch = 0;
-				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch, 0.5f);
+				Projectile proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.MaverickContactDamage, player, damage, flinch);
 				proj.globalCollider = globalCollider.clone();
 				return proj;
 			};
@@ -673,7 +689,7 @@ public class Maverick : Actor, IDamagable {
 
 		health -= damage;
 
-		if (owner != null && weaponIndex != null && damage > 0) {
+		if ((damage > 0 || Damager.alwaysAssist(projId)) && owner != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));
 		}
 
@@ -734,10 +750,10 @@ public class Maverick : Actor, IDamagable {
 			if (awardWeaponId == WeaponIds.ShotgunIce) weaponToAdd = new ShotgunIce();
 			if (awardWeaponId == WeaponIds.ElectricSpark) weaponToAdd = new ElectricSpark();
 			if (awardWeaponId == WeaponIds.RollingShield) weaponToAdd = new RollingShield();
-			if (awardWeaponId == WeaponIds.Torpedo) weaponToAdd = new Torpedo();
-			if (awardWeaponId == WeaponIds.Boomerang) weaponToAdd = new Boomerang();
-			if (awardWeaponId == WeaponIds.Sting) weaponToAdd = new Sting();
-			if (awardWeaponId == WeaponIds.Tornado) weaponToAdd = new Tornado();
+			if (awardWeaponId == WeaponIds.HomingTorpedo) weaponToAdd = new HomingTorpedo();
+			if (awardWeaponId == WeaponIds.BoomerangCutter) weaponToAdd = new BoomerangCutter();
+			if (awardWeaponId == WeaponIds.ChameleonSting) weaponToAdd = new ChameleonSting();
+			if (awardWeaponId == WeaponIds.StormTornado) weaponToAdd = new StormTornado();
 			if (awardWeaponId == WeaponIds.FireWave) weaponToAdd = new FireWave();
 
 			if (awardWeaponId == WeaponIds.CrystalHunter) weaponToAdd = new CrystalHunter();
@@ -747,7 +763,7 @@ public class Maverick : Actor, IDamagable {
 			if (awardWeaponId == WeaponIds.SonicSlicer) weaponToAdd = new SonicSlicer();
 			if (awardWeaponId == WeaponIds.StrikeChain) weaponToAdd = new StrikeChain();
 			if (awardWeaponId == WeaponIds.MagnetMine) weaponToAdd = new MagnetMine();
-			if (awardWeaponId == WeaponIds.SpeedBurner) weaponToAdd = new SpeedBurner(player);
+			if (awardWeaponId == WeaponIds.SpeedBurner) weaponToAdd = new SpeedBurner();
 
 			if (awardWeaponId == WeaponIds.AcidBurst) weaponToAdd = new AcidBurst();
 			if (awardWeaponId == WeaponIds.ParasiticBomb) weaponToAdd = new ParasiticBomb();
@@ -756,7 +772,7 @@ public class Maverick : Actor, IDamagable {
 			if (awardWeaponId == WeaponIds.RaySplasher) weaponToAdd = new RaySplasher();
 			if (awardWeaponId == WeaponIds.GravityWell) weaponToAdd = new GravityWell();
 			if (awardWeaponId == WeaponIds.FrostShield) weaponToAdd = new FrostShield();
-			if (awardWeaponId == WeaponIds.TunnelFang) weaponToAdd = new TunnelFang();
+			if (awardWeaponId == WeaponIds.TornadoFang) weaponToAdd = new TornadoFang();
 
 			if (weaponToAdd != null) {
 				var matchingW = player.weapons.FirstOrDefault(w => w.index == weaponToAdd.index);
@@ -792,19 +808,19 @@ public class Maverick : Actor, IDamagable {
 		if ((weaponId == WeaponIds.RollingShield || projId == ProjIds.ArmoredARoll) && this is LaunchOctopus lo) {
 			return true;
 		}
-		if ((weaponId == WeaponIds.Torpedo || projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo) && this is BoomerangKuwanger bk) {
+		if ((weaponId == WeaponIds.HomingTorpedo || projId == ProjIds.LaunchOMissle || projId == ProjIds.LaunchOTorpedo) && this is BoomerangKuwanger bk) {
 			return true;
 		}
-		if ((weaponId == WeaponIds.Boomerang || projId == ProjIds.BoomerangKBoomerang) && this is StingChameleon sc) {
+		if ((weaponId == WeaponIds.BoomerangCutter || projId == ProjIds.BoomerangKBoomerang) && this is StingChameleon sc) {
 			if (sc.isInvisible && sc.ownedByLocalPlayer) {
 				sc.decloak();
 			}
 			return true;
 		}
-		if ((weaponId == WeaponIds.Sting || projId == ProjIds.StingCSting) && this is StormEagle se) {
+		if ((weaponId == WeaponIds.ChameleonSting || projId == ProjIds.StingCSting) && this is StormEagle se) {
 			return true;
 		}
-		if ((weaponId == WeaponIds.Tornado || projId == ProjIds.StormETornado) && this is FlameMammoth fm) {
+		if ((weaponId == WeaponIds.StormTornado || projId == ProjIds.StormETornado) && this is FlameMammoth fm) {
 			return true;
 		}
 		if ((weaponId == WeaponIds.ShotgunIce || projId == ProjIds.ChillPIceShot || projId == ProjIds.ChillPIceBlow || projId == ProjIds.ChillPIcePenguin) && this is Velguarder vg) {
@@ -863,7 +879,7 @@ public class Maverick : Actor, IDamagable {
 		if ((weaponId == WeaponIds.AcidBurst || projId == ProjIds.TSeahorseAcid1 || projId == ProjIds.TSeahorseAcid2) && this is TunnelRhino) {
 			return true;
 		}
-		if ((weaponId == WeaponIds.TunnelFang || projId == ProjIds.TunnelRTornadoFang || projId == ProjIds.TunnelRTornadoFang2 || projId == ProjIds.TunnelRTornadoFangDiag) && this is VoltCatfish) {
+		if ((weaponId == WeaponIds.TornadoFang || projId == ProjIds.TunnelRTornadoFang || projId == ProjIds.TunnelRTornadoFang2 || projId == ProjIds.TunnelRTornadoFangDiag) && this is VoltCatfish) {
 			return true;
 		}
 		if ((weaponId == WeaponIds.TriadThunder || projId == ProjIds.VoltCBall || projId == ProjIds.VoltCTriadThunder || projId == ProjIds.VoltCUpBeam || projId == ProjIds.VoltCUpBeam2) && this is CrushCrawfish) {
@@ -931,6 +947,10 @@ public class Maverick : Actor, IDamagable {
 		}
 		commonHealLogic(healer, healAmount, health, maxHealth, drawHealText);
 		this.healAmount = healAmount;
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
 	}
 
 	public virtual float getAirSpeed() {
@@ -1032,6 +1052,13 @@ public class Maverick : Actor, IDamagable {
 		deductLabelY(labelSubtankOffY);
 	}
 
+	public override bool shouldDraw() {
+		if (invulnTime > 0) {
+			if (Global.level.frameCount % 4 < 2) return false;
+		}
+		return base.shouldDraw();
+	}
+
 	public override void render(float x, float y) {
 		base.render(x, y);
 		currentLabelY = -getLabelOffY();
@@ -1086,6 +1113,17 @@ public class Maverick : Actor, IDamagable {
 			if (state?.wasFlying == true) changeState(new MFly(transitionSprite));
 			else if (state is not MFall) changeState(new MFall(transitionSprite));
 		}
+	}
+
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > timeStopThreshold) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [Player.darkHoldShader];
+			}
+		}
+		return null;
 	}
 
 	public const int CustomNetDataLength = 3;

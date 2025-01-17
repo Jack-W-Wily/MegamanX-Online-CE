@@ -23,7 +23,7 @@ public class VoltCatfish : Maverick {
 		meleeWeapon = getMeleeWeapon(player);
 
 		awardWeaponId = WeaponIds.TriadThunder;
-		weakWeaponId = WeaponIds.TunnelFang;
+		weakWeaponId = WeaponIds.TornadoFang;
 		weakMaverickWeaponId = WeaponIds.TunnelRhino;
 
 		netActorCreateId = NetActorCreateId.VoltCatfish;
@@ -127,29 +127,38 @@ public class VoltCatfish : Maverick {
 		return mshoot;
 	}
 
-	public float getStompDamage() {
-		float damage = 0;
-		if (deltaPos.y > 150 * Global.spf) damage = 2;
-		if (deltaPos.y > 225 * Global.spf) damage = 2;
-		if (deltaPos.y > 300 * Global.spf) damage = 3;
-		return damage;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Fall,
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.VoltCStomp, player, damage: getStompDamage(), flinch: Global.defFlinch, hitCooldown: 0.5f);
-			}
-		}
-		return null;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"voltc_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Fall => new GenericMeleeProj(
+				weapon, pos, ProjIds.VoltCStomp, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (sprite.name.EndsWith("fall")) {
-			proj.damager.damage = getStompDamage();
+		if (proj.projId == (int)ProjIds.VoltCStomp) {
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.6125f), 1, 3);
+			proj.damager.damage = damage;
 		}
 	}
+
 }
 
 public class VoltCTriadThunderProj : Projectile {
@@ -190,7 +199,7 @@ public class VoltCTriadThunderProj : Projectile {
 			damager.flinch = Global.miniFlinch;
 		} else if (sprite.name == "voltc_proj_triadt_electricity") {
 			damager.flinch = Global.miniFlinch;
-			damager.hitCooldown = 0.25f;
+			damager.hitCooldown = 15;
 		}
 		if (time > 0.75f) {
 			stopMoving();
@@ -230,7 +239,7 @@ public class VoltCTriadThunderProj : Projectile {
 }
 
 public class VoltCTriadThunderState : MaverickState {
-	public VoltCTriadThunderState() : base("spit", "") {
+	public VoltCTriadThunderState() : base("spit") {
 		exitOnAnimEnd = true;
 	}
 
@@ -301,19 +310,22 @@ public class VoltCSuckProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		if (vc == null) return;
-
+		if (!damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
 		if (damagable is Character chr) {
 			if (!chr.ownedByLocalPlayer) return;
-			if (chr.isImmuneToKnockback()) return;
-			chr.moveToPos(vc.getFirstPOIOrDefault(), 150);
+			if (chr.isPushImmune()) return;
 		}
+		actor.moveToPos(vc.getFirstPOIOrDefault(), 150);
 	}
 }
 
 public class VoltCSuckState : MaverickState {
 	float partTime;
 	VoltCSuckProj suckProj;
-	public VoltCSuckState() : base("suck", "") {
+	public VoltCSuckState() : base("suck") {
 	}
 
 	public override void update() {
@@ -381,7 +393,7 @@ public class VoltCUpBeamProj : Projectile {
 }
 
 public class VoltCUpBeamState : MaverickState {
-	public VoltCUpBeamState() : base("thunder_vertical", "") {
+	public VoltCUpBeamState() : base("thunder_vertical") {
 		exitOnAnimEnd = true;
 	}
 
@@ -451,7 +463,7 @@ public class VoltCSpecialState : MaverickState {
 	VoltCBarrierProj barrierProj1;
 	VoltCBarrierProj barrierProj2;
 	const float drainAmmoRate = 6;
-	public VoltCSpecialState() : base("charge_start", "") {
+	public VoltCSpecialState() : base("charge_start") {
 		superArmor = true;
 	}
 
@@ -529,7 +541,8 @@ public class VoltCSpecialState : MaverickState {
 }
 
 public class VoltCBounce : MaverickState {
-	public VoltCBounce() : base("jump", "") {
+	public VoltCBounce() : base("jump") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

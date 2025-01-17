@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SFML.Graphics;
 
@@ -191,6 +191,7 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 		immuneToWind = true;
 		showExhaust = true;
 		canShootBallistics = true;
+		useGravity = false;
 	}
 
 	public override void update() {
@@ -217,7 +218,8 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 
 		exhaustMoveDir = 0;
 		if (!moveAmount.isZero()) {
-			if (moveAmount.y > 0 && character.checkCollision(0, moveAmount.y * Global.spf) != null) {
+			CollideData? collideData = character.checkCollision(0, moveAmount.y * Global.spf);
+			if (moveAmount.y > 0 && collideData?.isGroundHit() == true) {
 				kaiserSigma.changeToKaiserIdleOrFall();
 				character.playSound("crash", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
@@ -577,7 +579,7 @@ public class KaiserMissileWeapon : Weapon {
 }
 
 public class KaiserSigmaMissileProj : Projectile {
-	public Actor target;
+	public Actor? target;
 	public float smokeTime = 0;
 	public float maxSpeed = 150;
 	public float health = 2;
@@ -594,18 +596,27 @@ public class KaiserSigmaMissileProj : Projectile {
 		angle = 270;
 
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateAngle(pos, player, netProjId, xDir);
 		}
+	}
+	public void reflect(float reflectAngle) {
+		angle = reflectAngle;
+		target = null;
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
 	}
 
 	public override void update() {
 		base.update();
 
-		updateProjectileCooldown();
-
 		if (ownedByLocalPlayer) {
-			if (!Global.level.gameObjects.Contains(target)) {
-				target = null;
+			if (target != null) {
+				if (!Global.level.gameObjects.Contains(target)) {
+					target = null;
+				}
 			}
 
 			if (target != null) {
@@ -613,15 +624,19 @@ public class KaiserSigmaMissileProj : Projectile {
 					var dTo = pos.directionTo(target.getCenterPos()).normalize();
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
-					angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
+					if (angle != null) angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
 				}
 			}
 			if (time >= 0.1 && target == null) {
 				target = Global.level.getClosestTarget(pos, damager.owner.alliance, false, aMaxDist: Global.screenW);
 			}
 
-			vel.x = Helpers.cosd((float)angle) * maxSpeed;
-			vel.y = Helpers.sind((float)angle) * maxSpeed;
+			if (angle != null) {
+				forceNetUpdateNextFrame = true;
+				vel.x = Helpers.cosd((float)angle) * maxSpeed;
+				vel.y = Helpers.sind((float)angle) * maxSpeed;
+			}
+
 		}
 
 		smokeTime += Global.spf;
@@ -683,9 +698,13 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		Helpers.decrementTime(ref hitWallCooldown);
 		if (startWall) {
 			if (Global.level.checkCollisionShape(collider.shape, null) == null) {
@@ -732,6 +751,7 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class KaiserStompWeapon : Weapon {
@@ -746,9 +766,8 @@ public class KaiserSigmaRevive : CharState {
 	int state = 0;
 	public ExplodeDieEffect explodeDieEffect;
 	public Point spawnPoint;
-	public KaiserSigmaRevive(ExplodeDieEffect explodeDieEffect, Point spawnPoint) : base("enter") {
+	public KaiserSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("enter") {
 		this.explodeDieEffect = explodeDieEffect;
-		this.spawnPoint = spawnPoint;
 	}
 
 	float alphaTime;
@@ -796,7 +815,7 @@ public class KaiserSigmaRevive : CharState {
 
 			if (player.health >= player.maxHealth) {
 				character.invulnTime = 0.5f;
-				character.useGravity = false;
+				character.useGravity = true;
 				character.stopMoving();
 				character.grounded = false;
 				character.canBeGrounded = false;
@@ -808,6 +827,7 @@ public class KaiserSigmaRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		spawnPoint = character.pos;
 		character.syncScale = true;
 		character.frameIndex = 0;
 		character.frameSpeed = 0;

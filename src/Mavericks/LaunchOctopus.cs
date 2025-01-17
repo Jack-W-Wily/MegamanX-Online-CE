@@ -3,14 +3,13 @@
 namespace MMXOnline;
 
 public class LaunchOctopus : Maverick {
-	public LaunchOMissileWeapon missileWeapon = new LaunchOMissileWeapon();
-	public LaunchODrainWeapon meleeWeapon;
-	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new LaunchOHomingTorpedoWeapon();
+	public LaunchOMissileWeapon missileWeapon = new();
+	public LaunchODrainWeapon meleeWeapon = new();
+	public LaunchOHomingTorpedoWeapon homingTorpedoWeapon = new();
 	public bool lastFrameWasUnderwater;
 
 	public LaunchOctopus(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		meleeWeapon = new LaunchODrainWeapon(player);
 
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 1f));
 		stateCooldowns.Add(typeof(LaunchOShoot), new MaverickStateCooldown(false, true, 0.325f));
@@ -19,7 +18,7 @@ public class LaunchOctopus : Maverick {
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
 
-		awardWeaponId = WeaponIds.Torpedo;
+		awardWeaponId = WeaponIds.HomingTorpedo;
 		weakWeaponId = WeaponIds.RollingShield;
 		weakMaverickWeaponId = WeaponIds.ArmoredArmadillo;
 
@@ -108,11 +107,29 @@ public class LaunchOctopus : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("launcho_spin")) {
-			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.LaunchODrain, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		OctoSpin,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"launcho_spin" => MeleeIds.OctoSpin,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.OctoSpin => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.LaunchODrain, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
@@ -132,10 +149,9 @@ public class LaunchOWhirlpoolWeapon : Weapon {
 }
 
 public class LaunchODrainWeapon : Weapon {
-	public LaunchODrainWeapon(Player player) {
+	public LaunchODrainWeapon() {
 		index = (int)WeaponIds.LaunchOMelee;
 		killFeedIndex = 96;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
 }
 
@@ -173,9 +189,13 @@ public class LaunchOMissile : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (MathF.Abs(vel.x) < 300) {
 			vel.x += Global.spf * 300 * xDir;
@@ -203,6 +223,9 @@ public class LaunchOMissile : Projectile, IDamagable {
 		if (damage > 0) {
 			destroySelf();
 		}
+	}
+	public bool isPlayableDamagable() {
+		return false;
 	}
 }
 
@@ -239,12 +262,20 @@ public class LaunchOWhirlpoolProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
+		if (!damagable.isPlayableDamagable()) { return; }
+
 		if (damagable is Character chr) {
 			float modifier = 1;
 			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isImmuneToKnockback()) return;
+			if (chr.isPushImmune()) return;
 			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 			chr.move(new Point(xMoveVel * 100 * modifier, 0));
+		}
+		if (damagable is Actor actor) {
+			float modifier = 1;
+			if (actor.isUnderwater()) modifier = 2;
+			float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
+			actor.move(new Point(xMoveVel * 100 * modifier, 0));
 		}
 	}
 }
@@ -255,7 +286,7 @@ public class LaunchOShoot : MaverickState {
 	int shootState;
 	bool isGrounded;
 	float afterShootTime;
-	public LaunchOShoot(bool isGrounded) : base(isGrounded ? "shoot" : "air_shoot", "") {
+	public LaunchOShoot(bool isGrounded) : base(isGrounded ? "shoot" : "air_shoot") {
 		this.isGrounded = isGrounded;
 	}
 
@@ -327,7 +358,7 @@ public class LaunchOShoot : MaverickState {
 
 public class LaunchOHomingTorpedoState : MaverickState {
 	public bool shootOnce;
-	public LaunchOHomingTorpedoState() : base("ht", "") {
+	public LaunchOHomingTorpedoState() : base("ht") {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -366,7 +397,7 @@ public class LaunchOWhirlpoolState : MaverickState {
 	LaunchOWhirlpoolProj whirlpool;
 	float whirlpoolSoundTime;
 	int initYDir = 1;
-	public LaunchOWhirlpoolState() : base("spin", "") {
+	public LaunchOWhirlpoolState() : base("spin") {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -421,7 +452,7 @@ public class LaunchODrainState : MaverickState {
 	float leechTime = 0.5f;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public LaunchODrainState(Character grabbedChar) : base("drain", "") {
+	public LaunchODrainState(Character grabbedChar) : base("drain") {
 		this.victim = grabbedChar;
 	}
 
@@ -456,7 +487,7 @@ public class LaunchODrainState : MaverickState {
 			leechTime = 0;
 			maverick.addHealth(2, true);
 			var damager = new Damager(player, 2, 0, 0);
-			damager.applyDamage(victim, false, new LaunchODrainWeapon(player), maverick, (int)ProjIds.LaunchODrain);
+			damager.applyDamage(victim, false, new LaunchODrainWeapon(), maverick, (int)ProjIds.LaunchODrain);
 		}
 
 		soundTime += Global.spf;

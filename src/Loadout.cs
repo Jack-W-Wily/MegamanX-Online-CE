@@ -46,9 +46,8 @@ public class XLoadout {
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);
-		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperBuster);
+		if (player.hasArmArmor(3)) indices.Add((int)WeaponIds.HyperCharge);
 		if (player.hasBodyArmor(2)) indices.Add((int)WeaponIds.GigaCrush);
-		if (player.hasUltimateArmor()) indices.Add((int)WeaponIds.NovaStrike);
 
 		return indices.Select(index => {
 			return Weapon.getAllSwitchableWeapons(new AxlLoadout()).Find(w => w.index == index).clone();
@@ -56,7 +55,7 @@ public class XLoadout {
 	}
 
 	public static XLoadout createRandom() {
-		var randomXWeapons = Weapon.getRandomXWeapons();
+		List<int> randomXWeapons = Weapon.getRandomXWeapons();
 		return new XLoadout() {
 			weapon1 = randomXWeapons[0],
 			weapon2 = randomXWeapons[1],
@@ -351,11 +350,11 @@ public class SigmaLoadout {
 [ProtoContract]
 public class LoadoutData {
 	[ProtoMember(1)] public int playerId;
-	[ProtoMember(2)] public XLoadout xLoadout = new XLoadout();
-	[ProtoMember(3)] public ZeroLoadout zeroLoadout = new ZeroLoadout();
-	[ProtoMember(4)] public VileLoadout vileLoadout = new VileLoadout();
-	[ProtoMember(5)] public AxlLoadout axlLoadout = new AxlLoadout();
-	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new SigmaLoadout();
+	[ProtoMember(2)] public XLoadout xLoadout = new();
+	[ProtoMember(3)] public ZeroLoadout zeroLoadout = new();
+	[ProtoMember(4)] public VileLoadout vileLoadout = new();
+	[ProtoMember(5)] public AxlLoadout axlLoadout = new();
+	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new();
 	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
@@ -366,6 +365,7 @@ public class LoadoutData {
 			vileLoadout = VileLoadout.createRandom(),
 			axlLoadout = AxlLoadout.createRandom(),
 			sigmaLoadout = SigmaLoadout.createRandom(),
+			pzeroLoadout = PZeroLoadout.createRandom(),
 		};
 	}
 

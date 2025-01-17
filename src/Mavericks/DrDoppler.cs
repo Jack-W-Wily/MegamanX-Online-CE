@@ -107,21 +107,47 @@ public class DrDoppler : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name == "drdoppler_dash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDash, player, damage: 4, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
-		} else if (sprite.name == "drdoppler_dash_water") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerDashWater, player, damage: 2, flinch: 0, hitCooldown: 0.5f, owningActor: this);
-		} else if (sprite.name == "drdoppler_absorb") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.DrDopplerAbsorb, player, damage: 0, flinch: 0, hitCooldown: 0.25f, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Charge,
+		ChargeUnderwater,
+		AttackAbsorb,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"drdoppler_dash" => MeleeIds.Charge,
+			"drdoppler_dash_water" => MeleeIds.ChargeUnderwater,
+			"drdoppler_absorb" => MeleeIds.AttackAbsorb,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Charge => new GenericMeleeProj(
+				weapon, pos, ProjIds.DrDopplerDash, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.ChargeUnderwater => new GenericMeleeProj(
+				weapon, pos, ProjIds.DrDopplerDashWater, player,
+				2, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.AttackAbsorb => new GenericMeleeProj(
+				weapon, pos, ProjIds.DrDopplerAbsorb, player,
+				0, 0, 15, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public void healDrDoppler(Player attacker, float damage) {
 		if (ownedByLocalPlayer && health < maxHealth) {
 			addHealth(damage, true);
-			playSound("heal", sendRpc: true);
+			playSound("healX3", sendRpc: true);
 			addDamageText(-damage);
 			ammo -= damage;
 			if (ammo < 0) ammo = 0;
@@ -157,7 +183,7 @@ public class DrDopplerBallProj : Projectile {
 }
 
 public class DrDopplerDashStartState : MaverickState {
-	public DrDopplerDashStartState() : base("dash_charge", "") {
+	public DrDopplerDashStartState() : base("dash_charge") {
 		stopMovingOnEnter = true;
 		enterSound = "ryuenjin";
 	}
@@ -241,7 +267,7 @@ public class DrDopplerDashState : MaverickState {
 public class DrDopplerAbsorbState : MaverickState {
 	float soundTime = 119f/60f;
 	public SoundWrapper? sound;
-	public DrDopplerAbsorbState() : base("absorb", "") {
+	public DrDopplerAbsorbState() : base("absorb") {
 		exitOnAnimEnd = true;
 		superArmor = true;
 		enterSound = "bcrabShield";
@@ -276,9 +302,10 @@ public class DrDopplerAbsorbState : MaverickState {
 }
 
 public class DrDopplerUncoatState : MaverickState {
-	public DrDopplerUncoatState() : base("uncoat", "") {
+	public DrDopplerUncoatState() : base("uncoat") {
 		exitOnAnimEnd = true;
 		enterSound = "transform";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

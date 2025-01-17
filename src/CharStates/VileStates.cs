@@ -111,8 +111,8 @@ public class VileRevive : CharState {
 			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
 			drDopplerAnim.blink = true;
 		} else {
-			if (vile.startRideArmor != null) {
-				vile.startRideArmor.ownedByMK5 = true;
+			if (vile.linkedRideArmor != null) {
+				vile.linkedRideArmor.ownedByMK5 = true;
 			}
 		}
 	}
@@ -248,16 +248,14 @@ public class VileHover : CharState {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
 		character.useGravity = false;
-		if (player.speedDevil) {
+		if (vile.hasSpeedDevil) {
 			flyVelMaxSpeed *= 1.1f;
 			flyVelAcc *= 1.1f;
 		}
 
 		float flyVelX = 0;
-		if (character.isDashing && character.deltaPos.x != 0) {
-			flyVelX = character.xDir * character.getDashSpeed() * 0.5f;
-		} else if (character.deltaPos.x != 0) {
-			flyVelX = character.xDir * character.getRunSpeed() * 0.5f;
+		if (character.deltaPos.x != 0) {
+			flyVelX = character.xDir * character.getDashOrRunSpeed() * 0.5f;
 		}
 
 		float flyVelY = 0;

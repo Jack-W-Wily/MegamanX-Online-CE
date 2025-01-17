@@ -182,13 +182,35 @@ public class MorphMothCocoon : Maverick {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("spin")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.MorphMCSpin, player, 1, 0, 0.5f);
-		} else if (sprite.name.Contains("hang")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.MorphMCSwing, player, 0, Global.defFlinch, 0.5f);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Spin,
+		Hang,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"morphmc_spin" => MeleeIds.Spin,
+			"morphmc_hang" or "morphmc_burn_hang" => MeleeIds.Hang,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Spin => new GenericMeleeProj(
+				weapon, pos, ProjIds.MorphMCSpin, player,
+				1, 0, addToLevel: addToLevel
+			),
+			MeleeIds.Hang => new GenericMeleeProj(
+				weapon, pos, ProjIds.MorphMCSwing, player,
+				0, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
@@ -271,17 +293,16 @@ public class MorphMothCocoon : Maverick {
 		);
 		return targets.FirstOrDefault((t) => {
 			if (t is Character chr) {
-				return chr.player.alliance != player.alliance || chr.player.health < chr.player.maxHealth;
+				return chr.player.alliance != player.alliance || chr.health < chr.maxHealth;
 			}
-			/*
+			
 			// GMTODO: use an "isAtMaxHealth" boolstate
 			else if (t is Maverick mvk) {
-				return mvk.player.alliance != player.alliance || mvk.health < mvk.maxHealth;
+				return mvk?.player?.alliance != player.alliance || mvk.health < mvk.maxHealth;
 			}
 			else if (t is RideArmor ra) {
-				return ra.player.alliance != player.alliance || ra.health < ra.maxHealth;
+				return ra?.player?.alliance != player.alliance || ra.health < ra.maxHealth;
 			}
-			*/
 			return false;
 		});
 	}
@@ -365,7 +386,7 @@ public class MorphMCSpinState : MaverickState {
 	float shootTime;
 	float soundTime;
 
-	public MorphMCSpinState() : base("spin", "") {
+	public MorphMCSpinState() : base("spin") {
 	}
 
 	public override void update() {
@@ -521,7 +542,7 @@ public class MorphMCThreadProj : Projectile {
 
 public class MorphMCThreadState : MaverickState {
 	MorphMCThreadProj proj;
-	public MorphMCThreadState() : base("idle", "") {
+	public MorphMCThreadState() : base("idle") {
 	}
 
 	public override void update() {
@@ -532,7 +553,7 @@ public class MorphMCThreadState : MaverickState {
 			return;
 		}
 
-		if (input.isPressed(Control.Special1, player)) {
+		if (input.isPressed(Control.Shoot, player)) {
 			proj.reverse();
 		}
 
@@ -561,7 +582,7 @@ public class MorphMCThreadState : MaverickState {
 
 public class MorphMCLatchState : MaverickState {
 	float latchDestY;
-	public MorphMCLatchState(float latchDestY) : base("latch", "") {
+	public MorphMCLatchState(float latchDestY) : base("latch") {
 		this.latchDestY = latchDestY;
 	}
 
@@ -600,7 +621,8 @@ public class MorphMCHangState : MaverickState {
 	Point origin;
 	Point swingVel;
 	float suckSoundTime;
-	public MorphMCHangState() : base("hang", "") {
+	public MorphMCHangState() : base("hang") {
+		aiAttackCtrl = true;
 	}
 
 	float suckAngle;
@@ -730,7 +752,8 @@ public class MorphMCHangState : MaverickState {
 }
 
 public class MorphMCBurnState : MaverickState {
-	public MorphMCBurnState() : base("burn", "") {
+	public MorphMCBurnState() : base("burn") {
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

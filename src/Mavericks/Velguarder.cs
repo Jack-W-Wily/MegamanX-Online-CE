@@ -3,7 +3,7 @@
 namespace MMXOnline;
 
 public class Velguarder : Maverick {
-	public VelGMeleeWeapon meleeWeapon;
+	public VelGMeleeWeapon meleeWeapon = new();
 
 	public Velguarder(
 		Player player, Point pos, Point destPos, int xDir,
@@ -12,7 +12,6 @@ public class Velguarder : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		meleeWeapon = new VelGMeleeWeapon(player);
 		canClimbWall = true;
 
 		awardWeaponId = WeaponIds.Buster;
@@ -81,12 +80,31 @@ public class Velguarder : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("pounce")) {
-			return new GenericMeleeProj(meleeWeapon, centerPoint, ProjIds.VelGMelee, player);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Pounce,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"velg_pounce" => MeleeIds.Pounce,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Pounce => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.VelGMelee, player,
+				3, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 #region weapons
@@ -105,10 +123,9 @@ public class VelGIceWeapon : Weapon {
 }
 
 public class VelGMeleeWeapon : Weapon {
-	public VelGMeleeWeapon(Player player) {
+	public VelGMeleeWeapon() {
 		index = (int)WeaponIds.VelGMelee;
 		killFeedIndex = 101;
-		damager = new Damager(player, 3, Global.defFlinch, 0.5f);
 	}
 }
 #endregion
@@ -169,7 +186,7 @@ public class VelGIceProj : Projectile {
 #region states
 public class VelGShootFireState : MaverickState {
 	float shootTime;
-	public VelGShootFireState() : base("shoot2", "") {
+	public VelGShootFireState() : base("shoot2") {
 
 	}
 
@@ -196,7 +213,7 @@ public class VelGShootFireState : MaverickState {
 public class VelGShootIceState : MaverickState {
 	bool shot;
 	int index = 0;
-	public VelGShootIceState() : base("shoot", "") {
+	public VelGShootIceState() : base("shoot") {
 
 	}
 

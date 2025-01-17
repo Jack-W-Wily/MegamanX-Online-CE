@@ -36,11 +36,7 @@ public class NeonTiger : Maverick {
 				if (input.isHeld(Control.Special1, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Dash, player)) {
-					if (player.isTagTeam()) {
 						changeState(new NeonTDashState());
-					} else {
-						changeState(new NeonTDashClawState());
-					}
 				} else if (input.isHeld(Control.Shoot, player)) {
 					changeState(new NeonTClawState(false));
 				}
@@ -95,27 +91,66 @@ public class NeonTiger : Maverick {
 		return mshoot;
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name == "neont_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw, player, damage: 2, flinch: 0, hitCooldown: 0.2f, owningActor: this);
-		} else if (sprite.name == "neont_slash2") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClaw2, player, damage: 2, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
-		} else if (sprite.name == "neont_jump_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawAir, player, damage: 3, flinch: Global.defFlinch, hitCooldown: 0.25f, owningActor: this);
-		} else if (sprite.name == "neont_dash_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawDash, player, damage: 3, flinch: Global.halfFlinch, hitCooldown: 0.25f, owningActor: this);
-		} else if (sprite.name == "neont_wall_slash") {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.NeonTClawWall, player, damage: 3, flinch: 0, hitCooldown: 0.25f, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Slash,
+		Slash2,
+		JumpSlash,
+		DashSlash,
+		WallSlash,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"neont_slash" => MeleeIds.Slash,
+			"neont_slash2" => MeleeIds.Slash2,
+			"neont_jump_slash" => MeleeIds.JumpSlash,
+			"neont_dash_slash" => MeleeIds.DashSlash,
+			"neont_wall_slash" => MeleeIds.WallSlash,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Slash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClaw, player,
+				2, 0, 12, addToLevel: addToLevel
+			),
+			MeleeIds.Slash2 => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClaw2, player,
+				2, Global.halfFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.JumpSlash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClawAir, player,
+				3, Global.defFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.DashSlash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClawDash, player,
+				3, Global.halfFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.WallSlash => new GenericMeleeProj(
+				weapon, pos, ProjIds.NeonTClawWall, player,
+				3, 0, 15, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 }
 
 public class NeonTRaySplasherProj : Projectile {
 	int shootNum;
 	bool isHanging;
-	public NeonTRaySplasherProj(Weapon weapon, Point pos, int xDir, int shootNum, bool isHanging, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "neont_projectile_start", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public NeonTRaySplasherProj(
+		Weapon weapon, Point pos, int xDir, int shootNum,
+		bool isHanging, Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "neont_projectile_start",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.NeonTRaySplasher;
 		maxTime = 0.875f;
 		this.shootNum = shootNum;
@@ -151,7 +186,7 @@ public class NeonTRaySplasherProj : Projectile {
 
 public class NeonTWallShootState : MaverickState {
 	MaverickState prevState;
-	public NeonTWallShootState(MaverickState prevState) : base("wall_shoot", "") {
+	public NeonTWallShootState(MaverickState prevState) : base("wall_shoot") {
 		useGravity = false;
 		this.prevState = prevState;
 	}
@@ -175,7 +210,7 @@ public class NeonTWallShootState : MaverickState {
 
 public class NeonTWallClawState : MaverickState {
 	MaverickState prevState;
-	public NeonTWallClawState(MaverickState prevState) : base("wall_slash", "") {
+	public NeonTWallClawState(MaverickState prevState) : base("wall_slash") {
 		useGravity = false;
 		this.prevState = prevState;
 		enterSound = "neontSlash";
@@ -192,7 +227,7 @@ public class NeonTWallClawState : MaverickState {
 public class NeonTClawState : MaverickState {
 	bool isSecond;
 	bool shootPressed;
-	public NeonTClawState(bool isSecond) : base(isSecond ? "slash2" : "slash", "") {
+	public NeonTClawState(bool isSecond) : base(isSecond ? "slash2" : "slash") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
 		canEnterSelf = true;
@@ -220,7 +255,7 @@ public class NeonTClawState : MaverickState {
 public class NeonTAirClawState : MaverickState {
 	bool wasPounce;
 	bool wasWallPounce;
-	public NeonTAirClawState() : base("jump_slash", "") {
+	public NeonTAirClawState() : base("jump_slash") {
 		exitOnAnimEnd = true;
 		enterSound = "neontSlash";
 	}
@@ -244,7 +279,7 @@ public class NeonTAirClawState : MaverickState {
 
 public class NeonTDashClawState : MaverickState {
 	float velX;
-	public NeonTDashClawState() : base("dash_slash", "") {
+	public NeonTDashClawState() : base("dash_slash") {
 		exitOnAnimEnd = true;
 		enterSound = "neontSlash";
 	}
@@ -263,8 +298,11 @@ public class NeonTDashClawState : MaverickState {
 
 public class NeonTDashState : MaverickState {
 	float dustTime;
-	public NeonTDashState() : base("dash", "") {
+	public NeonTDashState() : base("dash") {
 		enterSound = "dashX3";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -314,6 +352,9 @@ public class NeonTPounceState : MaverickState {
 	public bool isWallPounce;
 	public NeonTPounceState() : base("fall") {
 		enterSound = "jump";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {

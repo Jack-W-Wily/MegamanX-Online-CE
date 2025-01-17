@@ -78,35 +78,44 @@ public class GravityBeetle : Maverick {
 		};
 	}
 
-	public float getStompDamage() {
-		float damagePercent = 0;
-		if (deltaPos.y > 150 * Global.spf) damagePercent = 0.5f;
-		if (deltaPos.y > 225 * Global.spf) damagePercent = 0.75f;
-		if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-		return damagePercent;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Dash,
+		Fall,
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("gbeetle_dash")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleLift, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.GBeetleStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 0.5f);
-			}
-		}
-		return null;
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"gbeetle_dash" => MeleeIds.Dash,
+			"gbeetle_fall" => MeleeIds.Fall,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Dash => new GenericMeleeProj(
+				weapon, pos, ProjIds.GBeetleLift, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			MeleeIds.Fall => new GenericMeleeProj(
+				weapon, pos, ProjIds.GBeetleStomp, player,
+				1, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
-		if (sprite.name.EndsWith("fall")) {
-			float damagePercent = getStompDamage();
-			if (damagePercent > 0) {
-				proj.damager.damage = 4 * damagePercent;
-			}
+		if (proj.projId == (int)ProjIds.GBeetleStomp) {
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.9f), 1, 4);
+			proj.damager.damage = damage;
 		}
 	}
+
 }
 
 public class GBeetleBallProj : Projectile {
@@ -128,6 +137,7 @@ public class GBeetleBallProj : Projectile {
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void update() {
@@ -326,9 +336,9 @@ public class BeetleGrabbedState : GenericGrabbedState {
 				character.changeToIdleOrFall();
 				return;
 			}
-			if (character.stopCeiling()) {
+			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
 				(grabber as GravityBeetle).meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
-				character.playSound("crash", sendRpc: true);
+				character.playSound("crashX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}
 			return;
@@ -360,8 +370,14 @@ public class GBeetleGravityWellProj : Projectile {
 	float randPartTime;
 	public float maxRadius = 50;
 	float ttl = 4;
-	public GBeetleGravityWellProj(Weapon weapon, Point pos, int xDir, float chargeTime, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+
+	public GBeetleGravityWellProj(
+		Weapon weapon, Point pos, int xDir, float chargeTime,
+		Player player, ushort netProjId, bool sendRpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "gbeetle_proj_blackhole",
+		0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.GBeetleGravityWell;
 		setIndestructableProperties();
 
@@ -419,9 +435,10 @@ public class GBeetleGravityWellProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
+		if (!damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
 		Character chr = actor as Character;
-		if (chr != null && chr.isCCImmune()) return;
+		if (chr != null && !chr.isPushImmune()) return;
 		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
 		if (chr != null && (chr.charState is DeadLiftGrabbed || chr.charState is BeetleGrabbedState)) return;
 
@@ -458,7 +475,7 @@ public class GBeetleGravityWellState : MaverickState {
 	int state = 0;
 	float partTime;
 	float chargeTime;
-	public GBeetleGravityWellState() : base("blackhole_start", "") {
+	public GBeetleGravityWellState() : base("blackhole_start") {
 	}
 
 	public override void update() {

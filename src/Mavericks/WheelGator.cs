@@ -4,6 +4,11 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class WheelGator : Maverick {
+	public WheelGatorDrillSpinWeapon GatorSpinWeapon = new WheelGatorDrillSpinWeapon();
+	public WheelGatorEatWeapon GatorEatWeapon = new WheelGatorEatWeapon();
+	public WheelGatorFallWeapon GatorFallWeapon = new WheelGatorFallWeapon();
+	public WheelGatorGrabWeapon GatorGrabWeapon = new WheelGatorGrabWeapon();
+
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.WheelGGeneric, 142); }
 	public static Weapon getUpBiteWeapon(Player player) { return new Weapon(WeaponIds.WheelGGeneric, 142, new Damager(player, 4, Global.defFlinch, 0.25f)); }
 	public Weapon upBiteWeapon;
@@ -88,30 +93,55 @@ public class WheelGator : Maverick {
 		return new List<ShaderWrapper>();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("drill_loop")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGSpin, player, damage: 1, flinch: Global.defFlinch, hitCooldown: 0.1f, owningActor: this);
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Drill,
+		Eat,
+		Fall,
+		Grab,
+
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"wheelg_drill_loop" => MeleeIds.Drill,
+			"wheelg_eat_start" => MeleeIds.Eat,
+			"wheelg_fall" => MeleeIds.Fall,
+			"wheelg_grab_start" => MeleeIds.Grab,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Drill => new GenericMeleeProj(
+				GatorSpinWeapon, pos, ProjIds.WheelGSpin, player,
+				1, Global.defFlinch, 6, addToLevel: addToLevel
+			),
+			MeleeIds.Eat => new GenericMeleeProj(
+				GatorEatWeapon, pos, ProjIds.WheelGEat, player,
+				6, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.Fall => new GenericMeleeProj(
+				GatorFallWeapon, pos, ProjIds.WheelGStomp, player,
+				4, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			MeleeIds.Grab => new GenericMeleeProj(
+				GatorGrabWeapon, pos, ProjIds.WheelGGrab, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
+	public override void updateProjFromHitbox(Projectile proj) {
+		if (proj.projId == (int)ProjIds.WheelGStomp) {
+			float damage = Helpers.clamp(MathF.Floor(deltaPos.y * 0.9f), 1, 4);
+			proj.damager.damage = damage;
 		}
-		if (sprite.name.Contains("eat_start")) {
-			if (hitbox.name == "eat") {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGEat, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
-			} else {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGBite, player, damage: 6, flinch: Global.defFlinch, hitCooldown: 0.5f, owningActor: this);
-			}
-		}
-		if (sprite.name.Contains("grab_start") && deltaPos.y <= 0) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGGrab, player, damage: 0, flinch: 0, hitCooldown: 0.5f, owningActor: this);
-		}
-		if (sprite.name.Contains("fall")) {
-			float damagePercent = 0;
-			if (deltaPos.y > 100 * Global.spf) damagePercent = 0.5f;
-			if (deltaPos.y > 200 * Global.spf) damagePercent = 0.75f;
-			if (deltaPos.y > 300 * Global.spf) damagePercent = 1;
-			if (damagePercent > 0) {
-				return new GenericMeleeProj(weapon, centerPoint, ProjIds.WheelGStomp, player, damage: 4 * damagePercent, flinch: Global.defFlinch, hitCooldown: 1);
-			}
-		}
-		return null;
 	}
 
 	public override MaverickState[] aiAttackStates() {
@@ -146,6 +176,33 @@ public class WheelGator : Maverick {
 		data = data[Maverick.CustomNetDataLength..];
 
 		damageEaten = data[0];
+	}
+}
+
+public class WheelGatorDrillSpinWeapon : Weapon {
+	public WheelGatorDrillSpinWeapon() {
+		index = (int)WeaponIds.WheelGSpinWeapon;
+		killFeedIndex = 142;
+	}
+}
+
+public class WheelGatorEatWeapon : Weapon {
+	public WheelGatorEatWeapon() {
+		index = (int)WeaponIds.WheelGEatWeapon;
+		killFeedIndex = 142;
+	}
+}
+public class WheelGatorFallWeapon : Weapon {
+	public WheelGatorFallWeapon() {
+		index = (int)WeaponIds.WheelGFallWeapon;
+		killFeedIndex = 142;
+	}
+}
+
+public class WheelGatorGrabWeapon : Weapon {
+	public WheelGatorGrabWeapon() {
+		index = (int)WeaponIds.WheelGGrabWeapon;
+		killFeedIndex = 142;
 	}
 }
 
@@ -199,14 +256,14 @@ public class WheelGSpinWheelProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		if (damagable is CrackedWall) {
-			damager.hitCooldown = hitCooldown;
+			damager.hitCooldownSeconds = hitCooldown;
 			return;
 		}
 
 		lastHitTime = hitCooldown;
 
 		var chr = damagable as Character;
-		if (chr != null && chr.ownedByLocalPlayer && !chr.isImmuneToKnockback()) {
+		if (chr != null && chr.ownedByLocalPlayer && !chr.isSlowImmune()) {
 			chr.vel = Point.lerp(chr.vel, Point.zero, Global.spf * 10);
 			chr.slowdownTime = 0.25f;
 		}

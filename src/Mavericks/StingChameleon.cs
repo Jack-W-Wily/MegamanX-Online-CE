@@ -29,8 +29,8 @@ public class StingChameleon : Maverick {
 		canClimb = true;
 		//invisibleShader = Helpers.cloneShaderSafe("invisible");
 
-		awardWeaponId = WeaponIds.Sting;
-		weakWeaponId = WeaponIds.Boomerang;
+		awardWeaponId = WeaponIds.ChameleonSting;
+		weakWeaponId = WeaponIds.BoomerangCutter;
 		weakMaverickWeaponId = WeaponIds.BoomerangKuwanger;
 
 		netActorCreateId = NetActorCreateId.StingChameleon;
@@ -169,11 +169,32 @@ public class StingChameleon : Maverick {
 		return attacks.GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("tongue")) {
-			return new GenericMeleeProj(tongueWeapon, centerPoint, ProjIds.StingCTongue, player);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Tongue,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"stingc_tongue" or "stingc_tongue2" or "stingc_tongue3" or
+			"stingc_cling_tongue" or "stingc_cling_tongue2" or 
+			"stingc_cling_tongue3" or "stingc_cling_tongue4" or
+			"stingc_cling_tongue5"  => MeleeIds.Tongue,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Tongue => new GenericMeleeProj(
+				tongueWeapon, pos, ProjIds.StingCTongue, player,
+				4, Global.defFlinch, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	/*
@@ -290,6 +311,7 @@ public class StingCSpikeProj : Projectile {
 #region states
 public class StingCClimb : MaverickState {
 	public StingCClimb() : base("climb") {
+		aiAttackCtrl = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -350,7 +372,7 @@ public class StingCClimb : MaverickState {
 }
 
 public class StingCTongueState : MaverickState {
-	public StingCTongueState(int type) : base(type == 0 ? "tongue" : (type == 1 ? "tongue2" : "tongue3"), "") {
+	public StingCTongueState(int type) : base(type == 0 ? "tongue" : (type == 1 ? "tongue2" : "tongue3")) {
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -408,7 +430,7 @@ public class StingCClimbTongueState : MaverickState {
 public class StingCClingShootState : MaverickState {
 	bool shotOnce;
 	public MaverickState oldState;
-	public StingCClingShootState() : base("cling_shoot", "") {
+	public StingCClingShootState() : base("cling_shoot") {
 	}
 
 	public override void update() {
@@ -441,7 +463,7 @@ public class StingCHangState : MaverickState {
 	float spikeTime;
 	float endTime;
 	float ceilingY;
-	public StingCHangState(float ceilingY) : base("hang", "") {
+	public StingCHangState(float ceilingY) : base("hang") {
 		this.ceilingY = ceilingY;
 	}
 

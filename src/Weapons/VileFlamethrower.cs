@@ -15,7 +15,7 @@ public abstract class VileFlamethrower : Weapon {
 	public int projId;
 
 	public VileFlamethrower() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 	}
 
@@ -24,7 +24,7 @@ public abstract class VileFlamethrower : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -35,7 +35,7 @@ public class WildHorseKick : VileFlamethrower {
 	public static WildHorseKick netWeapon = new();
 
 	public WildHorseKick() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.WildHorseKick;
 	
@@ -46,6 +46,9 @@ public class WildHorseKick : VileFlamethrower {
 		description = new string[] { "Shoot jets of flame from your leg.", "Strong, but not energy efficient." };
 		killFeedIndex = 117;
 		vileWeight = 2;
+		damage = "1";
+		hitcooldown = "0.1";
+		effect = "Fire DOT: 0.5";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -53,7 +56,7 @@ public class WildHorseKick : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -65,7 +68,7 @@ public class SeaDragonRage : VileFlamethrower {
 	public static SeaDragonRage netWeapon = new();
 
 	public SeaDragonRage() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.SeaDragonRage;
 	
@@ -76,6 +79,9 @@ public class SeaDragonRage : VileFlamethrower {
 		description = new string[] { "This powerful flamethrower can freeze", "enemies and even be used underwater." };
 		killFeedIndex = 119;
 		vileWeight = 4;
+		damage = "1";
+		hitcooldown = "0.1";
+		effect = "Stack hits to freeze.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -83,7 +89,7 @@ public class SeaDragonRage : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -94,7 +100,7 @@ public class DragonsWrath : VileFlamethrower {
 	public static DragonsWrath netWeapon = new();
 
 	public DragonsWrath() : base() {
-		rateOfFire = 1f;
+		fireRate = 60;
 		index = (int)WeaponIds.VileFlamethrower;
 		type = (int)VileFlamethrowerType.DragonsWrath;
 	
@@ -105,6 +111,9 @@ public class DragonsWrath : VileFlamethrower {
 		killFeedIndex = 118;
 		projId = (int)ProjIds.DragonsWrath;
 		vileWeight = 3;
+		damage = "1";
+		hitcooldown = "0.1";
+		effect = "None.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -112,7 +121,7 @@ public class DragonsWrath : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}

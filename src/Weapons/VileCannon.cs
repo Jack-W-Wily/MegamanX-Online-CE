@@ -31,16 +31,22 @@ public class VileCannon : Weapon {
 			description = new string[] { "Do not equip a cannon." };
 			killFeedIndex = 126;
 		} else if (vileCannonType == VileCannonType.FrontRunner) {
-			rateOfFire = 0.75f;
+			fireRate = 45;
 			vileAmmoUsage = 8;
+			ammousage = vileAmmoUsage;
+			damage = "3";
 			displayName = "Front Runner";
 			projSprite = "vile_mk2_proj";
 			fadeSprite = "vile_mk2_proj_fade";
 			description = new string[] { "This cannon not only offers power,", "but can be aimed up and down." };
 			vileWeight = 2;
+			effect = "None.";
 		} else if (vileCannonType == VileCannonType.FatBoy) {
-			rateOfFire = 0.75f;
+			fireRate = 45;
+			damage = "4";
+			Flinch = "26";
 			vileAmmoUsage = 24;
+			ammousage = vileAmmoUsage;
 			displayName = "Fat Boy";
 			projSprite = "vile_mk2_fb_proj";
 			fadeSprite = "vile_mk2_fb_proj_fade";
@@ -48,10 +54,13 @@ public class VileCannon : Weapon {
 			weaponSlotIndex = 61;
 			description = new string[] { "The most powerful cannon around,", "it consumes a lot of energy." };
 			vileWeight = 3;
+			effect = "None.";
 		}
 		if (vileCannonType == VileCannonType.LongshotGizmo) {
-			rateOfFire = 0.1f;
+			fireRate = 6;
+			damage = "1";
 			vileAmmoUsage = 4;
+			ammousage = vileAmmoUsage;
 			displayName = "Longshot Gizmo";
 			projSprite = "vile_mk2_lg_proj";
 			fadeSprite = "vile_mk2_lg_proj_fade";
@@ -59,6 +68,7 @@ public class VileCannon : Weapon {
 			weaponSlotIndex = 62;
 			description = new string[] { "This cannon fires 5 shots at once,", "but leaves you open to attack." };
 			vileWeight = 4;
+			effect = "Burst of 5 shots.";
 		}
 	}
 
@@ -67,7 +77,7 @@ public class VileCannon : Weapon {
 		if (isLongshotGizmo && vile.gizmoCooldown > 0) return;
 
 		Player player = vile.player;
-		if (shootTime > 0 || !vile.missileWeapon.isCooldownPercentDone(0.5f)) return;
+		if (shootCooldown > 0 || !vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
 		if (vile.charState is MissileAttack || vile.charState is RocketPunchAttack) return;
 		float overrideAmmoUsage = (isLongshotGizmo && vile.isVileMK2) ? 6 : vileAmmoUsage;
 
@@ -92,7 +102,6 @@ public class VileCannon : Weapon {
 				if (player.input.isHeld(Control.Left, player)) vile.xDir = -1;
 				if (player.input.isHeld(Control.Right, player)) vile.xDir = 1;
 				vile.changeSpriteFromName("ladder_shoot2", true);
-				vile.vileLadderShootCooldown = 0.35f;
 			}
 
 			if (vile.charState is Jump || vile.charState is Fall || vile.charState is WallKick || vile.charState is VileHover || vile.charState is AirDash) {
@@ -182,7 +191,7 @@ public class CannonAttack : CharState {
 	bool isGizmo;
 	private Vile vile = null!;
 
-	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded), "", "", "") {
+	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
 		this.isGizmo = isGizmo;
 	}
 
@@ -197,7 +206,7 @@ public class CannonAttack : CharState {
 		base.update();
 
 		if (vile.isShootingLongshotGizmo) {
-			if (vile.cannonWeapon.shootTime == 0) {
+			if (vile.cannonWeapon.shootCooldown == 0) {
 				vile.cannonWeapon.vileShoot(0, vile);
 			}
 			if (player.vileAmmo <= 0) {

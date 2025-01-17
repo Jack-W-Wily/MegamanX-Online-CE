@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -29,6 +29,7 @@ public class Doppma : BaseSigma {
 		fireballWeapon.update();
 		Helpers.decrementTime(ref fireballCooldown);
 		Helpers.decrementTime(ref shieldCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For ladder and slide shoot.
 		if (charState is WallSlide or LadderClimb &&
 			!string.IsNullOrEmpty(charState?.shootSprite) &&
@@ -38,8 +39,8 @@ public class Doppma : BaseSigma {
 				changeSpriteFromName(charState.sprite, true);
 			} else {
 				var shootPOI = getFirstPOI();
-				if (shootPOI != null && fireballWeapon.shootTime == 0) {
-					fireballWeapon.shootTime = 0.15f;
+				if (shootPOI != null && fireballWeapon.shootCooldown == 0) {
+					fireballWeapon.shootCooldown = 0.15f;
 					int upDownDir = MathF.Sign(player.input.getInputDir(player).y);
 					float ang = getShootXDir() == 1 ? 0 : 180;
 					if (charState.shootSprite.EndsWith("jump_shoot_downdiag")) {
@@ -90,7 +91,7 @@ public class Doppma : BaseSigma {
 				}
 			}
 
-			if (fireballWeapon.shootTime == 0 && fireballCooldown == 0) {
+			if (fireballWeapon.shootCooldown == 0 && fireballCooldown == 0) {
 				if (charState is WallSlide or LadderClimb) {
 					changeSpriteFromName(charState.shootSprite, true);
 				} else {
@@ -114,15 +115,38 @@ public class Doppma : BaseSigma {
 		return "sigma3_" + spriteName;
 	}
 
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Guard,
+		Shield,
+		ShieldGuard,
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync.
-	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
-		if (collider.name == "shield") {
-			return new GenericMeleeProj(
-				new Weapon(), centerPoint, ProjIds.Sigma3ShieldBlock, player,
-				damage: 0, flinch: 0, hitCooldown: 1, isDeflectShield: true, isShield: true
-			);
+	public override int getHitboxMeleeId(Collider hitbox) {
+		if (sprite.name == "sigma3_block") {
+			return (int)MeleeIds.ShieldGuard;
 		}
-		return base.getProjFromHitbox(collider, centerPoint);
+		if (hitbox.name == "shield") {
+			return (int)MeleeIds.Shield;
+		}
+		return (int)MeleeIds.None;
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return id switch {
+			(int)MeleeIds.Shield or (int)MeleeIds.ShieldGuard => new GenericMeleeProj(
+				new Weapon(), pos, ProjIds.Sigma3ShieldBlock, player,
+				damage: 0, flinch: 0, hitCooldown: 60,
+				isDeflectShield: true, isShield: true,
+				isReflectShield: id == (int)MeleeIds.ShieldGuard,
+				addToLevel: addToLevel
+			) {
+				highPiority = true
+			},
+			_ => null
+		};
 	}
 
 	public override List<ShaderWrapper> getShaders() {
@@ -141,5 +165,47 @@ public class Doppma : BaseSigma {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (currentWeapon is MaverickWeapon mw &&
+			mw.maverick == null && canAffordMaverick(mw)
+		) {
+			buyMaverick(mw);
+			if (mw.maverick != null) {
+				changeState(new CallDownMaverick(mw.maverick, true, false), true);
+			}
+			mw.summon(player, pos.addxy(0, -112), pos, xDir);
+			player.changeToSigmaSlot();
+		}
+		if (charState is not LadderClimb) {
+			int DoppmaSigmaAttack = Helpers.randomRange(0, 4);
+			if (isTargetInAir) DoppmaSigmaAttack = 1;
+			if (charState?.isGrabbedState == false && !player.isDead && aiAttackCooldown <= 0 &&
+				!isInvulnerable() && !(charState is CallDownMaverick or SigmaThrowShieldState or Sigma3Shoot)) {
+				switch (DoppmaSigmaAttack) {
+					case 0 when isFacingTarget:
+						player.press(Control.Shoot);
+						break;
+					case 1 when isFacingTarget:
+						player.press(Control.Special1);
+						break;
+					case 2:
+						player.changeWeaponSlot(1);			
+						break;
+					case 3:
+						player.changeWeaponSlot(2);					
+						break;
+					case 4:
+						player.changeWeaponSlot(0);
+						break;
+				}
+				aiAttackCooldown = 20;
+			}
+		}
+		base.aiAttack(target);
 	}
 }

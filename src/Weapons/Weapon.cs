@@ -4,24 +4,23 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class Weapon {
+	public static Weapon baseNetWeapon = new();
 	public string[] shootSounds = { "", "", "", ""};
 	public float ammo;
 	public float maxAmmo;
-	public float rateOfFire;
+	public float fireRate;
+	public float shootCooldown;
+	public float altShotCooldown;
 	public float? switchCooldown;
+	public float? switchCooldownFrames;
 	public float soundTime = 0;
 	public bool isStream = false;
-	public float shootTime;
-	public float altShootTime;
-	public float streamTime;
 	public string displayName = "";
 	public string[] description = {""};
 	public Damager? damager;
 	public int type; // For "swappable category" weapons, like techniques, vile weapon sections, etc.
 
 	public int streams;
-	public int maxStreams;
-	public float streamCooldown;
 
 	public int index;
 	public int killFeedIndex;
@@ -61,11 +60,12 @@ public class Weapon {
 	public string effect = "";
 	public string Flinch = "";
 	public string FlinchCD = "";
+	public bool hasCustomChargeAnim;
 
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;
-		rateOfFire = 0.15f;
+		fireRate = 9;
 		effect = "";
 		damage = "0";
 		hitcooldown = "0";
@@ -87,8 +87,8 @@ public class Weapon {
 	public static List<Weapon> getAllSwitchableWeapons(AxlLoadout axlLoadout) {
 		var weaponList = new List<Weapon>() {
 			new GigaCrush(),
-			new HyperBuster(),
-			new NovaStrike(null),
+			new HyperCharge(),
+			new HyperNovaStrike(),
 			new DoubleBullet(),
 			new DNACore(),
 			new VileMissile(VileMissileType.ElectricShock),
@@ -147,14 +147,14 @@ public class Weapon {
 	public static List<Weapon> getAllXWeapons() {
 		return new List<Weapon>()
 		{
-				new Buster(),
-				new Torpedo(),
-				new Sting(),
+				new XBuster(),
+				new HomingTorpedo(),
+				new ChameleonSting(),
 				new RollingShield(),
 				new FireWave(),
-				new Tornado(),
+				new StormTornado(),
 				new ElectricSpark(),
-				new Boomerang(),
+				new BoomerangCutter(),
 				new ShotgunIce(),
 				new CrystalHunter(),
 				new BubbleSplash(),
@@ -163,7 +163,7 @@ public class Weapon {
 				new SonicSlicer(),
 				new StrikeChain(),
 				new MagnetMine(),
-				new SpeedBurner(null),
+				new SpeedBurner(),
 				new AcidBurst(),
 				new ParasiticBomb(),
 				new TriadThunder(),
@@ -171,7 +171,7 @@ public class Weapon {
 				new RaySplasher(),
 				new GravityWell(),
 				new FrostShield(),
-				new TunnelFang(),
+				new TornadoFang(),
 			};
 	}
 
@@ -274,15 +274,31 @@ public class Weapon {
 	// Gacel:
 	// This is to be used locally to get projectiles.
 	// A replacement of the above. Remeber to send RPCs when using this one.
+	public virtual void shoot(Actor actor, int[] args) {
+	}
 	public virtual void shoot(Character character, int[] args) {
 	}
-	public virtual void shoot(Actor actor, int[] args) {
+	public virtual void shootLight(Character character, int[] args) {
+		shoot(character, args);
+	}
+	public virtual void shootSecond(Character character, int[] args) {
+		shoot(character, args);
+	}
+	public virtual void shootMax(Character character, int[] args) {
+		shoot(character, args);
+	}
+	public virtual void shootHypercharge(Character character, int[] args) {
+		shoot(character, args);
 	}
 
 	// ToDo: Remove default values from this.
 	public virtual float getAmmoUsage(int chargeLevel) {
 		if (chargeLevel >= 3) return 8;
 		else return 1;
+	}
+
+	public virtual float getAmmoUsageEX(int chargeLevel, Character character) {
+		return getAmmoUsage(chargeLevel);
 	}
 
 	public virtual void rechargeAmmo(float maxRechargeTime) {
@@ -301,12 +317,12 @@ public class Weapon {
 	}
 
 	public bool isCooldownPercentDone(float percent) {
-		if (rateOfFire == 0) { return true; }
-		return (shootTime / rateOfFire) < (1 - percent);
+		if (fireRate == 0) { return true; }
+		return (shootCooldown / fireRate) <= (1 - percent);
 	}
 
 	public void addAmmo(float amount, Player player) {
-		if (player.isX && player.hasChip(3) && amount < 0) amount *= 0.5f;
+		if (player.character is MegamanX mmx && mmx.hyperArmArmor == ArmorId.Max && amount < 0) amount *= 0.5f;
 		ammo += amount;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 	}
@@ -331,17 +347,17 @@ public class Weapon {
 	}
 
 	public bool isCmWeapon() {
-		return type > 0 && (this is AxlBullet || this is DoubleBullet);
+		return type > 0 && (this is AxlBullet || this is DoubleBullet 
+		|| this is MettaurCrash || this is BeastKiller || this is MachineBullets
+		|| this is RevolverBarrel || this is AncientGun);
 	}
 	
 	public virtual void update() {
-		if (soundTime > 0) {
-			soundTime = Helpers.clampMin(soundTime - Global.spf, 0);
-		}
-		Helpers.decrementTime(ref shootTime);
-		Helpers.decrementTime(ref altShootTime);
+		Helpers.decrementFrames(ref soundTime);
+		Helpers.decrementFrames(ref shootCooldown);
+		Helpers.decrementFrames(ref altShotCooldown);
 		if (timeSinceLastShoot != null) {
-			timeSinceLastShoot += Global.spf;
+			timeSinceLastShoot += Global.speedMul;
 		}
 	}
 
@@ -359,7 +375,7 @@ public class Weapon {
 			ammo = Helpers.clampMax(ammo + ammoDisplayScale, maxAmmo);
 			if (weaponHealCount >= 1) {
 				weaponHealCount = 0;
-				if (isAlwaysOn || character.player.weapon == this) {
+				if (isAlwaysOn || character.currentWeapon == this) {
 					if (character.player.hasArmArmor(3)) {
 						character.playSound("healX3", forcePlay: true);
 					} else {
@@ -401,5 +417,9 @@ public class Weapon {
 				actor.playSound(normalSound);
 			}
 		}
+	}
+
+	public virtual float getFireRate(Character character, int chargeLevel, int[] args) {
+		return fireRate;
 	}
 }

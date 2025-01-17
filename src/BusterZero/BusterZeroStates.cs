@@ -12,14 +12,13 @@ public class BusterZeroMelee : CharState {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
 		airMove = true;
-		//superArmor = true;
 		canJump = true;
 		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
@@ -43,19 +42,59 @@ public class BusterZeroMelee : CharState {
 	}
 }
 
+
+public class BusterZeroMeleeWall : CharState {
+	bool fired;
+	public BusterZero zero = null!;
+	public int wallDir;
+	public Collider wallCollider;
+
+	public BusterZeroMeleeWall(int wallDir, Collider wallCollider) : base("wall_slide_attack") {
+		this.wallDir = wallDir;
+		this.wallCollider = wallCollider;
+		useGravity = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("zerosaberx3", sendRpc: true);
+		}
+		if (character.isAnimOver()) {
+			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
+			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		zero = character as BusterZero ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState oldState) {
+		base.onExit(oldState);
+		useGravity = true;
+		zero.zSaberCooldown = 36;
+	}
+}
+
 public class BusterZeroDoubleBuster : CharState {
 	public bool fired1;
 	public bool fired2;
 	public bool isSecond;
-	public bool shootPressedAgain;
 	public bool isPinkCharge;
+	public bool shootPressedAgain;
+	public int startStockLevel;
 	BusterZero zero = null!;
 
-	public BusterZeroDoubleBuster(bool isSecond, bool isPinkCharge) : base("doublebuster") {
+	public BusterZeroDoubleBuster(bool isSecond, int startstockLevel) : base("doublebuster") {
 		this.isSecond = isSecond;
-		this.isPinkCharge = isPinkCharge;
+		this.startStockLevel = startstockLevel;
 		airMove = true;
-		superArmor = true;
+		superArmor = false;
+		canStopJump = true;
+		canJump = true;
 		landSprite = "doublebuster";
 		airSprite = "doublebuster_air";
 	}
@@ -95,31 +134,25 @@ public class BusterZeroDoubleBuster : CharState {
 			character.changeToIdleOrFall();
 		} else if (!isSecond && character.frameIndex >= 4 && !shootPressedAgain) {
 			character.changeToIdleOrFall();
-		} else {
-			if ((character.grounded || character.canAirJump() && character.flag == null) &&
-				player.input.isPressed(Control.Jump, player)
-			) {
-				if (!character.grounded) {
-					character.dashedInAir++;
-				}
-				character.vel.y = -character.getJumpPower();
-				sprite = "doublebuster_air";
-				character.changeSpriteFromName(sprite, false);
-			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero = character as BusterZero ?? throw new NullReferenceException();
+		// For the starting buster;
+		if (startStockLevel is 1 or 3) {
+			isPinkCharge = true;
+		}
 		// Non-full charge.
 		if (isPinkCharge) {
 			zero.stockedBusterLv = 1;
+			isPinkCharge = true;
 		}
 		// Full charge.
 		else {
 			// We add Z-Saber charge if we fire the full charge and we were at 0 charge before.
-			if (zero.stockedBusterLv != 2 || !isSecond) {
+			if (startStockLevel == 4 || !isSecond) {
 				zero.stockedSaber = true;
 			}
 			zero.stockedBusterLv = 2;
@@ -128,8 +161,10 @@ public class BusterZeroDoubleBuster : CharState {
 			sprite = "doublebuster_air";
 			character.changeSpriteFromName(sprite, true);
 		}
-		if (isSecond) {
+		// For halfway shot.
+		if (startStockLevel <= 2) {
 			character.frameIndex = 4;
+			fired1 = true;
 		}
 	}
 
@@ -144,6 +179,14 @@ public class BusterZeroDoubleBuster : CharState {
 				zero.stockedSaber = true;
 			}
 		}
+		if (!fired1) {
+			if (isPinkCharge) {
+				zero.stockedBusterLv = 3;
+			} else {
+				zero.stockedBusterLv = 4;
+				zero.stockedSaber = true;
+			}
+		}
 	}
 }
 
@@ -155,7 +198,9 @@ public class BusterZeroHadangeki : CharState {
 		landSprite = "projswing";
 		airSprite = "projswing_air";
 		airMove = true;
-		superArmor = true;
+		superArmor = false;
+		canStopJump = true;
+		canJump = true;
 	}
 
 	public override void update() {
@@ -171,17 +216,6 @@ public class BusterZeroHadangeki : CharState {
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
-		} else {
-			if ((character.grounded || character.canAirJump() && character.flag == null) &&
-				player.input.isPressed(Control.Jump, player)
-			) {
-				if (!character.grounded) {
-					character.dashedInAir++;
-				}
-				character.vel.y = -character.getJumpPower();
-				sprite = "projswing_air";
-				character.changeSpriteFromName(sprite, false);
-			}
 		}
 	}
 
@@ -226,7 +260,7 @@ public class BusterZeroHadangekiWall : CharState {
 			);
 		}
 		if (character.isAnimOver()) {
-			character.changeState(new WallSlide(wallDir, wallCollider));
+			character.changeState(new WallSlide(wallDir, wallCollider) { enterSound = "" });
 			character.sprite.frameIndex = character.sprite.totalFrameNum - 1;
 		}
 	}

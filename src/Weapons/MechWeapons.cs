@@ -227,10 +227,13 @@ public class MechMissileProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-
-		updateProjectileCooldown();
 
 		smokeTime += Global.spf;
 		if (smokeTime > 0.2) {
@@ -258,6 +261,10 @@ public class MechMissileProj : Projectile, IDamagable {
 	}
 
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
 	}
 }
 

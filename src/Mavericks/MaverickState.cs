@@ -62,13 +62,23 @@ public class MaverickState {
 	public Player player { get { return maverick?.player; } }
 	public Input input { get { return maverick?.input; } }
 
+	public bool normalCtrl;
+	public bool attackCtrl;
+	public bool aiAttackCtrl;
+
 	public MaverickStateConsecutiveData consecutiveData;
 
-	public MaverickState(string sprite, string transitionSprite = null) {
+	public MaverickState(string sprite, string transitionSprite = "") {
 		this.sprite = string.IsNullOrEmpty(transitionSprite) ? sprite : transitionSprite;
 		this.transitionSprite = transitionSprite;
 		defaultSprite = sprite;
 		stateTime = 0;
+	}
+
+	public virtual void preUpdate() {
+	}
+
+	public virtual void postUpdate() {
 	}
 
 	public virtual void update() {
@@ -135,12 +145,14 @@ public class MaverickState {
 				nt.isDashing = false;
 			}
 		}
-
-		if (this is not MLand && this is not DrDopplerUncoatState && this is not MEnter && (newState is MIdle || newState is MFall)) {
-			maverick.aiCooldown = maverick.maxAICooldown;
+		if (aiAttackCtrl && (newState is MIdle || newState is MFall)) {
 			if (player.isStriker()) {
+				maverick.aiCooldown = maverick.maxAICooldown;
 				maverick.autoExit = true;
 			}
+		}
+		if (aiAttackCtrl && newState.attackCtrl) {
+			maverick.aiCooldown = maverick.maxAICooldown;
 		}
 		if (!useGravity) maverick.useGravity = true;
 	}
@@ -282,7 +294,9 @@ public class MaverickState {
 		rect.y2 -= 15;
 		var shape = rect.getShape();
 		var ladders = Global.level.getTerrainTriggerList(maverick, new Point(0, 0), typeof(Ladder));
-		var backwallZones = maverick is StingChameleon ? Global.level.getTriggerList(shape, typeof(BackwallZone)) : new List<CollideData>();
+		var backwallZones = maverick is StingChameleon ? Global.level.getTerrainTriggerList(
+			shape, typeof(BackwallZone)
+		) : new List<CollideData>();
 		if (ladders.Count > 0 || (backwallZones.Count > 0 && !backwallZones.Any(bw => (bw.gameObject as BackwallZone).isExclusion))) {
 			if (ladders.Count > 0) hitLadder = true;
 			return true;
@@ -347,7 +361,9 @@ public class MaverickState {
 			maverick.changeState(new MTaunt());
 		} else if (player.input.isPressed(Control.Down, player) && !maverick.canClimb) {
 			maverick.checkLadderDown = true;
-			var ladders = Global.level.getTriggerList(maverick, 0, 1, null, typeof(Ladder));
+			var ladders = Global.level.getTerrainTriggerList(
+				maverick, new Point(0, 1), typeof(Ladder)
+			);
 			if (ladders.Count > 0) {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
@@ -359,7 +375,9 @@ public class MaverickState {
 			maverick.checkLadderDown = false;
 		} else if (player.input.isPressed(Control.Down, player) && maverick.canClimb) {
 			maverick.checkLadderDown = true;
-			var ladders = Global.level.getTriggerList(maverick, 0, 1, null, typeof(Ladder));
+			var ladders = Global.level.getTerrainTriggerList(
+				maverick, new Point(0, 1), typeof(Ladder)
+			);
 			if (ladders.Count > 0) {
 				var rect = ladders[0].otherCollider.shape.getRect();
 				var snapX = (rect.x1 + rect.x2) / 2;
@@ -437,6 +455,9 @@ public class MaverickState {
 
 public class MIdle : MaverickState {
 	public MIdle(string transitionSprite = "") : base("idle", transitionSprite) {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	float attackCooldown = 0;
@@ -482,8 +503,9 @@ public class MIdle : MaverickState {
 
 public class MEnter : MaverickState {
 	public float destY;
-	public MEnter(Point destPos) : base("enter", "") {
+	public MEnter(Point destPos) : base("enter") {
 		destY = destPos.y;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -527,7 +549,7 @@ public class MExit : MaverickState {
 	public Point destPos;
 	bool isRecall;
 	public const float yPos = 164;
-	public MExit(Point destPos, bool isRecall) : base("exit", "") {
+	public MExit(Point destPos, bool isRecall) : base("exit") {
 		this.destPos = destPos;
 		this.isRecall = isRecall;
 	}
@@ -568,7 +590,9 @@ public class MExit : MaverickState {
 }
 
 public class MTaunt : MaverickState {
-	public MTaunt() : base("taunt", "") {
+	public MTaunt() : base("taunt") {
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -607,12 +631,22 @@ public class MTaunt : MaverickState {
 public class MRun : MaverickState {
 	float dustTime;
 	float runSoundTime;
+	int xDir = 1;
 
-	public MRun() : base("run", "") {
+	public MRun() : base("run") {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		xDir = maverick.xDir;
 	}
 
 	public override void update() {
 		base.update();
+		int inputDir = input.getXDir(player);
 
 		var oo = maverick as OverdriveOstrich;
 		if (oo != null) {
@@ -627,20 +661,22 @@ public class MRun : MaverickState {
 				runSoundTime = 0.175f;
 			}
 
-			if (input.isHeld(Control.Left, player) && oo.xDir == 1 && oo.getRunSpeed() >= oo.skidSpeed) {
+			if (xDir == 1 && inputDir != 1 && oo.getRunSpeed() >= oo.skidSpeed) {
 				oo.changeState(new OverdriveOSkidState(), true);
 				return;
-			} else if (input.isHeld(Control.Right, player) && oo.xDir == -1 && oo.getRunSpeed() >= oo.skidSpeed) {
+			}
+			if (xDir == -1 && inputDir == 1 && oo.getRunSpeed() >= oo.skidSpeed) {
 				oo.changeState(new OverdriveOSkidState(), true);
 				return;
 			}
 		}
 
 		var move = new Point(0, 0);
-		if (input.isHeld(Control.Left, player)) {
+		if (inputDir == -1) {
 			maverick.xDir = -1;
 			move.x = -maverick.getRunSpeed();
-		} else if (input.isHeld(Control.Right, player)) {
+		}
+		else if (inputDir == 1) {
 			maverick.xDir = 1;
 			move.x = maverick.getRunSpeed();
 		}
@@ -650,8 +686,8 @@ public class MRun : MaverickState {
 			if (oo != null && oo.getRunSpeed() >= 100) {
 				oo.accSpeed -= Global.spf * 500;
 				maverick.move(new Point(oo.getRunSpeed() * oo.xDir, 0));
-				// oo.changeState(new OverdriveOSkidState(), true);
-				// return;
+				//oo.changeState(new OverdriveOSkidState(), true);
+				return;
 			} else {
 				maverick.changeState(new MIdle());
 			}
@@ -670,9 +706,9 @@ public class MRun : MaverickState {
 			}
 		}
 		if (maverick is FakeZero && !once && stateTime >= 14/60f) {
-				maverick.playSound("dashX2", sendRpc: true);
-				once = true;
-			}
+			maverick.playSound("dashX2", sendRpc: true);
+			once = true;
+		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -687,17 +723,30 @@ public class MJumpStart : MaverickState {
 	const float maxPreJumpFrames = 4;
 	new const float maxJumpFrames = 2;
 	float additionalJumpPower;
-	public MJumpStart(float additionalJumpPower = 1) : base("jump_start", "") {
+	public MJumpStart(float additionalJumpPower = 1) : base("jump_start") {
 		this.additionalJumpPower = additionalJumpPower;
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
+		int inputDir = input.getXDir(player);
+		if (inputDir != 0) {
+			maverick.xDir = inputDir;
+			maverick.move(new Point(maverick.getRunSpeed() * inputDir, 0));
+		}
+		if (stateFrame > 6) {
+			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod();
+			maverick.changeState(new MJump());
+			return;
+		}
 
 		if (maverick is BoomerangKuwanger ||
 			(maverick is OverdriveOstrich oo && oo.deltaPos.magnitude > 100 * Global.spf) ||
 			(maverick is FakeZero fz)) {
-			maverick.vel.y = -maverick.getJumpPower() * getJumpModifier() * maverick.getYMod();
+			maverick.vel.y = -maverick.getJumpPower() * maverick.getYMod() * (MathF.Abs(maverick.deltaPos.x / 10f) + 1);
 			maverick.changeState(new MJump());
 			return;
 		}
@@ -755,22 +804,21 @@ public class MJump : MaverickState {
 	new int jumpFramesHeld = 0;
 	public bool fromCling;
 	public MaverickState followUpAiState;
-	public MJump(MaverickState followUpAiState = null) : base("jump", "") {
+	public MJump(MaverickState followUpAiState = null) : base("jump") {
 		this.followUpAiState = followUpAiState;
 		enterSound = "jump";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (!player.input.isHeld(Control.Jump, player)) {
-			jumpFramesHeld = 6;
-		}
-
-		bool jumpHeld = player.input.isHeld(Control.Jump, player);
-		if (jumpHeld && jumpFramesHeld < 6) {
-			jumpFramesHeld++;
-			maverick.vel.y -= Global.spf * 1250 * maverick.getYMod();
+		bool jumpHeld = player.input.isHeld(Control.Jump, player) || maverick.aiBehavior != MaverickAIBehavior.Control;
+		if (stateFrame > 2 && jumpFramesHeld == 0 && !jumpHeld && maverick.vel.y < 0) {
+			jumpFramesHeld = 1;
+			maverick.vel.y *= 0.25f;
 		}
 
 		if (maverick.vel.y * maverick.getYMod() > 0) {
@@ -783,6 +831,9 @@ public class MJump : MaverickState {
 
 public class MFall : MaverickState {
 	public MFall(string transitionSprite = "") : base("fall", transitionSprite) {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -795,6 +846,9 @@ public class MFall : MaverickState {
 
 public class MFly : MaverickState {
 	public MFly(string transitionSprite = "") : base("fly", transitionSprite) {
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -927,9 +981,12 @@ public class MFly : MaverickState {
 public class MLand : MaverickState {
 	float landingVelY;
 	bool jumpHeldOnce;
-	public MLand(float landingVelY) : base("land", "") {
+	public MLand(float landingVelY) : base("land") {
 		this.landingVelY = landingVelY;
 		enterSound = "land";
+		normalCtrl = true;
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void onEnter(MaverickState oldState) {
@@ -970,18 +1027,12 @@ public class MLand : MaverickState {
 				maverick.changeState(new MIdle());
 			}
 		}
-		if (input.isHeld(Control.Left, player) || input.isHeld(Control.Right, player)) {
+		int inputDir = input.getXDir(player);
+		if (inputDir != 0) {
 			Point move = new(0, 0);
-			if (input.isHeld(Control.Left, player)) {
-				maverick.xDir = -1;
-				move.x = -maverick.getRunSpeed();
-			} else if (input.isHeld(Control.Right, player)) {
-				maverick.xDir = 1;
-				move.x = maverick.getRunSpeed();
-			}
-			if (move.magnitude > 0) {
-				maverick.move(move);
-			}
+			maverick.xDir = inputDir;
+			move.x = maverick.getRunSpeed() * inputDir;
+			maverick.move(move);
 		}
 	}
 }
@@ -1002,6 +1053,7 @@ public class MHurt : MaverickState {
 			isCombo = true;
 			flinchYPos = oldComboPos.Value;
 		}
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1185,6 +1237,7 @@ public class MWallSlide : MaverickState {
 		this.wallDir = wallDir;
 		this.wall = wall;
 		enterSound = "land";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1268,6 +1321,7 @@ public class MWallKick : MaverickState {
 		this.kickDir = kickDir;
 		kickSpeed = kickDir * 150;
 		enterSound = "jump";
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1300,9 +1354,9 @@ public class MShoot : MaverickState {
 	bool shotOnce;
 	string shootSound;
 	public Action<Point, int> getProjectile;
-	public int shootFramesHeld;
+	public float shootFramesHeld;
 	bool shootReleased;
-	public MShoot(Action<Point, int> getProjectile, string shootSound) : base("shoot", "") {
+	public MShoot(Action<Point, int> getProjectile, string shootSound) : base("shoot") {
 		this.getProjectile = getProjectile;
 		this.shootSound = shootSound;
 	}
@@ -1313,7 +1367,7 @@ public class MShoot : MaverickState {
 
 		if (input.isHeld(Control.Shoot, player)) {
 			if (!shootReleased) {
-				shootFramesHeld++;
+				shootFramesHeld += maverick.speedMul;
 			}
 		} else {
 			shootReleased = true;

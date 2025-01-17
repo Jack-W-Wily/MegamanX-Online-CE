@@ -26,36 +26,54 @@ public class RocketPunch : Weapon {
 			description = new string[] { "Do not equip a Rocket Punch." };
 			killFeedIndex = 126;
 		} else if (rocketPunchType == RocketPunchType.GoGetterRight) {
-			rateOfFire = 1f;
+			fireRate = 60;
 			displayName = "Go-Getter Right";
 			vileAmmoUsage = 8;
 			projSprite = "rocket_punch_proj";
 			description = new string[] { "A rocket punch sends your fist", "flying to teach enemies a lesson." };
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			Flinch = "13";
+			FlinchCD = "1";
+			effect = "Won't destroy on hit.";
 		} else if (rocketPunchType == RocketPunchType.SpoiledBrat) {
-			rateOfFire = 0.2f;
+			fireRate = 12;
 			displayName = "Spoiled Brat";
 			vileAmmoUsage = 8;
 			projSprite = "rocket_punch_sb_proj";
 			description = new string[] { "Though lacking in power, this", "rocket punch offers intense speed." };
 			killFeedIndex = 77;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.1";
+			Flinch = "13";
+			FlinchCD = "1";
+			effect = "Destroys on hit.";
 		}
 		if (rocketPunchType == RocketPunchType.InfinityGig) {
-			rateOfFire = 1f;
+			fireRate = 60;
 			displayName = "Infinity Gig";
 			vileAmmoUsage = 16;
 			projSprite = "rocket_punch_ig_proj";
 			description = new string[] { "Advanced homing technology can be", "difficult to get a handle on." };
 			killFeedIndex = 78;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			Flinch = "13";
+			FlinchCD = "1";
+			effect = "Homing,Travels further.";
 		}
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (vile.charState is RocketPunchAttack && type != (int)RocketPunchType.SpoiledBrat) return;
 
-		if (shootTime == 0 && vile.charState is not Dash && vile.charState is not AirDash) {
+		if (shootCooldown == 0 && vile.charState is not Dash && vile.charState is not AirDash) {
 			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 				vile.setVileShootTime(this);
 				if (vile.charState is RocketPunchAttack rpa) {
@@ -82,7 +100,7 @@ public class RocketPunchProj : Projectile {
 		ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, getSpeed(weapon.type), 3,
-		player, weapon.projSprite, Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		player, weapon.projSprite, Global.halfFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.RocketPunch;
 		destroyOnHit = false;
@@ -94,7 +112,7 @@ public class RocketPunchProj : Projectile {
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
 			damager.damage = 2;
-			damager.hitCooldown = 0.1f;
+			damager.hitCooldown = 6;
 			maxTime = 0.25f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBrat;
@@ -109,6 +127,7 @@ public class RocketPunchProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public bool ownerExists => (owner.character?.destroyed == false);

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using SFML.Graphics;
+using System.Linq;
 
 namespace MMXOnline;
 
 public class BlackArrow : AxlWeapon {
+	public static BlackArrow netWeapon;
 	public BlackArrow(int altFire) : base(altFire) {
 		shootSounds = new string[] { "blackArrow", "blackArrow", "blackArrow", "blackArrow" };
-		rateOfFire = 0.4f;
-		altFireCooldown = 0.8f;
+		fireRate = 24;
+		altFireCooldown = 48;
 		index = (int)WeaponIds.BlackArrow;
 		weaponBarBaseIndex = 33;
 		weaponSlotIndex = 53;
@@ -40,14 +42,14 @@ public class BlackArrow : AxlWeapon {
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		if (chargeLevel < 3) {
-			bullet = new BlackArrowProj(weapon, bulletPos, player, bulletDir, 0, netId, rpc: true);
+			bullet = new BlackArrowProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
 		} else {
 			if (altFire == 0) {
 				new WindCutterProj(weapon, bulletPos, player, bulletDir, netId, rpc: true);
 			} else {
-				new BlackArrowProj(weapon, bulletPos, player, bulletDir, 1, netId, rpc: true);
-				new BlackArrowProj(weapon, bulletPos, player, Point.createFromAngle(angle - 30), 1, player.getNextActorNetId(), rpc: true);
-				new BlackArrowProj(weapon, bulletPos, player, Point.createFromAngle(angle + 30), 1, player.getNextActorNetId(), rpc: true);
+				new BlackArrowProj2(weapon, bulletPos, player, bulletDir, netId, rpc: true);
+				new BlackArrowProj2(weapon, bulletPos, player, Point.createFromAngle(angle - 30), player.getNextActorNetId(), rpc: true);
+				new BlackArrowProj2(weapon, bulletPos, player, Point.createFromAngle(angle + 30), player.getNextActorNetId(), rpc: true);
 			}
 		}
 
@@ -58,41 +60,36 @@ public class BlackArrow : AxlWeapon {
 }
 
 public class BlackArrowProj : Projectile {
-	int type;
+	public bool landed;
 	public Actor? target;
 	public List<Point> lastPoses = new List<Point>();
 
-	public BlackArrowProj(Weapon weapon, Point pos, Player player, Point bulletDir, int type, ushort netProjId, bool rpc = false) :
+	public BlackArrowProj(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, 1, 450, 1, player, "blackarrow_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		this.type = type;
 		projId = (int)ProjIds.BlackArrow;
 		useGravity = true;
 		updateAngle();
-
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateAngle(pos, player, netProjId, bulletDir.angle);
 		}
+		canBeLocal = false;
 	}
-
 	public void updateAngle() {
 		angle = vel.angle;
 	}
-
 	public override void update() {
+		base.update();
 		lastPoses.Add(pos);
 		if (lastPoses.Count > 5) lastPoses.RemoveAt(0);
 
 		if (ownedByLocalPlayer) {
-			if (type == 0) {
 				target = Global.level.getClosestTarget(pos, damager.owner.alliance, true);
-
 				if (!Global.level.gameObjects.Contains(target)) {
 					target = null;
 				}
-
 				if (target != null) {
 					useGravity = false;
 					var dTo = pos.directionTo(target.getCenterPos()).normalize();
@@ -100,17 +97,12 @@ public class BlackArrowProj : Projectile {
 					destAngle = Helpers.to360(destAngle);
 					float distFactor = pos.distanceTo(target.getCenterPos()) / 100;
 					angle = Helpers.moveAngle((float)angle.Value, destAngle, Global.spf * 200 * distFactor);
-
 					vel.x = Helpers.cosd((float)angle) * speed;
 					vel.y = Helpers.sind((float)angle) * speed;
 				} else {
 					useGravity = true;
 					updateAngle();
-				}
-			} else if (type == 1) {
-				updateAngle();
-			}
-
+				} 
 			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
 				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
 				damager.damage = 0;
@@ -119,26 +111,79 @@ public class BlackArrowProj : Projectile {
 				return;
 			}
 		}
-
-		base.update();
 	}
-
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 		if (!ownedByLocalPlayer) return;
-		if (type != 2) {
-			useGravity = false;
-			maxTime = 4;
-			if ((owner.character as Axl)?.isWhiteAxl() == true) {
-				maxTime = 10;
+		var hitNormal = other.getNormalSafe();
+		destroySelf();
+		new BlackArrowGrounded(
+			weapon, other.getHitPointSafe(), owner, hitNormal.byteAngle,
+			owner.getNextActorNetId(), true
+		);
+	}
+	public override void render(float x, float y) {
+		base.render(x, y);
+		if (Options.main.lowQualityParticles()) return;
+
+		for (int i = lastPoses.Count - 1; i >= 1; i--) {
+			Point head = lastPoses[i];
+			Point outerTail = lastPoses[i - 1];
+			Point innerTail = lastPoses[i - 1];
+			if (i == 1) {
+				innerTail = innerTail.add(head.directionToNorm(innerTail).times(5));
 			}
-			time = 0;
-			type = 2;
-			changeSprite("blackarrow_stuck_proj", true);
-			vel = new Point();
+
+			DrawWrappers.DrawLine(head.x, head.y, outerTail.x, outerTail.y, new Color(80, 59, 145, 64), 4, 0, true);
+			DrawWrappers.DrawLine(head.x, head.y, innerTail.x, innerTail.y, new Color(24, 24, 32, 128), 2, 0, true);
 		}
 	}
+}
+public class BlackArrowProj2 : Projectile {
+	public bool landed;
+	public Actor? target;
+	public List<Point> lastPoses = new List<Point>();
 
+	public BlackArrowProj2(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, 1, 450, 1, player, "blackarrow_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		maxTime = 0.5f;
+		vel.x = bulletDir.x * speed;
+		vel.y = bulletDir.y * speed;
+		projId = (int)ProjIds.BlackArrow2;
+		useGravity = true;
+		updateAngle();
+		if (rpc) {
+			rpcCreateAngle(pos, player, netProjId, bulletDir.angle);
+		}
+	}
+	public void updateAngle() {
+		angle = vel.angle;
+	}
+	public override void update() {
+		base.update();
+		lastPoses.Add(pos);
+		if (lastPoses.Count > 5) lastPoses.RemoveAt(0);
+		if (ownedByLocalPlayer) {
+			updateAngle();
+			if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
+				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * Damager.headshotModifier);
+				damager.damage = 0;
+				playSound("hurt");
+				destroySelf();
+				return;
+			}
+		}
+	}
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+		if (!ownedByLocalPlayer) return;
+		var hitNormal = other.getNormalSafe();
+		destroySelf();
+		new BlackArrowGrounded(
+			weapon, other.getHitPointSafe(), owner, hitNormal.byteAngle,
+			owner.getNextActorNetId(), true
+		);
+	}
 	public override void render(float x, float y) {
 		base.render(x, y);
 		if (Options.main.lowQualityParticles()) return;
@@ -268,4 +313,46 @@ public class WindCutterProj : Projectile {
 	public override void render(float x, float y) {
 		base.render(x, y);
 	}
+}
+
+public class BlackArrowGrounded : Projectile {
+	public Axl? axl;
+	public BlackArrowGrounded(Weapon weapon, Point pos, Player player, float byteAngle, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, 1, 0, 1, player, "blackarrow_stuck_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		maxTime = 4	;
+		if (axl?.isWhiteAxl() == true) {
+			maxTime = 10;
+		}
+		projId = (int)ProjIds.BlackArrowGround;
+		destroyOnHit = true;
+		playSound("minePlant");
+		if (rpc) {
+			rpcCreateByteAngle(pos, player, netProjId, byteAngle);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BlackArrowGrounded(BlackArrow.netWeapon,
+			args.pos, args.player, args.byteAngle, args.netId
+		);
+	}
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
+	public override void update() {
+		base.update();
+		moveWithMovingPlatform();
+		if (axl?.isWhiteAxl() == true) {
+			maxTime = 10;
+		}
+	}
+	public override void onDestroy() {
+		base.onDestroy();
+		new Anim(pos, "buster1_fade", xDir,
+			axl?.player.getNextActorNetId(), true, sendRpc: true);
+	}
+	
 }

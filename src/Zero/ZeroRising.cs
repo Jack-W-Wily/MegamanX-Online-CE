@@ -14,7 +14,7 @@ public class RyuenjinWeapon : Weapon {
 	public RyuenjinWeapon() : base() {
 		//damager = new Damager(player, 4, 0, 0.2f);
 		index = (int)WeaponIds.Ryuenjin;
-		rateOfFire = 0.25f;
+		fireRate = 15;
 		weaponBarBaseIndex = 23;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 11;
@@ -41,7 +41,7 @@ public class DenjinWeapon : Weapon {
 	public DenjinWeapon() : base() {
 		//damager = new Damager(player, 3, Global.defFlinch, 0.1f);
 		index = (int)WeaponIds.EBlade;
-		rateOfFire = 0.25f;
+		fireRate = 15;
 		weaponBarBaseIndex = 41;
 		killFeedIndex = 36;
 		type = (int)RisingType.Denjin;
@@ -60,7 +60,7 @@ public class RisingFangWeapon : Weapon {
 	public RisingFangWeapon() : base() {
 		//damager = new Damager(player, 2, 0, 0.5f);
 		index = (int)WeaponIds.Rising;
-		rateOfFire = 0.1f;
+		fireRate = 6;
 		weaponBarBaseIndex = 41;
 		killFeedIndex = 83;
 		type = (int)RisingType.RisingFang;
@@ -83,13 +83,13 @@ public class ZeroUppercut : CharState {
 	public Zero zero = null!;
 	int jumpFrame;
 
-	public ZeroUppercut(RisingType type, bool isUnderwater) : base(getSprite(type, isUnderwater), "", "") {
+	public ZeroUppercut(RisingType type, bool isUnderwater) : base(getSprite(type, isUnderwater)) {
 		this.type = type;
 		this.isUnderwater = type == RisingType.Ryuenjin && isUnderwater;
 		setStartupFrame(type);
 	}
 
-	public ZeroUppercut(int type, bool isUnderwater) : base(getSprite((RisingType)type, isUnderwater), "", "") {
+	public ZeroUppercut(int type, bool isUnderwater) : base(getSprite((RisingType)type, isUnderwater)) {
 		this.type = (RisingType)type;
 		this.isUnderwater = this.type == RisingType.Ryuenjin && isUnderwater;
 		setStartupFrame(this.type);
@@ -202,8 +202,6 @@ public class ZeroUppercut : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-		if (type == RisingType.RisingFang) {
-			zero.airRisingUses++;
-		}
+		zero.airRisingUses++;	
 	}
 }

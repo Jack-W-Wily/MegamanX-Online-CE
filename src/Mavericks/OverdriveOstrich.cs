@@ -46,17 +46,18 @@ public class OverdriveOstrich : Maverick {
 			dashDist += accSpeed * Global.spf;
 			accSpeed += Global.spf * 800;
 			if (accSpeed > 300) accSpeed = 300;
-		} else if (state is not MJumpStart && state is not MJump && state is not MFall && state is not MLand && state is not OverdriveOSkidState &&
-			  state is not OverdriveOJumpKickState && state is not OverdriveOShootState && state is not OverdriveOShoot2State) {
-			accSpeed = 0;
 		}
 
 		// Momentum carrying states
-		if (state is OverdriveOShootState || state is OverdriveOShoot2State || state is MRun || state is MFall) {
-			var inputDir = input.getInputDir(player);
-			if (state is OverdriveOShootState || inputDir.x != xDir) {
+		if (state is OverdriveOShootState or
+			OverdriveOShoot2State or MRun or MFall or MJumpStart or MLand
+		) {
+			int inputDir = input.getXDir(player);
+			if (inputDir != xDir && (state is not MRun || inputDir == 0)) {
 				accSpeed = Helpers.lerp(accSpeed, 0, Global.spf * 5);
 			}
+		} else {
+			accSpeed = Helpers.lerp(accSpeed, 0, Global.spf * 5);
 		}
 
 		if (state is OverdriveOShootState || state is OverdriveOShoot2State) {
@@ -122,13 +123,35 @@ public class OverdriveOstrich : Maverick {
 		return aiAttackStates().GetRandomItem();
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("skip")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 3, Global.defFlinch, 1);
-		} else if (sprite.name.EndsWith("_run") && MathF.Abs(deltaPos.x) >= damageSpeed * Global.spf) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.OverdriveOMelee, player, 2, Global.halfFlinch, 1);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		Skip,
+		Run,
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"overdriveo_skip" or "overdriveo_skip2" => MeleeIds.Skip,
+			"overdriveo_run" => MeleeIds.Skip,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Skip => new GenericMeleeProj(
+				weapon, pos, ProjIds.OverdriveOMelee, player,
+				3, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			MeleeIds.Run => new GenericMeleeProj(
+				weapon, pos, ProjIds.OverdriveOMelee, player,
+				2, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public override void updateProjFromHitbox(Projectile proj) {
@@ -149,6 +172,8 @@ public class OverdriveOSonicSlicerProj : Projectile {
 		projId = (int)ProjIds.OverdriveOSonicSlicer;
 		maxTime = 0.5f;
 		destroyOnHit = false;
+		fadeSprite = "buster4_fade";
+		fadeOnAutoDestroy = true;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -168,7 +193,7 @@ public class OverdriveOSonicSlicerProj : Projectile {
 
 public class OverdriveOShootState : MaverickState {
 	bool shotOnce;
-	public OverdriveOShootState() : base("attack", "") {
+	public OverdriveOShootState() : base("attack") {
 	}
 
 	public override void update() {
@@ -181,18 +206,24 @@ public class OverdriveOShootState : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("overdriveoShoot", sendRpc: true);
-			new OverdriveOSonicSlicerProj(maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true);
+			new OverdriveOSonicSlicerProj(
+				maverick.weapon, shootPos.Value, maverick.xDir, player, player.getNextActorNetId(), rpc: true
+			);
+			//proj.vel.x += maverick.getRunSpeed() * 3 * proj.xDir;
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeToIdleOrFall();
+			maverick.changeToIdleRunOrFall();
 		}
 	}
 }
 
 public class OverdriveOSonicSlicerUpProj : Projectile {
+	public float displacent;
+	public float offset;
 	public Point dest;
 	public bool fall;
+
 	public OverdriveOSonicSlicerUpProj(Weapon weapon, Point pos, int num, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, 1, 0, 3, player, "overdriveo_slicer_vertical", Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = "sonicslicer_charged_fade";
@@ -200,13 +231,12 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 		projId = (int)ProjIds.OverdriveOSonicSlicerUp;
 		destroyOnHit = false;
 
-		if (num == 0) dest = pos.addxy(-90, -100);
-		if (num == 1) dest = pos.addxy(-45, -100);
-		if (num == 2) dest = pos.addxy(-0, -100);
-		if (num == 3) dest = pos.addxy(45, -100);
-		if (num == 4) dest = pos.addxy(90, -100);
+		if (num == 0) dest = new Point(-90, -100);
+		if (num == 1) dest = new Point(-45, -100);
+		if (num == 2) dest = new Point(-0, -100);
+		if (num == 3) dest = new Point(45, -100);
+		if (num == 4) dest = new Point(90, -100);
 
-		vel.x = 0;
 		vel.y = -500;
 		useGravity = true;
 
@@ -220,8 +250,10 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 
 		vel.y += Global.speedMul * getGravity();
 		if (!fall) {
-			float x = Helpers.lerp(pos.x, dest.x, Global.spf * 10);
-			changePos(new Point(x, pos.y));
+			displacent = Helpers.lerp(displacent, dest.x, Global.spf * 10);
+			incPos(new Point(displacent - offset, 0));
+			offset = displacent;
+
 			if (vel.y > 0) {
 				fall = true;
 				yDir = -1;
@@ -232,7 +264,7 @@ public class OverdriveOSonicSlicerUpProj : Projectile {
 
 public class OverdriveOShoot2State : MaverickState {
 	bool shotOnce;
-	public OverdriveOShoot2State() : base("attack2", "") {
+	public OverdriveOShoot2State() : base("attack2") {
 	}
 
 	public override void update() {
@@ -242,15 +274,16 @@ public class OverdriveOShoot2State : MaverickState {
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("overdriveoShoot2", sendRpc: true);
-			new OverdriveOSonicSlicerUpProj(maverick.weapon, shootPos.Value, 0, player, player.getNextActorNetId(), rpc: true);
-			new OverdriveOSonicSlicerUpProj(maverick.weapon, shootPos.Value, 1, player, player.getNextActorNetId(), rpc: true);
-			new OverdriveOSonicSlicerUpProj(maverick.weapon, shootPos.Value, 2, player, player.getNextActorNetId(), rpc: true);
-			new OverdriveOSonicSlicerUpProj(maverick.weapon, shootPos.Value, 3, player, player.getNextActorNetId(), rpc: true);
-			new OverdriveOSonicSlicerUpProj(maverick.weapon, shootPos.Value, 4, player, player.getNextActorNetId(), rpc: true);
+			for (int i = 0; i < 5; i++) {
+				new OverdriveOSonicSlicerUpProj(
+					maverick.weapon, shootPos.Value, i, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeToIdleOrFall();
+			maverick.changeToIdleRunOrFall();
 		}
 	}
 }
@@ -282,8 +315,10 @@ public class OverdriveOJumpKickState : MaverickState {
 
 public class OverdriveOSkidState : MaverickState {
 	float dustTime;
-	public OverdriveOSkidState() : base("skid", "") {
+	public OverdriveOSkidState() : base("skid") {
 		enterSound = "overdriveoSkid";
+		attackCtrl = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -329,6 +364,7 @@ public class OverdriveOSkidState : MaverickState {
 public class OverdriveOCrystalizedState : MaverickState {
 	public OverdriveOCrystalizedState() : base("hurt_weakness") {
 		enterSound = "crystalize";
+		aiAttackCtrl = true;
 	}
 
 	public override bool canEnter(Maverick maverick) {

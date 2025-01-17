@@ -155,6 +155,11 @@ public class WolfSigmaHead : Actor, IDamagable {
 			};
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
 
@@ -173,8 +178,6 @@ public class WolfSigmaHead : Actor, IDamagable {
 
 			return;
 		}
-
-		updateProjectileCooldown();
 
 		fadeinShader.update();
 		if (!ownedByLocalPlayer) return;
@@ -270,6 +273,10 @@ public class WolfSigmaHead : Actor, IDamagable {
 		if (explodeTime == 0) {
 			explodeTime = Global.spf;
 		}
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
 	}
 }
 
@@ -396,10 +403,13 @@ public class WolfSigmaHand : Actor, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
-
 		fadeinShader.update();
 
 		if (beamMuzzle1 != null && beamMuzzle1.destroyed) beamMuzzle1 = null;
@@ -618,6 +628,10 @@ public class WolfSigmaHand : Actor, IDamagable {
 			DrawWrappers.DrawRect(topLeft.x + 1, topLeft.y + 1, topLeft.x + 1 + width, botRight.y - 1, true, Color.Yellow, 0, ZIndex.HUD - 1);
 		}
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class WolfSigmaBeamWeapon : Weapon {
@@ -651,7 +665,7 @@ public class WolfSigmaBeam : Projectile {
 			startSound = "wspongeThunder";
 			fadeOnAutoDestroy = true;
 			damager.damage = 8;
-			damager.hitCooldown = 0.15f;
+			damager.hitCooldown = 9;
 		}
 
 		if (type == 0) maxTime = 0.5f;
@@ -784,7 +798,7 @@ public class WolfSigmaRevive : CharState {
 		} else if (state == 1) {
 			character.visible = true;
 			if (character.grounded || groundStart) {
-				character.sigmaHeadGroundCamCenterPos = character.getCamCenterPos();
+				sigma.sigmaHeadGroundCamCenterPos = character.getCamCenterPos();
 				state = 2;
 				stateTime = 0;
 			} else {
@@ -841,11 +855,10 @@ public class WolfSigmaRevive : CharState {
 			}
 		} else if (state == 5) {
 			if (player.health >= player.maxHealth) {
-				player.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
-				player.weapons.Add(new WolfSigmaHeadWeapon());
-				player.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
-
-				player.weaponSlot = 1;
+				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
+				character.weapons.Add(new WolfSigmaHeadWeapon());
+				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
+				character.weaponSlot = 1;
 
 				character.changeState(new WolfSigmaHeadState(), true);
 				character.addMusicSource("wolfSigmaIntro", character.pos.addxy(0, -75), false, loop: false);

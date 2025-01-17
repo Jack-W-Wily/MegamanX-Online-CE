@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -35,6 +35,10 @@ public class NeutralEnemy : Actor, IDamagable {
 		this.alliance = alliance;
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
 	// For state update.
 	public override void statePreUpdate() {
 		state.stateTime += Global.speedMul;
@@ -121,6 +125,10 @@ public class NeutralEnemy : Actor, IDamagable {
 
 	public bool isInvincible(Player attacker, int? projId) {
 		return invincibleFlag;
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
 	}
 
 	// Sends net data to update.

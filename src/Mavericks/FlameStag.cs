@@ -147,19 +147,42 @@ public class FlameStag : Maverick {
 		}
 	}
 
-	public override Projectile? getProjFromHitbox(Collider hitbox, Point centerPoint) {
-		if (sprite.name.Contains("dash_grab")) {
-			return new GenericMeleeProj(weapon, centerPoint, ProjIds.FStagUppercut, player, damage: 0, flinch: 0, hitCooldown: 0, owningActor: this);
-		}
-		return null;
+	// Melee IDs for attacks.
+	public enum MeleeIds {
+		None = -1,
+		DashGrab,
 	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"fstag_dash_grab" => MeleeIds.DashGrab,
+			_ => MeleeIds.None
+		});
+	}
+
+	// This can be called from a RPC, so make sure there is no character conditionals here.
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.DashGrab => new GenericMeleeProj(
+				weapon, pos, ProjIds.FStagUppercut, player,
+				0, 0, 0, addToLevel: addToLevel
+			),
+			_ => null
+		};
+	}
+
 }
 
 public class FStagFireballProj : Projectile {
 	Wall? hitWall;
 	public bool launched;
-	public FStagFireballProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "fstag_fireball_proj", 0, 0.01f, netProjId, player.ownedByLocalPlayer) {
+	public FStagFireballProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "fstag_fireball_proj",
+		0, 0.01f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.FStagFireball;
 		maxTime = 0.75f;
 
@@ -170,9 +193,8 @@ public class FStagFireballProj : Projectile {
 
 	public override void update() {
 		base.update();
-		if (!ownedByLocalPlayer) return;
 		if (isUnderwater()) {
-			destroySelf();
+			destroySelf(disableRpc: true);
 		}
 	}
 
@@ -204,7 +226,7 @@ public class FStagShoot : MaverickState {
 	bool shotOnce;
 	FStagFireballProj fireball;
 	bool isSecond;
-	public FStagShoot(bool isSecond) : base(isSecond ? "punch2" : "punch", "") {
+	public FStagShoot(bool isSecond) : base(isSecond ? "punch2" : "punch") {
 		this.isSecond = isSecond;
 	}
 
@@ -218,6 +240,7 @@ public class FStagShoot : MaverickState {
 		}
 
 		if (fireball != null) {
+			fireball.forceNetUpdateNextFrame = true;
 			if (shootPos != null) {
 				fireball.changePos(shootPos.Value);
 			}
@@ -312,7 +335,7 @@ public class FStagDashChargeProj : Projectile {
 
 public class FStagDashChargeState : MaverickState {
 	FStagDashChargeProj proj;
-	public FStagDashChargeState() : base("angry", "") {
+	public FStagDashChargeState() : base("angry") {
 	}
 
 	public override void update() {
@@ -359,6 +382,7 @@ public class FStagDashProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 
@@ -366,7 +390,7 @@ public class FStagDashState : MaverickState {
 	float trailTime;
 	FStagDashProj proj;
 	float chargeTime;
-	public FStagDashState(float chargeTime) : base("dash", "") {
+	public FStagDashState(float chargeTime) : base("dash") {
 		this.chargeTime = chargeTime;
 		enterSound = "fstagDash";
 	}
@@ -411,8 +435,9 @@ public class FStagGrabState : MaverickState {
 	float xVel = 400;
 	public Character victim;
 	float endLagTime;
-	public FStagGrabState(bool fromDash) : base("dash_grab", "") {
+	public FStagGrabState(bool fromDash) : base("dash_grab") {
 		if (!fromDash) xVel = 0;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -458,7 +483,7 @@ public class FStagUppercutState : MaverickState {
 	float topDelay;
 	int upHitCount;
 	int downHitCount;
-	public FStagUppercutState(Character victim) : base("updash", "") {
+	public FStagUppercutState(Character victim) : base("updash") {
 		this.victim = victim;
 		enterSound = "fstagUppercut";
 	}

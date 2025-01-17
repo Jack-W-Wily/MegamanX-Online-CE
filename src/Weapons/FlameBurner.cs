@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
 public class FlameBurner : AxlWeapon {
 	public FlameBurner(int altFire) : base(altFire) {
 		shootSounds = new string[] { "flameBurner", "flameBurner", "flameBurner", "circleBlaze" };
-		rateOfFire = 0.075f;
-		altFireCooldown = 1.5f;
+		fireRate = 5;
+		altFireCooldown = 90;
 		index = (int)WeaponIds.FlameBurner;
 		weaponBarBaseIndex = 38;
 		weaponSlotIndex = 58;
@@ -16,7 +17,7 @@ public class FlameBurner : AxlWeapon {
 
 		if (altFire == 1) {
 			shootSounds[3] = "flameBurner2";
-			altFireCooldown = 1;
+			altFireCooldown = 60;
 		}
 	}
 
@@ -63,23 +64,24 @@ public class FlameBurnerProj : Projectile {
 		}
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-
+		byteAngle = Helpers.randomRange(0, 360);
 		collider.wallOnly = true;
-		angle = Helpers.randomRange(0, 360);
+		isOwnerLinked = true;
+		if (player?.character != null) {
+			owningActor = player.character;
+		}
 		if (isUnderwater()) {
 			destroySelf();
 			return;
 		}
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
-
-		isOwnerLinked = true;
-		if (player?.character != null) {
-			owningActor = player.character;
-		}
+		updateAngle();
 	}
-
+	public void updateAngle() {
+		byteAngle = vel.byteAngle;
+	}
 	public override void update() {
 		base.update();
 		float progress = (time / maxTime);
@@ -114,7 +116,7 @@ public class FlameBurnerAltProj : Projectile {
 	public float maxSpeed = 400;
 	public FlameBurnerAltProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
 		base(weapon, pos, xDir, 100, 0, player, "airblast_proj", 0, 0.15f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.FlameBurner2;
+		projId = (int)ProjIds.AirBlastProj;
 		maxTime = 0.15f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime *= 2;
@@ -125,14 +127,13 @@ public class FlameBurnerAltProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-		updateAngle();
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
+		updateAngle();
 	}
-
 	public void updateAngle() {
-		angle = vel.angle;
+		byteAngle = vel.byteAngle;
 	}
 
 	public override void onStart() {
@@ -172,22 +173,34 @@ public class FlameBurnerAltProj : Projectile {
 	}
 
 	public override void onHitDamagable(IDamagable damagable) {
-		var character = damagable as Character;
-		if (character == null) return;
-		if (character.charState.invincible) return;
-		if (character.charState.immuneToWind) return;
-		if (!character.ownedByLocalPlayer) return;
-		if (character.isCCImmune()) return;
+		if (!damagable.isPlayableDamagable()) { return; }
+		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
+			return;
+		}
+		if (damagable is Character char1 && char1.isPushImmune()) {
+			return;
+		}
 
 		//character.damageHistory.Add(new DamageEvent(damager.owner, weapon.killFeedIndex, true, Global.frameCount));
-		if (character.isClimbingLadder()) {
-			character.setFall();
+		float modifier = 1.33f;
+		Point pushVel = getPushVel();
+		if (actor.useGravity) {
+			if (MathF.Sign(actor.vel.y) != MathF.Sign(pushVel.y)) {
+				actor.vel.y = 0;
+			}
+			actor.vel.y += pushVel.y * modifier;
+			if (damagable is Character character) {
+				if (character.charState.normalCtrl && character.charState is not Fall or Jump) {
+					character.changeState(new Fall());
+				}
+				else if (character.charState.canStopJump) {
+					character.charState.canStopJump = false;
+				}
+			}
 		} else {
-			float modifier = 1.33f;
-			Point pushVel = getPushVel();
-			character.vel.y = pushVel.y * modifier;
-			character.xPushVel = pushVel.x * modifier;
+			actor.yPushVel = pushVel.y * modifier;
 		}
+		actor.xPushVel = pushVel.x * modifier;
 	}
 
 	public Point getPushVel() {
@@ -206,14 +219,17 @@ public class CircleBlazeProj : Projectile {
 		maxTime = 0.5f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
-		angle = vel.angle;
 		if (isUnderwater()) {
 			destroySelf();
 			return;
 		}
 		if (sendRpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
+		updateAngle();
+	}
+	public void updateAngle() {
+		byteAngle = vel.byteAngle;
 	}
 
 	public override void update() {

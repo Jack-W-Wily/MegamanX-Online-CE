@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace MMXOnline;
-
+ 
 public class WireSponge : Maverick {
-	public static Weapon getWeapon() { return new Weapon(WeaponIds.WSpongeGeneric, 141); }
+	public static Weapon netWeapon = new Weapon(WeaponIds.WSpongeGeneric, 141);
+	public static Weapon getWeapon() => netWeapon;
+
 	public static Weapon getChainWeapon(Player player) { return new Weapon(WeaponIds.WSpongeStrikeChain, 141, new Damager(player, 4, Global.defFlinch, 0.5f)); }
 	public Weapon chainWeapon;
 
@@ -132,12 +134,13 @@ public class WSpongeChainSpinProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 }
 
 public class WSpongeChainSpinState : MaverickState {
 	WSpongeChainSpinProj proj;
-	public WSpongeChainSpinState() : base("vine_spin", "") {
+	public WSpongeChainSpinState() : base("vine_spin") {
 	}
 
 	public override void update() {
@@ -418,7 +421,7 @@ public class WSpongeSideChainState : MaverickState {
 	bool jumpedOnce;
 	float spinTime;
 
-	public WSpongeSideChainState(float spinTime) : base("vine_throw", "") {
+	public WSpongeSideChainState(float spinTime) : base("vine_throw") {
 		this.spinTime = spinTime;
 	}
 
@@ -496,7 +499,7 @@ public class WSpongeClingState : MaverickState {
 	new int jumpFramesHeld;
 	new int maxJumpFrames = 1;
 	bool jumpedOnce;
-	public WSpongeClingState() : base("cling", "") {
+	public WSpongeClingState() : base("cling") {
 	}
 
 	public override void update() {
@@ -650,7 +653,7 @@ public class WSpongeUpChainProj : Projectile {
 
 public class WSpongeUpChainStartState : MaverickState {
 	WSpongeUpChainProj proj;
-	public WSpongeUpChainStartState() : base("vine_up_start", "") {
+	public WSpongeUpChainStartState() : base("vine_up_start") {
 	}
 
 	public override void update() {
@@ -696,7 +699,7 @@ public class WSpongeUpChainLatchState : MaverickState {
 	WSpongeUpChainProj proj;
 	float dist;
 	float distToTravel;
-	public WSpongeUpChainLatchState(WSpongeUpChainProj proj) : base("vine_up_loop", "") {
+	public WSpongeUpChainLatchState(WSpongeUpChainProj proj) : base("vine_up_loop") {
 		this.proj = proj;
 	}
 
@@ -737,7 +740,7 @@ public class WSpongeUpChainLatchState : MaverickState {
 
 public class WSpongeUpChainHangState : MaverickState {
 	WSpongeUpChainProj proj;
-	public WSpongeUpChainHangState(WSpongeUpChainProj proj) : base("vine_up_loop", "") {
+	public WSpongeUpChainHangState(WSpongeUpChainProj proj) : base("vine_up_loop") {
 		this.proj = proj;
 	}
 
@@ -798,8 +801,11 @@ public class WSpongeUpChainHangState : MaverickState {
 
 public class WSpongeSeedProj : Projectile {
 	bool once;
-	public WSpongeSeedProj(Weapon weapon, Point pos, int xDir, Point vel, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "wsponge_seed", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+	public WSpongeSeedProj(
+		Weapon weapon, Point pos, int xDir, Point vel, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 3, player, "wsponge_seed", 0, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.WSpongeSeed;
 		maxTime = 2f;
 		destroyOnHit = true;
@@ -849,16 +855,30 @@ public class WSpongeSeedProj : Projectile {
 
 public class WSpongeSpike : Projectile, IDamagable {
 	public float health = 2;
-	public WSpongeSpike(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, getSpriteFromType(type), Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
+	public int type;
+	public WSpongeSpike(
+		Weapon weapon, Point pos, int xDir, int type,
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, getSpriteFromType(type),
+		Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer
+	) {
 		projId = (int)ProjIds.WSpongeSpike;
 		destroyOnHit = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
-
+		this.type = type;
 		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
+			rpcCreate(pos, player, netProjId, xDir, (byte)type);
 		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSpike(
+			WireSponge.netWeapon,
+			args.pos, args.xDir, args.extraData[0],
+			args.player, args.netId
+		);
 	}
 
 	private static string getSpriteFromType(int type) {
@@ -867,9 +887,13 @@ public class WSpongeSpike : Projectile, IDamagable {
 		return "wsponge_spike_ceiling";
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 		moveWithMovingPlatform();
 	}
 
@@ -899,6 +923,7 @@ public class WSpongeSpike : Projectile, IDamagable {
 		base.onDestroy();
 		owner.seeds.Remove(this);
 	}
+	public bool isPlayableDamagable() { return false; }
 }
 
 public class WSpongeSeedThrowState : MaverickState {
@@ -906,7 +931,7 @@ public class WSpongeSeedThrowState : MaverickState {
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
-	public WSpongeSeedThrowState(string shootControl) : base("seedthrow", "") {
+	public WSpongeSeedThrowState(string shootControl) : base("seedthrow") {
 		this.shootControl = shootControl;
 		consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.25f);
 	}
@@ -978,9 +1003,10 @@ public class WSpongeHangSeedThrowState : MaverickState {
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
-	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow", "") {
+	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow") {
 		this.proj = proj;
 		this.shootControl = shootControl;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1044,8 +1070,9 @@ public class WSpongeChargeState : MaverickState {
 	public const float maxChargeTime = 4;
 	SoundWrapper chargeSound;
 
-	public WSpongeChargeState() : base("angry_start", "") {
+	public WSpongeChargeState() : base("angry_start") {
 		superArmor = true;
+		aiAttackCtrl = true;
 	}
 
 	public override void update() {
@@ -1095,7 +1122,7 @@ public class WSpongeChargeState : MaverickState {
 public class WSpongeLightningState : MaverickState {
 	int state;
 	Point poi;
-	public WSpongeLightningState() : base("angry_thunder_start", "") {
+	public WSpongeLightningState() : base("angry_thunder_start") {
 		superArmor = true;
 	}
 

@@ -43,10 +43,13 @@ public class RideChaser : Actor, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void postUpdate() {
 		base.postUpdate();
-
-		updateProjectileCooldown();
 		fadeXMomentum();
 
 		Helpers.decrementTime(ref slowdownTime);
@@ -529,7 +532,7 @@ public class RideChaser : Actor, IDamagable {
 			//slowdownTime = 0.25f;
 		}
 
-		if (owner != null && weaponIndex != null && damage > 0) {
+		if ((damage > 0 || Damager.alwaysAssist(projId)) && owner != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));
 		}
 
@@ -581,9 +584,9 @@ public class RideChaser : Actor, IDamagable {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		if (player != null && canRunEnemyOver()) {
-			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 4, Global.defFlinch, 1);
+			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 4, Global.defFlinch);
 		} else if (player != null && canHurtEnemy()) {
-			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 2, 0, 1);
+			return new GenericMeleeProj(hitWeapon, centerPoint, ProjIds.RideChaserHit, player, 2, 0);
 		}
 		return null;
 	}
@@ -600,6 +603,10 @@ public class RideChaser : Actor, IDamagable {
 		} else {
 			proj.damager.damage = 0;
 		}
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
 	}
 
 	public void creditKill(Player killer, Player assister, int? weaponIndex) {
@@ -627,6 +634,17 @@ public class RideChaser : Actor, IDamagable {
 		if (ownedByLocalPlayer) {
 			RPC.creditPlayerKillVehicle.sendRpc(killer, assister, this, weaponIndex);
 		}
+	}
+
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > timeStopThreshold) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [Player.darkHoldShader];
+			}
+		}
+		return null;
 	}
 
 	public override List<byte> getCustomActorNetData() {

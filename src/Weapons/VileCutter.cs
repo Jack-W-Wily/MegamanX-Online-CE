@@ -18,7 +18,7 @@ public class VileCutter : Weapon {
 	public VileCutter(VileCutterType vileCutterType) : base() {
 		index = (int)WeaponIds.VileCutter;
 		type = (int)vileCutterType;
-		rateOfFire = 1;
+		fireRate = 60;
 
 		if (vileCutterType == VileCutterType.None) {
 			displayName = "None(MISSILE)";
@@ -33,6 +33,10 @@ public class VileCutter : Weapon {
 			description = new string[] { "This cutter travels in an arc like a", "boomerang. Use it to pick up items!" };
 			killFeedIndex = 114;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.5";
+			effect = "Can carry items.";
 		} else if (vileCutterType == VileCutterType.ParasiteSword) {
 			displayName = "Parasite Sword";
 			projId = ProjIds.ParasiteSword;
@@ -41,6 +45,10 @@ public class VileCutter : Weapon {
 			description = new string[] { "Fires cutters that grow as they fly", "and can pierce enemies." };
 			killFeedIndex = 115;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "2";
+			hitcooldown = "0.5";
+			effect = "Won't Destroy on hit.";
 		} else if (vileCutterType == VileCutterType.MaroonedTomahawk) {
 			displayName = "Marooned Tomahawk";
 			projId = ProjIds.MaroonedTomahawk;
@@ -49,6 +57,10 @@ public class VileCutter : Weapon {
 			description = new string[] { "This long-lasting weapon spins", "in place and goes through objects." };
 			killFeedIndex = 116;
 			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "1";
+			hitcooldown = "0.33";
+			effect = "Won't Destroy on hit.";
 		}
 	}
 
@@ -57,7 +69,7 @@ public class VileCutter : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootTime == 0) {
+		if (shootCooldown == 0) {
 			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 				vile.setVileShootTime(this);
 				if (!vile.grounded) {
@@ -73,7 +85,7 @@ public class VileCutter : Weapon {
 public class CutterAttackState : CharState {
 	VileCutterProj proj;
 
-	public CutterAttackState(bool grounded) : base(getSprite(grounded), "", "", "") {
+	public CutterAttackState(bool grounded) : base(getSprite(grounded)) {
 		exitOnAirborne = true;
 		normalCtrl = true;
 	}
@@ -147,7 +159,7 @@ public class VileCutterProj : Projectile {
 			maxAngleDist = 45;
 			returnTime = 0;
 			damager.damage = 1;
-			damager.hitCooldown = 0.33f;
+			damager.hitCooldown = 20;
 		}
 
 		this.vel.y = 50;
@@ -157,6 +169,7 @@ public class VileCutterProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
+		canBeLocal = false;
 	}
 
 	public override void onCollision(CollideData other) {

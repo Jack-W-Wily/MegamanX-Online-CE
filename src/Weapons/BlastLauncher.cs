@@ -13,12 +13,12 @@ public class BlastLauncher : AxlWeapon {
 		weaponSlotIndex = 29;
 		killFeedIndex = 29;
 		switchCooldown = 0.1f;
-		rateOfFire = 0.75f;
+		fireRate = 45;
 
 		sprite = "axl_arm_blastlauncher";
 		flashSprite = "axl_pistol_flash_charged";
 		chargedFlashSprite = "axl_pistol_flash_charged";
-		altFireCooldown = 1.5f;
+		altFireCooldown = 90;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
@@ -61,6 +61,7 @@ public class GrenadeProj : Projectile, IDamagable {
 	public IDamagable target;
 	int type = 0;
 	bool planted;
+	int framesNotMoved;
 	// We use player here due to airblast reflect potential.
 	// The explosion should still be the original owner's.
 	Player? player;
@@ -78,6 +79,7 @@ public class GrenadeProj : Projectile, IDamagable {
 		}
 
 		if (type == 1) {
+			projId = (int)ProjIds.BlastLauncherMineGrenadeProj;
 			fadeSound = "explosion";
 			fadeSprite = "explosion";
 		}
@@ -85,7 +87,7 @@ public class GrenadeProj : Projectile, IDamagable {
 		vel.x = speed * bulletDir.x;
 		vel.y = speed * bulletDir.y;
 
-		projId = (int)ProjIds.BlastLauncher;
+		projId = (int)ProjIds.BlastLauncherGrenadeProj;
 		useGravity = true;
 		collider.wallOnly = true;
 		destroyOnHit = false;
@@ -95,10 +97,13 @@ public class GrenadeProj : Projectile, IDamagable {
 		updateAngle();
 	}
 
-	int framesNotMoved;
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		updateAngle();
 		if (MathF.Abs(vel.y) < 0.5f && grounded) {
@@ -199,6 +204,10 @@ public class GrenadeProj : Projectile, IDamagable {
 		);
 		destroySelfNoEffect();
 	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }
 
 public class GrenadeExplosionProj : Projectile {
@@ -218,7 +227,7 @@ public class GrenadeExplosionProj : Projectile {
 		this.directHitXDir = directHitXDir;
 		this.type = type;
 		destroyOnHit = false;
-		projId = (int)ProjIds.BlastLauncherSplash;
+		projId = (int)ProjIds.BlastLauncherGrenadeSplash;
 		playSound("grenadeExplode");
 		shouldShieldBlock = false;
 		rands = new List<int>();

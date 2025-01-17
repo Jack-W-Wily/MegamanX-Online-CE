@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -11,6 +11,7 @@ public class BusterZero : Character {
 	public bool stockedSaber;
 	public List<DZBusterProj> zeroLemonsOnField = new();
 	public ZBusterSaber meleeWeapon = new();
+	public int lastShootPressed;
 
 	public BusterZero(
 		Player player, float x, float y, int xDir,
@@ -26,11 +27,11 @@ public class BusterZero : Character {
 		if (stockedBusterLv > 0 || stockedSaber) {
 			var renderGfx = stockedBusterLv switch {
 				_ when stockedSaber || stockedBusterLv == 2 => RenderEffectType.ChargeGreen,
-				1 => RenderEffectType.ChargePink,
-				2 => RenderEffectType.ChargeOrange,
+				1 or 3 => RenderEffectType.ChargePink,
+				2 or 4 => RenderEffectType.ChargeOrange,
 				_ => RenderEffectType.ChargeBlue
 			};
-			addRenderEffect(renderGfx, 0.033333f, 0.1f);
+			addRenderEffect(renderGfx, 2, 6);
 		}
 		if (!ownedByLocalPlayer) {
 			return;
@@ -48,10 +49,10 @@ public class BusterZero : Character {
 		// Cooldowns.
 		Helpers.decrementFrames(ref zSaberCooldown);
 		Helpers.decrementFrames(ref lemonCooldown);
-
+		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.spf;
+			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				changeSpriteFromName(charState.defaultSprite, false);
@@ -63,6 +64,7 @@ public class BusterZero : Character {
 		// Charge and release charge logic.
 		chargeLogic(shoot);
 	}
+
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();
@@ -78,7 +80,7 @@ public class BusterZero : Character {
 				3 => RenderEffectType.ChargePink,
 				_ => RenderEffectType.ChargeGreen,
 			};
-			addRenderEffect(renderGfx, 0.033333f, 0.1f);
+			addRenderEffect(renderGfx, 2, 6);
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
@@ -115,7 +117,11 @@ public class BusterZero : Character {
 					changeState(new BusterZeroHadangeki(), true);
 					return true;
 				}
-				changeState(new BusterZeroMelee(), true);
+				if (charState is WallSlide wallSlide) {
+					changeState(new BusterZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
+				} else {
+					changeState(new BusterZeroMelee(), true);
+				}
 				return true;
 			}
 		}
@@ -125,25 +131,21 @@ public class BusterZero : Character {
 			}
 			int framesSinceLastShootPressed = Global.frameCount - lastShootPressed;
 			if (shootPressed || framesSinceLastShootPressed < 6) {
-				if (stockedBusterLv == 1) {
+				if (stockedBusterLv >= 1) {
 					if (charState is WallSlide) {
-						shoot(1);
+						int chargeLevel = stockedBusterLv;
+						if (stockedBusterLv >= 3) {
+							stockedBusterLv -= 2;
+							chargeLevel = stockedBusterLv;
+						} else {
+							stockedBusterLv = 0;
+						}
+						shoot(chargeLevel);
 						lemonCooldown = 22;
-						stockedBusterLv = 0;
-						return true;
-					}
-					changeState(new BusterZeroDoubleBuster(true, true), true);
-					return true;
-				}
-				if (stockedBusterLv == 2) {
-					if (charState is WallSlide) {
-						shoot(2);
-						lemonCooldown = 22;
-						stockedBusterLv = 0;
 						lastShootPressed = 0;
 						return true;
 					}
-					changeState(new BusterZeroDoubleBuster(true, false), true);
+					changeState(new BusterZeroDoubleBuster(true, stockedBusterLv), true);
 					return true;
 				}
 				if (stockedSaber) {
@@ -167,7 +169,7 @@ public class BusterZero : Character {
 	public void shoot(int chargeLevel) {
 		if (chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
-				if (zeroLemonsOnField[i].destroyed) {
+				if (zeroLemonsOnField[i].destroyed || zeroLemonsOnField[i].reflectCount > 0) {
 					zeroLemonsOnField.RemoveAt(i);
 				}
 			}
@@ -190,7 +192,7 @@ public class BusterZero : Character {
 				this.xDir = 1;
 			}
 		}
-		shootAnimTime = 0.3f;
+		shootAnimTime = DefaultShootAnimTime;
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
 
@@ -221,7 +223,7 @@ public class BusterZero : Character {
 				return;
 			} else {
 				shootAnimTime = 0;
-				changeState(new BusterZeroDoubleBuster(false, true), true);
+				changeState(new BusterZeroDoubleBuster(false, 3), true);
 			}
 		}
 		else if (chargeLevel >= 4) {
@@ -233,7 +235,7 @@ public class BusterZero : Character {
 				return;
 			} else {
 				shootAnimTime = 0;
-				changeState(new BusterZeroDoubleBuster(false, false), true);
+				changeState(new BusterZeroDoubleBuster(false, 4), true);
 			}
 		}
 		if (chargeLevel >= 1) {
@@ -241,10 +243,14 @@ public class BusterZero : Character {
 		}
 	}
 
+	public override int getMaxChargeLevel() {
+		return 4;
+	}
+
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zero_projswing" or "zero_projswing_air" => MeleeIds.SaberSwing,
+			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
@@ -253,7 +259,9 @@ public class BusterZero : Character {
 		Projectile? proj = id switch {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.DZMelee, player,
-				isBlackZero ? 4 : 3, Global.defFlinch, 0.5f, isReflectShield: true, addToLevel: addToLevel
+				isBlackZero ? 4 : 3, Global.defFlinch, isReflectShield: true,
+				isZSaberClang : true, isZSaberEffect : true,
+				addToLevel: addToLevel
 			),
 			_ => null
 		};
@@ -266,6 +274,9 @@ public class BusterZero : Character {
 	}
 
 	public override string getSprite(string spriteName) {
+		if (Global.sprites.ContainsKey("bzero_" + spriteName)) {
+			return "bzero_" + spriteName;
+		}
 		return "zero_" + spriteName;
 	}
 
@@ -288,10 +299,7 @@ public class BusterZero : Character {
 	}
 
 	public override float getDashSpeed() {
-		if (flag != null || !isDashing) {
-			return getRunSpeed();
-		}
-		float dashSpeed = 210;
+		float dashSpeed = 3.45f * 60f;
 		if (isBlackZero) {
 			dashSpeed *= 1.15f;
 		}
@@ -345,5 +353,67 @@ public class BusterZero : Character {
 		data = data[data[0]..];
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
+	}
+
+	public float aiAttackCooldown;
+	public override void aiAttack(Actor? target) {
+		if (charState.normalCtrl) {
+			player.press(Control.Shoot);
+		}
+		// Go hypermode 
+		if (player.currency >= 10 && !isBlackZero && !isInvulnerable()
+			&& charState is not HyperBusterZeroStart and not WarpIn) {
+			changeState(new HyperBusterZeroStart(), true);
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 10;
+		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		int ZBattack = Helpers.randomRange(0, 2);
+		if (isTargetInAir && vel.y >= 0) {
+			player.press(Control.Jump);
+		}
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0) {
+			switch (ZBattack) {
+				// Release full charge if we have it.
+				case >= 0 when canHitMaxCharge && isFacingTarget:
+					player.press(Control.Shoot);
+					break;
+				// Saber swing when target is close.
+				case 0 when isTargetClose:
+					player.press(Control.Special1);
+					break;
+				// Another action if the enemy is on Do Jump and do SaberSwing.
+				case 1 when isTargetClose:
+					if (vel.y >= 0) {
+						player.press(Control.Jump);
+					}
+					player.press(Control.Special1);
+					break;
+				// Press Shoot to lemon.
+				default:
+					player.press(Control.Shoot);
+					break;
+			}
+			aiAttackCooldown = 10;
+		}
+		base.aiAttack(target);
+	}
+
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
+				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (zSaberCooldown <= 0) {
+						turnToInput(player.input, player);
+						changeState(new BusterZeroMelee(), true);
+						zSaberCooldown = 36;
+					}
+				}
+			}
+		}
+		base.aiDodge(target);
 	}
 }

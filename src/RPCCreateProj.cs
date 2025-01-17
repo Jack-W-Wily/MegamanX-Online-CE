@@ -28,15 +28,21 @@ public partial class RPCCreateProj : RPC {
 			byteAngle = arguments[14];
 			angle = byteAngle * 1.40625f;
 		}
-		// Extra arguments.
+		// Optional arguments.
 		int extraDataIndex = 15;
+		Actor? owner = null;
+		if (dataInf[1]) {
+			owner = Global.level.getActorByNetId(BitConverter.ToUInt16(arguments[15..17], 0), true);
+			extraDataIndex = 17;
+		}
+		// Extra arguments.
 		byte[] extraData;
-		if (dataInf[1] && arguments.Length >= extraDataIndex + 1) {
+		if (dataInf[2] && arguments.Length >= extraDataIndex + 1) {
 			extraData = arguments[extraDataIndex..];
 		} else {
 			extraData = new byte[0];
 		}
-		Point bulletDir = Point.createFromAngle(angle);
+		Point bulletDir = Point.createFromByteAngle(byteAngle);
 
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
@@ -52,7 +58,8 @@ public partial class RPCCreateProj : RPC {
 				netId = netProjByte,
 				angle = angle,
 				byteAngle = byteAngle,
-				extraData = extraData
+				extraData = extraData,
+				owner = owner,
 			};
 			functs[projId](args);
 			return;
@@ -67,22 +74,22 @@ public partial class RPCCreateProj : RPC {
 				proj = new ZSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.XSaberProj:
-				proj = new XSaberProj(new XSaber(player), pos, xDir, player, netProjByte);
+				proj = new XSaberProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Buster3:
-				proj = new Buster3Proj(new Buster(), pos, xDir, extraData[0], player, netProjByte);
+				proj = new Buster3Proj(pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Proj2:
-				proj = new BusterX3Proj2(new Buster(), pos, xDir, extraData[0], player, netProjByte);
+				proj = new BusterX3Proj2(pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3Plasma:
-				proj = new BusterPlasmaProj(new Buster(), pos, xDir, player, netProjByte);
+				proj = new BusterPlasmaProj(pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.BusterX3PlasmaHit:
-				proj = new BusterPlasmaHitProj(new Buster(), pos, xDir, player, netProjByte);
+				proj = new BusterPlasmaHitProj(new XBuster(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster:
-				proj = new BusterProj(new ZeroBuster(), pos, xDir, 1, player, netProjByte);
+				proj = new BusterProj(pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.ZBuster2:
 				proj = new ZBuster2Proj(pos, xDir, 0, player, netProjByte);
@@ -95,15 +102,13 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.Sting:
 			case (int)ProjIds.StingDiag:
-				proj = new StingProj(new Sting(), pos, xDir, player, extraData[0], netProjByte);
+				proj = new StingProj(new ChameleonSting(), pos, xDir, player, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.FireWaveCharged:
 				proj = new FireWaveProjCharged(new FireWave(), pos, xDir, player, 0, netProjByte, 0);
 				break;
 			case (int)ProjIds.ElectricSpark:
-				proj = new ElectricSparkProj(
-						new ElectricSpark(), pos, xDir, player, extraData[0], netProjByte
-					);
+				proj = new ElectricSparkProj(new ElectricSpark(), pos, xDir, player, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.ElectricSparkCharged:
 				proj = new ElectricSparkProjCharged(new ElectricSpark(), pos, xDir, player, netProjByte);
@@ -161,28 +166,28 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.MechBuster2:
 				proj = new MechBusterProj2(new MechBusterWeapon(player), pos, xDir, 0, player, netProjByte);
 				break;
-			case (int)ProjIds.BlastLauncherSplash:
+			case (int)ProjIds.BlastLauncherGrenadeSplash:
 				proj = new GrenadeExplosionProj(new Weapon(), pos, xDir, player, 0, null, 0, netProjByte);
 				break;
 			case (int)ProjIds.GreenSpinnerSplash:
 				proj = new GreenSpinnerExplosionProj(new Weapon(), pos, xDir, player, 0, null, 1, netProjByte);
 				break;
-			case (int)ProjIds.NapalmGrenade:
+			case (int)ProjIds.RumblingBangGrenade:
 				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm:
+			case (int)ProjIds.RumblingBangProj:
 				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
 				break;
-			case (int)ProjIds.NapalmGrenade2:
+			case (int)ProjIds.FlameRoundGrenade:
 				proj = new MK2NapalmGrenadeProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm2:
+			case (int)ProjIds.FlameRoundProj:
 				proj = new MK2NapalmProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm2Wall:
+			case (int)ProjIds.FlameRoundWallProj:
 				proj = new MK2NapalmWallProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.Napalm2Flame:
+			case (int)ProjIds.FlameRoundFlameProj:
 				proj = new MK2NapalmFlame(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.RocketPunch:
@@ -209,19 +214,20 @@ public partial class RPCCreateProj : RPC {
 				);
 				break;
 			case (int)ProjIds.SpinWheelCharged:
-				proj = new SpinWheelProjCharged(new SpinWheel(), pos, xDir, 0, player, netProjByte);
+				proj = new SpinWheelProjCharged(new SpinWheel(), pos, xDir, player, extraData[0], netProjByte);
 				break;
 			case (int)ProjIds.SonicSlicer:
 				proj = new SonicSlicerProj(new SonicSlicer(), pos, xDir, extraData[0], player, netProjByte);
 				break;
-			case (int)ProjIds.StrikeChain:
+			/* case (int)ProjIds.StrikeChain:
 				proj = new StrikeChainProj(
 					new StrikeChain(), pos, xDir, arguments[extraDataIndex],
 					arguments[extraDataIndex + 1] - 128, player, netProjByte
-				);
+				); 
 				break;
+			*/
 			case (int)ProjIds.SpeedBurnerTrail:
-				proj = new SpeedBurnerProjGround(new SpeedBurner(null), pos, xDir, player, netProjByte);
+				proj = new SpeedBurnerProjGround(SpeedBurner.netWeapon, pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.GigaCrush:
 				proj = new GigaCrushProj(new GigaCrush(), pos, xDir, player, netProjByte);
@@ -242,7 +248,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new TriadThunderProjCharged(new TriadThunder(), pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.GravityWellCharged:
-				proj = new GravityWellProjCharged(new GravityWell(), pos, xDir, 1, player, netProjByte);
+				proj = new GravityWellProjCharged(pos, xDir, 1, player, netProjByte);
 				break;
 			case (int)ProjIds.FrostShieldAir:
 				proj = new FrostShieldProjAir(new FrostShield(), pos, xDir, 0, player, netProjByte);
@@ -256,14 +262,17 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.FrostShieldChargedPlatform:
 				proj = new FrostShieldProjPlatform(new FrostShield(), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.TunnelFang or (int)ProjIds.TunnelFang2:
-				proj = new TunnelFangProj(new TunnelFang(), pos, xDir, extraData[0], player, netProjByte);
+			case (int)ProjIds.TornadoFang or (int)ProjIds.TornadoFang2:
+				proj = new TornadoFangProj(new TornadoFang(), pos, xDir, extraData[0], player, netProjByte);
 				break;
 			case (int)ProjIds.SplashLaser:
 				proj = new SplashLaserProj(new RayGun(0), pos, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.BlackArrow:
-				proj = new BlackArrowProj(new BlackArrow(0), pos, player, bulletDir, 0, netProjByte);
+				proj = new BlackArrowProj(new BlackArrow(0), pos, player, bulletDir, netProjByte);
+				break;
+			case (int)ProjIds.BlackArrow2:
+				proj = new BlackArrowProj2(new BlackArrow(0), pos, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.WindCutter:
 				proj = new WindCutterProj(new BlackArrow(0), pos, player, bulletDir, netProjByte);
@@ -277,16 +286,16 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.BoundBlaster:
 				proj = new BoundBlasterProj(new BoundBlaster(0), pos, angle, player, netProjByte);
 				break;
-			case (int)ProjIds.BoundBlaster2:
+			case (int)ProjIds.BoundBlasterRadar:
 				proj = new BoundBlasterAltProj(new BoundBlaster(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.MovingWheel:
 				proj = new MovingWheelProj(new BoundBlaster(0), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.PlasmaGun:
+			case (int)ProjIds.PlasmaGunProj:
 				proj = new PlasmaGunProj(new PlasmaGun(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
-			case (int)ProjIds.PlasmaGun2 or (int)ProjIds.PlasmaGun2Hyper:
+			case (int)ProjIds.PlasmaGunBeamProj or (int)ProjIds.PlasmaGunBeamProjHyper:
 				proj = new PlasmaGunAltProj(new PlasmaGun(0), pos, pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.VoltTornado or (int)ProjIds.VoltTornadoHyper:
@@ -298,7 +307,7 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.FlameBurner or (int)ProjIds.FlameBurnerHyper:
 				proj = new FlameBurnerProj(new FlameBurner(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
-			case (int)ProjIds.FlameBurner2:
+			case (int)ProjIds.AirBlastProj:
 				proj = new FlameBurnerAltProj(new FlameBurner(0), pos, xDir, player, bulletDir, netProjByte);
 				break;
 			case (int)ProjIds.CircleBlaze:
@@ -316,10 +325,10 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.MechFrogStompShockwave:
 				proj = new MechFrogStompShockwave(new MechFrogStompWeapon(null), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.NapalmGrenadeSplashHit:
+			case (int)ProjIds.SplashHitGrenade:
 				proj = new SplashHitGrenadeProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 				break;
-			case (int)ProjIds.NapalmSplashHit:
+			case (int)ProjIds.SplashHitProj:
 				proj = new SplashHitProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.ShinMessenkou:
@@ -376,7 +385,7 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.ArmoredAChargeRelease:
 				proj = new ArmoredAChargeReleaseProj(
-					new ArmoredAChargeReleaseWeapon(), pos, xDir, new Point(), 6, player, netProjByte
+					new ArmoredAChargeReleaseWeapon(), pos, xDir, byteAngle, 6, player, netProjByte
 				);
 				break;
 			case (int)ProjIds.LaunchOMissle:
@@ -422,7 +431,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new FlameMBigFireProj(new FlameMOilFireWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.FlameMStompShockwave:
-				proj = new FlameMStompShockwave(new FlameMStompWeapon(player), pos, xDir, player, netProjByte);
+				proj = new FlameMStompShockwave(new FlameMStompWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.VelGFire:
 				proj = new VelGFireProj(new VelGFireWeapon(), pos, xDir, player, netProjByte);
@@ -434,7 +443,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new SigmaSlashProj(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.SigmaBall:
-				proj = new SigmaBallProj(new SigmaBallWeapon(), pos, xDir, player, netProjByte);
+				proj = new SigmaBallProj(new SigmaBallWeapon(), pos, byteAngle, player, netProjByte);
 				break;
 			case (int)ProjIds.SigmaHandElecBeam:
 				proj = new WolfSigmaBeam(new WolfSigmaBeamWeapon(), pos, xDir, 1, 0, player, netProjByte);
@@ -524,7 +533,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new WSpongeSeedProj(WireSponge.getWeapon(), pos, xDir, Point.zero, player, netProjByte);
 				break;
 			case (int)ProjIds.WSpongeSpike:
-				proj = new WSpongeSpike(WireSponge.getWeapon(), pos, xDir, 0, player, netProjByte);
+				//proj = new WSpongeSpike(WireSponge.getWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.WheelGSpinWheel:
 				proj = new WheelGSpinWheelProj(WheelGator.getWeapon(), pos, xDir, player, netProjByte);
@@ -608,10 +617,10 @@ public partial class RPCCreateProj : RPC {
 				proj = new FakeZeroRockProj(FakeZero.getWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma2Ball:
-				proj = new SigmaElectricBallProj(new SigmaElectricBallWeapon(), pos, 0, player, netProjByte);
+				proj = new SigmaElectricBallProj(new SigmaElectricBallWeapon(), pos, byteAngle, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma2Ball2:
-				proj = new SigmaElectricBall2Proj(new SigmaElectricBallWeapon(), pos, 0, player, netProjByte);
+				proj = new SigmaElectricBall2Proj(new SigmaElectricBallWeapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.Sigma2ViralProj:
 				proj = new ViralSigmaShootProj(null, pos, xDir, player, netProjByte);
@@ -648,9 +657,6 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.TSeahorseAcid1:
 				proj = new TSeahorseAcidProj(ToxicSeahorse.getWeapon(), pos, xDir, player, netProjByte);
-				break;
-			case (int)ProjIds.TSeahorseAcid2:
-				proj = new TSeahorseAcid2Proj(ToxicSeahorse.getWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.TunnelRTornadoFang:
 			case (int)ProjIds.TunnelRTornadoFang2:
@@ -711,18 +717,15 @@ public partial class RPCCreateProj : RPC {
 				proj = new RCProj(RideChaser.getGunWeapon(), pos, xDir, 0, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloCrash:
-				proj = new BBuffaloCrashProj(BlizzardBuffalo.getWeapon(), pos, xDir, player, netProjByte);
-				break;
-			case (int)ProjIds.BBuffaloIceProj:
-				proj = new BBuffaloIceProj(BlizzardBuffalo.getWeapon(), pos, xDir, Point.zero, 0, player, netProjByte);
+				proj = new BBuffaloCrashProj(BlizzardBuffalo.netWeapon, pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloIceProjGround:
-				proj = new BBuffaloIceProjGround(BlizzardBuffalo.getWeapon(), pos, 0, player, netProjByte);
+				proj = new BBuffaloIceProjGround(BlizzardBuffalo.netWeapon, pos, byteAngle, player, netProjByte);
 				break;
 			case (int)ProjIds.BBuffaloBeam:
 				ushort bbNetIdBytes = BitConverter.ToUInt16(extraData[0..2], 0);
 				BlizzardBuffalo? bb = Global.level.getActorByNetId(bbNetIdBytes) as BlizzardBuffalo;
-				proj = new BBuffaloBeamProj(BlizzardBuffalo.getWeapon(), pos, xDir, bb, player, netProjByte);
+				proj = new BBuffaloBeamProj(BlizzardBuffalo.netWeapon, pos, xDir, bb, player, netProjByte);
 				break;
 			case (int)ProjIds.BHornetBee:
 				proj = new BHornetBeeProj(

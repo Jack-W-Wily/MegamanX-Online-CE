@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MMXOnline;
 
@@ -54,9 +55,13 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (MathF.Abs(deltaPos.x) > 100 * Global.spf) {
 			damager.damage = 6;
@@ -106,6 +111,7 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 	public bool isInvincible(Player attacker, int? projId) { return false; }
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isPlayableDamagable() { return true; }
 
 	public override void onDestroy() {
 		base.onDestroy();
@@ -125,6 +131,7 @@ public class Mechaniloid : Actor, IDamagable {
 	MechaniloidWeapon weapon;
 	float speed;
 	float maxTime = 16;
+	float time;
 
 	public static string getSpriteFromType(MechaniloidType type) {
 		if (type == MechaniloidType.Tank) return "sigma2_tank";
@@ -186,10 +193,13 @@ public class Mechaniloid : Actor, IDamagable {
 		}
 	}
 
-	float time;
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-		updateProjectileCooldown();
 
 		if (!ownedByLocalPlayer) return;
 
@@ -365,7 +375,7 @@ public class Mechaniloid : Actor, IDamagable {
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name == "sigma2_hopper_attack") {
-			proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.Sigma2HopperDrill, netOwner, 1, Global.defFlinch, 0.15f);
+			proj = new GenericMeleeProj(weapon, centerPoint, ProjIds.Sigma2HopperDrill, netOwner, 1, Global.defFlinch, 9);
 			proj.netcodeOverride = NetcodeModel.FavorDefender;
 		}
 		return proj;
@@ -422,6 +432,21 @@ public class Mechaniloid : Actor, IDamagable {
 		if (killZone != null) {
 			killZone.applyDamage(this);
 		}
+	}
+
+	public bool isPlayableDamagable() {
+		return true;
+	}
+
+	public override List<ShaderWrapper>? getShaders() {
+		if (timeStopTime > timeStopThreshold) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				return [Player.darkHoldShader];
+			}
+		}
+		return null;
 	}
 }
 

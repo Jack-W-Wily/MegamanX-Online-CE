@@ -27,33 +27,48 @@ public class VileMissile : Weapon {
 			vileAmmo = 8;
 			killFeedIndex = 126;
 		} else if (vileMissileType == VileMissileType.ElectricShock) {
-			rateOfFire = 0.75f;
+			fireRate = 45;
 			displayName = "Electric Shock";
 			vileAmmo = 8;
 			description = new string[] { "Stops enemies in their tracks,", "but deals no damage." };
 			vileWeight = 3;
+			vileWeight = 2;
+			ammousage = vileAmmo;
+			damage = "0";
+			hitcooldown = "0.15";
+			effect = "Stuns Enemies. CD: 2";
 		} else if (vileMissileType == VileMissileType.HumerusCrush) {
-			rateOfFire = 0.75f;
+			fireRate = 45;
 			displayName = "Humerus Crush";
 			projSprite = "missile_hc_proj";
 			vileAmmo = 8;
 			description = new string[] { "This missile shoots straight", "and deals decent damage." };
 			killFeedIndex = 74;
 			vileWeight = 3;
+			vileWeight = 2;
+			ammousage = vileAmmo;
+			damage = "3";
+			hitcooldown = "0.15";
+			effect = "None.";
 		} else if (vileMissileType == VileMissileType.PopcornDemon) {
-			rateOfFire = 0.75f;
+			fireRate = 45;
 			displayName = "Popcorn Demon";
 			projSprite = "missile_pd_proj";
 			vileAmmo = 12;
 			description = new string[] { "This missile splits into 3", "and can cause great damage." };
 			killFeedIndex = 76;
 			vileWeight = 3;
+			vileWeight = 2;
+			ammousage = vileAmmo;
+			damage = "2";
+			hitcooldown = "0.15/0";
+			effect = "Can Split.";
 		}
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		Player player = vile.player;
-		if (shootTime > 0) return;
+		if (shootCooldown > 0) return;
 
 		if (vile.charState is Idle || vile.charState is Run || vile.charState is Crouch) {
 			if (vile.tryUseVileAmmo(vileAmmo)) {
@@ -145,17 +160,16 @@ public class VileMissileProj : Projectile {
 	}
 
 	/*
-	public override void onHitDamagable(IDamagable damagable)
-	{
+	public override void onHitDamagable(IDamagable damagable){
 		base.onHitDamagable(damagable);
+		if (damagable.isPlayableDamagable()) { return; }
 
-		if (damagable is Character character)
-		{
-			var victimCenter = character.getCenterPos();
+		if (damagable is Actor actor) {
+			var victimCenter = actor.getCenterPos();
 			var bombCenter = pos;
 			var dirTo = bombCenter.directionToNorm(victimCenter);
-			character.vel.y = dirTo.y * 150;
-			character.xPushVel = dirTo.x * 300;
+			actor.vel.y = dirTo.y * 150;
+			actor.xPushVel = dirTo.x * 300;
 		}
 	}
 	*/
@@ -163,7 +177,7 @@ public class VileMissileProj : Projectile {
 
 public class VileMK2StunShot : Weapon {
 	public VileMK2StunShot() : base() {
-		rateOfFire = 0.75f;
+		fireRate = 45;
 		index = (int)WeaponIds.MK2StunShot;
 		killFeedIndex = 67;
 	}
@@ -237,7 +251,7 @@ public class VileMK2StunShotProj : Projectile {
 }
 
 public class MissileAttack : CharState {
-	public MissileAttack() : base("idle_shoot", "", "", "") {
+	public MissileAttack() : base("idle_shoot") {
 		exitOnAirborne = true;
 		normalCtrl = true;
 	}

@@ -6,8 +6,8 @@ namespace MMXOnline;
 public class SpiralMagnum : AxlWeapon {
 	public SpiralMagnum(int altFire) : base(altFire) {
 		shootSounds = new string[] { "spiralMagnum", "spiralMagnum", "spiralMagnum", "sniperMissile" };
-		rateOfFire = 0.75f;
-		altFireCooldown = 2;
+		fireRate = 45;
+		altFireCooldown = 120;
 		index = (int)WeaponIds.SpiralMagnum;
 		weaponBarBaseIndex = 34;
 		weaponSlotIndex = 54;
@@ -19,7 +19,7 @@ public class SpiralMagnum : AxlWeapon {
 
 		if (altFire == 1) {
 			sprite = "axl_arm_spiralmagnum";
-			altFireCooldown = 1;
+			altFireCooldown = 60;
 			shootSounds[1] = "spiralMagnum";
 		}
 	}
@@ -56,7 +56,7 @@ public class SpiralMagnum : AxlWeapon {
 		} else {
 			float jumpDist = 0;
 			if (headshotTarget != null || target != null) {
-				bulletPos = player.axlGenericCursorWorldPos;
+				bulletPos = axl.axlGenericCursorWorldPos;
 				jumpDist = bulletPos.distanceTo(bulletPos);
 			}
 			bullet = new SpiralMagnumProj(weapon, bulletPos, jumpDist, 1, player, bulletDir.Value, target, headshotTarget, netId);			
@@ -412,29 +412,31 @@ public class SniperMissileProj : Projectile, IDamagable {
 		}
 	}
 
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+
 	public override void update() {
 		base.update();
-
-		updateProjectileCooldown();
-
 		speed += (Global.spf * 25);
 
 		if (blinkTime > 0) {
 			blinkTime -= Global.spf;
 			if (blinkTime < 0) {
 				blinkTime = maxBlinkTime * (1 - (time / maxTime));
-				addRenderEffect(RenderEffectType.Hit, 0.05f, 0.05f);
+				addRenderEffect(RenderEffectType.Hit, 3, 6);
 			}
 		}
 
 		if (!ownedByLocalPlayer) return;
 
-		if (owner.isMainPlayer && time > 0.25f) {
+		if (owner.isMainPlayer && time > 0.25f && axl != null) {
 			if (Options.main.axlAimMode == 2) {
-				if (pos.distanceTo(owner.axlCursorWorldPos) > 25) {
+				if (pos.distanceTo(axl.axlCursorWorldPos) > 25) {
 					//vel = Point.lerp(vel, pos.directionToNorm(owner.axlCursorWorldPos).times(speed), Global.spf * 2.5f);
 
-					float destAngle = pos.directionToNorm(owner.axlCursorWorldPos).angle;
+					float destAngle = pos.directionToNorm(axl.axlCursorWorldPos).angle;
 					if (angle != null) {
 						if (MathF.Abs(angle.Value - destAngle) > 3) {
 							angle = Helpers.moveAngle(angle.Value, destAngle, Global.spf * 200 * turnSpeed);
@@ -517,6 +519,10 @@ public class SniperMissileProj : Projectile, IDamagable {
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
 		health += healAmount;
 		if (health > maxHealth) health = maxHealth;
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
 	}
 }
 

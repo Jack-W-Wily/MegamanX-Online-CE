@@ -10,6 +10,7 @@ public partial class Actor : GameObject {
 	public Sprite sprite; //Current sprite
 	public bool useTerrainGrid { get; set; } = false;
 	public bool useActorGrid { get; set; } = true;
+	public bool iDestroyed => destroyed;
 
 	public int frameIndex {
 		get => sprite.frameIndex;
@@ -43,7 +44,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	public float localSpeedMul { get; set; } = 1;
+	public float speedMul { get; set; } = 1;
 	public bool useFrameProjs;
 	public Dictionary<string, List<Projectile>> spriteFrameToProjs = new Dictionary<string, List<Projectile>>();
 	public List<Projectile> globalProjs = new List<Projectile>();
@@ -61,6 +62,8 @@ public partial class Actor : GameObject {
 	public float landingVelY;
 	public bool immuneToKnockback;
 	public bool isPlatform;
+	public bool cachedUndewater;
+	public Point cachedUndewaterPos = new Point(float.MinValue, float.MinValue);
 
 	public float xFlinchPushVel = 0;
 
@@ -157,7 +160,10 @@ public partial class Actor : GameObject {
 	public float bigBubbleTime;
 	public float waterTime;
 
+	public const float timeStopThreshold = 15;
 	public float timeStopTime;
+	public bool highPiority;
+	public bool lowPiority;
 
 	public Actor(
 		string spriteName, Point pos, ushort? netId, bool ownedByLocalPlayer, bool dontAddToLevel
@@ -221,6 +227,11 @@ public partial class Actor : GameObject {
 	}
 
 	public bool isUnderwater() {
+		if (cachedUndewaterPos == pos) {
+			return cachedUndewater;
+		}
+		cachedUndewaterPos = pos;
+
 		float colliderHeight;
 		if (globalCollider == null) colliderHeight = 10;
 		else colliderHeight = globalCollider.shape.maxY - globalCollider.shape.minY;
@@ -235,9 +246,11 @@ public partial class Actor : GameObject {
 				pos.y - colliderHeight > waterRect.y1 && pos.y < waterRect.y2
 			) {
 				lastWaterY = waterRect.y1;
+				cachedUndewater = true;
 				return true;
 			}
 		}
+		cachedUndewater = false;
 		return false;
 		//if (Global.level.levelData.waterY == null) return false;
 		//if (Global.level.levelData.name == "forest2" && pos.x > 1415 && pos.x < 1888 && pos.y < 527) return false;
@@ -436,6 +449,18 @@ public partial class Actor : GameObject {
 		deltaPos = pos.subtract(prevPos);
 		prevPos = pos;
 
+		if (locallyControlled && sprite != null) {
+			int oldFrameIndex = sprite.frameIndex;
+			sprite?.update();
+
+			if (sprite != null && sprite.frameIndex != oldFrameIndex) {
+				string spriteFrameKey = sprite.name + "/" + sprite.frameIndex.ToString(CultureInfo.InvariantCulture);
+				if (spriteFrameToSounds.ContainsKey(spriteFrameKey)) {
+					playSound(spriteFrameToSounds[spriteFrameKey], sendRpc: true);
+				}
+			}
+		}
+
 		if (!useFrameProjs) {
 			return;
 		}
@@ -448,14 +473,12 @@ public partial class Actor : GameObject {
 
 		// Delete old stuff.
 		foreach (string key in spriteFrameToProjs.Keys) {
-			if (key != spriteKey) {
-				if (spriteFrameToProjs[key] != null) {
-					foreach (Projectile proj in spriteFrameToProjs[key]) {
-						proj.destroySelf();
-					}
+			if (spriteFrameToProjs[key] != null) {
+				foreach (Projectile proj in spriteFrameToProjs[key]) {
+					proj.destroySelf();
 				}
-				spriteFrameToProjs.Remove(key);
 			}
+			spriteFrameToProjs.Remove(key);
 		}
 		// Move if same frame.
 		if (spriteFrameToProjs.GetValueOrDefault(spriteKey) != null) {
@@ -546,7 +569,7 @@ public partial class Actor : GameObject {
 
 		var renderEffectsToRemove = new HashSet<RenderEffectType>();
 		foreach (var kvp in renderEffects) {
-			kvp.Value.time -= Global.spf;
+			kvp.Value.time -= Global.speedMul;
 			if (kvp.Value.time <= 0) {
 				renderEffectsToRemove.Add(kvp.Key);
 			}
@@ -566,17 +589,6 @@ public partial class Actor : GameObject {
 				timeStopTime = 0;
 			}
 		};
-		if (locallyControlled && sprite != null) {
-			int oldFrameIndex = sprite.frameIndex;
-			sprite?.update();
-
-			if (sprite != null && sprite.frameIndex != oldFrameIndex) {
-				string spriteFrameKey = sprite.name + "/" + sprite.frameIndex.ToString(CultureInfo.InvariantCulture);
-				if (spriteFrameToSounds.ContainsKey(spriteFrameKey)) {
-					playSound(spriteFrameToSounds[spriteFrameKey], sendRpc: true);
-				}
-			}
-		}
 
 		bool wading = isWading();
 		bool underwater = isUnderwater();
@@ -672,16 +684,6 @@ public partial class Actor : GameObject {
 		if (useGravity && !grounded) {
 			if (underwater) {
 				grav *= 0.5f;
-			}
-			if (this is MegamanX mmx) {
-				int bubbleCount = mmx.chargedBubbles.Count;
-				float modifier = 1;
-				if (underwater) {
-					modifier = 1 - (0.01f * bubbleCount);
-				} else {
-					modifier = 1 - (0.05f * bubbleCount);
-				}
-				grav *= modifier;
 			}
 			if (grav > 0 && vel.y < terminalVelDown) {
 				vel.y += grav * Global.speedMul;
@@ -903,29 +905,8 @@ public partial class Actor : GameObject {
 	}
 
 	// The code here needs to work for non-owners too. So all variables in it needs to be synced.
-	public bool shouldDraw() {
-		if (!visible) return false;
-		if (this is Character character) {
-			/*
-			if (this is Axl axl && axl.isStealthModeSynced() && character.isInvisibleEnemy()) {
-				return false;
-			}
-			*/
-			if (character.isCStingInvisibleGraphics() && this is MegamanX mmx && mmx.cStingPaletteTime % 3 == 0) {
-				return false;
-			}
-			if (character.invulnTime > 0) {
-				long mod10 = Global.level.frameCount % 4;
-				if (mod10 < 2) return false;
-			}
-		}
-		if (this is Maverick maverick) {
-			if (maverick.invulnTime > 0) {
-				long mod10 = Global.level.frameCount % 4;
-				if (mod10 < 2) return false;
-			}
-		}
-		return true;
+	public virtual bool shouldDraw() {
+		return visible;
 	}
 
 	public void getKillerAndAssister(
@@ -948,10 +929,14 @@ public partial class Actor : GameObject {
 				if (secondLastAttacker.attacker == killer) continue;
 
 				// Non-suicide case: prevent assists aggressively
-				if (killer != ownPlayer) {
-					if (secondLastAttacker.envKillOnly && weaponIndex != null) continue;
-					if (Damager.unassistable(secondLastAttacker.projId)) continue;
-					if (Global.time - secondLastAttacker.time > 2) continue;
+				if (killer != ownPlayer && (
+						secondLastAttacker.envKillOnly && weaponIndex != null ||
+						Global.time - secondLastAttacker.time > 2 ||
+						Global.time - secondLastAttacker.time > 0.5f && Damager.lowTimeAssist(secondLastAttacker.projId) ||
+						Damager.unassistable(secondLastAttacker.projId)
+					)
+				) {
+					continue;
 				}
 				// Suicide case: grant assists liberally to "punish" suicider more
 				else if (Global.time - secondLastAttacker.time > 10) {
@@ -1127,6 +1112,9 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual bool shouldRender(float x, float y) {
+		if (destroyed) {
+			return false;
+		}
 		// Don't draw things without sprites or with the "null" sprite.
 		if (sprite.name == "null" || currentFrame == null) {
 			return false;
@@ -1177,8 +1165,12 @@ public partial class Actor : GameObject {
 	}
 
 	public void commonHealLogic(Player healer, float healAmount, float currentHealth, float maxHealth, bool drawHealText) {
+		commonHealLogic(healer, (decimal)healAmount, (decimal)currentHealth, (decimal)maxHealth, drawHealText);
+	}
+
+	public void commonHealLogic(Player healer, decimal healAmount, decimal currentHealth, decimal maxHealth, bool drawHealText) {
 		if (drawHealText && ownedByLocalPlayer) {
-			float reportAmount = Helpers.clampMax(healAmount, maxHealth - currentHealth);
+			float reportAmount = (float)Helpers.clampMax(healAmount, maxHealth - currentHealth);
 			if (reportAmount == 0) {
 				bool hasSubtankCapacity = false;
 				if (this is Character chr && chr.player.hasSubtankCapacity()) hasSubtankCapacity = true;
@@ -1294,10 +1286,19 @@ public partial class Actor : GameObject {
 		frameSpeed = 1;
 	}
 
-	public void addRenderEffect(RenderEffectType type, float flashTime = 0, float time = float.MaxValue) {
+	public void addRenderEffect(
+		RenderEffectType type, float flashTime = 0,
+		float time = float.MaxValue, float cycleTime = -1
+	) {
 		if (renderEffects.ContainsKey(type)) return;
-		renderEffects[type] = new RenderEffect(type, flashTime, time);
+		renderEffects[type] = new RenderEffect(type, flashTime, time, cycleTime);
 	}
+
+	public void addRenderEffect(RenderEffectType type) {
+		if (renderEffects.ContainsKey(type)) return;
+		renderEffects[type] = new RenderEffect(type, 0, float.MaxValue);
+	}
+
 
 	public void removeRenderEffect(RenderEffectType type) {
 		renderEffects.Remove(type);
@@ -1451,7 +1452,7 @@ public partial class Actor : GameObject {
 	public SoundWrapper createSoundWrapper(SoundBufferWrapper soundBuffer) {
 		if (this is Character chara) {
 			string charName = chara switch {
-				MegamanX => "mmx",
+				MegamanX or RagingChargeX => "mmx",
 				Zero => "zero",
 				PunchyZero => "pzero",
 				BusterZero => "dzero",
@@ -1556,14 +1557,14 @@ public partial class Actor : GameObject {
 			string projName = key;
 			float cooldown = projectileCooldown[key];
 			if (cooldown > 0) {
-				projectileCooldown[projName] = Helpers.clampMin(cooldown - Global.spf, 0);
+				projectileCooldown[projName] = Helpers.clampMin(cooldown - 1, 0);
 			}
 		}
 		foreach (var key in flinchCooldown.Keys.ToList()) {
 			int projName = key;
 			float cooldown = flinchCooldown[key];
 			if (cooldown > 0) {
-				flinchCooldown[projName] = Helpers.clampMin(cooldown - Global.spf, 0);
+				flinchCooldown[projName] = Helpers.clampMin(cooldown - 1, 0);
 			}
 		}
 	}

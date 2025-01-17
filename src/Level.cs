@@ -20,8 +20,8 @@ public partial class Level {
 
 	public List<GameObject>[,] grid;
 	public List<GameObject>[,] terrainGrid;
-	public HashSet<int[]> populatedGrids = new();
-	public HashSet<int[]> populatedTerrainGrids = new();
+	public HashSet<(int x, int y)> populatedGrids = new();
+	//public HashSet<(int x, int y)> populatedTerrainGrids = new();
 	public Dictionary<int, Rect> gridsPopulatedByGo = new();
 	public Dictionary<int, Rect> terrainGridsPopulatedByGo = new();
 	public HashSet<int> collidedGObjs = new();
@@ -71,6 +71,8 @@ public partial class Level {
 	public bool camSetFirstTime;
 	public float camX;
 	public float camY;
+	float lastCameraXDelta;
+	float lastCameraXDeltaTimer;
 	public float zoomScale;
 	public long frameCount;
 	public int nonSkippedframeCount;
@@ -302,7 +304,12 @@ public partial class Level {
 		scaledW = levelData.width * scaleW;
 		scaledH = levelData.height * scaleH;
 
-		Global.radarRenderTexture = new RenderTexture((uint)(scaledW * 4), (uint)(scaledH * 4));
+		Global.radarRenderTexture = new RenderTexture(
+			(uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH)
+		);
+		Global.radarRenderTextureB = new RenderTexture(
+			(uint)Math.Ceiling(scaledW), (uint)Math.Ceiling(scaledH)
+		);
 		Global.input.lastUpdateTime = 0;
 
 		foreach (var serverPlayer in server.players) {
@@ -333,6 +340,8 @@ public partial class Level {
 			Global.srtBuffer1 = Global.srtBuffer1L;
 			Global.srtBuffer2 = Global.srtBuffer2L;
 		} else {
+			Global.viewSize = 1;
+			Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 			Global.screenRenderTexture = Global.screenRenderTextureS;
 			Global.srtBuffer1 = Global.srtBuffer1S;
 			Global.srtBuffer2 = Global.srtBuffer2S;
@@ -857,6 +866,14 @@ public partial class Level {
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
 	}
 
+	public void changeCameraScale(float scale) {
+		if (server.fixedCamera) {
+			scale *= 2;
+		}
+		Global.viewSize = scale;
+		Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
+	}
+
 	private long getZIndexFromProperty(dynamic property, long defaultZIndex) {
 		string zIndexString = property;
 		long zIndex;
@@ -937,20 +954,30 @@ public partial class Level {
 			player.armorFlag = hostPlayer.armorFlag;
 			player.loadout = hostPlayer.loadoutData;
 			player.disguise = hostPlayer.disguise;
+			player.atransLoadout = hostPlayer.atransLoadout;
 
-			if (hostPlayer.charNetId != null && hostPlayer.charNetId != 0 && player.character == null) {
+			if (hostPlayer.currentCharNum != null && hostPlayer.charNetId != null &&
+				hostPlayer.charNetId != 0 && player.character == null
+			) {
+				int targetCharNum = hostPlayer.currentCharNum.Value;
+				LoadoutData currentLoadout = player.loadout;
+				if (player.atransLoadout != null) {
+					player.loadout = player.atransLoadout;
+				}
 				player.spawnCharAtPoint(
-					player.newCharNum, player.getCharSpawnData(player.newCharNum),
+					targetCharNum, player.getCharSpawnData(targetCharNum),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
 					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
 				);
-				player.changeWeaponFromWi(hostPlayer.weaponIndex);
 				if (hostPlayer.charRollingShieldNetId != null) {
 					new RollingShieldProjCharged(
 						player.weapon, player.character.pos,
 						player.character.xDir, player, hostPlayer.charRollingShieldNetId.Value
 					);
 				}
+				player.loadout = currentLoadout;
+			} else {
+				player.atransLoadout = null;
 			}
 		}
 	}
@@ -974,7 +1001,7 @@ public partial class Level {
 		foreach (var magnetMine in magnetMines) {
 			var player = getPlayerById(magnetMine.playerId);
 			if (player == null) continue;
-			new MagnetMineProj(new MagnetMine(), new Point(magnetMine.x, magnetMine.y), 1, 1, player, magnetMine.netId);
+			new MagnetMineProj(new MagnetMine(), new Point(magnetMine.x, magnetMine.y), 1, player, magnetMine.netId);
 		}
 	}
 
@@ -1232,9 +1259,12 @@ public partial class Level {
 
 		List<GameObject> gos = gameObjects.ToList();
 		foreach (GameObject go in gos) {
+			if (go.iDestroyed) {
+				continue;
+			}
 			if (isTimeSlowed(go, out float slowAmount)) {
 				Global.speedMul = slowAmount;
-				go.localSpeedMul = slowAmount;
+				go.speedMul = slowAmount;
 			}
 			go.preUpdate();
 			go.statePreUpdate();
@@ -1246,9 +1276,12 @@ public partial class Level {
 		}
 
 		foreach (var go in gos) {
+			if (go.iDestroyed) {
+				continue;
+			}
 			if (isTimeSlowed(go, out float slowAmount)) {
 				Global.speedMul = slowAmount;
-				go.localSpeedMul = slowAmount;
+				go.speedMul = slowAmount;
 			}
 			go.update();
 			go.stateUpdate();
@@ -1271,7 +1304,7 @@ public partial class Level {
 						}
 						if (damagable.projectileCooldown["sigmavirus"] == 0) {
 							actor.playSound("hit");
-							actor.addRenderEffect(RenderEffectType.Hit, 0.05f, 0.1f);
+							actor.addRenderEffect(RenderEffectType.Hit, 3, 6);
 							damagable.applyDamage(2, null, null, null, null);
 							damagable.projectileCooldown["sigmavirus"] = 1;
 						}
@@ -1282,13 +1315,32 @@ public partial class Level {
 		}
 
 		// Collision shenanigans.
-		collidedGObjs = new();
-		HashSet<int[]> arrayGrid = new(populatedGrids);
-		foreach (int[] gridData in arrayGrid) {
+		collidedGObjs.Clear();
+		(int x, int y)[] arrayGrid = populatedGrids.ToArray();
+		foreach ((int x, int y)gridData in arrayGrid) {
 			// Initalize data.
-			List<GameObject> currentGrid = new(grid[gridData[0], gridData[1]]);
-			List<GameObject> currentTerrainGrid = new(terrainGrid[gridData[0], gridData[1]]);
-			// Awfull GM19 order code.
+			List<GameObject> currentGrid = new(grid[gridData.x, gridData.y]);
+			// Give piority to some objects.
+			currentGrid = currentGrid.OrderBy(gameObj => {
+				if (gameObj is not Actor actor) {
+					return 4;
+				}
+				if (actor.highPiority) {
+					return 0;
+				}
+				if (actor is IDamagable) {
+					return 3;
+				}
+				if (actor.lowPiority) {
+					return 2;
+				}
+				return 1;
+			}).ToList();
+			// Get the terrain.
+			List<GameObject>? currentTerrainGrid = null;
+			if (terrainGrid[gridData.x, gridData.y].Count >= 1) {
+				currentTerrainGrid = new List<GameObject>(terrainGrid[gridData.x, gridData.y]);
+			}
 			// Iterate trough populated grids.
 			for (int i = 0; i < currentGrid.Count; i++) {
 				// Skip terrain.
@@ -1296,10 +1348,14 @@ public partial class Level {
 					continue;
 				}
 				// Skip destroyed stuff.
-				if (currentGrid[i] is Actor { destroyed: true }) {
+				if (currentGrid[i].iDestroyed) {
 					continue;
 				}
 				for (int j = i; j < currentGrid.Count; j++) {
+					// Exit if we get destroyed.
+					if (currentGrid[i].iDestroyed) {
+						break;
+					}
 					// Skip terrain coliding with eachother.
 					if (currentGrid[j] is Geometry or CrackedWall) {
 						continue;
@@ -1310,12 +1366,12 @@ public partial class Level {
 					if (collidedGObjs.Contains(hash)) {
 						continue;
 					}
-					// Skip destroyed stuff.
-					if (currentGrid[j] is Actor { destroyed: true }) {
-						continue;
-					}
 					// Add to hash as we check.
 					collidedGObjs.Add(hash);
+					// Skip destroyed stuff.
+					if (currentGrid[j].iDestroyed) {
+						continue;
+					}
 					// Do preliminary collision checks and skip if we do not instersect.
 					if (!checkLossyCollision(currentGrid[i], currentGrid[j])) {
 						continue;
@@ -1324,7 +1380,7 @@ public partial class Level {
 						currentGrid[i], currentGrid[j]
 					);
 					if (iDatas.Count > 0) {
-						Global.speedMul = currentGrid[i].localSpeedMul;
+						Global.speedMul = currentGrid[i].speedMul;
 						iDatas = organizeTriggers(iDatas);
 						foreach (CollideData collideDataI in iDatas) {
 							currentGrid[i].registerCollision(collideDataI);
@@ -1332,13 +1388,17 @@ public partial class Level {
 						Global.speedMul = 1;
 					}
 					if (jDatas.Count > 0) {
-						Global.speedMul = currentGrid[j].localSpeedMul;
+						Global.speedMul = currentGrid[j].speedMul;
 						jDatas = organizeTriggers(jDatas);
 						foreach (CollideData collideDataJ in jDatas) {
 							currentGrid[j].registerCollision(collideDataJ);
 						}
 						Global.speedMul = 1;
 					}
+				}
+				// Continue if we get destroyed.
+				if (currentTerrainGrid == null || currentGrid[i].iDestroyed) {
+					continue;
 				}
 				foreach (GameObject wallObj in currentTerrainGrid) {
 					// Get order independent hash.
@@ -1361,12 +1421,12 @@ public partial class Level {
 						actor, geometry
 					);
 					if (iData != null) {
-						Global.speedMul = currentGrid[i].localSpeedMul;
+						Global.speedMul = currentGrid[i].speedMul;
 						currentGrid[i].registerCollision(iData);
 						Global.speedMul = 1;
 					}
 					if (jData != null) {
-						Global.speedMul = wallObj.localSpeedMul;
+						Global.speedMul = wallObj.speedMul;
 						wallObj.registerCollision(jData);
 						Global.speedMul = 1;
 					}
@@ -1376,9 +1436,12 @@ public partial class Level {
 		}
 
 		foreach (GameObject go in gos) {
+			if (go.iDestroyed) {
+				continue;
+			}
 			if (isTimeSlowed(go, out float slowAmount)) {
 				Global.speedMul = slowAmount;
-				go.localSpeedMul = slowAmount;
+				go.speedMul = slowAmount;
 			}
 			go.postUpdate();
 			go.statePostUpdate();
@@ -1390,12 +1453,33 @@ public partial class Level {
 			if (!camPlayer.character.stopCamUpdate) {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
-				Point expectedCamPos = computeCamPos(camPos, new Point(playerX, playerY));
 
-				float moveDeltaX = camX - MathF.Round(playerX);
-				float moveDeltaY = camY - MathF.Round(playerY);
+				float extraPos = 0;//MathF.Floor(MathF.Abs(followActor.deltaPos.x));
+				if (extraPos >= 4) {
+					extraPos = extraPos * 16 * MathF.Sign(followActor.deltaPos.x);
+					if (lastCameraXDelta == 0 ||
+						extraPos > 0 && extraPos * 100 > lastCameraXDelta ||
+						extraPos < 0 && extraPos * 100 < lastCameraXDelta
+					) {
+						float speed = 100;
+						if (MathF.Sign(lastCameraXDelta) != MathF.Sign(extraPos)) {
+							speed = 600;
+						}
+						lastCameraXDelta = Helpers.moveTo(lastCameraXDelta, extraPos * 100, speed, true);
+					}
+					lastCameraXDeltaTimer = 30;
+				} else {
+					if (lastCameraXDeltaTimer <= 0) {
+						lastCameraXDelta = Helpers.moveTo(lastCameraXDelta, 0, 350, true);
+						extraPos = 0;
+					} else {
+						lastCameraXDeltaTimer--;
+					}
+				}
+				extraPos = MathF.Round(lastCameraXDelta / 100f);
 
-				float fullDeltaX = MathF.Round(expectedCamPos.x) - camX;
+				Point expectedCamPos = computeCamPos(camPos, new Point(playerX + extraPos, playerY));
+				float fullDeltaX = MathF.Round(expectedCamPos.x + extraPos) - camX;
 				float fullDeltaY = MathF.Round(expectedCamPos.y) - camY;
 
 				if (followActor != null && followActor.grounded == false) {
@@ -1404,7 +1488,6 @@ public partial class Level {
 							(not WallKick and not WallSlide and not LadderClimb) or InRideChaser
 					) {
 						if (!unlockfollow) {
-							moveDeltaY = 0;
 							fullDeltaY = 0;
 						}
 					} else {
@@ -1420,16 +1503,20 @@ public partial class Level {
 				if (camPlayer.character?.charState is not InRideChaser &&
 					(camPlayer.character as Axl)?.isZooming() != true
 				) {
-					int camSpeed = 4;
-					if (MathF.Abs(deltaX) > camSpeed) {
-						deltaX = camSpeed * MathF.Sign(fullDeltaX);
+					int camSpeedX = 4;
+					int camSpeedY = 4;
+					float diference;
+					if (MathF.Abs(deltaX) > camSpeedX) {
+						diference = MathF.Floor(MathF.Abs((camSpeedX - MathF.Abs(deltaX)) / 24f));
+						deltaX = (camSpeedX + diference) * MathF.Sign(fullDeltaX);
 					}
-					if (MathF.Abs(deltaY) > camSpeed) {
-						deltaY = camSpeed * MathF.Sign(fullDeltaY);
+					if (MathF.Abs(deltaY) > camSpeedY) {
+						diference = MathF.Floor(MathF.Abs((camSpeedY - MathF.Abs(deltaY)) / 24f));
+						deltaY = (camSpeedY + diference) * MathF.Sign(fullDeltaY);
 					}
 				}
 
-				updateCamPos(deltaX, deltaY);
+				updateCamPos(deltaX, deltaY, playerX + extraPos, playerY);
 			} else {
 				shakeX = 0;
 				shakeY = 0;
@@ -1438,8 +1525,8 @@ public partial class Level {
 			if (camPlayer.character is Axl axl && axl.isZooming()) {
 				Player p = camPlayer.character.player;
 
-				p.axlScopeCursorWorldPos.x = Helpers.clamp(p.axlScopeCursorWorldPos.x, camCenterX - Global.halfViewScreenW, camCenterX + Global.halfViewScreenW);
-				p.axlScopeCursorWorldPos.y = Helpers.clamp(p.axlScopeCursorWorldPos.y, camCenterY - Global.halfViewScreenH, camCenterY + Global.halfViewScreenH);
+				axl.axlScopeCursorWorldPos.x = Helpers.clamp(axl.axlScopeCursorWorldPos.x, camCenterX - Global.halfViewScreenW, camCenterX + Global.halfViewScreenW);
+				axl.axlScopeCursorWorldPos.y = Helpers.clamp(axl.axlScopeCursorWorldPos.y, camCenterY - Global.halfViewScreenH, camCenterY + Global.halfViewScreenH);
 			}
 		} else {
 			shakeX = 0;
@@ -1601,44 +1688,53 @@ public partial class Level {
 		var actor = go as Actor;
 		if (actor == null) return false;
 
-		if (actor.timeStopTime > 10) {
+		if (actor.timeStopTime > 15) {
 			slowAmount = 0.125f;
 			return true;
 		}
 
 		bool isSlown = false;
 
-		if (actor is Character chr2) {
-			if (chr2.infectedTime > 0) {
-				slowAmount = 1 - (0.25f * (chr2.infectedTime / 8));
-				isSlown = true;
-			}
-		}
-
-		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is OverdriveOstrich) {
+		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is Maverick) {
 			foreach (var cch in chargedCrystalHunters) {
 				var chr = go as Character;
 				if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
-				if (chr != null && chr.isCCImmune()) continue;
+				if (chr != null && chr.isTimeImmune()) continue;
 
 				var proj = go as Projectile;
-				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) continue;
-				if (proj != null && proj.damager?.owner?.character?.isCCImmune() == true) continue;
-
+				if (proj != null && proj.damager.owner.alliance == cch.owner.alliance) {
+					continue;
+				}
 				var mech = go as RideArmor;
-				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) continue;
-
-				var oo = actor as OverdriveOstrich;
-				if (oo != null && oo.player != null && oo.player.alliance == cch.owner.alliance) continue;
-
+				if (mech != null && mech.player != null && mech.player.alliance == cch.owner.alliance) {
+					continue;
+				}
+				var mvrk = actor as Maverick;
+				if (mvrk != null && mvrk.player != null && mvrk.player.alliance == cch.owner.alliance) {
+					continue;
+				}
 				if (cch.pos.distanceTo(actor.getCenterPos()) < CrystalHunterCharged.radius) {
-					if (cch.isSnails) slowAmount = 0.5f;
-					if (oo != null && oo.ownedByLocalPlayer && oo.state is not OverdriveOCrystalizedState && oo.crystalizeCooldown == 0) {
+					if (cch.isSnails) {
+						slowAmount = 0.5f;
+					}
+					if (actor is OverdriveOstrich oo && oo.ownedByLocalPlayer &&
+						oo.state is not OverdriveOCrystalizedState && oo.crystalizeCooldown == 0
+					) {
 						oo.changeState(new OverdriveOCrystalizedState());
 					}
 					isSlown = true;
 					break;
 				}
+			}
+		}
+
+		if (actor is Character chr2) {
+			if (chr2.virusTime > 0) {
+				if (!isSlown) {
+					slowAmount = 1;
+				}
+				slowAmount *= 1 - (0.25f * (chr2.virusTime / 8));
+				isSlown = true;
 			}
 		}
 
@@ -1682,6 +1778,9 @@ public partial class Level {
 		}
 
 		foreach (var go in gameObjects) {
+			if (go.iDestroyed) {
+				continue;
+			}
 			go.render(0, 0);
 		}
 		foreach (var ms in mapSprites) {
@@ -2104,15 +2203,12 @@ public partial class Level {
 		return mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
 	}
 
-	public void updateCamPos(float deltaX, float deltaY) {
-		var playerX = camPlayer.character.getCamCenterPos().x;
-		var playerY = camPlayer.character.getCamCenterPos().y;
+	public void updateCamPos(float deltaX, float deltaY, float playerX, float playerY) {
+		bool dontMoveX = false;
+		bool dontMoveY = false;
 
-		var dontMoveX = false;
-		var dontMoveY = false;
-
-		var scaledCanvasW = Global.viewScreenW;
-		var scaledCanvasH = Global.viewScreenH;
+		uint scaledCanvasW = Global.viewScreenW;
+		uint scaledCanvasH = Global.viewScreenH;
 
 		var halfScaledCanvasW = Global.halfScreenW * Global.viewSize;
 		var halfScaledCanvasH = Global.halfScreenH * Global.viewSize;
@@ -2371,6 +2467,41 @@ public partial class Level {
 		}).ToArray();
 
 		return unoccupied.GetRandomItem();
+	}
+
+	public SpawnPoint getFirstSpawnPoint(Player player) {
+		if (Global.overrideSpawnPoint != null) {
+			var sp = spawnPoints.FirstOrDefault(s => s.name == Global.overrideSpawnPoint);
+			if (sp != null) return sp;
+		}
+		if (isRace()) {
+			return raceStartSpawnPoints[player.getSpawnIndex(raceStartSpawnPoints.Count)];
+		}
+		if (is1v1()) {
+			return spawnPoints[player.getSpawnIndex(spawnPoints.Count)];
+		}
+		if (Global.quickStart && Global.quickStartSpawn != null) {
+			return spawnPoints[Global.quickStartSpawn.Value];
+		}
+		SpawnPoint[] availableSpawns;
+		if (!gameMode.useTeamSpawns() || player.newAlliance < 0 || player.newAlliance > 1) {
+			availableSpawns = spawnPoints.Where(
+				(spawnPoint) => {
+					return (
+						spawnPoint.alliance == -1
+					);
+				}
+			).ToArray();
+		} else {
+			availableSpawns = spawnPoints.Where(
+				(spawnPoint) => {
+					return (
+						spawnPoint.alliance == player.newAlliance
+					);
+				}
+			).ToArray();
+		}
+		return availableSpawns[player.getSpawnIndex(availableSpawns.Length)];
 	}
 
 	public bool isRace() {
