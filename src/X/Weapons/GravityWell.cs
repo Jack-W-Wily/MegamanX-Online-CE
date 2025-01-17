@@ -241,7 +241,7 @@ public class GravityWellProj : Projectile, IDamagable {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
 		if (actor is Character chr && (chr.isPushImmune() || chr.isSlowImmune())) return;
 

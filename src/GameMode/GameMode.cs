@@ -1580,14 +1580,9 @@ public class GameMode {
 			}
 			player.lastHudWeapon = weapon;
 		}
-		// Return if there is no weapon to ren
-		if (weapon == null) {
-			return;
-		}
-
 		// Small Bars option.
 		float ammoDisplayMultiplier = 1;
-		if (weapon.allowSmallBar && Options.main.enableSmallBars && !forceSmallBarsOff) {
+		if (weapon?.allowSmallBar == true && Options.main.enableSmallBars && !forceSmallBarsOff) {
 			ammoDisplayMultiplier = 0.5f;
 		}
 
@@ -1660,6 +1655,11 @@ public class GameMode {
 				baseY -= 2;
 			}
 			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+			return;
+		}
+
+		// Return if there is no weapon to ren
+		if (weapon == null) {
 			return;
 		}
 

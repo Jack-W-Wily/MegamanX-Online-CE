@@ -468,7 +468,7 @@ public partial class Player {
 	public SoulBodyClone? sClone;
 
 
-	ExplodeDieEffect explodeDieEffect;
+	public ExplodeDieEffect explodeDieEffect;
 	public Character limboChar;
 	public bool suicided;
 
@@ -829,9 +829,6 @@ public partial class Player {
 	}
 
 	public bool isCrouchHeld() {
-		if (isControllingPuppet()) {
-			return true;
-		}
 		if (character == null) {
 			return false;
 		}
@@ -1699,7 +1696,7 @@ public partial class Player {
 		} else if  (charNum == (int)CharIds.KaiserSigma) {
 			retChar = new KaiserSigma(
 				this, character.pos.x, character.pos.y, character.xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isRevive: false
 			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
@@ -1756,15 +1753,20 @@ public partial class Player {
 		//retChar.heal(maxHealth);
 
 		// Speed and state.
-		if (character.charState.canStopJump) {
-			retChar.changeState(new Jump(), true);
-		} else {
-			retChar.changeToIdleOrFall();
+		if (retChar.charId != CharIds.KaiserSigma) {
+			if (character.charState.canStopJump) {
+				retChar.changeState(new Jump(), true);
+			} else {
+				retChar.changeToIdleOrFall();
+			}
+			retChar.vel = character.vel;
+			retChar.slideVel = character.slideVel;
+			retChar.xFlinchPushVel = character.xFlinchPushVel;
+			retChar.xIceVel = character.xIceVel;
 		}
-		retChar.vel = character.vel;
-		retChar.slideVel = character.slideVel;
-		retChar.xFlinchPushVel = character.xFlinchPushVel;
-		retChar.xIceVel = character.xIceVel;
+		retChar.health = character.health;
+		retChar.maxHealth = character.maxHealth;
+		retChar.healAmount = character.healAmount;
 
 		// Status effects.
 		retChar.burnTime = character.burnTime;
@@ -1858,7 +1860,11 @@ public partial class Player {
 			character.weaponSlot = 0;
 			lastDNACore = null;
 			lastDNACoreIndex = 4;
-			character.weapons.AddRange(oldChar.weapons.Where((Weapon w) => w is MaverickWeapon { summonedOnce: true }));
+
+			character.weapons.AddRange(oldChar.weapons.Where(
+				(Weapon w) => w is MaverickWeapon { summonedOnce: true } && !character.weapons.Contains(w)
+			));
+
 			character.grounded = oldChar.grounded;
 			if (oldChar.charState.canStopJump && !oldChar.grounded) {
 				character.changeState(new Jump(), true);
@@ -2263,7 +2269,6 @@ public partial class Player {
 				newNetId, true
 			);
 			character = kaiserSigma;
-			character.changeSprite("kaisersigma_enter", true);
 			//explodeDieEffect.changeSprite("sigma3_revive");
 			if (Global.level.is1v1() && spawnPoint.isZero()) {
 				var closestSpawn = Global.level.spawnPoints.OrderBy(
@@ -2271,7 +2276,6 @@ public partial class Player {
 				).FirstOrDefault();
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
-			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
 		}
 		RPC.reviveSigma.sendRpc(form, spawnPoint, id, newNetId);
 	}

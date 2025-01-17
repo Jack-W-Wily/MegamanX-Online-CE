@@ -455,7 +455,7 @@ public class Sprite {
 							animData.frames[1].rect.h(),
 							x, y, zIndex,
 							cx - frameOffsetX * xDirArg,
-							cy - (frameOffsetY - extraYOff) * yDirArg,
+							cy - frameOffsetY * yDirArg,
 							xDirArg, yDirArg,
 							angle, alpha,
 							shaderList, true
@@ -481,11 +481,12 @@ public class Sprite {
 				lastFiveTrailDraws.Add(new Trail() {
 					action = (float time) => {
 						DrawWrappers.DrawTexture(
-							bitmap, currentFrame.rect.x1, currentFrame.rect.y1,
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
 							currentFrame.rect.w(), currentFrame.rect.h(),
 							x, y, zIndex,
 							cx - frameOffsetX * xDirArg,
-							cy - (frameOffsetY - extraYOff) * yDirArg,
+							cy - frameOffsetY * yDirArg,
 							xDirArg, yDirArg, angle, alpha, shaderList, true
 						);
 					},
@@ -513,13 +514,13 @@ public class Sprite {
 					action = (float time) => {
 						speedDevilShader?.SetUniform("alpha", time * 2);
 						DrawWrappers.DrawTexture(
-							bitmap, currentFrame.rect.x1, currentFrame.rect.y1,
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
 							currentFrame.rect.w(), currentFrame.rect.h(),
 							x, y, zIndex,
 							cx - frameOffsetX * xDirArg,
-							cy - (frameOffsetY - extraYOff) * yDirArg,
-							xDirArg, yDirArg,
-							angle, alpha, shaderList, true
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
 						);
 					},
 					time = 0.125f
@@ -566,17 +567,19 @@ public class Sprite {
 				currentFrame.rect.w(), currentFrame.rect.h(),
 				x, y, zIndex,
 				cx - frameOffsetX * xDirArg,
-				cy - (frameOffsetY - extraYOff) * yDirArg,
+				cy - frameOffsetY * yDirArg,
 				xDirArg, yDirArg, angle, alpha, upShaders, true
 			);
 		}
 		if (animData.isAxlSprite && drawAxlArms) {
 			DrawWrappers.DrawTexture(
-				axlArmBitmap, currentFrame.rect.x1, currentFrame.rect.y1,
-				currentFrame.rect.w(), currentFrame.rect.h(),
+				axlArmBitmap,
+				currentFrame.rect.x1, currentFrame.rect.y1,
+				currentFrame.rect.w(),
+				currentFrame.rect.h(),
 				x, y, zIndex,
 				cx - frameOffsetX * xDirArg,
-				cy - (frameOffsetY - extraYOff) * yDirArg,
+				cy - frameOffsetY * yDirArg,
 				xDirArg, yDirArg, 0, alpha, shaders, true
 			);
 		}
