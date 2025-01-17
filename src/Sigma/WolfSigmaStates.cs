@@ -769,7 +769,123 @@ public class WolfSigmaBeam : Projectile {
 #endregion
 
 #region wolf sigma revive
+
+
+
+
 public class WolfSigmaRevive : CharState {
+	public int state = 0;
+	public ExplodeDieEffect explodeDieEffect;
+	public bool groundStart;
+	Point destPos;
+	public WolfSigma sigma;
+	public Point spawnPoint;
+		float speed = 1;
+	
+	public WolfSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("head_intro") {
+		this.explodeDieEffect = explodeDieEffect;
+	}
+
+	float alphaTime;
+	public override void update() {
+		base.update();
+
+		if (state == 0) {
+			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
+				state = 1;
+			}
+		} else if (state == 1) {
+			character.visible = true;
+			if (character.grounded || groundStart) {
+				//sigma.sigmaHeadGroundCamCenterPos = character.getCamCenterPos();
+				state = 2;
+				stateTime = 0;
+			} else {
+				character.useGravity = true;
+				character.immuneToKnockback = false;
+			}
+		} else if (state == 2) {
+			if (stateTime > 1) {
+				character.immuneToKnockback = true;
+				character.useGravity = false;
+				character.grounded = false;
+				character.collider.isTrigger = true;
+
+				float destY = Math.Max(character.pos.y - 140, Global.level.getTopScreenY(character.pos.y) + 30);
+				int headH = 20;
+
+				var hit = Global.level.raycast(character.pos.addxy(0, -5), new Point(character.pos.x, Global.level.getTopScreenY(character.pos.y)), new List<Type>() { typeof(Wall) });
+				if (hit != null) {
+					destPos = new Point(character.pos.x, Math.Max(destY, hit.getHitPointSafe().y + headH));
+				} else {
+					destPos = new Point(character.pos.x, destY);
+				}
+
+				stateTime = 0;
+				state = 3;
+
+				character.addMusicSource("wolfSigmaIntro", character.pos.addxy(0, -75), false, loop: false);
+				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaIntroMusicSource);
+
+			}
+		} else if (state == 3) {
+			if (character.pos.y > destPos.y) {
+				character.incPos(new Point(0, -50 * Global.spf * speed));
+			} else {
+				character.changePos(destPos);
+				if (stateTime >= 2.9f) {
+					stateTime = 0;
+					state = 4;
+				}
+			}
+		} else if (state == 4) {
+			if (stateTime > 1.2 && sigma.head == null) {
+				sigma.head = new WolfSigmaHead(destPos, player, player.getNextActorNetId(), true, rpc: true);
+				sigma.leftHand = new WolfSigmaHand(destPos.addxy(-85, 25), player, true, player.getNextActorNetId(), true, rpc: true);
+				sigma.rightHand = new WolfSigmaHand(destPos.addxy(85, 25), player, false, player.getNextActorNetId(), true, rpc: true);
+			}
+			if (stateTime > 4) {
+				character.frameSpeed = 1;
+			}
+			if (stateTime > 4.5f) {
+				player.health = 1;
+				character.addHealth(player.maxHealth);
+				state = 5;
+			}
+		} else if (state == 5) {
+			if (player.health >= player.maxHealth) {
+				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.leftHand));
+				character.weapons.Add(new WolfSigmaHeadWeapon());
+				character.weapons.Add(new WolfSigmaHandWeapon(player, sigma.rightHand));
+				character.weaponSlot = 1;
+
+				character.changeState(new WolfSigmaHeadState(), true);
+				character.addMusicSource("wolfSigmaIntro", character.pos.addxy(0, -75), false, loop: false);
+				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddWolfSigmaMusicSource);
+			}
+		}
+
+		// To assure there's never a softlock 
+		if (stateTime > 3){
+		character.changeState(new WolfSigmaHeadState(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		spawnPoint = character.pos;
+		character.syncScale = true;
+		character.frameIndex = 0;
+		character.frameSpeed = 0;
+		character.alpha = 0;
+		player.sigmaAmmo = player.sigmaMaxAmmo;
+		WolfSigma sigma = character as WolfSigma;
+		
+	}
+}
+
+
+public class WolfSigmaReviveOld : CharState {
 	public int state;
 	public ExplodeDieEffect explodeDieEffect;
 	public bool groundStart;
@@ -778,7 +894,7 @@ public class WolfSigmaRevive : CharState {
 
 	float speed = 1;
 
-	public WolfSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("head_intro") {
+	public WolfSigmaReviveOld(ExplodeDieEffect explodeDieEffect) : base("head_intro") {
 		this.explodeDieEffect = explodeDieEffect;
 	}
 

@@ -9,12 +9,24 @@ public class WolfSigma : Character {
 	public Point? sigmaHeadGroundCamCenterPos;
 
 	public WolfSigma(
-		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
+	Player player, float x, float y, int xDir, bool isVisible,
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false, bool isRevive = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) { 
 		charId = CharIds.WolfSigma;
+
+			if (isRevive) {
+			useGravity = true;
+			changeSprite("head_intro", true);
+			changeState(new WolfSigmaRevive(player.explodeDieEffect), true);
+		} //else {
+	}
+
+
+	
+	public override string getSprite(string spriteName) {
+		return "sigma_" + spriteName;
 	}
 
 	public override bool isSoundCentered() {

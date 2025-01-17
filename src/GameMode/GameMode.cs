@@ -1346,9 +1346,9 @@ public class GameMode {
 			frameIndex = player.character.rideArmor.raNum;
 			baseX = getHUDHealthPosition(position, false).x;
 			mechBarExists = false;
-			if (player.weapon.drawAmmo) {
+		//	if (player.weapon.drawAmmo) {
 				baseX += 15;
-			}
+		//	}
 			damageSavings = 0;
 		}
 		if (isMech && player.character?.rideArmorPlatform != null) {
@@ -1508,6 +1508,13 @@ public class GameMode {
 					player.currentMaverick.maxAmmo
 				);
 			}
+
+
+		//This right here crashes and needs to be redone
+		// - W
+
+
+		/*
 			if (player.character is ViralSigma) {
 				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
 			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
@@ -1533,7 +1540,7 @@ public class GameMode {
 				}
 				Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 				return;
-			}
+			}*/
 			return;
 		}
 

@@ -721,9 +721,11 @@ public class Damager {
 				// Flinch reduction.
 				if (flinch > 0) {
 					if (!maverick.player.isTagTeam()) {
+						if (!Global.level.isBonusMatch()){
 						flinch = 0;
+						}
 					}
-					if (maverick.player.isTagTeam()) {
+					if (maverick.player.isTagTeam() || Global.level.isBonusMatch()) {
 						// Large mavericks
 						if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
 							if (flinch <= Global.miniFlinch) {

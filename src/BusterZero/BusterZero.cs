@@ -90,6 +90,24 @@ public class BusterZero : Character {
 	}
 
 	public override bool normalCtrl() {
+
+		// Guard
+		if (Global.level.isBonusMatch()){
+			if (charState.attackCtrl && charState is not Dash && grounded && (
+				player.input.isHeld(Control.WeaponLeft, player) ||
+				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
+			) && (
+				!player.isDisguisedAxl ||
+				player.input.isHeld(Control.Down, player)
+			)
+			) {
+			turnToInput(player.input, player);
+			changeState(new SwordBlock());
+			return true;
+			} 
+		}	
+		
+
 		// Handles Standard Hypermode Activations.
 		if (player.currency >= Player.zBusterZeroHyperCost &&
 			!isBlackZero &&

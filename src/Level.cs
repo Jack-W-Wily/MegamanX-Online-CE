@@ -2523,6 +2523,10 @@ public partial class Level {
 		return is1v1() && server?.customMatchSettings?.hyperModeMatch == true;
 	}
 
+	public bool isBonusMatch() {
+		return server?.customMatchSettings?.bonusMatch == true;
+	}
+
 	public bool isHyperMatch() {
 		return server?.customMatchSettings?.hyperModeMatch == true;
 	}

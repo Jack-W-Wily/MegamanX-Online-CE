@@ -623,29 +623,29 @@ public class RideArmor : Actor, IDamagable {
 		}
 		// whats the center point value?
 		Projectile? proj = null;
-
+		 bool addToLevel = true;
 		if (sprite.name.Contains("attack")) {
 			switch (raNum) {
 				case 0:
 					proj = new GenericMeleeProj(new MechPunchWeapon(player),
-					 centerPoint, ProjIds.MechPunch, player);
+					 centerPoint, ProjIds.MechPunch, player, addToLevel : true);
 					break;
 				case 1:
 					proj = new GenericMeleeProj(new MechKangarooPunchWeapon(player),
-					 centerPoint, ProjIds.MechKangarooPunch, player);
+					 centerPoint, ProjIds.MechKangarooPunch, player, addToLevel : true);
 					break;
 				case 4:
 					proj = new GenericMeleeProj(new MechGoliathPunchWeapon(player),
-					 centerPoint, ProjIds.MechGoliathPunch, player);
+					 centerPoint, ProjIds.MechGoliathPunch, player, addToLevel : true);
 					break;
 				case 5:
 					proj = new GenericMeleeProj(new MechDevilBearPunchWeapon(player),
-					 centerPoint, ProjIds.MechDevilBearPunch, player);
+					 centerPoint, ProjIds.MechDevilBearPunch, player, addToLevel : true);
 					break;
 			}
 		}
 		else if (sprite.name.Contains("charge")) {
-			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player);
+			proj = new GenericMeleeProj(new MechChainChargeWeapon(player), centerPoint, ProjIds.MechChain, player, addToLevel : true);
 		}
 		else if (hitbox.name == "stomp" && deltaPos.y > 150 * Global.spf && character != null) {
 			bool canDamage = deltaPos.y > 150 * Global.spf;
@@ -655,27 +655,27 @@ public class RideArmor : Actor, IDamagable {
 			switch (raNum) {
 				case 0:
 					proj = new GenericMeleeProj(new MechStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null, addToLevel : addToLevel );
 					break;
 				case 1:
 					proj = new GenericMeleeProj(new MechKangarooStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null, addToLevel : addToLevel );
 					break;
 				case 2:
 					proj = new GenericMeleeProj(new MechHawkStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null, addToLevel : addToLevel );
 					break;
 				case 3:
 					proj = new GenericMeleeProj(new MechFrogStompWeapon(player),
-					 centerPoint, overrideProjId, player, damage: overrideDamage);
+					 centerPoint, overrideProjId, player, damage: overrideDamage, addToLevel : addToLevel );
 					break;
 				case 4:
 					proj = new GenericMeleeProj(new MechGoliathStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null, addToLevel : addToLevel );
 					break;
 				case 5:
 					proj = new GenericMeleeProj(new MechDevilBearStompWeapon(player),
-					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null);
+					 centerPoint, ProjIds.MechStomp, player, damage: !canDamage ? 0 : null, addToLevel : addToLevel );
 					break;
 			}
 		}
@@ -2271,6 +2271,26 @@ public class InRideArmor : CharState {
 			}
 		}
 		*/
+
+		if (grenade != null) {
+			grenade.vel.x = 75 * (character.xDir);
+			grenade.vel.y = -200;
+		}
+	}
+
+
+	public void tossGrenade2(VileClassic vileC) {
+		Projectile? grenade = null;
+		if (vileC.gizmoCooldown > 0) {
+			return;
+		}
+	
+		
+				grenade = new VileBombProj(new VileBall(VileBallType.ExplosiveRound), character.pos.addxy(0, -3), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
+				grenade.maxTime = 1f;
+				vileC.gizmoCooldown = 0.3f;
+			
+		
 
 		if (grenade != null) {
 			grenade.vel.x = 75 * (character.xDir);

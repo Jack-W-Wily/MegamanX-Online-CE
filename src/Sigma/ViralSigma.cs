@@ -24,12 +24,32 @@ public class ViralSigma : Character {
 	public int numPossesses;
 
 	public ViralSigma(
-		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false
+			Player player, float x, float y, int xDir, bool isVisible,
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false, bool isRevive = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) { 
-		charId = CharIds.WolfSigma;
+		charId = CharIds.ViralSigma;
+
+		maxHealth = (decimal)Player.getModifiedHealth(32);
+		if (!ownedByLocalPlayer || isRevive) {
+			health = maxHealth;
+		}
+		if (!ownedByLocalPlayer) {
+			visible = true;
+			return;
+		}
+		if (isRevive) {
+			useGravity = false;
+			changeSprite("viralsigma_enter", true);
+			changeState(new ViralSigmaRevive(player.explodeDieEffect), true);
+		} //else {
+			visible = true;
+	//		changeSprite("viralsigma_idle", true);
+	//
+	//		changeState(new ViralSigmaIdle(), true);
+	//	}
+
 	}
 
 	public override void update() {
@@ -130,6 +150,12 @@ public class ViralSigma : Character {
 
 	public override float getLabelOffY() {
 		return 43;
+	}
+
+
+	
+	public override string getSprite(string spriteName) {
+		return "viralsigma_" + spriteName;
 	}
 
 	public override List<ShaderWrapper> getShaders() {

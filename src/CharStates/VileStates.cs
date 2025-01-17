@@ -4,7 +4,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class CallDownMech : CharState {
-	Vile vile = null!;
+	Vile vile = null!; 
 	RideArmor rideArmor;
 	bool isNew;
 
@@ -32,11 +32,15 @@ public class CallDownMech : CharState {
 				return;
 			}
 			*/
-
-			if (vile.isVileMK5 != true && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
+			if (character is Vile){
+				if (vile.isVileMK5 != true && 
+				MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
 				rideArmor.putCharInRideArmor(character);
-			} else {
+				} else {
 				character.changeToIdleOrFall();
+				}
+			} else if (MathF.Abs(character.pos.x - rideArmor.pos.x) < 10)  {
+			rideArmor.putCharInRideArmor(character);
 			}
 		}
 	}
@@ -45,7 +49,9 @@ public class CallDownMech : CharState {
 		base.onEnter(oldState);
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
+		if (character is Vile){
 		vile = character as Vile ?? throw new NullReferenceException();
+		}
 	}
 }
 

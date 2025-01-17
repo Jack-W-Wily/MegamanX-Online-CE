@@ -29,13 +29,18 @@ public class ViralSigmaIdle : CharState {
 
 	public override void update() {
 		stateTime += Global.spf;
-		character.stopMoving();
+		
 
 		var inputDir = player.input.getInputDir(player);
 		var moveAmount = inputDir.times(125);
 		character.move(moveAmount);
 
-		clampViralSigmaPos();
+		//clampViralSigmaPos();
+
+		if (player.input.isPressed(Control.Up, player)) {
+				character.vel.y = -character.getJumpPower();
+			}
+
 
 		if (character.angle == 0) {
 			if (player.input.isPressed(Control.Dash, player) && sigma.viralSigmaTackleCooldown == 0) {
@@ -49,7 +54,9 @@ public class ViralSigmaIdle : CharState {
 				return;
 			}
 
-			if (player.input.isPressed(Control.Shoot, player) && player.sigmaAmmo >= player.weapon.getAmmoUsage(0)) {
+			if (player.input.isPressed(Control.Shoot, player) 
+		//	&& player.sigmaAmmo >= player.weapon.getAmmoUsage(0)
+			) {
 				character.changeState(new ViralSigmaShoot(inputDir.x != 0 ? inputDir.x : sigma.lastViralXDir), true);
 				return;
 			}
@@ -72,6 +79,8 @@ public class ViralSigmaIdle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.useGravity = false;
+		character.stopMoving();
 		sigma = character as ViralSigma ?? throw new NullReferenceException();
 	}
 }
@@ -374,7 +383,7 @@ public class ViralSigmaBeamProj : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		bottomY = pos.y;
-		getBottomY();
+		//getBottomY();
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -411,7 +420,7 @@ public class ViralSigmaBeamProj : Projectile {
 
 	public override void update() {
 		base.update();
-		getBottomY();
+	//	getBottomY();
 		Helpers.decrementTime(ref soundTime);
 		Helpers.decrementTime(ref explosionTime);
 		if (soundTime == 0) {
@@ -442,12 +451,97 @@ public class ViralSigmaBeamProj : Projectile {
 	}
 }
 
+
+
+
+
 public class ViralSigmaRevive : CharState {
+	int state = 0;
+	public ExplodeDieEffect explodeDieEffect;
+	public Point spawnPoint;
+	public ViralSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("enter") {
+		this.explodeDieEffect = explodeDieEffect;
+	}
+
+	float alphaTime;
+	public override void update() {
+		base.update();
+
+		if (state == 0) {
+			if (explodeDieEffect == null || explodeDieEffect.destroyed) {
+				state = 1;
+				character.addMusicSource("virusSigma", character.pos, true);
+				RPC.actorToggle.sendRpc(character.netId, RPCActorToggleType.AddKaiserSigmaMusicSource);
+				character.visible = true;
+			//	character.changePos(spawnPoint);
+			}
+		} else if (state == 1) {
+			alphaTime += Global.spf;
+			if (alphaTime >= 0.2) character.alpha = 0.2f;
+			if (alphaTime >= 0.4) character.alpha = 0.4f;
+			if (alphaTime >= 0.6) character.alpha = 0.6f;
+			if (alphaTime >= 0.8) character.alpha = 0.8f;
+			if (alphaTime >= 1) character.alpha = 1f;
+			if (character.alpha >= 1) {
+				character.alpha = 1;
+				character.frameSpeed = 1;
+				state = 2;
+			}
+		} else if (state == 2) {
+			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+				character.frameIndex = character.sprite.totalFrameNum - 1;
+			}
+
+			if (character.isAnimOver()) {
+				state = 3;
+			}
+		} else if (state == 3) {
+			if (stateTime > 0.5f) {
+				player.health = 1;
+				character.addHealth(player.maxHealth);
+				state = 4;
+			}
+		} else if (state == 4) {
+			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+				player.health = player.maxHealth;
+			}
+
+			if (player.health >= player.maxHealth) {
+				character.invulnTime = 0.5f;
+				character.useGravity = false;
+				character.stopMoving();
+				character.grounded = false;
+				character.canBeGrounded = false;
+
+				character.changeState(new ViralSigmaIdle(), true);
+			}
+		}
+		// To assure there's never a softlock 
+		if (stateTime > 3){
+		character.changeState(new ViralSigmaIdle(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		spawnPoint = character.pos;
+		character.syncScale = true;
+		character.frameIndex = 0;
+		character.frameSpeed = 0;
+		character.alpha = 0;
+		player.sigmaAmmo = player.sigmaMaxAmmo;
+		ViralSigma viralSigma = character as ViralSigma;
+		
+	}
+}
+
+
+public class ViralSigmaReviveOld : CharState {
 	int state = 0;
 	public ExplodeDieEffect explodeDieEffect;
 	public ViralSigma sigma;
 
-	public ViralSigmaRevive(ExplodeDieEffect explodeDieEffect) : base("viral_enter") {
+	public ViralSigmaReviveOld(ExplodeDieEffect explodeDieEffect) : base("viral_enter") {
 		this.explodeDieEffect = explodeDieEffect;
 	}
 

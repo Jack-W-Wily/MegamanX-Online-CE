@@ -83,23 +83,6 @@ public class CustomMatchSettingsMenu : IMainMenu {
 
 		menuOptions.Add(
 			new MenuOption(
-				startX, currentY,
-				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.bonusMatch);
-				},
-				(Point pos, int index) => {
-					Fonts.drawText(
-						FontType.Blue,
-						"Bonus Mode Match : " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.bonusMatch),
-						pos.x, pos.y, selected: selectArrowPosY == 0
-					);
-				}
-			)
-		);
-
-		menuOptions.Add(
-			new MenuOption(
 				startX, currentY += lineH,
 				() => {
 					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.startCurrency, 0, 9999, true);
@@ -354,6 +337,24 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				}
 			)
 		);
+		
+		menuOptions.Add(
+			new MenuOption(
+				startX, currentY,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.bonusMatch);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Blue,
+						"Bonus Mode Match : " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.bonusMatch),
+						pos.x, pos.y, selected: selectArrowPosY == 15
+					);
+				}
+			)
+		);
+
 	}
 
 	public string getSameCharString(int charNum) {

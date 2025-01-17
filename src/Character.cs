@@ -3055,14 +3055,16 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canAffordRideArmor() {
-		if (Global.level.is1v1()) {
+
+	
+		if (Global.level.is1v1() || this is VileClassic) {
 			return health > Math.Floor(maxHealth / 2);
 		}
 		return player.currency >= Vile.callNewMechCost;
 	}
 
 	public void buyRideArmor() {
-		if (Global.level.is1v1()) {
+		if (Global.level.is1v1() || this is VileClassic) {
 			health -= Math.Floor(maxHealth / 2);
 			return;
 		}

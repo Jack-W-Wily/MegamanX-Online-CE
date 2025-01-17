@@ -123,6 +123,7 @@ public partial class Player {
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
+	public bool isVileClassic { get { return charNum == (int)CharIds.VileClassic; } }
 
 	public float healthBackup;
 
@@ -213,6 +214,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.VileClassic, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -225,6 +227,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new() },
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
+		{ (int)CharIds.VileClassic, new() },
 	};
 
 	// Getter functions.
@@ -899,7 +902,15 @@ public partial class Player {
 				Global.shouldAiAutoRevive
 			)
 			) {
+				if (isSigma1AndSigma()){
+				reviveSigma(0, spawnPoint);
+				}
+				if (isSigma2AndSigma()){
+				reviveSigma(1, spawnPoint);
+				}
+				if (isSigma3AndSigma()){
 				reviveSigma(2, spawnPoint);
+				}
 			}
 		} else if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
@@ -1159,7 +1170,27 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else {
+		}
+		else if  (charNum == (int)CharIds.ViralSigma) {
+			character = new ViralSigma(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		else if  (charNum == (int)CharIds.WolfSigma) {
+			character = new WolfSigma(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.VileClassic) {
+			character = new VileClassic(
+				this, pos.x, pos.y, xDir, false, charNetId,
+				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride
+			);
+		} 
+
+
+		 else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		// Do this once char has spawned and is not null.
@@ -1351,12 +1382,20 @@ public partial class Player {
 				true, data.dnaNetId, false, isWarpIn: false,
 				mk2VileOverride: data.extraData[0] == 1, mk5VileOverride: data.extraData[0] == 2
 			);
-		} else if (data.charNum == (int)CharIds.Axl) {
+		} else if (data.charNum == (int)CharIds.VileClassic) {
+			retChar = new VileClassic(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false,
+				mk2VileOverride: data.extraData[0] == 1, mk5VileOverride: data.extraData[0] == 2
+			);
+		}
+		else if (data.charNum == (int)CharIds.Axl) {
 			retChar = new Axl(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.Sigma) {
+		} 
+		else if (data.charNum == (int)CharIds.Sigma) {
 			if (data.extraData[0] == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,
@@ -1486,12 +1525,22 @@ public partial class Player {
 				hasFrozenCastle = dnaCore.frozenCastle,
 				hasSpeedDevil = dnaCore.speedDevil
 			};
-		} else if (charNum == (int)CharIds.Axl) {
+		} else if (charNum == (int)CharIds.VileClassic) {
+			retChar = new VileClassic(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false,
+				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5
+			) ;
+		}
+		
+		else if (charNum == (int)CharIds.Axl) {
 			retChar = new Axl(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.Sigma) {
+		} 
+		
+		else if (charNum == (int)CharIds.Sigma) {
 			if (dnaCore.loadout.sigmaLoadout.sigmaForm == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,
@@ -2066,9 +2115,19 @@ public partial class Player {
 				character.changePos(new Point(Global.level.width / 2, character.pos.y));
 			}
 			character.changeState(new WolfSigmaRevive(explodeDieEffect), true);
+				WolfSigma wolfSigma = new WolfSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				newNetId, true
+			);
+			character = wolfSigma;
 		} else if (form == 1) {
 			explodeDieEffect.changeSprite("sigma2_revive");
 			character.changeState(new ViralSigmaRevive(explodeDieEffect), true);
+			ViralSigma viralSigma = new ViralSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				newNetId, true
+			);
+			character = viralSigma;
 		} else {
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
@@ -2087,6 +2146,30 @@ public partial class Player {
 	}
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
+		
+			if (form == 0) {
+			character.destroySelf();
+			WolfSigma wolfSigma = new WolfSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				sigmaNetId, false
+			);
+			character = wolfSigma;
+
+			character.changeSprite("sigma_head_intro", true);
+		}
+
+
+		if (form == 1) {
+			character.destroySelf();
+			ViralSigma viralSigma = new ViralSigma(
+				this, spawnPoint.x, spawnPoint.y, character.xDir, true,
+				sigmaNetId, false
+			);
+			character = viralSigma;
+
+			character.changeSprite("viralsigma_enter", true);
+		}
+
 		if (form >= 2) {
 			character.destroySelf();
 			KaiserSigma kaiserSigma = new KaiserSigma(

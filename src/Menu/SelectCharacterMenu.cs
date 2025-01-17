@@ -38,6 +38,8 @@ public enum CharIds {
 	RagingChargeX,
 	// Non-vanilla chars start here.
 	Rock = 10,
+	VileClassic,
+	
 }
 
 public class CharSelection {
@@ -60,6 +62,24 @@ public class CharSelection {
 			offset = new Point(2, 45)
 		},
 		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
+		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
+			offset = new Point(1, 45)
+		},
+		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
+		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
+	];
+
+
+	public static CharSelection[] selectionsBonus => [
+		new CharSelection("X", 0, 1, 0, "menu_mmx", 0),
+		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
+		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
+		},
+		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
+			offset = new Point(2, 45)
+		},
+		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
+		new CharSelection("Vile (Classic)", 11, 1, 0, "menu_vvile", 0),
 		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
 			offset = new Point(1, 45)
 		},
@@ -165,6 +185,8 @@ public class SelectCharacterMenu : IMainMenu {
 		this.isHost = isHost;
 
 		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selections;
+		
+		
 		playerData.charNum = isInGame ? Global.level.mainPlayer.newCharNum : Options.main.preferredCharacter;
 
 		if (is1v1) {
@@ -181,6 +203,10 @@ public class SelectCharacterMenu : IMainMenu {
 	public Player mainPlayer { get { return Global.level.mainPlayer; } }
 
 	public void update() {
+		if (isInGame && Global.level.isBonusMatch()){
+		charSelections = CharSelection.selectionsBonus;
+		}
+		
 		if (Global.input.isPressedMenu(Control.MenuConfirm) || (Global.quickStartOnline && !isInGame)) {
 			if (!isInGame && Global.quickStartOnline) {
 				playerData.charNum = Global.quickStartOnlineClientCharNum;
