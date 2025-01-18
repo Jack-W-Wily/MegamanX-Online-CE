@@ -49,7 +49,8 @@ public class SparkMandrill : Maverick {
 		//rechargeAmmo(8);
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (specialPressed()) {
 					//if (ammo >= 32)
 					{

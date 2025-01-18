@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SFML.Graphics;
+
 
 namespace MMXOnline;
 
@@ -36,7 +38,10 @@ public class StunShotAttack : CharState {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
 			return;
 		}
-		Point shootVel = vile.getVileShootVel(true);
+		bool isStunShot = true;
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
+		Point shootVel = vile.getVileShootVel(isStunShot);
+	
 
 		var player = vile.player;
 		vile.playSound("frontrunner", sendRpc: true);
@@ -57,7 +62,7 @@ public class StunShotAttack : CharState {
 		}
 
 			new StunShotProj(new VileMissile(VileMissileType.ElectricShock),
-			 shootPos, vile.getShootXDir(), 0, vile.player,
+			 shootPos, vile.xDir, 0, vile.player,
 			  vile.player.getNextActorNetId(), shootVel, rpc: true);
 		
 	}
@@ -115,7 +120,11 @@ public class RocketPunchAttackVC : CharState {
 		character.frameTime = 0;
 		var poi = character.sprite.getCurrentFrame().POIs[0];
 		poi.x *= character.xDir;
+		if (vile.vileForm == 0){
 		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.GoGetterRight), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+		} else {
+		proj = new RocketPunchProj(new RocketPunch(RocketPunchType.InfinityGig), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+		}
 	}
 
 	public void reset() {
@@ -182,5 +191,98 @@ public class ExplosiveRoundVC : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+	}
+}
+
+
+
+public class BecomeMk2 : CharState {
+	public float radius = 200;
+	Anim drDopplerAnim;
+	bool isMK5;
+	VileClassic vile;
+
+	public BecomeMk2(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
+		invincible = true;
+		this.isMK5 = isMK5;
+	}
+
+	public override void update() {
+		base.update();
+		if (radius >= 0) {
+			radius -= Global.spf * 150;
+		}
+		if (character.frameIndex < 2) {
+			if (Global.frameCount % 4 < 2) {
+				character.addRenderEffect(RenderEffectType.Flash);
+			} else {
+				character.removeRenderEffect(RenderEffectType.Flash);
+			}
+		} else {
+			character.removeRenderEffect(RenderEffectType.Flash);
+		}
+		if (character.frameIndex == 7 && !once) {
+			character.playSound("ching");
+			player.health = 1;
+			character.addHealth(player.maxHealth);
+			once = true;
+		}
+		if (character.ownedByLocalPlayer) {
+			if (character.isAnimOver()) {
+				setFlags();
+				character.changeState(new Fall(), true);
+			}
+		} else if (character?.sprite?.name != null) {
+			if (!character.sprite.name.EndsWith("_revive") && !character.sprite.name.EndsWith("_revive_to5") && radius <= 0) {
+				setFlags();
+				character.changeState(new Fall(), true);
+			}
+		}
+	}
+
+	public void setFlags() {
+		if (!isMK5) {
+			vile.vileForm = 1;
+		} else {
+			vile.vileForm = 2;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as VileClassic ?? throw new NullReferenceException();
+		//character.setzIndex(ZIndex.Foreground);
+		character.playSound("revive");
+		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);
+		if (!isMK5) {
+			drDopplerAnim = new Anim(character.pos.addxy(30 * character.xDir, -15), "drdoppler", -character.xDir, null, false);
+			drDopplerAnim.blink = true;
+		} else {
+			if (vile.linkedRideArmor != null) {
+				vile.linkedRideArmor.ownedByMK5 = true;
+			}
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		setFlags();
+		character.removeRenderEffect(RenderEffectType.Flash);
+		Global.level.delayedActions.Add(new DelayedAction(() => { character.destroyMusicSource(); }, 0.75f));
+
+		drDopplerAnim?.destroySelf();
+		if (character != null) {
+			character.invulnTime = 0.5f;
+		}
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		if (!character.ownedByLocalPlayer) return;
+
+		if (radius <= 0) return;
+		Point pos = character.getCenterPos();
+		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White);
 	}
 }

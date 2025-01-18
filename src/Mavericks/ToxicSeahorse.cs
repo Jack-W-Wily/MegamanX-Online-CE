@@ -44,7 +44,8 @@ public class ToxicSeahorse : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {

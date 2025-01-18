@@ -156,10 +156,10 @@ public class RideArmor : Actor, IDamagable {
 			}
 		}
 
-		bool isVileMk5 = ownedByMK5 && character != null && character is Vile vile && vile.isVileMK5;
+		bool isVileMK5 = ownedByMK5 && character != null && character is Vile vile && vile.isVileMK5;
 
 		// Health bar
-		if (ownedByLocalPlayer && isVileMk5 && !isInvincible(null, null)) {
+		if (ownedByLocalPlayer && isVileMK5 && !isInvincible(null, null)) {
 			float healthBarInnerWidth = 30;
 			Color color = new Color();
 
@@ -175,7 +175,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		// Tether
-		if (isVileMk5 && character != null) {
+		if (isVileMK5 && character != null) {
 			Point charPos = character.getCenterPos().addxy(0, -10);
 			Point raPos = getCenterPos().addxy(0, -10);
 			Point dirTo = charPos.directionTo(raPos);
@@ -1365,7 +1365,7 @@ public class RAIdle : RideArmorState {
 		if (rideArmor.isAttacking()) shootHeldTime = 0;
 
 		if (character.flag == null) {
-			if (player != null && player.isVile && player.input.isHeld(Control.Down, player)) {
+			if (player != null && (player.isVileClassic ||player.isVile) && player.input.isHeld(Control.Down, player)) {
 				(character.charState as InRideArmor)?.setHiding(true);
 				if (!rideArmor.isAttacking()) {
 					if (player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
@@ -2195,6 +2195,9 @@ public class InRideArmor : CharState {
 		} else {
 			if (character is Vile vile && player.input.isPressed(Control.Special1, player)) {
 				tossGrenade(vile);
+			}
+			if (character is VileClassic vileC && player.input.isPressed(Control.Special1, player)) {
+				tossGrenade2(vileC);
 			}
 		}
 

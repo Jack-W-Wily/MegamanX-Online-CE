@@ -73,7 +73,8 @@ public class ArmoredArmadillo : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control && !player.isSummoner()) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed() && !noArmor) {

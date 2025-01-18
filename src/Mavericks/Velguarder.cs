@@ -32,7 +32,8 @@ public class Velguarder : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (shootPressed()) {
 					changeState(getShootState());
 				} else if (specialPressed()) {

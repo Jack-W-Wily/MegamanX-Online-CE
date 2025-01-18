@@ -65,6 +65,9 @@ public class CharSelection {
 		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
 			offset = new Point(1, 45)
 		},
+		new CharSelection("Axl (Classic)", 3, 2, 0, "menu_aaxl", 0){
+			offset = new Point(1, 45)
+		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
@@ -81,6 +84,9 @@ public class CharSelection {
 		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
 		new CharSelection("Vile (Classic)", 11, 1, 0, "menu_vvile", 0),
 		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
+			offset = new Point(1, 45)
+		},
+		new CharSelection("Axl (Classic)", 3, 2, 0, "menu_aaxl", 0){
 			offset = new Point(1, 45)
 		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),

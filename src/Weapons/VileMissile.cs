@@ -72,12 +72,23 @@ public class VileMissile : Weapon {
 
 		if (vile.charState is Idle || vile.charState is Run || vile.charState is Crouch) {
 			if (vile.tryUseVileAmmo(vileAmmo)) {
-				if (!vile.isVileMK2) {
+
+				if (!Global.level.isBonusMatch()){
+					if (!vile.isVileMK2) {
 					vile.setVileShootTime(this);
 					vile.changeState(new MissileAttack(), true);
-				} else if (!vile.charState.isGrabbing) {
+					} else if (!vile.charState.isGrabbing) {
 					vile.setVileShootTime(this);
 					MissileAttack.mk2ShootLogic(vile, vile.missileWeapon.type == (int)VileMissileType.ElectricShock);
+					}
+				} else {
+					if (vile.isVileMK1) {
+					vile.setVileShootTime(this);
+					vile.changeState(new MissileAttack(), true);
+					} else if (!vile.charState.isGrabbing) {
+					vile.setVileShootTime(this);
+					MissileAttack.mk2ShootLogic(vile, vile.missileWeapon.type == (int)VileMissileType.ElectricShock);
+					}
 				}
 			}
 		} else if (vile.charState is InRideArmor) {

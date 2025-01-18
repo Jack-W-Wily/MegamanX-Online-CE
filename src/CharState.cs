@@ -1339,6 +1339,7 @@ public class Die : CharState {
 			character.player.revertToAxlDeath();
 			character.changeSpriteFromName("die", true);
 		}
+		
 		if (character is Vile vile) {
 			player.lastDeathWasVileMK2 = vile.isVileMK2 == true;
 			player.lastDeathWasVileMK5 = vile.isVileMK5 == true;
@@ -1490,7 +1491,7 @@ public class Die : CharState {
 
 				player.destroySigma();
 			}
-		} else if (player.isVile || player.isSigma) {
+		} else if (player.isVile || player.isVileClassic || player.isSigma) {
 			if (stateTime > 0.75f && !once) {
 				once = true;
 				character.visible = false;
@@ -1520,6 +1521,7 @@ public class Die : CharState {
 	public override bool canExit(Character character, CharState newState) {
 		if (character.charState is Die &&
 			newState is not VileRevive and
+			not BecomeMk2 and
 			not WolfSigmaRevive and
 			not ViralSigmaRevive and
 			not KaiserSigmaRevive and

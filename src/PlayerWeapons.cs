@@ -297,6 +297,13 @@ label:
 	}
 
 	private Weapon getAxlBullet(int axlBulletType) {
+		
+		if (character is Axl axl) {
+			if (axl.isWhiteAxl()){
+			return new DoubleBullet();
+			}
+		}
+
 		switch (axlBulletType) {
 			case (int)AxlBulletWeaponType.DoubleBullets:
 				return new DoubleBullet();
@@ -316,10 +323,24 @@ label:
 	}
 
 	public Weapon getAxlBulletWeapon() {
+
+		if (character is Axl axl) {
+			if (axl.isWhiteAxl()){
+			return new DoubleBullet();
+			}
+		}
 		return getAxlBulletWeapon(axlBulletType);
 	}
 
 	public Weapon getAxlBulletWeapon(int type) {
+
+		if (character is Axl axl) {
+			if (axl.isWhiteAxl()){
+			return new DoubleBullet();
+			}
+		}
+
+
 		switch (type) {
 			case (int)AxlBulletWeaponType.DoubleBullets:
 				return new DoubleBullet();

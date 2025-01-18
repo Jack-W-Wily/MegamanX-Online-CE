@@ -361,10 +361,11 @@ public partial class Player {
 		name = serverPlayer.name;
 		ping = serverPlayer.ping;
 
-		if (!ownedByLocalPlayer) {
+	//	if (!ownedByLocalPlayer) { this is stupid and bugs the score!
+	// Don't try this again Gacel not in this specific thing
 			kills = serverPlayer.kills;
 			deaths = serverPlayer.deaths;
-		}
+	//	}
 
 		if (ownedByLocalPlayer && serverPlayer.autobalanceAlliance != null &&
 			newAlliance != serverPlayer.autobalanceAlliance.Value
@@ -544,6 +545,15 @@ public partial class Player {
 		this.isAI = isAI;
 
 		if (getSameCharNum() != -1) charNum = getSameCharNum();
+		
+		
+		
+			if (charNum == 111) {
+				maverick1v1 = 2;
+				charNum = 3;
+			}
+
+
 		if (charNum >= 210) {
 			if (Global.level.is1v1()) {
 				maverick1v1 = charNum - 210;
@@ -560,6 +570,7 @@ public partial class Player {
 		this.ownedByLocalPlayer = ownedByLocalPlayer;
 
 		this.xArmor1v1 = playerData?.armorSet ?? 1;
+		
 		if (Global.level.is1v1() && isX) {
 			legArmorNum = xArmor1v1;
 			bodyArmorNum = xArmor1v1;
@@ -861,7 +872,33 @@ public partial class Player {
 					reviveVile(true);
 				}
 			}
-		} else if (isSigma) {
+		} 
+
+		 else if (isVileClassic){
+		
+		if (isSelectingRA()) {
+				int maxRAIndex = 3;
+				if (character is VileClassic vileC && !vileC.isVileMK1) {
+					maxRAIndex = 4;
+				}
+				if (input.isPressedMenu(Control.MenuDown)) {
+					selectedRAIndex--;
+					if (selectedRAIndex < 0) selectedRAIndex = maxRAIndex;
+				} else if (input.isPressedMenu(Control.MenuUp)) {
+					selectedRAIndex++;
+					if (selectedRAIndex > maxRAIndex) selectedRAIndex = 0;
+				}
+			}
+
+		if (canReviveVileClassic()) {
+				if (input.isPressed(Control.Special1, this) || Global.shouldAiAutoRevive) {
+					reviveVileClassic(false);
+				} 
+			}
+		}
+		
+		
+		else if (isSigma) {
 			if (isSelectingCommand()) {
 				if (maverickWeapon.selCommandIndexX == 1) {
 					if (input.isPressedMenu(Control.MenuDown)) {
@@ -912,7 +949,8 @@ public partial class Player {
 				reviveSigma(2, spawnPoint);
 				}
 			}
-		} else if (isX) {
+		} 
+		 if (isX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
 				reviveX();
 			}
@@ -1987,6 +2025,19 @@ public partial class Player {
 		return true;
 	}
 
+
+	public bool canReviveVileClassic() {
+		if (!lastDeathCanRevive ||
+			currency < reviveVileCost
+		) {
+			return false;
+		}
+		if (limboChar is not VileClassic vileC || vileC.summonedGoliath) {
+			return false;
+		}
+		return true;
+	}
+
 	public bool canReviveSigma(out Point spawnPoint) {
 		spawnPoint = Point.zero;
 
@@ -2079,6 +2130,28 @@ public partial class Player {
 		vile.rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		character.changeState(new VileRevive(vileFormToRespawnAs == 2), true);
 		RPC.playerToggle.sendRpc(id, vileFormToRespawnAs == 2 ? RPCToggleType.ReviveVileTo5 : RPCToggleType.ReviveVileTo2);
+	}
+
+
+	public void reviveVileClassic(bool toMK5) {
+		currency -= reviveVileCost;
+		VileClassic vile = (limboChar as VileClassic);
+
+		if (vile.vileForm == 0) {
+			vileFormToRespawnAs = 1;
+		}
+
+		respawnTime = 0;
+		character = limboChar;
+		vile.alreadySummonedNewMech = false;
+		character.visible = true;
+		if (explodeDieEffect != null) {
+			explodeDieEffect.destroySelf();
+			explodeDieEffect = null;
+		}
+		limboChar = null;
+		vile.rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+		character.changeState(new BecomeMk2(vileFormToRespawnAs == 2), true);
 	}
 
 	public void reviveVileNonOwner(bool toMK5) {

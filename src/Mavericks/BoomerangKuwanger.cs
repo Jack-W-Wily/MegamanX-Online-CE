@@ -53,7 +53,8 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or BoomerKDashState) {
+			if (state is MIdle or MRun or MLand or BoomerKDashState || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;

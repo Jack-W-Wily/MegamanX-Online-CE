@@ -42,7 +42,8 @@ public class WireSponge : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
 						changeState(new WSpongeUpChainStartState());

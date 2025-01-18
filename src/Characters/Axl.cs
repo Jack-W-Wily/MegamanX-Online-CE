@@ -498,13 +498,15 @@ public class Axl : Character {
 
 		bool bothHeld = shootHeld && altShootHeld;
 
-		if (player.weapon is AxlBullet || player.weapon is DoubleBullet || 
+		if (player.xArmor1v1 == 2 ||
+			player.weapon is AxlBullet || player.weapon is DoubleBullet || 
 			player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets || 
 			player.weapon is RevolverBarrel || player.weapon is AncientGun) {
 			(player.weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 1);
 		} else {
 			foreach (var weapon in player.weapons) {
-				if (weapon is AxlBullet || weapon is DoubleBullet || 
+				if (player.xArmor1v1 == 2 ||
+					weapon is AxlBullet || weapon is DoubleBullet || 
 					weapon is MettaurCrash || weapon is BeastKiller || weapon is MachineBullets || 
 					weapon is RevolverBarrel || weapon is AncientGun) {
 					(weapon as AxlWeapon)?.rechargeAxlBulletAmmo(player, this, shootHeld, 2);
@@ -1968,8 +1970,15 @@ public class Axl : Character {
 			weapons.Add(new IceGattling(player.axlLoadout.iceGattlingAlt));
 			weapons.Add(new FlameBurner(player.axlLoadout.flameBurnerAlt));
 		} else {
+
+			if (player.xArmor1v1 == 2){
+			weapons.Add(new AxlBullet());
+			weapons.Add(new RayGun(player.axlLoadout.rayGunAlt));
+			weapons.Add(new BlastLauncher(player.axlLoadout.blastLauncherAlt));
+			} else {
 			weapons = player.loadout.axlLoadout.getWeaponsFromLoadout();
 			weapons.Insert(0, getAxlBullet(player.axlBulletType));
+			}
 		}
 		if (ownedByLocalPlayer) {
 			foreach (var dnaCore in player.savedDNACoreWeapons) {
@@ -1982,7 +1991,7 @@ public class Axl : Character {
 	}
 
 	public Weapon getAxlBullet(int axlBulletType) {
-		if (axlBulletType == (int)AxlBulletWeaponType.DoubleBullets) {
+		if (player.xArmor1v1 == 2 && isWhiteAxl() || axlBulletType == (int)AxlBulletWeaponType.DoubleBullets) {
 			return new DoubleBullet();
 		}
 		return new AxlBullet((AxlBulletWeaponType)axlBulletType);

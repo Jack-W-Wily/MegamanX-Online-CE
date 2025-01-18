@@ -272,6 +272,7 @@ public class BusterZero : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zero_block" => MeleeIds.Gokumonken,
 			_ => MeleeIds.None
 		});
 	}
@@ -284,6 +285,10 @@ public class BusterZero : Character {
 				isZSaberClang : true, isZSaberEffect : true,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.Gokumonken => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
+				addToLevel: addToLevel
+			),
 			_ => null
 		};
 		return proj;
@@ -292,6 +297,7 @@ public class BusterZero : Character {
 	public enum MeleeIds {
 		None = -1,
 		SaberSwing,
+		Gokumonken,
 	}
 
 	public override string getSprite(string spriteName) {

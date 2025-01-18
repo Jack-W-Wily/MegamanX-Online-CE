@@ -2974,6 +2974,21 @@ public class GameMode {
 						Global.screenW / 2, 22 + Global.screenH / 2, Alignment.Center
 					);
 				}
+			} else if (level.mainPlayer.canReviveVileClassic()) {
+				
+					Fonts.drawText(
+						FontType.BlueMenu, respawnStr,
+						Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
+					);
+					string reviveText = Helpers.controlText(
+						$"[SPC]: Revive as MK-II (5 {Global.nameCoins})"
+					);
+					Fonts.drawText(
+						FontType.DarkBlue, reviveText,
+						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
+					);
+					
+				
 			} else if (level.mainPlayer.canReviveSigma(out _)) {
 				Fonts.drawText(
 					FontType.BlueMenu, respawnStr,

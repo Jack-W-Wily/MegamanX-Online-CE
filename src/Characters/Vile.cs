@@ -21,6 +21,7 @@ public class Vile : Character {
 	public bool hasSpeedDevil;
 	public bool summonedGoliath;
 	public int vileForm;
+	public int vileStack = 0;
 	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
 	public bool isVileMK5 { get { return vileForm == 2; } }
@@ -136,6 +137,10 @@ public class Vile : Character {
 
 	public override void update() {
 		base.update();
+
+		// For MkV keeping buffs
+		if (isVileMK2)vileStack =1;
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -269,7 +274,7 @@ public class Vile : Character {
 	}
 	public bool dashGrabSpecial() {
 		if (charState is Dash || charState is AirDash) {
-			if (isVileMK2) {
+			if (isVileMK2 || isVileMK5 && vileStack > 0) {
 				charState.isGrabbing = true;
 				charState.superArmor = true; //peakbalance
 				changeSpriteFromName("dash_grab", true);
@@ -603,7 +608,7 @@ public class Vile : Character {
 
 	public void setVileShootTime(Weapon weapon, float modifier = 1f, Weapon? targetCooldownWeapon = null) {
 		targetCooldownWeapon = targetCooldownWeapon ?? weapon;
-		if (isVileMK2) {
+		if ((isVileMK2 || isVileMK5 && vileStack > 0)) {
 			float innerModifier = 1f;
 			if (weapon is VileMissile) innerModifier = 0.3333f;
 			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * innerModifier * modifier);
@@ -816,7 +821,7 @@ public class Vile : Character {
 			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
 			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
 			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0) {
-			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
+			if ((isVileMK2 || isVileMK5 && vileStack > 0) && charState is Dash or AirDash && isFacingTarget) {
 				player.press(Control.Special1);
 			}
 			switch (Vattack) {

@@ -56,7 +56,12 @@ public class RayGun : AxlWeapon {
 		Point bulletDir = Point.createFromAngle(angle);
 		Projectile? bullet = null;
 		if (chargeLevel < 3) {
-			bullet = new RayGunProj(weapon, bulletPos, xDir, player, bulletDir, netId);
+
+			if (player.xArmor1v1 == 2){
+				bullet = new RayGunProjOld(weapon, bulletPos, xDir, player, bulletDir, netId);
+			}else{
+				bullet = new RayGunProj(weapon, bulletPos, xDir, player, bulletDir, netId);
+			}
 		} else {
 			if (altFire == 0) {
 				bullet = new SplashLaserProj(weapon, bulletPos, player, bulletDir, netId, sendRpc: true);
@@ -130,6 +135,113 @@ public class RayGunProj : Projectile {
 
 	public override void onDeflect() {
 		base.onDeflect();
+		len = 0;
+		lenDelay = 0;
+		updateAngle();
+	}
+
+	public override void render(float x, float y) {
+		var normVel = vel.normalize();
+		var col1 = new Color(74, 78, 221);
+		var col2 = new Color(61, 113, 255);
+		var col3 = new Color(215, 244, 255);
+		if (Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance) {
+			col1 = new Color(221, 78, 74);
+			col2 = new Color(255, 113, 61);
+			col3 = new Color(255, 244, 215);
+		}
+
+		float xOff1 = -(normVel.x * len);
+		float yOff1 = -(normVel.y * len);
+
+		float sin = MathF.Sin(Global.time * 42.5f);
+
+		if (!Options.main.lowQualityParticles()) {
+			DrawWrappers.DrawLine(pos.x + xOff1, pos.y + yOff1, pos.x, pos.y, col1, 4 + sin, 0, true);
+			DrawWrappers.DrawLine(pos.x + xOff1, pos.y + yOff1, pos.x, pos.y, col2, 2 + sin, 0, true);
+			DrawWrappers.DrawLine(pos.x + xOff1, pos.y + yOff1, pos.x, pos.y, col3, 1 + sin, 0, true);
+		} else {
+			DrawWrappers.DrawLine(pos.x + xOff1, pos.y + yOff1, pos.x, pos.y, col3, 2 + sin, 0, true);
+		}
+	}
+}
+
+
+
+
+public class RayGunProjOld : Projectile {
+	float len = 0;
+	float lenDelay = 0;
+	//float lastAngle;
+	const float maxLen = 50;
+	public RayGunProjOld(Weapon weapon, Point pos,  int xDir, Player player, Point bulletDir, ushort netProjId) :
+		base(weapon, pos, xDir, 400, 1, player, "axl_raygun_laser", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+	
+		if ((player?.character as Axl)?.isWhiteAxl() == true) {
+			speed = 525;
+			damager.hitCooldown = 0;
+			maxTime *= 1.5f;
+		}
+		reflectable = true;
+
+
+		
+		vel.x = bulletDir.x * speed;
+		vel.y = bulletDir.y * speed;
+	
+		maxTime = 0.35f;
+		projId = (int)ProjIds.RayGun;
+		updateAngle();
+	}
+
+
+	public override void update() {
+		base.update();
+		if (lenDelay > 0.01f) {
+			len += Global.spf * 300;
+			if (len > maxLen) len = maxLen;
+		}
+		lenDelay += Global.spf;
+
+		if (locallyControlled) {
+			bool reflected = false;
+			var wall = Global.level.checkCollisionPoint(pos.addxy(vel.x * Global.spf, 0), new List<GameObject>() { this });
+			if (wall?.gameObject is Wall) {
+				vel.x *= -1;
+				reflected = true;
+			}
+
+			wall = Global.level.checkCollisionPoint(pos.addxy(0, vel.y * Global.spf), new List<GameObject>() { this });
+			if (wall?.gameObject is Wall) {
+				vel.y *= -1;
+				reflected = true;
+			}
+
+			if (reflected) {
+				len = 0;
+				lenDelay = 0;
+				updateAngle();
+				
+			}
+		}
+	}
+
+	public void updateAngle() {
+		byteAngle = vel.byteAngle;
+	}
+
+	public void reflectSide() {
+		vel.x *= -1;
+		len = 0;
+		lenDelay = 0;
+		updateAngle();
+	}
+
+	public override void onReflect() {
+		reflectSide();
+	}
+
+	public override void onDeflect() {
 		len = 0;
 		lenDelay = 0;
 		updateAngle();

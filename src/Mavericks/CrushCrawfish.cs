@@ -28,7 +28,8 @@ public class CrushCrawfish : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand || Global.level.isBonusMatch() && 
+			(state is MJump || state is MFall)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CrushCShootArmState());
 				} else if (input.isPressed(Control.Special1, player)) {

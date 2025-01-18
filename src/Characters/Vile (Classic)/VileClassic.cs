@@ -146,7 +146,10 @@ public class VileClassic : Character {
 		bool shootHeld = player.input.isHeld(Control.Shoot, player);
 		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 		if (specialPressed) {
+			if (charState is not Dash && charState is not AirDash ){
 			changeState(new RocketPunchAttackVC(), true);
+			}
+			dashGrabSpecial();
 		}
 		if (shootHeld && gizmoCooldown == 0) {
 

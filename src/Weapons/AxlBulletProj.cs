@@ -10,7 +10,25 @@ public class AxlBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
+		if (owner.xArmor1v1 == 2){
+			damager.damage = 0.5f;
+		}
 	}
+
+
+	public override void update() {
+		base.update();
+		if (owner.xArmor1v1 == 2){
+		if (getHeadshotVictim(owner, out IDamagable? victim, out Point? hitPoint)) {
+				damager.applyDamage(victim, false, weapon, this, projId, overrideDamage: damager.damage * 1.5f);
+				damager.damage = 0;
+				playSound("hurt");
+				destroySelf();
+				return;
+			}
+		}
+	}
+
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);

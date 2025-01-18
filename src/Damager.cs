@@ -95,7 +95,8 @@ public class Damager {
 				weakness = false;
 			}
 
-			if (chr.player.isAxl && newFlinch > 0) {
+			if (chr.player.isAxl && chr.player.xArmor1v1 != 2
+			&& newFlinch > 0) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
 				}
