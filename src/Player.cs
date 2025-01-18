@@ -2373,7 +2373,6 @@ public partial class Player {
 			destroyCharacter();
 		} else {
 			character?.applyDamage(1000, this, character, null, null);
-			currentMaverick?.applyDamage(1000, this, character, null, null); // This fixes mav clonning bug
 		}
 		foreach (var maverick in mavericks) {
 			maverick.applyDamage(1000, this, character, null, null);
