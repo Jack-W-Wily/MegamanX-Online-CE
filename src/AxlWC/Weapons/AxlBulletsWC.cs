@@ -13,7 +13,7 @@ public class AxlBulletWC : AxlWeaponWC {
 		shootSounds = ["axlBullet", "axlBulletCharged", "axlBulletCharged", "axlBulletCharged"];
 		index = (int)WeaponIds.AxlBullet;
 		weaponBarBaseIndex = 28;
-		weaponBarIndex = 28;
+	//	weaponBarIndex = 28;
 		weaponSlotIndex = 28;
 		killFeedIndex = 28;
 		sprite = "axl_arm_pistol";
