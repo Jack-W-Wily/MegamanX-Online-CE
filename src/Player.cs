@@ -126,7 +126,7 @@ public partial class Player {
 	public bool isX1Zero { get { return charNum == (int)CharIds.ZeroX1; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxlXOD { get { return charNum == (int)CharIds.AxlOld; } }
-	public bool isAxlWC { get { return charNum == (int)CharIds.AxlOld; } }
+	public bool isAxlWC { get { return charNum == (int)CharIds.AxlWC; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
