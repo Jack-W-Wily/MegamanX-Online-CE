@@ -25,28 +25,22 @@ public class PlayerCharData {
 
 public enum CharIds {
 	X,
-<<<<<<< HEAD
 	XAnother,
 	ZeroX1,
 	ZeroX2,
 	ZeroX6,
-=======
-	Zero,
->>>>>>> 962b9239b5179e401c3631b899469f1dc1f34ea6
 	Vile,
 	AxlWC,
 	Sigma,
-	ZeroX1,
-	ZeroX2,
 
 	// Rubens if you change the Character IDs order one more time
 	// I am gonna Kill your entire family and rape your sister
 	// - W
-	
+	// callate pendejo de mierda 
+	// - R
 	//it must follow this order because gm hard coded prefered char option
 
 	// Wily Cut chars.
-	XAnother,
 	Zain,
 	GBD,
 	Dynamo,
