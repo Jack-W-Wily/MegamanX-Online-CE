@@ -2400,7 +2400,7 @@ public partial class Character : Actor, IDamagable {
 				);
 
 				int label = 125;
-				if (player.isAxlXOD || player.isDisguisedAxl) {
+				if (player.isAxlXOD || player.isAxlWC || player.isDisguisedAxl) {
 					label = 123;
 				}
 				Global.sprites["hud_killfeed_weapon"].draw(
@@ -3132,6 +3132,17 @@ public partial class Character : Actor, IDamagable {
 			if (assister?.ownedByLocalPlayer == true) {
 				if (assister.character is Axl axl && assister.copyShotDamageEvents.Any(c => c.character == this)) {
 					axl.addDNACore(this);
+				}
+			}
+
+			if (killer?.ownedByLocalPlayer == true)
+				if (killer.character is AxlWC axl2 && killer.copyShotDamageEvents.Any(c => c.character == this)) {
+					axl2.addDNACore(this);
+				}
+
+			if (assister?.ownedByLocalPlayer == true) {
+				if (assister.character is AxlWC axl2 && assister.copyShotDamageEvents.Any(c => c.character == this)) {
+					axl2.addDNACore(this);
 				}
 			}
 

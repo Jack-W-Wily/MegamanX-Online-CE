@@ -515,6 +515,26 @@ public class AxlWC : Character {
 		return shootOrigin.addxy(angleDir.x, angleDir.y);
 	}
 
+
+	public void addDNACore(Character hitChar) {
+		if (!player.ownedByLocalPlayer) return;
+		if (!player.isAxlWC) return;
+		if (Global.level.is1v1()) return;
+
+		if (player.weapons.Count((Weapon weapon) => weapon is DNACore) < 4) {
+			var dnaCoreWeapon = new DNACore(hitChar);
+			dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
+			if (player.isDisguisedAxl) {
+				player.oldWeapons.Add(dnaCoreWeapon);
+			} else {
+				player.weapons.Add(dnaCoreWeapon);
+			}
+			player.savedDNACoreWeapons.Add(dnaCoreWeapon);
+		}
+	}
+
+
+
 	public Point getAxlArmOrigin(AxlWeaponWC? weapon) {
 		if (weapon == null) {
 			return pos;

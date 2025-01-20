@@ -780,6 +780,9 @@ public enum ProjIds {
 	DZHadangeki,
 
 
+	// X another
+	SiceSlide,
+
 	// GBD stuff
 
 	GBDKick,

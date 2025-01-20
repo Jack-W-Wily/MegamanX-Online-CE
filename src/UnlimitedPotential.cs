@@ -59,7 +59,7 @@ public class XUPParryStartState : CharState {
 				character.playSound("upParryAbsorb", sendRpc: true);
 				if (!player.input.isWeaponLeftOrRightHeld(player)) {
 					character.unpoAbsorbedProj = absorbedProj;
-					character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
+			//		character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
 				} else {
 					shootProj = true;
 					absorbThenShoot = true;
@@ -88,9 +88,6 @@ public class XUPParryStartState : CharState {
 	}
 
 	public bool canParry(Actor damagingActor) {
-		if (damagingActor is GenericMeleeProj) {
-			return false;
-		}
 		return character.frameIndex == 0;
 	}
 
@@ -136,6 +133,7 @@ public class UPParryMeleeProj : Projectile {
 		projId = (int)ProjIds.UPParryMelee;
 		setIndestructableProperties();
 		maxTime = 0.25f;
+		damager.damage = 2;
 
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir, (byte)damage);
@@ -272,8 +270,8 @@ public class UPParryRangedProj : Projectile {
 	) {
 		projId = (int)ProjIds.UPParryProj;
 		maxDistance = 150;
-		damager.damage = MathInt.Ceiling(damage);
-
+		//damager.damage = MathInt.Ceiling(damage);
+		damager.damage = 2;
 		if (rpc) {
 			List<Byte> extraBytes = new List<Byte> {
 				(byte)damager.damage,
@@ -360,6 +358,8 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
+			character.unpoAbsorbedProj = null;		
+
 		//character.unpoAbsorbedProj = null;
 	//	if (character is RagingChargeX mmx) {
 	//		mmx.parryCooldown = mmx.maxParryCooldown;

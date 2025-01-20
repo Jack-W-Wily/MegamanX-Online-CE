@@ -826,7 +826,7 @@ public class SplashHitProj : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		destroyOnHit = false;
-		maxTime = 0.7f;
+		maxTime = 1f;
 		this.player = player;
 
 		if (sendRpc) {
@@ -847,18 +847,13 @@ public class SplashHitProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (!damagable.isPlayableDamagable()) { return; }
-		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
-			return;
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -600));
 		}
-		float modifier = 1;
-		if (actor.grounded) { modifier = 0.5f; };
-		if (damagable is Character character) {
-			if (character.isPushImmune() || character.isFlinchImmune()) { return; }
-			if (character.charState is Crouch) { modifier = 0.25f; }
-		}
-		if (actor.isUnderwater()) { modifier = 2; }
-		float xMoveVel = MathF.Sign(pos.x - actor.pos.x);
-		actor.move(new Point(xMoveVel * 50 * modifier, 0));
 	}
 }
+

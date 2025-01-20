@@ -375,6 +375,10 @@ public class Damager {
 			owner.character.ComboTimer += 0.25f;
 			}
 			
+			if (owner.character is XAnother Xa && owner.health > 0) {
+				Xa.gigaAttack.addAmmo(1, owner);
+			}
+
 
 			if (owner.character is Zero zeroz && owner.health > 0) {
 				zeroz.gigaAttack.addAmmo(1, owner);
@@ -388,7 +392,7 @@ public class Damager {
 
 			// GBD stuff
 
-			if ( projId == (int)ProjIds.GBDKick){
+			if ( projId == (int)ProjIds.GBDKick || projId == (int)ProjIds.SiceSlide){
 			
 			owner.character.isDashing = true;
 			owner.character.vel.y = -owner.character.getJumpPower();
@@ -610,6 +614,9 @@ public class Damager {
 					break;
 				case (int)ProjIds.IceGattlingWC:
 					character.addIgFreezeProgress(1);
+					break;
+				case (int)ProjIds.SiceSlide:
+					character.addIgFreezeProgress(3);
 					break;
 				case (int)ProjIds.IceGattlingAltWC:
 					character.addIgFreezeProgress(4);

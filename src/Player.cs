@@ -207,7 +207,7 @@ public partial class Player {
 
 	public int realCharNum {
 		get {
-			if (isAxlXOD || isDisguisedAxl) return 3;
+			if (isAxlXOD  || isAxlWC || isDisguisedAxl) return (int)CharIds.AxlWC;
 			return charNum;
 		}
 	}

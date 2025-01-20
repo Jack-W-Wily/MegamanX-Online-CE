@@ -83,7 +83,9 @@ public class Shoryuken : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		if (player.isX){
 		mmx = character as MegamanX;
+		}
 	}
 
 	public override void onExit(CharState newState) {
@@ -92,6 +94,8 @@ public class Shoryuken : CharState {
 			anim = null;
 		}
 		base.onExit(newState);
+		if (player.isX){
 		if (mmx != null) mmx.shoryukenCooldownTime = mmx.maxShoryukenCooldownTime;
+		}
 	}
 }

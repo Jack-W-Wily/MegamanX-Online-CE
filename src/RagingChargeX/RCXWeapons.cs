@@ -82,7 +82,23 @@ public class AbsorbWeapon : Weapon {
 		this.absorbedProj = otherProj;
 		drawAmmo = false;
 	}
-}
+
+
+
+
+		public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+
+		character.changeState(new XUPParryProjState(character.unpoAbsorbedProj, true, false), true);
+	
+		}
+	}
+
+					
+
 
 public class RCXParry : Weapon {
 	public static RCXParry netWeapon = new RCXParry();

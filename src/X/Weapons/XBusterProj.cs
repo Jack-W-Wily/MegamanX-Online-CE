@@ -240,7 +240,7 @@ public class Buster4Proj : Projectile {
 		int type, float offsetTime, ushort netProjId,
 		bool smoothStart = false, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 396, 1, player, "buster4",
+		weapon, pos, xDir, 396, 0.5f, player, "buster4",
 		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster4_fade";

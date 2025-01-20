@@ -88,6 +88,8 @@ public class GenericMeleeProj : Projectile {
 		}
 	}
 
+	
+
 	public void maverickGrabCode(CommandGrabScenario scenario, Maverick grabber, IDamagable damagable, CharState grabbedState) {
 		if (damagable is Character chr && chr.canBeGrabbed()) {
 			if (!owner.isDefenderFavored) {

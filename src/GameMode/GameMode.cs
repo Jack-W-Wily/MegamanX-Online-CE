@@ -703,6 +703,9 @@ public class GameMode {
 					xStart += 15;
 				}
 			}
+
+
+			
 			if (drawPlayer.character is PunchyZero punchyZero) {
 				int xStart = 11;
 				int yStart = 159;
@@ -1633,6 +1636,11 @@ public class GameMode {
 		Weapon? weapon = player.lastHudWeapon;
 		if (player.character != null) {
 			weapon = player.weapon;
+
+			if (player.character is XAnother XA && player.weapon is XBuster) {
+				weapon = XA.gigaAttack;
+			}
+
 			if (player.character is Zero zero) {
 				weapon = zero.gigaAttack;
 			}

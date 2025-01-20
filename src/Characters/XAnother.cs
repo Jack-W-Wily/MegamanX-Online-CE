@@ -135,6 +135,10 @@ public class XAnother : Character {
 	public float weaknessCooldown;
 
 
+	public Weapon gigaAttack;
+	public int gigaAttackSelected;
+
+
 	public Projectile? unpoAbsorbedProj;
 	public XAnother(
 		Player player, float x, float y, int xDir,
@@ -152,6 +156,17 @@ public class XAnother : Character {
 		} else {
 			specialBuster = new XBuster();
 		}
+
+
+
+			gigaAttackSelected = player.loadout.zeroLoadout.gigaAttack;
+		gigaAttack = player.loadout.zeroLoadout.gigaAttack switch {
+			1 => new CFlasher(),
+			2 => new RekkohaWeapon(),
+			_ => new RakuhouhaWeapon(),
+		};
+
+
 	}
 
 
@@ -159,6 +174,26 @@ public class XAnother : Character {
 
 public override bool normalCtrl() {
 		
+	if (gigaAttack.ammo >= 5 &&
+				player.input.isPressed(Control.Dash, player) &&
+				player.input.isHeld(Control.Up, player) 
+				
+			) {
+				gigaAttack.ammo -= 5;
+				changeState(new UpDash(Control.Dash));
+				return true;
+			}
+
+	if (charState is Dash or AirDash &&
+		player.input.isHeld(Control.Down, player)
+		&& gigaAttack.ammo >= 3
+		){
+			gigaAttack.ammo -= 3;
+			changeState(new XIceSlide());
+				slideVel = xDir * getDashSpeed() * 2;
+			return true;
+		}
+
 	if (charState is not Dash && grounded && 
 				player.input.isHeld(Control.Up, player) )
 			 {
@@ -257,20 +292,34 @@ public override bool normalCtrl() {
 		// Shotos
 
 		
-		bool hadokenCheck = false;
-		bool shoryukenCheck = false;
-	
-		hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
-		shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
-		
-		if (player.isX && hadokenCheck && canUseFgMove()) {
 
+	
+		bool hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
+		bool shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		
+		if ( hadokenCheck && gigaAttack.ammo >= 14) {
+			gigaAttack.ammo -= 14;
 			changeState(new Hadouken(), true);
 		}
-		if (player.isX && shoryukenCheck && canUseFgMove()) {
-	
+		if (shoryukenCheck && gigaAttack.ammo >= 14) {
+			 gigaAttack.ammo -= 14;
 			changeState(new Shoryuken(isUnderwater()), true);
 		}
+
+		if (gigaAttack.ammo > 0 && player.input.isHeld(Control.Down,player) &&
+		charState is Jump && !sprite.name.Contains("headbutt")){
+		 gigaAttack.ammo -= 1;
+		changeSpriteFromName("headbutt", false);
+		}
+
+		if (gigaAttack.ammo > 0 && player.input.isPressed(Control.Dash,player) &&
+		sprite.name.Contains("unpo")){
+		 gigaAttack.ammo -= 1;
+		changeState(new XlightKick(), true);
+		}
+
+
+
 		//>>>>>>>>>>>>>>>>>
 
 			player.fgMoveAmmo += Global.speedMul;
@@ -380,22 +429,14 @@ public override bool normalCtrl() {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
 			}  
-			if  ( hasUltimateArmor && parryCooldown == 0 &&
+			if  ( gigaAttack.ammo >= 5 && parryCooldown == 0 &&
 				 player.input.isPressed(Control.Special1, player) &&
 				 player.input.isHeld(Control.Down, player)		 ) {
-				if (unpoAbsorbedProj != null) {
-					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-					unpoAbsorbedProj = null;
-				
-				} else {
+					gigaAttack.ammo -= 5;
 					changeState(new XUPParryStartState(), true);
 				}
-			}
-			 if (!hasUltimateArmor && 
-			 player.input.isPressed(Control.Special1, player) &&
-			 player.input.isHeld(Control.Down, player) ) {
-					changeState(new GlobalParryState(), true);	
-			}
+			
+		
 		return base.attackCtrl();
 	}
 
@@ -696,6 +737,31 @@ public override bool normalCtrl() {
 	}
 
 	
+	
+	public enum MeleeIds {
+		None = -1,
+		SpeedBurnerCharged,
+		LigthHeadbutt,
+		LigthHeadbuttEX,
+		Shoryuken,
+		MaxZSaber,
+		ZSaber,
+		ZSaberAir,
+		NovaStrike,
+		XBlock,
+		UPGrab,
+		UPPunch,
+
+		UPDash,
+
+		IceSlide,
+
+		LightKick,
+
+		UPParryBlock,
+	}
+
+
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
@@ -709,10 +775,12 @@ public override bool normalCtrl() {
 			"rmx_unpo_grab_dash" => MeleeIds.UPGrab,
 			"rmx_unpo_punch" or "rmx_unpo_air_punch" or "rmx_unpo_punch_2" => MeleeIds.UPPunch,
 			"rmx_unpo_parry_start" => MeleeIds.UPParryBlock,
-
+			"rmx_up_dash"  => MeleeIds.UPDash,
+			"rmx_sice_slide"  => MeleeIds.IceSlide,
 			// Light Helmet.
-		//	"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
-		//	when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbutt,
+			"rmx_headbutt"  => MeleeIds.LigthHeadbutt,
+
+			"rmx_kick_lightarmor"  => MeleeIds.LightKick,
 			// Light Helmet when it up-dashes.
 		//	"rmx_up_dash" or "rmx_up_dash_shoot"
 		//	when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbuttEX,
@@ -746,6 +814,22 @@ public override bool normalCtrl() {
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
 				4, Global.defFlinch, 20f, addToLevel: addToLevel
 			),
+			(int)MeleeIds.IceSlide => new GenericMeleeProj(
+				ZXSaber.netWeapon, projPos, ProjIds.SiceSlide, player,
+				2, Global.defFlinch, 20f, addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.LightKick => new GenericMeleeProj(
+				ZXSaber.netWeapon, projPos, ProjIds.NormalPush, player,
+				3, 0, 20f, addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.UPDash => new GenericMeleeProj(
+				ZXSaber.netWeapon, projPos, ProjIds.MechFrogGroundPound, player,
+				3, 30, 20f, addToLevel: addToLevel
+			),
+
+
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
 				2, 10, 10f, addToLevel: addToLevel
@@ -774,22 +858,6 @@ public override bool normalCtrl() {
 			),
 			_ => null
 		};
-	}
-
-	public enum MeleeIds {
-		None = -1,
-		SpeedBurnerCharged,
-		LigthHeadbutt,
-		LigthHeadbuttEX,
-		Shoryuken,
-		MaxZSaber,
-		ZSaber,
-		ZSaberAir,
-		NovaStrike,
-		XBlock,
-		UPGrab,
-		UPPunch,
-		UPParryBlock,
 	}
 
 

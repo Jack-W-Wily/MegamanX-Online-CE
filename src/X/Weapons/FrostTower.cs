@@ -43,7 +43,7 @@ public class FrostTower : Weapon {
 		if (chargeLevel ==2) {
 			character.changeState(new FrostTowerSemiChargedState(), true);
 		}
-		if (chargeLevel >3 ) {
+		if (chargeLevel >=3 ) {
 			character.changeState(new FrostTowerChargedState(), true);
 		}
 	}
