@@ -34,17 +34,17 @@ public class InGameMainMenu : IMainMenu {
 				}
 
 				if (isSelWepDisabled()) return;
-				if (selectedCharNum == (int)CharIds.ZeroX1) {
-					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
-				} else if (selectedCharNum == 4) {
+				if (selectedCharNum == (int)CharIds.Sigma) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
-				} else if (selectedCharNum == 3) {
+				} else if (selectedCharNum == (int)CharIds.AxlWC) {
+					Menu.change(new SelectAxlWeaponMenu(this, true));
+				} /*else if (selectedCharNum == 3) {
 					Menu.change(new SelectAxlWeaponMenu(this, true));
 				} else if (selectedCharNum == 2) {
 					Menu.change(new SelectVileWeaponMenu(this, true));
 				} else if (selectedCharNum == 1) {
 					Menu.change(new SelectZeroWeaponMenu(this, true));
-				} else {
+				}*/ else {
 					Menu.change(new SelectWeaponMenu(this, true));
 				}
 			} else if (selectY == 1) {
@@ -84,7 +84,10 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelWepDisabled() {
-		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.ZeroX2;
+		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.ZeroX6 || 
+		mainPlayer?.realCharNum == (int)CharIds.GBD || mainPlayer?.realCharNum == (int)CharIds.Zain ||
+		mainPlayer?.realCharNum == (int)CharIds.Dragoon || mainPlayer?.realCharNum == (int)CharIds.ZeroX1 ||
+		mainPlayer?.realCharNum == (int)CharIds.Vile;
 	}
 
 	public bool isSelArmorDisabled() {

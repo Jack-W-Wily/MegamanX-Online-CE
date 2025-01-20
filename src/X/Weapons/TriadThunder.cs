@@ -10,7 +10,7 @@ public class TriadThunder : Weapon {
 		shootSounds = new string[] { "triadThunder", "triadThunder", "triadThunder", "", "" };
 		fireRate = 135;
 		index = (int)WeaponIds.TriadThunder;
-		weaponBarBaseIndex = 19;
+		weaponBarBaseIndex = (int)WeaponBarIndex.TriadThunder;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 19;
 		killFeedIndex = 42;

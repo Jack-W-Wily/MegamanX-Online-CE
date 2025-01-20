@@ -227,6 +227,7 @@ public class GBeetleShoot : MaverickState {
 public class GBeetleDashState : MaverickState {
 	float soundTime;
 	float dustTime;
+	Anim dust;
 	float partTime;
 	public GBeetleDashState() : base("dash", "dash_start") {
 	}
@@ -246,7 +247,9 @@ public class GBeetleDashState : MaverickState {
 		}
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
-			new Anim(maverick.getFirstPOIOrDefault(0), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			dust = new DashDustAnim(maverick.getFirstPOIOrDefault(0), player.getNextActorNetId(), true, true);
+			dust.xDir = maverick.xDir;
+			//new Anim(maverick.getFirstPOIOrDefault(0), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
 			dustTime = 0.05f;
 		}
 		Helpers.decrementTime(ref partTime);
@@ -443,7 +446,7 @@ public class GBeetleGravityWellProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
 		Character chr = actor as Character;
 		if (chr != null && !chr.isPushImmune()) return;

@@ -25,8 +25,12 @@ public class Weapon {
 	public int index;
 	public int killFeedIndex;
 	public int weaponBarBaseIndex;
+	public int weaponBarBaseLowIndex;
 	public int weaponBarIndex;
+	public int weaponBarLowIndex;
 	public int weaponSlotIndex;
+	public int weaponSlotLowIndex;
+	
 	public int weaknessIndex;
 	public int vileWeight;
 

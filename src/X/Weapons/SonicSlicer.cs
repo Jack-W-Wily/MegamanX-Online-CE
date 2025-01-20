@@ -10,7 +10,7 @@ public class SonicSlicer : Weapon {
 		shootSounds = new string[] { "sonicSlicer", "sonicSlicer", "sonicSlicer", "sonicSlicerCharged" , ""};
 		fireRate = 60;
 		index = (int)WeaponIds.SonicSlicer;
-		weaponBarBaseIndex = 13;
+		weaponBarBaseIndex = (int)WeaponBarIndex.SonicSlicer;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 13;
 		killFeedIndex = 24;

@@ -12,8 +12,8 @@ public partial class Character : Actor, IDamagable {
 	public static string[] charDisplayNames = {
 		"X", //0
 		"X (Another)", //1
-		"Zero (X1 - MHX)", //2
-		"Zero (X2 - X5)", //3
+		"Zero (Early)", //2
+		"Zero (Mid)", //3
 		"? ? ?", //4
 	//	"Zero (X5 - X6)",
 		"Vile", //5
@@ -341,7 +341,9 @@ public partial class Character : Actor, IDamagable {
 		lastGravityWellDamager = player;
 		maxHealth = (decimal)player.getMaxHealth();
 		health = 1;
-		healAmount = (float)maxHealth - 1;
+		if (player.disguise == null) {
+			healAmount = (float)maxHealth - 1;
+		}
 	}
 
 	public override void onStart() {
@@ -1396,6 +1398,7 @@ public partial class Character : Actor, IDamagable {
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
 			dashedInAir = 0;
+			isDashing = false;
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide or WallSlideAttack)
 			) {
@@ -1797,7 +1800,10 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isStunImmune() {
-		return isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() || charState.invincible;
+		return (
+			isStatusImmune() || isInvulnerable() || isNonDamageStatusImmune() ||
+			charState.invincible || charState.stunResistant
+		);
 	}
 
 	public virtual bool isFlinchImmune() {
@@ -1808,7 +1814,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isPushImmune() {
-		return isTrueStatusImmune() || charState?.immuneToWind == true || immuneToKnockback || isClimbingLadder();
+		return isTrueStatusImmune() || charState.immuneToWind == true || immuneToKnockback || isClimbingLadder();
 	}
 
 	public virtual bool isTimeImmune() {

@@ -38,7 +38,7 @@ public class CrystalSnail : Maverick {
 		canHealAmmo = true;
 		ammo = 32;
 		maxAmmo = 32;
-		barIndexes = (54, 43);
+		//barIndexes = (54, 43);
 
 		armorClass = ArmorClass.Light;
 	}
@@ -74,7 +74,7 @@ public class CrystalSnail : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if ((state is MIdle or MRun or MLand)) {
+			if ((state is MIdle or MRun or MLand or MJump or MFall)) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CSnailShootState());
 				} else if (input.isPressed(Control.Dash, player)) {

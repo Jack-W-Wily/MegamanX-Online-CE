@@ -12,7 +12,7 @@ public class StrikeChain : Weapon {
 		shootSounds = new string[] { "strikeChain", "strikeChain", "strikeChain", "strikeChainCharged", "" };
 		fireRate = 15;
 		index = (int)WeaponIds.StrikeChain;
-		weaponBarBaseIndex = 14;
+		weaponBarBaseIndex = (int)WeaponBarIndex.StrikeChain;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 14;
 		killFeedIndex = 20 + (index - 9);

@@ -16,7 +16,7 @@ public class BubbleSplash : Weapon {
 		fireRate = 6;
 		isStream = true;
 		index = (int)WeaponIds.BubbleSplash;
-		weaponBarBaseIndex = 10;
+		weaponBarBaseIndex = (int)WeaponBarIndex.BubbleSplash;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 10;
 		killFeedIndex = 21;

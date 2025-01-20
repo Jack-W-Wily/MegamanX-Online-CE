@@ -11,8 +11,8 @@ public class HyperNovaStrike : Weapon {
 		shootSounds = new string[] { "", "", "", "" };
 		fireRate = 90;
 		index = (int)WeaponIds.NovaStrike;
-		weaponBarBaseIndex = 42;
-		weaponBarIndex = 36;
+		weaponBarBaseIndex = (int)WeaponBarIndex.NovaStrike;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 95;
 		killFeedIndex = 104;
 		ammo = 28;

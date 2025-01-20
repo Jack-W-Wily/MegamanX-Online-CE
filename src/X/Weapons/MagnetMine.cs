@@ -12,7 +12,7 @@ public class MagnetMine : Weapon {
 		shootSounds = new string[] { "magnetMine", "magnetMine", "magnetMine", "magnetMineCharged" , ""};
 		fireRate = 45;
 		index = (int)WeaponIds.MagnetMine;
-		weaponBarBaseIndex = 15;
+		weaponBarBaseIndex = (int)WeaponBarIndex.MagnetMine;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 15;
 		killFeedIndex = 20 + (index - 9);

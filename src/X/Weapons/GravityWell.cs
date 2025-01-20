@@ -9,7 +9,7 @@ public class GravityWell : Weapon {
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" , ""};
 		fireRate = 30;
 		index = (int)WeaponIds.GravityWell;
-		weaponBarBaseIndex = 22;
+		weaponBarBaseIndex = (int)WeaponBarIndex.GravityWell;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 22;
 		killFeedIndex = 45;
@@ -241,7 +241,7 @@ public class GravityWellProj : Projectile, IDamagable {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
 		if (actor is Character chr && (chr.isPushImmune() || chr.isSlowImmune())) return;
 

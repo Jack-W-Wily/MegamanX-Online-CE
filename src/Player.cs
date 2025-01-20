@@ -122,7 +122,7 @@ public partial class Player {
 	public bool isXAnother { get { return charNum == (int)CharIds.XAnother; } }
 
 	
-	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
+	public bool isZero { get { return charNum == (int)CharIds.ZeroX2; } }
 	public bool isX1Zero { get { return charNum == (int)CharIds.ZeroX1; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxlXOD { get { return charNum == (int)CharIds.AxlOld; } }
@@ -221,14 +221,14 @@ public partial class Player {
 	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
 		{ (int)CharIds.X, new List<SubTank>() },
 		{ (int)CharIds.XAnother, new() },
-		{ (int)CharIds.Zero, new List<SubTank>() },
+		{ (int)CharIds.ZeroX2, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
 		{ (int)CharIds.AxlOld, new List<SubTank>() },
 		{ (int)CharIds.AxlWC, new List<SubTank>() },
 		{ (int)CharIds.AxlX8, new List<SubTank>() },
 		{ (int)CharIds.Sigma, new List<SubTank>() },
 		{ (int)CharIds.ZeroX1, new List<SubTank>() },
-		{ (int)CharIds.ZeroX2, new List<SubTank>() },
+		{ (int)CharIds.ZeroX6, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
 		{ (int)CharIds.GBD, new List<SubTank>() },
@@ -240,14 +240,14 @@ public partial class Player {
 	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
 		{ (int)CharIds.X, new() },
 		{ (int)CharIds.XAnother, new() },
-		{ (int)CharIds.Zero, new() },
+		{ (int)CharIds.ZeroX2, new() },
 		{ (int)CharIds.Vile, new() },
 		{ (int)CharIds.AxlOld, new() },
 		{ (int)CharIds.AxlWC, new() },
 		{ (int)CharIds.AxlX8, new () },
 		{ (int)CharIds.Sigma, new() },
 		{ (int)CharIds.ZeroX1, new() },
-		{ (int)CharIds.ZeroX2, new() },
+		{ (int)CharIds.ZeroX6, new() },
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Zain, new() },
 		{ (int)CharIds.GBD, new() },
@@ -468,7 +468,7 @@ public partial class Player {
 	public SoulBodyClone? sClone;
 
 
-	ExplodeDieEffect explodeDieEffect;
+	public ExplodeDieEffect explodeDieEffect;
 	public Character limboChar;
 	public bool suicided;
 
@@ -829,9 +829,6 @@ public partial class Player {
 	}
 
 	public bool isCrouchHeld() {
-		if (isControllingPuppet()) {
-			return true;
-		}
 		if (character == null) {
 			return false;
 		}
@@ -1172,7 +1169,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.Zero) {
+		} else if (charNum == (int)CharIds.ZeroX2) {
 			character = new Zero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1209,7 +1206,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.ZeroX2) {
+		} else if (charNum == (int)CharIds.ZeroX6) {
 			character = new BusterZero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1446,7 +1443,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.Zero) {
+		} else if (data.charNum == (int)CharIds.ZeroX2) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
@@ -1484,7 +1481,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.ZeroX2) {
+		} else if (data.charNum == (int)CharIds.ZeroX6) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
@@ -1619,7 +1616,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.Zero) {
+		} else if (charNum == (int)CharIds.ZeroX2) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
@@ -1662,7 +1659,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.ZeroX2) {
+		} else if (charNum == (int)CharIds.ZeroX6) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
@@ -1699,7 +1696,7 @@ public partial class Player {
 		} else if  (charNum == (int)CharIds.KaiserSigma) {
 			retChar = new KaiserSigma(
 				this, character.pos.x, character.pos.y, character.xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer, isRevive: false
 			);
 		} else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
@@ -1713,13 +1710,13 @@ public partial class Player {
 		// Weapon configuration.
 		oldWeapons = weapons;
 
-		if (charNum == (int)CharIds.Zero) {
+		if (charNum == (int)CharIds.ZeroX2) {
 			retChar.weapons.Add(new ZSaber());
 		}
-		if (charNum == (int)CharIds.ZeroX2) {
+		if (charNum == (int)CharIds.ZeroX1) {
 			retChar.weapons.Add(new KKnuckleWeapon());
 		}
-		if (charNum == (int)CharIds.ZeroX1) {
+		if (charNum == (int)CharIds.ZeroX6) {
 			retChar.weapons.Add(new ZeroBuster());
 		}
 		if (charNum == (int)CharIds.Dragoon) {
@@ -1756,15 +1753,20 @@ public partial class Player {
 		//retChar.heal(maxHealth);
 
 		// Speed and state.
-		if (character.charState.canStopJump) {
-			retChar.changeState(new Jump(), true);
-		} else {
-			retChar.changeToIdleOrFall();
+		if (retChar.charId != CharIds.KaiserSigma) {
+			if (character.charState.canStopJump) {
+				retChar.changeState(new Jump(), true);
+			} else {
+				retChar.changeToIdleOrFall();
+			}
+			retChar.vel = character.vel;
+			retChar.slideVel = character.slideVel;
+			retChar.xFlinchPushVel = character.xFlinchPushVel;
+			retChar.xIceVel = character.xIceVel;
 		}
-		retChar.vel = character.vel;
-		retChar.slideVel = character.slideVel;
-		retChar.xFlinchPushVel = character.xFlinchPushVel;
-		retChar.xIceVel = character.xIceVel;
+		retChar.health = character.health;
+		retChar.maxHealth = character.maxHealth;
+		retChar.healAmount = character.healAmount;
 
 		// Status effects.
 		retChar.burnTime = character.burnTime;
@@ -1858,7 +1860,11 @@ public partial class Player {
 			character.weaponSlot = 0;
 			lastDNACore = null;
 			lastDNACoreIndex = 4;
-			character.weapons.AddRange(oldChar.weapons.Where((Weapon w) => w is MaverickWeapon { summonedOnce: true }));
+
+			character.weapons.AddRange(oldChar.weapons.Where(
+				(Weapon w) => w is MaverickWeapon { summonedOnce: true } && !character.weapons.Contains(w)
+			));
+
 			character.grounded = oldChar.grounded;
 			if (oldChar.charState.canStopJump && !oldChar.grounded) {
 				character.changeState(new Jump(), true);
@@ -2263,7 +2269,6 @@ public partial class Player {
 				newNetId, true
 			);
 			character = kaiserSigma;
-			character.changeSprite("kaisersigma_enter", true);
 			//explodeDieEffect.changeSprite("sigma3_revive");
 			if (Global.level.is1v1() && spawnPoint.isZero()) {
 				var closestSpawn = Global.level.spawnPoints.OrderBy(
@@ -2271,7 +2276,6 @@ public partial class Player {
 				).FirstOrDefault();
 				spawnPoint = closestSpawn?.pos ?? new Point(Global.level.width / 2, character.pos.y);
 			}
-			character.changeState(new KaiserSigmaRevive(explodeDieEffect, spawnPoint), true);
 		}
 		RPC.reviveSigma.sendRpc(form, spawnPoint, id, newNetId);
 	}

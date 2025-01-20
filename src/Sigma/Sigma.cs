@@ -293,7 +293,7 @@ public class BaseSigma : Character {
 						}
 
 						mw.summon(player, currentPos.addxy(0, -112), currentPos, xDir);
-						mw.maverick.health = mw.lastHealth;
+						mw.maverick!.health = mw.lastHealth;
 						becomeMaverick(mw.maverick);
 					}
 				}
@@ -327,7 +327,7 @@ public class BaseSigma : Character {
 			var mw = player.weapons[0] as MaverickWeapon;
 			if (mw != null) {
 				mw.summon(player, pos.addxy(0, -112), pos, xDir);
-				mw.maverick.health = mw.lastHealth;
+				mw.maverick!.health = mw.lastHealth;
 				becomeMaverick(mw.maverick);
 			}
 		}
@@ -353,7 +353,11 @@ public class BaseSigma : Character {
 	}
 
 	public override bool normalCtrl() {
-		var changedState = base.normalCtrl();
+		if (grounded && player.isControllingPuppet()) {
+			changeState(new SigmaBlock());
+			return true;
+		}
+		bool changedState = base.normalCtrl();
 		if (changedState || !charState.normalCtrl) {
 			return true;
 		}

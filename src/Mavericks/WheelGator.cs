@@ -150,7 +150,7 @@ public class WheelGator : Maverick {
 			),
 				MeleeIds.Claw => new GenericMeleeProj(
 				GatorEatWeapon, pos, ProjIds.HeavyPush, player,
-				3, Global.defFlinch, addToLevel: addToLevel
+				3, 0, addToLevel: addToLevel
 			),
 			MeleeIds.Fall => new GenericMeleeProj(
 				GatorFallWeapon, pos, ProjIds.DynamoDropSlash, player,

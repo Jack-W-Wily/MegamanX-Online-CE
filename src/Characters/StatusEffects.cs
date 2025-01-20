@@ -542,15 +542,12 @@ public class LaunchedState : GenericGrabbedState {
 				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
 					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 						if (!once){
-								once = true;
+							once = true;
 							character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
-						//	character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
-		
-						}
 							character.playSound("crash", sendRpc: true);
 							character.shakeCamera(sendRpc: true);
-							//return;
-						}
+					}
+				}
 			}
 	
 		}

@@ -15,8 +15,7 @@ public class RayGunWC : AxlWeaponWC {
 		flashSprite = "axl_raygun_flash";
 		chargedFlashSprite = "axl_raygun_flash";
 		index = (int)WeaponIds.RayGun;
-		weaponBarBaseIndex = 30;
-		weaponBarIndex = 28;
+		weaponBarBaseIndex = (int)WeaponBarIndex.RayGun;
 		weaponSlotIndex = 34;
 		killFeedIndex = 33;
 		canHealAmmo = false;

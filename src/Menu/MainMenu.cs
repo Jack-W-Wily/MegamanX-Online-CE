@@ -220,7 +220,7 @@ public class MainMenu : IMainMenu {
 				Global.sprites["menu_x2_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-		/*	case (int)CharIds.Zero:
+		/*	case (int)CharIds.Zerox2:
 				Global.sprites["menu_x6_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;*/
@@ -328,7 +328,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case (int)CharIds.Zero: //ZX6
+				case (int)CharIds.ZeroX6: //ZX6
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);

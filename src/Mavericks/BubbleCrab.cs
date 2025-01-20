@@ -38,7 +38,7 @@ public class BubbleCrab : Maverick {
 		ammo = 32;
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
-		barIndexes = (62, 51);
+		//barIndexes = (62, 51);
 
 		armorClass = ArmorClass.Light;
 	}

@@ -39,7 +39,7 @@ public class VoltCatfish : Maverick {
 		ammo = 0;
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
-		barIndexes = (65, 54);
+		//barIndexes = (65, 54);
 	}
 
 	public override void update() {
@@ -312,7 +312,7 @@ public class VoltCSuckProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		if (vc == null) return;
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
 			return;
 		}

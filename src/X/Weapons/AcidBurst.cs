@@ -10,8 +10,8 @@ public class AcidBurst : Weapon {
 		shootSounds = new string[] { "acidBurst", "acidBurst", "acidBurst", "acidBurst", "" };
 		fireRate = 30;
 		index = (int)WeaponIds.AcidBurst;
-		weaponBarBaseIndex = 17;
-		weaponBarIndex = 17;
+		weaponBarBaseIndex = (int)WeaponBarIndex.AcidBurst;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 17;
 		killFeedIndex = 40;
 		

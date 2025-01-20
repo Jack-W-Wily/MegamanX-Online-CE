@@ -280,6 +280,7 @@ public class TunnelRShoot2State : MaverickState {
 
 public class TunnelRDashState : MaverickState {
 	float dustTime;
+	Anim dust;
 	public TunnelRDashState() : base("dash", "dash_start") {
 		superArmor = true;
 	}
@@ -291,13 +292,15 @@ public class TunnelRDashState : MaverickState {
 
 		dustTime += Global.spf;
 		if (dustTime > 0.05f) {
+			dust = new DashDustAnim(maverick.pos.addxy(-maverick.xDir * 10, 0), player.getNextActorNetId(), true, true);
+			dust.xDir = maverick.xDir;
 			dustTime = 0;
-			new Anim(
+			/*new Anim(
 				maverick.pos.addxy(-maverick.xDir * 10, 0), "dust", 1,
 				player.getNextActorNetId(), true, sendRpc: true
 			) {
 				vel = new Point(0, -50)
-			};
+			};*/
 		}
 
 		var move = new Point(300 * maverick.xDir, 0);

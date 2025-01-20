@@ -369,6 +369,50 @@ public class MegamanX : Character {
 		shoot(chargeLevel, currentWeapon, false);
 	}
 
+
+	public void maxArmorChargeShots(int type, HyperCharge hcWep) {
+		Point shootPos = getShootPos();
+		int shootDir = getShootXDir();
+		if (hcWep != null) {
+			hcWep.ammo -= hcWep.getChipFactoredAmmoUsage(player) / 2;
+		}
+		if (type == 0) {
+			new BusterX3Proj1(
+				player.weapon, shootPos, shootDir,
+				0, player, player.getNextActorNetId(), rpc: true
+			);
+			playSound("buster3X3", sendRpc: true);
+			stockedX3Charge = true;
+			shootCooldown = 0;
+		} else if (type == 1) {
+			new BusterX3Proj1(
+				player.weapon, shootPos, shootDir,
+				0, player, player.getNextActorNetId(), rpc: true
+			);
+			playSound("buster3X3", sendRpc: true);
+			stockedX3Charge = true;
+			shootCooldown = 0;
+		} else if (type == 2) {
+				new Buster3Proj(
+				shootPos, shootDir,
+				0, player, player.getNextActorNetId(), rpc: true
+			);
+			playSound("buster3X3", sendRpc: true);
+			stockedX3Charge = false;
+			shootCooldown = 30f;
+		} else if (type == 3) {
+			new Buster3Proj(
+				shootPos, shootDir,
+				0, player, player.getNextActorNetId(), rpc: true
+			);
+			playSound("buster3X3", sendRpc: true);
+			stockedX3Charge = false;
+			shootCooldown = 30f;
+		}
+
+	}
+
+
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
 		// Check if can shoot.
 		if (shootCooldown > 0 ||
@@ -754,6 +798,13 @@ public class MegamanX : Character {
 			);
 		}
 	}
+
+
+	public override bool isToughGuyHyperMode() {
+		return charState is GigaAirDash or LigthDash or X2ChargeShot;
+	}
+
+
 
 	public enum MeleeIds {
 		None = -1,

@@ -28,7 +28,7 @@ public class CrushCrawfish : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CrushCShootArmState());
 				} else if (input.isPressed(Control.Special1, player)) {
@@ -227,6 +227,7 @@ public class CrushCShootArmState : MaverickState {
 
 public class CrushCDashState : MaverickState {
 	float dustTime;
+	Anim dust;
 	float ftdWaitTime;
 	public CrushCDashState() : base("dash", "dash_start") {
 		enterSound = "dashX3";
@@ -244,7 +245,9 @@ public class CrushCDashState : MaverickState {
 
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
-			new Anim(maverick.pos.addxy(-maverick.xDir * 10, 0), "dust", maverick.xDir, null, true);
+			dust = new DashDustAnim(maverick.pos.addxy(maverick.xDir * 10, 0), player.getNextActorNetId(), true, true);
+			dust.xDir = maverick.xDir;
+		//	new Anim(maverick.pos.addxy(-maverick.xDir * 10, 0), "dust", maverick.xDir, null, true);
 			dustTime = 0.075f;
 		}
 

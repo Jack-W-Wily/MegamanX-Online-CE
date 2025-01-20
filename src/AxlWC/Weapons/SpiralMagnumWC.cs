@@ -10,7 +10,7 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 		fireRate = 30;
 		altFireRate = 40;
 		index = (int)WeaponIds.SpiralMagnum;
-		weaponBarBaseIndex = 34;
+		weaponBarBaseIndex = (int)WeaponBarIndex.SpiralMagnum;
 		weaponSlotIndex = 54;
 		killFeedIndex = 69;
 

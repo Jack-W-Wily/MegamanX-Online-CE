@@ -12,7 +12,7 @@ public class SpinningBlade : Weapon {
 		shootSounds = new string[] { "", "", "", "spinningBladeCharged", "" };
 		fireRate = 75;
 		index = (int)WeaponIds.SpinningBlade;
-		weaponBarBaseIndex = 20;
+		weaponBarBaseIndex = (int)WeaponBarIndex.SpinningBlade;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 20;
 		killFeedIndex = 43;

@@ -12,8 +12,8 @@ public class FrostTower : Weapon {
 		fireRate = 90;
 		switchCooldownFrames = 21;
 		index = (int)WeaponIds.FrostTower;
-		weaponBarIndex = 62;
-		weaponBarBaseIndex = 73;
+		weaponBarBaseIndex = (int)WeaponBarIndex.FrostTower;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 124;
 		killFeedIndex = 184;
 		weaknessIndex = (int)WeaponIds.RisingFire;
@@ -37,10 +37,15 @@ public class FrostTower : Weapon {
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];
 
-		if (chargeLevel < 3) {
+		if (chargeLevel <2) {
 			character.changeState(new FrostTowerState(), true);
 		}
-		else character.changeState(new FrostTowerChargedState(), true);
+		if (chargeLevel ==2) {
+			character.changeState(new FrostTowerSemiChargedState(), true);
+		}
+		if (chargeLevel >3 ) {
+			character.changeState(new FrostTowerChargedState(), true);
+		}
 	}
 }
 
@@ -91,7 +96,7 @@ public class FrostTowerProj : Projectile, IDamagable
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 1, player, "frosttower_proj", 
-		0, 0.5f, netProjId, player.ownedByLocalPlayer
+		4, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 2.5f;
 		projId = (int)ProjIds.FrostTower;
@@ -159,6 +164,68 @@ public class FrostTowerProj : Projectile, IDamagable
 		breakFreeze(owner);
 	}
 }
+
+
+
+
+public class FrostTowerSemiChargedState : CharState {
+
+	bool fired;
+	int lap = 1;
+	float cooldown = 15;
+	Point spawnPos;
+	float extraPos;
+	float p = 48;
+
+	public FrostTowerSemiChargedState() : base("summon") {
+		normalCtrl = false;
+		attackCtrl = false;
+		useDashJumpSpeed = true;
+		useGravity = false;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		spawnPos = character.getCenterPos().addxy(0, -96);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		//MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+		//mmx.shootCooldown = 60;
+	}
+
+	public override void update() {
+		base.update();
+
+	
+		int xDir = character.getShootXDir();
+
+		if (character.frameIndex >= 1) {
+			Helpers.decrementFrames(ref cooldown);
+		}
+
+		if (cooldown <= 0) {
+			if (lap > 1) character.changeToIdleOrFall();
+			else shoot(spawnPos, xDir, lap);
+		} 
+	}
+
+	void shoot(Point pos, int xDir, int l) {
+		for (int i = 0; i < l; i++) {
+			float extra = extraPos + (i * p * 2);
+			new FrostTowerProjCharged(new FrostTower(), pos.addxy(extra, 0), xDir, player, player.getNextActorNetId(), true) ;
+	//		{ canReleasePlasma = player.hasPlasma() && l == 1 };
+			character.playSound("frostTower", sendRpc: true);
+		}
+		character.shakeCamera(true);
+		cooldown = 45;
+		extraPos -= p;
+		lap++;
+	} 
+}
+
 
 
 public class FrostTowerChargedState : CharState {

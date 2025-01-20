@@ -12,7 +12,7 @@ public class CrystalHunter : Weapon {
 		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged", "" };
 		fireRate = 75;
 		index = (int)WeaponIds.CrystalHunter;
-		weaponBarBaseIndex = 9;
+		weaponBarBaseIndex = (int)WeaponBarIndex.CrystalHunter;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 9;
 		killFeedIndex = 20;

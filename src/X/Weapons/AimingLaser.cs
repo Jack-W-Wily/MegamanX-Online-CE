@@ -13,8 +13,8 @@ public class AimingLaser : Weapon {
 		index = (int)WeaponIds.AimingLaser;
 		fireRate = 60;
 		weaponSlotIndex = 128;
-        weaponBarBaseIndex = 77;
-        weaponBarIndex = 66;
+        weaponBarBaseIndex = (int)WeaponBarIndex.AimingLaser;
+        weaponBarIndex = weaponBarBaseIndex;
 		shootSounds = new string[] {"torpedo","torpedo","","dynamopillar","dynamopillar"};
 		weaknessIndex = (int)WeaponIds.SoulBody;
 		type = index;

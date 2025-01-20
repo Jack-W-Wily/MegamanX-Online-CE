@@ -651,20 +651,14 @@ public class GameMode {
 			}
 			// Zain display
 			if (drawPlayer.character is Zain zain) {
-					int yStart = 159;
-						int xStart = 26;
-
-						
-					Global.sprites["hud_zaincounter"].drawToHUD(170, 7, 155);
-					Fonts.drawText(FontType.Grey,
-				"x" + zain.ZainCounters, 16, 152, Alignment.Left
-					);
+				int yStart = 159;
+				int xStart = 26;	
+				Global.sprites["hud_zaincounter"].drawToHUD(0, 14, 158);
+				Fonts.drawText(FontType.Grey,
+				"x" + zain.ZainCounters, 28, 155, Alignment.Left);
 				///	yStart += 12;
-
-
-			
 				yStart -= 36;
-				Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
+				/*Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
 				for (var i = 0; i < MathF.Ceiling(zain.player.vileMaxAmmo ); i++) {
 				if (i < Math.Ceiling(zain.player.vileAmmo)) {
 					Global.sprites["hud_weapon_full"].drawToHUD(32, xStart, yStart);
@@ -673,7 +667,7 @@ public class GameMode {
 				}
 				yStart -= 2;
 				}
-				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);
+				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);*/
 		
 				}
 
@@ -735,21 +729,22 @@ public class GameMode {
 					xStart += 15;
 				}
 			}
-			if (drawPlayer.character is Vile vilin) {
+			if (drawPlayer.character is Vile vilin && drawPlayer.character?.rideArmor == null) {
+				if(drawPlayer.character?.rideChaser != null) return;
 				int xStart = 26;
-				int yStart = 129;
+				int yStart = 133;
 				
-				Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
-				yStart -= 16;
+				Global.sprites["hud_bars_base_generic"].drawToHUD(1, xStart, yStart);
+				yStart -= 14;
 				for (var i = 0; i < MathF.Ceiling(vilin.player.vileMaxAmmo ); i++) {
 				if (i < Math.Ceiling(vilin.player.vileAmmo)) {
-					Global.sprites["hud_weapon_full"].drawToHUD(32, xStart, yStart);
+					Global.sprites["hud_bars_generic"].drawToHUD(6, xStart, yStart);
 				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, xStart, yStart);
+					Global.sprites["hud_bars_generic"].drawToHUD(1, xStart, yStart);
 				}
 				yStart -= 2;
 				}
-				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);
+				Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
 			}
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
@@ -1371,7 +1366,8 @@ public class GameMode {
 	public bool renderHealth(Player player, HUDHealthPosition position, bool isMech) {
 		bool mechBarExists = false;
 
-		string spriteName = "hud_health_base";
+		string spriteName = "hud_bars_char_hp";
+		int barIndex = 2;
 		float health = player.health;
 		float maxHealth = player.maxHealth;
 		float damageSavings = 0;
@@ -1386,13 +1382,40 @@ public class GameMode {
 			damageSavings = 0;
 		}
 
-		int frameIndex = player.charNum;
-		if (player.charNum == (int)CharIds.ZeroX1) {
-			frameIndex = 1;
+		int frameIndex = 0;
+		if (player.charNum == (int)CharIds.XAnother) {
+			frameIndex = (int)CharHpBarIndex.XAnother;
+		}if (player.charNum == (int)CharIds.ZeroX1) {
+			frameIndex = (int)CharHpBarIndex.ZeroX1;
+		}if (player.charNum == (int)CharIds.ZeroX2) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.ZeroX6) {
+			frameIndex = (int)CharHpBarIndex.ZeroX6;
+		}if (player.charNum == (int)CharIds.Vile) {
+			frameIndex = (int)CharHpBarIndex.Vile;
+		}if (player.charNum == (int)CharIds.AxlWC) {
+			frameIndex = (int)CharHpBarIndex.AxlWC;
+		}if (player.charNum == (int)CharIds.AxlX8) {
+			frameIndex = (int)CharHpBarIndex.AxlX8;
+		}if (player.charNum == (int)CharIds.Sigma) {
+			frameIndex = (int)CharHpBarIndex.Sigma;
+		}if (player.charNum == (int)CharIds.Sigma && 
+			Options.main.sigmaLoadout.sigmaForm == 3){
+			frameIndex = (int)CharHpBarIndex.Doppler;
+		}if (player.charNum == (int)CharIds.GBD) {
+			frameIndex = (int)CharHpBarIndex.GBD;
+		}if (player.charNum == (int)CharIds.Dynamo) {
+			frameIndex = (int)CharHpBarIndex.Dynamo;
+		}if (player.charNum == (int)CharIds.Dragoon) {
+			frameIndex = (int)CharHpBarIndex.Dragoon;
+		}if (player.charNum == (int)CharIds.Zain) {
+			frameIndex = (int)CharHpBarIndex.Zain;
+		}if(player.character is Zero zero && zero.isBlack){
+			frameIndex = (int)CharHpBarIndex.BlackZero;
+		}if(player.character is AxlWC awc && awc.isWhite){
+			frameIndex = (int)CharHpBarIndex.WhiteAxl;
 		}
-		if (player.charNum == (int)CharIds.ZeroX2) {
-			frameIndex = 1;
-		}
+		
 		if (player.isDisguisedAxl) frameIndex = 3;
 
 		var hudHealthPosition = getHUDHealthPosition(position, true);
@@ -1400,30 +1423,57 @@ public class GameMode {
 		float baseY = hudHealthPosition.y;
 
 		float twoLayerHealth = 0;
-		if (isMech && player.character?.rideArmor != null && player.character.rideArmor.raNum != 5) {
-			spriteName = "hud_health_base_mech";
+		if (isMech && player.character?.rideArmor != null /*&& player.character.rideArmor.raNum != 5*/) {
+			spriteName = "hud_bars_ra_hp";
+			barIndex = 4;
 			health = player.character.rideArmor.health;
 			maxHealth = player.character.rideArmor.maxHealth;
 			twoLayerHealth = player.character.rideArmor.goliathHealth;
 			frameIndex = player.character.rideArmor.raNum;
-			baseX = getHUDHealthPosition(position, false).x;
-			mechBarExists = false;
-			//if (player.weapon.drawAmmo) {
-				baseX += 15;
-			//}
+
+ 			if(player.character.rideArmor.raNum == 1){
+				frameIndex = (int)VehicleHpBarIndex.Kangroo;
+			}if(player.character.rideArmor.raNum == 2){
+				frameIndex = (int)VehicleHpBarIndex.Hawk;
+			}if(player.character.rideArmor.raNum == 3){
+				frameIndex = (int)VehicleHpBarIndex.Frog;
+			}if(player.character.rideArmor.raNum == 4){
+				frameIndex = (int)VehicleHpBarIndex.Goliath;
+			}if(player.character.rideArmor.raNum == 0){
+				frameIndex = (int)VehicleHpBarIndex.BlackBear;
+			}if(player.character.rideArmor.raNum == 5){
+				frameIndex = (int)VehicleHpBarIndex.DevilBear;
+			}
+			baseX = getHUDHealthPosition(position, false).x + 3;
+		/*	if (mechBarExists) {
+				baseX -= 17;
+			}*/
+			mechBarExists = true;
 			damageSavings = 0;
 		}
 		if (isMech && player.character?.rideArmorPlatform != null) {
-			spriteName = "hud_health_base_mech";
+			spriteName = "hud_bars_ra_hp";
+			barIndex = 4;
 			health = player.character.rideArmorPlatform.health;
 			maxHealth = player.character.rideArmorPlatform.maxHealth;
 			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
-			frameIndex = player.character.rideArmorPlatform.raNum;
-			baseX = getHUDHealthPosition(position, false).x;
+		//	frameIndex = player.character.rideArmorPlatform.raNum;
+			if(player.character.rideArmorPlatform.raNum == 1){
+				frameIndex = (int)VehicleHpBarIndex.Kangroo;
+			}if(player.character.rideArmorPlatform.raNum == 2){
+				frameIndex = (int)VehicleHpBarIndex.Hawk;
+			}if(player.character.rideArmorPlatform.raNum == 3){
+				frameIndex = (int)VehicleHpBarIndex.Frog;
+			}if(player.character.rideArmorPlatform.raNum == 4){
+				frameIndex = (int)VehicleHpBarIndex.Goliath;
+			}if(player.character.rideArmorPlatform.raNum == 0){
+				frameIndex = (int)VehicleHpBarIndex.BlackBear;
+			}
+			baseX = getHUDHealthPosition(position, false).x + 3;
 			//if (player.weapon.drawAmmo) {
-				baseX += 15;
+			//	baseX += 15;
 			//}
-			mechBarExists = false;
+			mechBarExists = true;
 			damageSavings = 0;
 		}
 
@@ -1431,11 +1481,12 @@ public class GameMode {
 
 
 		if (isMech && player.character?.rideChaser != null) {
-			spriteName = "hud_health_base_bike";
+			spriteName = "hud_bars_ra_hp";
+			barIndex = 4;
 			health = player.character.rideChaser.health;
 			maxHealth = player.character.rideChaser.maxHealth;
-			frameIndex = 0;
-			baseX = getHUDHealthPosition(position, false).x;
+			frameIndex = (int)VehicleHpBarIndex.RideChaser;
+			baseX = getHUDHealthPosition(position, false).x + 4;
 			mechBarExists = true;
 			damageSavings = 0;
 		}
@@ -1446,10 +1497,13 @@ public class GameMode {
 
 		baseY += 25;
 		var healthBaseSprite = spriteName;
-		Global.sprites["hud_health_base"].drawToHUD(frameIndex, baseX, baseY);
-		baseY -= 16;
-		int barIndex = 0;
-
+		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
+		baseY -= 14;
+		if (isMech && player.character?.rideChaser != null | 
+			isMech && player.character?.rideArmor != null |
+			isMech && player.character?.rideArmorPlatform != null | 
+			isMech && player.character?.rideArmor != null) {
+			baseY -= 3;}
 		if (player.character is RagingChargeX mmx) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
 			if (hpPercent >= 75) barIndex = 1;
@@ -1461,21 +1515,21 @@ public class GameMode {
 		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
 			// Draw HP
 			if (i < MathF.Ceiling(health)) {
-				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(barIndex, baseX, baseY);
 			} else if (i < MathInt.Ceiling(health) + damageSavings) {
-				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(3, baseX, baseY);
 			} else {
-				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 			}
 
 			// 2-layer health
 			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {
-				Global.sprites["hud_health_full"].drawToHUD(2, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(2, baseX, baseY);
 			}
 
 			baseY -= 2;
 		}
-		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+		Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
 
 		return mechBarExists;
 	}
@@ -1520,16 +1574,18 @@ public class GameMode {
 
 		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 	}
-	const int grayAmmoIndex = 30;
+	const int grayAmmoIndex = 7;
 	public void renderAmmo(
 		float baseX, ref float baseY, int baseIndex,
 		int barIndex, float ammo, float grayAmmo = 0, float maxAmmo = 32,
 		bool allowSmall = true
 	) {
 		baseY += 25;
-		Global.sprites["hud_weapon_base"].drawToHUD(baseIndex, baseX, baseY);
-		baseY -= 16;
-
+		Global.sprites["hud_bars_base_generic"].drawToHUD(baseIndex, baseX, baseY);
+		/*if(ammo < grayAmmo){
+		Global.sprites["hud_bars_generic"].drawToHUD(baseIndex, baseX, baseY);
+		}*/
+		baseY -= 14;
 		// Puppeteer small energy bars.
 		bool forceSmallBarsOff = false;
 		if (!Options.main.smallBarsEx || !allowSmall && maxAmmo > 16) {
@@ -1543,14 +1599,14 @@ public class GameMode {
 		}
 		for (var i = 0; i < MathF.Ceiling(maxAmmo * ammoDisplayMultiplier); i++) {
 			if (i < Math.Ceiling(ammo * ammoDisplayMultiplier)) {
-				if (ammo < grayAmmo) Global.sprites["hud_weapon_full"].drawToHUD(grayAmmoIndex, baseX, baseY);
-				else Global.sprites["hud_weapon_full"].drawToHUD(barIndex, baseX, baseY);
+				if (ammo < grayAmmo) Global.sprites["hud_bars_generic"].drawToHUD(grayAmmoIndex, baseX, baseY);
+				else Global.sprites["hud_bars_generic"].drawToHUD(barIndex, baseX, baseY);
 			} else {
-				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 			}
 			baseY -= 2;
 		}
-		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+		Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
 	}
 
 	public bool shouldDrawWeaponAmmo(Player player, Weapon weapon) {
@@ -1558,10 +1614,15 @@ public class GameMode {
 		if (weapon.weaponSlotIndex == 0) return false;
 		if (!weapon.drawAmmo) return false;
 		if (weapon is HyperNovaStrike && level.isHyper1v1()) return false;
-
+	//	if (renderHealth(player, position, true))
+		if (player.character?.rideArmor != null) return false;
+	/*	if (player.isVile) {
+			if (player.character != null | (player.character is Vile && 
+			player.character?.rideArmor != null)) {
+				return false;
+			}}*/
 		return true;
 	}
-
 	public void renderWeapon(Player player, HUDHealthPosition position) {
 		var hudHealthPosition = getHUDHealthPosition(position, false);
 		float baseX = hudHealthPosition.x;
@@ -1580,14 +1641,9 @@ public class GameMode {
 			}
 			player.lastHudWeapon = weapon;
 		}
-		// Return if there is no weapon to ren
-		if (weapon == null) {
-			return;
-		}
-
 		// Small Bars option.
 		float ammoDisplayMultiplier = 1;
-		if (weapon.allowSmallBar && Options.main.enableSmallBars && !forceSmallBarsOff) {
+		if (weapon?.allowSmallBar == true && Options.main.enableSmallBars && !forceSmallBarsOff) {
 			ammoDisplayMultiplier = 0.5f;
 		}
 
@@ -1602,8 +1658,8 @@ public class GameMode {
 			) {
 				renderAmmo(
 					baseX, ref baseY,
-					player.currentMaverick.flyBarIndexes.icon,
-					player.currentMaverick.flyBarIndexes.units,
+					0,
+					player.currentMaverick.ammoIndex,
 					MathF.Ceiling((player.currentMaverick.flyBar / player.currentMaverick.maxFlyBar) * 28),
 					maxAmmo: 28, allowSmall: false
 				);
@@ -1611,62 +1667,79 @@ public class GameMode {
 			if (player.currentMaverick != null && player.isMainPlayer && player.currentMaverick.usesAmmo) {
 				renderAmmo(
 					baseX, ref baseY,
-					player.currentMaverick.barIndexes.icon,
-					player.currentMaverick.barIndexes.units,
+					0,
+					player.currentMaverick.ammoIndex,
 					player.currentMaverick.ammo,
 					player.currentMaverick.grayAmmoLevel,
 					player.currentMaverick.maxAmmo
 				);
 			}
 			if (player.character is ViralSigma) {
-				renderAmmo(baseX, ref baseY, 61, 50, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
+				renderAmmo(baseX, ref baseY, 2, 2, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
 			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
-				int hudWeaponBaseIndex = 50;
-				int hudWeaponFullIndex = 39;
+				int hudWeaponBaseIndex = 2;
+				int hudWeaponFullIndex = 8;
 				ammoDisplayMultiplier = 1;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
-					hudWeaponBaseIndex = 51;
-					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 30 : 40;
+					hudWeaponBaseIndex = player.sigmaAmmo < 16 ? 5 : 4;
+					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 7 : 5;
 					floorOrCeil = MathInt.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				}
 				baseY += 25;
-				Global.sprites["hud_weapon_base"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
-				baseY -= 16;
+				Global.sprites["hud_bars_base_generic"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
+				baseY -= 14;
 				for (var i = 0; i < floorOrCeil; i++) {
 					if (i < Math.Ceiling(player.sigmaAmmo * ammoDisplayMultiplier)) {
-						Global.sprites["hud_weapon_full"].drawToHUD(hudWeaponFullIndex, baseX, baseY);
+						Global.sprites["hud_bars_generic"].drawToHUD(hudWeaponFullIndex, baseX, baseY);
 					} else {
-						Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+						Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 					}
 					baseY -= 2;
 				}
-				Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
 				return;
 			}
 			return;
 		}
 
-		if (player.isVile) {
+		/*if (player.isVile && shouldDrawWeaponAmmo(player, weapon)) {
 			baseY += 25;
-			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
-			baseY -= 16;
+			Global.sprites["hud_bars_base_generic"].drawToHUD(1, baseX, baseY);
+			baseY -= 14;
 			for (var i = 0; i < MathF.Ceiling(player.vileMaxAmmo * ammoDisplayMultiplier); i++) {
 				if (i < Math.Ceiling(player.vileAmmo * ammoDisplayMultiplier)) {
-					Global.sprites["hud_weapon_full"].drawToHUD(32, baseX, baseY);
+					Global.sprites["hud_bars_generic"].drawToHUD(9, baseX, baseY);
 				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+					Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 				}
 				baseY -= 2;
 			}
-			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+			Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
+			return;
+		}*/
+
+		// Return if there is no weapon to ren
+		if (weapon == null) {
 			return;
 		}
 
 		if (shouldDrawWeaponAmmo(player, weapon)) {
 			baseY += 25;
-			Global.sprites["hud_weapon_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
-			baseY -= 16;
+			//Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
+			if(player.isX | player.isXAnother){
+				if(weapon.ammo <= 0){
+					Global.sprites["hud_bars_wp_base_off_x"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
+				}else{Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
+				}
+			else if(player.isX1Zero | player.isZero){
+				if(weapon.ammo <= 0){
+					Global.sprites["hud_bars_base_generic"].drawToHUD(5, baseX, baseY);}
+				else{
+					Global.sprites["hud_bars_base_generic"].drawToHUD(4, baseX, baseY);}
+				}
+			else{Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
+			baseY -= 14;
 			for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
 				var floorOrCeiling = Math.Ceiling(weapon.ammo * ammoDisplayMultiplier);
 				// Weapons that cost the whole bar go here, so they don't show up as full but still grayed out
@@ -1679,18 +1752,32 @@ public class GameMode {
 						(weapon is GigaCrush && !weapon.canShoot(0, player)) ||
 						(weapon is HyperNovaStrike && !weapon.canShoot(0, player)) ||
 						(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
-						spriteIndex = grayAmmoIndex;
+					if(player.isX | player.isXAnother){
+						Global.sprites["hud_bars_generic"].drawToHUD(10, baseX, baseY);}else{
+						Global.sprites["hud_bars_generic"].drawToHUD(grayAmmoIndex, baseX, baseY);
+						}
 					}
-					if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
+				/*	if (spriteIndex >= Global.sprites["hud_bars_generic"].frames.Length) {
 						spriteIndex = 0;
-					}
-					Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);	
+					}*/
+					else if(player.isX | player.isXAnother){
+						Global.sprites["hud_bars_wp_x"].drawToHUD(spriteIndex, baseX, baseY);}
+					else if(level.mainPlayer.isX1Zero | player.isX1Zero | player.isZero | level.mainPlayer.isZero){
+						Global.sprites["hud_bars_generic"].drawToHUD(5, baseX, baseY);
+					}else{Global.sprites["hud_bars_generic"].drawToHUD(weapon.weaponBarIndex, baseX, baseY);}
 				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+					if(player.isX | player.isXAnother){
+					Global.sprites["hud_bars_generic"].drawToHUD(9, baseX, baseY);}
+					else{
+					Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);}
 				}
 				baseY -= 2;
 			}
-			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+			if(player.isX | player.isXAnother){
+				Global.sprites["hud_bars_generic"].drawToHUD(8, baseX, baseY);
+			}else{
+			Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
+			}
 		}
 		//if (shouldDrawWeaponAmmo(player, weapon) && player.isIris) {
 		//	Global.sprites["iris_hud"].drawToHUD(0, 25, 125);
@@ -2461,7 +2548,7 @@ public class GameMode {
 		for (int i = 0; i < dnaCore.weapons.Count && i < 6; i++) {
 			weapons.Add(dnaCore.weapons[i]);
 		}
-		if (dnaCore.charNum == (int)CharIds.Zero) {
+		if (dnaCore.charNum == (int)CharIds.ZeroX2) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
@@ -2887,8 +2974,8 @@ public class GameMode {
 
 	public string getCharIcon(Player player) {
 		return "char_icon";
-		//if (isOver) return "char_icon";
-		//return player.isDead ? "char_icon_dead" : "char_icon";
+		if (isOver) return "char_icon";
+		return player.isDead ? "char_icon_dead" : "char_icon";
 	}
 
 	public static string getTeamName(int alliance) {

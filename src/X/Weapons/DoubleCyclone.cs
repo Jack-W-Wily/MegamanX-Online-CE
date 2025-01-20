@@ -14,7 +14,7 @@ public class DoubleCyclone : Weapon {
 		index = (int)WeaponIds.DoubleCyclone;
 		weaponSlotIndex = 118;
 		killFeedIndex = 168;
-		weaponBarBaseIndex = 78;
+		weaponBarBaseIndex = (int)WeaponBarIndex.DoubleCyclone;
 		weaponBarIndex = weaponBarBaseIndex;
 		
 		weaknessIndex = (int)WeaponIds.AimingLaser;

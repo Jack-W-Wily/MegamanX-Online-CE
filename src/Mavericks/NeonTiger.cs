@@ -300,6 +300,7 @@ public class NeonTDashClawState : MaverickState {
 
 public class NeonTDashState : MaverickState {
 	float dustTime;
+	Anim dust;
 	public NeonTDashState() : base("dash") {
 		enterSound = "dashX3";
 		normalCtrl = true;
@@ -312,7 +313,9 @@ public class NeonTDashState : MaverickState {
 
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
-			new Anim(maverick.pos.addxy(-maverick.xDir * 27, 0), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			dust = new DashDustAnim(maverick.pos.addxy(-maverick.xDir * 27, 0), player.getNextActorNetId(), true, true);
+			dust.xDir = maverick.xDir;
+			//new Anim(maverick.pos.addxy(-maverick.xDir * 27, 0), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
 			dustTime = 0.075f;
 		}
 

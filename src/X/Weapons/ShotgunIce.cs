@@ -9,7 +9,7 @@ public class ShotgunIce : Weapon {
 	public ShotgunIce() : base() {
 		index = (int)WeaponIds.ShotgunIce;
 		killFeedIndex = 8;
-		weaponBarBaseIndex = 8;
+		weaponBarBaseIndex = (int)WeaponBarIndex.ShotgunIce;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 8;
 		weaknessIndex = (int)WeaponIds.FireWave;

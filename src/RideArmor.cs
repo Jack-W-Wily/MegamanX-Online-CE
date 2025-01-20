@@ -954,7 +954,7 @@ public class RideArmor : Actor, IDamagable {
 			spriteName = spriteName ?? "";
 
 			if (spriteName.Contains("dash") && !oldSpriteName.Contains("dash")) {
-				new Anim(pos, "dash_sparks", xDir, null, true);
+				//new DashDustAnim(pos, player.getNextActorNetId(), true, true);
 			}
 			if (spriteName.Contains("jump") && !oldSpriteName.Contains("jump")) {
 			}
@@ -1810,6 +1810,7 @@ public class RAGroundPoundLand : RideArmorState {
 }
 
 public class RADash : RideArmorState {
+	Anim dust;
 	public float dashTime = 0;
 	float dashAttackTime = 0;
 	public Character? draggedChar;
@@ -1875,7 +1876,8 @@ public class RADash : RideArmorState {
 		}
 		if (stateTime > 0.1) {
 			stateTime = 0;
-			new Anim(rideArmor.pos.addxy(rideArmor.xDir * -15, -4), "dust", rideArmor.xDir, null, true);
+			dust = new DashDustAnim(rideArmor.pos.addxy(rideArmor.xDir * -15, -4), player.getNextActorNetId(), true, true);
+			dust.xDir = rideArmor.xDir;
 		}
 	}
 

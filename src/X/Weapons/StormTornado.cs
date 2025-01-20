@@ -9,7 +9,7 @@ public class StormTornado : Weapon {
 	public StormTornado() : base() {
 		index = (int)WeaponIds.StormTornado;
 		killFeedIndex = 5;
-		weaponBarBaseIndex = 5;
+		weaponBarBaseIndex = (int)WeaponBarIndex.StormTornado;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
 		weaknessIndex = (int)WeaponIds.ChameleonSting;
@@ -137,7 +137,7 @@ public class TornadoProj : Projectile {
 
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
 			return;
 		}

@@ -10,8 +10,8 @@ public class RisingFire : Weapon {
 		shootSounds = new string[] { "ryuenjin", "ryuenjin", "ryuenjin", "ryuenjin", "ryuenjin" };
 		fireRate = 45;
 		index = (int)WeaponIds.RisingFire;
-		weaponBarIndex = 64;
-		weaponBarBaseIndex = 75;
+		weaponBarBaseIndex = (int)WeaponBarIndex.RisingFire;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 126;
 		killFeedIndex = 183;
 		type = index;

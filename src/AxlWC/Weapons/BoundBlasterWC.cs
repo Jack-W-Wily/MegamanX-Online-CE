@@ -8,7 +8,7 @@ public class BoundBlasterWC : AxlWeaponWC {
 		fireRate = 9;
 		altFireRate = 24;
 		index = (int)WeaponIds.BoundBlaster;
-		weaponBarBaseIndex = 35;
+		weaponBarBaseIndex = (int)WeaponBarIndex.BoundBlaster;
 		weaponSlotIndex = 55;
 		killFeedIndex = 70;
 

@@ -11,7 +11,7 @@ public SpeedBurner() : base() {
 		shootSounds = new string[] { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
 		fireRate = 60;
 		index = (int)WeaponIds.SpeedBurner;
-		weaponBarBaseIndex = 16;
+		weaponBarBaseIndex = (int)WeaponBarIndex.SpeedBurner;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 16;
 		killFeedIndex = 27;

@@ -9,7 +9,7 @@ public class FlameBurnerWC : AxlWeaponWC {
 		fireRate = 5;
 		altFireRate = 14;
 		index = (int)WeaponIds.FlameBurner;
-		weaponBarBaseIndex = 38;
+		weaponBarBaseIndex = (int)WeaponBarIndex.FlameBurner;
 		weaponSlotIndex = 58;
 		killFeedIndex = 73;
 		sprite = "axl_arm_flameburner";

@@ -28,7 +28,7 @@ public class StormEagle : Maverick {
 		}
 
 		canFly = true;
-		flyBarIndexes = (44, 38);
+	//	flyBarIndexes = (44, 38);
 		maxFlyBar = 960;
 		flyBar = 960;
 	}
@@ -288,7 +288,7 @@ public class StormEGustProj : Projectile {
 
 
 	public override void onHitDamagable(IDamagable damagable) {
-		if (damagable.isPlayableDamagable()) { return; }
+		if (!damagable.isPlayableDamagable()) { return; }
 		if (damagable is not Actor actor || !actor.ownedByLocalPlayer) {
 			return;
 		}
