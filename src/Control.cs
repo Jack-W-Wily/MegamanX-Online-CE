@@ -104,10 +104,10 @@ public class Control {
 		if (charNum == -1 || charNum == -2) return baseStr;
 
 		baseStr += "_";
-		if (charNum == 0) baseStr += "x";
-		if (charNum == 1) baseStr += "zero";
-		if (charNum == 2) baseStr += "vile";
-		if (charNum == 3) {
+		if (charNum == (int)CharIds.X) baseStr += "x";
+		if (charNum == (int)CharIds.ZeroX2) baseStr += "zero";
+		if (charNum == (int)CharIds.Vile) baseStr += "vile";
+		if (charNum == (int)CharIds.AxlWC) {
 			baseStr += "axl";
 			/*
 			if (aimMode == 0) baseStr += "_dir";
@@ -115,7 +115,7 @@ public class Control {
 			if (aimMode == 2) baseStr += "_cur";
 			*/
 		}
-		if (charNum == 4) baseStr += "sigma";
+		if (charNum == (int)CharIds.Sigma) baseStr += "sigma";
 		return baseStr;
 	}
 

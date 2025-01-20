@@ -2490,7 +2490,7 @@ public class GameMode {
 		sy += 5;
 		Fonts.drawText(FontType.RedishOrange, dnaCore.name, x, sy);
 		sy += 30;
-		if (dnaCore.charNum == 0) {
+		if (dnaCore.charNum == (int)CharIds.X) {
 			if (dnaCore.ultimateArmor) {
 				Global.sprites["menu_megaman"].drawToHUD(5, x, sy + 4);
 			} else if (dnaCore.armorFlag == ushort.MaxValue) {
@@ -2524,13 +2524,13 @@ public class GameMode {
 				if (arm == 15) Global.sprites["menu_chip"].drawToHUD(0, x - 9, sy - 2 + 4);
 				if (boots == 15) Global.sprites["menu_chip"].drawToHUD(0, x - 12, sy + 10);
 			}
-		} else if (dnaCore.charNum == 1) {
+		} else if (dnaCore.charNum == (int)CharIds.ZeroX2) {
 			int index = 0;
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) index = 1;
 			if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) index = 2;
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) index = 3;
 			Global.sprites["menu_zero"].drawToHUD(index, x, sy + 1);
-		} else if (dnaCore.charNum == 2) {
+		} else if (dnaCore.charNum == (int)CharIds.Vile) {
 			int index = 0;
 			if (dnaCore.hyperMode == DNACoreHyperMode.VileMK2) index = 1;
 			if (dnaCore.hyperMode == DNACoreHyperMode.VileMK5) index = 2;
@@ -2541,9 +2541,9 @@ public class GameMode {
 			if (dnaCore.speedDevil) {
 				Fonts.drawText(FontType.DarkPurple, "S", x + 20, sy);
 			}
-		} else if (dnaCore.charNum == 3) {
+		} else if (dnaCore.charNum == (int)CharIds.AxlWC) {
 			Global.sprites["menu_axl"].drawToHUD(dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl ? 1 : 0, x, sy + 4);
-		} else if (dnaCore.charNum == 4) {
+		} else if (dnaCore.charNum == (int)CharIds.Sigma) {
 			Global.sprites["menu_sigma"].drawToHUD(sigmaForm, x, sy + 10);
 		}
 
@@ -3301,7 +3301,7 @@ public class GameMode {
 		if (nonSpecPlayers[0].charNum != nonSpecPlayers[1].charNum) {
 			return true;
 		} else {
-			if (nonSpecPlayers[0].charNum == 0 && nonSpecPlayers[0].armorFlag != nonSpecPlayers[1].armorFlag) {
+			if (nonSpecPlayers[0].charNum == (int)CharIds.X && nonSpecPlayers[0].armorFlag != nonSpecPlayers[1].armorFlag) {
 				return true;
 			}
 			return false;
@@ -3318,20 +3318,20 @@ public class GameMode {
 	public string getLoggingCharNum(Player player, bool is1v1) {
 		int charNum = player.realCharNum;
 		string charName;
-		if (charNum == 0) {
+		if (charNum == (int)CharIds.X) {
 			charName = "X";
 			if (is1v1) {
 				if (player.legArmorNum == 1) charName += "1";
 				else if (player.legArmorNum == 2) charName += "2";
 				else if (player.legArmorNum == 3) charName += "3";
 			}
-		} else if (charNum == 1) charName = "Zero";
-		else if (charNum == 2) charName = "Vile";
+		} else if (charNum == (int)CharIds.ZeroX2) charName = "Zero";
+		else if (charNum == (int)CharIds.Vile) charName = "Vile";
 		else if (charNum == (int)CharIds.AxlOld) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";
 			else if (Options.main.axlAimMode == 1) charName = "AxlAngular";
 			else charName = "AxlDirectional";
-		} else if (charNum == 4) {
+		} else if (charNum == (int)CharIds.Sigma) {
 			if (Options.main.sigmaLoadout.commandMode == 0) charName = "SigmaSummoner";
 			else if (Options.main.sigmaLoadout.commandMode == 1) charName = "SigmaPuppeteer";
 			else if (Options.main.sigmaLoadout.commandMode == 2) charName = "SigmaStriker";

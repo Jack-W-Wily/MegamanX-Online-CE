@@ -66,17 +66,17 @@ public class ControlMenu : IMainMenu {
 			bindableControls.Add(new string[] { Control.AllChat, "All Chat" });
 			bindableControls.Add(new string[] { Control.TeamChat, "Team Chat" });
 		}
-		/* if (charNum == 4) {
+		/* if (charNum == (int)CharIds.Sigma) {
 			bindableControls.Add(new string[] { Control.SigmaCommand, "Command Button" });
 		} */
 		// Vile Settings
-		if (charNum == 2) {
+		if (charNum == (int)CharIds.Vile) {
 			bindableControls.Add(new string[] { Control.AxlCrouch, "Ride Attack" });
 			bindableControls.Add(new string[] { Control.AimAngleUp, "Ride Hold" });
 				
 		}
 		// Axl specific settings
-		if (charNum == (int)CharIds.AxlOld) {
+		if (charNum == (int)CharIds.AxlOld || charNum ==  (int)CharIds.AxlWC) {
 			if (axlAimMode == 0) {
 				bindableControls.Add(new string[] { Control.AimUp, "Aim Up" });
 				bindableControls.Add(new string[] { Control.AimDown, "Aim Down" });

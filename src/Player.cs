@@ -82,7 +82,7 @@ public partial class Player {
 	public RaycastHitData assassinHitPos;
 
 	public bool canUpgradeXArmor() {
-		return (realCharNum == 0);
+		return (realCharNum == (int)CharIds.X);
 	}
 
 	public float adjustedZoomRange { get { return zoomRange - 40; } }
@@ -1574,8 +1574,8 @@ public partial class Player {
 		disguise = new Disguise(dnaCore.name);
 		charNum = dnaCore.charNum;
 
-		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
-		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
+		bool isVileMK2 = charNum == (int)CharIds.Vile && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
+		bool isVileMK5 = charNum == (int)CharIds.Vile && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 
 		// If somehow the DNA core loadout is null we copy current one.
 		if (dnaCore.loadout == null) {
@@ -2119,7 +2119,7 @@ public partial class Player {
 	public bool canReviveVile() {
 		if (//Global.level.isElimination() ||
 			!lastDeathCanRevive ||
-			newCharNum != 2 ||
+			newCharNum != (int)CharIds.Vile ||
 			currency < reviveVileCost ||
 			lastDeathWasVileMK5
 		) {
@@ -2137,14 +2137,14 @@ public partial class Player {
 		if (Global.level.isHyper1v1() &&
 			!lastDeathWasSigmaHyper &&
 			limboChar != null && isSigma
-			&& newCharNum == 4
+			&& newCharNum == (int)CharIds.Sigma
 		) {
 			return true;
 		}
 		if (limboChar == null ||
 			!lastDeathCanRevive ||
 			!isSigma ||
-			newCharNum != 4 ||
+			newCharNum != (int)CharIds.Vile ||
 			currency < reviveSigmaCost ||
 			lastDeathWasSigmaHyper
 			|| !isSigma3()
@@ -2197,7 +2197,7 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return  armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
+		return  armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == (int)CharIds.X && currency >= reviveXCost && !lastDeathWasXHyper;
 	}
 
 	public void reviveVile(bool toMK5) {

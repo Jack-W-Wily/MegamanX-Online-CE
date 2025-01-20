@@ -11,7 +11,7 @@ public class PlayerCharData {
 	[ProtoMember(3)] public int alliance = -1;
 	[ProtoMember(4)] public bool isRandom;
 
-	public bool xSelected { get { return charNum == 0; } }
+	public bool xSelected { get { return charNum == (int)CharIds.X; } }
 
 	public int uiSelectedCharIndex;
 
