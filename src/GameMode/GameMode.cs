@@ -1724,6 +1724,11 @@ public class GameMode {
 			return;
 		}
 
+		// Return if there is no weapon to ren
+		if (weapon == null) {
+			return;
+		}
+
 		if (shouldDrawWeaponAmmo(player, weapon)) {
 			baseY += 25;
 			//Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);

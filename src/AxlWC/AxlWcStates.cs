@@ -361,7 +361,7 @@ public class AxlString2 : CharState {
 			}
 			character.move(new Point(moveSpeed * xInput, 0));
 		}
-		if (character.frameIndex >= 4 && !shot) {
+		if (character.frameIndex >= 3 && !shot) {
 			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
 			new AxlMeleeBullet(
@@ -505,7 +505,7 @@ public class AxlString5 : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 3 && axl.grounded) {
-			character.iframesTime = 2;
+			character.iframesTime = 7;
 		}
 
 		if (character.frameIndex <= 4) {
@@ -551,6 +551,9 @@ public class EvasionBarrage : CharState {
 
 	public override void update() {
 		base.update();
+			if (character.frameIndex <= 0) {
+			character.iframesTime = 2;
+		}
 		if (pushBackSpeed > 0) {
 			character.vel.y = 0;
 			character.useGravity = false;
@@ -621,6 +624,9 @@ public class RisingBarrage : CharState {
 	public override void update() {
 		base.update();
 		Point? gunpos = character.getFirstPOI();
+				if (character.frameIndex <= 0) {
+			character.iframesTime = 7;
+		}
 		if (character.sprite.frameIndex >= 2 && gunpos != null) {
 			character.move(new Point(character.xDir * 150, 0));
 			projTime += character.speedMul;
@@ -676,6 +682,9 @@ public class AxlRainDrop : CharState {
 	}
 
 	public override void update() {
+		if (character.frameIndex <= 0) {
+			character.iframesTime = 8;
+		}
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
