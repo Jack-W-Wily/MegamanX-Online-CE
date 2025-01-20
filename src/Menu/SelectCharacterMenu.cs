@@ -83,16 +83,10 @@ public class CharSelection {
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
-<<<<<<< HEAD
 		new CharSelection("Zero (X1 - MHX)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
 		new CharSelection("Zero (X2 - X5)", (int)CharIds.ZeroX2, sprite: "smenu_zero_2"),
 		new CharSelection("Axl (WC)", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("Axl (X7 - CM)", (int)CharIds.AxlX8, sprite: "smenu_axl"),
-=======
-		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
-		new CharSelection("Zero (MID)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
-		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
->>>>>>> 962b9239b5179e401c3631b899469f1dc1f34ea6
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
 		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
@@ -105,13 +99,8 @@ public class CharSelection {
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
-<<<<<<< HEAD
 		new CharSelection("Zero (X2 - X5)", (int)CharIds.ZeroX2, sprite: "smenu_zero_2"),
 		new CharSelection("Zero (X1 - MHX)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
-=======
-		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
-		new CharSelection("Zero (MID)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
->>>>>>> 962b9239b5179e401c3631b899469f1dc1f34ea6
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
