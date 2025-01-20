@@ -125,7 +125,7 @@ public class PunchyZero : Character {
 			return;
 		}
 
-
+		if (!isInDamageSprite()){
 		if (player.input.isHeld(Control.Down,player)){
 				if (gigaAttack.ammo >= 28 &&
 				player.input.isPressed(Control.WeaponRight, player) ) {
@@ -133,6 +133,15 @@ public class PunchyZero : Character {
 					changeState(new ZeroInferno(), true);	
 					
 				}
+		}
+		if (player.input.isHeld(Control.Up,player)){
+				if (gigaAttack.ammo >= 28 &&
+				player.input.isPressed(Control.WeaponRight, player) ) {
+					gigaAttack.addAmmo(-28, player);			
+					changeState(new SuperBurnKnuckle1(), true);	
+					
+				}
+		}
 		}
 		// Local update starts here.
 		inputUpdate();
@@ -282,9 +291,10 @@ public class PunchyZero : Character {
 			currencyUse = 1;
 			if (!isViral){
 			playSound("buster4", sendRpc: true);
-			new ZBuster4Proj(
-				shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
-			);
+			shootBuster4(player, shootPos, xDir);
+			//new ZBuster4Proj(
+			//	shootPos, xDir, 0, player, player.getNextActorNetId(), rpc: true
+			//);
 			}
 			if (isViral)changeState(new PZeroDoubleBuster(false, true), true);
 			
@@ -299,6 +309,69 @@ public class PunchyZero : Character {
 			}
 		}
 	}
+
+
+
+	public void shootBuster4(Player player, Point pos, int xDir) {
+		new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+		//Create the buster effect
+		int xOff = xDir * -5;
+		player.setNextActorNetId(player.getNextActorNetId());
+		// Create first line instantly.
+		createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0f);
+		// Create 2nd with a delay.
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			createBuster4Line(pos.x + xOff, pos.y, xDir, player, 10);
+		}, 2.8f / 60f));
+		// Use smooth spawn on the 3rd.
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			createBuster4Line(pos.x + xOff, pos.y, xDir, player, 5, true);
+		}, 5.8f / 60f));
+	}
+	
+	public void createBuster4Line(
+		float x, float y, int xDir, Player player,
+		float offsetTime, bool smoothStart = false
+	) {
+		new Buster4Proj(
+			new ZeroBuster(), new Point(x + xDir, y), xDir,
+			player, 0, offsetTime,
+			player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
+		);
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				new ZeroBuster(), new Point(x + xDir, y), xDir,
+				player, 1, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
+			);
+		}, 1.8f / 60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				new ZeroBuster(), new Point(x + xDir, y), xDir,
+				player, 2, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
+			);
+		}, 3.8f / 60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				new ZeroBuster(), new Point(x + xDir, y), xDir,
+				player, 2, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
+			);
+		}, 5.8f / 60f
+		));
+		Global.level.delayedActions.Add(new DelayedAction(delegate {
+			new Buster4Proj(
+				new ZeroBuster(), new Point(x + xDir, y), xDir,
+				player, 3, offsetTime,
+				player.getNextActorNetId(allowNonMainPlayer: true), smoothStart, true
+			);
+		}, 7.8f / 60f
+		));
+	}
+
 
 	public void shootDonuts(int chargeLevel) {
 		if (player.currency <= 0 && freeBusterShots <= 0) { return; }
@@ -622,6 +695,8 @@ public class PunchyZero : Character {
 			"zerox1_megapunch" => MeleeIds.StrongPunch,
 			"zerox1_dropkick" => MeleeIds.DropKick,
 			"zerox1_burnknuckle" => MeleeIds.BurnKnUckle,
+			"zerox1_aok_start" => MeleeIds.SBurnKnUckle1,
+			"zerox1_aok_end" => MeleeIds.SBurnKnUckle2,
 			"zerox1_block" => MeleeIds.Gokumonken,
 
 			"zerox1_pipe_attack" or "zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
@@ -664,6 +739,14 @@ public class PunchyZero : Character {
 			),
 			(int)MeleeIds.BurnKnUckle => new GenericMeleeProj(
 				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, 20, 30f,
+				addToLevel: addToLevel, ShouldClang : true
+			),
+			(int)MeleeIds.SBurnKnUckle1 => new GenericMeleeProj(
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 2, 0, 30f,
+				addToLevel: addToLevel, ShouldClang : true
+			),
+			(int)MeleeIds.SBurnKnUckle2 => new GenericMeleeProj(
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.HeavyPush, player, 6, 0, 30f,
 				addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
@@ -753,6 +836,10 @@ public class PunchyZero : Character {
 		Uppercut,
 		DropKick,
 		BurnKnUckle,
+
+		SBurnKnUckle1,
+
+		SBurnKnUckle2,
 
 		Parry,
 		ParryAttack,

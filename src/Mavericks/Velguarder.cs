@@ -32,7 +32,7 @@ public class Velguarder : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (shootPressed()) {
 					changeState(getShootState());
 				} else if (specialPressed()) {
@@ -40,7 +40,6 @@ public class Velguarder : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new VelGPounceStartState());
 				}
-			} else if (state is MJump || state is MFall) {
 			}
 		}
 	}

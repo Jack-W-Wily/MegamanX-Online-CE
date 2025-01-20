@@ -324,8 +324,8 @@ public override bool normalCtrl() {
 			if (hasUltimateArmor &&
 				UPDamageCooldown > unpoDamageMaxCooldown) {
 				UPDamageCooldown = 0;
-				addAmmo(1);
-				applyDamage(1f, player, this, null, null);
+				addAmmo(2);
+				//applyDamage(1f, player, this, null, null);
 			}
 		}
 		unpoShotCount = 0;

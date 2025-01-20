@@ -67,6 +67,14 @@ public class FlameStag : Maverick {
 					changeState(new FStagDashChargeState());
 				}
 			} else if (state is MJump || state is MFall) {
+				if (input.isPressed(Control.Shoot, player)) {
+					changeState(new FStagShoot(false));
+				} else if (input.isPressed(Control.Special1, player)) {
+					changeState(new FStagGrabState(false));
+				} else if (input.isPressed(Control.Dash, player)) {
+					changeState(new FStagDashChargeState());
+				}
+
 				var inputDir = input.getInputDir(player);
 				if (inputDir.x != 0) {
 					if (!sprite.name.EndsWith("wall_dash")) changeSpriteFromName("wall_dash", true);

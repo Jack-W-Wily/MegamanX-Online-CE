@@ -146,6 +146,10 @@ public class GigaCrushPilar : Effect {
 public class GigaCrushCharState : CharState {
 	GigaCrushProj? proj;
 	bool fired;
+
+	int HPBuffer = 0;
+
+	float HpDecayCD;
 	Point moveDir = new(0, -20);
 
 	public GigaCrushCharState() : base("gigacrush") {
@@ -154,12 +158,43 @@ public class GigaCrushCharState : CharState {
 
 	public override void update() {
 		base.update();
+
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		//New Gigacrush Systems
+
+		//Gigacrush Delay System
+		Helpers.decrementTime(ref HpDecayCD);
+		if (!fired ){
+			if (player.input.isHeld(Control.Shoot, player)
+			 || player.input.isHeld(Control.Special1, player) ){
+			character.frameIndex = 2;
+		 	}
+		}
+
+		//Gigacrush Delay System Hp Decay
+		if (character.frameIndex == 2 && stateTime > 1.7f){
+		   if (HpDecayCD == 0){
+			character.applyDamage(1, player, character, null, null);
+			HpDecayCD = 0.8f;
+			HPBuffer++;
+			character.shakeCamera(sendRpc : true);
+		   }
+		}
+		// System that turns your Decayed HP into aditional dmg for gigacrush
+		if (proj != null){
+		proj.damager.damage = 12 + HPBuffer;
+		}
+
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 		if (character.frameIndex == 4 && !fired) {
 			fired = true;
 			proj = new GigaCrushProj(
 				new GigaCrush(), character.getCenterPos(), character.xDir,
 				player, player.getNextActorNetId(), rpc: true
 			);
+			
+			
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();

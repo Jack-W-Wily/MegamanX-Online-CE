@@ -73,7 +73,7 @@ public class ArmoredArmadillo : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control && !player.isSummoner()) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (shootPressed()) {
 					changeState(getShootState(false));
 				} else if (specialPressed() && !noArmor) {
@@ -237,7 +237,7 @@ public class ArmoredAChargeReleaseProj : Projectile {
 		vel.y = 400 * Helpers.sinb(byteAngle);
 		this.byteAngle = byteAngle;
 		projId = (int)ProjIds.ArmoredAChargeRelease;
-		maxTime = 0.4f;
+		maxTime = 0.5f;
 		damager.damage = damage;
 
 		if (rpc) {
@@ -245,8 +245,15 @@ public class ArmoredAChargeReleaseProj : Projectile {
 		}
 	}
 
+
+	
+
 	public override void update() {
 		base.update();
+		if (time > 0.4f && ownedByLocalPlayer){
+		destroySelf();
+		new TorpedoProj(new ArmoredAChargeReleaseWeapon(), pos, xDir, owner, 6, owner.getNextActorNetId(), 0, rpc: true);
+		}
 	}
 }
 #endregion
@@ -260,6 +267,13 @@ public class ArmoredAGuardState : MaverickState {
 	public override void update() {
 		base.update();
 		if (player == null) return;
+
+
+
+		if (input.isHeld(Control.Down, player)){
+		maverick.changeState(new ArmoredAGuardChargeState(3));
+		}
+
 
 		if (input.isHeld(Control.Left, player)) maverick.xDir = -1;
 		else if (input.isHeld(Control.Right, player)) maverick.xDir = 1;

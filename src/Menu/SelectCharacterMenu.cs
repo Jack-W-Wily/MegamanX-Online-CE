@@ -25,27 +25,26 @@ public class PlayerCharData {
 
 public enum CharIds {
 	X,
-	XAnother,
-	ZeroX1,
-	ZeroX2,
 	Zero,
 	Vile,
 	AxlWC,
-	AxlX8,
 	Sigma,
-	Zain,
-	GBD,
-	Dynamo,
-	Dragoon,
+	ZeroX1,
+	ZeroX2,
+
+	// Rubens if you change the Character IDs order one more time
+	// I am gonna Kill your entire family and rape your sister
+	// - W
+	
 	//it must follow this order because gm hard coded prefered char option
 
-	/*// Wily Cut chars.
+	// Wily Cut chars.
 	XAnother,
 	Zain,
 	GBD,
 	Dynamo,
 	Dragoon,
-	AxlX8,*/
+	AxlX8,
 
 	// Old stuff.
 	AxlOld,
@@ -77,8 +76,8 @@ public class CharSelection {
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
-		new CharSelection("Zero (X2 - X5)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
-		new CharSelection("Zero (X1 - MHX)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("Zero (MID)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
@@ -92,8 +91,8 @@ public class CharSelection {
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
-		new CharSelection("Zero (X2 - X5)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
-		new CharSelection("Zero (X1 - MHX)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("Zero (Early)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("Zero (MID)", (int)CharIds.Zero, sprite: "smenu_zero_2"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
@@ -101,7 +100,7 @@ public class CharSelection {
 		new CharSelection("Zain", (int)CharIds.Zain, sprite: "smenu_zain"),
 		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "empty"),
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, sprite: "smenu_dynamo"),
-	
+			
 		new CharSelection("C.Penguin", 210, 1, 0, "chillp_idle", 0),
 		new CharSelection("S.Mandrill", 212, 1, 1, "sparkm_idle", 0),
 		new CharSelection("A.Armadillo", 213, 1, 2, "armoreda_idle", 0),

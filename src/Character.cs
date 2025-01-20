@@ -12,8 +12,8 @@ public partial class Character : Actor, IDamagable {
 	public static string[] charDisplayNames = {
 		"X", //0
 		"X (Another)", //1
-		"Zero (X1 - MHX)", //2
-		"Zero (X2 - X5)", //3
+		"Zero (Early)", //2
+		"Zero (Mid)", //3
 		"? ? ?", //4
 	//	"Zero (X5 - X6)",
 		"Vile", //5

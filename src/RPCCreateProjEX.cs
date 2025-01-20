@@ -13,6 +13,8 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.Buster3, Buster3Proj.rpcInvoke },
 		{ (int)ProjIds.Buster4, Buster4Proj.rpcInvoke },
 		{ (int)ProjIds.BusterX3Proj2, BusterX3Proj2.rpcInvoke },
+		{ (int)ProjIds.BusterX3Proj3, BusterX3Proj3.rpcInvoke },
+		
 		{ (int)ProjIds.BusterX3Plasma, BusterPlasmaProj.rpcInvoke },
 		{ (int)ProjIds.BusterX3PlasmaHit, BusterPlasmaHitProj.rpcInvoke },
 

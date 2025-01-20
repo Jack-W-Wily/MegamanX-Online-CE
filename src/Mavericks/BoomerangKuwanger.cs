@@ -43,7 +43,7 @@ public class BoomerangKuwanger : Maverick {
 		base.update();
 		Helpers.decrementTime(ref dashSoundCooldown);
 		Helpers.decrementTime(ref teleportCooldown);
-
+		
 		if (state is not BoomerKTeleportState) {
 			rechargeAmmo(4);
 		}
@@ -53,7 +53,7 @@ public class BoomerangKuwanger : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand or BoomerKDashState) {
+			if (state is MIdle or MRun or MLand or BoomerKDashState or MJump or MFall) {
 				if (state is not BoomerKDashState) {
 					if (input.isHeld(Control.Left, player)) {
 						xDir = -1;

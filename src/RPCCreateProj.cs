@@ -83,9 +83,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.Buster3:
 				proj = new Buster3Proj(pos, xDir, extraData[0], player, netProjByte);
 				break;
-			case (int)ProjIds.BusterX3Proj2:
-				proj = new BusterX3Proj2(pos, xDir, extraData[0], player, netProjByte);
-				break;
+		//	case (int)ProjIds.BusterX3Proj2:
+		//		proj = new BusterX3Proj2(pos, xDir, extraData[0], player, netProjByte);
+		//		break;
 			case (int)ProjIds.BusterX3Plasma:
 				proj = new BusterPlasmaProj(pos, xDir, player, netProjByte);
 				break;
@@ -433,6 +433,9 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.LaunchOTorpedo:
 				proj = new TorpedoProj(new LaunchOHomingTorpedoWeapon(), pos, xDir, player, 3, netProjByte);
+				break;
+			case (int)ProjIds.ArmoredAChargeRelease2:
+				proj = new TorpedoProj(new ArmoredAChargeReleaseWeapon(), pos, xDir, player, 6, netProjByte);
 				break;
 			case (int)ProjIds.SigmaHeadProjectile:
 				proj = new TorpedoProj(new SigmaBallWeapon(), pos, xDir, player, 5, netProjByte);

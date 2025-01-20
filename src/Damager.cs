@@ -106,6 +106,7 @@ public class Damager {
 				&& projId != (int)ProjIds.MechFrogStompShockwave
 				&& projId != (int)ProjIds.HeavyPush
 				&& projId != (int)ProjIds.VileSuperKick	
+				&& projId != (int)ProjIds.ForceGrabState	
 				){
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;

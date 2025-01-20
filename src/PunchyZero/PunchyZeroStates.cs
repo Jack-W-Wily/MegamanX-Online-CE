@@ -108,10 +108,12 @@ public class ZeroBurnKnuckle : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.grounded && stateTime > 0.75f) {
+		if (stateTime > 1f) {
 			landingCode();
 			return;
 		}
+
+		
 
 		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
 			character.vel.y = 0;
@@ -128,6 +130,87 @@ public class ZeroBurnKnuckle : CharState {
 		base.onExit(newState);
 	}
 }
+
+
+
+
+public class SuperBurnKnuckle1 : CharState {
+
+public RekkohaEffect? effect;
+	public SuperBurnKnuckle1() : base("aok_start") {
+		superArmor = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex >= 3){
+			character.move(new Point(character.xDir * 350, 0));
+		}
+
+	
+		 if (stateTime > 1f) {
+			character.changeState(new SuperBurnKnuckle2(),true);
+			
+		}
+
+	
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		
+	}
+}
+
+
+
+
+public class SuperBurnKnuckle2 : CharState {
+
+
+	public SuperBurnKnuckle2() : base("aok_end") {
+		superArmor = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+	 if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+	
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
 
 
 public class PZeroYoudantotsu : PZeroGenericMeleeState {

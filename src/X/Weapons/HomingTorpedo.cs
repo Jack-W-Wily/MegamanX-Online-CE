@@ -106,6 +106,14 @@ public class TorpedoProj : Projectile, IDamagable {
 			changeSprite("sigma_proj_head", true);
 		}
 
+		else if (type == 6){
+				projId = (int)ProjIds.ArmoredAChargeRelease2;
+			changeSprite("armoreda_proj_release", true);
+	
+
+
+		}
+
 
 		maxTime = 2f;
 		fadeOnAutoDestroy = true;

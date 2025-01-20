@@ -172,7 +172,10 @@ public class SelectWeaponMenu : IMainMenu {
 
 	public static List<Weapon> SubWeapon = new List<Weapon>() {
 		new XBuster(),
-		new ZXSaber()
+		new XBuster(),
+		new XBuster(),
+		new XBuster(),
+		new XBuster()
 	};
 
 

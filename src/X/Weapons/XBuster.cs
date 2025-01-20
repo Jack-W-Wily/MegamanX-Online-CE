@@ -76,9 +76,7 @@ public class XBuster : Weapon {
 	}
 
 	public override void shoot(Character character, int[] args) {
-		if (character is not MegamanX mmx) {
-			return;
-		}
+		
 		int chargeLevel = args[0];
 		bool isStock = args[1] == 1;
 		Point pos = character.getShootPos();
@@ -93,6 +91,8 @@ public class XBuster : Weapon {
 			_ when isStock => "buster4X2",
 			_ => "buster4"
 		};
+
+		if (character is  MegamanX mmx) {
 		if (mmx.armArmor == ArmorId.Giga && !isStock) {
 			shootSound = chargeLevel switch {
 				1 => "buster2X2",
@@ -120,7 +120,7 @@ public class XBuster : Weapon {
 				mmx.changeState(new X3ChargeShot(null));
 				return;
 			}
-			createX3SpreadShot(mmx, xDir);
+		//	createX3SpreadShot(mmx, xDir);
 			mmx.stockedMaxBuster = false;
 			shootSound = "buster4X2";
 		}
@@ -150,30 +150,49 @@ public class XBuster : Weapon {
 				shootLigthBuster4(player, pos, xDir);
 			}
 		}
+		} else {
+
+			 if (chargeLevel == 0) {
+			lemonsOnField.Add(new BusterProj(pos, xDir, 0, player, player.getNextActorNetId(), true));
+			} else if (chargeLevel == 1) {
+			new Buster2Proj(pos, xDir, player, player.getNextActorNetId(), true);
+			} else if (chargeLevel == 2) {
+			new Buster3Proj(pos, xDir, 0, player, player.getNextActorNetId(), true);
+			} else if (chargeLevel == 3) {
+			new Buster3Proj(pos, xDir,	3, player, player.getNextActorNetId(), rpc: true);
+			}	else if (chargeLevel == 4) {
+			new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+			new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
+			character.playSound("plasmaShot", sendRpc: true);	
+			}
+		}
+
+		
 		if (shootSound != "") {
 			character.playSound(shootSound, sendRpc: true);	
 		}
 	}
 
+/*
 	public static void createX3SpreadShot(Character character, int xDir) {
 		Player player = character.player;
-		new BusterX3Proj2(
+		new BusterX3Proj3(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0,
 			player, player.getNextActorNetId(), rpc: true
 		);
-		new BusterX3Proj2(
+		new BusterX3Proj3(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1,
 			player, player.getNextActorNetId(), rpc: true
 		);
-		new BusterX3Proj2(
+		new BusterX3Proj3(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2,
 			player, player.getNextActorNetId(), rpc: true
 		);
-		new BusterX3Proj2(
+		new BusterX3Proj3(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3,
 			player, player.getNextActorNetId(), rpc: true
 		);
-	}
+	}*/
 
 	public void shootLigthBuster4(Player player, Point pos, int xDir) {
 		new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
