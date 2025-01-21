@@ -4,6 +4,7 @@ public class AxlWeaponWC : Weapon {
 	// Controls the cooldown and other stuff.
 	public int altFireSelected;
 	public float altFireRate;
+	
 	public bool autoFire;
 	// Sprite definitions.
 	public bool isTwoHanded;
@@ -15,7 +16,9 @@ public class AxlWeaponWC : Weapon {
 	public float swapCooldown;
 	public int spriteFrameIndex;
 
-	public AxlWeaponWC() {}
+	public AxlWeaponWC() {
+		weaponBarIndex = 11;
+	}
 
 	public virtual void preAxlUpdate(AxlWC axl, bool isSelected) { }
 	public virtual void axlUpdate(AxlWC axl, bool isSelected) { }

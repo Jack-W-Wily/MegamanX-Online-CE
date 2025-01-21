@@ -77,7 +77,7 @@ public class Zero : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		charId = CharIds.Zero;
+		charId = CharIds.ZeroX2;
 		// Loadout stuff.
 		ZeroLoadout zeroLoadout = player.loadout.zeroLoadout;
 

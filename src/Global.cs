@@ -61,8 +61,8 @@ public partial class Global {
 	 */
 
 	// Most common by far
-	public static int quickStartCharNum = 2;
-	public static int quickStartBotCharNum = 0;
+	public static int quickStartCharNum = (int)CharIds.Vile;
+	public static int quickStartBotCharNum = (int)CharIds.X;
 
 	public static bool _quickStart = true;
 	public static string quickStartMap = "training";
@@ -100,8 +100,8 @@ public partial class Global {
 	public static NetcodeModel quickStartNetcodeModel = NetcodeModel.FavorAttacker;
 	public static int quickStartNetcodePing = 500;
 
-	public static int quickStartOnlineHostCharNum = 2;
-	public static int quickStartOnlineClientCharNum = 0;
+	public static int quickStartOnlineHostCharNum = (int)CharIds.Vile;
+	public static int quickStartOnlineClientCharNum = (int)CharIds.X;
 
 	public static int quickStartOnlineHostSound = 0;
 	public static int quickStartOnlineHostMusic = 0;

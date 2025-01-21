@@ -728,7 +728,7 @@ public class OptionsMenu : IMainMenu {
 					"See the game website for a list of commands."
 				),
 			};
-		} else if (charNum == 0) {
+		} else if (charNum == (int)CharIds.X) {
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,
@@ -830,7 +830,7 @@ public class OptionsMenu : IMainMenu {
 				)
 				*/
 			};
-		} else if (charNum == 1) {
+		} else if (charNum == (int)CharIds.ZeroX2) {
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,
@@ -869,7 +869,7 @@ public class OptionsMenu : IMainMenu {
 					"Shows a cooldown circle for giga attacks."
 				),
 			};
-		} else if (charNum == 2) {
+		} else if (charNum == (int)CharIds.Vile) {
 			menuOptions = new List<MenuOption>() {
 				// Swap goliath inputs
 				new MenuOption(
@@ -967,7 +967,7 @@ public class OptionsMenu : IMainMenu {
 					"If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot."
 				),
 			};
-		} else if (charNum == 3000) {
+		} else if (charNum == (int)CharIds.AxlWC) {
 			menuOptions = new List<MenuOption>() {
 				// Axl Use Mouse Aim
 				new MenuOption(
@@ -1177,7 +1177,7 @@ public class OptionsMenu : IMainMenu {
 					"indicating Dodge Roll cooldown."
 				),
 			};
-		} else if (charNum == 3) {
+		} else if (charNum == (int)CharIds.AxlWC) {
 			menuOptions = new List<MenuOption>() {
 				// Axl Use Mouse Aim
 				new MenuOption(
@@ -1203,7 +1203,7 @@ public class OptionsMenu : IMainMenu {
 					"Lock Axl direction when shooting."
 				),
 			};
-		} else if (charNum == 4) {
+		} else if (charNum == (int)CharIds.Sigma) {
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,
@@ -1490,11 +1490,11 @@ public class OptionsMenu : IMainMenu {
 
 		string subtitle = "GENERAL SETTINGS";
 		if (isGraphics) subtitle = "GRAPHICS SETTINGS";
-		else if (charNum == 0) subtitle = "X SETTINGS";
-		else if (charNum == 1) subtitle = "ZERO SETTINGS";
-		else if (charNum == 2) subtitle = "VILE SETTINGS";
-		else if (charNum == 3) subtitle = "AXL SETTINGS";
-		else if (charNum == 4) subtitle = "SIGMA SETTINGS";
+		else if (charNum == (int)CharIds.X) subtitle = "X SETTINGS";
+		else if (charNum == (int)CharIds.ZeroX2) subtitle = "ZERO SETTINGS";
+		else if (charNum == (int)CharIds.Vile) subtitle = "VILE SETTINGS";
+		else if (charNum == (int)CharIds.AxlWC) subtitle = "AXL SETTINGS";
+		else if (charNum == (int)CharIds.Sigma) subtitle = "SIGMA SETTINGS";
 		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 20, Alignment.Center);
 		Fonts.drawTextEX(
 			FontType.Grey, "[MLEFT]/[MRIGHT]: Change, [BACK]: Save and Back",

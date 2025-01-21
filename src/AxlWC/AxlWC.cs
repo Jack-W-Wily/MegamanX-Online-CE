@@ -515,6 +515,26 @@ public class AxlWC : Character {
 		return shootOrigin.addxy(angleDir.x, angleDir.y);
 	}
 
+
+	public void addDNACore(Character hitChar) {
+		if (!player.ownedByLocalPlayer) return;
+		if (!player.isAxlWC) return;
+		if (Global.level.is1v1()) return;
+
+		if (player.weapons.Count((Weapon weapon) => weapon is DNACore) < 4) {
+			var dnaCoreWeapon = new DNACore(hitChar);
+			dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
+			if (player.isDisguisedAxl) {
+				player.oldWeapons.Add(dnaCoreWeapon);
+			} else {
+				player.weapons.Add(dnaCoreWeapon);
+			}
+			player.savedDNACoreWeapons.Add(dnaCoreWeapon);
+		}
+	}
+
+
+
 	public Point getAxlArmOrigin(AxlWeaponWC? weapon) {
 		if (weapon == null) {
 			return pos;
@@ -595,32 +615,32 @@ public class AxlWC : Character {
 			),
 			MeleeIds.TailShot => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.FireWave, player,
-				3, Global.halfFlinch, isJuggleProjectile: true,
+				3, Global.defFlinch, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			MeleeIds.String1 => new GenericMeleeProj(
-				FireWave.netWeapon, pos, ProjIds.FireWave, player,
-				2, Global.defFlinch,
+				FireWave.netWeapon, pos, ProjIds.ShotgunIce, player,
+				2, Global.defFlinch, 6,
 				addToLevel: addToLevel
 			),
 			MeleeIds.String2 => new GenericMeleeProj(
-				FireWave.netWeapon, pos, ProjIds.FireWave, player,
-				2, Global.defFlinch,
+				FireWave.netWeapon, pos, ProjIds.VirusSlash, player,
+				2, Global.defFlinch, 6,
 				addToLevel: addToLevel
 			),
 			MeleeIds.String3 => new GenericMeleeProj(
-				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				FireWave.netWeapon, pos, ProjIds.AcidBurst, player,
 				2, Global.defFlinch, 5,
 				addToLevel: addToLevel
 			),
 			MeleeIds.String4 => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.Raijingeki2, player,
-				2, 0,
+				2, 0, 6,
 				addToLevel: addToLevel
 			),
 			MeleeIds.String5 => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.HeavyPush, player,
-				2, 0,
+				2, 0, 6,
 				addToLevel: addToLevel
 			),
 			MeleeIds.RisingBarrage => new GenericMeleeProj(

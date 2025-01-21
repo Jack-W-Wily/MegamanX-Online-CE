@@ -30,7 +30,7 @@ public class ToxicSeahorse : Maverick {
 		ammo = 32;
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
-		barIndexes = (67, 56);
+		//barIndexes = (67, 56);
 	}
 
 	public override void update() {

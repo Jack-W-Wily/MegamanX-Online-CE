@@ -51,15 +51,15 @@ public class PreControlMenu : IMainMenu {
 		}
 	}
 
-	private void getCharNumAndAimMode(int rawCharNum, out int charNum, out int aimMode) {
-		charNum = rawCharNum;
+	private void getCharNumAndAimMode(int rawcharNum, out int charNum, out int aimMode) {
+		charNum = rawcharNum;
 		aimMode = 0;
-		if (rawCharNum == 4) {
-			charNum = 3;
+		if (rawcharNum == (int)CharIds.Sigma) {
+			charNum = (int)CharIds.AxlWC;
 			aimMode = 2;
 		}
-		if (rawCharNum == 5) {
-			charNum = 4;
+		if (rawcharNum == 5) {
+			charNum = (int)CharIds.Sigma;
 		}
 	}
 

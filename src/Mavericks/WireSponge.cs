@@ -42,7 +42,7 @@ public class WireSponge : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
 						changeState(new WSpongeUpChainStartState());
@@ -52,7 +52,16 @@ public class WireSponge : Maverick {
 				} else if (input.isPressed(Control.Special1, player)) {
 					changeState(new WSpongeSeedThrowState(Control.Special1));
 				} else if (input.isPressed(Control.Dash, player)) {
+
+
+					if (input.isHeld(Control.Special2, player)
+					&& player.currency > 4) {
+						player.currency -= 5;
+					changeState(new WSpongeLightningState());
+					}
+					else{
 					changeState(new WSpongeChargeState());
+					}
 				}
 			}
 			//else if ((state is MJump mJump && !mJump.fromCling) || state is MFall)
@@ -126,7 +135,7 @@ public class WireSponge : Maverick {
 
 public class WSpongeChainSpinProj : Projectile {
 	public WSpongeChainSpinProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 250, 1, player, "wsponge_vine_spin_shield", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 250, 1, player, "wsponge_vine_spin_shield", Global.defFlinch, 0.1f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.WSpongeChainSpin;
 		setIndestructableProperties();
 		isDeflectShield = true;

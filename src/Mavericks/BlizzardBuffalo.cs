@@ -464,6 +464,7 @@ public class BBuffaloShootBeamState : MaverickState {
 
 public class BBuffaloDashState : MaverickState {
 	float dustTime;
+	Anim dust;
 	Character? victim;
 	public BBuffaloDashState() : base("dash", "dash_start") {
 	}
@@ -475,7 +476,9 @@ public class BBuffaloDashState : MaverickState {
 
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
-			new Anim(maverick.pos.addxy(-maverick.xDir * 30, 0), "dust", maverick.xDir, null, true) { vel = new Point(0, -25) };
+			dust = new DashDustAnim(maverick.pos.addxy(-maverick.xDir * 30, 0), player.getNextActorNetId(), true, true);
+			dust.xDir = maverick.xDir;
+			//new Anim(maverick.pos.addxy(-maverick.xDir * 30, 0), "dust", maverick.xDir, null, true) { vel = new Point(0, -25) };
 			dustTime = 0.1f;
 		}
 

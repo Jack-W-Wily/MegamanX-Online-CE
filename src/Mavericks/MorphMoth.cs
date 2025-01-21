@@ -29,7 +29,7 @@ public class MorphMoth : Maverick {
 		}
 
 		canFly = true;
-		flyBarIndexes = (53, 42);
+	//	flyBarIndexes = (53, 42);
 		maxFlyBar = 960;
 		flyBar = 960;
 	}

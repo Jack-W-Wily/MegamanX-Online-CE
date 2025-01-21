@@ -41,7 +41,7 @@ public class FakeZero : Maverick {
 		ammo = 32;
 		maxAmmo = 32;
 		grayAmmoLevel = 2;
-		barIndexes = (60, 49);
+		//barIndexes = (60, 49);
 	}
 
 	public override void preUpdate() {
@@ -108,8 +108,8 @@ public class FakeZero : Maverick {
 					changeState(new FakeZeroShoot2State());
 				} else if (input.isPressed(Control.Dash, player)) {
 					if (input.isHeld(Control.Special2, player)
-					&& player.currency > 2) {
-						player.currency -= 3;
+					&& player.currency > 4) {
+						player.currency -= 5;
 					changeState(new WSpongeLightningState());
 					}
 					if (!input.isHeld(Control.Special2, player)
@@ -124,7 +124,7 @@ public class FakeZero : Maverick {
 			} else if (state is MJump || state is MFall || state is MWallKick) {
 				if (input.isHeld(Control.Shoot, player) && ammo >= 2) {
 					changeState(new FakeZeroShootAirState());
-				} else if (input.isPressed(Control.Special1, player) && ammo >= 8) {
+				} else if (input.isPressed(Control.Special1, player) && ammo >= 14) {
 					changeState(new FakeZeroShootAir2State());
 				}
 			}
@@ -302,7 +302,7 @@ public class FakeZeroShootAir2State : MaverickState {
 		if (shootPos != null) {
 			if (!once) {
 				once = true;
-				maverick.deductAmmo(4);
+				maverick.deductAmmo(14);
 				maverick.playSound("buster3X2", forcePlay: false, sendRpc: true);
 				new TorpedoProj(maverick.weapon, maverick.pos, 1, player, 3, player.getNextActorNetId(), 0, rpc: true);
 				new TorpedoProj(maverick.weapon, shootPos.Value, 1, player, 3, player.getNextActorNetId(), 0, rpc: true);	

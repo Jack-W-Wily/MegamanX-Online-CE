@@ -7,11 +7,10 @@ public class ZXSaber : Weapon {
 		shootSounds = new string[] { "", "", "", "", "" };
 		
 		index = (int)WeaponIds.XSaber;
-		weaponBarBaseIndex = 21;
+		weaponBarBaseIndex = (int)WeaponBarIndex.ZSaber;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 66;
 		weaponSlotIndex = 118;
-
 		type = index;
 		displayName = "Z Saber ";
 		effect = "Zero's Saber";

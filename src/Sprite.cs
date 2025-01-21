@@ -282,7 +282,7 @@ public class Sprite {
 			bitmap = Global.textures["RMXUAX"];
 			extraYOff = 3;
 			extraY = 3;
-			armors = null;
+		//	armors = null;
 		}
 
 		if (isUPX) {

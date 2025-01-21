@@ -39,7 +39,7 @@ public class VoltCatfish : Maverick {
 		ammo = 0;
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
-		barIndexes = (65, 54);
+		//barIndexes = (65, 54);
 	}
 
 	public override void update() {

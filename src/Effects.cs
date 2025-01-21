@@ -144,7 +144,7 @@ public class DieEffectParticles {
 		for (var i = ang; i < ang + 360; i += 22.5f) {
 			var x = this.centerPos.x + Helpers.cosd(i) * time * 150;
 			var y = this.centerPos.y + Helpers.sind(i) * time * 150;
-			var diePartSprite = charNum == 1 ? "die_particle_zero" : "die_particle";
+			var diePartSprite = charNum == (int)CharIds.ZeroX2 ? "die_particle_zero" : "die_particle";
 			var diePart = new DieParticleActor(diePartSprite, new Point(centerPos.x, centerPos.y));
 			dieParts.Add(diePart);
 		}

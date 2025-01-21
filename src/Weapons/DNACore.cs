@@ -123,7 +123,7 @@ public class DNACore : AxlWeapon {
 	}
 
 	public DNACore() : base(0) {
-		charNum = 0;
+		charNum = (int)CharIds.X;
 		name = "error";
 		loadout = null!;
 		fireRate = 60;
@@ -131,7 +131,7 @@ public class DNACore : AxlWeapon {
 		weaponBarBaseIndex = 30 + charNum;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 30 + charNum;
-		if (charNum == 4) weaponSlotIndex = 65;
+		if (charNum == (int)CharIds.Sigma) weaponSlotIndex = 65;
 		sprite = "axl_arm_pistol";
 	}
 

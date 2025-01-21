@@ -630,7 +630,8 @@ public class Projectile : Actor {
 					weakness = true;
 				}
 
-				if (owner.ownedByLocalPlayer && projId == (int)ProjIds.CopyShot && character != null) {
+				if (owner.ownedByLocalPlayer && (projId == (int)ProjIds.CopyShot
+				|| projId == (int)ProjIds.CopyShotWC) && character != null) {
 					owner.copyShotDamageEvents.Add(new CopyShotDamageEvent(character));
 				}
 

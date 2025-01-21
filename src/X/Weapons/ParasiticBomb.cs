@@ -12,7 +12,7 @@ public class ParasiticBomb : Weapon {
 		shootSounds = new string[] { "", "", "", "" , ""};
 		fireRate = 60;
 		index = (int)WeaponIds.ParasiticBomb;
-		weaponBarBaseIndex = 18;
+		weaponBarBaseIndex = (int)WeaponBarIndex.ParasiticBomb;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 18;
 		killFeedIndex = 41;

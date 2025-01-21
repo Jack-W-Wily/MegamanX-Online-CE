@@ -10,7 +10,7 @@ public class RollingShield : Weapon {
 	public RollingShield() : base() {
 		index = (int)WeaponIds.RollingShield;
 		killFeedIndex = 3;
-		weaponBarBaseIndex = 3;
+		weaponBarBaseIndex = (int)WeaponBarIndex.RollingShield;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 3;
 		weaknessIndex = 6;

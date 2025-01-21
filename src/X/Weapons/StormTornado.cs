@@ -9,7 +9,7 @@ public class StormTornado : Weapon {
 	public StormTornado() : base() {
 		index = (int)WeaponIds.StormTornado;
 		killFeedIndex = 5;
-		weaponBarBaseIndex = 5;
+		weaponBarBaseIndex = (int)WeaponBarIndex.StormTornado;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 5;
 		weaknessIndex = (int)WeaponIds.ChameleonSting;

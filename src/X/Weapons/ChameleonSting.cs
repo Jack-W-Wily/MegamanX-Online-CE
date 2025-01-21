@@ -9,7 +9,7 @@ public class ChameleonSting : Weapon {
 	public ChameleonSting() : base() {
 		index = (int)WeaponIds.ChameleonSting;
 		killFeedIndex = 2;
-		weaponBarBaseIndex = 2;
+		weaponBarBaseIndex = (int)WeaponBarIndex.ChameleonSting;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
 		weaknessIndex = (int)WeaponIds.BoomerangCutter;

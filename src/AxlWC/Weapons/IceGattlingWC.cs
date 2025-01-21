@@ -17,7 +17,7 @@ public class IceGattlingWC : AxlWeaponWC {
 		fireRate = minFireRate;
 		altFireRate = 24;
 		index = (int)WeaponIds.IceGattling;
-		weaponBarBaseIndex = 37;
+		weaponBarBaseIndex = (int)WeaponBarIndex.IceGattling;
 		weaponSlotIndex = 57;
 		killFeedIndex = 72;
 

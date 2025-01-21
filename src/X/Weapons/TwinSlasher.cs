@@ -10,8 +10,8 @@ public class TwinSlasher : Weapon {
 	public TwinSlasher() {
 		index = (int)WeaponIds.TwinSlasher;
 		killFeedIndex = 182;
-		weaponBarIndex = 68;
-		weaponBarBaseIndex = 79;
+		weaponBarBaseIndex = (int)WeaponBarIndex.TwinSlasher;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 130;
 		weaknessIndex = (int)WeaponIds.GroundHunter;
 		shootSounds = new string[] { "buster2X4", "buster2X4", "buster2X4", "buster4X4" };

@@ -7,7 +7,7 @@ public class AddBotMenu : IMainMenu {
 	public int selectArrowPosY;
 	public IMainMenu previous;
 
-	public static int botCharNum = -1;
+	public static int BotCharNum = -1;
 	public static int botTeamNum = -1;
 
 	public List<Point> optionPoses = new List<Point>()
@@ -26,11 +26,11 @@ public class AddBotMenu : IMainMenu {
 
 		if (selectArrowPosY == 0) {
 			if (Global.input.isPressedMenu(Control.MenuLeft)) {
-				botCharNum--;
-				if (botCharNum < -1) botCharNum = -1;
+				BotCharNum--;
+				if (BotCharNum < -1) BotCharNum = -1;
 			} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-				botCharNum++;
-				if (botCharNum >= 210) botCharNum = 4;
+				BotCharNum++;
+				if (BotCharNum >= 210) BotCharNum = (int)CharIds.Sigma;
 			}
 		}
 		if (selectArrowPosY == 1 && teamOptionEnabled()) {
@@ -45,10 +45,10 @@ public class AddBotMenu : IMainMenu {
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			if (Global.serverClient != null) {
-				RPC.addBot.sendRpc(botCharNum, botTeamNum);
+				RPC.addBot.sendRpc(BotCharNum, botTeamNum);
 			} else {
 				int id = 0;
-				int charNum = botCharNum;
+				int charNum = BotCharNum;
 				int alliance = botTeamNum;
 				if (charNum == -1) charNum = Helpers.randomRange(0, 4);
 				if (alliance == -1) {
@@ -88,11 +88,11 @@ public class AddBotMenu : IMainMenu {
 		else if (botTeamNum == GameMode.redAlliance) botTeamStr = "Red";
 
 		string botCharStr = "(Random)";
-		if (botCharNum == 0) botCharStr = "Mega Man X";
-		else if (botCharNum == 1) botCharStr = "Zero";
-		else if (botCharNum == 2) botCharStr = "Vile";
-		else if (botCharNum == 3) botCharStr = "Axl";
-		else if (botCharNum == 4) botCharStr = "Sigma";
+		if (BotCharNum == (int)CharIds.X) botCharStr = "Mega Man X";
+		else if (BotCharNum == (int)CharIds.ZeroX2) botCharStr = "Zero";
+		else if (BotCharNum == (int)CharIds.Vile) botCharStr = "Vile";
+		else if (BotCharNum == (int)CharIds.AxlOld) botCharStr = "Axl";
+		else if (BotCharNum == (int)CharIds.Sigma) botCharStr = "Sigma";
 
 		Fonts.drawText(
 			FontType.Blue, "Character: " + botCharStr,

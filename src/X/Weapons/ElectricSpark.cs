@@ -9,7 +9,7 @@ public class ElectricSpark : Weapon {
 	public ElectricSpark() : base() {
 		index = (int)WeaponIds.ElectricSpark;
 		killFeedIndex = 6;
-		weaponBarBaseIndex = 6;
+		weaponBarBaseIndex = (int)WeaponBarIndex.ElectricSpark;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 6;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;

@@ -10,8 +10,8 @@ public class HyperCharge : Weapon {
 	public HyperCharge() : base() {
 		index = (int)WeaponIds.HyperCharge;
 		killFeedIndex = 48;
-		weaponBarBaseIndex = 32;
-		weaponBarIndex = 31;
+		weaponBarBaseIndex = (int)WeaponBarIndex.HyperCharge;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 36;
 		shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
 		fireRate = 120;

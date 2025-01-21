@@ -89,7 +89,7 @@ public class UpgradeMenu : IMainMenu {
 		if (!subtankTargets.InRange(subtankTargetIndex)) subtankTargetIndex = 0;
 
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
-			if (mainPlayer.realCharNum == 0) {
+			if (mainPlayer.realCharNum == (int)CharIds.X) {
 				if (mainPlayer.canUpgradeXArmor()) {
 					UpgradeArmorMenu.xGame = 3;
 					Menu.change(new UpgradeArmorMenu(prevMenu));
@@ -100,14 +100,14 @@ public class UpgradeMenu : IMainMenu {
 		}
 
 		if (Global.input.isPressedMenu(Control.MenuRight)) {
-			if (mainPlayer.realCharNum == 0) {
+			if (mainPlayer.realCharNum == (int)CharIds.X) {
 				if (mainPlayer.canUpgradeXArmor()) {
 					UpgradeArmorMenu.xGame = 1;
 					Menu.change(new UpgradeArmorMenu(prevMenu));
 					onUpgradeMenu = false;
 					return;
 				}
-			} else if (mainPlayer.realCharNum == 2) {
+			} else if (mainPlayer.realCharNum == (int)CharIds.Vile) {
 				Menu.change(new SelectVileArmorMenu(prevMenu));
 				onUpgradeMenu = false;
 				return;
@@ -196,7 +196,7 @@ public class UpgradeMenu : IMainMenu {
 			);
 		}
 
-		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
+		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == (int)CharIds.Vile) {
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
 			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
 		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {

@@ -12,7 +12,7 @@ public class RaySplasher : Weapon {
 		shootSounds = new string[] { "raySplasher", "raySplasher", "raySplasher", "warpIn" , ""};
 		fireRate = 60;
 		index = (int)WeaponIds.RaySplasher;
-		weaponBarBaseIndex = 21;
+		weaponBarBaseIndex = (int)WeaponBarIndex.RaySplasher;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 21;
 		killFeedIndex = 44;

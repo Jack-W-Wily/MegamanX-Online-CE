@@ -82,7 +82,7 @@ public partial class Player {
 	public RaycastHitData assassinHitPos;
 
 	public bool canUpgradeXArmor() {
-		return (realCharNum == 0);
+		return (realCharNum == (int)CharIds.X);
 	}
 
 	public float adjustedZoomRange { get { return zoomRange - 40; } }
@@ -122,11 +122,11 @@ public partial class Player {
 	public bool isXAnother { get { return charNum == (int)CharIds.XAnother; } }
 
 	
-	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
+	public bool isZero { get { return charNum == (int)CharIds.ZeroX2; } }
 	public bool isX1Zero { get { return charNum == (int)CharIds.ZeroX1; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxlXOD { get { return charNum == (int)CharIds.AxlOld; } }
-	public bool isAxlWC { get { return charNum == (int)CharIds.AxlOld; } }
+	public bool isAxlWC { get { return charNum == (int)CharIds.AxlWC; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
@@ -207,7 +207,7 @@ public partial class Player {
 
 	public int realCharNum {
 		get {
-			if (isAxlXOD || isDisguisedAxl) return 3;
+			if (isAxlXOD  || isAxlWC || isDisguisedAxl) return (int)CharIds.AxlWC;
 			return charNum;
 		}
 	}
@@ -221,14 +221,14 @@ public partial class Player {
 	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
 		{ (int)CharIds.X, new List<SubTank>() },
 		{ (int)CharIds.XAnother, new() },
-		{ (int)CharIds.Zero, new List<SubTank>() },
+		{ (int)CharIds.ZeroX2, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
 		{ (int)CharIds.AxlOld, new List<SubTank>() },
 		{ (int)CharIds.AxlWC, new List<SubTank>() },
 		{ (int)CharIds.AxlX8, new List<SubTank>() },
 		{ (int)CharIds.Sigma, new List<SubTank>() },
 		{ (int)CharIds.ZeroX1, new List<SubTank>() },
-		{ (int)CharIds.ZeroX2, new List<SubTank>() },
+		{ (int)CharIds.ZeroX6, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
 		{ (int)CharIds.GBD, new List<SubTank>() },
@@ -240,14 +240,14 @@ public partial class Player {
 	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
 		{ (int)CharIds.X, new() },
 		{ (int)CharIds.XAnother, new() },
-		{ (int)CharIds.Zero, new() },
+		{ (int)CharIds.ZeroX2, new() },
 		{ (int)CharIds.Vile, new() },
 		{ (int)CharIds.AxlOld, new() },
 		{ (int)CharIds.AxlWC, new() },
 		{ (int)CharIds.AxlX8, new () },
 		{ (int)CharIds.Sigma, new() },
 		{ (int)CharIds.ZeroX1, new() },
-		{ (int)CharIds.ZeroX2, new() },
+		{ (int)CharIds.ZeroX6, new() },
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Zain, new() },
 		{ (int)CharIds.GBD, new() },
@@ -1169,7 +1169,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.Zero) {
+		} else if (charNum == (int)CharIds.ZeroX2) {
 			character = new Zero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1206,7 +1206,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.ZeroX2) {
+		} else if (charNum == (int)CharIds.ZeroX6) {
 			character = new BusterZero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1443,7 +1443,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.Zero) {
+		} else if (data.charNum == (int)CharIds.ZeroX2) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
@@ -1481,7 +1481,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.ZeroX2) {
+		} else if (data.charNum == (int)CharIds.ZeroX6) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
@@ -1574,8 +1574,8 @@ public partial class Player {
 		disguise = new Disguise(dnaCore.name);
 		charNum = dnaCore.charNum;
 
-		bool isVileMK2 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
-		bool isVileMK5 = charNum == 2 && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
+		bool isVileMK2 = charNum == (int)CharIds.Vile && dnaCore.hyperMode == DNACoreHyperMode.VileMK2;
+		bool isVileMK5 = charNum == (int)CharIds.Vile && dnaCore.hyperMode == DNACoreHyperMode.VileMK5;
 
 		// If somehow the DNA core loadout is null we copy current one.
 		if (dnaCore.loadout == null) {
@@ -1616,7 +1616,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.Zero) {
+		} else if (charNum == (int)CharIds.ZeroX2) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
@@ -1659,7 +1659,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.ZeroX2) {
+		} else if (charNum == (int)CharIds.ZeroX6) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
@@ -1710,13 +1710,13 @@ public partial class Player {
 		// Weapon configuration.
 		oldWeapons = weapons;
 
-		if (charNum == (int)CharIds.Zero) {
+		if (charNum == (int)CharIds.ZeroX2) {
 			retChar.weapons.Add(new ZSaber());
 		}
-		if (charNum == (int)CharIds.ZeroX2) {
+		if (charNum == (int)CharIds.ZeroX1) {
 			retChar.weapons.Add(new KKnuckleWeapon());
 		}
-		if (charNum == (int)CharIds.ZeroX1) {
+		if (charNum == (int)CharIds.ZeroX6) {
 			retChar.weapons.Add(new ZeroBuster());
 		}
 		if (charNum == (int)CharIds.Dragoon) {
@@ -2119,7 +2119,7 @@ public partial class Player {
 	public bool canReviveVile() {
 		if (//Global.level.isElimination() ||
 			!lastDeathCanRevive ||
-			newCharNum != 2 ||
+			newCharNum != (int)CharIds.Vile ||
 			currency < reviveVileCost ||
 			lastDeathWasVileMK5
 		) {
@@ -2137,14 +2137,14 @@ public partial class Player {
 		if (Global.level.isHyper1v1() &&
 			!lastDeathWasSigmaHyper &&
 			limboChar != null && isSigma
-			&& newCharNum == 4
+			&& newCharNum == (int)CharIds.Sigma
 		) {
 			return true;
 		}
 		if (limboChar == null ||
 			!lastDeathCanRevive ||
 			!isSigma ||
-			newCharNum != 4 ||
+			newCharNum != (int)CharIds.Vile ||
 			currency < reviveSigmaCost ||
 			lastDeathWasSigmaHyper
 			|| !isSigma3()
@@ -2197,7 +2197,7 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return  armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == 0 && currency >= reviveXCost && !lastDeathWasXHyper;
+		return  armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == (int)CharIds.X && currency >= reviveXCost && !lastDeathWasXHyper;
 	}
 
 	public void reviveVile(bool toMK5) {

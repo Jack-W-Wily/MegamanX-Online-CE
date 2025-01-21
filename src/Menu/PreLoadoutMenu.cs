@@ -41,7 +41,7 @@ public class PreLoadoutMenu : IMainMenu {
 			if (selectY == (int)CharIds.X) {
 				Menu.change(new SelectWeaponMenu(this, false));
 			}
-			if (selectY == (int)CharIds.Zero) {
+			if (selectY == (int)CharIds.ZeroX2) {
 				Menu.change(new SelectZeroWeaponMenu(this, false));
 			}
 			if (selectY == (int)CharIds.Vile) {

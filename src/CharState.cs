@@ -1455,9 +1455,9 @@ public class Taunt : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (player.charNum == 0) tauntTime = 0.75f;
-		if (player.charNum == 1) tauntTime = 0.7f;
-		if (player.charNum == 3) tauntTime = 0.75f;
+		if (player.charNum == (int)CharIds.X) tauntTime = 0.75f;
+		if (player.charNum == (int)CharIds.ZeroX2) tauntTime = 0.7f;
+		if (player.charNum == (int)CharIds.AxlWC) tauntTime = 0.75f;
 	}
 
 	public override void onExit(CharState newState) {
@@ -1468,7 +1468,7 @@ public class Taunt : CharState {
 	public override void update() {
 		base.update();
 
-		if (player.charNum == 2) {
+		if (player.charNum == (int)CharIds.Vile) {
 			if (character.isAnimOver()) {
 				character.changeToIdleOrFall();
 			}
@@ -1476,7 +1476,7 @@ public class Taunt : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (player.charNum == (int)CharIds.Zero && player.input.isHeld(Control.Up, player)) {
+		if (player.charNum == (int)CharIds.ZeroX2 && player.input.isHeld(Control.Up, player)) {
 			character.changeSprite("zero_win2", true);
 			if (character.isAnimOver()) {
 				character.changeToIdleOrFall();

@@ -10,7 +10,7 @@ public class SilkShot : Weapon {
 		shootSounds = new string[] { "silkShot", "silkShot", "silkShot", "silkShotCharged", "" };
 		fireRate = 45;
 		index = (int)WeaponIds.SilkShot;
-		weaponBarBaseIndex = 11;
+		weaponBarBaseIndex = (int)WeaponBarIndex.SilkShot;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 11;
 		killFeedIndex = 20 + (index - 9);

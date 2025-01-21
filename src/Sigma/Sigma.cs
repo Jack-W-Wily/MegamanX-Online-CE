@@ -353,7 +353,7 @@ public class BaseSigma : Character {
 	}
 
 	public override bool normalCtrl() {
-		if (grounded && player.isControllingPuppet()) {
+		if (grounded && player.isControllingPuppet() && charState is Idle) {
 			changeState(new SigmaBlock());
 			return true;
 		}

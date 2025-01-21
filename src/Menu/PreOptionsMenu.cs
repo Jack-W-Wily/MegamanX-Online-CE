@@ -39,11 +39,11 @@ public class PreOptionsMenu : IMainMenu {
 		Helpers.menuUpDown(ref selectY, 0, 8);
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			int? charNum = null;
-			if (selectY == 3) charNum = 0;
-			if (selectY == 4) charNum = 1;
-			if (selectY == 5) charNum = 2;
-			if (selectY == 6) charNum = 3;
-			if (selectY == 7) charNum = 4;
+			if (selectY == 3) charNum = (int)CharIds.X;
+			if (selectY == 4) charNum = (int)CharIds.ZeroX2;
+			if (selectY == 5) charNum = (int)CharIds.Vile;
+			if (selectY == 6) charNum = (int)CharIds.AxlWC;
+			if (selectY == 7) charNum = (int)CharIds.Sigma;
 			Menu.change(new OptionsMenu(this, inGame, charNum, selectY));
 		} 
 		if  (Global.input.isPressedMenu(Control.MenuConfirm)) {

@@ -39,23 +39,23 @@ public class InGameMainMenu : IMainMenu {
 					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.Sigma) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
-				} else if (selectedCharNum == (int)CharIds.AxlWC) {
+				} else if (selectedCharNum == (int)CharIds.AxlWC || selectedCharNum == (int)CharIds.AxlX8) {
 					Menu.change(new SelectAxlWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.Vile) {
 					Menu.change(new SelectVileWeaponMenu(this, true));
-				} else if (selectedCharNum == (int)CharIds.Zero) {
+				} else if (selectedCharNum == (int)CharIds.ZeroX6) {
 					Menu.change(new SelectZeroWeaponMenu(this, true));
-				} else {
+				} else if (selectedCharNum == (int)CharIds.X || selectedCharNum == (int)CharIds.XAnother) {
 					Menu.change(new SelectWeaponMenu(this, true));
 				}
 			} else if (selectY == 1) {
 				if (isSelArmorDisabled()) return;
-				if (Global.level.mainPlayer.realCharNum == 0 || Global.level.mainPlayer.realCharNum == 2) {
+				if (Global.level.mainPlayer.realCharNum == (int)CharIds.X || Global.level.mainPlayer.realCharNum == (int)CharIds.Vile) {
 					if (UpgradeMenu.onUpgradeMenu && !Global.level.server.disableHtSt) {
 						Menu.change(new UpgradeMenu(this));
-					} else if (Global.level.mainPlayer.realCharNum == 0) {
+					} else if (Global.level.mainPlayer.realCharNum == (int)CharIds.X) {
 						Menu.change(new UpgradeArmorMenu(this));
-					} else if (Global.level.mainPlayer.realCharNum == 2) {
+					} else if (Global.level.mainPlayer.realCharNum == (int)CharIds.Vile) {
 						Menu.change(new SelectVileArmorMenu(this));
 					}
 				} else {
@@ -85,14 +85,17 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelWepDisabled() {
-		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.ZeroX2;
+		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.ZeroX6 || 
+		mainPlayer?.realCharNum == (int)CharIds.GBD || mainPlayer?.realCharNum == (int)CharIds.Zain ||
+		mainPlayer?.realCharNum == (int)CharIds.Dragoon || mainPlayer?.realCharNum == (int)CharIds.ZeroX1 ||
+		mainPlayer?.realCharNum == (int)CharIds.Vile;
 	}
 
 	public bool isSelArmorDisabled() {
 		if (Global.level.is1v1()) return true;
-		if (mainPlayer.realCharNum == 2) return false;
+		if (mainPlayer.realCharNum == (int)CharIds.Vile) return false;
 		if (Global.level.server.disableHtSt) {
-			if (mainPlayer.realCharNum != 0) return Global.level.server.disableHtSt;
+			if (mainPlayer.realCharNum != (int)CharIds.X) return Global.level.server.disableHtSt;
 			if (mainPlayer.canUpgradeXArmor()) {
 				return false;
 			} else {

@@ -9,7 +9,7 @@ public class PlasmaGunWC : AxlWeaponWC {
 		fireRate = 14;
 		altFireRate = 2;
 		index = (int)WeaponIds.PlasmaGun;
-		weaponBarBaseIndex = 36;
+		weaponBarBaseIndex = (int)WeaponBarIndex.PlasmaGun;
 		weaponSlotIndex = 56;
 		killFeedIndex = 71;
 		sprite = "axl_arm_plasmagun";

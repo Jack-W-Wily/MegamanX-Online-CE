@@ -9,7 +9,7 @@ public class HomingTorpedo : Weapon {
 	public HomingTorpedo() : base() {
 		index = (int)WeaponIds.HomingTorpedo;
 		killFeedIndex = 1;
-		weaponBarBaseIndex = 1;
+		weaponBarBaseIndex = (int)WeaponBarIndex.HomingTorpedo;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;
 		weaknessIndex = (int)WeaponIds.RollingShield;
@@ -104,6 +104,14 @@ public class TorpedoProj : Projectile, IDamagable {
 		else if (type == 5) {
 			projId = (int)ProjIds.SigmaHeadProjectile;
 			changeSprite("sigma_proj_head", true);
+		}
+
+		else if (type == 6){
+				projId = (int)ProjIds.ArmoredAChargeRelease2;
+			changeSprite("armoreda_proj_release", true);
+	
+
+
 		}
 
 

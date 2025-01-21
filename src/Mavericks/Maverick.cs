@@ -74,7 +74,9 @@ public class Maverick : Actor, IDamagable {
 	public bool canHealAmmo = false;
 	public float? ammoHealScale = null;
 	public bool ammoRoundDown = false;
-	public (int icon, int units) barIndexes = (0, 0);
+	public int ammoIndex = 2;
+	//public int flyIndex = ammoIndex;
+	//public (int icon, int units) barIndexes = (0, 0);
 
 	// Movement.
 	public bool canStomp;
@@ -84,7 +86,7 @@ public class Maverick : Actor, IDamagable {
 	public bool canFly;
 	public float maxFlyBar = 16;
 	public float flyBar = 16;
-	public (int icon, int units) flyBarIndexes = (0, 0);
+	//public (int icon, int units) flyBarIndexes = (0, 0);
 
 	// Defense.
 	public float weaknessCooldown;

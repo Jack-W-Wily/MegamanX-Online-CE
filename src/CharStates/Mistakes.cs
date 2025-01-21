@@ -259,3 +259,87 @@ public class XTeleportState : CharState {
 		return tempClone;
 	}
 }
+
+
+
+
+
+public class XIceSlide : CharState {
+	Anim? proj;
+
+	public XIceSlide() : base("sice_slide", "", "", "") {
+		enterSound = "chillpSlide";
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		character.move(new Point(character.xDir * 150, 0));
+
+	  if (stateTime > 0.4f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+		character.vel.y = 0;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+public class XlightKick : CharState {
+	Anim? proj;
+
+	public XlightKick() : base("kick_lightarmor", "", "", "") {
+		enterSound = "dash";
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		character.move(new Point(character.xDir * 50, 0));
+
+	  if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+		character.vel.y = 0;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+

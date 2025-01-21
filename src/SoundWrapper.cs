@@ -46,15 +46,15 @@ public class SoundBufferWrapper {
 				} else if (Helpers.parseFileDotParam(subpiece, 's', out int s)) {
 					stopAllOtherVoiceClips = true;
 				} else if (subpiece == "mmx") {
-					charNum = 0;
+					charNum = (int)CharIds.X;
 				} else if (subpiece == "zero") {
-					charNum = 1;
+					charNum = (int)CharIds.ZeroX2;
 				} else if (subpiece == "vile") {
-					charNum = 2;
+					charNum = (int)CharIds.Vile;
 				} else if (subpiece == "axl") {
-					charNum = 3;
+					charNum = (int)CharIds.AxlWC;
 				} else if (subpiece == "sigma") {
-					charNum = 4;
+					charNum = (int)CharIds.Sigma;
 				}
 			}
 		}

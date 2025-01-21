@@ -11,9 +11,9 @@ public class SoulBody : Weapon {
 		index = (int)WeaponIds.SoulBody;
 		fireRate = 30;
 		weaponSlotIndex = 125;
-        weaponBarBaseIndex = 74;
-        weaponBarIndex = 63;
-			displayName = "Soul Body";
+        weaponBarBaseIndex = (int)WeaponBarIndex.SoulBody;
+        weaponBarIndex = weaponBarBaseIndex;
+		displayName = "Soul Body";
 		shootSounds = new string[] {"","buster2X4","buster2X4","SoulBodyAlt",""};
 		weaknessIndex = (int)WeaponIds.LightningWeb;
 		type = index;

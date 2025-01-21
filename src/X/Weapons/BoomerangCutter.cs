@@ -9,7 +9,7 @@ public class BoomerangCutter : Weapon {
 	public BoomerangCutter() : base() {
 		index = (int)WeaponIds.BoomerangCutter;
 		killFeedIndex = 7;
-		weaponBarBaseIndex = 7;
+		weaponBarBaseIndex = (int)WeaponBarIndex.BoomerangCutter;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 7;
 		weaknessIndex = (int)WeaponIds.HomingTorpedo;

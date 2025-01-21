@@ -70,15 +70,15 @@ public class Hurt : CharState {
 		if (isMiniFlinch()) {
 			character.frameSpeed = 0;
 			if (Global.frameCount % 2 == 0) {
-				if (player.charNum == 0) character.frameIndex = 3;
-				if (player.charNum == 1) character.frameIndex = 3;
-				if (player.charNum == 2) character.frameIndex = 0;
-				if (player.charNum == 3) character.frameIndex = 3;
+				if (player.charNum == (int)CharIds.X) character.frameIndex = 3;
+				if (player.charNum == (int)CharIds.ZeroX2) character.frameIndex = 3;
+				if (player.charNum == (int)CharIds.Vile) character.frameIndex = 0;
+				if (player.charNum == (int)CharIds.AxlWC) character.frameIndex = 3;
 			} else {
-				if (player.charNum == 0) character.frameIndex = 2;
-				if (player.charNum == 1) character.frameIndex = 2;
-				if (player.charNum == 2) character.frameIndex = 1;
-				if (player.charNum == 3) character.frameIndex = 2;
+				if (player.charNum == (int)CharIds.X) character.frameIndex = 2;
+				if (player.charNum == (int)CharIds.ZeroX2) character.frameIndex = 2;
+				if (player.charNum == (int)CharIds.Vile) character.frameIndex = 1;
+				if (player.charNum == (int)CharIds.AxlWC) character.frameIndex = 2;
 			}
 		}
 
@@ -542,15 +542,12 @@ public class LaunchedState : GenericGrabbedState {
 				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
 					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 						if (!once){
-								once = true;
+							once = true;
 							character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
-						//	character.changeState(new Hurt(-character.xDir, Global.defFlinch, 0), true);
-		
-						}
 							character.playSound("crash", sendRpc: true);
 							character.shakeCamera(sendRpc: true);
-							//return;
-						}
+					}
+				}
 			}
 	
 		}

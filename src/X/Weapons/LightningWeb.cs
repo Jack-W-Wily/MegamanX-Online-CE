@@ -10,8 +10,8 @@ public class LightningWeb : Weapon {
 		shootSounds = new string[] { "busterX4", "busterX4", "busterX4", "busterX4" };
 		fireRate = 60;
 		index = (int)WeaponIds.LightningWeb;
-		weaponBarBaseIndex = 72;
-		weaponBarIndex = 61;
+		weaponBarBaseIndex = (int)WeaponBarIndex.LightningWeb;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 123;
 		type = index;
 		displayName = "Lightning Web";

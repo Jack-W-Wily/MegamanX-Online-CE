@@ -28,7 +28,7 @@ public class StormEagle : Maverick {
 		}
 
 		canFly = true;
-		flyBarIndexes = (44, 38);
+	//	flyBarIndexes = (44, 38);
 		maxFlyBar = 960;
 		flyBar = 960;
 	}

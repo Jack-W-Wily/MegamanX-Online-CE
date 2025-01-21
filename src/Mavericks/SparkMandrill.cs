@@ -37,7 +37,7 @@ public class SparkMandrill : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 31;
 		ammoRoundDown = true;
-		barIndexes = (55, 44);
+		//barIndexes = (55, 44);
 
 		armorClass = ArmorClass.Heavy;
 		canStomp = true;
@@ -49,7 +49,7 @@ public class SparkMandrill : Maverick {
 		//rechargeAmmo(8);
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (specialPressed()) {
 					//if (ammo >= 32)
 					{
@@ -182,6 +182,7 @@ public class SparkMPunchWeapon : Weapon {
 #region states
 public class SparkMPunchState : MaverickState {
 	public float dustTime;
+	
 	public SparkMPunchState() : base("punch") {
 	}
 
@@ -197,6 +198,7 @@ public class SparkMPunchState : MaverickState {
 
 public class SparkMDashPunchState : MaverickState {
 	public float dustTime;
+	Anim dust;
 	public SparkMDashPunchState() : base("dash_punch") {
 	}
 
@@ -229,8 +231,10 @@ public class SparkMDashPunchState : MaverickState {
 
 		dustTime += Global.spf;
 		if (dustTime > 0.1) {
+			dust = new DashDustAnim(maverick.pos.addxy(0, -4), player.getNextActorNetId(), true, true);
+			dust.xDir = maverick.xDir;
 			dustTime = 0;
-			new Anim(maverick.pos.addxy(0, -4), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			//new Anim(maverick.pos.addxy(0, -4), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
 		}
 	}
 }

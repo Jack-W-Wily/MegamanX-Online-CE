@@ -20,8 +20,8 @@ public class VileCannon : Weapon {
 
 	public VileCannon(VileCannonType vileCannonType) : base() {
 		index = (int)WeaponIds.FrontRunner;
-		weaponBarBaseIndex = 56;
-		weaponBarIndex = 56;
+		/*weaponBarBaseIndex = 56;
+		weaponBarIndex = 56;*/
 		killFeedIndex = 56;
 		weaponSlotIndex = 43;
 		type = (int)vileCannonType;

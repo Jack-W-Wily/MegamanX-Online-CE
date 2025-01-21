@@ -322,7 +322,9 @@ public enum ProjIds {
 	Buster3,
 	Buster4,
 	BusterUnpo,
+	BusterX3Proj1,
 	BusterX3Proj2,
+	BusterX3Proj3,
 	BusterX3Plasma,
 	BusterX3PlasmaHit,
 	Torpedo,
@@ -599,6 +601,7 @@ public enum ProjIds {
 	ArmoredAProj,
 	ArmoredARoll,
 	ArmoredAChargeRelease,
+	ArmoredAChargeRelease2,
 	LaunchOMissle,
 	LaunchOTorpedo,
 	LaunchOWhirlpool,
@@ -777,6 +780,9 @@ public enum ProjIds {
 	DZHadangeki,
 
 
+	// X another
+	SiceSlide,
+
 	// GBD stuff
 
 	GBDKick,
@@ -877,4 +883,135 @@ public enum ProjIds {
 	// Close to the int16 max value.
 	// Do not add things bellow this.
 	SelfDestruct = 32700,
+}
+//weapon bar index
+public enum WeaponBarIndex{
+	//X1
+	HomingTorpedo,
+	ChameleonSting,
+	RollingShield,
+	FireWave,
+	StormTornado,
+	ElectricSpark,
+	BoomerangCutter,
+	ShotgunIce,
+	//X2
+	CrystalHunter,
+	BubbleSplash,
+	SilkShot,
+	SpinWheel,
+	SonicSlicer,
+	StrikeChain,
+	MagnetMine,
+	SpeedBurner,
+	GigaCrush,
+	//X3
+	AcidBurst,
+	ParasiticBomb,
+	TriadThunder,
+	SpinningBlade,
+	RaySplasher,
+	GravityWell,
+	FrostShield,
+	TornadoFang,
+	HyperCharge,
+	ZSaber,
+	//X4
+	LightningWeb,
+	FrostTower,
+	SoulBody,
+	RisingFire,
+	GroundHunter,
+	AimingLaser,
+	DoubleCyclone,
+	TwinSlasher,
+	NovaStrike,
+	//X5
+	DarkHold,
+	AxlBullet = 64,
+	BlastLauncher,
+	RayGun,
+	IceGattling,
+	BlackArrow,
+	FlameBurner,
+	PlasmaGun,
+	SpiralMagnum,
+	BoundBlaster
+	
+	
+}
+public enum WeaponSlotIndex{
+	//X1
+	Buster,
+	HomingTorpedo,
+	ChameleonSting,
+	RollingShield,
+	FireWave,
+	StormTornado,
+	ElectricSpark,
+	BoomerangCutter,
+	ShotgunIce,
+	Hadouken,
+	//X2
+	CrystalHunter,
+	BubbleSplash,
+	SilkShot,
+	SpinWheel,
+	SonicSlicer,
+	StrikeChain,
+	MagnetMine,
+	SpeedBurner,
+	GigaCrush,
+	Shoryuken,
+	//X3
+	AcidBurst,
+	ParasiticBomb,
+	TriadThunder,
+	SpinningBlade,
+	RaySplasher,
+	GravityWell,
+	FrostShield,
+	TornadoFang,
+	HyperCharge,
+	//X4
+	LightningWeb,
+	FrostTower,
+	SoulBody,
+	RisingFire,
+	GroundHunter,
+	AimingLaser,
+	DoubleCyclone,
+	TwinSlasher,
+	//X5
+	DarkHold
+}
+
+public enum CharHpBarIndex{
+	X,
+	XAnother,
+	ZeroX1,
+	ZeroX2,
+	ZeroX6,
+	Vile,
+	AxlWC,
+	AxlX8,
+	Sigma,
+	Doppler,
+	GBD,
+	Dynamo,
+	Dragoon,
+	Zain,
+	BlackZero,
+	WhiteAxl,
+	BoostMode
+}
+
+public enum VehicleHpBarIndex{
+	BlackBear,
+	Frog,
+	Kangroo,
+	Hawk,
+	Goliath,
+	DevilBear,
+	RideChaser
 }

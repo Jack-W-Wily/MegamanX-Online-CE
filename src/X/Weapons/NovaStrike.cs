@@ -9,10 +9,10 @@ public class HyperNovaStrike : Weapon {
 	public HyperNovaStrike() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		shootSounds = new string[] { "", "", "", "" };
-		fireRate = 90;
+		fireRate = 10;
 		index = (int)WeaponIds.NovaStrike;
-		weaponBarBaseIndex = 42;
-		weaponBarIndex = 36;
+		weaponBarBaseIndex = (int)WeaponBarIndex.NovaStrike;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 95;
 		killFeedIndex = 104;
 		ammo = 28;

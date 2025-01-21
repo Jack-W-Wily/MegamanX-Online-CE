@@ -11,8 +11,8 @@ public class GroundHunter : Weapon {
 		index = (int)WeaponIds.GroundHunter;
 		fireRate = 30;
 		weaponSlotIndex = 127;
-		weaponBarIndex = 65;
-		weaponBarBaseIndex = 76;
+		weaponBarIndex = weaponBarBaseIndex;
+		weaponBarBaseIndex = (int)WeaponBarIndex.GroundHunter;
 		shootSounds = new string[] {"busterX4","busterX4","busterX4","buster2X4","buster2X4"};
 		weaknessIndex = (int)WeaponIds.FrostTower;
 		type = index;

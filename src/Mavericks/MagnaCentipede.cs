@@ -36,7 +36,7 @@ public class MagnaCentipede : Maverick {
 		ammo = 32;
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
-		barIndexes = (59, 48);
+	//	barIndexes = (59, 48);
 	}
 
 	bool shootHeldLastFrame;
@@ -214,7 +214,7 @@ public class MagnaCShurikenProj : Projectile {
 	public Pickup pickup;
 	public float maxSpeed = 250;
 	public MagnaCShurikenProj(Weapon weapon, Point pos, int xDir, Point velDir, Player player, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "magnac_shuriken", 0, 0, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, Global.halfFlinch, 2, player, "magnac_shuriken", 0, 0, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MagnaCShuriken;
 		maxTime = 1f;
 		vel = velDir.times(maxSpeed);

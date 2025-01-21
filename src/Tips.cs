@@ -744,11 +744,11 @@ public class Tips {
 	public static string[] getRandomTip(int charNum) {
 		var tipsPool = new List<string[]>(Tips.tipsPool);
 		if (Global.level.isRace()) tipsPool = Tips.raceTipsPool;
-		else if (charNum == 0) tipsPool.AddRange(Tips.xTipsPool);
-		else if (charNum == 1) tipsPool.AddRange(Tips.zeroTipsPool);
-		else if (charNum == 2) tipsPool.AddRange(Tips.vileTipsPool);
-		else if (charNum == 3) tipsPool.AddRange(Tips.axlTipsPool);
-		else if (charNum == 4) tipsPool.AddRange(Tips.sigmaTipsPool);
+		else if (charNum == (int)CharIds.X) tipsPool.AddRange(Tips.xTipsPool);
+		else if (charNum == (int)CharIds.ZeroX2) tipsPool.AddRange(Tips.zeroTipsPool);
+		else if (charNum == (int)CharIds.Vile) tipsPool.AddRange(Tips.vileTipsPool);
+		else if (charNum == (int)CharIds.AxlWC) tipsPool.AddRange(Tips.axlTipsPool);
+		else if (charNum == (int)CharIds.Sigma) tipsPool.AddRange(Tips.sigmaTipsPool);
 		return tipsPool.GetRandomItem();
 	}
 }
