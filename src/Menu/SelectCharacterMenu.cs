@@ -93,8 +93,8 @@ public class CharSelection {
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
-		new CharSelection("Zero (Mid)", (int)CharIds.BusterZero, sprite: "smenu_zero"),
-		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero_2"),
+		new CharSelection("Zero (Mid)", (int)CharIds.BusterZero, sprite: "smenu_zero_2"),
+		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("Axl (Another)", (int)CharIds.AxlAnother, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),

@@ -1389,11 +1389,11 @@ public class GameMode {
 		if (player.charNum == (int)CharIds.XAnother) {
 			frameIndex = (int)CharHpBarIndex.XAnother;
 		}if (player.charNum == (int)CharIds.PunchyZero) {
-			frameIndex = (int)CharHpBarIndex.ZeroX1;
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
 		}if (player.charNum == (int)CharIds.BusterZero) {
 			frameIndex = (int)CharHpBarIndex.ZeroX2;
 		}if (player.charNum == (int)CharIds.Zero) {
-			frameIndex = (int)CharHpBarIndex.ZeroX6;
+			frameIndex = (int)CharHpBarIndex.ZeroX1;
 		}if (player.charNum == (int)CharIds.Vile) {
 			frameIndex = (int)CharHpBarIndex.Vile;
 		}if (player.charNum == (int)CharIds.AxlWC) {
@@ -1686,7 +1686,7 @@ public class GameMode {
 				renderAmmo(baseX, ref baseY, 2, 2, player.sigmaAmmo, grayAmmo: player.weapon.getAmmoUsage(0));
 			} else if (player.isMainPlayer && player.currentMaverick == null && !player.isSigma3()) {
 				int hudWeaponBaseIndex = 2;
-				int hudWeaponFullIndex = 8;
+				int hudWeaponFullIndex = 3;
 				ammoDisplayMultiplier = 1;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {

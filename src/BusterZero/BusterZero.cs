@@ -56,7 +56,10 @@ public class BusterZero : Character {
 			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				if (sprite.name == getSprite(charState.shootSprite)) {
+				if (sprite.name == getSprite(charState.shootSprite) ||
+					sprite.name == getSprite("shoot") ||
+					sprite.name == getSprite("fall_shoot")
+				) {
 					changeSpriteFromName(charState.defaultSprite, false);
 					if (charState is WallSlide) {
 						frameIndex = sprite.totalFrameNum - 1;
