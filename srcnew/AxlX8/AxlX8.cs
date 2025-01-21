@@ -24,9 +24,15 @@ public class AxlX8 : Character {
 			shootAnimTime -= Global.speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				changeSpriteFromName(charState.defaultSprite, false);
-				if (charState is WallSlide) {
-					frameIndex = sprite.totalFrameNum - 1;
+				if (sprite.name == getSprite(charState.shootSprite) ||
+					sprite.name == getSprite("shoot") ||
+					sprite.name == getSprite("jump_shoot") ||
+					sprite.name == getSprite("fall_shoot")
+				) {
+					changeSpriteFromName(charState.defaultSprite, false);
+					if (charState is WallSlide) {
+						frameIndex = sprite.totalFrameNum - 1;
+					}
 				}
 			}
 		}
@@ -99,7 +105,7 @@ public class AxlX8 : Character {
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
-		} else if (charState is Idle) {
+		} else if (shootSprite == getSprite("shoot")) {
 			frameIndex = 0;
 			frameTime = 0;
 		}

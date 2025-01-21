@@ -166,11 +166,15 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref specialSaberCooldown);
 
 		// For the shooting animation.
-		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
+		if (shootAnimTime > 0) {
 			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				if (sprite.name == getSprite(charState.shootSprite)) {
+				if (sprite.name == getSprite(charState.shootSprite) ||
+					sprite.name == getSprite("shoot") ||
+					sprite.name == getSprite("jump_shoot") ||
+					sprite.name == getSprite("fall_shoot")
+				) {
 					changeSpriteFromName(charState.defaultSprite, false);
 					if (charState is WallSlide) {
 						frameIndex = sprite.totalFrameNum - 1;
@@ -419,6 +423,7 @@ public class MegamanX : Character {
 		// Check if can shoot.
 		if (shootCooldown > 0 ||
 			weapon == null ||
+			!canShoot() ||
 			!weapon.canShoot(chargeLevel, player) ||
 			weapon.shootCooldown > 0
 		) {
@@ -518,7 +523,7 @@ public class MegamanX : Character {
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
-		} else if (charState is Idle) {
+		} else if (shootSprite == getSprite("shoot")) {
 			frameIndex = 0;
 			frameTime = 0;
 		}
@@ -546,7 +551,8 @@ public class MegamanX : Character {
 			hasLastingProj() ||
 			shootCooldown > 0 ||
 			invulnTime > 0 ||
-			linkedTriadThunder != null
+			linkedTriadThunder != null ||
+			charState is SwordBlock
 		) {
 			return false;
 		}

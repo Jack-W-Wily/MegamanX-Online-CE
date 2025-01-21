@@ -82,6 +82,7 @@ public partial class Character : Actor, IDamagable {
 	public bool insideCharacter;
 	public float invulnTime = 0;
 	public float iframesTime = 0;
+	public float counterCooldown;
 
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;
@@ -832,6 +833,7 @@ public partial class Character : Actor, IDamagable {
 	public override void preUpdate() {
 		base.preUpdate();
 		Helpers.decrementFrames(ref iframesTime);
+		Helpers.decrementFrames(ref counterCooldown);
 		updateProjectileCooldown();
 		insideCharacter = false;
 		changedStateInFrame = false;

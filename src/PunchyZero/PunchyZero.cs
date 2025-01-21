@@ -204,6 +204,7 @@ public class PunchyZero : Character {
 				shootAnimTime = 0;
 				if (sprite.name == getSprite(charState.shootSprite) ||
 					sprite.name == getSprite("shoot") ||
+					sprite.name == getSprite("jump_shoot") ||
 					sprite.name == getSprite("fall_shoot")
 				) {
 					changeSpriteFromName(charState.defaultSprite, false);
@@ -251,7 +252,7 @@ public class PunchyZero : Character {
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
-		} else if (charState is Idle) {
+		} else if (shootSprite == getSprite("shoot")) {
 			frameIndex = 0;
 			frameTime = 0;
 		}

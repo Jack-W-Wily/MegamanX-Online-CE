@@ -244,13 +244,19 @@ public override bool normalCtrl() {
 		Helpers.decrementFrames(ref specialSaberCooldown);
 
 		// For the shooting animation.
-		if (shootAnimTime > 0 && sprite.name == getSprite(charState.shootSprite)) {
+		if (shootAnimTime > 0) {
 			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				changeSpriteFromName(charState.defaultSprite, false);
-				if (charState is WallSlide) {
-					frameIndex = sprite.totalFrameNum - 1;
+				if (sprite.name == getSprite(charState.shootSprite) ||
+					sprite.name == getSprite("shoot") ||
+					sprite.name == getSprite("jump_shoot") ||
+					sprite.name == getSprite("fall_shoot")
+				) {
+					changeSpriteFromName(charState.defaultSprite, false);
+					if (charState is WallSlide) {
+						frameIndex = sprite.totalFrameNum - 1;
+					}
 				}
 			}
 		}
@@ -548,7 +554,7 @@ public override bool normalCtrl() {
 		}
 		if (shootAnimTime == 0) {
 			changeSprite(shootSprite, false);
-		} else if (charState is Idle) {
+		} else if (shootSprite == getSprite("shoot")) {
 			frameIndex = 0;
 			frameTime = 0;
 		}

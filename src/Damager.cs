@@ -94,34 +94,6 @@ public class Damager {
 				newFlinch = 0;
 				weakness = false;
 			}
-// Counter system aka Frail guy
-			if (chr.isAttacking()
-			 && newFlinch >= 0 && (
-			projId != (int)ProjIds.HexaInvolute &&
-			projId != (int)ProjIds.AwakenedAura
-			 )) {
-
-				if (projId != (int)ProjIds.BlockableLaunch
-				&& projId != (int)ProjIds.NormalPush
-				&& projId != (int)ProjIds.MechFrogStompShockwave
-				&& projId != (int)ProjIds.HeavyPush
-				&& projId != (int)ProjIds.VileSuperKick	
-				&& projId != (int)ProjIds.ForceGrabState	
-				){
-				if (newFlinch < Global.halfFlinch) {
-					newFlinch = Global.halfFlinch;
-				}
-				else if (newFlinch < Global.defFlinch) {
-					newFlinch = Global.defFlinch;
-				}
-				else {
-					newFlinch = Global.superFlinch;
-				}
-				}
-				chr.addDamageText("COUNTER!!!", 1);	
-				chr.shakeCamera(sendRpc: true);
-				chr.playSound("weakness");		
-			}
 		}
 
 		return applyDamage(
@@ -268,11 +240,11 @@ public class Damager {
 					break;
 				case (int)ProjIds.SpreadShot:
 					character?.paralize2();
-		//			maverick?.crystalize();
+					//			maverick?.crystalize();
 					break;
 				case (int)ProjIds.MK2StunShot:
 					character?.paralize2();
-		//			maverick?.crystalize();
+					//			maverick?.crystalize();
 					break;
 				case (int)ProjIds.CSnailCrystalHunter:
 					character?.crystalize();
@@ -317,7 +289,7 @@ public class Damager {
 				case (int)ProjIds.Raijingeki2:
 				case (int)ProjIds.PeaceOutRoller:
 				case (int)ProjIds.PeaceOutRoller2:
-				
+
 					character?.paralize();
 					maverick?.paralize();
 					break;
@@ -360,21 +332,45 @@ public class Damager {
 				character.flattenedTime = 0.5f;
 			}
 
-			if (owner.character is PunchyZero){
-				if (projId == (int)ProjIds.PZeroEnkoukyaku 
-				&& owner.input.isHeld(Control.Jump,owner)){
-				owner.character.vel.y = -owner.character.getJumpPower();
-				owner.character.changeState(new WallKick(), true);
+			if (owner.character is PunchyZero) {
+				if (projId == (int)ProjIds.PZeroEnkoukyaku
+				&& owner.input.isHeld(Control.Jump, owner)) {
+					owner.character.vel.y = -owner.character.getJumpPower();
+					owner.character.changeState(new WallKick(), true);
 
 				}
 			}
-
-
-			if (owner.health > 0 && projId >= 0){
-			// Combotimer
-			owner.character.ComboTimer += 0.25f;
+			bool countered = false;
+			// Counter system aka Frail guy
+			if (character.isAttacking() &&
+				!character.isFlinchImmune() &&
+				flinch >= 0 &&
+				projId != (int)ProjIds.HexaInvolute &&
+				projId != (int)ProjIds.AwakenedAura
+			) {
+				if (projId != (int)ProjIds.BlockableLaunch &&
+				projId != (int)ProjIds.NormalPush &&
+				projId != (int)ProjIds.MechFrogStompShockwave &&
+				projId != (int)ProjIds.HeavyPush &&
+				projId != (int)ProjIds.VileSuperKick &&
+				projId != (int)ProjIds.ForceGrabState
+				) {
+					if (flinch < Global.halfFlinch) {
+						flinch = Global.halfFlinch;
+					} else if (flinch < Global.defFlinch) {
+						flinch = Global.defFlinch;
+					} else {
+						flinch = Global.superFlinch;
+					}
+				}
+				countered = true;
 			}
-			
+
+			if (owner.health > 0 && projId >= 0) {
+				// Combotimer
+				owner.character.ComboTimer += 0.25f;
+			}
+
 			if (owner.character is XAnother Xa && owner.health > 0) {
 				Xa.gigaAttack.addAmmo(1, owner);
 			}
@@ -386,124 +382,124 @@ public class Damager {
 			if (owner.character is PunchyZero zerop && owner.health > 0) {
 				zerop.gigaAttack.addAmmo(1, owner);
 			}
-			
-			if (owner.health > 0){
-			
 
-			// GBD stuff
-
-			if ( projId == (int)ProjIds.GBDKick || projId == (int)ProjIds.SiceSlide){
-			
-			owner.character.isDashing = true;
-			owner.character.vel.y = -owner.character.getJumpPower();
-			owner.character.changeState(new WallKick() ,true);
-			}
-			// ZeroFinal
-			if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart){
-			owner.character.changeState(new ZeroFinalEnd(character), true);
-			}
+			if (owner.health > 0) {
 
 
-			// Vile Special interaction trigger
-			if (owner.isVile && character is PunchyZero){
-			owner.character.wasFightingZeroEarly = true;
-			character.wasFightingVile = true;
-			}
-			if (owner.isVile && character is MegamanX){
-			owner.character.wasFightingX = true;
-			character.wasFightingVile = true;
-			}
-			if (owner.isVile && character is CmdSigma){
-			owner.character.wasFightingSigma = true;
-			character.wasFightingVile = true;
-			}
+				// GBD stuff
 
-			// Hexa stuff
-		//	if (character.charState is HexaInvoluteState) {
-		//			character.addHealth(damage);	
-		//			victim.addDamageText("ABSORBED!", 1);		
-		//	}
+				if (projId == (int)ProjIds.GBDKick || projId == (int)ProjIds.SiceSlide) {
 
-			if (projId == (int)ProjIds.HexaInvolute && owner.health > 0) {
-				owner.character.addHealth(0.1f);
-			}
+					owner.character.isDashing = true;
+					owner.character.vel.y = -owner.character.getJumpPower();
+					owner.character.changeState(new WallKick(), true);
+				}
+				// ZeroFinal
+				if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart) {
+					owner.character.changeState(new ZeroFinalEnd(character), true);
+				}
 
 
-			// Vile stomp 
-			if (character.sprite.name.Contains("knocked_down")
-			 && projId == (int)ProjIds.VileStomp
-			 && !character.isStatusImmune()){
-			owner.character.changeState(new VileStompState(character), true);
-			character.changeState(new VileStomped(owner.character), true);
-			}
-			if (projId == (int)ProjIds.VileStomp2
-			&& !character.isStatusImmune()){
-			character.changeState(new VileStomped(owner.character), true);
-			}
-			// Vile Air Raid 
-			if (owner.isVile && 
-			(
-				projId == (int)ProjIds.VileAirRaidStart
-			|| projId == (int)ProjIds.VileAirRaidPlusKnock
-			)){
-			owner.character.changeState(new VileAirRaid(character), true);
-			}
+				// Vile Special interaction trigger
+				if (owner.isVile && character is PunchyZero) {
+					owner.character.wasFightingZeroEarly = true;
+					character.wasFightingVile = true;
+				}
+				if (owner.isVile && character is MegamanX) {
+					owner.character.wasFightingX = true;
+					character.wasFightingVile = true;
+				}
+				if (owner.isVile && character is CmdSigma) {
+					owner.character.wasFightingSigma = true;
+					character.wasFightingVile = true;
+				}
+
+				// Hexa stuff
+				//	if (character.charState is HexaInvoluteState) {
+				//			character.addHealth(damage);	
+				//			victim.addDamageText("ABSORBED!", 1);		
+				//	}
+
+				if (projId == (int)ProjIds.HexaInvolute && owner.health > 0) {
+					owner.character.addHealth(0.1f);
+				}
 
 
-			// ShunGokusatsu (Need to make a new Proj ID etc etc for this later)
-			if (owner.isDragoon && 
-			(
-				projId == (int)ProjIds.VileAirRaidStart
-			|| projId == (int)ProjIds.VileAirRaidPlusKnock
-			)){
-			owner.character.changeState(new VileAirRaid(character), true);
-			}
+				// Vile stomp 
+				if (character.sprite.name.Contains("knocked_down")
+				 && projId == (int)ProjIds.VileStomp
+				 && !character.isStatusImmune()) {
+					owner.character.changeState(new VileStompState(character), true);
+					character.changeState(new VileStomped(owner.character), true);
+				}
+				if (projId == (int)ProjIds.VileStomp2
+				&& !character.isStatusImmune()) {
+					character.changeState(new VileStomped(owner.character), true);
+				}
+				// Vile Air Raid 
+				if (owner.isVile &&
+				(
+					projId == (int)ProjIds.VileAirRaidStart
+				|| projId == (int)ProjIds.VileAirRaidPlusKnock
+				)) {
+					owner.character.changeState(new VileAirRaid(character), true);
+				}
 
 
-			// Axl Air Raid 
-			if (owner.ownedByLocalPlayer && owner.character is AxlWC && 
-				((ProjIds)projId) is ProjIds.VileAirRaidStart or ProjIds.VileAirRaidPlusKnock
-			) {
-				owner.character.changeState(new AxlAirRaid(character), true);
-			}
-			// Vile Blockable Grab
-			if (!character.sprite.name.Contains("block") &&
-			 projId == (int)ProjIds.VileGrab
-			 && !character.isStatusImmune()){
-			character.changeState(new VileMK2Grabbed(owner.character), true);
-			}
-			if (owner.character.charState is VileAirRaid){
-			damage = 1;
-			}
+				// ShunGokusatsu (Need to make a new Proj ID etc etc for this later)
+				if (owner.isDragoon &&
+				(
+					projId == (int)ProjIds.VileAirRaidStart
+				|| projId == (int)ProjIds.VileAirRaidPlusKnock
+				)) {
+					owner.character.changeState(new VileAirRaid(character), true);
+				}
+
+
+				// Axl Air Raid 
+				if (owner.ownedByLocalPlayer && owner.character is AxlWC &&
+					((ProjIds)projId) is ProjIds.VileAirRaidStart or ProjIds.VileAirRaidPlusKnock
+				) {
+					owner.character.changeState(new AxlAirRaid(character), true);
+				}
+				// Vile Blockable Grab
+				if (!character.sprite.name.Contains("block") &&
+				 projId == (int)ProjIds.VileGrab
+				 && !character.isStatusImmune()) {
+					character.changeState(new VileMK2Grabbed(owner.character), true);
+				}
+				if (owner.character.charState is VileAirRaid) {
+					damage = 1;
+				}
 			}
 
 
 			//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		//Get Launched
-		if (((projId == (int)ProjIds.BlockableLaunch
-		|| projId == (int)ProjIds.VileAirRaidPlusKnock
-		) &&	 !victim.sprite.name.Contains("block"))
-		&& !character.isStatusImmune()) {		
-		character.changeState(new LaunchedState(owner.character), true);
-		}
+			//Get Launched
+			if (((projId == (int)ProjIds.BlockableLaunch
+			|| projId == (int)ProjIds.VileAirRaidPlusKnock
+			) && !victim.sprite.name.Contains("block"))
+			&& !character.isStatusImmune()) {
+				character.changeState(new LaunchedState(owner.character), true);
+			}
 
 
-		if (((projId == (int)ProjIds.ForceGrabState) &&	 !victim.sprite.name.Contains("knocked"))
-		&& !character.isStatusImmune()) {		
-		character.changeState(new VileMK2Grabbed(owner.character), true);
-		
-		if (owner.isDragoon)owner.character.changeState(new DragoonGrab(), true);
-		}
+			if (((projId == (int)ProjIds.ForceGrabState) && !victim.sprite.name.Contains("knocked"))
+			&& !character.isStatusImmune()) {
+				character.changeState(new VileMK2Grabbed(owner.character), true);
+
+				if (owner.isDragoon) owner.character.changeState(new DragoonGrab(), true);
+			}
 
 
 			// Damage Scaling	
-			if (character != null){
+			if (character != null) {
 				character.DamageScaling += 1;
 				character.DamageScalingCD = 0.5f;
 			}
-			
+
 			if (isArmorPiercing(projId)) {
-			victim.addDamageText("PIERCE!", 1);	
+				victim.addDamageText("PIERCE!", 1);
 			}
 
 			//WCUT OP Block
@@ -511,21 +507,21 @@ public class Damager {
 			&& character.charState is not SigmaBlock ||
 			 character.charState is SwordBlock
 			 ) {
-				if (!hitFromBehind(character, damagingActor, owner, projId) 
+				if (!hitFromBehind(character, damagingActor, owner, projId)
 				&& !isArmorPiercing(projId)) {
 					damage--;
-					weakness = false;	
+					weakness = false;
 					flinch = 0;
-					if (damage < 4){
-					damage = 0;
+					if (damage < 4) {
+						damage = 0;
 					}
 					if (damage < 1) {
 						damage = 0;
 						character.playSound("m10ding");
 					}
-				}	
+				}
 			}
-			
+
 
 
 			if (character.isAlwaysHeadshot() && (projId == (int)ProjIds.RevolverBarrel || projId == (int)ProjIds.AncientGun)) {
@@ -679,7 +675,7 @@ public class Damager {
 				case (int)ProjIds.TBreakerProj:
 				case (int)ProjIds.ZBuster4:
 				case (int)ProjIds.UPParryMelee:
-				
+
 					if (character.ownedByLocalPlayer) {
 						character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 					}
@@ -695,13 +691,13 @@ public class Damager {
 					if (character.ownedByLocalPlayer && !character.charState.stunResistant) {
 						character.changeState(new PushedOver2(character.pos.x < damagingActor?.pos.x ? 1 : -1), true);
 					}
-						break;
+					break;
 				case (int)ProjIds.DynamoDropSlash:
-				if (!character.grounded && character.isAttacking()) {
+					if (!character.grounded && character.isAttacking()) {
 						character.vel.y += 300;
 						spiked = true;
 					}
-				break;
+					break;
 				case (int)ProjIds.MechFrogGroundPound:
 					if (!character.grounded) {
 						character.vel.y += 300;
@@ -718,13 +714,13 @@ public class Damager {
 					break;
 				case (int)ProjIds.MagnaCTail:
 					character.addVirusTime(owner, 4f);
-					break;	
+					break;
 				case (int)ProjIds.SigmaHeadProjectile:
 					character.addVirusTime(owner, 2f);
-					break;	
+					break;
 				case (int)ProjIds.VirusSlash:
 					character.addVirusTime(owner, 2f);
-					break;	
+					break;
 				case (int)ProjIds.MechPunch:
 				case (int)ProjIds.MechDevilBearPunch:
 					switch (Helpers.randomRange(0, 1)) {
@@ -784,9 +780,9 @@ public class Damager {
 				} else if (flinch < Global.defFlinch) {
 					flinch = Global.defFlinch;
 				}
-			//	damage = MathF.Ceiling(damage * 1.5f);
+				//	damage = MathF.Ceiling(damage * 1.5f);
 			}
-		
+
 			// Disallow flinch stack for non-BZ.
 			else if (!Global.canFlinchCombo) {
 				if (character != null && character.charState is Hurt hurtState &&
@@ -831,8 +827,16 @@ public class Damager {
 				if (damagingActor != null && hitFromBehind(character, damagingActor, owner, projId)) hurtDir *= -1;
 				if (projId == (int)ProjIds.GravityWellCharged) hurtDir = 0;
 
+				// Counter effect.
+				if (flinch > Global.miniFlinch && countered && character.counterCooldown == 0) {
+					character.counterCooldown = 60;
+					character.addDamageText("COUNTER!", (int)FontType.RedishOrange);
+					character.shakeCamera();
+					character.playSound("weakness");
+					character.setHurt(hurtDir, flinch, spiked);
+				}
 				// Flinch above 0 and is not weakness
-				if (flinch > 0 && !weakness) {
+				else if (flinch > 0 && !weakness) {
 					victim?.playSound("hurt");
 					character.setHurt(hurtDir, flinch, spiked);
 				}
@@ -850,8 +854,7 @@ public class Damager {
 						}
 						if (flinch < Global.halfFlinch) {
 							flinch = Global.halfFlinch;
-						}
-						else if (flinch < Global.defFlinch) {
+						} else if (flinch < Global.defFlinch) {
 							flinch = Global.defFlinch;
 						}
 						if (character.ownedByLocalPlayer) {
@@ -1081,7 +1084,7 @@ public class Damager {
 			character.ownedByLocalPlayer && charState is XUPParryStartState parryState &&
 			parryState.canParry(damagingActor) && !isDot(projId)
 		) {
-			victim.addDamageText("PARRY!", 1);	
+			victim.addDamageText("PARRY!", 1);
 			parryState.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
 			return true;
 		}
@@ -1090,7 +1093,7 @@ public class Damager {
 			character.ownedByLocalPlayer && charState is GlobalParryState parryStateG &&
 			parryStateG.canParry(damagingActor) && !isDot(projId)
 		) {
-			victim.addDamageText("PARRY!", 1);	
+			victim.addDamageText("PARRY!", 1);
 			parryStateG.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
 			return true;
 		}
@@ -1102,7 +1105,7 @@ public class Damager {
 			&& parryState2.canParry(damagingActor) &&
 			!isDot(projId)
 		) {
-			victim.addDamageText("PARRY!", 1);	
+			victim.addDamageText("PARRY!", 1);
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
 			return true;
 		}
@@ -1114,7 +1117,7 @@ public class Damager {
 			&& parryStateZain.canParry(damagingActor) &&
 			!isDot(projId)
 		) {
-			victim.addDamageText("PARRY!", 1);	
+			victim.addDamageText("PARRY!", 1);
 			parryStateZain.counterAttack(owner, damagingActor, finalDamage);
 			return true;
 		}
@@ -1125,11 +1128,11 @@ public class Damager {
 			charState is PZeroParry zeroParryState &&
 			zeroParryState.canParry(damagingActor, projId)
 		) {
-			victim.addDamageText("PARRY!", 1);	
+			victim.addDamageText("PARRY!", 1);
 			zeroParryState.counterAttack(owner, damagingActor);
 			return true;
 		}
-		
+
 		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 
 		return true;
@@ -1342,8 +1345,8 @@ public class Damager {
 			ProjIds.AcidBurstPoison => true,
 			ProjIds.SelfDmg => true,
 			ProjIds.FlameRoundFlameProj => true,
-			ProjIds.BlastLauncherMineGrenadeProj => true, 
-			ProjIds.BoundBlasterRadar => true, 
+			ProjIds.BlastLauncherMineGrenadeProj => true,
+			ProjIds.BoundBlasterRadar => true,
 			ProjIds.RayGunChargeBeam => true,
 			ProjIds.PlasmaGunBeamProj => true,
 			ProjIds.PlasmaGunBeamProjHyper => true,
