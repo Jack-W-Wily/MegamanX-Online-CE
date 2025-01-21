@@ -828,9 +828,11 @@ public class Damager {
 				if (projId == (int)ProjIds.GravityWellCharged) hurtDir = 0;
 
 				// Counter effect.
+				if (flinch > Global.miniFlinch && countered) {
+					character.addDamageText("COUNTER!", (int)FontType.Red);
+				}
 				if (flinch > Global.miniFlinch && countered && character.counterCooldown == 0) {
 					character.counterCooldown = 60;
-					character.addDamageText("COUNTER!", (int)FontType.RedishOrange);
 					character.shakeCamera();
 					character.playSound("weakness");
 					character.setHurt(hurtDir, flinch, spiked);
