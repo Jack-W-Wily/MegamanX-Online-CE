@@ -105,7 +105,7 @@ public class Control {
 
 		baseStr += "_";
 		if (charNum == (int)CharIds.X) baseStr += "x";
-		if (charNum == (int)CharIds.BusterZero) baseStr += "zero";
+		if (charNum == (int)CharIds.Zero) baseStr += "zero";
 		if (charNum == (int)CharIds.Vile) baseStr += "vile";
 		if (charNum == (int)CharIds.AxlWC) {
 			baseStr += "axl";

@@ -174,7 +174,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			missingXCores = xCoresRequired - xDnaCount;
 		}
 
-		int zeroDnaCount = mainPlayer.weapons.Count(w => w is DNACore dnaCore && dnaCore.charNum == (int)CharIds.BusterZero);
+		int zeroDnaCount = mainPlayer.weapons.Count(w => w is DNACore dnaCore && dnaCore.charNum == (int)CharIds.Zero);
 		if (zeroDnaCount < zeroCoresRequired) {
 			canAfford = false;
 			missingZeroCores = xCoresRequired - zeroDnaCount;
@@ -206,8 +206,8 @@ public class SelectAxlWeaponMenu : IMainMenu {
 				if (removeIndex >= 0) mainPlayer.savedDNACoreWeapons.RemoveAt(removeIndex);
 			}
 			for (int i = 0; i < zeroCoresRequired; i++) {
-				mainPlayer.weapons.RemoveAt(mainPlayer.weapons.FindIndex(w => w is DNACore dnaCore && dnaCore.charNum == (int)CharIds.BusterZero));
-				int removeIndex = mainPlayer.savedDNACoreWeapons.FindIndex(w => w is DNACore dnaCore && dnaCore.charNum == (int)CharIds.BusterZero);
+				mainPlayer.weapons.RemoveAt(mainPlayer.weapons.FindIndex(w => w is DNACore dnaCore && dnaCore.charNum == (int)CharIds.Zero));
+				int removeIndex = mainPlayer.savedDNACoreWeapons.FindIndex(w => w is DNACore dnaCore && dnaCore.charNum == (int)CharIds.Zero);
 				if (removeIndex >= 0) mainPlayer.savedDNACoreWeapons.RemoveAt(removeIndex);
 			}
 			for (int i = 0; i < vileCoresRequired; i++) {

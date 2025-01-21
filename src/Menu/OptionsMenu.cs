@@ -830,7 +830,7 @@ public class OptionsMenu : IMainMenu {
 				)
 				*/
 			};
-		} else if (charNum == (int)CharIds.BusterZero) {
+		} else if (charNum == (int)CharIds.Zero) {
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,
@@ -1491,7 +1491,7 @@ public class OptionsMenu : IMainMenu {
 		string subtitle = "GENERAL SETTINGS";
 		if (isGraphics) subtitle = "GRAPHICS SETTINGS";
 		else if (charNum == (int)CharIds.X) subtitle = "X SETTINGS";
-		else if (charNum == (int)CharIds.BusterZero) subtitle = "ZERO SETTINGS";
+		else if (charNum == (int)CharIds.Zero) subtitle = "ZERO SETTINGS";
 		else if (charNum == (int)CharIds.Vile) subtitle = "VILE SETTINGS";
 		else if (charNum == (int)CharIds.AxlWC) subtitle = "AXL SETTINGS";
 		else if (charNum == (int)CharIds.Sigma) subtitle = "SIGMA SETTINGS";

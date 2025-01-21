@@ -745,7 +745,7 @@ public class Tips {
 		var tipsPool = new List<string[]>(Tips.tipsPool);
 		if (Global.level.isRace()) tipsPool = Tips.raceTipsPool;
 		else if (charNum == (int)CharIds.X) tipsPool.AddRange(Tips.xTipsPool);
-		else if (charNum == (int)CharIds.BusterZero) tipsPool.AddRange(Tips.zeroTipsPool);
+		else if (charNum == (int)CharIds.Zero) tipsPool.AddRange(Tips.zeroTipsPool);
 		else if (charNum == (int)CharIds.Vile) tipsPool.AddRange(Tips.vileTipsPool);
 		else if (charNum == (int)CharIds.AxlWC) tipsPool.AddRange(Tips.axlTipsPool);
 		else if (charNum == (int)CharIds.Sigma) tipsPool.AddRange(Tips.sigmaTipsPool);

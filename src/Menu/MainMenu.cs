@@ -216,7 +216,7 @@ public class MainMenu : IMainMenu {
 				Global.sprites["menu_x1_zero"].drawToHUD(0,WD - 42,  selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
-			case (int)CharIds.BusterZero:
+			case (int)CharIds.Zero:
 				Global.sprites["menu_x2_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;

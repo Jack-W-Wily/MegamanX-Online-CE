@@ -1456,7 +1456,7 @@ public class Taunt : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (player.charNum == (int)CharIds.X) tauntTime = 0.75f;
-		if (player.charNum == (int)CharIds.BusterZero) tauntTime = 0.7f;
+		if (player.charNum == (int)CharIds.Zero) tauntTime = 0.7f;
 		if (player.charNum == (int)CharIds.AxlWC) tauntTime = 0.75f;
 	}
 
@@ -1476,7 +1476,7 @@ public class Taunt : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (player.charNum == (int)CharIds.BusterZero && player.input.isHeld(Control.Up, player)) {
+		if (player.charNum == (int)CharIds.Zero && player.input.isHeld(Control.Up, player)) {
 			character.changeSprite("zero_win2", true);
 			if (character.isAnimOver()) {
 				character.changeToIdleOrFall();

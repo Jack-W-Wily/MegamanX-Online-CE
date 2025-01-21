@@ -1745,7 +1745,7 @@ public class GameMode {
 					Global.sprites["hud_bars_wp_base_off_x"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
 				}else{Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
 				}
-			else if(player.isX1Zero | player.isZero){
+			else if(player.isPunchyZero | player.isZero){
 				if(weapon.ammo <= 0){
 					Global.sprites["hud_bars_base_generic"].drawToHUD(5, baseX, baseY);}
 				else{
@@ -1775,7 +1775,7 @@ public class GameMode {
 					}*/
 					else if(player.isX | player.isXAnother){
 						Global.sprites["hud_bars_wp_x"].drawToHUD(spriteIndex, baseX, baseY);}
-					else if(level.mainPlayer.isX1Zero | player.isX1Zero | player.isZero | level.mainPlayer.isZero){
+					else if(level.mainPlayer.isPunchyZero | player.isPunchyZero | player.isZero | level.mainPlayer.isZero){
 						Global.sprites["hud_bars_generic"].drawToHUD(5, baseX, baseY);
 					}else{Global.sprites["hud_bars_generic"].drawToHUD(weapon.weaponBarIndex, baseX, baseY);}
 				} else {
@@ -2532,7 +2532,7 @@ public class GameMode {
 				if (arm == 15) Global.sprites["menu_chip"].drawToHUD(0, x - 9, sy - 2 + 4);
 				if (boots == 15) Global.sprites["menu_chip"].drawToHUD(0, x - 12, sy + 10);
 			}
-		} else if (dnaCore.charNum == (int)CharIds.BusterZero) {
+		} else if (dnaCore.charNum == (int)CharIds.Zero) {
 			int index = 0;
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) index = 1;
 			if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) index = 2;
@@ -2561,7 +2561,7 @@ public class GameMode {
 		for (int i = 0; i < dnaCore.weapons.Count && i < 6; i++) {
 			weapons.Add(dnaCore.weapons[i]);
 		}
-		if (dnaCore.charNum == (int)CharIds.BusterZero) {
+		if (dnaCore.charNum == (int)CharIds.Zero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
@@ -3333,7 +3333,7 @@ public class GameMode {
 				else if (player.legArmorNum == 2) charName += "2";
 				else if (player.legArmorNum == 3) charName += "3";
 			}
-		} else if (charNum == (int)CharIds.BusterZero) charName = "Zero";
+		} else if (charNum == (int)CharIds.Zero) charName = "Zero";
 		else if (charNum == (int)CharIds.Vile) charName = "Vile";
 		else if (charNum == (int)CharIds.AxlOld) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";

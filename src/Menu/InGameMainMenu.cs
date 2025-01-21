@@ -85,7 +85,7 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelWepDisabled() {
-		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.BusterZero || 
+		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.Zero || 
 		mainPlayer?.realCharNum == (int)CharIds.GBD || mainPlayer?.realCharNum == (int)CharIds.Zain ||
 		mainPlayer?.realCharNum == (int)CharIds.Dragoon || mainPlayer?.realCharNum == (int)CharIds.PunchyZero ||
 		mainPlayer?.realCharNum == (int)CharIds.Vile;

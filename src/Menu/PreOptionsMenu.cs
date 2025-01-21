@@ -40,7 +40,7 @@ public class PreOptionsMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			int? charNum = null;
 			if (selectY == 3) charNum = (int)CharIds.X;
-			if (selectY == 4) charNum = (int)CharIds.BusterZero;
+			if (selectY == 4) charNum = (int)CharIds.Zero;
 			if (selectY == 5) charNum = (int)CharIds.Vile;
 			if (selectY == 6) charNum = (int)CharIds.AxlWC;
 			if (selectY == 7) charNum = (int)CharIds.Sigma;

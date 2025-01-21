@@ -93,7 +93,7 @@ public class CharSelection {
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
-		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero"),
+		new CharSelection("Zero (Mid)", (int)CharIds.BusterZero, sprite: "smenu_zero"),
 		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero_2"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("Axl (Another)", (int)CharIds.AxlAnother, sprite: "smenu_axl"),
@@ -347,7 +347,7 @@ public class SelectCharacterMenu : IMainMenu {
 			/*(int)CharIds.ZeroX6 => new string[] {
 				"Long range figther with a powerfull buster."
 			},*/
-			(int)CharIds.BusterZero => new string[] {
+			(int)CharIds.Zero => new string[] {
 				"Combo & Rushdown fighter\nwith a variety of combo routes and hypermodes."
 			},
 			(int)CharIds.Vile => new string[] {

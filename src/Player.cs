@@ -122,8 +122,8 @@ public partial class Player {
 	public bool isXAnother { get { return charNum == (int)CharIds.XAnother; } }
 
 	
-	public bool isZero { get { return charNum == (int)CharIds.BusterZero; } }
-	public bool isX1Zero { get { return charNum == (int)CharIds.PunchyZero; } }
+	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
+	public bool isPunchyZero { get { return charNum == (int)CharIds.PunchyZero; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxlXOD { get { return charNum == (int)CharIds.AxlOld; } }
 	public bool isAxlWC { get { return charNum == (int)CharIds.AxlWC; } }
@@ -221,14 +221,14 @@ public partial class Player {
 	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
 		{ (int)CharIds.X, new List<SubTank>() },
 		{ (int)CharIds.XAnother, new() },
-		{ (int)CharIds.BusterZero, new List<SubTank>() },
+		{ (int)CharIds.Zero, new List<SubTank>() },
 		{ (int)CharIds.Vile, new List<SubTank>() },
 		{ (int)CharIds.AxlOld, new List<SubTank>() },
 		{ (int)CharIds.AxlWC, new List<SubTank>() },
 		{ (int)CharIds.AxlAnother, new List<SubTank>() },
 		{ (int)CharIds.Sigma, new List<SubTank>() },
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
-		{ (int)CharIds.Zero, new List<SubTank>() },
+		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
 		{ (int)CharIds.GBD, new List<SubTank>() },
@@ -240,14 +240,14 @@ public partial class Player {
 	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
 		{ (int)CharIds.X, new() },
 		{ (int)CharIds.XAnother, new() },
-		{ (int)CharIds.BusterZero, new() },
+		{ (int)CharIds.Zero, new() },
 		{ (int)CharIds.Vile, new() },
 		{ (int)CharIds.AxlOld, new() },
 		{ (int)CharIds.AxlWC, new() },
 		{ (int)CharIds.AxlAnother, new () },
 		{ (int)CharIds.Sigma, new() },
 		{ (int)CharIds.PunchyZero, new() },
-		{ (int)CharIds.Zero, new() },
+		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Zain, new() },
 		{ (int)CharIds.GBD, new() },
@@ -703,7 +703,7 @@ public partial class Player {
 		if (isSigma) {
 			bonus = 12;
 		}
-		if (isX1Zero) {
+		if (isPunchyZero) {
 			bonus = 14;
 		}
 		if (isZain) {
@@ -1169,7 +1169,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.BusterZero) {
+		} else if (charNum == (int)CharIds.Zero) {
 			character = new Zero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1206,7 +1206,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (charNum == (int)CharIds.Zero) {
+		} else if (charNum == (int)CharIds.BusterZero) {
 			character = new BusterZero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1443,7 +1443,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.Zero) {
+		} else if (data.charNum == (int)CharIds.BusterZero) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
@@ -1481,7 +1481,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else if (data.charNum == (int)CharIds.BusterZero) {
+		} else if (data.charNum == (int)CharIds.Zero) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
@@ -1616,7 +1616,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.BusterZero) {
+		} else if (charNum == (int)CharIds.Zero) {
 			retChar = new Zero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
@@ -1659,7 +1659,7 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.BusterZero) {
+		} else if (charNum == (int)CharIds.Zero) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
@@ -1710,13 +1710,13 @@ public partial class Player {
 		// Weapon configuration.
 		oldWeapons = weapons;
 
-		if (charNum == (int)CharIds.Zero) {
+		if (charNum == (int)CharIds.BusterZero) {
 			retChar.weapons.Add(new ZSaber());
 		}
 		if (charNum == (int)CharIds.PunchyZero) {
 			retChar.weapons.Add(new KKnuckleWeapon());
 		}
-		if (charNum == (int)CharIds.BusterZero) {
+		if (charNum == (int)CharIds.Zero) {
 			retChar.weapons.Add(new ZeroBuster());
 		}
 		if (charNum == (int)CharIds.Dragoon) {
