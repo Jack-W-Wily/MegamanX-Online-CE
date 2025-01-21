@@ -71,12 +71,12 @@ public class Hurt : CharState {
 			character.frameSpeed = 0;
 			if (Global.frameCount % 2 == 0) {
 				if (player.charNum == (int)CharIds.X) character.frameIndex = 3;
-				if (player.charNum == (int)CharIds.ZeroX2) character.frameIndex = 3;
+				if (player.charNum == (int)CharIds.BusterZero) character.frameIndex = 3;
 				if (player.charNum == (int)CharIds.Vile) character.frameIndex = 0;
 				if (player.charNum == (int)CharIds.AxlWC) character.frameIndex = 3;
 			} else {
 				if (player.charNum == (int)CharIds.X) character.frameIndex = 2;
-				if (player.charNum == (int)CharIds.ZeroX2) character.frameIndex = 2;
+				if (player.charNum == (int)CharIds.BusterZero) character.frameIndex = 2;
 				if (player.charNum == (int)CharIds.Vile) character.frameIndex = 1;
 				if (player.charNum == (int)CharIds.AxlWC) character.frameIndex = 2;
 			}

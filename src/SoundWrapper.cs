@@ -48,7 +48,7 @@ public class SoundBufferWrapper {
 				} else if (subpiece == "mmx") {
 					charNum = (int)CharIds.X;
 				} else if (subpiece == "zero") {
-					charNum = (int)CharIds.ZeroX2;
+					charNum = (int)CharIds.BusterZero;
 				} else if (subpiece == "vile") {
 					charNum = (int)CharIds.Vile;
 				} else if (subpiece == "axl") {

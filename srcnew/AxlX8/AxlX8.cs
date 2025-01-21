@@ -12,7 +12,7 @@ public class AxlX8 : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, false, false
 	) {
-		charId = CharIds.AxlX8;
+		charId = CharIds.AxlAnother;
 	}
 
 	public override void update() {

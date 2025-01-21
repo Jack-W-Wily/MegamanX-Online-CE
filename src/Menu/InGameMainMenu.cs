@@ -35,15 +35,15 @@ public class InGameMainMenu : IMainMenu {
 
 				if (isSelWepDisabled()) return;
 
-				if (selectedCharNum == (int)CharIds.ZeroX1) {
+				if (selectedCharNum == (int)CharIds.PunchyZero) {
 					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.Sigma) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
-				} else if (selectedCharNum == (int)CharIds.AxlWC || selectedCharNum == (int)CharIds.AxlX8) {
+				} else if (selectedCharNum == (int)CharIds.AxlWC || selectedCharNum == (int)CharIds.AxlAnother) {
 					Menu.change(new SelectAxlWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.Vile) {
 					Menu.change(new SelectVileWeaponMenu(this, true));
-				} else if (selectedCharNum == (int)CharIds.ZeroX6) {
+				} else if (selectedCharNum == (int)CharIds.Zero) {
 					Menu.change(new SelectZeroWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.X || selectedCharNum == (int)CharIds.XAnother) {
 					Menu.change(new SelectWeaponMenu(this, true));
@@ -85,9 +85,9 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelWepDisabled() {
-		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.ZeroX6 || 
+		return Global.level.is1v1() || mainPlayer?.realCharNum == (int)CharIds.BusterZero || 
 		mainPlayer?.realCharNum == (int)CharIds.GBD || mainPlayer?.realCharNum == (int)CharIds.Zain ||
-		mainPlayer?.realCharNum == (int)CharIds.Dragoon || mainPlayer?.realCharNum == (int)CharIds.ZeroX1 ||
+		mainPlayer?.realCharNum == (int)CharIds.Dragoon || mainPlayer?.realCharNum == (int)CharIds.PunchyZero ||
 		mainPlayer?.realCharNum == (int)CharIds.Vile;
 	}
 

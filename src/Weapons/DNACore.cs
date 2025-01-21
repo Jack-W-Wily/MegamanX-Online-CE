@@ -115,7 +115,7 @@ public class DNACore : AxlWeapon {
 		) {
 			weaponSlotIndex = 65;
 		}
-		if (charNum == (int)CharIds.ZeroX2 || charNum == (int)CharIds.ZeroX1) {
+		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {
 			weaponBarBaseIndex = 31;
 		}
 		sprite = "axl_arm_pistol";

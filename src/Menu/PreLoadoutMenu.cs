@@ -41,7 +41,7 @@ public class PreLoadoutMenu : IMainMenu {
 			if (selectY == (int)CharIds.X) {
 				Menu.change(new SelectWeaponMenu(this, false));
 			}
-			if (selectY == (int)CharIds.ZeroX2) {
+			if (selectY == (int)CharIds.BusterZero) {
 				Menu.change(new SelectZeroWeaponMenu(this, false));
 			}
 			if (selectY == (int)CharIds.Vile) {
@@ -53,7 +53,7 @@ public class PreLoadoutMenu : IMainMenu {
 			if (selectY == (int)CharIds.Sigma) {
 				Menu.change(new SelectSigmaWeaponMenu(this, false));
 			}
-			if (selectY == (int)CharIds.ZeroX1) {
+			if (selectY == (int)CharIds.PunchyZero) {
 				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
 			}
 		} 

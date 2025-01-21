@@ -1388,17 +1388,17 @@ public class GameMode {
 		int frameIndex = 0;
 		if (player.charNum == (int)CharIds.XAnother) {
 			frameIndex = (int)CharHpBarIndex.XAnother;
-		}if (player.charNum == (int)CharIds.ZeroX1) {
+		}if (player.charNum == (int)CharIds.PunchyZero) {
 			frameIndex = (int)CharHpBarIndex.ZeroX1;
-		}if (player.charNum == (int)CharIds.ZeroX2) {
+		}if (player.charNum == (int)CharIds.BusterZero) {
 			frameIndex = (int)CharHpBarIndex.ZeroX2;
-		}if (player.charNum == (int)CharIds.ZeroX6) {
+		}if (player.charNum == (int)CharIds.Zero) {
 			frameIndex = (int)CharHpBarIndex.ZeroX6;
 		}if (player.charNum == (int)CharIds.Vile) {
 			frameIndex = (int)CharHpBarIndex.Vile;
 		}if (player.charNum == (int)CharIds.AxlWC) {
 			frameIndex = (int)CharHpBarIndex.AxlWC;
-		}if (player.charNum == (int)CharIds.AxlX8) {
+		}if (player.charNum == (int)CharIds.AxlAnother) {
 			frameIndex = (int)CharHpBarIndex.AxlX8;
 		}if (player.charNum == (int)CharIds.Sigma) {
 			frameIndex = (int)CharHpBarIndex.Sigma;
@@ -2532,7 +2532,7 @@ public class GameMode {
 				if (arm == 15) Global.sprites["menu_chip"].drawToHUD(0, x - 9, sy - 2 + 4);
 				if (boots == 15) Global.sprites["menu_chip"].drawToHUD(0, x - 12, sy + 10);
 			}
-		} else if (dnaCore.charNum == (int)CharIds.ZeroX2) {
+		} else if (dnaCore.charNum == (int)CharIds.BusterZero) {
 			int index = 0;
 			if (dnaCore.hyperMode == DNACoreHyperMode.BlackZero) index = 1;
 			if (dnaCore.hyperMode == DNACoreHyperMode.AwakenedZero) index = 2;
@@ -2561,7 +2561,7 @@ public class GameMode {
 		for (int i = 0; i < dnaCore.weapons.Count && i < 6; i++) {
 			weapons.Add(dnaCore.weapons[i]);
 		}
-		if (dnaCore.charNum == (int)CharIds.ZeroX2) {
+		if (dnaCore.charNum == (int)CharIds.BusterZero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
 				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
 			} else {
@@ -2975,7 +2975,7 @@ public class GameMode {
 			return FontType.Blue;
 		} else if (player.isZero) {
 			return FontType.Red;
-		} else if (player.charNum == (int)CharIds.AxlWC || player.charNum == (int)CharIds.AxlX8) {
+		} else if (player.charNum == (int)CharIds.AxlWC || player.charNum == (int)CharIds.AxlAnother) {
 			return FontType.Yellow;
 		} else if (player.isVile) {
 			return FontType.Pink;
@@ -3333,7 +3333,7 @@ public class GameMode {
 				else if (player.legArmorNum == 2) charName += "2";
 				else if (player.legArmorNum == 3) charName += "3";
 			}
-		} else if (charNum == (int)CharIds.ZeroX2) charName = "Zero";
+		} else if (charNum == (int)CharIds.BusterZero) charName = "Zero";
 		else if (charNum == (int)CharIds.Vile) charName = "Vile";
 		else if (charNum == (int)CharIds.AxlOld) {
 			if (Options.main.axlAimMode == 2) charName = "AxlCursor";

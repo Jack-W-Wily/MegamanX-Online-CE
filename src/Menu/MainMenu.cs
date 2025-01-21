@@ -127,8 +127,8 @@ public class MainMenu : IMainMenu {
 		Fonts.drawText(FontType.BlueMenu, "JOIN MATCH", WD, optionPos[0].y, Alignment.Center, selected: selectY == 0);
 		Fonts.drawText(FontType.BlueMenu, "CREATE MATCH", WD, optionPos[1].y,  Alignment.Center, selected: selectY == 1);
 		Fonts.drawText(FontType.BlueMenu, "VS. CPU", WD, optionPos[2].y,  Alignment.Center, selected: selectY == 2);
-	//	Fonts.drawText(FontType.BlueMenu, "LOADOUT", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
-	//	Fonts.drawText(FontType.BlueMenu, "Controls", WD, optionPos[4].y, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "LOADOUT", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
+		//Fonts.drawText(FontType.BlueMenu, "Controls", WD, optionPos[4].y, selected: selectY == 4);
 		Fonts.drawText(FontType.BlueMenu, "OPTION MODE", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
 		Fonts.drawText(FontType.BlueMenu, "QUIT", WD, optionPos[4].y, Alignment.Center, selected: selectY == 4);
 
@@ -212,11 +212,11 @@ public class MainMenu : IMainMenu {
 				Global.sprites["menu_megaman"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
-			case (int)CharIds.ZeroX1:
+			case (int)CharIds.PunchyZero:
 				Global.sprites["menu_x1_zero"].drawToHUD(0,WD - 42,  selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos - 2 + (selectY * yDistance));
 				break;
-			case (int)CharIds.ZeroX2:
+			case (int)CharIds.BusterZero:
 				Global.sprites["menu_x2_zero"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
@@ -232,7 +232,7 @@ public class MainMenu : IMainMenu {
 				Global.sprites["menu_axl"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
-			case (int)CharIds.AxlX8:
+			case (int)CharIds.AxlAnother:
 				Global.sprites["menu_axl_x8"].drawToHUD(0,WD - 42, selectY == 5 ? startPos - 8 + (selectY * yDistance) 
 				: startPos + (selectY * yDistance));
 				break;
@@ -302,7 +302,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case (int)CharIds.ZeroX1: //ZX1
+				case (int)CharIds.PunchyZero: //ZX1
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -315,7 +315,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case (int)CharIds.ZeroX2: //ZX2
+				case (int)CharIds.BusterZero: //ZX2
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -328,7 +328,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case (int)CharIds.ZeroX6: //ZX6
+				case (int)CharIds.Zero: //ZX6
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("buster3X3", false);
@@ -367,7 +367,7 @@ public class MainMenu : IMainMenu {
 							break;
 					}
 					break;
-				case (int)CharIds.AxlX8: //AxlX8
+				case (int)CharIds.AxlAnother: //AxlX8
 					switch (Helpers.randomRange(0,2)) {
 						case 0:
 							Global.playSound("assassinate", false);

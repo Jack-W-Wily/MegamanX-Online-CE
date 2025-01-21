@@ -89,7 +89,7 @@ public class AddBotMenu : IMainMenu {
 
 		string botCharStr = "(Random)";
 		if (BotCharNum == (int)CharIds.X) botCharStr = "Mega Man X";
-		else if (BotCharNum == (int)CharIds.ZeroX2) botCharStr = "Zero";
+		else if (BotCharNum == (int)CharIds.BusterZero) botCharStr = "Zero";
 		else if (BotCharNum == (int)CharIds.Vile) botCharStr = "Vile";
 		else if (BotCharNum == (int)CharIds.AxlOld) botCharStr = "Axl";
 		else if (BotCharNum == (int)CharIds.Sigma) botCharStr = "Sigma";

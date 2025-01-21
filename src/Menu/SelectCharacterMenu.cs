@@ -25,27 +25,27 @@ public class PlayerCharData {
 
 public enum CharIds {
 	X,
-	XAnother,
-	ZeroX1,
-	ZeroX2,
-	ZeroX6,
+	Zero,
 	Vile,
 	AxlWC,
 	Sigma,
+	PunchyZero,
+	BusterZero,
 
+	// Jack:
 	// Rubens if you change the Character IDs order one more time
 	// I am gonna Kill your entire family and rape your sister
-	// - W
-	// callate pendejo de mierda 
-	// - R
-	//it must follow this order because gm hard coded prefered char option
+	// It must follow this order because gm hard coded prefered char option
+	// Gacel:
+	// Really. Do not change this order unless really needed it breaks stuff.
 
 	// Wily Cut chars.
+	XAnother,
 	Zain,
 	GBD,
 	Dynamo,
 	Dragoon,
-	AxlX8,
+	AxlAnother,
 
 	// Old stuff.
 	AxlOld,
@@ -76,11 +76,11 @@ public class CharSelection {
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
-		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
-		new CharSelection("Zero (X1 - MHX)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
-		new CharSelection("Zero (X2 - X5)", (int)CharIds.ZeroX2, sprite: "smenu_zero_2"),
-		new CharSelection("Axl (WC)", (int)CharIds.AxlWC, sprite: "smenu_axl"),
-		new CharSelection("Axl (X7 - CM)", (int)CharIds.AxlX8, sprite: "smenu_axl"),
+		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
+		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero"),
+		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero_2"),
+		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
+		new CharSelection("Axl (Another)", (int)CharIds.AxlAnother, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
 		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
@@ -92,10 +92,11 @@ public class CharSelection {
 
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
-		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),
-		new CharSelection("Zero (X2 - X5)", (int)CharIds.ZeroX2, sprite: "smenu_zero_2"),
-		new CharSelection("Zero (X1 - MHX)", (int)CharIds.ZeroX1, sprite: "smenu_zero"),
+		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
+		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero"),
+		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero_2"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
+		new CharSelection("Axl (Another)", (int)CharIds.AxlAnother, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
 		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
@@ -340,13 +341,13 @@ public class SelectCharacterMenu : IMainMenu {
 			(int)CharIds.XAnother => new string[]{
 				"Lacks ability to mix armors but has a bigger moveset."
 			},
-			(int)CharIds.ZeroX1 => new string[] {
+			(int)CharIds.PunchyZero => new string[] {
 				"High Damage Melee fighter but weak midair."
 			},
 			/*(int)CharIds.ZeroX6 => new string[] {
 				"Long range figther with a powerfull buster."
 			},*/
-			(int)CharIds.ZeroX2 => new string[] {
+			(int)CharIds.BusterZero => new string[] {
 				"Combo & Rushdown fighter\nwith a variety of combo routes and hypermodes."
 			},
 			(int)CharIds.Vile => new string[] {
@@ -355,7 +356,7 @@ public class SelectCharacterMenu : IMainMenu {
 			(int)CharIds.AxlWC => new string[] {
 				"Gunslinger Rushdown Zoner hybrid\nwith access to i-frames."
 			},
-			(int)CharIds.AxlX8 => new string[] {
+			(int)CharIds.AxlAnother => new string[] {
 				"???"
 			},
 			(int)CharIds.Sigma => new string[] {
