@@ -20,7 +20,7 @@ public class BusterZero : Character {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		charId = CharIds.ZeroX6;
+		charId = CharIds.BusterZero;
 	}
 
 	public override void update() {

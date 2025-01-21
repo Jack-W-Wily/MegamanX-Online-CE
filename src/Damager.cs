@@ -1001,14 +1001,11 @@ public class Damager {
 						}
 					}
 				}
-				
 				if (maverick is GravityBeetle gb) {
-					if ((hitFromBehind(maverick, damagingActor, owner, projId) ||
-						maverick.sprite.name == "armoreda_roll"
-						) && !isArmorPiercingOrElectric(projId)
-					) {
+					if (hitFromBehind(maverick, damagingActor, owner, projId) && !isArmorPiercing(projId)) {
 						damage = MathF.Floor(damage * 0.5f);
 						if (damage == 0) {
+							flinch = 0;
 							maverick.playSound("m10ding");
 						}
 					}
