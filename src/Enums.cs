@@ -93,7 +93,7 @@ public enum WeaponIds {
 	Hadouken,
 	Shoryuken,
 	LightHelmetHeadbutt,
-	LightUPGrab,
+	UPGrab,
 	UPPunch,
 	UPParry,
 	NovaStrike,
