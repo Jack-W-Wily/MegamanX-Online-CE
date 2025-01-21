@@ -353,10 +353,9 @@ public class Maverick : Actor, IDamagable {
 
 	public override void update() {
 		base.update();
-
 		Helpers.decrementTime(ref invulnTime);
-		Helpers.decrementTime(ref weaknessCooldown);
-		
+		Helpers.decrementFrames(ref weaknessCooldown);
+
 		igFreezeRecoveryCooldown += Global.spf;
 		if (igFreezeRecoveryCooldown > 0.2f) {
 			igFreezeRecoveryCooldown = 0;

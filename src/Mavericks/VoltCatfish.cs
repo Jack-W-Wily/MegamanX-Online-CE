@@ -545,6 +545,7 @@ public class VoltCSpecialState : MaverickState {
 public class VoltCBounce : MaverickState {
 	public VoltCBounce() : base("jump") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

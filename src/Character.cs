@@ -514,6 +514,13 @@ public partial class Character : Actor, IDamagable {
 				shaders.Add(Player.darkHoldShader);
 			}
 		}
+		else if (timeStopTime > timeStopThreshold && Player.darkHoldShader != null) {
+			if (!Global.level.darkHoldProjs.Any(
+				dhp => dhp.screenShader != null && dhp.inRange(this))
+			) {
+				shaders.Add(Player.darkHoldShader);
+			}
+		}
 
 		if (Player.darkHoldShader != null) {
 			// Invert the zero who used a dark hold so he appears to be drawn normally on top of it
@@ -1396,14 +1403,17 @@ public partial class Character : Actor, IDamagable {
 			player.input.isPressed(Control.Jump, player) &&
 			(charState.wallKickLeftWall != null || charState.wallKickRightWall != null)
 		) {
+			// Reset airdash and disable dash speed.
 			dashedInAir = 0;
 			isDashing = false;
+			// Enable dash speed if input if pressed.
 			if (player.input.isHeld(Control.Dash, player) &&
 				(charState.useDashJumpSpeed || charState is WallSlide or WallSlideAttack)
 			) {
 				isDashing = true;
 				dashedInAir++;
 			}
+			// Jump action.
 			vel.y = -getJumpPower();
 			wallKickDir = 0;
 			if (charState.wallKickLeftWall != null) {
@@ -1420,19 +1430,28 @@ public partial class Character : Actor, IDamagable {
 					wallKickDir -= 1;
 				}
 			}
+			// Set variables.
 			wallKickTimer = maxWallKickTime;
+			charState.wallKickLeftWall = null;
+			charState.wallKickRightWall = null;
+			charState.lastLeftWall = null;
+			charState.lastRightWall = null;
+			// Set wallkick state if normal ctrl.
 			if (charState.normalCtrl || charState is WallSlide or WallSlideAttack) {
 				changeState(new WallKick(), true);
 				if (wallKickDir != 0) {
 					xDir = -wallKickDir;
 				}
-			} else {
+			}
+			// Play sound and wallkick mid-state if not.
+			else {
 				if (this is not Vile) {
 					playSound("jump", sendRpc: true);
 				} else {
 					playSound("vileJump", sendRpc: true);
 				}
 			}
+			// GFX.
 			var wallSparkPoint = pos.addxy(12 * xDir, 0);
 			var rect = new Rect(wallSparkPoint.addxy(-2, -2), wallSparkPoint.addxy(2, 2));
 			if (Global.level.checkCollisionShape(rect.getShape(), null) != null) {
@@ -1443,10 +1462,12 @@ public partial class Character : Actor, IDamagable {
 			return true;
 		}
 		if (charState.canStopJump &&
+			!charState.stoppedJump &&
 			!grounded && vel.y < 0 &&
 			!player.input.isHeld(Control.Jump, player)
 		) {
 			vel.y = 0;
+			charState.stoppedJump = true;
 		}
 		if (charState.airMove && !grounded) {
 			airMove();
@@ -1460,6 +1481,9 @@ public partial class Character : Actor, IDamagable {
 				}
 				if (player.input.isHeld(Control.Dash, player) && charState.useDashJumpSpeed && canDash()) {
 					isDashing = true;
+				}
+				if (charState.canStopJump) {
+					charState.stoppedJump = false;
 				}
 				vel.y = -getJumpPower();
 				if (this is not Vile) {
@@ -2080,7 +2104,12 @@ public partial class Character : Actor, IDamagable {
 		if (grounded) {
 			changeState(new Idle(transitionSprite), true);
 		} else {
-			changeState(new Fall(), true);
+			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
+				changeState(new Jump() { enterSound = "" }, true);
+				frameIndex = sprite.totalFrameNum - 1;
+			} else {
+				changeState(new Fall(), true);
+			}
 		}
 	}
 
@@ -2088,7 +2117,12 @@ public partial class Character : Actor, IDamagable {
 		if (grounded) {
 			landingCode(useSound);
 		} else {
-			changeState(new Fall(), true);
+			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
+				changeState(new Jump() { enterSound = "" }, true);
+				frameIndex = sprite.totalFrameNum - 1;
+			} else {
+				changeState(new Fall(), true);
+			}
 		}
 	}
 
@@ -2096,7 +2130,12 @@ public partial class Character : Actor, IDamagable {
 		if (grounded) {
 			changeState(new Crouch(), true);
 		} else {
-			changeState(new Fall(), true);
+			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
+				changeState(new Jump() { enterSound = "" }, true);
+				frameIndex = sprite.totalFrameNum - 1;
+			} else {
+				changeState(new Fall(), true);
+			}
 		}
 	}
 

@@ -245,6 +245,7 @@ public class SparkMClimbState : MaverickState {
 	public SparkMClimbState(Point hitPoint) : base("climb") {
 		this.hitPoint = hitPoint;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -308,6 +309,7 @@ public class SparkMClimbState : MaverickState {
 public class SparkMFrozenState : MaverickState {
 	public SparkMFrozenState() : base("freeze") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

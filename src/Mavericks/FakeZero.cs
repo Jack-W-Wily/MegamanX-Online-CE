@@ -585,6 +585,7 @@ public class FakeZeroGuardState : MaverickState {
 	public FakeZeroGuardState() : base("guard") {
 	//	superArmor = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

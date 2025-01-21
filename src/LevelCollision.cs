@@ -369,8 +369,10 @@ public partial class Level {
 			pushDir = vel?.times(-1).normalize();
 			if (collideDatas.Count > 0) {
 				foreach (var collideData in collideDatas) {
-					if (collideData.hitData != null && collideData.hitData.normal != null && ((Point)collideData.hitData.normal).isAngled() && pushIncline && onlyWalls) {
-						pushDir = new Point(0, -1); //Helpers.getInclinePushDir(collideData.hitData.normal, vel);
+					if (collideData.hitData != null && collideData.hitData.normal != null &&
+						((Point)collideData.hitData.normal).isAngled() && pushIncline && onlyWalls
+					) {
+						pushDir = new Point(0, -1);
 					}
 				}
 			}
@@ -379,7 +381,7 @@ public partial class Level {
 		if (collideDatas.Count > 0) {
 			float maxMag = 0;
 			Point? maxMtv = null;
-			foreach (var collideData in collideDatas) {
+			foreach (CollideData collideData in collideDatas) {
 				actor.registerCollision(collideData);
 				int hash = GetHashCode() ^ collideData.gameObject.GetHashCode();
 				if (!Global.level.collidedGObjs.Contains(hash)) {
@@ -815,31 +817,27 @@ public partial class Level {
 	) {
 		List<CollideData> collideDatas = new List<CollideData>();
 		// Use custom terrain collider by default.
-		Collider? terrainCollider = actor.getTerrainCollider();
-		// If terrain collider is not used or is null we use the default colliders.
-		if (terrainCollider == null) {
-			terrainCollider = actor.standartCollider;
-		}
+		Collider? terrainCollider = actor.getTerrainCollider() ?? actor.physicsCollider ?? actor.collider;
 		// If there is no collider we return.
-		if (actor.standartCollider == null) {
+		if (terrainCollider == null) {
 			return collideDatas;
 		}
 		if (autoVel && vel == null) {
 			vel = new Point(incX, incY);
 		}
-		Shape actorShape = actor.collider.shape.clone(incX, incY);
+		Shape actorShape = terrainCollider.shape.clone(incX, incY);
 		List<GameObject> gameObjects = getTerrainInSameCell(actorShape);
 		foreach (GameObject go in gameObjects) {
 			if (go == actor) continue;
 			if (go.collider == null) continue;
-			bool isTrigger = shouldTrigger(actor, go, actor.collider, go.collider, new Point(incX, incY));
+			bool isTrigger = shouldTrigger(actor, go, terrainCollider, go.collider, new Point(incX, incY));
 			if (go is Actor goActor && goActor.isPlatform && checkPlatforms) {
 				isTrigger = false;
 			}
 			if (isTrigger) continue;
 			HitData? hitData = actorShape.intersectsShape(go.collider.shape, vel);
 			if (hitData != null) {
-				collideDatas.Add(new CollideData(actor.collider, go.collider, vel, isTrigger, go, hitData));
+				collideDatas.Add(new CollideData(terrainCollider, go.collider, vel, isTrigger, go, hitData));
 				if (returnOne) {
 					return collideDatas;
 				}

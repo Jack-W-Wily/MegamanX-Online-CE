@@ -1116,6 +1116,7 @@ public class WSpongeChargeState : MaverickState {
 	public WSpongeChargeState() : base("angry_start") {
 		superArmor = true;
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {
@@ -1167,6 +1168,7 @@ public class WSpongeLightningState : MaverickState {
 	Point poi;
 	public WSpongeLightningState() : base("angry_thunder_start") {
 		superArmor = true;
+		canBeCanceled = false;
 	}
 
 	public override void update() {

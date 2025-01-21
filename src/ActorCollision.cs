@@ -102,7 +102,6 @@ public partial class Actor {
 		}
 		bool hasNonAttackColider = false;
 		foreach (Collider allCollider in getAllColliders()) {
-			
 			if (allCollider._shape.points.Count == 4) {
 				Color hitboxColor = new Color(50, 100, 255, 50);
 				Color outlineColor = new Color(0, 0, 255, 200);
@@ -113,10 +112,10 @@ public partial class Actor {
 					hasNonAttackColider = true;
 				}
 				Rect rect = allCollider.shape.getRect();
-				rect.x1 += 1;
-				rect.y1 += 1;
-				rect.x2 -= 1;
-				rect.y2 -= 1;
+				rect.x1 = MathF.Round(rect.x1 + 1);
+				rect.y1 = MathF.Round(rect.y1 + 1);
+				rect.x2 = MathF.Round(rect.x2 - 1);
+				rect.y2 = MathF.Round(rect.y2 - 1);
 				DrawWrappers.DrawRect(
 					rect.x1, rect.y1, rect.x2, rect.y2,
 					true, hitboxColor, 1, zIndex + 1, true,
@@ -141,10 +140,10 @@ public partial class Actor {
 				return;
 			}
 			Rect rect = terrainCollider.shape.getRect();
-			rect.x1 += 1;
-			rect.y1 += 1;
-			rect.x2 -= 1;
-			rect.y2 -= 1;
+			rect.x1 = MathF.Round(rect.x1 + 1);
+			rect.y1 = MathF.Round(rect.y1 + 1);
+			rect.x2 = MathF.Round(rect.x2 - 1);
+			rect.y2 = MathF.Round(rect.y2 - 1);
 			DrawWrappers.DrawPolygon(
 				rect.getPoints(),
 				new Color(0, 255, 0, 150),
@@ -364,19 +363,9 @@ public partial class Actor {
 		// Regular collider: need to detect collision incrementally
 		// and stop moving past a collider if that's the case
 		else {
-			freeFromCollision();
+			Point incAmount = amount * times;
 
-			var inc = amount.clone();
-			var incAmount = inc.multiply(times);
-
-			// Hack to make it not get stuck sometimes
-			if (this is RideChaser) {
-				incPos(incAmount);
-				freeFromCollision();
-				return;
-			}
-
-			var mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
+			Point? mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
 			if (mtv != null && mtv?.magnitude > 10) {
 				mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, null, false);
 			}
@@ -384,29 +373,32 @@ public partial class Actor {
 			if (mtv != null) {
 				incPos(mtv.Value.unitInc(0.01f));
 			}
-
-			//This shouldn't be needed, but sometimes getMtvDir doesn't free properly or isn't returned
 			freeFromCollision();
 		}
 	}
 
 	public void freeFromCollision() {
-		//Already were colliding in first place: free with path of least resistance
-		var currentCollideDatas = Global.level.checkTerrainCollision(this, 0, 0, null);
+		// Already were colliding in first place: free with path of least resistance
+		List<CollideData> currentCollideDatas = Global.level.checkTerrainCollision(this, 0, 0, null);
+
+		Collider? terrainCollider = getTerrainCollider() ?? physicsCollider ?? collider;
+		if (terrainCollider == null) {
+			return;
+		}
  
-		foreach (var collideData in currentCollideDatas) {
+		foreach (CollideData collideData in currentCollideDatas) {
 			if (this is Character chara && collideData.gameObject is Character otherChara) {
 				chara.insideCharacter = true;
 				otherChara.insideCharacter = true;
 				continue;
 			}
 			Point? freeVec = null;
-			if (this is RideChaser rc && physicsCollider != null) {
+			if (this is RideChaser rc) {
 				// Hack to make ride chasers not get stuck on inclines
-				freeVec = physicsCollider.shape.getMinTransVectorDir(collideData.otherCollider.shape, new Point(0, -1));
+				freeVec = terrainCollider.shape.getMinTransVectorDir(collideData.otherCollider.shape, new Point(0, -1));
 			}
-			if ((freeVec == null || freeVec.Value.magnitude > 20) && physicsCollider != null) {
-				freeVec = physicsCollider.shape.getMinTransVector(collideData.otherCollider.shape);
+			if ((freeVec == null || freeVec.Value.magnitude > 20)) {
+				freeVec = terrainCollider.shape.getMinTransVector(collideData.otherCollider.shape);
 			}
 			if (freeVec == null) {
 				return;

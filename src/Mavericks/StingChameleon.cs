@@ -314,6 +314,7 @@ public class StingCSpikeProj : Projectile {
 public class StingCClimb : MaverickState {
 	public StingCClimb() : base("climb") {
 		aiAttackCtrl = true;
+		canBeCanceled = false;
 	}
 
 	public override void onEnter(MaverickState oldState) {

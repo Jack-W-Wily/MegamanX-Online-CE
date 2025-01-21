@@ -196,7 +196,7 @@ public class FlameBurnerAltProj : Projectile {
 					character.changeState(new Fall());
 				}
 				else if (character.charState.canStopJump) {
-					character.charState.canStopJump = false;
+					character.charState.stoppedJump = true;
 				}
 			}
 		} else {

@@ -170,9 +170,11 @@ public class MegamanX : Character {
 			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
-				changeSpriteFromName(charState.defaultSprite, false);
-				if (charState is WallSlide) {
-					frameIndex = sprite.totalFrameNum - 1;
+				if (sprite.name == getSprite(charState.shootSprite)) {
+					changeSpriteFromName(charState.defaultSprite, false);
+					if (charState is WallSlide) {
+						frameIndex = sprite.totalFrameNum - 1;
+					}
 				}
 			}
 		}
@@ -274,7 +276,7 @@ public class MegamanX : Character {
 				player.dashPressed(out string dashControlL) &&
 				canDash()
 			) {
-				changeState(new LigthDash(dashControlL), true);
+				changeState(new LightDash(dashControlL), true);
 				return true;
 			}
 		} else if (!grounded) {
@@ -723,19 +725,17 @@ public class MegamanX : Character {
 			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
 			"mmx_nova_strike" or "mmx_nova_strike_down" or 
 			"mmx_nova_strike_up" => MeleeIds.NovaStrike,
-				"mmx_unpo_punch" or "mmx_unpo_air_punch" or 
-				"mmx_unpo_punch_2" => MeleeIds.UPPunch,
-			
+			"mmx_unpo_punch" or "mmx_unpo_air_punch" or 
+			"mmx_unpo_punch_2" => MeleeIds.UPPunch,
 			// Light Helmet.
 			"mmx_jump" or "mmx_jump_shoot" or "mmx_wall_kick" or "mmx_wall_kick_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbutt,
+			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
 			"mmx_up_dash" or "mmx_up_dash_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbuttEX,
 			// Light Helmet when it Enemy Steps.
-			"mmx_fall" 
+			"mmx_fall"
 			when legArmor == ArmorId.Light && player.input.isHeld(Control.Jump,player) => MeleeIds.EnemyStep,
-			
 			// Nothing.
 			_ => MeleeIds.None
 		});
@@ -747,11 +747,11 @@ public class MegamanX : Character {
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				2, Global.defFlinch, 10, addToLevel: addToLevel
 			),
-			(int)MeleeIds.LigthHeadbutt => new GenericMeleeProj(
+			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				2, Global.halfFlinch, 10, addToLevel: addToLevel
 			),
-			(int)MeleeIds.LigthHeadbuttEX => new GenericMeleeProj(
+			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				4, Global.defFlinch, 10, addToLevel: addToLevel
 			),
@@ -809,8 +809,8 @@ public class MegamanX : Character {
 	public enum MeleeIds {
 		None = -1,
 		SpeedBurnerCharged,
-		LigthHeadbutt,
-		LigthHeadbuttEX,
+		LightHeadbutt,
+		LightHeadbuttEX,
 		Shoryuken,
 		MaxZSaber,
 		ZSaber,
