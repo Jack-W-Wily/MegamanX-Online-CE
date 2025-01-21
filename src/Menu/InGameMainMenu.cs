@@ -34,15 +34,16 @@ public class InGameMainMenu : IMainMenu {
 				}
 
 				if (isSelWepDisabled()) return;
+
 				if (selectedCharNum == (int)CharIds.ZeroX1) {
 					Menu.change(new SelectPunchyZeroWeaponMenu(this, true));
-				} else if (selectedCharNum == 4) {
+				} else if (selectedCharNum == (int)CharIds.Sigma) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
-				} else if (selectedCharNum == 3) {
+				} else if (selectedCharNum == (int)CharIds.AxlWC) {
 					Menu.change(new SelectAxlWeaponMenu(this, true));
-				} else if (selectedCharNum == 2) {
+				} else if (selectedCharNum == (int)CharIds.Vile) {
 					Menu.change(new SelectVileWeaponMenu(this, true));
-				} else if (selectedCharNum == 1) {
+				} else if (selectedCharNum == (int)CharIds.Zero) {
 					Menu.change(new SelectZeroWeaponMenu(this, true));
 				} else {
 					Menu.change(new SelectWeaponMenu(this, true));
