@@ -732,7 +732,7 @@ public class MegamanX : Character {
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
 			"mmx_up_dash" or "mmx_up_dash_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LigthHeadbuttEX,
+			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbuttEX,
 			// Light Helmet when it Enemy Steps.
 			"mmx_fall"
 			when legArmor == ArmorId.Light && player.input.isHeld(Control.Jump,player) => MeleeIds.EnemyStep,
@@ -801,7 +801,7 @@ public class MegamanX : Character {
 
 
 	public override bool isToughGuyHyperMode() {
-		return charState is GigaAirDash or LigthDash or X2ChargeShot;
+		return charState is GigaAirDash or LightDash or X2ChargeShot;
 	}
 
 
