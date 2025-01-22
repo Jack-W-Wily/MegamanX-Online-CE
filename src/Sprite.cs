@@ -190,6 +190,7 @@ public class Sprite {
 			else if (character is AxlWC axlWC) {
 				drawAxlArms = axlWC.axlWeapon?.isTwoHanded != true;
 			}
+			
 			isUPX = character is RagingChargeX;
 			isUltX = character is XAnother { hasUltimateArmor: true };
 		}

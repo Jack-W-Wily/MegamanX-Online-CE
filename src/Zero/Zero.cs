@@ -660,7 +660,21 @@ public class Zero : Character {
 		}
 		// Air attack.
 		if (specialPressed) {
+			
 
+			if (isDashing) {
+			slideVel = xDir * getDashSpeed();
+			if (specialPressTime > shootPressTime) {
+				if (!isViral){
+				changeState(new ZeroShippuugaState(), true);
+				} else {
+				changeState(new SuiretsusanState(false), true);
+				 
+				}
+				return true;
+			}
+
+			}	
 			if (!isViral){
 			if (charState is not ZeroRollingSlashtate) {
 				changeState(new ZeroRollingSlashtate(), true);

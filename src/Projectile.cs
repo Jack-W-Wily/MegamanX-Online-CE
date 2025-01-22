@@ -169,6 +169,12 @@ public class Projectile : Actor {
 	public override void update() {
 		base.update();
 
+
+
+		if (this is not RollingShieldProjCharged and 
+		not HexaInvoluteProj and
+		not GigaCrushProj
+		&& owner.character.isInDamageSprite())destroySelf();
 		time += Global.spf;
 		moveDistance += deltaPos.magnitude;
 

@@ -276,13 +276,14 @@ public override bool normalCtrl() {
 		base.update();
 
 
-		if (player.currency > 4 && !hasUltimateArmor &&
+		if (gigaAttack.ammo >= 28 && !hasUltimateArmor &&
 		player.input.isPressed(Control.Special2, player)){
 		hasUltimateArmor = true;
 		player.addNovaStrike();
-		addHealth(50);
-		player.currency -= 5;
-		changeSpriteFromName("warpin", true);
+		addHealth(5);
+		//player.currency -= 5;
+		changeSpriteFromName("warp_in", true);
+
 		}
 	if (cStingPaletteTime > 5) {
 			cStingPaletteTime = 0;
@@ -339,7 +340,7 @@ public override bool normalCtrl() {
 		shootingRaySplasher?.burstLogic2(this);
 
 		// Charge and release charge logic.
-		if (!isInDamageSprite()){
+		if (!isInDamageSprite() && !sprite.name.Contains("block")){
 		chargeLogic(shoot);
 		}
 		player.changeWeaponControls();
