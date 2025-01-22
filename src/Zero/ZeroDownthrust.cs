@@ -99,7 +99,7 @@ public class ZeroDownthrust : CharState {
 	public static string getSpriteName(ZeroDownthrustType type) {
 		return type switch {
 			ZeroDownthrustType.Hyouretsuzan => "hyouretsuzan",
-			ZeroDownthrustType.Rakukojin => "rakukojin",
+			ZeroDownthrustType.Rakukojin => "hyouretsuzan",
 			_ => "quakeblazer"
 		};
 	}

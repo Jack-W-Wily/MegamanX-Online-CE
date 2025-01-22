@@ -925,7 +925,7 @@ public partial class Level {
 	}
 
 	public bool pickupRestricted(dynamic instance) {
-		if (isNon1v1Elimination()) return true;
+		//if (isNon1v1Elimination()) return true;
 		if (instance.properties.nonDmOnly == true && Global.level.server.gameMode.Contains(GameMode.Deathmatch)) return true;
 		if (instance.properties.nonCpOnly == true && Global.level.server.gameMode.Contains(GameMode.ControlPoint)) return true;
 		if (instance.properties.nonCtfOnly == true && Global.level.server.gameMode.Contains(GameMode.CTF)) return true;

@@ -32,12 +32,15 @@ public enum CharIds {
 	PunchyZero,
 	BusterZero,
 
+	// Ruben:
+	// It must follow this order because gm hard coded prefered char option
 	// Jack:
 	// Rubens if you change the Character IDs order one more time
 	// I am gonna Kill your entire family and rape your sister
-	// It must follow this order because gm hard coded prefered char option
 	// Gacel:
 	// Really. Do not change this order unless really needed it breaks stuff.
+	// Ruben:
+	// Ok then you fix this mess gacel.
 
 	// Wily Cut chars.
 	XAnother,
@@ -79,8 +82,8 @@ public class CharSelection {
 		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
 		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero"),
 		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero_2"),
+	//	new CharSelection("Axl", (int)CharIds.AxlOld, sprite: "smenu_axl"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
-		new CharSelection("Axl (Another)", (int)CharIds.AxlAnother, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
 		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),

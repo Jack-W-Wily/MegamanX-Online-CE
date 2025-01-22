@@ -59,7 +59,7 @@ public class HyperZeroStart : CharState {
 				radius = 0;
 				activateHypermode();
 				character.playSound("ching");
-				//character.fillHealthToMax();
+				character.addHealth(5);//fillHealthToMax();
 			}
 		} else {
 			time += Global.spf;

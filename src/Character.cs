@@ -1069,6 +1069,8 @@ public partial class Character : Actor, IDamagable {
 			dropFlagUnlocked = false;
 		}
 
+
+/*    Temporarily removing this one for a test
 		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
 			int alliance = player.alliance;
 			// If this is an enemy disguised Axl, change the alliance
@@ -1088,7 +1090,7 @@ public partial class Character : Actor, IDamagable {
 				addRenderEffect(allianceEffect.Value);
 			}
 		}
-
+*/ 
 		if (Global.level.mainPlayer.readyTextOver) {
 			Helpers.decrementTime(ref invulnTime);
 		}
@@ -3030,6 +3032,18 @@ public partial class Character : Actor, IDamagable {
 					);
 				}
 			}
+			if (this is XAnother XA) {
+				float currentAmmo = XA.gigaAttack.ammo;
+				if (XA.hasUltimateArmor){
+				XA.gigaAttack.ammo -= gigaAmmoToAdd;
+				}
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, XA.gigaAttack.ammo,
+						XA.gigaAttack.getAmmoUsage(0), XA.gigaAttack.maxAmmo
+					);
+				}
+			}
 			if (this is PunchyZero punchyZero) {
 				float currentAmmo = punchyZero.gigaAttack.ammo;
 				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
@@ -3540,7 +3554,8 @@ public partial class Character : Actor, IDamagable {
 		|| sprite.name.Contains("knocked")
 		|| sprite.name.Contains("grabbed")
 		|| sprite.name.Contains("stunned")
-		|| sprite.name.Contains("pushed");
+		|| sprite.name.Contains("pushed")
+		|| sprite.name.Contains("die");
 	}
 	public virtual bool isAttacking() {
 		return sprite.name.Contains("attack")

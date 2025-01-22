@@ -9,8 +9,8 @@ public class FireWave : Weapon {
 	public FireWave() : base() {
 		index = (int)WeaponIds.FireWave;
 		killFeedIndex = 4;
-		weaponBarBaseIndex = 4;
-		weaponBarIndex = (int)WeaponBarIndex.FireWave;
+		weaponBarBaseIndex = (int)WeaponBarIndex.FireWave;
+		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 4;
 		weaknessIndex = (int)WeaponIds.StormTornado;
 		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" , ""};

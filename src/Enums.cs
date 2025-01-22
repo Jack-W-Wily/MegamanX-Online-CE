@@ -928,6 +928,7 @@ public enum WeaponBarIndex{
 	NovaStrike,
 	//X5
 	DarkHold,
+	//AxlWC
 	AxlBullet = 64,
 	BlastLauncher,
 	RayGun,
@@ -936,9 +937,15 @@ public enum WeaponBarIndex{
 	FlameBurner,
 	PlasmaGun,
 	SpiralMagnum,
-	BoundBlaster
-	
-	
+	BoundBlaster,
+	//Others
+	VileAmmo,
+	MaverickAmmo,
+	MaverickAmmoOff,
+	WeaponAmmo,
+	WeaponAmmoOff,
+	SuperBar,
+	SuperBarOff
 }
 public enum WeaponSlotIndex{
 	//X1
