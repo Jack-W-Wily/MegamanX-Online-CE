@@ -11,18 +11,18 @@ namespace MMXOnline;
 public partial class Character : Actor, IDamagable {
 	public static string[] charDisplayNames = {
 		"X",
-		"Zero (Late)",
+		"Zero (Mid)",
 		"Vile",
 		"Sigma",
 		"Zero (Early)",
-		"Zero (Mid)",
+		"Zero (Late)",
 		"X (Awakened)",
 		"Zain",
 		"GBD",
 		"Dynamo",
 		"High Max",
 		"Dragoon",
-		"Axl (Alt)",
+		"Axl (Another)",
 	};
 
 	// Health.
