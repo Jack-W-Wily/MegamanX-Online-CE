@@ -413,8 +413,8 @@ public class Damager {
 				owner.character.ComboTimer += 0.25f;
 			}
 
-			if (owner.character is XAnother Xa && owner.health > 0) {
-				Xa.gigaAttack.addAmmo(1, owner);
+			if (owner.character is XAnother xa && owner.health > 0) {
+				owner.superAmmo += 1;
 			}
 
 

@@ -32,12 +32,15 @@ public enum CharIds {
 	PunchyZero,
 	BusterZero,
 
+	// Ruben:
+	// It must follow this order because gm hard coded prefered char option
 	// Jack:
 	// Rubens if you change the Character IDs order one more time
 	// I am gonna Kill your entire family and rape your sister
-	// It must follow this order because gm hard coded prefered char option
 	// Gacel:
 	// Really. Do not change this order unless really needed it breaks stuff.
+	// Ruben:
+	// Ok then you fix this mess gacel.
 
 	// Wily Cut chars.
 	XAnother,

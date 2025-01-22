@@ -323,7 +323,8 @@ public class AxlWC : Character {
 		}
 		// Dodge.
 		if (player.input.checkDoubleTap(Control.Dash) &&
-			player.input.isPressed(Control.Dash, player) && canDash() && flag == null
+			player.input.isPressed(Control.Dash, player) && canDash() && flag == null ||
+			charState is Dash && player.input.isPressed(Control.Down, player)
 		) {
 			changeState(new DodgeRollAxlWC(), true);
 			return true;

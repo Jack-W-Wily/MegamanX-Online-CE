@@ -452,6 +452,8 @@ public partial class Player {
 	public int xArmor1v1;
 	public float vileAmmo = 32;
 	public float vileMaxAmmo = 32;
+	public float superAmmo = 32;
+	public float superMaxAmmo = 32;
 	public float sigmaAmmo = 32;
 	public float sigmaMaxAmmo = 32;
 	public int? maverick1v1;

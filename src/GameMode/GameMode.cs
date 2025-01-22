@@ -737,11 +737,34 @@ public class GameMode {
 				int xStart = 26;
 				int yStart = 133;
 				
-				Global.sprites["hud_bars_base_generic"].drawToHUD(1, xStart, yStart);
+				Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.VileAmmo, xStart, yStart);
 				yStart -= 14;
 				for (var i = 0; i < MathF.Ceiling(vilin.player.vileMaxAmmo ); i++) {
 				if (i < Math.Ceiling(vilin.player.vileAmmo)) {
 					Global.sprites["hud_bars_generic"].drawToHUD(6, xStart, yStart);
+				} else {
+					Global.sprites["hud_bars_generic"].drawToHUD(1, xStart, yStart);
+				}
+				yStart -= 2;
+				}
+				Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
+			}
+			if (drawPlayer.character is XAnother xa /*&& xa.player.weapon is XBuster*/) {
+				int xStart = 25;
+				int yStart = 133;
+				if(xa.player.weapon is not XBuster) {
+					xStart += 16;
+				}
+				if(xa.player.superAmmo <= 0){
+					Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBarOff, xStart, yStart);}
+				else{
+					Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBar, xStart, yStart);}
+				
+				//Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBar, xStart, yStart);
+				yStart -= 14;
+				for (var i = 0; i < MathF.Ceiling(xa.player.superMaxAmmo ); i++) {
+				if (i < Math.Ceiling(xa.player.superAmmo)) {
+					Global.sprites["hud_bars_generic"].drawToHUD(5, xStart, yStart);
 				} else {
 					Global.sprites["hud_bars_generic"].drawToHUD(1, xStart, yStart);
 				}
@@ -1584,7 +1607,7 @@ public class GameMode {
 		bool allowSmall = true
 	) {
 		baseY += 25;
-		Global.sprites["hud_bars_base_generic"].drawToHUD(baseIndex, baseX, baseY);
+		Global.sprites["hud_bars_wp_base"].drawToHUD(baseIndex, baseX, baseY);
 		/*if(ammo < grayAmmo){
 		Global.sprites["hud_bars_generic"].drawToHUD(baseIndex, baseX, baseY);
 		}*/
@@ -1637,9 +1660,9 @@ public class GameMode {
 		if (player.character != null) {
 			weapon = player.weapon;
 
-			if (player.character is XAnother XA && player.weapon is XBuster) {
+		/*	if (player.character is XAnother XA && player.weapon is XBuster) {
 				weapon = XA.gigaAttack;
-			}
+			}*/
 
 			if (player.character is Zero zero) {
 				weapon = zero.gigaAttack;
@@ -1690,12 +1713,12 @@ public class GameMode {
 				ammoDisplayMultiplier = 1;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
-					hudWeaponBaseIndex = player.sigmaAmmo < 16 ? 5 : 4;
+					hudWeaponBaseIndex = player.sigmaAmmo < 16 ? (int)WeaponBarIndex.WeaponAmmo : (int)WeaponBarIndex.WeaponAmmoOff;
 					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 7 : 5;
 					floorOrCeil = MathInt.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				}
 				baseY += 25;
-				Global.sprites["hud_bars_base_generic"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
+				Global.sprites["hud_bars_wp_base"].drawToHUD(hudWeaponBaseIndex, baseX, baseY);
 				baseY -= 14;
 				for (var i = 0; i < floorOrCeil; i++) {
 					if (i < Math.Ceiling(player.sigmaAmmo * ammoDisplayMultiplier)) {
@@ -1743,15 +1766,15 @@ public class GameMode {
 			if(player.isX | player.isXAnother){
 				if(weapon.ammo <= 0){
 					Global.sprites["hud_bars_wp_base_off_x"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
-				}else{Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
+				}else{Global.sprites["hud_bars_wp_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
 				}
 			else if(player.isPunchyZero | player.isZero){
 				if(weapon.ammo <= 0){
-					Global.sprites["hud_bars_base_generic"].drawToHUD(5, baseX, baseY);}
+					Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBarOff, baseX, baseY);}
 				else{
-					Global.sprites["hud_bars_base_generic"].drawToHUD(4, baseX, baseY);}
+					Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBar, baseX, baseY);}
 				}
-			else{Global.sprites["hud_bars_wp_base_generic"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
+			else{Global.sprites["hud_bars_wp_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);}
 			baseY -= 14;
 			for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
 				var floorOrCeiling = Math.Ceiling(weapon.ammo * ammoDisplayMultiplier);
