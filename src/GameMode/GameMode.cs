@@ -1689,7 +1689,7 @@ public class GameMode {
 			) {
 				renderAmmo(
 					baseX, ref baseY,
-					0,
+					(int)WeaponBarIndex.MaverickAmmo,
 					player.currentMaverick.ammoIndex,
 					MathF.Ceiling((player.currentMaverick.flyBar / player.currentMaverick.maxFlyBar) * 28),
 					maxAmmo: 28, allowSmall: false
@@ -1698,7 +1698,7 @@ public class GameMode {
 			if (player.currentMaverick != null && player.isMainPlayer && player.currentMaverick.usesAmmo) {
 				renderAmmo(
 					baseX, ref baseY,
-					0,
+					(int)WeaponBarIndex.MaverickAmmo,
 					player.currentMaverick.ammoIndex,
 					player.currentMaverick.ammo,
 					player.currentMaverick.grayAmmoLevel,
@@ -1713,7 +1713,7 @@ public class GameMode {
 				ammoDisplayMultiplier = 1;
 				int floorOrCeil = MathInt.Ceiling(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				if (player.isSigma2()) {
-					hudWeaponBaseIndex = player.sigmaAmmo < 16 ? (int)WeaponBarIndex.WeaponAmmo : (int)WeaponBarIndex.WeaponAmmoOff;
+					hudWeaponBaseIndex = player.sigmaAmmo < 16 ? (int)WeaponBarIndex.WeaponAmmoOff : (int)WeaponBarIndex.WeaponAmmo;
 					hudWeaponFullIndex = player.sigmaAmmo < 16 ? 7 : 5;
 					floorOrCeil = MathInt.Floor(player.sigmaMaxAmmo * ammoDisplayMultiplier);
 				}
