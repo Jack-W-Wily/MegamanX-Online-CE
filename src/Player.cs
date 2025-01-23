@@ -1224,6 +1224,12 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
+			else if (charNum == (int)CharIds.AxlOld) {
+			character = new Axl(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
 		else if (charNum == (int)CharIds.Zain) {
 			character = new Zain(
 				this, pos.x, pos.y, xDir,
@@ -1555,6 +1561,12 @@ public partial class Player {
 				retX.hasUltimateArmor = (data.extraData[2] == 1);
 			}
 		}
+		if (data.charNum == (int)CharIds.XAnother) {
+		
+			if (retChar is XAnother retXA) {
+				retXA.hasUltimateArmor = (data.extraData[2] == 1);
+			}
+		}
 		// Restore old loadout and save the transformed one.
 		atransLoadout = loadout;
 		loadout = oldLoadout;
@@ -1632,12 +1644,19 @@ public partial class Player {
 				hasFrozenCastle = dnaCore.frozenCastle,
 				hasSpeedDevil = dnaCore.speedDevil
 			};
-		} else if (charNum == (int)CharIds.AxlWC) {
+		} else if (charNum == (int)CharIds.AxlOld) {
+			retChar = new Axl(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} 
+		else if (charNum == (int)CharIds.AxlWC) {
 			retChar = new AxlWC(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.Sigma) {
+		} 
+		else if (charNum == (int)CharIds.Sigma) {
 			if (dnaCore.loadout.sigmaLoadout.sigmaForm == 2) {
 				retChar = new Doppma(
 					this, character.pos.x, character.pos.y, character.xDir,

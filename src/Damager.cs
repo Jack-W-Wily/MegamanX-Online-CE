@@ -94,8 +94,48 @@ public class Damager {
 				newFlinch = 0;
 				weakness = false;
 			}
-		}
 
+/*
+			// Counter system aka Frail guy
+		if (Global.level.gameMode is Elimination or TeamElimination ||
+			Global.level.isTraining()){
+			if (chr.isAttacking()
+			 && newFlinch >= 0 && (
+			projId != (int)ProjIds.HexaInvolute &&
+			projId != (int)ProjIds.AwakenedAura
+			 )) {
+
+				if (projId != (int)ProjIds.BlockableLaunch
+				&& projId != (int)ProjIds.NormalPush
+				&& projId != (int)ProjIds.MechFrogStompShockwave
+				&& projId != (int)ProjIds.HeavyPush
+				&& projId != (int)ProjIds.VileSuperKick	
+				&& projId != (int)ProjIds.ForceGrabState	
+				){
+				if (newFlinch < Global.halfFlinch) {
+					newFlinch = Global.halfFlinch;
+				}
+				else if (newFlinch < Global.defFlinch) {
+					newFlinch = Global.defFlinch;
+				}
+				else {
+					newFlinch = Global.superFlinch;
+				}
+				}
+				chr.addDamageText("COUNTER!!!", 1);	
+				chr.shakeCamera(sendRpc: true);
+				chr.playSound("weakness");		
+			}
+		}
+*/
+
+	
+
+
+
+
+
+		}
 		return applyDamage(
 			owner, newDamage, hitCooldown, newFlinch, victim as Actor,
 			weakness, weapon.index, weapon.killFeedIndex, actor, projId, sendRpc
@@ -353,7 +393,9 @@ public class Damager {
 				projId != (int)ProjIds.MechFrogStompShockwave &&
 				projId != (int)ProjIds.HeavyPush &&
 				projId != (int)ProjIds.VileSuperKick &&
-				projId != (int)ProjIds.ForceGrabState
+				projId != (int)ProjIds.ForceGrabState &&
+				projId != (int)ProjIds.BoomerangKDeadLift &&
+				projId != (int)ProjIds.FlameMSlam
 				) {
 					if (flinch < Global.halfFlinch) {
 						flinch = Global.halfFlinch;

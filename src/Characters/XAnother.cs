@@ -32,14 +32,25 @@ public class XAnother : MegamanX {
 	}
 	public override void update() {
 		base.update();
-		if (player.currency > 4 && !hasUltimateArmor &&
+
+
+		if (gigaAttack.ammo >= 28 && !hasUltimateArmor &&
 		player.input.isPressed(Control.Special2, player)){
 		hasUltimateArmor = true;
 		player.addNovaStrike();
-		addHealth(50);
-		player.currency -= 5;
-		changeSpriteFromName("warpin", true);
+		addHealth(5);
+		//player.currency -= 5;
+		changeSpriteFromName("warp_in", true);
+
 		}
+	if (cStingPaletteTime > 5) {
+			cStingPaletteTime = 0;
+			cStingPaletteIndex++;
+		}
+		cStingPaletteTime++;
+
+
+
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -67,6 +78,34 @@ public class XAnother : MegamanX {
 			player.superAmmo -= 1;
 			changeState(new XlightKick(), true);
 		}
+
+
+
+		//>>>>>>>>>>>>>>>>>
+
+			player.fgMoveAmmo += Global.speedMul;
+		if (player.fgMoveAmmo > player.fgMoveMaxAmmo) player.fgMoveAmmo = player.fgMoveMaxAmmo;
+
+
+
+		gigaWeapon?.update();
+		hyperNovaStrike?.update();
+		itemTracer?.update();
+		shootingRaySplasher?.burstLogic2(this);
+
+		// Charge and release charge logic.
+		if (!isInDamageSprite() && !sprite.name.Contains("block")){
+		chargeLogic(shoot);
+		}
+		player.changeWeaponControls();
+		Helpers.decrementFrames(ref shootCooldown);
+		Helpers.decrementFrames(ref upPunchCooldown);
+		Helpers.decrementFrames(ref parryCooldown);
+		Helpers.decrementFrames(ref xSaberCooldown);
+
+
+		
+
 		if (musicSource == null && hasUltimateArmor) {
 			addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 		}
