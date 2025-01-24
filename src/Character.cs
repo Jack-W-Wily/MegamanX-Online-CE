@@ -3032,15 +3032,15 @@ public partial class Character : Actor, IDamagable {
 					);
 				}
 			}
-			if (this is XAnother XA) {
-				float currentAmmo = XA.gigaAttack.ammo;
-				if (XA.hasUltimateArmor){
-				XA.gigaAttack.ammo -= gigaAmmoToAdd;
+			if (this is XAnother xa) {
+				float currentAmmo = xa.player.superAmmo;
+				if (xa.hasUltimateArmor){
+				xa.player.superAmmo -= gigaAmmoToAdd;
 				}
 				if (player.isMainPlayer) {
 					Weapon.gigaAttackSoundLogic(
-						this, currentAmmo, XA.gigaAttack.ammo,
-						XA.gigaAttack.getAmmoUsage(0), XA.gigaAttack.maxAmmo
+						this, currentAmmo, xa.player.superAmmo,
+						0, xa.player.superAmmo
 					);
 				}
 			}

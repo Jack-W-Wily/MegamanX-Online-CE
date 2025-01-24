@@ -13,7 +13,7 @@ public class Zain : Character {
 
 	private float CounterTimer;
 
-	private float CounterAddcooldown;
+	private float CounterCooldown;
 
 	private float SlashCooldown;
 
@@ -40,44 +40,26 @@ public override bool normalCtrl() {
 
 
 		//Cooldowns
-		Helpers.decrementTime(ref CounterTimer);
-		Helpers.decrementTime(ref CounterAddcooldown);
+		//Helpers.decrementTime(ref CounterTimer);
+		Helpers.decrementTime(ref CounterCooldown);
 		Helpers.decrementTime(ref SlashCooldown);
-
-
-		
-
-			player.vileAmmo += Global.spf * 15;
-			if (player.vileAmmo > player.vileMaxAmmo) {
-				player.vileAmmo = 0;
-				ZainCounters += 1;
-			}
-
-		if (ZainCounters >8 ) ZainCounters =8;
-		if (ZainCounters < 0) ZainCounters = 0;
-
-
-	
-
-		
-
-
+		if (ZainCounters > 8 ) ZainCounters = 8;
+		if (ZainCounters <= 0) {
+			ZainCounters = 0;
+			counterCooldown = 1;
+		}
 		//KillingSpreeThemes
 		//if (KillingSpree == 3){
 		//		if (musicSource == null) {
 		//			addMusicSource("RequiemNitanchouDiesIrae", getCenterPos(), true); 
 		///		}
 		//} 
-
-
 		if (charState.attackCtrl){
 			if ((charState is Dash || charState is AirDash) 
 			&& (player.input.isPressed(Control.Shoot, player))){
 			slideVel = xDir * getDashSpeed();			
 			}
 		}
-
-		
 		if (charState.attackCtrl){
 			if ((charState is AirDash) 
 			&& (player.input.isPressed(Control.Shoot, player)
@@ -85,45 +67,36 @@ public override bool normalCtrl() {
 			slideVel = xDir * getDashSpeed();			
 			}
 		}
-
-		
 		if (player.input.isHeld(Control.Down,player)
 		&& charState is Dash or AirDash or Fall or Jump &&
 		!sprite.name.Contains("spinslash")){
 		changeSpriteFromName("spinslash", true);
 		}
-
 		if (player.input.isHeld(Control.Special1,player)
 		&& charState.attackCtrl && charState is not Dash or AirDash &&
 		!sprite.name.Contains("jab")){
 		changeSpriteFromName("jab", true);
 		}
-
 		if (sprite.name.Contains("jab") && isAnimOver()){
 		changeToIdleOrFall();
 		}
-
 		if (charState.attackCtrl  &&
-		 player.input.isPressed(Control.Shoot, player))
-		{	
-			
+		player.input.isPressed(Control.Shoot, player))
+		{		
        		changeState(new ZainProjSwingState(grounded, shootProj: false), forceChange: true);
 		}
-
 		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 0 &&
-		 player.input.isPressed(Control.WeaponRight, player))
+		player.input.isPressed(Control.WeaponRight, player))
 		{	
 			changeState(new ZainKokuSlash(grounded, shootProj: false), forceChange: true);
 			ZainCounters -= 1;
-       }
-
+        }
 		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 3 &&
-		 player.input.isPressed(Control.Special2, player))
+		player.input.isPressed(Control.Special2, player))
 		{	
 			changeState(new ZainProjSwingState(grounded, shootProj: true), forceChange: true);
 			ZainCounters -= 4;
-       }
-
+		}
 
 		if ((charState.attackCtrl || charState.bonusAttackCtrl) 
 		 &&	 player.input.isPressed(Control.WeaponLeft, player) 
@@ -133,25 +106,33 @@ public override bool normalCtrl() {
 			}
 		
 		 if  (player.input.isPressed(Control.WeaponLeft,player)
-		  &&  (charState.attackCtrl || charState.bonusAttackCtrl) 
-				 && !player.input.isHeld(Control.Up,player)
-			  ) {
-				if (unpoAbsorbedProj != null) {
-					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-					unpoAbsorbedProj = null;		
-				} else {
-					changeState(new XUPParryStartState(), true);
-				}
+			&&  (charState.attackCtrl || charState.bonusAttackCtrl) 
+			&& !player.input.isHeld(Control.Up,player)
+			) {
+			if (unpoAbsorbedProj != null) {
+				changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
+				unpoAbsorbedProj = null;		
+			} else {
+				changeState(new XUPParryStartState(), true);
+			}
 		}
 
-		 if  (player.input.isPressed(Control.Special1,player) && parryCooldown == 0 &&
-				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
-			  ) {
-				if (unpoAbsorbedProj != null) {
-					changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-					unpoAbsorbedProj = null;	
-				}
-			  }
+		 if (player.input.isPressed(Control.Special1,player) && parryCooldown == 0 &&
+			  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
+			) {
+			if (unpoAbsorbedProj != null) {
+				changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
+				unpoAbsorbedProj = null;	
+			}
+			}
+		
+		if (ZainCounters >= 8) return;
+
+		player.vileAmmo += Global.spf * 15;
+		if (player.vileAmmo > player.vileMaxAmmo) {
+			player.vileAmmo = 0;
+			ZainCounters += 1;
+			}
 	}
 
 

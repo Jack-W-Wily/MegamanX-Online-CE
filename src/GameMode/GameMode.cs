@@ -656,19 +656,19 @@ public class GameMode {
 				Global.sprites["hud_zaincounter"].drawToHUD(0, 14, 158);
 				Fonts.drawText(FontType.Grey,
 				"x" + zain.ZainCounters, 28, 155, Alignment.Left);
-				///	yStart += 12;
-				yStart -= 36;
-				/*Global.sprites["hud_weapon_base"].drawToHUD(39, xStart, yStart);
+				yStart -= 26;
+				if (zain.ZainCounters >= 8) return;
+				Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.ZainCounter, xStart, yStart);
+				yStart -= 18;
 				for (var i = 0; i < MathF.Ceiling(zain.player.vileMaxAmmo ); i++) {
-				if (i < Math.Ceiling(zain.player.vileAmmo)) {
-					Global.sprites["hud_weapon_full"].drawToHUD(32, xStart, yStart);
-				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, xStart, yStart);
-				}
-				yStart -= 2;
-				}
-				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);*/
-		
+					if (i < Math.Ceiling(zain.player.vileAmmo)) {
+					Global.sprites["hud_bars_generic"].drawToHUD(12, xStart, yStart);
+					} else {
+						Global.sprites["hud_bars_generic"].drawToHUD(1, xStart, yStart);
+					}
+					yStart -= 2;
+					}
+					Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
 				}
 
 			if (drawPlayer.character is Zero zero) {

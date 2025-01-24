@@ -945,7 +945,8 @@ public enum WeaponBarIndex{
 	WeaponAmmo,
 	WeaponAmmoOff,
 	SuperBar,
-	SuperBarOff
+	SuperBarOff,
+	ZainCounter
 }
 public enum WeaponSlotIndex{
 	//X1
