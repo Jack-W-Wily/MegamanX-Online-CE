@@ -30,6 +30,7 @@ public class CmdSigma : BaseSigma {
 	public override void update() {
 		base.update();
 
+
 		if (sprite.name.Contains("slash"))sigmaAmmoRechargeCooldown = 0.5f;
 		if (charState.attackCtrl){
 			if ((charState is Dash || charState is AirDash) 
@@ -46,6 +47,8 @@ public class CmdSigma : BaseSigma {
 				rideArmorPlatform = null;
 			}
 		}
+
+
 
 
 		if (!ownedByLocalPlayer) {
@@ -146,9 +149,14 @@ public class CmdSigma : BaseSigma {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override string getSprite(string spriteName) {
-		return "sigma_" + spriteName;
+public override string getSprite(string spriteName) {
+			if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("sigma1alt_" + spriteName)){		
+			return "sigma1alt_" + spriteName;
+			}
+			return "sigma_" + spriteName;
 	}
+	
 
 	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile? getProjFromHitbox(Collider collider, Point centerPoint) {
@@ -191,6 +199,51 @@ public class CmdSigma : BaseSigma {
 				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
 				2, Global.defFlinch, 60f
 			),
+
+
+
+
+
+
+
+
+			"sigma1alt_ladder_attack" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				3, 30, 25f
+			),
+			"sigma1alt_wall_slide_attack" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				3, 30, 25f
+			),
+				"sigma1alt_wall_dash" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				1, 30, 25f, isDeflectShield : true, isJuggleProjectile : true
+			),
+				"sigma1alt_dash" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				1, 30, 25f
+			),
+				"sigma1alt_slash_1" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
+				2, Global.defFlinch, 15f
+			),
+				"sigma1alt_slash_2" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
+				3, Global.superFlinch, 15f
+			),
+				"sigma1alt_slash_3" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VirusSlash, player,
+				3, Global.defFlinch, 15f
+			),
+				"sigma1alt_grab" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.VileSuperKick, player,
+				2, Global.defFlinch, 15f
+			),
+				"sigma1alt_block" => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, centerPoint, ProjIds.SigmaSlash, player,
+				2, Global.defFlinch, 60f
+			),
+
 			_ => null
 		};
 		if (proj != null) {

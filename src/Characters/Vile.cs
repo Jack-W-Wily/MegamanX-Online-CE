@@ -1076,8 +1076,15 @@ public class Vile : Character {
 
 	public override string getSprite(string spriteName) {
 		if (player.loadout.vileLoadout.cannon == 2) {
+
+			if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("vilemk5alt_" + spriteName)){		
+			return "vilemk5alt_" + spriteName;
+			}
 			return "vilemk5_" + spriteName;
 		}
+
+
 		if (player.loadout.vileLoadout.cannon == 1) {
 			return "vilemk2_" + spriteName;
 		}

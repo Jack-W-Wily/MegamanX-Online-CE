@@ -28,6 +28,10 @@ public class Options {
 	public bool killOnLoadoutChange = true;
 	public bool killOnCharChange = true;
 	public float networkTimeoutSeconds = 3;
+
+	public bool enableSkins;
+
+
 	public bool autoCreateDocFolderPromptShown = false;
 
 	public int getNetworkTimeoutMs() {

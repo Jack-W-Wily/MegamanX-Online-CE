@@ -33,12 +33,17 @@ public class XAnother : MegamanX {
 	}
 	public override void update() {
 		base.update();
-		if (player.superAmmo > 28 && player.input.isPressed(Control.Special2, player)){
+
+		if (player.superAmmo == 0){
+		hasUltimateArmor = true;
+		player.removeNovaStrike();
+		}
+		if (player.superAmmo > 14 && player.input.isPressed(Control.Special2, player)){
 		hasUltimateArmor = true;
 		player.addNovaStrike();
-		player.superAmmo -= 28;
 		changeSpriteFromName("warpin", true);
-		addHealth(5);}
+	//	addHealth(5);
+		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -68,14 +73,15 @@ public class XAnother : MegamanX {
 			changeSpriteFromName("headbutt", false);
 		}
 
-		if (player.superAmmo > 0 && player.input.isPressed(Control.Dash,player) &&
+		if (player.superAmmo > 2 && player.input.isPressed(Control.Dash,player) &&
 		sprite.name.Contains("unpo")){
-			player.superAmmo -= 1;
+			player.superAmmo -= 3;
 			changeState(new XlightKick(), true);
 		}
-		if (musicSource == null && hasUltimateArmor) {
-			addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
-		}
+
+	//	if (musicSource == null && hasUltimateArmor) {
+	//		addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
+	//	}
 	}
 	public override bool attackCtrl() {
 		if(player.superAmmo >= 5 && parryCooldown == 0 &&

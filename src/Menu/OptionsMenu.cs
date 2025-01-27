@@ -727,6 +727,26 @@ public class OptionsMenu : IMainMenu {
 					"If enabled, press F10 to open the dev-console in-match\n" +
 					"See the game website for a list of commands."
 				),
+			
+				// EnableSkins.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.enableSkins);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Enable Skins:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.enableSkins),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If enabled, character sprites will be replaced\n" +
+					"by their alt counterparts."
+				),
 			};
 		} else if (charNum == (int)CharIds.X) {
 			menuOptions = new List<MenuOption>() {

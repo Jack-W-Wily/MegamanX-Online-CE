@@ -901,7 +901,7 @@ class Program {
 			Global.fileChecksumBlob += "-" + fileChecksum;
 		}
 		// Override sprite mods
-		string overrideSpriteSource = "assets/sprites_visualmods";
+		string overrideSpriteSource = "assets/sprites_visualmods";	
 		if (Options.main.shouldUseOptimizedAssets()) overrideSpriteSource = "assets/sprites_optimized";
 
 		List<string> overrideSpritePaths = Helpers.getFiles(Global.assetPath + overrideSpriteSource, false, "json");
