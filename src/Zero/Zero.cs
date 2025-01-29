@@ -749,7 +749,12 @@ public class Zero : Character {
 		return dashSpeed * getRunDebuffs();
 	}
 	public override string getSprite(string spriteName) {
-		return "zero_" + spriteName;
+
+		if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("zeroalt_" + spriteName)){		
+			return "zeroalt_" + spriteName;
+			}
+			return "zero_" + spriteName;
 	}
 
 	// Simple giga ammo logic.
@@ -843,6 +848,7 @@ public class Zero : Character {
 		return (int)(sprite.name switch {
 			// Ground
 			"zero_attack" => MeleeIds.HuSlash,
+			
 			"zero_attack2" => MeleeIds.HaSlash,
 			"zero_attack3" => MeleeIds.HuhSlash,
 			"zero_attack_crouch" => MeleeIds.CrouchSlash,
@@ -874,6 +880,7 @@ public class Zero : Character {
 			"zero_final_start" => MeleeIds.ZeroFinal,
 			"zero_final_end" => MeleeIds.Dairettsui,
 			"zero_projswing" => MeleeIds.Hadangeki,
+
 			_ => MeleeIds.None
 		});
 	}

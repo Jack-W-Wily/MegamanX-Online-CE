@@ -297,7 +297,11 @@ public override bool attackCtrl() {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "dynamo_" + spriteName;
+		if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("dynamoalt_" + spriteName)){		
+			return "dynamoalt_" + spriteName;
+			}
+			return "dynamo_" + spriteName;
 	}
 }
 

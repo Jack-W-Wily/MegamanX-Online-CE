@@ -635,7 +635,11 @@ public class PunchyZero : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "zerox1_" + spriteName;
+			if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("zerox1alt_" + spriteName)){		
+			return "zerox1alt_" + spriteName;
+			}
+			return "zerox1_" + spriteName;
 	}
 
 	public override bool isToughGuyHyperMode() {

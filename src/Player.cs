@@ -128,6 +128,7 @@ public partial class Player {
 	public bool isAxlXOD { get { return charNum == (int)CharIds.AxlOld; } }
 	public bool isAxlWC { get { return charNum == (int)CharIds.AxlWC; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
+	public bool isIris { get { return charNum == (int)CharIds.Iris; } }
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
 
@@ -230,6 +231,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.Iris, new List<SubTank>() },
 		{ (int)CharIds.Zain, new List<SubTank>() },
 		{ (int)CharIds.GBD, new List<SubTank>() },
 		{ (int)CharIds.Dynamo, new List<SubTank>() },
@@ -249,6 +251,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new() },
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
+		{ (int)CharIds.Iris, new() },
 		{ (int)CharIds.Zain, new() },
 		{ (int)CharIds.GBD, new() },
 		{ (int)CharIds.Dynamo, new() },
@@ -1253,6 +1256,11 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
+		} else if (charNum == (int)CharIds.Iris) {
+			character = new Iris(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
 		}
 		else if (charNum == (int)CharIds.Dragoon) {
 			character = new Dragoon(
@@ -1524,6 +1532,11 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
+		}else if (data.charNum == (int)CharIds.Iris) {
+			retChar = new Rock(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
 		}
 		else if (data.charNum == (int)CharIds.Dragoon) {
 			retChar = new Dragoon(
@@ -1680,7 +1693,12 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
-		} else if (charNum == (int)CharIds.Zero) {
+		} else if (charNum == (int)CharIds.Iris) {
+			retChar = new Rock(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}else if (charNum == (int)CharIds.Zero) {
 			retChar = new BusterZero(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false

@@ -271,7 +271,11 @@ public override bool attackCtrl() {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "magmadragoon_" + spriteName;
+		if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("magmadragoonalt_" + spriteName)){		
+			return "magmadragoonalt_" + spriteName;
+			}
+			return "magmadragoon_" + spriteName;
 	}
 }
 

@@ -767,6 +767,19 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.NeonTRaySplasher:
 				proj = new NeonTRaySplasherProj(NeonTiger.getWeapon(), pos, xDir, 0, false, player, netProjByte);
 				break;
+			case (int)ProjIds.IrisFireBallProj:
+				proj = new NeonTRaySplasherProj(new IrisCrystal(), pos, xDir, 0, false, player, netProjByte);
+				break;
+			case (int)ProjIds.IrisCrystal:
+				proj = new NewIrisCrystal(new IrisCrystal(), pos, xDir, player, netProjByte);
+			break;
+				case (int)ProjIds.IrisSlashProj:
+			proj = new IrisSlashProj(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
+			break;
+				case (int)ProjIds.IrisCannon:
+			proj = new IrisCannon(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
+				break;
+
 			case (int)ProjIds.GBeetleBall:
 				proj = new GBeetleBallProj(GravityBeetle.getWeapon(), pos, xDir, false, player, netProjByte);
 				break;

@@ -693,7 +693,12 @@ public class AxlWC : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "axl_" + spriteName;
+
+		if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("axlalt_" + spriteName)){		
+			return "axlalt_" + spriteName;
+			}
+			return "axl_" + spriteName;
 	}
 
 	public override List<ShaderWrapper> getShaders() {

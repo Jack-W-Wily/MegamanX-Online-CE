@@ -93,7 +93,11 @@ public class XAnother : MegamanX {
 		return base.attackCtrl();
 	}
 	public override string getSprite(string spriteName) {
-		return "rmx_" + spriteName;
+		if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("rmxalt_" + spriteName)){		
+			return "rmxalt_" + spriteName;
+			}
+			return "rmx_" + spriteName;
 	}
 
 	
@@ -124,21 +128,26 @@ public class XAnother : MegamanX {
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
-			"rmx_shoryuken" => MeleeIds.Shoryuken,
-			"rmx_block" => MeleeIds.XBlock,
-			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
-			"rmx_beam_saber2"  => MeleeIds.ZSaber,
-			"rmx_beam_saber_air2"  => MeleeIds.ZSaberAir,
-			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
-			"rmx_unpo_grab_dash" => MeleeIds.UPGrab,
-			"rmx_unpo_punch" or "rmx_unpo_air_punch" or "rmx_unpo_punch_2" => MeleeIds.UPPunch,
-			"rmx_unpo_parry_start" => MeleeIds.UPParryBlock,
-			"rmx_up_dash"  => MeleeIds.UPDash,
-			"rmx_sice_slide"  => MeleeIds.IceSlide,
+			"rmx_speedburner" or "rmxalt_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"rmx_shoryuken" or "rmxalt_shoryuken" => MeleeIds.Shoryuken,
+			"rmx_block" or "rmxalt_block" => MeleeIds.XBlock,
+			"rmx_beam_saber" or "rmx_beam_saber_air"  or
+			"rmxalt_beam_saber" or "rmxalt_beam_saber_air" => MeleeIds.MaxZSaber,
+			"rmx_beam_saber2" or "rmxalt_beam_saber2" => MeleeIds.ZSaber,
+			"rmx_beam_saber_air2"  or "rmxalt_beam_saber_air2"  => MeleeIds.ZSaberAir,
+			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" or
+			"rmxalt_nova_strike" or "rmxalt_nova_strike_down" or "rmxalt_nova_strike_up" 
+			=> MeleeIds.NovaStrike,
+			"rmx_unpo_grab_dash" or "rmxalt_unpo_grab_dash" => MeleeIds.UPGrab,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch" or "rmx_unpo_punch_2" or 
+			"rmxalt_unpo_punch" or "rmxalt_unpo_air_punch" or "rmxalt_unpo_punch_2"
+			=> MeleeIds.UPPunch,
+			"rmx_unpo_parry_start" or "rmxalt_unpo_parry_start" => MeleeIds.UPParryBlock,
+			"rmx_up_dash" or "rmxalt_up_dash" => MeleeIds.UPDash,
+			"rmx_sice_slide" or "rmxalt_sice_slide" => MeleeIds.IceSlide,
 			// Light Helmet.
-			"rmx_headbutt"  => MeleeIds.LigthHeadbutt,
-			"rmx_kick_lightarmor"  => MeleeIds.LightKick,
+			"rmx_headbutt" or "rmxalt_headbutt" => MeleeIds.LigthHeadbutt,
+			"rmx_kick_lightarmor" or "rmxalt_kick_lightarmor"  => MeleeIds.LightKick,
 			// Nothing.
 			_ => MeleeIds.None
 		});

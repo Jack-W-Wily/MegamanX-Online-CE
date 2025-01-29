@@ -1197,6 +1197,7 @@ public class Damager {
 			(int)ProjIds.Rakuhouha => true,
 			(int)ProjIds.AcidBurstPoison => true,
 			(int)ProjIds.MetteurCrash => true,
+			(int)ProjIds.IrisSlashProj => true,
 			_ => false
 		};
 	}

@@ -220,7 +220,11 @@ public override bool normalCtrl() {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "zain_" + spriteName;
+		if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("zainalt_" + spriteName)){		
+			return "zainalt_" + spriteName;
+			}
+			return "zain_" + spriteName;
 	}
 }
 

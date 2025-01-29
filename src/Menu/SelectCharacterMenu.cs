@@ -49,6 +49,7 @@ public enum CharIds {
 	Dynamo,
 	Dragoon,
 	AxlAnother,
+	Iris,
 
 	// Old stuff.
 	AxlOld,
@@ -79,23 +80,24 @@ public class CharSelection {
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
-		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
+		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "smenu_xanother"),  
 		new CharSelection("Zero (Mid)", (int)CharIds.Zero, sprite: "smenu_zero"),
 		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero_2"),
-	//	new CharSelection("Axl", (int)CharIds.AxlOld, sprite: "smenu_axl"),
+	//	new CharSelection("Axl", (int)CharIds.AxlX8, sprite: "smenu_axl2"),
+		new CharSelection("Iris", (int)CharIds.Iris, sprite: "smenu_iris"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
 		new CharSelection("GBD", (int)CharIds.GBD, sprite: "smenu_gbd"),
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
 		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
 		new CharSelection("Zain", (int)CharIds.Zain, sprite: "smenu_zain"),
-		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "empty"),
+		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "smenu_dragoon"),
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, sprite: "smenu_dynamo"),
 		//new CharSelection("High Max", (int)CharIds.Highmax, sprite: "smenu_highmax"),
 	];
 
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.X, sprite: "smenu_x"),
-		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "empty"),  
+		new CharSelection("X (Another)", (int)CharIds.XAnother, sprite: "smenu_xanother"),  
 		new CharSelection("Zero (Mid)", (int)CharIds.BusterZero, sprite: "smenu_zero_2"),
 		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, sprite: "smenu_zero"),
 		new CharSelection("Axl", (int)CharIds.AxlWC, sprite: "smenu_axl"),
@@ -104,7 +106,7 @@ public class CharSelection {
 		new CharSelection("Sigma", (int)CharIds.Sigma, sprite: "smenu_sigma"),
 		new CharSelection("Vava", (int)CharIds.Vile, sprite: "smenu_vile"),
 		new CharSelection("Zain", (int)CharIds.Zain, sprite: "smenu_zain"),
-		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "empty"),
+		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "smenu_dragoon"),
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, sprite: "smenu_dynamo"),
 			
 		new CharSelection("C.Penguin", 210, 1, 0, "chillp_idle", 0),

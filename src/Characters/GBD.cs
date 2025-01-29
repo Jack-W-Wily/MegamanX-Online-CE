@@ -415,8 +415,15 @@ public class GBD : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		if (isOnBike) return "tgbdbike_" + spriteName;
-		return "tgbd_" + spriteName;
+
+
+			if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("tgbdalt_" + spriteName)){		
+			return "tgbdalt_" + spriteName;
+			}
+			return "tgbd_" + spriteName;
 	}
+	
+	
 }
 

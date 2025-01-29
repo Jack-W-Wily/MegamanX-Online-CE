@@ -1086,11 +1086,23 @@ public class Vile : Character {
 
 
 		if (player.loadout.vileLoadout.cannon == 1) {
+
+			if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("vilemk2alt_" + spriteName)){		
+			return "vilemk2alt_" + spriteName;
+			}
 			return "vilemk2_" + spriteName;
 		}
-	//	if (isVileMK2) {
-	//		return "vilemk2_" + spriteName;
-	//	}
+
+		if (player.loadout.vileLoadout.cannon == 0) {
+
+			if ((Options.main.enableSkins == true)
+			&& Global.sprites.ContainsKey("vilealt_" + spriteName)){		
+			return "vilealt_" + spriteName;
+			}
+			return "vile_" + spriteName;
+		}
+
 		return "vile_" + spriteName;
 	}
 

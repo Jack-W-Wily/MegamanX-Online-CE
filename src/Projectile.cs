@@ -170,11 +170,27 @@ public class Projectile : Actor {
 		base.update();
 
 
+		// I'm Gonna recode this later adding a 
+		// Destructable on hit = false tag to the excaptions but for a test we're going with
+		// This 
 
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		if (this is not RollingShieldProjCharged and 
 		not HexaInvoluteProj and
+		not MagnetMineProj and
+		not MagnetMineProj and
+		not IrisCannon and
+		not IrisSlashProj and
+		not NewIrisCrystal and
 		not GigaCrushProj
 		&& owner.character.isInDamageSprite())destroySelf();
+		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// Jack to Do :
+		// Recode this as a Bool that declares rather the projectiles should
+		// be destroyed or not when player is hit, shouldn't be hard
+
+
+
 		time += Global.spf;
 		moveDistance += deltaPos.magnitude;
 

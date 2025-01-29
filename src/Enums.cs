@@ -309,7 +309,8 @@ public enum WeaponIds {
 	ZainParry,
 	DNACore = 250,
 
-
+	// Iris
+	IrisCrystal,
 	// GBD
 	GBDKick,
 
@@ -870,6 +871,13 @@ public enum ProjIds {
 	SpiralMagnumWC,
 	FormicAcidWC,
 	FormicAcidSmallWC,
+
+
+	// Iris Stuff
+	IrisFireBallProj,
+	IrisCrystal,
+	IrisSlashProj,
+	IrisCannon,
 
 	// Random non-projectiles.
 	AxlDiscardedWeapon,
