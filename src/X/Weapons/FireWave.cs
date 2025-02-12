@@ -11,7 +11,7 @@ public class FireWave : Weapon {
 		killFeedIndex = 4;
 		weaponBarBaseIndex = (int)WeaponBarIndex.FireWave;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 4;
+		weaponSlotIndex = (int)SlotIndex.FWave;
 		weaknessIndex = (int)WeaponIds.StormTornado;
 		shootSounds = new string[] { "fireWave", "fireWave", "fireWave", "fireWave" , ""};
 		fireRate = 4;
@@ -20,7 +20,7 @@ public class FireWave : Weapon {
 	//	switchCooldownFrames = 0;
 		damage = "1/1";
 		ammousage = 0.5;
-		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.\nBurn won't give assists.";
+		effect = "Inflicts burn to enemies. \nDOT: 0.5/2 seconds.\nBurn won't give assists.";
 		hitcooldown = "0.2/0.33";
 		maxAmmo = 28;
 		ammo = maxAmmo;

@@ -101,6 +101,7 @@ public class Weapon {
 		};
 		weaponList.AddRange(getAllXWeapons());
 		weaponList.AddRange(getAllAxlWeapons(axlLoadout));
+		weaponList.AddRange(getAllWCAxlWeapons());
 		weaponList.AddRange(getAllSigmaWeapons(null));
 		return weaponList;
 	}
@@ -183,9 +184,9 @@ public class Weapon {
 				new	GroundHunter(),
 				new	AimingLaser(),
 				new	DoubleCyclone(),
-				new	TwinSlasher(),				
+				new	TwinSlasher(),		
+				new DarkHold(),
 				new ZXSaber(),
-				new DarkHoldWeapon(),
 				new RagingChargeBuster(),
 			};
 	}
@@ -204,20 +205,34 @@ public class Weapon {
 				new FlameBurner(axlLoadout.flameBurnerAlt),
 			};
 	}
+	public static List<Weapon> getAllWCAxlWeapons() {
+		return new List<Weapon>()
+		{
+				new AxlBulletWC(),
+				new RayGunWC(),
+				new BlastLauncherWC(),
+				new BlackArrowWC(),
+				new SpiralMagnumWC(),
+				new BoundBlasterWC(),
+				new PlasmaGunWC(),
+				new IceGattlingWC(),
+				new FlameBurnerWC(),
+			};
+	}
 
 	// friendlyIndex is 0-8.
 	// Don't use this to generate weapons for use as they don't come with the right alt fire
-	public static AxlWeapon fiToAxlWep(int friendlyIndex) {
+	public static AxlWeaponWC fiToAxlWep(int friendlyIndex) {
 		return friendlyIndex switch {
-			1 => new RayGun(0),
-			2 => new BlastLauncher(0),
-			3 => new BlackArrow(0),
-			4 => new SpiralMagnum(0),
-			5 => new BoundBlaster(0),
-			6 => new PlasmaGun(0),
-			7 => new IceGattling(0),
-			8 => new FlameBurner(0),
-			_ => new AxlBullet()
+			1 => new RayGunWC(),
+			2 => new BlastLauncherWC(),
+			3 => new BlackArrowWC(),
+			4 => new SpiralMagnumWC(),
+			5 => new BoundBlasterWC(),
+			6 => new PlasmaGunWC(),
+			7 => new IceGattlingWC(),
+			8 => new FlameBurnerWC(),
+			_ => new AxlBulletWC()
 		};
 	}
 

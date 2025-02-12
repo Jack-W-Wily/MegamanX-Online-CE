@@ -12,7 +12,7 @@ public class SilkShot : Weapon {
 		index = (int)WeaponIds.SilkShot;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SilkShot;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 11;
+		weaponSlotIndex = (int)SlotIndex.SShot;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.SpeedBurner;
 		damage = "2+1/4+1";

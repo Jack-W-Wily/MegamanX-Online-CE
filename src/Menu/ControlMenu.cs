@@ -22,7 +22,7 @@ public class ControlMenu : IMainMenu {
 	public int charNum;
 	public int axlAimMode;
 
-	public ControlMenu(IMainMenu mainMenu, bool inGame, bool isController, int charNum, int axlAimMode) {
+	public ControlMenu(IMainMenu mainMenu, bool inGame, bool isController, int charNum) {
 		previous = mainMenu;
 		this.inGame = inGame;
 		this.isController = isController;
@@ -74,17 +74,19 @@ public class ControlMenu : IMainMenu {
 			bindableControls.Add(new string[] { Control.AxlCrouch, "Ride Attack" });
 			bindableControls.Add(new string[] { Control.AimAngleUp, "Ride Hold" });
 				
+		}if(charNum == (int)CharIds.AxlWC){
+			bindableControls.Add(new string[] { Control.AxlAimBackwards, "Block" });
 		}
 		// Axl specific settings
-		if (charNum == (int)CharIds.AxlOld || charNum ==  (int)CharIds.AxlWC) {
-			if (axlAimMode == 0) {
+	/*	if (charNum == (int)CharIds.AxlOld || charNum ==  (int)CharIds.AxlWC) {
+			//if (axlAimMode == 0) {
 				bindableControls.Add(new string[] { Control.AimUp, "Aim Up" });
 				bindableControls.Add(new string[] { Control.AimDown, "Aim Down" });
 				bindableControls.Add(new string[] { Control.AimLeft, "Aim Left" });
 				bindableControls.Add(new string[] { Control.AimRight, "Aim Right" });
 				bindableControls.Add(new string[] { Control.AxlAimBackwards, "Aim Key" });
-				bindableControls.Add(new string[] { Control.AxlCrouch, "Crouch" });
-			} else if (axlAimMode == 1) {
+				bindableControls.Add(new string[] { Control.AxlCrouch, "Block" });
+			/*} else if (axlAimMode == 1) {
 				bindableControls.Add(new string[] { Control.AimAngleUp, "Aim Angle Up" });
 				bindableControls.Add(new string[] { Control.AimAngleDown, "Aim Angle Down" });
 				bindableControls.Add(new string[] { Control.AimAngleReset, "Aim Angle Reset" });
@@ -95,8 +97,8 @@ public class ControlMenu : IMainMenu {
 				bindableControls.Add(new string[] { Control.AimDown, "Aim Down" });
 				bindableControls.Add(new string[] { Control.AimLeft, "Aim Left" });
 				bindableControls.Add(new string[] { Control.AimRight, "Aim Right" });
-			}
-		}
+			}*/
+		/*/*/
 	}
 
 	public bool isBindingControl() {
@@ -162,8 +164,8 @@ public class ControlMenu : IMainMenu {
 			foreach (var kvp in mappingClone) {
 				if (kvp.Key.StartsWith("menu", StringComparison.OrdinalIgnoreCase)) continue;
 				if (inputName.StartsWith("menu", StringComparison.OrdinalIgnoreCase)) continue;
-				if (kvp.Key.StartsWith("aim", StringComparison.OrdinalIgnoreCase)) continue;
-				if (inputName.StartsWith("aim", StringComparison.OrdinalIgnoreCase)) continue;
+				/*if (kvp.Key.StartsWith("aim", StringComparison.OrdinalIgnoreCase)) continue;
+				if (inputName.StartsWith("aim", StringComparison.OrdinalIgnoreCase)) continue;*/
 				if (kvp.Key.StartsWith("command", StringComparison.OrdinalIgnoreCase)) continue;
 				if (inputName.StartsWith("command", StringComparison.OrdinalIgnoreCase)) continue;
 				// Jump and up are the only only other exceptions to the "can't bind multiple with one key" rule
@@ -208,13 +210,13 @@ public class ControlMenu : IMainMenu {
 
 		string subtitle = charNum switch {
 			-2 => "MENU CONTROLS",
-			0 => "X CONTROLS",
-			1 => "ZERO CONTROLS",
-			2 => "VILE CONTROLS",
-			3 when (axlAimMode == 0) => "AXL CONTROLS (CURSOR)",
-			3 when (axlAimMode == 1) => "AXL CONTROLS (ANGULAR)",
-			3 => "AXL CONTROLS (DIRECTIONAL)",
-			4 => "SIGMA CONTROLS",
+			(int)CharIds.X => "X CONTROLS",
+			(int)CharIds.Zero => "ZERO CONTROLS",
+			(int)CharIds.Vile => "VILE CONTROLS",
+			/*3 when (axlAimMode == 0) => "AXL CONTROLS (CURSOR)",
+			3 when (axlAimMode == 1) => "AXL CONTROLS (ANGULAR)",*/
+			(int)CharIds.AxlWC => "AXL CONTROLS",
+			(int)CharIds.Sigma => "SIGMA CONTROLS",
 			_ => "GENERAL CONTROLS"
 		};
 		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 24, Alignment.Center);

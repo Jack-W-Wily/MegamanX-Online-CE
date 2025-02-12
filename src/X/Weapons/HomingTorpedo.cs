@@ -11,12 +11,12 @@ public class HomingTorpedo : Weapon {
 		killFeedIndex = 1;
 		weaponBarBaseIndex = (int)WeaponBarIndex.HomingTorpedo;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 1;
+		weaponSlotIndex = (int)SlotIndex.HTorpedo;
 		weaknessIndex = (int)WeaponIds.RollingShield;
 		shootSounds = new string[] { "torpedo", "torpedo", "torpedo", "buster3" , "buster4"};
 		fireRate = 38;
 		damage = "2/1*6";
-		effect = "Destroys on contact with projectiles or enemies.\nBesides of it's homing capabilities.";
+		effect = "Destroyable; Has 1 HP.\nHomes into foes.\nLv.2 shoots a single piranha.";
 		hitcooldown = "0";
 		Flinch = "0/13";
 		maxAmmo = 16;

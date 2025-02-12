@@ -38,7 +38,7 @@ public class PreLoadoutMenu : IMainMenu {
 		Helpers.menuUpDown(ref selectY, 0, 5);
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-			if (selectY == (int)CharIds.X) {
+			if (selectY == (int)CharIds.X || selectY == (int)CharIds.XAnother) {
 				Menu.change(new SelectWeaponMenu(this, false));
 			}
 			if (selectY == (int)CharIds.Zero) {

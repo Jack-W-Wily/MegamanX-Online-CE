@@ -12,11 +12,11 @@ public class SpinWheel : Weapon {
 		index = (int)WeaponIds.SpinWheel;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpinWheel;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 12;
+		weaponSlotIndex = (int)SlotIndex.SWheel;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.StrikeChain;
 		damage = "1/1*8";
-		effect = "Inflicts Slowdown. Doesn't destroy on hit.\nUncharged won't give assists.";
+		effect = "Inflicts Slowdown. \nDoesn't destroy on hit.\nUncharged won't give assists.";
 		hitcooldown = "0.2/0";
 		Flinch = "0/26";
 		maxAmmo = 28;

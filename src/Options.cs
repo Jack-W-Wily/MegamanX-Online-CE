@@ -84,10 +84,18 @@ public class Options {
 	public bool lockInAirCannon = true;
 	public VileLoadout vileLoadout = new VileLoadout();
 
+
+	//wcaxl
+	public bool moveWhileShooting;
+	public bool autoCharge;
+	public bool blockInput;
+	public bool hoverWhileDown;
 	// Axl
 	public int gridModeAxl;
 	public bool axlDirLock;
 	public bool aimAnalog = false;
+	public AxlWCLoadout axlWCLoadout = AxlWCLoadout.createDefault();
+
 	public float aimSensitivity = 0.5f;
 	public int axlAimMode = 0;
 	public bool lockOnSound = false;
@@ -153,7 +161,8 @@ public class Options {
 		xLoadout.validate();
 		zeroLoadout.validate();
 		vileLoadout.validate();
-		axlLoadout.validate();
+		//axlLoadout.validate();
+		axlWCLoadout.validate();
 		sigmaLoadout.validate();
 	}
 

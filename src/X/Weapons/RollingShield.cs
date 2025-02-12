@@ -12,7 +12,7 @@ public class RollingShield : Weapon {
 		killFeedIndex = 3;
 		weaponBarBaseIndex = (int)WeaponBarIndex.RollingShield;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 3;
+		weaponSlotIndex = (int)SlotIndex.RShield;
 		weaknessIndex = 6;
 		shootSounds = new string[] { "rollingShield", "rollingShield", "rollingShield", "", "" };
 		fireRate = 45;

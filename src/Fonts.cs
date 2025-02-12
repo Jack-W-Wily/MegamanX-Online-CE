@@ -236,8 +236,8 @@ public class Fonts {
 			FontType.Golden => "Golden",
 			FontType.Green => "Green",
 			FontType.DarkGreen => "DarkGreen",
-			FontType.Grey => "Grey",
-			FontType.LightGrey => "LightGrey",
+			FontType.Grey => "DarkGrey",
+			FontType.LightGrey => "Grey",
 			FontType.Orange => "Orange",
 			FontType.DarkOrange => "DarkOrange",
 			FontType.Pink => "Pink",
@@ -250,6 +250,23 @@ public class Fonts {
 			FontType.FOrange => "FixedOrange",
 			FontType.BlueMenu => "BlueMenu",
 			FontType.OrangeMenu => "OrangeMenu",
+			FontType.GrayChat => "GrayChat",
+			FontType.BlueBig => "BlueBig",
+			FontType.GreenBig => "GreenBig",
+			FontType.PinkBig => "PinkBig",
+			FontType.DarkBlueBig => "DarkBlueBig",
+			FontType.DarkGreenBig => "DarkGreenBig",
+			FontType.RedBig => "RedBig",
+			FontType.YellowBig => "YellowBig",
+			FontType.GrayBig => "DarkGreyBig",
+			FontType.PurpleBig => "PurpleBig",
+			FontType.DiedGray => "DiedGray",
+			FontType.DiedBlue => "DiedBlue",
+			FontType.DiedRed => "DiedRed",
+			FontType.DiedGreen => "DiedGreen",
+			FontType.DiedPurple => "DiedPurple",
+			FontType.DiedYellow => "DiedYellow",
+			FontType.DiedPink => "DiedPink",
 			_ => "Blue"
 		};
 	}
@@ -269,6 +286,7 @@ public class Fonts {
 
 public enum FontType {
 	Blue,
+	Black,
 	DarkBlue,
 	Golden,
 	Green,
@@ -286,5 +304,24 @@ public enum FontType {
 	FBlue,
 	FOrange,
 	BlueMenu,
-	OrangeMenu
+	OrangeMenu,
+	GrayChat,
+	DiedGray,
+	DiedGreen,
+	DiedPink,
+	DiedPurple,
+	DiedRed,
+	DiedBlue,
+	DiedYellow,
+	//bigger fonts, use it carefully
+	BlueBig,
+	PinkBig,
+	GreenBig,
+	DarkBlueBig,
+	DarkGreenBig,
+	RedBig,
+	YellowBig,
+	GrayBig,
+	PurpleBig
+
 }

@@ -12,7 +12,7 @@ public class HyperCharge : Weapon {
 		killFeedIndex = 48;
 		weaponBarBaseIndex = (int)WeaponBarIndex.HyperCharge;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 36;
+		weaponSlotIndex = (int)SlotIndex.HyperCharge;
 		shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3", "buster3X3" };
 		fireRate = 120;
 		//switchCooldown = 0.25f;

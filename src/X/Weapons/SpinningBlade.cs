@@ -14,11 +14,11 @@ public class SpinningBlade : Weapon {
 		index = (int)WeaponIds.SpinningBlade;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpinningBlade;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 20;
+		weaponSlotIndex = (int)SlotIndex.SBlade;
 		killFeedIndex = 43;
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 		damage = "2/2";
-		effect = "Goes back after some time on screen.";
+		effect = "Goes back after some time on screen.\nCharged: Spins around X.";
 		hitcooldown = "0/0.5";
 		Flinch = "0/26";
 		FlinchCD = "0/1";

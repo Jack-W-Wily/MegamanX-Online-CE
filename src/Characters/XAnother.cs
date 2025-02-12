@@ -11,6 +11,7 @@ public class XAnother : MegamanX {
 	) {
 		
 		charId = CharIds.XAnother;
+		player.superAmmo = 0;
 	}
 	public override bool normalCtrl() {
 		

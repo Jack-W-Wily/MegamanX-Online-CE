@@ -38,9 +38,9 @@ public class FlameBurner : AxlWeapon {
 		Point bulletDir = Point.createFromAngle(angle);
 		if (chargeLevel < 3) {
 			if (player.character?.isUnderwater() == false) {
-				new FlameBurnerProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
+				/*new FlameBurnerProj(weapon, bulletPos, xDir, player, bulletDir, netId, sendRpc: true);
 				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(5)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
-				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(10)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);
+				new FlameBurnerProj(weapon, bulletPos.add(bulletDir.times(10)), xDir, player, Point.createFromAngle(angle + Helpers.randomRange(-10, 10)), player.getNextActorNetId(), sendRpc: true);*/
 			}
 			RPC.playSound.sendRpc(shootSounds[0], player.character?.netId);
 		} else {
@@ -57,16 +57,18 @@ public class FlameBurner : AxlWeapon {
 
 public class FlameBurnerProj : Projectile {
 	bool hitWall;
+	public Anim particle;
+	float partTime;
 	public FlameBurnerProj(Weapon weapon, Point pos, int xDir, Player player, Point bulletDir, ushort netProjId, bool sendRpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, "flameburner_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, xDir, player, "x8_axl_fburner_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.FlameBurner;
 		maxTime = 0.3f;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			projId = (int)ProjIds.FlameBurnerHyper;
 		}
-		vel.x = bulletDir.x * speed;
-		vel.y = bulletDir.y * speed;
-		byteAngle = Helpers.randomRange(0, 360);
+		vel.x = bulletDir.x * speed * xDir;
+		vel.y = bulletDir.y * speed * yDir;
+		//byteAngle = Helpers.randomRange(360, 360);
 		collider.wallOnly = true;
 		isOwnerLinked = true;
 		if (player?.character != null) {
@@ -79,26 +81,33 @@ public class FlameBurnerProj : Projectile {
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, player, netProjId, bulletDir.byteAngle);
 		}
-		updateAngle();
 	}
 	public void updateAngle() {
 		byteAngle = vel.byteAngle;
 	}
 	public override void update() {
 		base.update();
-		float progress = (time / maxTime);
-		if (!Options.main.lowQualityParticles()) {
+		updateAngle();
+		/*	partTime += Global.spf;
+		if (partTime > 0.033f) {
+			partTime = 0;
+			particle = new Anim(pos,"x8_axl_fburner_particle", xDir, owner.getNextActorNetId(),true, true);
+			particle.setzIndex(zIndex - 100);
+
+		}
+		//float progress = (time / maxTime);
+		/*if (!Options.main.lowQualityParticles()) {
 			alpha = 1f - (progress / 1.5f);
 			xScale = 1f + progress * 1.5f;
 			yScale = 1f + progress * 1.5f;
-		}
+		}*/
 	}
 
-	public override void onHitDamagable(IDamagable damagable) {
+	/*public override void onHitDamagable(IDamagable damagable) {
 		var character = damagable as Character;
 		if (maxTime < 0.475f) maxTime = 0.475f;
 		stopMoving();
-	}
+	}*/
 
 	public override void onHitWall(CollideData other) {
 		if (!ownedByLocalPlayer) return;

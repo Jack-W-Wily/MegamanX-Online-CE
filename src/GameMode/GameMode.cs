@@ -830,7 +830,7 @@ public class GameMode {
 			);
 		} else if (Global.serverClient != null && Global.serverClient.isLagging() && hudErrorMsgTime == 0) {
 			Fonts.drawText(
-				FontType.RedishOrange, Helpers.controlText("Connectivity issues detected."),
+				FontType.Red, Helpers.controlText("ES 4DR14N!!!"),
 				Global.halfScreenW, 50, Alignment.Center
 			);
 		} else if (mainPlayer?.character is ViralSigma viralSigma && viralSigma.possessTarget != null) {
@@ -1440,6 +1440,8 @@ public class GameMode {
 			frameIndex = (int)CharHpBarIndex.BlackZero;
 		}if(player.character is AxlWC awc && awc.isWhite){
 			frameIndex = (int)CharHpBarIndex.WhiteAxl;
+		}if (player.charNum == (int)CharIds.Iris) {
+			frameIndex = (int)CharHpBarIndex.Iris;
 		}
 		
 		if (player.isDisguisedAxl) frameIndex = 3;
@@ -1550,7 +1552,7 @@ public class GameMode {
 
 			// 2-layer health
 			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {
-				Global.sprites["hud_bars_generic"].drawToHUD(2, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
 			}
 
 			baseY -= 2;
@@ -1564,7 +1566,7 @@ public class GameMode {
 	public void renderSBodyHealth(Player player, HUDHealthPosition position) {
 		if (player.sClone == null) return;
 
-		string spriteName = "hud_health_base_sbody";
+		string spriteName = "hud_bars_char_hp";
 		float health = player.sClone.health;
 		float maxHealth = player.sClone.maxHealth;
 		float damageSavings = 0;
@@ -1573,7 +1575,7 @@ public class GameMode {
 			//damageSavings = MathInt.Floor(player.sClone.damageSavings);
 		}
 
-		int frameIndex = player.charNum;
+		int frameIndex = (int)CharHpBarIndex.SoulBody;
 
 		var hudHealthPosition = getHUDHealthPosition(position, false);
 		float baseX = hudHealthPosition.x;
@@ -1582,23 +1584,23 @@ public class GameMode {
 		baseY += 25;
 		string healthBaseSprite = spriteName;
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
-		baseY -= 16;
+		baseY -= 14;
 		int barIndex = 0;
 
 		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
 			// Draw HP
 			if (i < MathF.Ceiling(health)) {
-				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
 			} else if (i < MathInt.Ceiling(health) + damageSavings) {
-				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 			} else {
-				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 			}
 
 			baseY -= 2;
 		}
 
-		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+		Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
 	}
 	const int grayAmmoIndex = 7;
 	public void renderAmmo(
@@ -2103,7 +2105,7 @@ public class GameMode {
 		}
 		if (player.character is MegamanX mmx && mmx.hasFgMoveEquipped() && mmx.canAffordFgMove()) {
 			int x = gigaWeaponX, y = 159;
-			Global.sprites["hud_weapon_icon"].drawToHUD(mmx.hasHadoukenEquipped() ? 112 : 113, x, y);
+			Global.sprites["hud_bars_slot"].drawToHUD(mmx.hasHadoukenEquipped() ? (int)SlotIndex.Hadouken : (int)SlotIndex.Shoryuken, x, y);
 			float cooldown = Helpers.progress(player.fgMoveAmmo, 1920f);
 			drawWeaponSlotCooldown(x, y, cooldown);
 		}
@@ -2148,7 +2150,7 @@ public class GameMode {
 
 				drawWeaponSlot(weapon, x, y);
 
-				//Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, x, y);
+				//Global.sprites["hud_bars_slot"].drawToHUD(weapon.weaponSlotIndex, x, y);
 				//DrawWrappers.DrawRectWH(
 					//x - 8, y - 8, 16, 16 - MathF.Floor(16 * (weapon.ammo / weapon.maxAmmo)),
 					//true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false
@@ -2215,8 +2217,8 @@ public class GameMode {
 			}
 			if (level.mainPlayer.weapon == weapon && !level.mainPlayer.isSelectingCommand()) {
 				DrawWrappers.DrawRectWH(
-					x - 7, y - 8, 14, 15, false,
-					Color.Black, 1, ZIndex.HUD, false
+					x - 5, y - 6, 10, 11, false,
+					Color.Black, 2, ZIndex.HUD, false
 				);
 				drawWeaponSlot(weapon, x, y-1, true);
 			} else {
@@ -2239,7 +2241,7 @@ public class GameMode {
 	}
 
 	public void drawGigaWeaponCooldown(int slotIndex, float cooldown, int x = 11, int y = 159) {
-		Global.sprites["hud_weapon_icon"].drawToHUD(slotIndex, x, y);
+		Global.sprites["hud_bars_slot"].drawToHUD(slotIndex, x, y);
 		drawWeaponSlotCooldown(x, y, cooldown);
 	}
 
@@ -2247,11 +2249,11 @@ public class GameMode {
 		if (weapon is MechMenuWeapon && !mainPlayer.isSpectator && level.mainPlayer.character?.linkedRideArmor != null) {
 			int index = 37 + level.mainPlayer.character.linkedRideArmor.raNum;
 			if (index == 42) index = 119;
-			Global.sprites["hud_weapon_icon"].drawToHUD(index, x, y);
+			Global.sprites["hud_bars_slot"].drawToHUD(index, x, y);
 		} else if (weapon is MechMenuWeapon && level.mainPlayer.isSelectingRA()) {
 			return;
 		} else if (weapon is not AbsorbWeapon) {
-			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, x, y);
+			Global.sprites["hud_bars_slot"].drawToHUD(weapon.weaponSlotIndex, x, y);
 		}
 		if (selected) {
 			if (!weapon.canShoot(0, mainPlayer)) {
@@ -2324,13 +2326,13 @@ public class GameMode {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
-				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-				drawWeaponSlotCooldown(x, y, mw.shootCooldown / MaverickWeapon.summonerCooldown);
+				drawWeaponSlotAmmo(x, y + 1, mHealth / mMaxHealth);
+				drawWeaponSlotCooldown(x, y + 1, mw.shootCooldown / MaverickWeapon.summonerCooldown);
 			} else if (level.mainPlayer.isPuppeteer()) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
-				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
+				drawWeaponSlotAmmo(x, y + 1, mHealth / mMaxHealth);
 			} else if (level.mainPlayer.isStriker()) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
@@ -2338,24 +2340,26 @@ public class GameMode {
 					mHealth = 0;
 				}
 
-				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-				drawWeaponSlotCooldown(x, y, mw.cooldown / MaverickWeapon.strikerCooldown);
+				drawWeaponSlotAmmo(x, y + 1, mHealth / mMaxHealth);
+				drawWeaponSlotCooldown(x, y + 1, mw.cooldown / MaverickWeapon.strikerCooldown);
 			} else if (level.mainPlayer.isTagTeam()) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
-				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-				drawWeaponSlotCooldown(x, y, mw.cooldown / MaverickWeapon.tagTeamCooldown);
+				drawWeaponSlotAmmo(x, y + 1, mHealth / mMaxHealth);
+				drawWeaponSlotCooldown(x, y + 1, mw.cooldown / MaverickWeapon.tagTeamCooldown);
 			}
 
 			if (mw is ChillPenguinWeapon) {
 				for (int i = 0; i < mainPlayer.iceStatues.Count; i++) {
-					Global.sprites["hud_ice_statue"].drawToHUD(0, x - 3 + (i * 6), y + 10);
+					Global.sprites["hud_bars_slot"].drawToHUD((int)SlotIndex.CPIceStatue, x - 182 + (i * 15), y - 46);
 				}
 			}
 
-			if (mw is DrDopplerWeapon ddw && ddw.ballType == 1) {
-				Global.sprites["hud_doppler_weapon"].drawToHUD(ddw.ballType, x + 4, y + 4);
+			if (mw is DrDopplerWeapon ddw) {
+				int index = (int)SlotIndex.DrDShock;
+				if(ddw.ballType == 1) index = (int)SlotIndex.DrDVaccine;
+				Global.sprites["hud_bars_slot"].drawToHUD(index, x, y - 15);
 			}
 
 			if (mw is WireSpongeWeapon && level.mainPlayer.seeds.Count > 0) {
@@ -2413,7 +2417,7 @@ public class GameMode {
 			float scaleX = Helpers.clampMax(10f / w, 1);
 			float scaleY = Helpers.clampMax(10f / h, 1);
 
-			Global.sprites["hud_weapon_icon"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
+			Global.sprites["hud_bars_slot"].draw(weapon.weaponSlotIndex, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, 1, 1, ZIndex.HUD);
 			Global.sprites[aw.absorbedProj.sprite.name].draw(0, Global.level.camX + x, Global.level.camY + y, 1, 1, null, 1, scaleX, scaleY, ZIndex.HUD);
 		}
 
@@ -2421,13 +2425,13 @@ public class GameMode {
 
 	private void drawWeaponStateOverlay(float x, float y, int type) {
 		Color cooldownColour = type switch {
-			1 => new Color(255, 212, 128, 128),
-			2 => new Color(255, 128, 128, 128),
-			_ => new Color(128, 255, 128, 128),
+			1 => new Color(255, 212, 128, 198),
+			2 => new Color(255, 128, 128, 198),
+			_ => new Color(128, 255, 128, 198),
 		};
 		DrawWrappers.DrawRectWH(
-			x - 6f, y - 6f,
-			12f, 12f, filled: false,
+			x - 5f, y - 5f,
+			10f, 10f, filled: false,
 			cooldownColour, 1,
 			1000000L, isWorldPos: false
 		);
@@ -2440,21 +2444,21 @@ public class GameMode {
 	}
 
 	private void drawWeaponSlotSelected(float x, float y) {
-		DrawWrappers.DrawRectWH(x - 7, y - 7, 14, 14, false, new Color(0, 224, 0), 1, ZIndex.HUD, false);
+		DrawWrappers.DrawRectWH(x - 5	, y - 5, 10, 10, false, new Color(0, 224, 0), 1, ZIndex.HUD, false);
 	}
 
 	private void drawWeaponSlotAmmo(float x, float y, float val) {
-		DrawWrappers.DrawRectWH(x - 8, y - 8, 16, 16 - MathF.Floor(16 * val), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
+		DrawWrappers.DrawRectWH(x - 6, y - 6, 12, 12 - MathF.Floor(14 * val), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
 	}
 
 	public static void drawWeaponSlotCooldownBar(float x, float y, float val, bool isAlt = false) {
 		if (val <= 0) return;
 		val = Helpers.clamp01(val);
 
-		float yPos = -8.5f;
-		if (isAlt) yPos = 8.5f;
-		DrawWrappers.DrawLine(x - 8, y + yPos, x + 8, y + yPos, Color.Black, 1, ZIndex.HUD, false);
-		DrawWrappers.DrawLine(x - 8, y + yPos, x - 8 + (val * 16), y + yPos, Color.Yellow, 1, ZIndex.HUD, false);
+		float yPos = -6.5f;
+		if (isAlt) yPos = 6.5f;
+		DrawWrappers.DrawLine(x - 8, y + yPos, x + 6, y + yPos, Color.Black, 1, ZIndex.HUD, false);
+		DrawWrappers.DrawLine(x - 8, y + yPos, x - 6 + (val * 14), y + yPos, Color.Yellow, 1, ZIndex.HUD, false);
 	}
 
 	public static void drawWeaponSlotCooldown(float x, float y, float val) {
@@ -2465,11 +2469,11 @@ public class GameMode {
 		if (Options.main.particleQuality == 0) sliceStep = 4;
 		if (Options.main.particleQuality == 1) sliceStep = 2;
 
-		int gridLen = 16 / sliceStep;
-		List<Point> points = new List<Point>(gridLen * 4);
+		int gridLen = 14 / sliceStep;
+		List<Point> points = new List<Point>(gridLen * 2);
 
 		int startX = 0;
-		int startY = -8;
+		int startY = -6;
 
 		int xDir = -1;
 		int yDir = 0;
@@ -2479,19 +2483,19 @@ public class GameMode {
 			startX += sliceStep * xDir;
 			startY += sliceStep * yDir;
 
-			if (xDir == -1 && startX == -8) {
+			if (xDir == -1 && startX == -6) {
 				xDir = 0;
 				yDir = 1;
 			}
-			if (yDir == 1 && startY == 8) {
+			if (yDir == 1 && startY == 6) {
 				yDir = 0;
 				xDir = 1;
 			}
-			if (xDir == 1 && startX == 8) {
+			if (xDir == 1 && startX == 6) {
 				xDir = 0;
 				yDir = -1;
 			}
-			if (yDir == -1 && startY == -8) {
+			if (yDir == -1 && startY == -6) {
 				xDir = -1;
 				yDir = 0;
 			}
@@ -2608,7 +2612,7 @@ public class GameMode {
 		foreach (var weapon in weapons) {
 			float slotX = wx + (counter * 15);
 			float slotY = sy;
-			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, slotX, slotY);
+			Global.sprites["hud_bars_slot"].drawToHUD(weapon.weaponSlotIndex, slotX, slotY);
 			float ammo = weapon.ammo;
 			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is CFlasher || weapon is DarkHoldWeapon) ammo = dnaCore.rakuhouhaAmmo;
 			if (weapon is not MechMenuWeapon) {
@@ -2702,9 +2706,9 @@ public class GameMode {
 		for (int i = 0; i < maxIndex; i++) {
 			float x = startX;
 			float y = startY - (i * height);
-			int iconIndex = 37 + i;
-			if (i == 4 && isMK5) iconIndex = 119;
-			Global.sprites["hud_weapon_icon"].drawToHUD(iconIndex, x, y);
+			int iconIndex = 66 + i;
+			if (i == 4 && isMK5) iconIndex = 71;
+			Global.sprites["hud_bars_slot"].drawToHUD(iconIndex, x, y);
 		}
 
 		for (int i = 0; i < maxIndex; i++) {
@@ -2745,36 +2749,36 @@ public class GameMode {
 		}
 
 		string netcodePingStr = "";
-		int iconXPos = 280;
+		int iconXPos = 330;
 		if (level.server.netcodeModel == NetcodeModel.FavorAttacker) {
 			netcodePingStr = "<" + level.server.netcodeModelPing.ToString();
-			if (level.server.netcodeModelPing < 100) iconXPos = 260;
-			else iconXPos = 253;
+			if (level.server.netcodeModelPing < 100) iconXPos = 330;
+			else iconXPos = 335;
 		}
 		Fonts.drawText(
 			FontType.DarkPurple, netcodePingStr,
-			Global.screenW - 12, top2 + 22, Alignment.Right
+			Global.screenW - 12, top2 + 23, Alignment.Right
 		);
-		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, iconXPos, top2 + 26);
+		Global.sprites["hud_netcode"].drawToHUD((int)level.server.netcodeModel, iconXPos, top2 + 28);
 		if (Global.level.server.isLAN) {
 			Fonts.drawText(
 				FontType.DarkPurple, "IP: " + Global.level.server.ip,
-				Global.screenW - 12, top2 + 32, Alignment.Right
+				Global.screenW - 12, top2 + 33, Alignment.Right
 			);
 		}
 	}
 
 	public virtual void drawScoreboard() {
 		int padding = 16;
-		int top = 16;
+		int top = 12;
 		int col1x = padding;
 		int col2x = (int)Math.Floor(Global.screenW * 0.33);
 		int col3x = (int)Math.Floor(Global.screenW * 0.475);
 		int col4x = (int)Math.Floor(Global.screenW * 0.65);
 		int col5x = (int)Math.Floor(Global.screenW * 0.85);
 		int lineY = padding + 20;
-		var labelTextY = lineY + 2;
-		int line2Y = lineY + 12;
+		var labelTextY = lineY + 3;
+		int line2Y = lineY + 15;
 		int topPlayerY = line2Y + 2;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
@@ -2785,10 +2789,10 @@ public class GameMode {
 			_ => Global.level.server.gameMode
 		};
 		Fonts.drawText(FontType.BlueMenu, modeText, padding, top);
-		drawMapName(padding, top + 10);
+		drawMapName(padding, top + 12);
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top + 10
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top
 			);
 			drawNetcodeData();
 		}
@@ -2836,8 +2840,43 @@ public class GameMode {
 			if (Global.serverClient != null) {
 				Fonts.drawText(FontType.Blue, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left);
 			}
+			int frameIndex = 0;
+		if (player.charNum == (int)CharIds.XAnother) {
+			frameIndex = (int)CharHpBarIndex.XAnother;
+		}if (player.charNum == (int)CharIds.PunchyZero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.BusterZero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.Zero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX1;
+		}if (player.charNum == (int)CharIds.Vile) {
+			frameIndex = (int)CharHpBarIndex.Vile;
+		}if (player.charNum == (int)CharIds.AxlWC) {
+			frameIndex = (int)CharHpBarIndex.AxlWC;
+		}if (player.charNum == (int)CharIds.AxlAnother) {
+			frameIndex = (int)CharHpBarIndex.AxlX8;
+		}if (player.charNum == (int)CharIds.Sigma) {
+			frameIndex = (int)CharHpBarIndex.Sigma;
+		}if (player.charNum == (int)CharIds.Sigma && 
+			Options.main.sigmaLoadout.sigmaForm == 3){
+			frameIndex = (int)CharHpBarIndex.Doppler;
+		}if (player.charNum == (int)CharIds.GBD) {
+			frameIndex = (int)CharHpBarIndex.GBD;
+		}if (player.charNum == (int)CharIds.Dynamo) {
+			frameIndex = (int)CharHpBarIndex.Dynamo;
+		}if (player.charNum == (int)CharIds.Dragoon) {
+			frameIndex = (int)CharHpBarIndex.Dragoon;
+		}if (player.charNum == (int)CharIds.Zain) {
+			frameIndex = (int)CharHpBarIndex.Zain;
+		}if(player.character is Zero zero && zero.isBlack){
+			frameIndex = (int)CharHpBarIndex.BlackZero;
+		}if(player.character is AxlWC awc && awc.isWhite){
+			frameIndex = (int)CharHpBarIndex.WhiteAxl;
+		}if (player.charNum == (int)CharIds.Iris) {
+			frameIndex = (int)CharHpBarIndex.Iris;
+		}
 
-			Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH);
+			Global.sprites[getCharIcon(player)].drawToHUD(frameIndex, col2x + 4, topPlayerY + i * rowH);
 		}
 		//drawSpectators();
 	}
@@ -2867,11 +2906,11 @@ public class GameMode {
 			_ => Global.level.server.gameMode
 		};
 		Fonts.drawText(FontType.BlueMenu, textMode, padding, top);
-		drawMapName(padding, top + 10);
+		drawMapName(padding, top + 12);
 
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top + 10
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 155, top
 			);
 			drawNetcodeData();
 		}
@@ -2916,7 +2955,7 @@ public class GameMode {
 				teamFonts[i], $"{teamNames[i]}: {Global.level.gameMode.teamPoints[i]}"
 			);
 		}
-		drawSpectators();
+	//	drawSpectators();
 	}
 
 	public void drawTeamMiniScore((int x, int y) pos, int alliance, FontType color, string title) {
@@ -2935,14 +2974,15 @@ public class GameMode {
 			new Color(255, 255, 255, 128), 0, ZIndex.HUD, false
 		);
 
-		Fonts.drawText(color, title, cols[0] + 12, rows[0]);
-		Fonts.drawText(FontType.Orange, "Player", cols[0] + 12, rows[1]);
-		Fonts.drawText(FontType.Orange, "K", cols[1], rows[1]);
-		Fonts.drawText(FontType.Orange, isTE ? "L" : "D", cols[2], rows[1]);
-		if (Global.serverClient != null) {
+		Fonts.drawText(color, title, cols[0] + 12, rows[0] - 3);
+		Fonts.drawText(FontType.Orange, "Player", cols[0] + 12, rows[1] - 2);
+		Fonts.drawText(FontType.Orange, "K", cols[2], rows[1] - 2);
+		Fonts.drawText(FontType.Orange, isTE ? "L" : "D", cols[3], rows[1] - 2);
+		/*if (Global.serverClient != null) {
 			Fonts.drawText(FontType.Orange, "P", cols[3], rows[1]);
-		}
+		}-**/	
 		// Player draw
+		
 		Player[] players = level.players.Where(p => p.alliance == alliance && !p.isSpectator).ToArray();
 		for (var i = 0; i < players.Length && i <= 14; i++) {
 			Player player = players[i];
@@ -2955,16 +2995,53 @@ public class GameMode {
 				Fonts.drawText(FontType.Grey, "B", cols[0] - 8, posY);
 			}
 
-			Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, cols[0] + 5, posY - 2);
+		int frameIndex = 0;
+		if (player.charNum == (int)CharIds.XAnother) {
+			frameIndex = (int)CharHpBarIndex.XAnother;
+		}if (player.charNum == (int)CharIds.PunchyZero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.BusterZero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.Zero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX1;
+		}if (player.charNum == (int)CharIds.Vile) {
+			frameIndex = (int)CharHpBarIndex.Vile;
+		}if (player.charNum == (int)CharIds.AxlWC) {
+			frameIndex = (int)CharHpBarIndex.AxlWC;
+		}if (player.charNum == (int)CharIds.AxlAnother) {
+			frameIndex = (int)CharHpBarIndex.AxlX8;
+		}if (player.charNum == (int)CharIds.Sigma) {
+			frameIndex = (int)CharHpBarIndex.Sigma;
+		}if (player.charNum == (int)CharIds.Sigma && 
+			Options.main.sigmaLoadout.sigmaForm == 3){
+			frameIndex = (int)CharHpBarIndex.Doppler;
+		}if (player.charNum == (int)CharIds.GBD) {
+			frameIndex = (int)CharHpBarIndex.GBD;
+		}if (player.charNum == (int)CharIds.Dynamo) {
+			frameIndex = (int)CharHpBarIndex.Dynamo;
+		}if (player.charNum == (int)CharIds.Dragoon) {
+			frameIndex = (int)CharHpBarIndex.Dragoon;
+		}if (player.charNum == (int)CharIds.Zain) {
+			frameIndex = (int)CharHpBarIndex.Zain;
+		}if(player.character is Zero zero && zero.isBlack){
+			frameIndex = (int)CharHpBarIndex.BlackZero;
+		}if(player.character is AxlWC awc && awc.isWhite){
+			frameIndex = (int)CharHpBarIndex.WhiteAxl;
+		}if (player.charNum == (int)CharIds.Iris) {
+			frameIndex = (int)CharHpBarIndex.Iris;
+		}
+
+			Global.sprites[getCharIcon(player)].drawToHUD(frameIndex, cols[0] + 5, posY - 2);
 			Fonts.drawText(charColor, player.name, cols[0] + 12, posY);
-			Fonts.drawText(FontType.Blue, player.kills.ToString(), cols[1], posY);
-			Fonts.drawText(FontType.Red, player.getDeathScore().ToString(), cols[2], posY);
+			Fonts.drawText(FontType.Blue, player.kills.ToString(), cols[2], posY);
+			Fonts.drawText(FontType.Red, player.getDeathScore().ToString(), cols[3], posY);
 
 			if (Global.serverClient != null) {
 				Fonts.drawText(FontType.Grey, player.getTeamDisplayPing(), cols[3], posY);
 			}
 		}
 	}
+	
 
 	private void drawMapName(int x, int y) {
 		string displayName = "Map: " + level.levelData.displayName.Replace("_mirrored", "");
@@ -2991,27 +3068,62 @@ public class GameMode {
 
 	public FontType getCharFont(Player player) {
 		if (player.isDead && !isOver) {
-			return FontType.Grey;
+			return getDiedCharFont(player);
 		} else if (player.eliminated()) {
 			return FontType.DarkOrange;
 		} else if (player.isX) {
 			return FontType.Blue;
-		} else if (player.isZero) {
+		} else if (player.isXAnother) {
+			return FontType.DarkBlue;
+		} else if (player.isZero || player.isPunchyZero || 
+			player.charNum == (int)CharIds.BusterZero ||
+			player.charNum == (int)CharIds.Dragoon) {
 			return FontType.Red;
-		} else if (player.charNum == (int)CharIds.AxlWC || player.charNum == (int)CharIds.AxlAnother) {
+		} else if (player.charNum == (int)CharIds.AxlWC || 
+			player.charNum == (int)CharIds.AxlAnother ||
+			player.charNum == (int)CharIds.Zain) {
 			return FontType.Yellow;
 		} else if (player.isVile) {
-			return FontType.Pink;
+			return FontType.Purple;
 		} else if (player.isSigma) {
+			return FontType.DarkGreen;
+		} else if (player.charNum == (int)CharIds.GBD) {
 			return FontType.Green;
+		} else if (player.charNum == (int)CharIds.Dynamo){
+			return FontType.Grey;
+		} else if (player.charNum == (int)CharIds.Iris){
+			return FontType.Pink;
 		}
 		return FontType.Grey;
 	}
+	public FontType getDiedCharFont(Player player) {
+		if (player.isX || player.isXAnother) {
+			return FontType.DiedBlue;
+		} else if (player.isZero || player.isPunchyZero || 
+			player.charNum == (int)CharIds.BusterZero ||
+			player.charNum == (int)CharIds.Dragoon) {
+			return FontType.DiedRed;
+		} else if (player.charNum == (int)CharIds.AxlWC || 
+			player.charNum == (int)CharIds.AxlAnother ||
+			player.charNum == (int)CharIds.Zain) {
+			return FontType.DiedYellow;
+		} else if (player.isVile) {
+			return FontType.DiedPurple;
+		} else if (player.isSigma || player.charNum == (int)CharIds.GBD) {
+			return FontType.DiedGreen;
+		} else if (player.charNum == (int)CharIds.Dynamo){
+			return FontType.DiedGray;
+		} else if (player.charNum == (int)CharIds.Iris){
+			return FontType.DiedPink;
+		}
+		return FontType.DiedGray;
+	}
 
 	public string getCharIcon(Player player) {
-		return "char_icon";
+		//return "char_icon";
 		if (isOver) return "char_icon";
-		return player.isDead ? "char_icon_dead" : "char_icon";
+		if (player.isDead)return "char_icon_dead";
+		return "char_icon";
 	}
 
 	public static string getTeamName(int alliance) {
@@ -3203,7 +3315,7 @@ public class GameMode {
 				}
 			} else if (level.mainPlayer.canReviveSigma(out _)) {
 				Fonts.drawText(
-					FontType.BlueMenu, respawnStr,
+					FontType.DarkGreen, respawnStr,
 					Global.screenW / 2, -10 + Global.screenH / 2, Alignment.Center
 				);
 				string hyperType = "Kaiser";
@@ -3215,8 +3327,28 @@ public class GameMode {
 					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);
 			} else {
+					FontType fontColor = FontType.BlueBig;
+					/*Player player;
+					int charId = player.charNum;*/
+					if(mainPlayer.charNum == (int)CharIds.Zero || mainPlayer.charNum == (int)CharIds.BusterZero || mainPlayer.charNum == (int)CharIds.PunchyZero || mainPlayer.charNum == (int)CharIds.Dragoon){
+						fontColor = FontType.RedBig;
+					}if(mainPlayer.charNum == (int)CharIds.Vile){
+						fontColor = FontType.PurpleBig;
+					}if(mainPlayer.charNum == (int)CharIds.Sigma){
+						fontColor = FontType.DarkGreenBig;
+					}if( mainPlayer.charNum == (int)CharIds.GBD){
+						fontColor = FontType.GreenBig;
+					}if(mainPlayer.charNum == (int)CharIds.AxlWC || mainPlayer.charNum == (int)CharIds.AxlAnother || mainPlayer.charNum == (int)CharIds.Zain){
+						fontColor = FontType.YellowBig;
+					}if(mainPlayer.charNum == (int)CharIds.Dynamo){
+						fontColor = FontType.GrayBig;
+					}if(mainPlayer.charNum == (int)CharIds.Iris){
+						fontColor = FontType.Pink;
+					}if(mainPlayer.charNum == (int)CharIds.XAnother){
+						fontColor = FontType.DarkBlueBig;
+					}
 				Fonts.drawText(
-					FontType.BlueMenu, respawnStr,
+					fontColor, respawnStr,
 					Global.screenW / 2, Global.screenH / 2, Alignment.Center
 				);
 			}
@@ -3226,8 +3358,28 @@ public class GameMode {
 				for (int i = 0; i < level.mainPlayer.randomTip.Length; i++) {
 					var line = level.mainPlayer.randomTip[i];
 					if (i == 0) line = "Tip: " + line;
+					FontType fontColor = FontType.Blue;
+					/*Player player;
+					int charId = player.charNum;*/
+					if(mainPlayer.charNum == (int)CharIds.Zero || mainPlayer.charNum == (int)CharIds.BusterZero || mainPlayer.charNum == (int)CharIds.PunchyZero || mainPlayer.charNum == (int)CharIds.Dragoon){
+						fontColor = FontType.Red;
+					}if(mainPlayer.charNum == (int)CharIds.Vile){
+						fontColor = FontType.Purple;
+					}if(mainPlayer.charNum == (int)CharIds.Sigma){
+						fontColor = FontType.DarkGreen;
+					}if(mainPlayer.charNum == (int)CharIds.GBD){
+						fontColor = FontType.Green;
+					}if(mainPlayer.charNum == (int)CharIds.AxlWC || mainPlayer.charNum == (int)CharIds.AxlAnother || mainPlayer.charNum == (int)CharIds.Zain){
+						fontColor = FontType.Yellow;
+					}if(mainPlayer.charNum == (int)CharIds.Dynamo){
+						fontColor = FontType.LightGrey;
+					}if(mainPlayer.charNum == (int)CharIds.Iris){
+						fontColor = FontType.Pink;
+					}if(mainPlayer.charNum == (int)CharIds.XAnother){
+						fontColor = FontType.DarkBlue;
+					}
 					Fonts.drawText(
-						FontType.BlueMenu, line,
+						fontColor, line,
 						Global.screenW / 2, (Global.screenH / 2) + 45 + (12 * i), Alignment.Center
 					);
 				}

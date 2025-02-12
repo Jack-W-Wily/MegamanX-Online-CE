@@ -12,11 +12,11 @@ public class SonicSlicer : Weapon {
 		index = (int)WeaponIds.SonicSlicer;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SonicSlicer;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 13;
+		weaponSlotIndex = (int)SlotIndex.SSlicer;
 		killFeedIndex = 24;
 		weaknessIndex = (int)WeaponIds.CrystalHunter;
 		damage = "2/4";
-		effect = "U: Bounces on Wall. Breaks W.Sponge Shield.\nC: Decreases vertical speed drastically.";
+		effect = "U: Bounces on Wall. \nBreaks W.Sponge Shield.\nC: Decreases vertical speed drastically.";
 		hitcooldown = "0/0.25";
 		Flinch = "0/26";
 		type = index;

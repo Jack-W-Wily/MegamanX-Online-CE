@@ -40,7 +40,7 @@ public class InGameMainMenu : IMainMenu {
 				} else if (selectedCharNum == (int)CharIds.Sigma) {
 					Menu.change(new SelectSigmaWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.AxlWC || selectedCharNum == (int)CharIds.AxlAnother) {
-					Menu.change(new SelectAxlWeaponMenu(this, true));
+					Menu.change(new AxlWCWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.Vile) {
 					Menu.change(new SelectVileWeaponMenu(this, true));
 				} else if (selectedCharNum == (int)CharIds.Zero) {

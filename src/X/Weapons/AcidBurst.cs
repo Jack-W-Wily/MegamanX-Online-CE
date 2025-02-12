@@ -12,12 +12,12 @@ public class AcidBurst : Weapon {
 		index = (int)WeaponIds.AcidBurst;
 		weaponBarBaseIndex = (int)WeaponBarIndex.AcidBurst;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 17;
+		weaponSlotIndex = (int)SlotIndex.ABurst;
 		killFeedIndex = 40;
 		
 		weaknessIndex = (int)WeaponIds.FrostShield;
 		damage = "1/1";
-		effect = "DOT: 2+1/3+1. Reduces Enemy Defense. Acid DMG \nstops when cured or immersed in water. Doesn't Assists.";
+		effect = "Acid DOT: 2+1/3+1. \nReduces Enemy Defense; Acid stops \nwhen cured or immersed in water. \nDoesn't Assists.";
 		type = index;
 		displayName = "Acid Burst ";
 	}

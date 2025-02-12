@@ -12,14 +12,14 @@ public class DoubleCyclone : Weapon {
 		shootSounds = new string[] { "fakeDoubleCyclone", "fakeDoubleCyclone", "fakeDoubleCyclone", "twinSlasherCharged", "twinSlasherCharged" };
 		fireRate = 75;
 		index = (int)WeaponIds.DoubleCyclone;
-		weaponSlotIndex = 118;
-		killFeedIndex = 168;
+		weaponSlotIndex = (int)SlotIndex.DCyclone;
+		killFeedIndex = 187;
 		weaponBarBaseIndex = (int)WeaponBarIndex.DoubleCyclone;
 		weaponBarIndex = weaponBarBaseIndex;
 		
 		weaknessIndex = (int)WeaponIds.AimingLaser;
 		damage = "2/2";
-		effect = ".";
+		effect = "Shoots a projectile that lifts enemies.\nShoots two projectiles.\nShoots two tornadoes that flinches\nand pushes.";
 		hitcooldown = "0/0.5";
 		Flinch = "0/26";
 		FlinchCD = "0/1";

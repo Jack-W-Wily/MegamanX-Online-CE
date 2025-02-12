@@ -11,14 +11,14 @@ public class StormTornado : Weapon {
 		killFeedIndex = 5;
 		weaponBarBaseIndex = (int)WeaponBarIndex.StormTornado;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 5;
+		weaponSlotIndex = (int)SlotIndex.STornado;
 		weaknessIndex = (int)WeaponIds.ChameleonSting;
 		shootSounds = new string[] { "tornado", "tornado", "tornado", "buster3", "tornado" };
 		fireRate = 120;
 		//switchCooldown = 0.5f;
 		//switchCooldownFrames = 30;
 		damage = "1/4";
-		effect = "Weak push. Extinguishes Fire. Ignores Shields.\nUncharged won't give assists.";
+		effect = "Weak push. Extinguishes Fire.\nIgnores Shields.\nUncharged won't give assists.";
 		hitcooldown = "0.25/0.33";
 		Flinch = "0/26";
 		FlinchCD = "0/1";

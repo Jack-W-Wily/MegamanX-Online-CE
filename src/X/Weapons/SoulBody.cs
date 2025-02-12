@@ -10,18 +10,19 @@ public class SoulBody : Weapon {
 	public SoulBody() : base() {
 		index = (int)WeaponIds.SoulBody;
 		fireRate = 30;
-		weaponSlotIndex = 125;
+		weaponSlotIndex = (int)SlotIndex.SBody;
         weaponBarBaseIndex = (int)WeaponBarIndex.SoulBody;
         weaponBarIndex = weaponBarBaseIndex;
+		killFeedIndex = 183;
 		displayName = "Soul Body";
 		shootSounds = new string[] {"","buster2X4","buster2X4","SoulBodyAlt",""};
 		weaknessIndex = (int)WeaponIds.LightningWeb;
 		type = index;
-		/* damage = "1/3";
+		damage = "1/3";
 		hitcooldown = "0.5/0.75";
 		Flinch = "0/13";
 		FlinchCD = hitcooldown;
-		effect = "Deals damage on contact. C: Spawns 5 holograms that track enemies."; */
+		effect = "Deals damage on contact. \nC: Spawns 5 holograms that track enemies.";
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {

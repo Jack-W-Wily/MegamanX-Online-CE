@@ -9,6 +9,7 @@ public class ShoryukenWeapon : Weapon {
 		index = (int)WeaponIds.Shoryuken;
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = (int)SlotIndex.Shoryuken;
 		killFeedIndex = 32;
 		type = index;
 		displayName = "Shoryuken ";

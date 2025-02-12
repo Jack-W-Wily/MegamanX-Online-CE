@@ -396,13 +396,9 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			}
 			if (i == 0) {
 				for (int j = 0; j < craftableWeapons.Count; j++) {
-					Global.sprites["hud_weapon_icon"].drawToHUD(
-						craftableWeapons[j].weaponSlotIndex, startX2 + (j * wepW), startY + (i * wepH)
+					Global.sprites["hud_bars_slot"].drawToHUD(
+						1, startX2 + (j * wepW), startY + (i * wepH)
 					);
-					if (Global.level?.mainPlayer != null && mainPlayer.axlBulletTypeBought[j] == false) {
-						//DrawWrappers.DrawRectWH(startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true, new Color(0, 0, 0, 128), 0, ZIndex.HUD, false);
-						Global.sprites["hud_weapon_locked"].drawToHUD(0, startX2 + (j * wepW), startY + (i * wepH));
-					}
 					if (selectedWeaponIndices[i] != j) {
 						DrawWrappers.DrawRectWH(
 							startX2 + (j * wepW) - 7, startY + (i * wepH) - 7,
@@ -414,7 +410,7 @@ public class SelectAxlWeaponMenu : IMainMenu {
 			}
 
 			for (int j = 0; j < 8; j++) {
-				Global.sprites["hud_weapon_icon"].drawToHUD(
+				Global.sprites["hud_bars_slot"].drawToHUD(
 					Weapon.fiToAxlWep(j + 1).weaponSlotIndex, startX2 + (j * wepW), startY + (i * wepH)
 				);
 				if (selectedWeaponIndices[i] != j + 1) {

@@ -74,7 +74,7 @@ public class CharSelection {
 	public int mappedCharMaverick;
 	public string sprite;
 	public int frameIndex;
-	public Point offset = new Point(0, 20);
+	public Point offset = new Point(0, 23);
 
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
@@ -326,16 +326,16 @@ public class SelectCharacterMenu : IMainMenu {
 
 		if (Global.frameCount % 60 < 30) {
 			Fonts.drawText(
-				FontType.Orange, "<", Global.halfScreenW - 60, Global.halfScreenH + 36,
+				FontType.Orange, "<", Global.halfScreenW - 60, Global.halfScreenH + 28,
 				Alignment.Center
 			);
 			Fonts.drawText(
-				FontType.Orange, ">", Global.halfScreenW + 60, Global.halfScreenH + 36,
+				FontType.Orange, ">", Global.halfScreenW + 60, Global.halfScreenH + 28,
 				Alignment.Center
 			);
 		}
 		Fonts.drawText(
-			FontType.Orange, charSelection.name, Global.halfScreenW, Global.halfScreenH + 36,
+			FontType.Orange, charSelection.name, Global.halfScreenW, Global.halfScreenH + 28,
 			alignment: Alignment.Center
 		);
 
@@ -379,24 +379,27 @@ public class SelectCharacterMenu : IMainMenu {
 			(int)CharIds.Dragoon => new string[] {
 				"Shoto styled fighter with burning damage passive."
 			},
+			(int)CharIds.Iris => new string[] {
+				"VAGABUNDA ESTRUPADA ARROMBADA"
+			},
 			_ => new string[] { "ERROR" }
 		};
 		if (description.Length > 0) {
 			DrawWrappers.DrawRect(
-				25, startY + 110, Global.screenW - 25, startY + 132,
+				25, startY + 102, Global.screenW - 25, startY + 125,
 				true, new Color(0, 0, 0, 100), 1, ZIndex.HUD, false, outlineColor: Color.White
 			);
 			for (int i = 0; i < description.Length; i++) {
 				Fonts.drawText(
 					FontType.Green, description[i],
-					Global.halfScreenW, startY + 102 + (10 * (i + 1)), alignment: Alignment.Center
+					Global.halfScreenW, startY + 94 + (10 * (i + 1)), alignment: Alignment.Center
 				);
 			}
 		}
 		if (!isInGame) {
 			Fonts.drawTextEX(
 				FontType.Grey, "[OK]: Continue, [BACK]: Back\n[MLEFT]/[MRIGHT]: Change character",
-				Global.screenW * 0.5f, 182, Alignment.Center
+				Global.screenW * 0.5f, 175, Alignment.Center
 			);
 		} else {
 			if (!Global.isHost) {

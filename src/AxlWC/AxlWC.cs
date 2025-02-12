@@ -9,8 +9,26 @@ namespace MMXOnline;
 
 public class AxlWC : Character {
 	// Weapon data.
+	public Anim chargeAnim;
 	public AxlWeaponWC mainWeapon = null!;
 	public List<AxlWeaponWC> axlWeapons = new();
+	public static List<AxlWeaponWC> getAllSpecialWeapons() {
+		return new List<AxlWeaponWC>() {
+			new RayGunWC(),
+			new BlastLauncherWC(),
+			new BlackArrowWC(),
+			new SpiralMagnumWC(),
+			new PlasmaGunWC(),
+			new BoundBlasterWC(),
+			new IceGattlingWC(),
+			new FlameBurnerWC(),
+		};
+	}
+	public static List<AxlWeaponWC> getAllMainWeapons() {
+		return new List<AxlWeaponWC>() {
+			new AxlBulletWC(),
+		};
+	}
 	public AxlWeaponWC? axlWeapon {
 		get {
 			if (weaponSlot < 0 || weaponSlot >= weapons.Count) {
@@ -24,6 +42,7 @@ public class AxlWC : Character {
 	public bool? shouldDrawArmNet = null;
 	public bool isWhite;
 	public float whiteTime;
+	public float autoChargeCooldown;
 	public float dodgeRollCooldown;
 	public float aiAttackCooldown;
 	public float shootCooldown;
@@ -57,7 +76,9 @@ public class AxlWC : Character {
 		Helpers.decrementFrames(ref shootCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref recoilTime);
+		Helpers.decrementTime(ref autoChargeCooldown);
 		// Weapon input logic.
+		
 		foreach (AxlWeaponWC weapon in axlWeapons) {
 			weapon.preAxlUpdate(this, weapon == axlWeapon);
 		}
@@ -71,10 +92,58 @@ public class AxlWC : Character {
 			turnCooldown = 0;
 		}
 	}
+	public bool checkLockMoveCoditions(){
+		if (!Options.main.moveWhileShooting){
+		if (player.input.isHeld(Control.Shoot, player) || player.input.isPressed(Control.Shoot, player)) return true;
+		if (axlWeapon is not AxlBulletWC && player.input.isHeld(Control.Special1, player)) return true;
+		if (player.input.isPressed(Control.Special1, player)) return true;
+		if (isCharging() && player.input.isPressed(Control.Special1, player)) return true;}
+		return false;
+	}
+	public override bool canMove() {
+		if (checkLockMoveCoditions()) {
+			return false;
+		}
+		return base.canMove();
+	}
 
+	public override int getMaxChargeLevel() {
+		return 2;
+	}
+	public override void chargeGfx() {
+		if (ownedByLocalPlayer) {
+			chargeEffect.stop();
+		}
+		if (isCharging()) {
+			chargeSound.play();
+			if (!sprite.name.Contains("ra_hide")) {
+				int level = getChargeLevel();
+				
+				if(level == 2){
+					if(chargeAnim == null){
+					//	Point animPos = ;
+						chargeAnim = new Anim(getCenterPos(), "x8_axl_charge_part2", 1, null, true);
+						//chargeAnim.setzIndex(zIndex - 100);
+					}
+				addRenderEffect(RenderEffectType.ChargeYellow, 4, 6);
+				}
+			}
+			chargeEffect.update(getChargeLevel(), 5);
+		}}
 	public override void update() {
 		bool wasGrounded = grounded;
 		base.update();
+		if(charState is Die){
+			if(chargeAnim != null){
+				chargeAnim.destroySelf();
+				chargeAnim = null;
+			}
+		}
+		if(isCharging() && getAutoChargeConditions() && player.input.isPressed(Control.Special1, player)){
+			autoChargeCooldown = 0.1f;
+		}
+		if(chargeAnim != null){
+			chargeAnim.changePos(getCenterPos());}
 		// Hypermode music.
 		if (isWhite) {
 			if (musicSource == null) {
@@ -125,6 +194,7 @@ public class AxlWC : Character {
 		// Arm angle.
 		updateArmAngle();
 		// Charge and release charge logic.
+
 		if (!isInDamageSprite()) {
 			chargeLogic(chargeShoot);
 		}
@@ -271,6 +341,9 @@ public class AxlWC : Character {
 		if (oldWeapon == mainWeapon) {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
+			if(chargeAnim != null){
+			chargeAnim.destroySelf();
+			chargeAnim = null;}
 		}
 		turnCooldown = 0;
 		lockDir = false;
@@ -295,7 +368,7 @@ public class AxlWC : Character {
 			// Create the weapon object.
 			armAngle = 0;
 			new AxlDiscrardedWeapon(
-				oldWeapon.index - (int)WeaponIds.AxlBullet,
+				axlWeapon.throwIndex,
 				getAxlBulletPos(axlWeapon), armDir, throwSpeed,
 				player, player.getNextActorNetId(), true, sendRpc: true
 			);
@@ -331,7 +404,7 @@ public class AxlWC : Character {
 		}
 		// Hover.
 		if (!grounded && player.input.isPressed(Control.Jump, player)
-			&& !player.input.isHeld(Control.Down, player) && hoverTimes == 0 &&
+			&& getHoverConditions() && hoverTimes == 0 &&
 			canJump() && flag == null
 		) {
 			hoverTimes++;
@@ -339,7 +412,13 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Block.
-		if (grounded && player.input.isHeld(Control.Down, player) &&
+		if (Options.main.blockInput && grounded && player.input.isHeld(Control.AxlAimBackwards, player) &&
+			charState is not AxlBlock2 and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
+		) {
+			changeState(new AxlBlock2(), true);
+			return true;
+		}
+		if (!Options.main.blockInput && grounded && player.input.isHeld(Control.Down, player) &&
 			charState is not AxlBlock and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
 		) {
 			changeState(new AxlBlock(), true);
@@ -347,10 +426,17 @@ public class AxlWC : Character {
 		}
 		return base.normalCtrl();
 	}
+	public bool getHoverConditions(){
+		if (!Options.main.hoverWhileDown){
+		if (player.input.isHeld(Control.Down, player)) return false;}
+		return true;
+	}
+
 
 	// Attack inputs.
 	public override bool attackCtrl() {
-		if (isCharging() || axlWeapon == null) {
+		//if (isCharging()) return
+		if (axlWeapon == null) {
 			return base.attackCtrl();
 		}
 		// Custom inputs.
@@ -359,7 +445,7 @@ public class AxlWC : Character {
 			return true;
 		}
 		// For stuff we do not want to do mid guard animation.
-		if (charState is AxlBlock or RisingBarrage) {
+		if (charState is AxlBlock or AxlBlock2 or RisingBarrage) {
 			return false;
 		}
 		if ((player.input.isHeld(Control.Shoot, player) || axlWeapon.autoFire) &&
@@ -444,9 +530,16 @@ public class AxlWC : Character {
 		if (axlWeapon is not AxlBulletWC axlBullet) {
 			return;
 		}
+		if (chargeLevel < getMaxChargeLevel()) {
+			return;
+		}
 		float shootAngle = armAngle;
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
+		}
+		if(chargeAnim != null){
+			chargeAnim.destroySelf();
+			chargeAnim = null;
 		}
 		Point shootPos = getAxlBulletPos(axlWeapon);
 		axlBullet.shootAlt(this, shootPos, shootAngle, chargeLevel);
@@ -472,8 +565,17 @@ public class AxlWC : Character {
 		}
 		stopCharge();
 	}
+	public bool getAutoChargeConditions(){
+		if(axlWeapon is not AxlBulletWC || !Options.main.autoCharge) return false;
+		return true;
+		
+	}
 
 	public override bool chargeButtonHeld() {
+		if(autoChargeCooldown > 0) return false;
+		if(getAutoChargeConditions()){
+			return true;
+		}
 		return player.input.isHeld(Control.Special1, player);
 	}
 
@@ -669,14 +771,15 @@ public class AxlWC : Character {
 	}
 
 	public void configureWeapons() {
-		AxlLoadout axlLoadout = player.loadout.axlLoadout;
-		axlWeapons.Add(getWeaponFromIndex(axlLoadout.weapon2));
-		axlWeapons.Add(new AxlBulletWC());
-		axlWeapons.Add(getWeaponFromIndex(axlLoadout.weapon3));
+		AxlWCLoadout axlLoadout = player.loadout.axlWCLoadout;
+		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon1]);
+		axlWeapons.Add(getAllMainWeapons()[axlLoadout.sideArm]);
+		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon2]); 
 		mainWeapon = axlWeapons[1];
 		weaponSlot = 1;
 		weapons = axlWeapons.Cast<Weapon>().ToList();
 	}
+	
 
 	public AxlWeaponWC getWeaponFromIndex(int index) {
 		return index switch {
@@ -693,13 +796,13 @@ public class AxlWC : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-
 		if ((Options.main.enableSkins == true)
 			&& Global.sprites.ContainsKey("axlalt_" + spriteName)){		
 			return "axlalt_" + spriteName;
 			}
-			return "axl_" + spriteName;
+		return "axl_" + spriteName;
 	}
+
 
 	public override List<ShaderWrapper> getShaders() {
 		var shaders = new List<ShaderWrapper>();
@@ -728,6 +831,7 @@ public class AxlWC : Character {
 			sprite.name != "axl_lose" &&
 			charState is not Hurt and
 			not AxlBlock and
+			not AxlBlock2 and
 			not Die and
 			not GenericStun and
 			not InRideArmor and
@@ -833,7 +937,17 @@ public class AxlWC : Character {
 		isWhite = flags[1];
 	}
 }
-
+public enum ThrowID{
+	AxlBullet,
+	RayGun,
+	SpiralMagnum,
+	BoundBlaster,
+	PlasmaGun,
+	BlackArrow,
+	BlastLauncher,
+	FlameBurner,
+	IceGattling
+}
 public class AxlDiscrardedWeapon : Actor {
 	public float time;
 	public float currentAngle;

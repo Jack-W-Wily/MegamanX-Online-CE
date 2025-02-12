@@ -9,14 +9,14 @@ public class BlastLauncherWC : AxlWeaponWC {
 		shootSounds = [ "grenadeShoot", "rocketShoot" ];
 		index = (int)WeaponIds.BlastLauncher;
 		weaponBarBaseIndex = (int)WeaponBarIndex.BlastLauncher;
-		weaponSlotIndex = 29;
+		weaponSlotIndex = (int)SlotIndex.BLauncher;
 		killFeedIndex = 29;
 		fireRate = 28;
 		altFireRate = 14;
-
+		throwIndex = (int)ThrowID.BlastLauncher;
 		sprite = "axl_arm_blastlauncher";
-		flashSprite = "axl_pistol_flash_charged";
-		chargedFlashSprite = "axl_pistol_flash_charged";
+		flashSprite = "x8_axl_bullet_flash";
+		chargedFlashSprite = "x8_axl_bullet_cflash";
 		isTwoHanded = true;
 
 		maxAmmo = 10;
@@ -64,7 +64,7 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "axl_grenade", netProjId, player
+		pos, 1, owner, "x8_axl_blauncher_proj", netProjId, player
 	) {
 		weapon = BlastLauncherWC.netWeapon;
 		this.byteAngle = byteAngle;
@@ -166,7 +166,7 @@ public class GreenSpinnerWCProj : Projectile {
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "axl_rocket", netProjId, player
+		pos, 1, owner, "x8_axl_green_spinner", netProjId, player
 	) {
 		weapon = BlastLauncherWC.netWeapon;
 		projId = (int)ProjIds.GreenSpinnerWC;

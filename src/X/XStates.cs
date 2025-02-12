@@ -157,10 +157,8 @@ public class LightDash : CharState {
 
 		if (dustTime >= 6 && !character.isUnderwater()) {
 			dustTime = 0;
-			new Anim(
-				character.getDashDustEffectPos(dashDir),
-				"dust", dashDir, player.getNextActorNetId(), true,
-				sendRpc: true
+			new DashDustAnim(
+				character.pos.addxy(-18 * dashDir, 0), player.getNextActorNetId(), true, true
 			);
 		} else {
 			dustTime += character.speedMul;

@@ -1,14 +1,16 @@
 namespace MMXOnline;
-
 public class BlackArrowWC : AxlWeaponWC {
 	public BlackArrowWC() {
 		shootSounds = [ "blackArrow", "blackArrow", "blackArrow", "blackArrow" ];
 		isTwoHanded = true;
+		throwIndex = (int)ThrowID.BlackArrow;
+		flashSprite = "x8_axl_bullet_flash2";
+		chargedFlashSprite ="x8_axl_bullet_cflash2";
 		fireRate = 20;
 		altFireRate = 24;
 		index = (int)WeaponIds.BlackArrow;
 		weaponBarBaseIndex = (int)WeaponBarIndex.BlackArrow;
-		weaponSlotIndex = 2;
+		weaponSlotIndex = (int)SlotIndex.BArrow;
 		killFeedIndex = 68;
 		sprite = "axl_arm_blackarrow";
 		maxAmmo = 8;
@@ -69,3 +71,28 @@ public class BlackArrowWC : AxlWeaponWC {
 		return 6;
 	}
 }
+public class Particle : Anim {
+	//int type;
+	Player player;
+	float randPartTime;
+	public Particle(Point pos, int type, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
+		base(pos, "empty", 1, netId, false, sendRpc, ownedByLocalPlayer) {
+	}
+
+	public override void update() {
+		base.update();
+		randPartTime += Global.spf;
+			if (randPartTime > 0.025f) {
+				randPartTime = 0;
+				var partSpawnAngle = Helpers.randomRange(0, 360);
+			//	float spawnRadius = maxRadius;
+				float spawnSpeed = 300;
+				var partSpawnPos = pos.addxy(Helpers.cosd(partSpawnAngle), Helpers.sind(partSpawnAngle));
+				var partVel = partSpawnPos.directionToNorm(pos).times(spawnSpeed);
+				var partSprite = "gbeetle_proj_flare" + (Helpers.randomRange(0, 1) == 0 ? "2" : "");
+				new Anim(partSpawnPos, partSprite, 1, player.getNextActorNetId(), false, sendRpc: true) {
+					vel = partVel,
+				//	ttl = ((spawnRadius - 10) / spawnSpeed),
+				};
+			}
+	}}

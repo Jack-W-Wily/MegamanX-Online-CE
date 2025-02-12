@@ -13,7 +13,7 @@ public class XBuster : Weapon {
 		killFeedIndex = 0;
 		weaponBarBaseIndex = 0;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 0;
+		weaponSlotIndex = (int)SlotIndex.Buster;
 		shootSounds = new string[] { "", "", "", "", "", "" };
 		fireRate = 9;
 		canHealAmmo = false;

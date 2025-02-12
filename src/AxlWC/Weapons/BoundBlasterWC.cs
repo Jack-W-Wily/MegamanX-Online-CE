@@ -9,12 +9,12 @@ public class BoundBlasterWC : AxlWeaponWC {
 		altFireRate = 24;
 		index = (int)WeaponIds.BoundBlaster;
 		weaponBarBaseIndex = (int)WeaponBarIndex.BoundBlaster;
-		weaponSlotIndex = 55;
+		weaponSlotIndex = (int)SlotIndex.BBlaster;
 		killFeedIndex = 70;
-
+		throwIndex = (int)ThrowID.BoundBlaster;
 		sprite = "axl_arm_boundblaster";
-		flashSprite = "axl_pistol_flash";
-		chargedFlashSprite = "axl_pistol_flash_charged";
+		flashSprite = "x8_axl_bullet_flash";
+		chargedFlashSprite = "x8_axl_bullet_cflash";
 
 		maxAmmo = 16;
 		ammo = maxAmmo;

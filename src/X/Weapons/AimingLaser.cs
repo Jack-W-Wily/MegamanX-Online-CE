@@ -12,18 +12,19 @@ public class AimingLaser : Weapon {
 	public AimingLaser() : base() {
 		index = (int)WeaponIds.AimingLaser;
 		fireRate = 60;
-		weaponSlotIndex = 128;
+		weaponSlotIndex = (int)SlotIndex.ALaser;
         weaponBarBaseIndex = (int)WeaponBarIndex.AimingLaser;
         weaponBarIndex = weaponBarBaseIndex;
 		shootSounds = new string[] {"torpedo","torpedo","","dynamopillar","dynamopillar"};
 		weaknessIndex = (int)WeaponIds.SoulBody;
 		type = index;
 		displayName = "Aiming Feather";
-		/* damage = "1";
+		killFeedIndex = 186;
+		damage = "2";
 		hitcooldown = "0.3";
-		Flinch = "0";
+		Flinch = "13/26";
 		FlinchCD = "0";
-		effect = "Focuses scanned enemies."; */
+		effect = "Focuses scanned enemies.\nCharged shoots multhiting lazers.";
 	}
 
 	public override bool canShoot(int chargeLevel, Player player) {
@@ -47,7 +48,8 @@ public class AimingLaser : Weapon {
 		Point pos = character.getShootPos();
 		int xDir = character.getShootXDir();
 		Player player = character.player;
-		if (chargeLevel == 0){
+		
+		/*if (chargeLevel == 0){
 		new PeacockMissle(this, character.getShootPos(), 
 		character.pos.x - character.aLaserCursor.pos.x < 0 ? 1 : -1, 
 		character.player, 
@@ -66,26 +68,38 @@ public class AimingLaser : Weapon {
 				}
 			character.aLaserCursor?.destroySelf();
 		character.aLaserCursor = null!;
-		}
+		}*/
 
 
 
-		if (chargeLevel == 2) {
+		if (chargeLevel >= 3 && character.aLaserCursor != null) {
 			int type = 0;
 
 			foreach(var targ in character.aLaserTargets) {
+				
 				if (targ.pos.distanceTo(pos) <= 320) {
 					new AimingLaserProj(this, pos, xDir, player, type, player.getNextActorNetId(), targ, true);
 					addAmmo(-1, player);
 					type++;
 				}
 			}
-		character.aLaserCursor?.destroySelf();
-		character.aLaserCursor = null!;
+			character.aLaserCursor?.destroySelf();
+			character.aLaserCursor = null!;
+		}else {
+			foreach(var targ in character.aLaserTargets) {
+				new PeacockMissle(this, character.getShootPos(), 
+				character.pos.x - character.aLaserCursor?.pos.x < 0 ? 1 : -1, 
+				character.player, 
+				character.player.getNextActorNetId(), 
+				targ, rpc: true);
+				}
+			character.aLaserCursor?.destroySelf();
+			character.aLaserCursor = null!;
+			character.aLaserTargets.Clear();
 		}
 
 
-		if (chargeLevel >= 3){
+		/*if (chargeLevel >= 3){
 			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new AimingLaserBlade(
@@ -103,7 +117,7 @@ public class AimingLaser : Weapon {
 	//		new AimingLaserChargedProj(this, pos, xDir, player, angle, player.getNextActorNetId(), true);
 //
 	//		character.aLaserTargets.Clear();
-	//	}
+	//	}*/
 
 	
 	}
@@ -113,21 +127,22 @@ public class AimingLaser : Weapon {
 public class AimingLaserTargetAnim : Anim {
 
 	Character chara;
+	Player player;
 
 	public AimingLaserTargetAnim(
 		Point pos, int xDir, ushort? netId, Character chara
 	) : base (
-		pos, "aiming_laser_cursor", xDir, netId, false, true
+		pos, "aiming_laser_target", xDir, netId, false, true
 	) {
 		this.chara = chara;
 	}
 
 	public override void update() {
 		base.update();
-
+		//if (chara == null) destroySelf();
 		changePos(chara.getCenterPos());
 
-		if (sprite.loopCount >= 5) destroySelf();
+		if (sprite.loopCount >= 10) destroySelf();
 	}
 
 	public override void onDestroy() {
@@ -149,6 +164,7 @@ Player player;
 	) : base(
 		pos, "aiming_laser_hud", xDir, netId, false
 	) {
+		setzIndex(zIndex - 10);
 		frameSpeed = 0;
 		frameIndex = frame;
 		this.player = player;
@@ -262,6 +278,7 @@ public class AimingLaserCursor : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
+		
 		mmx.aLaserCursor = null!;
 	}
 }
@@ -339,7 +356,7 @@ public class AimingLaserProj : Projectile {
 	}
 
 
-	/* public override void onCollision(CollideData other) {
+	 /*public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!ownedByLocalPlayer) return;
 
@@ -565,8 +582,8 @@ public class PeacockMissle : Projectile, IDamagable {
 		if (angle != null) {
 			this.angle = angle + (this.xDir == -1 ? 180 : 0);
 		}
-		fadeSprite = "explosion";
-		fadeSound = "explosion";
+		//fadeSprite = "explosion";
+		//fadeSound = "explosion";
 		maxTime = 3f;
 		projId = (int)ProjIds.AimingLaserMissle;
 		destroyOnHit = true;

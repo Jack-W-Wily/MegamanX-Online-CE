@@ -60,6 +60,8 @@ public class FlashAnim : Anim {
 			changeSprite("x8_axl_bullet_flash2", true);
 		}if(type == 2){
 			changeSprite("x8_axl_bullet_flash3", true);
+		}if(type == 3){
+			changeSprite("x8_axl_meleeshot_flash", true);
 		}
 	}
 

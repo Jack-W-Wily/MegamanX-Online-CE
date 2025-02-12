@@ -10,13 +10,13 @@ public class PlasmaGunWC : AxlWeaponWC {
 		altFireRate = 2;
 		index = (int)WeaponIds.PlasmaGun;
 		weaponBarBaseIndex = (int)WeaponBarIndex.PlasmaGun;
-		weaponSlotIndex = 56;
+		weaponSlotIndex = (int)SlotIndex.PGun;
 		killFeedIndex = 71;
 		sprite = "axl_arm_plasmagun";
 		maxSwapCooldown = 60;
 		maxAmmo = 4;
 		ammo = 4;
-
+		throwIndex = (int)ThrowID.PlasmaGun;
 		maxAmmo = 2;
 		ammo = maxAmmo;
 		maxSwapCooldown = 20 * 2;
@@ -28,7 +28,7 @@ public class PlasmaGunWC : AxlWeaponWC {
 		ushort netId = axl.player.getNextActorNetId();
 		ushort netIdEffect = axl.player.getNextActorNetId();
 		// Effect.
-		new Anim(pos, "plasmagun_effect", 1, netIdEffect, true, sendRpc: true) {
+		new Anim(pos, "x8_axl_pgun_effect", 1, netIdEffect, true, sendRpc: true) {
 			byteAngle = byteAngle,
 			host = axl
 		};

@@ -69,8 +69,10 @@ public class BlackArrowProj : Projectile {
 	public BlackArrowProj(
 		Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 450, 1, player, "blackarrow_proj", 0, 0, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 450, 1, player, "x8_axl_barrow_proj", 0, 0, netProjId, player.ownedByLocalPlayer
 	) {
+		fadeSprite = "x8_axl_barrow_fade";
+		fadeOnAutoDestroy = true;
 		maxTime = 0.3f;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
@@ -115,7 +117,7 @@ public class BlackArrowProj : Projectile {
 		base.onHitWall(other);
 		if (!ownedByLocalPlayer) return;
 		var hitNormal = other.getNormalSafe();
-		destroySelf();
+		destroySelfNoEffect();
 		new BlackArrowGrounded(
 			weapon, other.getHitPointSafe(), owner, byteAngle ?? hitNormal.byteAngle,
 			owner.getNextActorNetId(), true
@@ -144,8 +146,10 @@ public class BlackArrowProj2 : Projectile {
 	public List<Point> lastPoses = new List<Point>();
 
 	public BlackArrowProj2(Weapon weapon, Point pos, Player player, Point bulletDir, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 450, 1, player, "blackarrow_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 450, 1, player, "x8_axl_barrow_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.5f;
+		fadeSprite = "x8_axl_barrow_fade";
+		fadeOnAutoDestroy = true;
 		vel.x = bulletDir.x * speed;
 		vel.y = bulletDir.y * speed;
 		projId = (int)ProjIds.BlackArrow2;
@@ -177,7 +181,7 @@ public class BlackArrowProj2 : Projectile {
 		base.onHitWall(other);
 		if (!ownedByLocalPlayer) return;
 		var hitNormal = other.getNormalSafe();
-		destroySelf();
+		destroySelfNoEffect();
 		new BlackArrowGrounded(
 			weapon, other.getHitPointSafe(), owner, byteAngle ?? hitNormal.byteAngle,
 			owner.getNextActorNetId(), true
@@ -317,7 +321,7 @@ public class WindCutterProj : Projectile {
 public class BlackArrowGrounded : Projectile {
 	public Axl? axl;
 	public BlackArrowGrounded(Weapon weapon, Point pos, Player player, float byteAngle, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, 1, 0, 1, player, "blackarrow_stuck_proj", 0, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, 1, 0, 1, player, "x8_axl_barrow_proj_stuck", 0, 0f, netProjId, player.ownedByLocalPlayer) {
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;
 		maxTime = 4;
@@ -350,7 +354,7 @@ public class BlackArrowGrounded : Projectile {
 	}
 	public override void onDestroy() {
 		base.onDestroy();
-		new Anim(pos, "buster1_fade", xDir,
+		new Anim(pos, "x8_axl_barrow_fade", xDir,
 			axl?.player.getNextActorNetId(), true, sendRpc: true);
 	}
 

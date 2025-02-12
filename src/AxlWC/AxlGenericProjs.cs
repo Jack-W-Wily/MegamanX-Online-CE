@@ -8,9 +8,9 @@ public class BlueBulletProj : Projectile {
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "axl_bullet_blue", netProjId, player
+		pos, 1, owner, "x8_axl_bullet2_proj", netProjId, player
 	) {
-		fadeSprite = "axl_bullet_fade";
+		fadeSprite = "x8_axl_bullet2_fade";
 		projId = (int)ProjIds.BlueBullet;
 		weapon = AxlBulletWC.netWeapon;
 		damager.damage = 1;
@@ -50,7 +50,7 @@ public class AxlMeleeBullet : Projectile {
 		int xDir, ushort netProjId,
 		bool sendRpc = false, Player? player = null, float byteAngle = 0
 	) : base(
-		pos, 1, owner, "axl_meleeshot_proj", netProjId, player
+		pos, 1, owner, "x8_axl_meleeshot_proj", netProjId, player
 	) {
 		weapon = AxlBulletWC.netWeapon;
 		projId = (int)ProjIds.AxlMeleeBullet;

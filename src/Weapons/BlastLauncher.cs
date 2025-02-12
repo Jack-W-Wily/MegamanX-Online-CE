@@ -222,7 +222,7 @@ public class GrenadeExplosionProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player, int type,
 		IDamagable directHit, int directHitXDir, ushort netProjId
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "axl_grenade_explosion2", 0, 0.25f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 1, player, "x8_axl_blauncher_explosion", 0, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		this.xDir = xDir;
 		this.directHit = directHit;
@@ -373,7 +373,7 @@ public class GreenSpinnerExplosionProj : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player, float angle,
 		IDamagable directHit, int directHitXDir, ushort netProjId
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "axl_rocket_explosion", 13, 0.25f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 3, player, "x8_axl_green_spinner_exploasion", 13, 0.25f, netProjId, player.ownedByLocalPlayer
 	) {
 		this.xDir = xDir;
 		this.angle = angle;

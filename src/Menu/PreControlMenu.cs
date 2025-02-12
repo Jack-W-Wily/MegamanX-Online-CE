@@ -27,23 +27,22 @@ public class PreControlMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
 			cursorToCharNum[selArrowPosY]--;
 			if (cursorToCharNum[selArrowPosY] < -2) {
-				cursorToCharNum[selArrowPosY] = 5;
+				cursorToCharNum[selArrowPosY] = 4;
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuRight)) {
 			cursorToCharNum[selArrowPosY]++;
-			if (cursorToCharNum[selArrowPosY] > 5) {
+			if (cursorToCharNum[selArrowPosY] > 4) {
 				cursorToCharNum[selArrowPosY] = -2;
 			}
 		}
 
 		Helpers.menuUpDown(ref selArrowPosY, 0, 1);
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-			getCharNumAndAimMode(cursorToCharNum[selArrowPosY], out int charNum, out int aimMode);
 			if (selArrowPosY == 0) {
-				Menu.change(new ControlMenu(this, inGame, false, charNum, aimMode));
+				Menu.change(new ControlMenu(this, inGame, false,cursorToCharNum[selArrowPosY]));
 			} else if (selArrowPosY == 1) {
 				if (Control.isJoystick()) {
-					Menu.change(new ControlMenu(this, inGame, true, charNum, aimMode));
+					Menu.change(new ControlMenu(this, inGame, true, cursorToCharNum[selArrowPosY]));
 				}
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuBack)) {
@@ -121,12 +120,12 @@ public class PreControlMenu : IMainMenu {
 		return charNum switch {
 			-2 => "(Menu)",
 			-1 => "(All)",
-			0 => "(X)",
-			1 => "(Zero)",
-			2 => "(Vile)",
-			3 => "(Directional Axl)",
-			4 => "(Cursor Axl)",
-			5 => "(Sigma)",
+			(int)CharIds.X => "(X)",
+			(int)CharIds.Zero => "(Zero)",
+			(int)CharIds.Vile => "(Vile)",
+		//	3 => "(Directional Axl)",
+			(int)CharIds.AxlWC => "(Axl)",
+			(int)CharIds.Sigma => "(Sigma)",
 			_ => "(ERROR)"
 		};
 	}

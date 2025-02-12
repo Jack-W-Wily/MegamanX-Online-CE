@@ -12,18 +12,19 @@ public class TwinSlasher : Weapon {
 		killFeedIndex = 182;
 		weaponBarBaseIndex = (int)WeaponBarIndex.TwinSlasher;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 130;
+		weaponSlotIndex = (int)SlotIndex.TSlasher;
 		weaknessIndex = (int)WeaponIds.GroundHunter;
 		shootSounds = new string[] { "buster2X4", "buster2X4", "buster2X4", "buster4X4" };
 		fireRate = 9;
 		switchCooldownFrames = 9;
+		killFeedIndex = 188;
 		type = index;
-			displayName = "Twin Slasher";
-		/* damage = "1";
+		displayName = "Twin Slasher";
+		damage = "1";
 		hitcooldown = "0.5";
 		Flinch = "0/26";
 		FlinchCD = hitcooldown;
-		effect = "Pierces enemies."; */
+		effect = "Pierces enemies.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

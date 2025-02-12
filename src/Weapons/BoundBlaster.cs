@@ -70,21 +70,26 @@ public class BoundBlasterProj : Projectile {
 	float len = 0;
 	float lenDelay = 0;
 	float lastAngle;
-	const float circleRadius = 14;
+	//const float circleRadius = 14;
 	const float maxLen = 60;
 	float partTime;
 	bool isWaProj;
+	float hitCooldown;
+	public Sprite sprite;
+	public Anim particle;
 
 	public BoundBlasterProj(
 		Weapon weapon, Point pos, float angle, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, 1, 250, 1, player, "boundblaster_proj", 0, 0, netProjId, player.ownedByLocalPlayer
+		weapon, pos, 1, 250, 1, player, "x8_axl_bblaster_proj", 0, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
+		sprite = new Sprite("x8_axl_bblaster_proj");
 		reflectable = true;
 		Point anglePoint = Point.createFromAngle(angle);
 		vel.x = anglePoint.x * speed;
 		vel.y = anglePoint.y * speed;
 		maxTime = 0.4f;
+		destroyOnHit = false;
 		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
 			maxTime = 1f;
 			isWaProj = true;
@@ -108,7 +113,15 @@ public class BoundBlasterProj : Projectile {
 		lenDelay = 0;
 		updateAngle();
 	}
-
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+	
+		if (hitCooldown > 0) return;
+		hitCooldown = 0.66f;
+		updateDamager();
+		reflectSide();
+		increasePower();
+	}
 	public override void onReflect() {
 		reflectSide();
 	}
@@ -125,6 +138,7 @@ public class BoundBlasterProj : Projectile {
 				base.update();
 				return;
 			}
+		Helpers.decrementTime(ref hitCooldown);
 
 			vel.x = Helpers.cosd(angle.Value);
 			vel.y = Helpers.sind(angle.Value);
@@ -142,11 +156,11 @@ public class BoundBlasterProj : Projectile {
 		lenDelay += Global.spf;
 
 		partTime += Global.spf;
-		if (partTime > 0.03f) {
+		if (partTime > 0.033f) {
 			partTime = 0;
-			if (!Options.main.lowQualityParticles()) {
-				new BoundBlasterParticle(pos, Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance);
-			}
+			particle = new BoundBlasterParticle(pos, Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance);
+			particle.setzIndex(zIndex - 100);
+
 		}
 
 		if (locallyControlled) {
@@ -177,11 +191,12 @@ public class BoundBlasterProj : Projectile {
 	}
 
 	public void increasePower() {
-		speed += 50;
-		updateLocalDamager(damager.damage + 0.5f);
+		speed *= 2;
+		//updateLocalDamager(damager.damage + 0.5f);
 	}
 
 	public override void render(float x, float y) {
+		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
 		if (Options.main.lowQualityParticles()) {
 			int oldXDir = xDir;
 			xDir = 1;
@@ -192,20 +207,22 @@ public class BoundBlasterProj : Projectile {
 
 		var normVel = vel.normalize();
 
-		var col1 = new Color(74, 78, 221);
-		var col2 = new Color(61, 113, 255);
-		var col3 = new Color(215, 244, 255);
+		var col1 = new Color(129, 189, 227, 100);
+		var col2 = new Color(149, 232, 232, 100);
+		var col3 = new Color(215, 244, 255, 100);
 		if (Global.level.gameMode.isTeamMode && damager.owner.alliance == GameMode.redAlliance) {
-			col1 = new Color(221, 78, 74);
-			col2 = new Color(255, 113, 61);
-			col3 = new Color(255, 244, 215);
+			col1 = new Color(221, 78, 74, 100);
+			col2 = new Color(255, 113, 61, 100);
+			col3 = new Color(255, 244, 215, 100);
 		}
 
 		float xOff1 = -(normVel.x * len);
 		float yOff1 = -(normVel.y * len);
 
+	
 		Point tail = new Point(pos.x + xOff1, pos.y + yOff1);
 		Point head = new Point(pos.x, pos.y);
+
 
 		Point tailToHead = tail.directionToNorm(head);
 
@@ -218,22 +235,25 @@ public class BoundBlasterProj : Projectile {
 		DrawWrappers.DrawLine(tail3.x, tail3.y, head3.x, head3.y, col1, 6, 0, true);
 		DrawWrappers.DrawLine(tail2.x, tail2.y, head2.x, head2.y, col2, 4, 0, true);
 		DrawWrappers.DrawLine(tail.x, tail.y, head.x, head.y, col3, 2, 0, true);
+
+
 	}
 }
 
 public class BoundBlasterParticle : Anim {
 	bool isRed;
 	const float radius = 10;
-	public BoundBlasterParticle(Point pos, bool isRed) : base(pos, "empty", 1, null, false) {
-		ttl = 0.25f;
+	public BoundBlasterParticle(Point pos, bool isRed) : base(pos, "x8_axl_bblaster_particle", 1, null, false) {
+	//	ttl = 1f;
 		this.isRed = isRed;
 	}
 
 	public override void update() {
 		base.update();
+		if(isAnimOver()) destroySelf();
 	}
 
-	public override void render(float x, float y) {
+	/*public override void render(float x, float y) {
 		float radiusProgress = 1 - (time / (ttl.Value * 4));
 		float alphaProgress = 1 - (time / ttl.Value);
 		Color col = new Color(167, 195, 255, (byte)(alphaProgress * 255));
@@ -244,7 +264,7 @@ public class BoundBlasterParticle : Anim {
 		}
 		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius * radiusProgress, false, col, 1, zIndex, outlineColor: col);
 		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, (radius + 1) * radiusProgress, false, col2, 1, zIndex, outlineColor: col2);
-	}
+	}*/
 }
 
 public class BoundBlasterAltProj : Projectile {
@@ -353,9 +373,9 @@ public class MovingWheelProj : Projectile {
 	int hitCount;
 	float hitCooldown;
 	public MovingWheelProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 3, player, "movingwheel_proj", Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 3, player, "x8_axl_mwheel_start", Global.defFlinch, 1, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.MovingWheel;
-		if (player.character is Axl axl && axl.isWhiteAxl() == true) {
+		if (player.character is AxlWC axl && axl.isWhite == true) {
 			startMaxTime = 5;
 		}
 		maxTime = startMaxTime;
@@ -376,7 +396,9 @@ public class MovingWheelProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 		if (hitCooldown > 0 || started == 0) return;
+		xDir *= -1;
 		hitCooldown = 0.75f;
+		if (owner.character is AxlWC axl && axl.isWhite == true) return;
 		speed *= 0.66f;
 		damager.damage--;
 		damager.flinch /= 2;
@@ -386,17 +408,19 @@ public class MovingWheelProj : Projectile {
 			damager.flinch = 0;
 		}
 		updateDamager();
-		if (hitCount >= 3) {
+		/*if (hitCount >= 3) {
 			//destroySelf();
-		}
+		}*/
 	}
 
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref hitCooldown);
+
 		if (started == 0) {
-			if (frameIndex > 0) frameIndex = 0;
+		//	if (frameIndex > 0) frameIndex = 0;
 			if (grounded) {
+				changeSprite("x8_axl_mwheel_proj", true);
 				started = 1;
 				damager.damage = 3;
 				if (isDefenderFavored()) damager.damage = 4;
@@ -407,7 +431,7 @@ public class MovingWheelProj : Projectile {
 				updateDamager();
 			}
 		}
-		if (started == 1) {
+		if (started == 1 && isAnimOver()) {
 			vel.x = xDir * speed;
 			angle += xDir * speed * 3 * Global.spf;
 			if (Global.level.checkTerrainCollisionOnce(this, 0, -1) == null) {
@@ -421,7 +445,8 @@ public class MovingWheelProj : Projectile {
 			soundTime += Global.spf;
 			if (soundTime > 0.15f) {
 				soundTime = 0;
-				//playSound("spinWheelLoop");
+				new Anim(pos.addxy(-8 * xDir, 13), "x8_axl_mwheel_spark", xDir, owner.getNextActorNetId(), true, true);
+				playSound("movingWheelRun");
 			}
 		}
 	}

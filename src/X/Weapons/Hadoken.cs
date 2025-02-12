@@ -9,6 +9,7 @@ public class HadoukenWeapon : Weapon {
 		index = (int)WeaponIds.Hadouken;
 		weaponBarBaseIndex = 19;
 		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = (int)SlotIndex.Hadouken;
 		killFeedIndex = 14;
 		type = index;
 		displayName = "Hadouken ";

@@ -72,7 +72,7 @@ public class MainMenu : IMainMenu {
 			return;
 		}
 		
-		if (Time == 0) Helpers.menuUpDown(ref selectY, 0, 4);
+		if (Time == 0) Helpers.menuUpDown(ref selectY, 0, 5);
 		TimeUpdate();
 		if (Time >= 1) {
 			Time = 0;
@@ -83,14 +83,14 @@ public class MainMenu : IMainMenu {
 			} else if (selectY == 2) {
 				Menu.change(new HostMenu(this, null, true, true));
 			} 
-			else if (selectY == 3) {
+			else if (selectY == 4) {
 				Menu.change(new PreOptionsMenu(this, false));
 			}
-			else if (selectY == 4) {
+			else if (selectY == 3) {
 				Menu.change(new PreLoadoutMenu(this));
 			}
 			else if (selectY == 5) {
-				System.Environment.Exit(1);
+				System.Environment.Exit(0);
 			}
 		}
 		MenuConfirmSound();
@@ -122,8 +122,8 @@ public class MainMenu : IMainMenu {
 		Fonts.drawText(FontType.BlueMenu, "VS. CPU", WD, optionPos[2].y,  Alignment.Center, selected: selectY == 2);
 		Fonts.drawText(FontType.BlueMenu, "LOADOUT", WD, optionPos[3].y, Alignment.Center, selected: selectY == 3);
 		//Fonts.drawText(FontType.BlueMenu, "Controls", WD, optionPos[4].y, selected: selectY == 4);
-		Fonts.drawText(FontType.BlueMenu, "OPTION MODE", WD, optionPos[4].y, Alignment.Center, selected: selectY == 3);
-		Fonts.drawText(FontType.BlueMenu, "QUIT", WD, optionPos[5].y, Alignment.Center, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "OPTION MODE", WD, optionPos[4].y, Alignment.Center, selected: selectY == 4);
+		Fonts.drawText(FontType.BlueMenu, "QUIT", WD, optionPos[5].y, Alignment.Center, selected: selectY == 5);
 
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Change selection, [OK]: Choose",

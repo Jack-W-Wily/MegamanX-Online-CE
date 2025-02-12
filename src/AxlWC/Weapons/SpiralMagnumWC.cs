@@ -10,13 +10,14 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 		fireRate = 30;
 		altFireRate = 40;
 		index = (int)WeaponIds.SpiralMagnum;
+		throwIndex = (int)ThrowID.SpiralMagnum;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpiralMagnum;
-		weaponSlotIndex = 54;
+		weaponSlotIndex = (int)SlotIndex.SMagnum;
 		killFeedIndex = 69;
 
-		sprite = "axl_arm_spiralmagnum2";
-		flashSprite = "axl_pistol_flash";
-		chargedFlashSprite = "axl_pistol_flash";
+		sprite = "axl_arm_spiralmagnum";
+		flashSprite = "x8_axl_bullet_flash";
+		chargedFlashSprite = "x8_axl_bullet_cflash";
 
 		maxAmmo = 10;
 		ammo = maxAmmo;
@@ -88,7 +89,7 @@ public class SpiralMagnumWCProj : Projectile {
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "spiralmagnum_proj", netProjId, player
+		pos, 1, owner, "x8_axl_magnum_proj", netProjId, player
 	) {
 		projId = (int)ProjIds.SpiralMagnumWC;
 		weapon = SpiralMagnumWC.netWeapon;

@@ -13,7 +13,7 @@ public class TornadoFang : Weapon {
 		index = (int)WeaponIds.TornadoFang;
 		weaponBarBaseIndex = (int)WeaponBarIndex.TornadoFang;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 24;
+		weaponSlotIndex = (int)SlotIndex.TFang;
 		killFeedIndex = 47;
 		weaknessIndex = (int)WeaponIds.AcidBurst;
 		damage = "1/1";

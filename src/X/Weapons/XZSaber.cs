@@ -10,10 +10,14 @@ public class ZXSaber : Weapon {
 		weaponBarBaseIndex = (int)WeaponBarIndex.ZSaber;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 66;
-		weaponSlotIndex = 118;
+		weaponSlotIndex = (int)SlotIndex.ZSaber;
 		type = index;
-		displayName = "Z Saber ";
-		effect = "Zero's Saber";
+		damage = "2/4";
+		Flinch = "10/26";
+		FlinchCD = "0";
+		hitcooldown = "0.3/0.3|0.5";
+		displayName = "Z-Saber ";
+		effect = "Zero's Saber. \nCharged shoots a saber wave.";
 		
 	}
 
@@ -39,7 +43,7 @@ public class XSaberProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		ZXSaber.netWeapon, pos, xDir, 300, 4, player, "zsaber_shot", 
-		30, 0.5f, netProjId, player.ownedByLocalPlayer
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = true;
 		projId = (int)ProjIds.XSaberProj;
@@ -87,9 +91,9 @@ public class XSaberState : CharState {
 public class X6SaberState : CharState {
 	bool fired;
 	bool grounded;
-	public X6SaberState(bool grounded) : base(grounded ? "beam_saber2" : "beam_saber_air2") {
+	public X6SaberState(bool grounded) : base(grounded ? "beam_saber" : "beam_saber_air") {
 		this.grounded = grounded;
-		landSprite = "beam_saber2";
+		landSprite = "beam_saber";
 		airMove = true;
 		useDashJumpSpeed = true;
 		normalCtrl = true;

@@ -4,7 +4,7 @@ public class AxlWeaponWC : Weapon {
 	// Controls the cooldown and other stuff.
 	public int altFireSelected;
 	public float altFireRate;
-	
+	public int throwIndex;
 	public bool autoFire;
 	// Sprite definitions.
 	public bool isTwoHanded;
@@ -37,6 +37,7 @@ public class AxlWeaponWC : Weapon {
 		return Helpers.clamp(recoil, 0, 12);
 	}
 	public virtual float getAltRecoil(AxlWC axl, int chargeLevel) {
+		//if(chargeLevel <= 1) return 0;
 		float recoil = getAltFireRate(axl, chargeLevel) - 2;
 		return Helpers.clamp(recoil, 0, 12);
 	}

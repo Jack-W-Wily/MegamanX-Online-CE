@@ -12,12 +12,13 @@ public class FrostShield : Weapon {
 		index = (int)WeaponIds.FrostShield;
 		weaponBarBaseIndex = (int)WeaponBarIndex.FrostShield;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 23;
+		weaponSlotIndex = (int)SlotIndex.FShield;
 		killFeedIndex = 46;
 		weaknessIndex = (int)WeaponIds.ParasiticBomb;
 		damage = "2+2/3+3";
 		hitcooldown = "0-0.5/1";
 		Flinch = "0/26-26";
+		effect = "Blocks projectiles and creates spikes.\nLv.1 Charge shoots 2 projs.\n Lv.2 Chage shoots a frost flower.\nFull Charge creates a frost shield.";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 		type = index;

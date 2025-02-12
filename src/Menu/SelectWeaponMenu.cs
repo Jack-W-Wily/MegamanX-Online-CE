@@ -91,7 +91,7 @@ public class SelectWeaponMenu : IMainMenu {
 		new DoubleCyclone(),
 		new TwinSlasher(),
 		new ZXSaber(),
-		new DarkHoldWeapon()
+		new DarkHold()
 	};
 
 	public static List<Weapon> SpecialWeapon2 = new List<Weapon>() {
@@ -129,7 +129,7 @@ public class SelectWeaponMenu : IMainMenu {
 		new DoubleCyclone(),
 		new TwinSlasher(),
 		new ZXSaber(),
-		new DarkHoldWeapon()
+		new DarkHold()
 	};
 
 	public static List<Weapon> SpecialWeapon3 = new List<Weapon>() {
@@ -167,7 +167,7 @@ public class SelectWeaponMenu : IMainMenu {
 		new DoubleCyclone(),
 		new TwinSlasher(),
 		new ZXSaber(),
-		new DarkHoldWeapon()
+		new DarkHold()
 	};
 
 	public static List<Weapon> SubWeapon = new List<Weapon>() {
@@ -183,7 +183,7 @@ public class SelectWeaponMenu : IMainMenu {
 		Tuple.Create("WEAPON 1", SpecialWeapon1),
 		Tuple.Create("WEAPON 2", SpecialWeapon2),
 		Tuple.Create("WEAPON 3", SpecialWeapon3),
-		Tuple.Create("SUB WEAPON", SubWeapon),
+		//Tuple.Create("SUB WEAPON", SubWeapon),
 };
 
 	public IMainMenu prevMenu;
@@ -196,14 +196,14 @@ public class SelectWeaponMenu : IMainMenu {
 			new WeaponCursor(Options.main.xLoadout.weapon1),
 			new WeaponCursor(Options.main.xLoadout.weapon2),
 			new WeaponCursor(Options.main.xLoadout.weapon3),
-			new WeaponCursor(Options.main.xLoadout.melee)
+			//-new WeaponCursor(Options.main.xLoadout.melee)
 		};
 	}
 
 	public void update() {
 		if (!string.IsNullOrEmpty(error)) {
 			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
-				error = "";
+				error = null;
 			}
 			return;
 		}
@@ -221,17 +221,17 @@ public class SelectWeaponMenu : IMainMenu {
 				Options.main.xLoadout.weapon1,
 				Options.main.xLoadout.weapon2,
 				Options.main.xLoadout.weapon3,
-				Options.main.xLoadout.melee,
+				//Options.main.xLoadout.melee,
 			};
 			Options.main.xLoadout.weapon1 = xWeaponCategories[0].Item2[cursors[0].index].type;
 			Options.main.xLoadout.weapon2 = xWeaponCategories[1].Item2[cursors[1].index].type;
 			Options.main.xLoadout.weapon3 = xWeaponCategories[2].Item2[cursors[2].index].type;
-			Options.main.xLoadout.melee = xWeaponCategories[3].Item2[cursors[3].index].type;
+		//	Options.main.xLoadout.melee = xWeaponCategories[3].Item2[cursors[3].index].type;
 			int[] newArray = {
 				Options.main.xLoadout.weapon1,
 				Options.main.xLoadout.weapon2,
 				Options.main.xLoadout.weapon3,
-				Options.main.xLoadout.melee,
+			//	Options.main.xLoadout.melee,
 			};
 			if (!Enumerable.SequenceEqual(oldArray, newArray)) {
 				Options.main.saveToFile();
@@ -275,7 +275,7 @@ public class SelectWeaponMenu : IMainMenu {
 		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH));
 		Color color;
 		float alpha;
-		for (int i = 0; i < cursors.Length - 1; i++) {
+		for (int i = 0; i < cursors.Length; i++) {
 			color = Color.White;
 			alpha = 1f;
 			float yPos = startY - 3 + (i * wepH);
@@ -326,36 +326,44 @@ public class SelectWeaponMenu : IMainMenu {
 		string FlinchCD = wep1.FlinchCD;
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		Color DefaultColor = new Color(0, 0, 0, 100);
+		
 
 		DrawWrappers.DrawRect(25, 32, Global.screenW - 25, 84, true, DefaultColor,
 		1, ZIndex.HUD, false, outlineColor: outlineColor); //Up Rectangle	
-		DrawWrappers.DrawRect(25, 118, Global.screenW - 25, 132, true, DefaultColor,
+		DrawWrappers.DrawRect(25, 100, Global.screenW - 25, 85, true, DefaultColor,
 		1, ZIndex.HUD, false, outlineColor: outlineColor); //Weapon Stats Rectangle	
-		DrawWrappers.DrawRect(25, 118, 359, 192, true, DefaultColor,
+		DrawWrappers.DrawRect(25, 101, 359, 192, true, DefaultColor,
 		1, ZIndex.HUD, false, outlineColor: outlineColor); // Bottom Rectangle
-		DrawWrappers.DrawRect(25, 133, 148, 147, true, DefaultColor,
-		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //DMG Rectangle
-		DrawWrappers.DrawRect(25, 147, 148, 158, true, DefaultColor,
-		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
-		DrawWrappers.DrawRect(25, 158, 148, 170, true, DefaultColor,
-		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FireRate Rectangle
-		DrawWrappers.DrawRect(148, 133, 288, 147, true, DefaultColor,
-		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
-		DrawWrappers.DrawRect(148, 147, 288, 158, true, DefaultColor,
-		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //FlinchCD Rectangle
-		DrawWrappers.DrawRect(148, 158, 288, 170, true, DefaultColor,
-		0.5f, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
-		Fonts.drawText(FontType.Purple, "Weapon Stats", Global.halfScreenW, 122, Alignment.Center);
+		DrawWrappers.DrawRect(25, 101, 151, 112, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Ammo Rectangle
+		DrawWrappers.DrawRect(283, 101, 152, 112, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Fireate Rectangle
+		DrawWrappers.DrawRect(151, 113, 25, 124, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //damage Rectangle
+		DrawWrappers.DrawRect(152, 113, 283, 124, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //HitCD Rectangle
+		DrawWrappers.DrawRect(25, 125, 151, 136, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Flinch Rectangle
+		DrawWrappers.DrawRect(152, 125, 283, 136, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Flinchce Rectangle
+		DrawWrappers.DrawRect(25, 150, 283, 192, true, DefaultColor,
+		1, ZIndex.HUD, false, outlineColor: outlineColor); //Effect Rectangle
+		Fonts.drawText(FontType.Purple, "Weapon Stats", Global.halfScreenW - 34, 88, Alignment.Center);
 
+		renderDemo();
 		if (selCursorIndex < 5) {
-			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 138);
-			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 26, 150);
-			Fonts.drawText(FontType.Blue, "Fire Rate: " + rateOfFire, 25, 162);
-			Fonts.drawText(FontType.Blue, "Hit CD: " + hitcooldown, 152, 138);
-			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 151, 150);
-			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 151, 162);
-			Fonts.drawText(FontType.Blue, effect, 26, 172);
-			if (wep1 is XBuster) {
+			Fonts.drawText(FontType.Blue, "Ammo: " + maxAmmo, 26, 102);
+			Fonts.drawText(FontType.Blue, "Fire Rate: " + rateOfFire, 153, 102);
+			Fonts.drawText(FontType.Blue, "Damage: " + damage, 26, 114);
+			Fonts.drawText(FontType.Blue, "Hit CD: " + hitcooldown, 153, 114);
+			Fonts.drawText(FontType.Blue, "Flinch: " + Flinch, 26, 126);
+			Fonts.drawText(FontType.Blue, "Flinch CD: " + FlinchCD, 153, 126);
+			Fonts.drawText(FontType.Pink, "Weapon Effect", 120, 138);
+
+			Fonts.drawText(FontType.Blue, effect, 26, 152);
+
+
+/*if (wep1 is XBuster) {
 				switch (Global.level?.mainPlayer.armArmorNum) {
 					case (int)ArmorId.Light:
 						effect = "Mega Buster Mark 17 with Spiral Crush Shot.";
@@ -383,8 +391,221 @@ public class SelectWeaponMenu : IMainMenu {
 					effect = "Missile,Mine,Shield,'Unbreakable' you name it.\nihatethisweapon";
 				} else { effect = "Blocks, Leaves Spikes. C: Tackle or Shoot it."; }
 				Fonts.drawText(FontType.Blue, effect, 26, 172);
-			}
+			}*/
 		}
+	}
+	public void renderDemo(){
+		var wep1 = xWeaponCategories[selCursorIndex].Item2[cursors[selCursorIndex].index];
+		//Global.sprites["xMenuTest"].drawToHUD(1, 307, 160); 0 = all, 1 = no side wall, 2 = ground only 3 = bot
+		if(wep1 is HomingTorpedo){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(0, 322, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(1, 322, 179);
+		}}
+		else if(wep1 is ChameleonSting){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(2, 322, 180);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(3, 320, 179);
+		}}
+		else if(wep1 is RollingShield){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(4, 320, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(5, 321, 187);
+		}}else if(wep1 is FireWave){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(6, 315, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(7, 322, 179);
+		}}else if(wep1 is StormTornado){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(8, 322, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(9, 322, 193);
+		}}else if(wep1 is ElectricSpark){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(0, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(10, 322, 182);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(11, 321, 192);
+		}}else if(wep1 is BoomerangCutter){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(12, 322, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(13, 324, 193);
+		}}else if(wep1 is ShotgunIce){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(0, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(14, 320, 192);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(15, 322, 179);
+		}}else if(wep1 is CrystalHunter){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(16, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(17, 322, 192);
+		}}else if(wep1 is BubbleSplash){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(18, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(19, 322, 150);
+		}}else if(wep1 is SilkShot){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(20, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(21, 321, 192);
+		}}else if(wep1 is SpinWheel){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(22, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(23, 322, 188);
+		}}else if(wep1 is SonicSlicer){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(0, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(24, 317, 179);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(25, 322, 179);
+		}}else if(wep1 is StrikeChain){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(1, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(26, 321, 175);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(27, 320, 179);
+		}}else if(wep1 is MagnetMine){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(0, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(28, 318, 188);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(29, 321, 179);
+		}}else if(wep1 is SpeedBurner){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(30, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(31, 322, 170);
+		}}else if(wep1 is AcidBurst){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(32, 321, 179);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(0, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(33, 319, 179);
+		}}else if(wep1 is ParasiticBomb){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(34, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(35, 321, 179);
+		}}else if(wep1 is TriadThunder){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(36, 321, 192);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(37, 321, 192);
+		}}else if(wep1 is SpinningBlade){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(38, 321, 192);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(39, 322, 188);
+		}}else if(wep1 is RaySplasher){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(40, 317, 184);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(41, 322, 179);
+		}}else if(wep1 is GravityWell){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(42, 321, 185);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(1, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(43, 320, 192);
+		}}else if(wep1 is FrostShield){
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuTest"].drawToHUD(0, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(44, 315, 180);
+		}else{
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+			Global.sprites["xMenuWp"].drawToHUD(45, 321, 179);
+		}}else if(wep1 is TornadoFang){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(46, 322, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(47, 325,180);
+		}}else if(wep1 is LightningWeb){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(48, 321, 170);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(49, 321, 192);
+		}}else if(wep1 is FrostTower){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(50, 321, 170);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(51, 321, 179);
+		}}else if(wep1 is SoulBody){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(52, 321, 160);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(53, 321, 179);
+		}}else if(wep1 is RisingFire){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(54, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(55, 322, 170);
+		}}else if(wep1 is GroundHunter){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(56, 321, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(57, 321, 185);
+		}}else if(wep1 is DoubleCyclone){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(58, 321, 179);
+		}else{
+		Global.sprites["xMenuWp"].drawToHUD(59, 321, 189);
+		}}else if(wep1 is TwinSlasher){
+			Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(60, 315, 190);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(61, 320, 192);
+		}}else if(wep1 is ZXSaber){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(62, 322, 179);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(63, 322,179);
+		}}else if(wep1 is AimingLaser){
+		Global.sprites["xMenuTest"].drawToHUD(2, 321, 193);
+		if (Global.frameCount % 100 < 40) {
+			Global.sprites["xMenuWp"].drawToHUD(64, 321, 192);
+		}else{
+			Global.sprites["xMenuWp"].drawToHUD(65, 321,192);
+		}}
 	}
 }
 public class SelectWeaponMenuOLD : IMainMenu {

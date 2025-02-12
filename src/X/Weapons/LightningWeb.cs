@@ -12,17 +12,17 @@ public class LightningWeb : Weapon {
 		index = (int)WeaponIds.LightningWeb;
 		weaponBarBaseIndex = (int)WeaponBarIndex.LightningWeb;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 123;
+		weaponSlotIndex = (int)SlotIndex.LWeb;
 		type = index;
 		displayName = "Lightning Web";
 		killFeedIndex = 181;
 		switchCooldownFrames = 9;
 		weaknessIndex = (int)WeaponIds.TwinSlasher;
-		/* damage = "1/1";
+		damage = "1/1";
 		hitcooldown = "0.75";
 		Flinch = "6/26";
 		FlinchCD = hitcooldown;
-		effect = "Can be used as a wall. C: Creates a network of nine webs."; */
+		effect = "Can be used as a wall. \nC: Creates a network of nine webs."; 
 	}
 
 

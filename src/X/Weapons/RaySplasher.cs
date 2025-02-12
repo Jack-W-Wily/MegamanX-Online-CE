@@ -14,11 +14,11 @@ public class RaySplasher : Weapon {
 		index = (int)WeaponIds.RaySplasher;
 		weaponBarBaseIndex = (int)WeaponBarIndex.RaySplasher;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 21;
+		weaponSlotIndex = (int)SlotIndex.RSplasher;
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
 		damage = "1/1";
-		effect = "Charged: Grants Super Armor.";
+		effect = "Shoots burst in a rapid succesion.\nCharged: Grants Super Armor.";
 		hitcooldown = "0.075";
 		type = index;
 		displayName = "Ray Splasher ";

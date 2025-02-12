@@ -12,7 +12,7 @@ public class TriadThunder : Weapon {
 		index = (int)WeaponIds.TriadThunder;
 		weaponBarBaseIndex = (int)WeaponBarIndex.TriadThunder;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 19;
+		weaponSlotIndex = (int)SlotIndex.TThunder;
 		killFeedIndex = 42;
 		weaknessIndex = (int)WeaponIds.TornadoFang;
 		damage = "2/4+3";

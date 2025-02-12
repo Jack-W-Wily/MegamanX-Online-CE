@@ -13,11 +13,11 @@ public SpeedBurner() : base() {
 		index = (int)WeaponIds.SpeedBurner;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpeedBurner;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 16;
+		weaponSlotIndex = (int)SlotIndex.SBurner;
 		killFeedIndex = 27;
 		weaknessIndex = (int)WeaponIds.BubbleSplash;
 		damage = "2/4";
-		effect = "Fire DOT: 1. Charged Grants Super Armor. Self Damage\non contact of a wall. Burn won't give assists.";
+		effect = "Inflicts burn to enemies.\nDOT: 1. \nCharged Grants Super Armor. Self Damage\non contact of a wall.";
 		hitcooldown = "0-0.25/0";
 		Flinch = "0/26";
 		FlinchCD = "0/0.5";

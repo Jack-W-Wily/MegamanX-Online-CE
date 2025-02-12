@@ -264,7 +264,12 @@ public class MegamanX : Character {
 		
 	}
 
-
+	public override bool canCrouch() {
+		if (charState is X6SaberState) {
+			return false;
+		}
+		return base.canCrouch();
+	}
 
 	public override bool normalCtrl() {
 		if (grounded) {
@@ -947,9 +952,9 @@ public class MegamanX : Character {
 		if (index >= (int)WeaponIds.GigaCrush) {
 			index = 0;
 		}
-		if (index >= (int)WeaponIds.XSaber) {
+		/*if (index >= (int)WeaponIds.XSaber) {
 			index = 0;
-		}
+		}*/
 	
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
 			index = player.weapons[player.hyperChargeSlot].index;

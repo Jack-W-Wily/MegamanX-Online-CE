@@ -348,21 +348,21 @@ public class SigmaLoadout {
 		};
 	}
 }
-
 [ProtoContract]
 public class LoadoutData {
 	[ProtoMember(1)] public int playerId;
 	[ProtoMember(2)] public XLoadout xLoadout = new();
 	[ProtoMember(3)] public ZeroLoadout zeroLoadout = new();
 	[ProtoMember(4)] public VileLoadout vileLoadout = new();
-	[ProtoMember(5)] public AxlLoadout axlLoadout = new();
+	[JsonIgnore] public AxlLoadout axlLoadout = new();
+	[ProtoMember(5)] public AxlWCLoadout axlWCLoadout = new();
 	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new();
 	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
 		return new LoadoutData() {
 			playerId = playerId,
-			xLoadout = XLoadout.createRandom(),
+		//	xLoadout = XLoadout.createRandom(),
 			zeroLoadout = ZeroLoadout.createRandom(),
 			vileLoadout = VileLoadout.createRandom(),
 			axlLoadout = AxlLoadout.createRandom(),
@@ -378,8 +378,10 @@ public class LoadoutData {
 			zeroLoadout = Helpers.cloneProtobuf(Options.main.zeroLoadout),
 			vileLoadout = Helpers.cloneProtobuf(Options.main.vileLoadout),
 			axlLoadout = Helpers.cloneProtobuf(Options.main.axlLoadout),
+			axlWCLoadout = Helpers.cloneProtobuf(Options.main.axlWCLoadout),
 			sigmaLoadout = Helpers.cloneProtobuf(Options.main.sigmaLoadout),
 			pzeroLoadout = Helpers.cloneProtobuf(Options.main.pzeroLoadout),
 		};
 	}
 }
+

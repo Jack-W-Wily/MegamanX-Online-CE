@@ -16,7 +16,7 @@ public class GigaCrush : Weapon {
 		index = (int)WeaponIds.GigaCrush;
 		weaponBarBaseIndex = (int)WeaponBarIndex.GigaCrush;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 25;
+		weaponSlotIndex = (int)SlotIndex.GigaCrush;
 		killFeedIndex = 13;
 		type = index;
 		displayName = "Giga Crush ";

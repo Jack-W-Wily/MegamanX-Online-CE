@@ -14,17 +14,17 @@ public class FrostTower : Weapon {
 		index = (int)WeaponIds.FrostTower;
 		weaponBarBaseIndex = (int)WeaponBarIndex.FrostTower;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 124;
-		killFeedIndex = 184;
+		weaponSlotIndex = (int)SlotIndex.FTower;
+		killFeedIndex = 182;
 		weaknessIndex = (int)WeaponIds.RisingFire;
 		type = index;
 		displayName = "Frost Tower";
 	//	hasCustomAnim = true;
-		/* damage = "1-2/3";
+		damage = "1-2/3";
 		hitcooldown = "0.75/0.5";
 		Flinch = "0-13/26";
 		FlinchCD = hitcooldown;
-		effect = "Blocks projectiles. C: Summons huge icicles that drop from above."; */
+		effect = "Blocks projectiles. \nC: Summons huge icicles that \ndrop from above.";
 	}
 
 

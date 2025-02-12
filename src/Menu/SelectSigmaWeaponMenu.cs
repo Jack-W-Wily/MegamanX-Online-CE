@@ -35,6 +35,7 @@ public class SigmaWeaponCursor {
 
 
 public class SelectSigmaWeaponMenu : IMainMenu {
+	public MaverickWeapon mw;
 	public bool inGame;
 	public List<SigmaWeaponCursor> cursors;
 	public int selCursorIndex;
@@ -186,7 +187,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 
 			for (int j = 0; j < cursors[i].numWeapons(); j++) {
 				int jIndex = j + cursors[i].startOffset();
-				Global.sprites["hud_weapon_icon"].drawToHUD(66 + jIndex, startX2 + (j * wepW), startY + (i * wepH));
+				Global.sprites["hud_bars_slot"].drawToHUD(72 + jIndex, startX2 + (j * wepW), startY + (i * wepH));
 				if (cursors[i].index != jIndex) {
 					DrawWrappers.DrawRectWH(
 						startX2 + (j * wepW) - 7, startY + (i * wepH) - 7, 14, 14, true,
@@ -223,7 +224,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				if (strongAgainstIndices[i] == 0) {
 					drawIndex = 118;
 				}
-				Global.sprites["hud_weapon_icon"].drawToHUD(
+				Global.sprites["hud_bars_slot"].drawToHUD(
 					drawIndex,
 					startX + 152 + i * 16 + 8,
 					wsy + 18
@@ -239,7 +240,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				if (weakAgainstIndices[i] == 0) {
 					drawIndex = 118;
 				}
-				Global.sprites["hud_weapon_icon"].drawToHUD(
+				Global.sprites["hud_bars_slot"].drawToHUD(
 					drawIndex,
 					startX + 152 + i * 16 + 8,
 					wsy + 34
@@ -358,7 +359,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			_ => ""
 		};
 	}
-
+	
 	private int[] getWeakAgainstFrameIndices(int wi) {
 		return wi switch {
 			0 => new int[] { new FlameMammothWeapon(null).weaponSlotIndex, new FireWave().weaponSlotIndex },

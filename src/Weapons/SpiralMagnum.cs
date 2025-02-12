@@ -84,7 +84,7 @@ public class SpiralMagnumShell : Anim {
 	float bounceCooldown;
 	float timeNoYVel;
 	public SpiralMagnumShell(Point pos, int xDir, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
-		base(pos, "spiralmagnum_shell", 1, netId, false, sendRpc, ownedByLocalPlayer) {
+		base(pos, "x8_axl_magnum_shell", 1, netId, false, sendRpc, ownedByLocalPlayer) {
 		vel = new Point(xDir * 75, -150);
 		collider.wallOnly = true;
 		useGravity = true;

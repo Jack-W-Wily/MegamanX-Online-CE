@@ -15,15 +15,16 @@ public class IceGattlingWC : AxlWeaponWC {
 		shootSounds = [ "iceGattling", "gaeaShield" ];
 		isTwoHanded = true;
 		fireRate = minFireRate;
+		throwIndex = (int)ThrowID.IceGattling;
 		altFireRate = 24;
 		index = (int)WeaponIds.IceGattling;
 		weaponBarBaseIndex = (int)WeaponBarIndex.IceGattling;
-		weaponSlotIndex = 57;
+		weaponSlotIndex = (int)SlotIndex.IGattling;
 		killFeedIndex = 72;
 
 		sprite = "axl_arm_icegattling";
-		flashSprite = "axl_pistol_flash";
-		chargedFlashSprite = "axl_pistol_flash";
+		flashSprite = "x8_axl_bullet_flash3";
+		chargedFlashSprite = "x8_axl_bullet_cflash3";
 
 		maxAmmo = 22;
 		ammo = maxAmmo;
@@ -95,13 +96,16 @@ public class IceGattlingWC : AxlWeaponWC {
 }
 
 public class IceGattlingWCProj : Projectile {
+	float sparkleTime;
+	Anim spark;
 	public IceGattlingWCProj(
 		Actor owner, Point pos,
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "icegattling_proj", netProjId, player
+		pos, 1, owner, "x8_axl_igattling_proj", netProjId, player
 	) {
+		fadeSprite = "x8_axl_igattling_fade";
 		projId = (int)ProjIds.IceGattlingWC;
 		weapon = IceGattlingWC.netWeapon;
 		damager.damage = 0.5f;
@@ -113,6 +117,15 @@ public class IceGattlingWCProj : Projectile {
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle);
+		}
+	}
+	public override void update() {
+		base.update();
+		sparkleTime += speedMul;
+		if (sparkleTime > 2	) {
+			sparkleTime = 0;
+			spark = new Anim(pos, "x8_axl_igattling_sparkles", 1, null, true);
+			spark.useGravity = true;
 		}
 	}
 

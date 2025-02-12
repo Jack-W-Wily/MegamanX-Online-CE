@@ -2415,7 +2415,7 @@ public partial class Character : Actor, IDamagable {
 
 				Fonts.drawText(
 					FontType.Grey, "Dropping...",
-					pos.x + 5, pos.y - 15 + currentLabelY,
+					pos.x + 5, pos.y - 16 + currentLabelY,
 					Alignment.Center, true, depth: ZIndex.HUD
 				);
 				deductLabelY(labelCooldownOffY);

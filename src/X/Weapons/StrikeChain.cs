@@ -14,12 +14,12 @@ public class StrikeChain : Weapon {
 		index = (int)WeaponIds.StrikeChain;
 		weaponBarBaseIndex = (int)WeaponBarIndex.StrikeChain;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 14;
+		weaponSlotIndex = (int)SlotIndex.SChain;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.SonicSlicer;
 		//switchCooldown = 0;
 		damage = "2/4";
-		effect = "Hooks enemies and items. Be Spider-Man.";
+		effect = "Hooks enemies and items. \nBe Spider-Man.";
 		hitcooldown = "0.5";
 		Flinch = "Hooked Time";
 		FlinchCD = "0";

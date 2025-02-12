@@ -11,12 +11,12 @@ public class ShotgunIce : Weapon {
 		killFeedIndex = 8;
 		weaponBarBaseIndex = (int)WeaponBarIndex.ShotgunIce;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 8;
+		weaponSlotIndex = (int)SlotIndex.SIce;
 		weaknessIndex = (int)WeaponIds.FireWave;
 		shootSounds = new string[] { "shotgunIce", "shotgunIce", "shotgunIce", "icyWind", "chillpBlizzard" };
 		fireRate = 30;
 		damage = "2/1-2";
-		effect = "U:Can Split.\nC: Insta Freeze enemies. Ice sled up to 12 DMG.";
+		effect = "U:Splits in 5 pieces on hit.\nC: Insta Freeze enemies. \nIce sled up to 12 DMG.";
 		hitcooldown = "0.01/0.5";
 		Flinch = "0";
 		type = index;

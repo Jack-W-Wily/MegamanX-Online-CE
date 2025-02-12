@@ -10,18 +10,19 @@ public class GroundHunter : Weapon {
 	public GroundHunter() : base() {
 		index = (int)WeaponIds.GroundHunter;
 		fireRate = 30;
-		weaponSlotIndex = 127;
-		weaponBarIndex = weaponBarBaseIndex;
+		weaponSlotIndex = (int)SlotIndex.GHunter;
 		weaponBarBaseIndex = (int)WeaponBarIndex.GroundHunter;
+		killFeedIndex = 185;
+		weaponBarIndex = weaponBarBaseIndex;
 		shootSounds = new string[] {"busterX4","busterX4","busterX4","buster2X4","buster2X4"};
 		weaknessIndex = (int)WeaponIds.FrostTower;
 		type = index;
 		displayName = "Ground Hunter";
-		/* damage = "2/1-1";
+		damage = "2/1-1";
 		hitcooldown = "0/0.5-0";
 		Flinch = "0";
 		FlinchCD = hitcooldown;
-		effect = "Press DOWN to change direction. C: Press UP or DOWN to spawn more projectiles."; */
+		effect = "Press DOWN to change direction. \nC: Press UP or DOWN to spawn \nmore projectiles.";
 	}
 
 	public override void shoot(Character character, int[] args) {

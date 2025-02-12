@@ -13,7 +13,7 @@ public class HyperNovaStrike : Weapon {
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = (int)WeaponBarIndex.NovaStrike;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 95;
+		weaponSlotIndex = (int)SlotIndex.NovaStrike;
 		killFeedIndex = 104;
 		ammo = 28;
 		drawGrayOnLowAmmo = true;

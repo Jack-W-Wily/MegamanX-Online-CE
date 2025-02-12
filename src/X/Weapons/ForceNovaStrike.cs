@@ -11,7 +11,7 @@ public class ForceNovaStrike : Weapon {
 		index = (int)WeaponIds.ForceNovaStrike;
 		weaponBarBaseIndex = 42;
 		weaponBarIndex = 36;
-		weaponSlotIndex = 95;
+		weaponSlotIndex = (int)SlotIndex.NovaStrike;
 		killFeedIndex = 104;
 		ammo = 28;
 		type = index;

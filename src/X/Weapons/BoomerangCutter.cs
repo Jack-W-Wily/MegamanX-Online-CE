@@ -11,7 +11,7 @@ public class BoomerangCutter : Weapon {
 		killFeedIndex = 7;
 		weaponBarBaseIndex = (int)WeaponBarIndex.BoomerangCutter;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 7;
+		weaponSlotIndex = (int)SlotIndex.BCutter;
 		weaknessIndex = (int)WeaponIds.HomingTorpedo;
 		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" , ""};
 		fireRate = 30;

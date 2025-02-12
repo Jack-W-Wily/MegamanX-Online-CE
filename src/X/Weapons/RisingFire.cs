@@ -12,17 +12,17 @@ public class RisingFire : Weapon {
 		index = (int)WeaponIds.RisingFire;
 		weaponBarBaseIndex = (int)WeaponBarIndex.RisingFire;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 126;
-		killFeedIndex = 183;
+		weaponSlotIndex = (int)SlotIndex.RFire;
+		killFeedIndex = 184;
 		type = index;
 		displayName = "Rising Fire";
 		weaknessIndex = (int)WeaponIds.DoubleCyclone;
 		//hasCustomAnim = true;
-		/* damage = "2+1-1/2+1-1";
+		damage = "2+1-1/2+1-1";
 		hitcooldown = "0.5";
 		Flinch = "0/13-26";
 		FlinchCD = hitcooldown;
-		effect = "Burns upper enemies. C: Resets airdashes count."; */
+		effect = "Burns upper enemies. \nC: Resets airdashes count.";
 	}
 
 	public override void shoot(Character character, int[] args) {

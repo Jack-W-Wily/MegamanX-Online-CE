@@ -1,5 +1,6 @@
 using System;
-
+using System.Collections.Generic;
+using SFML.Graphics;
 namespace MMXOnline;
 
 public class AxlBulletWC : AxlWeaponWC {
@@ -10,14 +11,15 @@ public class AxlBulletWC : AxlWeaponWC {
 	private bool specialActive;
 
 	public AxlBulletWC() {
+		throwIndex = (int)ThrowID.AxlBullet;
 		shootSounds = ["axlBullet", "axlBulletCharged", "axlBulletCharged", "axlBulletCharged"];
 		index = (int)WeaponIds.AxlBullet;
-		weaponSlotIndex = 28;
+		weaponSlotIndex = (int)SlotIndex.Abullet;
 		killFeedIndex = 28;
 		weaponBarBaseIndex = (int)WeaponBarIndex.AxlBullet;
 		sprite = "axl_arm_pistol";
-		flashSprite = "axl_pistol_flash";
-		chargedFlashSprite = "axl_pistol_flash_charged";
+		flashSprite = "x8_axl_bullet_flash";
+		chargedFlashSprite = "";
 		altFireRate = 18;
 		displayName = "Axl Bullets";
 		maxAmmo = 16;
@@ -50,16 +52,16 @@ public class AxlBulletWC : AxlWeaponWC {
 
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
-		new CopyShotWCProj(axl, pos, chargeLevel, byteAngle, netId, sendRpc: true);
+		ushort netIdEffect = axl.player.getNextActorNetId();
+		if(chargeLevel >= 2){
+			new CopyShotWCProj(axl, pos, chargeLevel, byteAngle, netId, sendRpc: true);
+			new Anim(pos, "x8_axl_bullet_cflash4", 1, netIdEffect, true, sendRpc: true) {
+			byteAngle = byteAngle, host = axl};
+		}
 	}
 
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
-		return chargeLevel switch {
-			1 => 2,
-			2 => 3,
-			3 => 4,
-			_ => 4,
-		};
+		return 0;
 	}
 
 	public override void onAmmoChange(float amount) {
@@ -71,15 +73,16 @@ public class AxlBulletWC : AxlWeaponWC {
 	}
 
 	public override bool attackCtrl(AxlWC axl) {
+		if(axl.isCharging()) return false;
 		Point inputDir = axl.player.input.getInputDir(axl.player);
 		bool specialPressed = wasSpecialHeld && !axl.player.input.isHeld(Control.Special1, axl.player);
 		// Shoryken does not use negative edge at all.
-		if (axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && ammo > 0) {
+		if (axl.autoChargeCooldown <= 0 && axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && ammo > 0) {
 			axl.changeState(new RainStorm(), true);
 			return true;
 		}
 		// Negative edge inputs.
-		if (axl.grounded && ammo > 0 && inputDir.y == -1 && axl.charState is not RisingBarrage && (
+		if (axl.autoChargeCooldown <= 0 && axl.grounded && ammo > 0 && inputDir.y == -1 && axl.charState is not RisingBarrage && (
 				axl.charState is Dash or AirDash ||
 				axl.player.input.isPressed(Control.Dash, axl.player)
 			)
@@ -87,7 +90,7 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new RisingBarrage(), true);
 			return true;
 		}
-		if (specialPressed && inputDir.y == -1 && ammo > 0) {
+		if (axl.autoChargeCooldown <= 0 && specialPressed && inputDir.y == -1 && ammo > 0) {
 			if (axl.grounded) {
 				axl.changeState(new TailShot(), true);
 			} else {
@@ -95,11 +98,11 @@ public class AxlBulletWC : AxlWeaponWC {
 			}
 			return true;
 		}
-		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
+		if (axl.autoChargeCooldown <= 0 && specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
 			axl.changeState(new OcelotSpin(), true);
 			return true;
 		}
-		if (specialPressed && ammo > 0) {
+		if (axl.autoChargeCooldown <= 0 && specialPressed && ammo > 0) {
 			axl.changeState(new EvasionBarrage(), true);
 			return true;
 		}
@@ -137,9 +140,9 @@ public class AxlBulletWCProj : Projectile {
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "axl_bullet", netProjId, player
+		pos, 1, owner, "x8_axl_bullet_proj", netProjId, player
 	) {
-		fadeSprite = "axl_bullet_fade";
+		fadeSprite = "x8_axl_bullet_fade";
 		projId = (int)ProjIds.AxlBulletWC;
 		weapon = AxlBulletWC.netWeapon;
 		damager.damage = 1;
@@ -151,7 +154,8 @@ public class AxlBulletWCProj : Projectile {
 		maxTime = 14f / 60f;
 
 		if (type >= 1) {
-			changeSprite("axl_bullet_blue", true);
+			changeSprite("x8_axl_bullet2_proj", true);
+			fadeSprite = "x8_axl_bullet2_fade";
 			damager.damage = 2;
 			damager.flinch = Global.halfFlinch;
 		}
@@ -169,47 +173,58 @@ public class AxlBulletWCProj : Projectile {
 }
 
 public class CopyShotWCProj : Projectile {
+	public List<Point> lastPoses = new List<Point>();
+	public Sprite sprite;
+	public Sprite trailSprite;
+
 	public CopyShotWCProj(
 		Actor owner, Point pos, int chargeLevel,
 		float byteAngle, ushort netProjId,
 		bool sendRpc = false, Player? player = null
 	) : base(
-		pos, 1, owner, "axl_bullet_charged", netProjId, player
+		pos, 1, owner, "x8_axl_cshot_proj", netProjId, player
 	) {
-		fadeSprite = "axl_bullet_charged_fade";
+		sprite = new Sprite("x8_axl_cshot_proj");
+		//trailSprite = new Sprite("");
+		damager.damage = 1;
+		damager.flinch = Global.miniFlinch;
+		fadeSprite = "x8_axl_cshot_fade";
 		fadeOnAutoDestroy = true;
 		projId = (int)ProjIds.CopyShotWC;
 		weapon = AxlBulletWC.netWeapon;
-		damager.damage = 2;
-		damager.flinch = Global.halfFlinch;
 		reflectable = true;
-
 		vel = Point.createFromByteAngle(byteAngle) * 500;
 		this.byteAngle = byteAngle;
 		maxTime = 0.225f;
 
 		if (sendRpc) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netProjId, byteAngle, [(byte)chargeLevel]);
-		}
-
-		if (chargeLevel == 2) {
-			damager.damage = 3;
-			damager.flinch = Global.defFlinch;
-			vel *= 1.25f;
-			maxTime /= 1.25f;
-			xScale = 1.25f;
-			yScale = 1.25f;
-		} else if (chargeLevel >= 3) {
-			damager.damage = 4;
-			damager.flinch = Global.superFlinch;
-			vel *= 1.5f;
-			maxTime /= 1.5f;
-			xScale = 1.5f;
-			yScale = 1.5f;
-		}
+		}}
+	public override void update() {
+		base.update();
+		lastPoses.Add(pos);
+		if (lastPoses.Count > 5) lastPoses.RemoveAt(0);
 	}
+	/*public override void render(float x, float y) {
+		base.render(x, y);
+		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex);
+		if (Options.main.lowQualityParticles()) return;
 
-	public static Projectile rpcInvoke(ProjParameters args) {
+		for (int i = lastPoses.Count - 1; i >= 1; i--) {
+			Point head = lastPoses[i];
+			Point outerTail = lastPoses[i - 1];
+			Point innerTail = lastPoses[i - 1];
+			if (i == 1) {
+				innerTail = innerTail.add(head.directionToNorm(innerTail).times(5));
+			}
+	
+			/DrawWrappers.DrawLine(head.x, head.y, outerTail.x, outerTail.y, new Color(255, 75, 3), 1, 0, true);
+			DrawWrappers.DrawLine(head.x, head.y, innerTail.x, innerTail.y, new Color(255, 75, 3), 1, 1, true);
+			DrawWrappers.DrawLine(head.x, head.y + 10, innerTail.x, innerTail.y + 10, new Color(255, 75, 3), 1, 1, true);
+
+		}
+	}*/
+		public static Projectile rpcInvoke(ProjParameters args) {
 		return new CopyShotWCProj(
 			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
 		);

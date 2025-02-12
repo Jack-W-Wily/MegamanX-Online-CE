@@ -11,12 +11,12 @@ public class ChameleonSting : Weapon {
 		killFeedIndex = 2;
 		weaponBarBaseIndex = (int)WeaponBarIndex.ChameleonSting;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 2;
+		weaponSlotIndex = (int)SlotIndex.CSting;
 		weaknessIndex = (int)WeaponIds.BoomerangCutter;
 		shootSounds = new string[] { "csting", "csting", "csting", "stingCharge", "stingCharge" };
 		fireRate = 45;
 		damage = "2";
-		effect = "Splits. \nFull Charge grants invulnerability.";
+		effect = "Splits into 3 projs. \nFull Charge grants invulnerability.";
 		hitcooldown = "0";
 		type = index;
 		displayName = "Chameleon Sting ";

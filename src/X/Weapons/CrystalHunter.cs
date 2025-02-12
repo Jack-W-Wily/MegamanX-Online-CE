@@ -14,7 +14,7 @@ public class CrystalHunter : Weapon {
 		index = (int)WeaponIds.CrystalHunter;
 		weaponBarBaseIndex = (int)WeaponBarIndex.CrystalHunter;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 9;
+		weaponSlotIndex = (int)SlotIndex.CHunter;
 		killFeedIndex = 20;
 		weaknessIndex = (int)WeaponIds.MagnetMine;
 		//switchCooldown = 0.5f;

@@ -11,12 +11,12 @@ public class ElectricSpark : Weapon {
 		killFeedIndex = 6;
 		weaponBarBaseIndex = (int)WeaponBarIndex.ElectricSpark;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 6;
+		weaponSlotIndex = (int)SlotIndex.ESpark;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" , ""};
 		fireRate = 30;
 		damage = "2/4";
-		effect =  "Can Split. Charged: Doesn't destroy on hit.";
+		effect =  "Can Split. \nCharged: Doesn't destroy on hit.";
 		hitcooldown = "0/0.5";
 		Flinch = "6/26";
 		FlinchCD = "1/0";

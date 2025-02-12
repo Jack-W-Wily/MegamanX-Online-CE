@@ -15,11 +15,11 @@ public class GravityWell : Weapon {
 		index = (int)WeaponIds.GravityWell;
 		weaponBarBaseIndex = (int)WeaponBarIndex.GravityWell;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 22;
+		weaponSlotIndex = (int)SlotIndex.GWell;
 		killFeedIndex = 45;
 		weaknessIndex = (int)WeaponIds.RaySplasher;
 		damage = "2/4";
-		effect = "Disables Gravity to the enemy. C: Super Armor.\nUncharged won't give assists.";
+		effect = "Disables Gravity to the enemy. \nC: Grants Super Armor. Hold UP \nto lift enemies or DOWN to push them. \nUncharged won't give assists.";
 		hitcooldown = "0.5";
 		Flinch = "0/26";
 		maxAmmo = 16;

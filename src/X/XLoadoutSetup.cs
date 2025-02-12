@@ -18,9 +18,9 @@ public class XLoadoutSetup {
 			bool enableX1Weapons = player.xArmor1v1 == 1 || !Global.level.server.useLoadout;
 			bool enableX2Weapons = player.xArmor1v1 == 2 || !Global.level.server.useLoadout;
 			bool enableX3Weapons = player.xArmor1v1 == 3 || !Global.level.server.useLoadout;
-				weapons.Add(new XBuster());
+			weapons.Add(new XBuster());
 
-			if (enableX1Weapons) {
+			//if (enableX1Weapons) {
 				weapons.Add(new HomingTorpedo());
 				weapons.Add(new ChameleonSting());
 				weapons.Add(new RollingShield());
@@ -29,8 +29,8 @@ public class XLoadoutSetup {
 				weapons.Add(new ElectricSpark());
 				weapons.Add(new BoomerangCutter());
 				weapons.Add(new ShotgunIce());
-			}
-			if (enableX2Weapons) {
+			//}
+			//if (enableX2Weapons) {
 				weapons.Add(new CrystalHunter());
 				weapons.Add(new BubbleSplash());
 				weapons.Add(new SilkShot());
@@ -39,8 +39,8 @@ public class XLoadoutSetup {
 				weapons.Add(new StrikeChain());
 				weapons.Add(new MagnetMine());
 				weapons.Add(new SpeedBurner());
-			}
-			if (enableX3Weapons) {
+		//	}
+		//	if (enableX3Weapons) {
 				weapons.Add(new AcidBurst());
 				weapons.Add(new ParasiticBomb());
 				weapons.Add(new TriadThunder());
@@ -49,7 +49,16 @@ public class XLoadoutSetup {
 				weapons.Add(new GravityWell());
 				weapons.Add(new FrostShield());
 				weapons.Add(new TornadoFang());
-			}
+		//	}
+				weapons.Add(new LightningWeb());
+				weapons.Add(new FrostTower());
+				weapons.Add(new SoulBody());
+				weapons.Add(new RisingFire());
+				weapons.Add(new GroundHunter());
+				weapons.Add(new AimingLaser());
+				weapons.Add(new DoubleCyclone());
+				weapons.Add(new TwinSlasher());
+				weapons.Add(new ZXSaber());
 
 			if (player.hasArmArmor(3) || player.xArmor1v1 == 2) weapons.Add(new HyperCharge());
 			if (player.hasBodyArmor(2) || player.xArmor1v1 == 3) weapons.Add(new GigaCrush());

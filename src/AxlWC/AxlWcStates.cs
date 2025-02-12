@@ -991,7 +991,38 @@ public class AxlBlock : CharState {
 	public override void update() {
 		base.update();
 		axl.armAngle = 0;
-		if (!player.input.isHeld(Control.Down, player) || player.input.isHeld(Control.Jump, player)) {
+		if (!player.input.isHeld(Control.Down, player) ||  player.input.isHeld(Control.Jump, player)) {
+			character.changeToIdleOrFall();
+			return;
+		}
+		if(!Options.main.blockInput) return;
+		if(!player.input.isHeld(Control.AxlAimBackwards,player)){
+			character.changeToIdleOrFall();
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		axl = character as AxlWC ?? throw new NullReferenceException();
+	}
+}
+public class AxlBlock2 : CharState {
+	private AxlWC axl = null!;
+
+	public AxlBlock2() : base("block") {
+		exitOnAirborne = true;
+		normalCtrl = true;
+		attackCtrl = true;
+		stunResistant = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+		axl.armAngle = 0;
+		if(!Options.main.blockInput) return;
+		if(!player.input.isHeld(Control.AxlAimBackwards,player)){
 			character.changeToIdleOrFall();
 			return;
 		}

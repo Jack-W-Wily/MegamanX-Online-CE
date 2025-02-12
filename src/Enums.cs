@@ -309,10 +309,11 @@ public enum WeaponIds {
 	ZainParry,
 	DNACore = 250,
 
-	// Iris
-	IrisCrystal,
+
 	// GBD
 	GBDKick,
+	// Iris
+	IrisCrystal,
 
 	ShieldBoomerang,
 }
@@ -871,8 +872,6 @@ public enum ProjIds {
 	SpiralMagnumWC,
 	FormicAcidWC,
 	FormicAcidSmallWC,
-
-
 	// Iris Stuff
 	IrisFireBallProj,
 	IrisCrystal,
@@ -956,50 +955,116 @@ public enum WeaponBarIndex{
 	SuperBarOff,
 	ZainCounter
 }
-public enum WeaponSlotIndex{
+public enum SlotIndex{
 	//X1
 	Buster,
-	HomingTorpedo,
-	ChameleonSting,
-	RollingShield,
-	FireWave,
-	StormTornado,
-	ElectricSpark,
-	BoomerangCutter,
-	ShotgunIce,
+	HTorpedo,
+	CSting,
+	RShield,
+	FWave,
+	STornado,
+	ESpark,
+	BCutter,
+	SIce,
 	Hadouken,
 	//X2
-	CrystalHunter,
-	BubbleSplash,
-	SilkShot,
-	SpinWheel,
-	SonicSlicer,
-	StrikeChain,
-	MagnetMine,
-	SpeedBurner,
+	CHunter,
+	BSplash,
+	SShot,
+	SWheel,
+	SSlicer,
+	SChain,
+	MMine,
+	SBurner,
 	GigaCrush,
 	Shoryuken,
 	//X3
-	AcidBurst,
-	ParasiticBomb,
-	TriadThunder,
-	SpinningBlade,
-	RaySplasher,
-	GravityWell,
-	FrostShield,
-	TornadoFang,
+	ABurst,
+	PBomb,
+	TThunder,
+	SBlade,
+	RSplasher,
+	GWell,
+	FShield,
+	TFang,
 	HyperCharge,
 	//X4
-	LightningWeb,
-	FrostTower,
-	SoulBody,
-	RisingFire,
-	GroundHunter,
-	AimingLaser,
-	DoubleCyclone,
-	TwinSlasher,
+	LWeb,
+	FTower,
+	SBody,
+	RFire,
+	GHunter,
+	ALaser,
+	DCyclone,
+	TSlasher,
+	NovaStrike,
 	//X5
-	DarkHold
+	DHold,
+	//extra weapons
+	ZSaber = 56,
+	//Rides
+	BBear = 66,
+	Kangroo,
+	Hawk,
+	Frog,
+	Goliath,
+	DBear,
+	//Mav X1
+	CP,
+	SMandrill,
+	AArmardillo,
+	LOctopus,
+	BKwagata,
+	SChameleon,
+	SEagle,
+	FMammoth,
+	Doggo,
+	//Mav X2
+	WSponge,
+	WGator,
+	Carlos,
+	FStag,
+	MMConcoon,
+	MCentiped,
+	Dav,
+	OOOStrich,
+	Claudio,
+	//Mav X3
+	BBuffalo,
+	TSeahorse,
+	TRino,
+	VCatfish,
+	CCrawfish,
+	NTiger,
+	GBeetle,
+	Bhornet,
+	DrCatus,
+	//moth form
+	MMMoth,
+	//sigma
+	Sigma,
+	WSigmaHead,
+	WSHand,
+	//Sigma Virus
+	MechaniloidBird,
+	MechaniloidDino,
+	MechaniloidFish,
+	MechaniloidDrill,
+	//DrDoppler Body
+	DrDoppler,
+	//Axl
+	Abullet,
+	BLauncher,
+	RGun,
+	IGattling,
+	BArrow,
+	FBurner,
+	PGun,
+	SMagnum,
+	BBlaster,
+	DrDShock = 121,
+	DrDVaccine,
+	CPIceStatue
 }
 
 public enum CharHpBarIndex{
@@ -1019,7 +1084,9 @@ public enum CharHpBarIndex{
 	Zain,
 	BlackZero,
 	WhiteAxl,
-	BoostMode
+	BoostMode,
+	SoulBody,
+	Iris
 }
 
 public enum VehicleHpBarIndex{

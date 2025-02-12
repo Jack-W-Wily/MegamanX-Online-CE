@@ -14,10 +14,10 @@ public class MagnetMine : Weapon {
 		index = (int)WeaponIds.MagnetMine;
 		weaponBarBaseIndex = (int)WeaponBarIndex.MagnetMine;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 15;
+		weaponSlotIndex = (int)SlotIndex.MMine;
 		killFeedIndex = 20 + (index - 9);
 		weaknessIndex = (int)WeaponIds.SilkShot;
-		effect = "C: Can absorb projectiles and grow it's size.\nSize growth depends on the damage of the projectile.";
+		effect = "C: Grow stronger absorving projectiles.\nGrowth depends on the damage.\nBoth Uncharged and Charged can be\nmanually controlled.";
 		hitcooldown = "0/0.2";
 		damage = "2-4/1-2-4";
 		Flinch = "0/26";

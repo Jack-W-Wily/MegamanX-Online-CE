@@ -18,7 +18,7 @@ public class BubbleSplash : Weapon {
 		index = (int)WeaponIds.BubbleSplash;
 		weaponBarBaseIndex = (int)WeaponBarIndex.BubbleSplash;
 		weaponBarIndex = weaponBarBaseIndex;
-		weaponSlotIndex = 10;
+		weaponSlotIndex = (int)SlotIndex.BSplash;
 		killFeedIndex = 21;
 		weaknessIndex = (int)WeaponIds.SpinWheel;
 		//switchCooldown = 0.25f;
