@@ -49,7 +49,7 @@ public class AimingLaser : Weapon {
 		int xDir = character.getShootXDir();
 		Player player = character.player;
 		
-		/*if (chargeLevel == 0){
+		if (chargeLevel == 0){
 		new PeacockMissle(this, character.getShootPos(), 
 		character.pos.x - character.aLaserCursor.pos.x < 0 ? 1 : -1, 
 		character.player, 
@@ -59,33 +59,6 @@ public class AimingLaser : Weapon {
 		}
 
 		if (chargeLevel == 1){
-				foreach(var targ in character.aLaserTargets) {
-		new PeacockMissle(this, character.getShootPos(), 
-		character.pos.x - character.aLaserCursor?.pos.x < 0 ? 1 : -1, 
-		character.player, 
-		character.player.getNextActorNetId(), 
-		targ, rpc: true);
-				}
-			character.aLaserCursor?.destroySelf();
-		character.aLaserCursor = null!;
-		}*/
-
-
-
-		if (chargeLevel >= 3 && character.aLaserCursor != null) {
-			int type = 0;
-
-			foreach(var targ in character.aLaserTargets) {
-				
-				if (targ.pos.distanceTo(pos) <= 320) {
-					new AimingLaserProj(this, pos, xDir, player, type, player.getNextActorNetId(), targ, true);
-					addAmmo(-1, player);
-					type++;
-				}
-			}
-			character.aLaserCursor?.destroySelf();
-			character.aLaserCursor = null!;
-		}else {
 			foreach(var targ in character.aLaserTargets) {
 				new PeacockMissle(this, character.getShootPos(), 
 				character.pos.x - character.aLaserCursor?.pos.x < 0 ? 1 : -1, 
@@ -99,7 +72,28 @@ public class AimingLaser : Weapon {
 		}
 
 
-		/*if (chargeLevel >= 3){
+
+		if ((chargeLevel == 2 || chargeLevel == 3)  
+		&& character.aLaserCursor != null && !player.hasArmArmor(2)
+		|| chargeLevel >= 4 && player.hasArmArmor(2) && character.aLaserCursor != null) {
+			int type = 0;
+
+			foreach(var targ in character.aLaserTargets) {
+				
+				if (targ.pos.distanceTo(pos) <= 320) {
+					new AimingLaserProj(this, pos, xDir, player, type, player.getNextActorNetId(), targ, true);
+					addAmmo(-1, player);
+					type++;
+				}
+			}
+			character.aLaserCursor?.destroySelf();
+			character.aLaserCursor = null!;
+		}
+	
+		
+
+
+		if (chargeLevel >= 4 && !player.hasArmArmor(2)){
 			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new AimingLaserBlade(

@@ -1799,7 +1799,7 @@ public class RAGroundPoundLand : RideArmorState {
 	public override void onEnter(RideArmorState? oldState) {
 		base.onEnter(oldState);
 		if (rideArmor.raNum == 4){
-		rideArmor.changeSprite("goliath_groundpound_land", true);
+		rideArmor.changeSprite("goliath_groundpound_end", true);
 		}
 		if (player == null) return;
 		rideArmor.playSound("crash", sendRpc: true);

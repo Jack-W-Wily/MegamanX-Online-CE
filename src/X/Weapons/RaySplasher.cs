@@ -9,7 +9,7 @@ public class RaySplasher : Weapon {
 	public static RaySplasher netWeapon = new RaySplasher();
 
 	public RaySplasher() : base() {
-		shootSounds = new string[] { "raySplasher", "raySplasher", "raySplasher", "warpIn" , ""};
+		shootSounds = new string[] { "neontSlash", "raySplasher", "raySplasher", "warpIn" , ""};
 		fireRate = 60;
 		index = (int)WeaponIds.RaySplasher;
 		weaponBarBaseIndex = (int)WeaponBarIndex.RaySplasher;
@@ -28,9 +28,17 @@ public class RaySplasher : Weapon {
 		int chargeLevel = args[0];
 
 		if (chargeLevel < 3) {
-			if (character is MegamanX mmx) {
-				mmx.shootingRaySplasher = this;
-			}
+		//	if (character is MegamanX mmx) {
+		//		mmx.shootingRaySplasher = this;
+		//	}
+
+		float damage = character.grounded ? 2 : 2;
+		int flinch = Global.defFlinch;
+		new RayClaw(
+				this, character.getShootPos(),
+				 character.xDir,  character.player,  character.player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true
+		);
+
 		} else {
 			if (character.ownedByLocalPlayer) {
 				character.changeState(new RaySplasherChargedState(), true);
@@ -94,6 +102,48 @@ public class RaySplasherProj : Projectile {
 		}
 	}
 }
+
+
+
+
+public class RayClaw : Projectile {
+	public RayClaw(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId,
+		float damage = 2, int flinch = 26, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "raysplasher_claw", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		reflectable = false;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		setIndestructableProperties();
+		isJuggleProjectile = true;
+		isShield = true;
+		isReflectShield = true;
+		maxTime = 0.3f;
+		projId = (int)ProjIds.RayClaw;
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void postUpdate() {
+		base.postUpdate();
+		if (owner?.character != null) {
+			incPos(owner.character.deltaPos);
+		}
+	}
+
+	
+}
+
+
+
 
 public class RaySplasherTurret : Actor, IDamagable {
 	Character? chr;

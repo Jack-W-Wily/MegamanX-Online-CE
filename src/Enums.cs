@@ -824,6 +824,9 @@ public enum ProjIds {
 	PlasmaBusterHit,
 	PlasmaBuster3,
 
+	// EXtra bonus weapons for X
+	RayClaw,
+
 	// X4 Wps
 
 	LightningWebProj,

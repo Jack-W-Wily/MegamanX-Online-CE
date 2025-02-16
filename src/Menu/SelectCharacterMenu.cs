@@ -341,10 +341,10 @@ public class SelectCharacterMenu : IMainMenu {
 
 		string[] description = playerData.charNum switch {
 			(int)CharIds.X => new string[]{
-				"X, Standard Zoner that can use Armors and mix them."
+				"X, Standard Zoner that can use Armors and mix them. (WIP)"
 			},
 			(int)CharIds.XAnother => new string[]{
-				"Lacks ability to mix armors but has a bigger moveset."
+				"Lacks ability to mix armors but has a bigger moveset. (WIP)"
 			},
 			(int)CharIds.PunchyZero => new string[] {
 				"High Damage Melee fighter but weak midair."
@@ -356,31 +356,32 @@ public class SelectCharacterMenu : IMainMenu {
 				"Combo & Rushdown fighter\nwith a variety of combo routes and hypermodes."
 			},
 			(int)CharIds.Vile => new string[] {
-				"Multiarchetype Fighter that can adapt\nto any strategy but lacks HP."
+				"Multiarchetype Fighter that can adapt\nto any strategy but lacks HP. (WIP)"
 			},
 			(int)CharIds.AxlWC => new string[] {
-				"Gunslinger Rushdown Zoner hybrid\nwith access to i-frames."
+			"O U T   O F    O R D E R\n (bugged)"	
+			//"Gunslinger Rushdown Zoner hybrid\nwith access to i-frames."
 			},
 			(int)CharIds.AxlAnother => new string[] {
 				"???"
 			},
 			(int)CharIds.Sigma => new string[] {
-				"Commander type unit that can\nuse mavericks to assist his kit."
+				"Commander type unit that can\nuse mavericks to assist his kit.(WIP)"
 			},
 			(int)CharIds.Zain => new string[] {
-				"High Damage Fighter with Defensive skills\nbut can't combo without resoruces."
+				"High Damage Fighter with Defensive skills\nbut can't combo without resoruces. (WIP)"
 			},
 			(int)CharIds.GBD => new string[] {
-				"Hit and run type Trickster\nthat can summon ride chasers."
+				"Hit and run type Trickster\nthat can summon ride chasers. (WIP)"
 			},
 			(int)CharIds.Dynamo => new string[] {
-				"Multi strategy fighter with great mobility options."
+				"Multi strategy fighter with great mobility options. (WIP)"
 			},
 			(int)CharIds.Dragoon => new string[] {
-				"Shoto styled fighter with burning damage passive."
+				"Shoto styled fighter with burning damage passive. (WIP)"
 			},
 			(int)CharIds.Iris => new string[] {
-				"VAGABUNDA ESTRUPADA ARROMBADA"
+				"Setplay Styled Zoner (WIP)"
 			},
 			_ => new string[] { "ERROR" }
 		};

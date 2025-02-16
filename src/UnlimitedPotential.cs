@@ -704,7 +704,7 @@ public class XReviveStart : CharState {
 public class XRevive : CharState {
 	public float radius = 200;
 	XReviveAnim reviveAnim;
-	RagingChargeX mmx;
+	MegamanX mmx;
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
@@ -720,8 +720,8 @@ public class XRevive : CharState {
 			player.health = 1;
 			character.addHealth(player.maxHealth);
 
-			player.weapons.RemoveAll(w => w is not XBuster);
-			player.weapons.Add(new RagingChargeBuster());
+		//	player.weapons.RemoveAll(w => w is not XBuster);
+		//	player.weapons.Add(new RagingChargeBuster());
 			
 			/* if (player.weapons.Count == 0) {
 				player.weapons.Add(new Buster());
@@ -755,14 +755,24 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
-		mmx = character as RagingChargeX;
+		MegamanX? mmx = Global.level.mainPlayer.character as MegamanX;
+
+		if (player.hasAllX3Armor()){
+		mmx.hyperChestActive = true;
+		mmx.hyperArmActive = true;
+		mmx.hyperLegActive = true;
+		mmx.hyperHelmetActive = true;
+		} else {
+		mmx.hasUltimateArmor = true;
+		}
+	
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		Global.level.addToGrid(character);
-		mmx.invulnTime = 2;
+		//Global.level.addToGrid(character);
+		//mmx.invulnTime = 2;
 	}
 }
 

@@ -104,7 +104,7 @@ public partial class Player {
 	public const int AxlHyperCost = 10;
 	public const int reviveVileCost = 1;
 	public const int reviveSigmaCost = 10;
-	public const int reviveXCost = 0;
+	public const int reviveXCost = 5;
 	public const int goldenArmorCost = 5;
 	public const int ultimateArmorCost = 10;
 	public bool lastDeathCanRevive;
@@ -2236,7 +2236,7 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return  armorFlag == 0 && character?.charState is Die && lastDeathCanRevive && isX && newCharNum == (int)CharIds.X && currency >= reviveXCost && !lastDeathWasXHyper;
+		return character?.charState is Die && lastDeathCanRevive && isX && newCharNum == (int)CharIds.X && currency >= reviveXCost && !lastDeathWasXHyper;
 	}
 
 	public void reviveVile(bool toMK5) {

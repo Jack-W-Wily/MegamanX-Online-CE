@@ -12,7 +12,7 @@ public class HyperAxlWcStart : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.loopCount > 8) {
+		if (stateTime > 2) {
 			axl.whiteTime = 1200;
 			axl.isWhite = true;
 			axl.playSound("ching");

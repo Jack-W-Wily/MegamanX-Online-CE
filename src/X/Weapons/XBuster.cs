@@ -109,13 +109,14 @@ public class XBuster : Weapon {
 			};
 		}
 
-		if (mmx.hasUltimateArmor && chargeLevel >= 3 && !isStock && mmx.armArmor != ArmorId.Max) {
+		/* if (mmx.hasUltimateArmor && chargeLevel >= 3 && !isStock && mmx.armArmor != ArmorId.Max) {
 			new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 			new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
 			character.playSound("plasmaShot", sendRpc: true);	
 			return;
 		}
-		else if (mmx.stockedMaxBuster) {
+		else */
+		 if (mmx.stockedMaxBuster) {
 			if (mmx.charState.attackCtrl && mmx.charState.normalCtrl) {
 				mmx.changeState(new X3ChargeShot(null));
 				return;

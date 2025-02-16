@@ -36,7 +36,7 @@ public class XAnother : MegamanX {
 		base.update();
 
 		if (player.superAmmo == 0){
-		hasUltimateArmor = true;
+		hasUltimateArmor = false;
 		player.removeNovaStrike();
 		}
 		if (player.superAmmo > 14 && player.input.isPressed(Control.Special2, player)){
