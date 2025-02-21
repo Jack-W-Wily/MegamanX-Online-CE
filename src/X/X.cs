@@ -255,7 +255,7 @@ public class MegamanX : Character {
 		if (stockedSaber) {
 			addRenderEffect(RenderEffectType.ChargeGreen, 2, 6);
 		}
-		else if (stockedMaxBuster) {
+		else if (stockedMaxBuster || stockedX3Charge) {
 			addRenderEffect(RenderEffectType.ChargeOrange, 2, 6);
 		}
 		else if (stockedBuster) {
@@ -429,9 +429,13 @@ public class MegamanX : Character {
 		if (shootCooldown > 0 ||
 			weapon == null ||
 			!canShoot() ||
-			!weapon.canShoot(chargeLevel, player) ||
-			weapon.shootCooldown > 0
+			!weapon.canShoot(chargeLevel, player) 
 		) {
+			return;
+		}
+
+
+		if (chargeLevel == 0 && weapon.shootCooldown > 0){
 			return;
 		}
 		// Calls the weapon shoot function.

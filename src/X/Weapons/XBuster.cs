@@ -119,10 +119,10 @@ public class XBuster : Weapon {
 		 if (mmx.stockedMaxBuster) {
 			if (mmx.charState.attackCtrl && mmx.charState.normalCtrl) {
 				mmx.changeState(new X3ChargeShot(null));
+				mmx.stockedMaxBuster = false;
 				return;
 			}
-		//	createX3SpreadShot(mmx, xDir);
-			mmx.stockedMaxBuster = false;
+		//	createX3SpreadShot(mmx, xDir);		
 			shootSound = "buster4X2";
 		}
 		else if (chargeLevel == 0) {
@@ -137,9 +137,13 @@ public class XBuster : Weapon {
 			}
 			else if (mmx.armArmor == ArmorId.Max) {
 				if (!mmx.charState.attackCtrl || !mmx.charState.normalCtrl || mmx.charState is WallSlide) {
-					new Anim(pos, "buster4_x3_muzzle", xDir, player.getNextActorNetId(), true, sendRpc: true);
-					new Buster3Proj(pos, xDir, 3, player, player.getNextActorNetId(), rpc: true);
-					mmx.stockedMaxBuster = true;
+				
+				new BusterX3Proj1(
+				this, pos, xDir,
+				0, player, player.getNextActorNetId(), rpc: true
+				);	
+				mmx.stockedMaxBuster = true;
+
 				} else {
 					mmx.changeState(new X3ChargeShot(null));
 					return;

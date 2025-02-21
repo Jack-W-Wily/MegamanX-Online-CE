@@ -393,6 +393,7 @@ public float angleDist = 0;
 	) : base(
 		weapon, pos, xDir, 0, damage, player, "iris_crystal_bb_behavior", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
+		canBeLocal = false;
 		//fadeSprite = weapon.fadeSprite;
 		projId = (int)ProjIds.IrisCrystal;
 		destroyOnHit = false;
@@ -508,10 +509,9 @@ public class IrisSlashProj : Projectile {
 
 	bool sound;
 	public IrisSlashProj(
-		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId,
-		float damage = 6, int flinch = 26, bool rpc = false
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, damage, player, "iris_cannon_slash", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 3, player, "iris_cannon_slash", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = true;
 		destroyOnHit = false;

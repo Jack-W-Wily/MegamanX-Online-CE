@@ -53,7 +53,7 @@ public class Iris : Character {
 			{
 				IrisGeneralizedCrystalCD = 1.5f;
 				
-                  	new IrisSlashProj(new SigmaSlashWeapon(), pos, xDir, player, player.getNextActorNetId(), 4, 35, rpc: true);
+                  	new IrisSlashProj(new SigmaSlashWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 
 

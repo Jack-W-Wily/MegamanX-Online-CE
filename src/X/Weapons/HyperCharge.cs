@@ -86,7 +86,7 @@ public class HyperCharge : Weapon {
 		Weapon wep = player.weapons[player.hyperChargeSlot];
 
 		if (wep is XBuster) {
-			character.changeState(new X3ChargeShot(this), true);
+			character.changeState(new X3ChargeShot2(this), true);
 			character.playSound("buster3X3");
 		} else {
 			if (changeToWeaponSlot(wep)) player.changeWeaponSlot(player.hyperChargeSlot);

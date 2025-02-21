@@ -611,21 +611,21 @@ public class FakeZeroGroundPunchState : MaverickState {
 			Weapon w = maverick.weapon;
 			new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	
-			new FakeZeroRockProj(w, maverick.pos.addxy(-15, 0), 0, player, player.getNextActorNetId(), rpc: true);
-			new FakeZeroRockProj(w, maverick.pos.addxy(15, 0), 1, player, player.getNextActorNetId(), rpc: true);
+			new FakeZeroRockProj(w, maverick.pos.addxy(-15, 0), 1, player, player.getNextActorNetId(), rpc: true);
+			new FakeZeroRockProj(w, maverick.pos.addxy(15, 0), 3, player, player.getNextActorNetId(), rpc: true);
 
 			Global.level.delayedActions.Add(new DelayedAction(() => {
 				new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0),maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	
-				new FakeZeroRockProj(w, maverick.pos.addxy(-35, 0),2,  player, player.getNextActorNetId(), rpc: true);
-				new FakeZeroRockProj(w, maverick.pos.addxy(35, 0),3,  player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(-35, 0),0,  player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(35, 0),4,  player, player.getNextActorNetId(), rpc: true);
 			}, 0.075f));
 
 			Global.level.delayedActions.Add(new DelayedAction(() => {
 				new VoltCSparkleProj(maverick.weapon, maverick.pos.addxy(-15, 0), maverick.xDir, player, player.getNextActorNetId(), rpc: true);
 	
-				new FakeZeroRockProj(w, maverick.pos.addxy(-55, 0),4, player, player.getNextActorNetId(), rpc: true);
-				new FakeZeroRockProj(w, maverick.pos.addxy(55, 0),5,  player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(-55, 0),5, player, player.getNextActorNetId(), rpc: true);
+				new FakeZeroRockProj(w, maverick.pos.addxy(55, 0),6,  player, player.getNextActorNetId(), rpc: true);
 			}, 0.15f));
 		}
 
