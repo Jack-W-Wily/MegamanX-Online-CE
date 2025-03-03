@@ -381,12 +381,18 @@ public class Damager {
 				}
 			}
 			bool countered = false;
+
+
 			// Counter system aka Frail guy
 			if (character.isAttacking() &&
 				!character.isFlinchImmune() &&
 				flinch >= 0 &&
 				projId != (int)ProjIds.HexaInvolute &&
-				projId != (int)ProjIds.AwakenedAura
+				projId != (int)ProjIds.AwakenedAura &&
+				projId != (int)ProjIds.Burn &&
+				projId != (int)ProjIds.FireWave &&
+				projId != (int)ProjIds.VelGFire &&
+				projId != (int)ProjIds.Burn
 			) {
 				if (projId != (int)ProjIds.BlockableLaunch &&
 				projId != (int)ProjIds.NormalPush &&
@@ -408,22 +414,24 @@ public class Damager {
 				countered = true;
 			}
 
-			if (owner.health > 0 && projId >= 0) {
-				// Combotimer
-				owner.character.ComboTimer += 0.25f;
-			}
+		
 
 			if (owner.character is XAnother xa && owner.health > 0) {
 				owner.superAmmo += 1;
+					xa.shootCooldown = 0;
 			}
+
+				if (owner.character is MegamanX x1 && owner.health > 0) {
+				x1.shootCooldown = 0;
+			}
+
 
 
 			if (owner.character is Zero zeroz && owner.health > 0) {
 				zeroz.gigaAttack.addAmmo(1, owner);
+				zeroz.charState.attackCtrl = true;
 			}
-			if (owner.character is PunchyZero zerop && owner.health > 0) {
-				zerop.gigaAttack.addAmmo(1, owner);
-			}
+		
 
 			if (owner.health > 0) {
 

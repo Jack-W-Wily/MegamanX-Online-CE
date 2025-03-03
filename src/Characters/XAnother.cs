@@ -80,11 +80,24 @@ public class XAnother : MegamanX {
 			changeState(new XlightKick(), true);
 		}
 
+
+			if(player.superAmmo >= 5 && parryCooldown == 0 &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.input.isHeld(Control.Down, player) && sprite.name.Contains("unpo")){
+				player.superAmmo -= 5;
+				changeState(new XUPParryStartState(), true);
+			}
+
+		
+
 	//	if (musicSource == null && hasUltimateArmor) {
 	//		addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 	//	}
 	}
 	public override bool attackCtrl() {
+
+
+
 		if(player.superAmmo >= 5 && parryCooldown == 0 &&
 			player.input.isPressed(Control.Special1, player) &&
 			player.input.isHeld(Control.Down, player)){

@@ -47,6 +47,9 @@ public class ZeroSlash1State : ZeroGenericMeleeState {
 		comboFrame = 6;
 	}
 
+
+
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zeroTripleStartTime = Global.time;
@@ -81,13 +84,15 @@ public class ZeroSlash2State : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (character.ComboTimer > 0 && 
-		(player.input.isPressed(Control.Dash,player))
-		|| player.input.isPressed(Control.Up,player)
-		|| player.input.isPressed(Control.Down,player)
-		) {
-			character.changeToIdleOrFall();
+		if (character.ComboTimer > 0 ){
+			attackCtrl = true;
 		}
+
+		if (zero.shootPressed || player.isAI) {
+			zero.shootPressTime = 0;
+			zero.changeState(new ZeroSlash3State(), true);
+		}
+
 	}
 
 	public override bool altCtrlUpdate(bool[] ctrls) {
@@ -115,12 +120,8 @@ public class ZeroSlash3State : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (character.ComboTimer > 0 && 
-		(player.input.isPressed(Control.Dash,player))
-		|| player.input.isPressed(Control.Up,player)
-		|| player.input.isPressed(Control.Down,player)
-		) {
-			character.changeToIdleOrFall();
+		if (character.ComboTimer > 0 ){
+			attackCtrl = true;
 		}
 	}
 
@@ -145,12 +146,8 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (character.sprite.frameIndex >= comboFrame || character.ComboTimer > 0 && 
-		(player.input.isPressed(Control.Dash,player))
-		|| player.input.isPressed(Control.Up,player)
-		|| player.input.isPressed(Control.Down,player)
-		) {
-			character.changeToIdleOrFall();
+		if (character.ComboTimer > 0 ){
+			attackCtrl = true;
 		}
 	}
 }
@@ -176,12 +173,8 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 			return;
 		}
 	
-		if (character.ComboTimer > 0 && 
-		(player.input.isPressed(Control.Dash,player))
-		|| player.input.isPressed(Control.Up,player)
-		|| player.input.isPressed(Control.Down,player)
-		) {
-			character.changeToIdleOrFall();
+		if (character.ComboTimer > 0 ){
+			attackCtrl = true;
 		}
 	
 	}
@@ -210,12 +203,8 @@ public class CMoonState : ZeroGenericMeleeState {
 			return;
 		}
 	
-		if (character.ComboTimer > 0 && 
-		(player.input.isPressed(Control.Dash,player))
-		|| player.input.isPressed(Control.Up,player)
-		|| player.input.isPressed(Control.Down,player)
-		) {
-			character.changeToIdleOrFall();
+		if (character.ComboTimer > 0 ){
+			attackCtrl = true;
 		}
 	
 	}
@@ -239,12 +228,8 @@ public class ZeroDashSlashState : ZeroGenericMeleeState {
 		base.update();
 
 	
-		if (character.ComboTimer > 0 && 
-		(player.input.isPressed(Control.Dash,player))
-		|| player.input.isPressed(Control.Up,player)
-		|| player.input.isPressed(Control.Down,player)
-		) {
-			character.changeToIdleOrFall();
+		if (character.ComboTimer > 0 ){
+			attackCtrl = true;
 		}
 	
 

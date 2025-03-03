@@ -53,4 +53,6 @@ public class BoundBlasterWC : AxlWeaponWC {
 	public override float getAltAmmoUse(AxlWC axl, int chargeLevel) {
 		return 8;
 	}
+
+	
 }

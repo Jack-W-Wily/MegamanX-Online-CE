@@ -78,7 +78,7 @@ public class ControlMenu : IMainMenu {
 			bindableControls.Add(new string[] { Control.AxlAimBackwards, "Block" });
 		}
 		// Axl specific settings
-	/*	if (charNum == (int)CharIds.AxlOld || charNum ==  (int)CharIds.AxlWC) {
+		if (charNum == (int)CharIds.AxlOld || charNum ==  (int)CharIds.AxlWC) {
 			//if (axlAimMode == 0) {
 				bindableControls.Add(new string[] { Control.AimUp, "Aim Up" });
 				bindableControls.Add(new string[] { Control.AimDown, "Aim Down" });
@@ -86,7 +86,7 @@ public class ControlMenu : IMainMenu {
 				bindableControls.Add(new string[] { Control.AimRight, "Aim Right" });
 				bindableControls.Add(new string[] { Control.AxlAimBackwards, "Aim Key" });
 				bindableControls.Add(new string[] { Control.AxlCrouch, "Block" });
-			/*} else if (axlAimMode == 1) {
+			} else if (axlAimMode == 1) {
 				bindableControls.Add(new string[] { Control.AimAngleUp, "Aim Angle Up" });
 				bindableControls.Add(new string[] { Control.AimAngleDown, "Aim Angle Down" });
 				bindableControls.Add(new string[] { Control.AimAngleReset, "Aim Angle Reset" });
@@ -97,8 +97,8 @@ public class ControlMenu : IMainMenu {
 				bindableControls.Add(new string[] { Control.AimDown, "Aim Down" });
 				bindableControls.Add(new string[] { Control.AimLeft, "Aim Left" });
 				bindableControls.Add(new string[] { Control.AimRight, "Aim Right" });
-			}*/
-		/*/*/
+			}
+		
 	}
 
 	public bool isBindingControl() {

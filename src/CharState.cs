@@ -695,7 +695,11 @@ public class Run : CharState {
 		if (move.magnitude > 0) {
 			character.move(move);
 		} else {
-			character.changeToIdleOrFall();
+			if (player.isIris){
+			character.changeState(new Idle("run_stop"));
+			} else {
+				character.changeToIdleOrFall();
+			}
 		}
 	}
 }
@@ -998,7 +1002,11 @@ public class Dash : CharState {
 				if (inputXDir != 0 && character.grounded) {
 					character.changeState(new Run(), true);
 				} else {
-					character.changeToIdleOrFall();
+					if (player.isIris){
+			character.changeState(new Idle("run_stop"));
+			} else {
+				character.changeToIdleOrFall();
+			}
 				}
 				return;
 			}

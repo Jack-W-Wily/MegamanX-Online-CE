@@ -40,6 +40,19 @@ public class BlueBulletProj : Projectile {
 			args.owner, args.pos, args.byteAngle, args.netId, player: args.player
 		);
 	}
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -800));
+		}
+	}
+	
 }
 
 public class AxlMeleeBullet : Projectile {

@@ -181,6 +181,11 @@ public override bool attackCtrl() {
 			changeState(new DynamoSlide());
 		}
 
+
+			if (DaggerCooldown == 0){
+			DaggerCount = 0;
+			}
+
 		if (player.currency > 1 && player.input.isHeld(Control.Up, player)
 		&& player.input.isPressed(Control.Special2, player)){
 		player.currency -= 2;

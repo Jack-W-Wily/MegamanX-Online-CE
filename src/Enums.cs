@@ -879,6 +879,7 @@ public enum ProjIds {
 	IrisFireBallProj,
 	IrisCrystal,
 	IrisSlashProj,
+	IrisStabProj,
 	IrisCannon,
 
 	// Random non-projectiles.

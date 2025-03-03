@@ -174,7 +174,8 @@ public class MagnetMineProj : Projectile, IDamagable {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		(player.character as MegamanX)?.magnetMines.Remove(this);
+		owner.character?.magnetMines.Remove(this);
+
 	}
 
 	public bool canBeSucked(int alliance) {

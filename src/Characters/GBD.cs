@@ -354,17 +354,17 @@ public class GBD : Character {
 
 		if (sprite.name.Contains("spear_1")) {
 			return new GenericMeleeProj(new GBDKick(), centerPoint,
-			ProjIds.Raijingeki2, player, 2f, 30, 14f,
+			ProjIds.Raijingeki2, player, 2f, 0, 14f,
 			isJuggleProjectile: true);
 		}
 		if (sprite.name.Contains("spear_up")) {
 			return new GenericMeleeProj(new GBDKick(), centerPoint,
-			ProjIds.Raijingeki2, player, 2f, 30, 15f,
+			ProjIds.Raijingeki2, player, 2f, 0, 15f,
 			isJuggleProjectile: true);
 		}
 		if (sprite.name.Contains("spear_rising")) {
 			return new GenericMeleeProj(new GBDKick(), centerPoint,
-			 ProjIds.Raijingeki2, player, 2f, 30, 30f,
+			 ProjIds.Raijingeki2, player, 2f, 0, 30f,
 			isJuggleProjectile: true);
 		}
 		if (sprite.name.Contains("spear_spin")) {

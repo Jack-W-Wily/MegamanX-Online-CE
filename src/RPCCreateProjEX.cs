@@ -160,8 +160,17 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.TSeahorseAcid2, TSeahorseAcid2Proj.rpcInvoke },
 		{ (int)ProjIds.WSpongeSpike, WSpongeSpike.rpcInvoke },
 		{ (int)ProjIds.BBuffaloIceProj, BBuffaloIceProj.rpcInvoke },
+
+
+
 		//Axl
 		{ (int)ProjIds.BlackArrowGround, BlackArrowGrounded.rpcInvoke },
+
+
+
+		// Iris
+		{ (int)ProjIds.IrisCrystal, NewIrisCrystal.rpcInvoke },
+		
 	};
 
 }

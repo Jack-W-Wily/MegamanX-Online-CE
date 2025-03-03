@@ -542,7 +542,7 @@ public class Zero : Character {
 			if (gigaAttack.ammo >= 10 &&
 				player.input.isPressed(Control.WeaponRight, player) ) {
 					gigaAttack.addAmmo(-10, player);
-					changeState(new AwakenedZeroHadangeki(), true);
+					if (charState is not AwakenedZeroHadangeki)changeState(new AwakenedZeroHadangeki(), true);
 					return true;
 				} 
 		}
@@ -556,9 +556,9 @@ public class Zero : Character {
 					gigaAttack.addAmmo(-14, player);
 					
 					if (!isAwakened){
-					changeState(new Rakuhouha(new CFlasher()), true);
+					if (charState is not Rakuhouha)changeState(new Rakuhouha(new CFlasher()), true);
 					} else {
-					changeState(new Rakuhouha(new ShinMessenkou()), true);		
+					if (charState is not Rakuhouha)changeState(new Rakuhouha(new ShinMessenkou()), true);		
 					}
 					return true;
 				}
@@ -578,21 +578,21 @@ public class Zero : Character {
 		
 			int weaponType = (int)RisingType.RisingFang;
 		
-			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
+			if (charState is not ZeroUppercut)changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
 			return true;
 		}
 		if (yDir == -1 && (specialPressed)) {
 		
 			int weaponType = (int)RisingType.Ryuenjin;
 		
-			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
+			if (charState is not ZeroUppercut)changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
 			return true;
 		}
 		if (yDir == -1 && (player.input.isPressed(Control.WeaponRight, player))) {
 		
 			int weaponType = (int)RisingType.Denjin;
 		
-			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
+			if (charState is not ZeroUppercut)changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
 			return true;
 		}
 		// Dash attacks.
@@ -605,9 +605,9 @@ public class Zero : Character {
 			slideVel = xDir * getDashSpeed();
 			if (specialPressTime > shootPressTime) {
 				if (!isViral){
-				changeState(new ZeroShippuugaState(), true);
+				if (charState is not ZeroShippuugaState)changeState(new ZeroShippuugaState(), true);
 				} else {
-				changeState(new SuiretsusanState(false), true);
+				if (charState is not SuiretsusanState)changeState(new SuiretsusanState(false), true);
 				 
 				}
 				return true;
@@ -619,14 +619,27 @@ public class Zero : Character {
 		if (specialPressed && specialPressTime > shootPressTime) {
 			groundSpecial.attack(this);
 		}
+
+		if (grounded && player.dashPressed(out string dashControl)){
+				changeState(new Dash(dashControl), true);
+		}
 		// Regular slashes.
 		if (shootPressed) {
 			// Crounch variant.
 			if (yDir == 1) {
-				changeState(new ZeroCrouchSlashState(), true);
+			if (charState is not ZeroCrouchSlashState)changeState(new ZeroCrouchSlashState(), true);
 				return true;
 			}
+
+			if (charState is not ZeroSlash1State
+			and not ZeroSlash2State
+			and not ZeroSlash3State &&
+			 !sprite.name.Contains("raijingeki")
+			){
+
 			changeState(new ZeroSlash1State(), true);
+
+			}
 			return true;
 		}
 		return false;

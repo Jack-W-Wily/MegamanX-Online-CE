@@ -54,6 +54,76 @@ public class AxlWC : Character {
 	public Anim? muzzleFlash;
 	public int hoverTimes = 0;
 
+
+
+
+	public bool aiming;
+	public IDamagable? axlCursorTarget = null;
+	public Character? axlHeadshotTarget = null;
+
+
+		// Cursor stuff.
+
+		public float stingChargeTime;
+	public int lastXDir;
+
+
+	public Point axlCursorPos;
+	public Point? assassinCursorPos;
+	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camX, Global.level.camY);
+	public Point axlScopeCursorWorldPos;
+	public Point axlScopeCursorWorldLerpPos;
+	public Point axlZoomOutCursorDestPos;
+	public Point axlLockOnCursorPos;
+	public Point axlGenericCursorWorldPos {
+		get {
+			if (!isZooming() || isZoomingIn || isZoomOutPhase1Done) {
+				return axlCursorWorldPos;
+			}
+			return axlScopeCursorWorldPos;
+		}
+	}
+
+
+	
+
+	public float axlSwapTime;
+	public float axlAltSwapTime;
+	public float switchTime;
+	public float altSwitchTime;
+	public float netArmAngle;
+	float targetSoundCooldown;
+	public Point nonOwnerAxlBulletPos;
+	public float stealthRevealTime;
+
+	public bool aimBackwardsToggle;
+	public bool positionLockToggle;
+	public bool cursorLockToggle;
+	public void resetToggle() {
+		aimBackwardsToggle = false;
+		positionLockToggle = false;
+		cursorLockToggle = false;
+	}
+
+	public bool isNonOwnerZoom;
+	public Point nonOwnerScopeStartPos;
+	public Point nonOwnerScopeEndPos;
+	public Point? netNonOwnerScopeEndPos;
+	private bool _zoom;
+	public bool isZoomingIn;
+	public bool isZoomingOut;
+	public bool isZoomOutPhase1Done;
+	public float zoomCharge;
+	public float savedCamX;
+	public float savedCamY;
+	public bool hyperAxlStillZoomed;
+
+	public float revTime;
+	public float revIndex;
+	public bool aimingBackwards;
+
+
+
 	public AxlWC(
 		Player player, float x, float y, int xDir, bool isVisible,
 		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
@@ -131,6 +201,8 @@ public class AxlWC : Character {
 			chargeEffect.update(getChargeLevel(), 5);
 		}}
 	public override void update() {
+
+		armAngle = netArmAngle;
 		bool wasGrounded = grounded;
 		base.update();
 		if(charState is Die){
@@ -192,7 +264,24 @@ public class AxlWC : Character {
 			weapon.axlUpdate(this, weapon == axlWeapon);
 		}
 		// Arm angle.
-		updateArmAngle();
+
+
+
+	
+
+	
+
+		 if (Options.main.axlAimMode == 2) {
+				updateAxlCursorPos();
+			} else {
+				updateAxlDirectionalAim();
+			}
+		
+	//	updateArmAngle();
+
+
+
+
 		// Charge and release charge logic.
 
 		if (!isInDamageSprite()) {
@@ -248,6 +337,536 @@ public class AxlWC : Character {
 		return base.changeState(newState, forceChange);
 	}
 
+
+
+
+
+	public bool isAnyZoom() {
+		return isZooming() || isZoomingOut || isZoomingIn;
+	}
+
+	public void updateAxlCursorPos() {
+		float aimThreshold = 5;
+		bool axisXMoved = false;
+		bool axisYMoved = false;
+		// Options.main.aimSensitivity is a float from 0 to 1.
+		float distFromNormal = Options.main.aimSensitivity - 0.5f;
+		float sensitivity = 1;
+		if (distFromNormal > 0) {
+			sensitivity += distFromNormal * 7.5f;
+		} else {
+			sensitivity += distFromNormal * 1.75f;
+		}
+
+		// Controller joystick axis move section
+		if (Input.aimX > aimThreshold && Input.aimX >= Input.lastAimX) {
+			axlCursorPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
+			axisXMoved = true;
+		} else if (Input.aimX < -aimThreshold && Input.aimX <= Input.lastAimX) {
+			axlCursorPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
+			axisXMoved = true;
+		}
+		if (Input.aimY > aimThreshold && Input.aimY >= Input.lastAimY) {
+			axlCursorPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
+			axisYMoved = true;
+		} else if (Input.aimY < -aimThreshold && Input.aimY <= Input.lastAimY) {
+			axlCursorPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
+			axisYMoved = true;
+		}
+
+		// Controller or keyboard button based aim section
+		if (!axisXMoved) {
+			if (player.input.isHeld(Control.AimLeft, player)) {
+				axlCursorPos.x -= Global.spf * 200 * sensitivity;
+			} else if (player.input.isHeld(Control.AimRight, player)) {
+				axlCursorPos.x += Global.spf * 200 * sensitivity;
+			}
+		}
+		if (!axisYMoved) {
+			if (player.input.isHeld(Control.AimUp, player)) {
+				axlCursorPos.y -= Global.spf * 200 * sensitivity;
+			} else if (player.input.isHeld(Control.AimDown, player)) {
+				axlCursorPos.y += Global.spf * 200 * sensitivity;
+			}
+		}
+
+		// Mouse based aim
+		if (!Menu.inMenu && !player.isAI) {
+			if (Options.main.useMouseAim) {
+				axlCursorPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
+				axlCursorPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
+			}
+			axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+			axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
+		}
+
+		if (isWarpIn()) {
+			axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
+		}
+
+		// aimbot
+		if (player.isAI) {
+			var target = Global.level.getClosestTarget(pos, player.alliance, true);
+			if (target != null) {
+				axlCursorPos = target.pos.addxy(
+					-Global.level.camX,
+					-Global.level.camY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
+				);
+			};
+		}
+
+		getMouseTargets();
+	}
+
+
+
+
+	public void getMouseTargets() {
+		axlCursorTarget = null;
+		axlHeadshotTarget = null;
+
+		int cursorSize = 1;
+		var shape = new Rect(axlGenericCursorWorldPos.x - cursorSize, axlGenericCursorWorldPos.y - cursorSize, axlGenericCursorWorldPos.x + cursorSize, axlGenericCursorWorldPos.y + cursorSize).getShape();
+		var hit = Global.level.checkCollisionsShape(shape, new List<GameObject>() { this }).FirstOrDefault(c => c.gameObject is IDamagable);
+		if (hit != null) {
+			var target = hit.gameObject as IDamagable;
+			if (target != null) {
+				if (target.canBeDamaged(player.alliance, player.id, null)) {
+					axlCursorTarget = target;
+				}
+			}
+		}
+		foreach (var enemy in Global.level.players) {
+			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.getHeadPos() != null) {
+				if (axlGenericCursorWorldPos.distanceTo(enemy.character.getHeadPos().Value) < headshotRadius) {
+					axlCursorTarget = enemy.character;
+					axlHeadshotTarget = enemy.character;
+				}
+			}
+		}
+	}
+
+
+	public void updateAxlDirectionalAim() {
+		if (player.input.isCursorLocked(player)) {
+			Point worldCursorPos = pos.add(lastDirToCursor);
+			axlCursorPos = worldCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			lockOn(out _);
+			return;
+		}
+
+		if (charState is Assassinate) {
+			return;
+		}
+
+		Point aimDir = new Point(0, 0);
+
+		if (Options.main.aimAnalog) {
+			aimDir.x = Input.aimX;
+			aimDir.y = Input.aimY;
+		}
+
+		bool aimLeft = player.input.isHeld(Control.AimLeft, player);
+		bool aimRight = player.input.isHeld(Control.AimRight, player);
+		bool aimUp = player.input.isHeld(Control.AimUp, player);
+		bool aimDown = (
+			player.input.isHeld(Control.AimDown, player) &&
+			(Options.main.axlSeparateAimDownAndCrouch ||
+			charState is not Idle && charState is not Crouch)
+		);
+
+
+
+
+
+
+		if (aimDir.magnitude < 10) {
+			if (aimLeft) {
+				aimDir.x = -100 * xDir;
+			} else if (aimRight) {
+				aimDir.x = 100 * xDir;
+			}
+			if (aimUp) {
+				aimDir.y = -100 * xDir;
+			} else if (aimDown) {
+				aimDir.y = 100 * xDir;
+			}
+		}
+
+		
+
+		aimingBackwards = player.input.isAimingBackwards(player);
+
+		int aimBackwardsMod = 1;
+		if (aimingBackwards && charState is not LadderClimb) {
+			if (player.axlWeapon?.isTwoHanded(false) != true) {
+				if (Math.Sign(aimDir.x) == Math.Sign(xDir)) {
+					aimDir.x *= -1;
+				}
+				aimBackwardsMod = -1;
+			} else {
+				// By design, aiming backwards with 2-handed weapons does not actually cause Axl to aim backwards like with 1-handed weapons as this would look really weird.
+				// Instead, it locks Axl's aim forward and allows him to backpedal without changing direction.
+				xDir = lastXDir;
+				if (Math.Sign(aimDir.x) != Math.Sign(xDir)) {
+					aimDir.x *= -1;
+				}
+			}
+		}
+
+		if (aimDir.magnitude < 10) {
+			aimDir = new Point(xDir * 100 * aimBackwardsMod, 0);
+		}
+
+		if (charState is WallSlide) {
+			if (xDir == -1) {
+				if (aimDir.x < 0) aimDir.x *= -1;
+			}
+			if (xDir == 1) {
+				if (aimDir.x > 0) aimDir.x *= -1;
+			}
+		}
+
+		float xOff = 0;
+		float yOff = -24;
+		if (charState is Crouch) yOff = -16;
+
+		//axlCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
+		Point destCursorPos = pos.addxy(xOff * xDir, yOff).addxy(aimDir.x, aimDir.y).addxy(-Global.level.camX, -Global.level.camY);
+
+		if (charState is Dash || charState is AirDash) {
+			destCursorPos = destCursorPos.addxy(15 * xDir, 0);
+		}
+
+		// Try to see if where cursor will go to has auto-aim target. If it does, make that the dest, not the actual dest
+		Point oldCursorPos = axlCursorPos;
+		axlCursorPos = destCursorPos;
+		lockOn(out Point? lockOnPoint);
+		if (lockOnPoint != null) {
+			destCursorPos = lockOnPoint.Value;
+		}
+		axlCursorPos = oldCursorPos;
+
+		// Lerp to the new target
+		//axlCursorPos = Point.moveTo(axlCursorPos, destCursorPos, Global.spf * 1000);
+		if (!Options.main.aimAnalog) {
+			axlCursorPos = Point.lerp(axlCursorPos, destCursorPos, Global.spf * 15);
+		} else {
+			axlCursorPos = destCursorPos;
+		}
+
+		lastDirToCursor = pos.directionTo(axlCursorWorldPos);
+	}
+
+	Point lastDirToCursor;
+
+
+
+	public void lockOn(out Point? lockOnPoint) {
+		// Check for lock on targets
+		lockOnPoint = null;
+		var prevTarget = axlCursorTarget;
+		axlCursorTarget = null;
+		axlHeadshotTarget = null;
+		assassinCursorPos = null;
+
+		if (!Options.main.lockOnSound) return;
+		if (player.isDisguisedAxl && !player.isAxlXOD && player.axlWeapon is not AssassinBullet) return;
+		if (player.isDisguisedAxl && player.axlWeapon is UndisguiseWeapon) return;
+		if (player.input.isCursorLocked(player)) return;
+
+		axlCursorTarget = getLockOnTarget();
+
+		if (axlCursorTarget != null && prevTarget == null && player.isMainPlayer && targetSoundCooldown == 0) {
+			Global.playSound("axlTarget", false);
+			targetSoundCooldown = Global.spf;
+		}
+
+		if (axlCursorTarget != null) {
+			axlLockOnCursorPos = (axlCursorTarget as Character).getAimCenterPos();
+			lockOnPoint = axlLockOnCursorPos.addxy(-Global.level.camX, -Global.level.camY);
+			// axlCursorPos = (axlCursorTarget as Character).getAimCenterPos().addxy(-Global.level.camX, -Global.level.camY);
+
+			if (player.axlWeapon is AssassinBullet) {
+				assassinCursorPos = lockOnPoint;
+			}
+		}
+	}
+
+		public bool isZooming() {
+		return _zoom && player.isAxlWC;
+	}
+
+
+		public bool hasScopedTarget() {
+		if (isZoomingOut || isZoomingIn) return false;
+		if (axlCursorTarget == null && axlHeadshotTarget == null) return false;
+		var hitData = getFirstHitPos(player.adjustedZoomRange, ignoreDamagables: true);
+		if (axlCursorTarget != null && axlHeadshotTarget != null) {
+			if (hitData.hitGos.Contains(axlCursorTarget) || hitData.hitGos.Contains(axlHeadshotTarget)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public int axlXDir {
+		get {
+			if (sprite.name.Contains("wall_slide")) return -xDir;
+			return xDir;
+		}
+	}
+
+	public int getAxlXDir() {
+		if (player.axlWeapon != null && (player.axlWeapon.isTwoHanded(false))) {
+			return pos.x < axlGenericCursorWorldPos.x ? 1 : -1;
+		}
+		return xDir;
+	}
+
+
+		public Point getDoubleBulletArmPos() {
+		if (sprite.name == "axl_dash") {
+			return new Point(-7, -2);
+		}
+		if (sprite.name == "axl_run") {
+			return new Point(-7, 1);
+		}
+		if (sprite.name == "axl_jump" || sprite.name == "axl_fall_start" || sprite.name == "axl_fall" || sprite.name == "axl_hover") {
+			return new Point(-7, 0);
+		}
+		return new Point(-5, 2);
+	}
+
+	public Point getAxlBulletPos(int poiIndex = 0) {
+		if (player.axlWeapon == null) return new Point();
+
+		Point gunArmOrigin = getAxlGunArmOrigin();
+
+		var doubleBullet = player.weapon as DoubleBullet;
+		if (doubleBullet != null && doubleBullet.isSecondShot) {
+			Point dbArmPos = getDoubleBulletArmPos();
+			gunArmOrigin = gunArmOrigin.addxy(dbArmPos.x * getAxlXDir(), dbArmPos.y);
+		}
+
+		Sprite sprite = getAxlArmSprite();
+		float angle = getShootAngle(ignoreXDir: true) + sprite.animData.frames[0].POIs[poiIndex].angle * axlXDir;
+		Point angleDir = Point.createFromAngle(angle).times(sprite.animData.frames[0].POIs[poiIndex].magnitude);
+
+		return gunArmOrigin.addxy(angleDir.x, angleDir.y);
+	}
+
+
+
+	public Point getAxlBulletDir() {
+		Point origin = getAxlBulletPos();
+		Point cursorPos = getCorrectedCursorPos();
+		return origin.directionTo(cursorPos).normalize();
+	}
+
+	public ushort netAxlArmSpriteIndex;
+	public string getAxlArmSpriteName() {
+	
+		return player.axlWeapon?.sprite ?? "axl_arm_pistol";
+	}
+
+	public Sprite getAxlArmSprite() {
+		if (!ownedByLocalPlayer && Global.spriteNameByIndex.ContainsKey(netAxlArmSpriteIndex)) {
+			return new Sprite(Global.spriteNameByIndex[netAxlArmSpriteIndex]);
+		}
+
+		return new Sprite(getAxlArmSpriteName());
+	}
+
+	public Point getCorrectedCursorPos() {
+		if (player.axlWeapon == null) return new Point();
+		Point cursorPos = axlGenericCursorWorldPos;
+		Point gunArmOrigin = getAxlGunArmOrigin();
+
+		Sprite sprite = getAxlArmSprite();
+		float minimumAimRange = sprite.animData.frames[0].POIs[0].magnitude + 5;
+
+		if (gunArmOrigin.distanceTo(cursorPos) < minimumAimRange) {
+			Point angleDir = Point.createFromAngle(getShootAngle(true));
+			cursorPos = cursorPos.add(angleDir.times(minimumAimRange));
+		}
+		return cursorPos;
+	}
+
+	public Point getAxlHitscanPoint(float maxRange) {
+		Point bulletPos = getAxlBulletPos();
+		Point bulletDir = getAxlBulletDir();
+		return bulletPos.add(bulletDir.times(maxRange));
+	}
+
+
+		public Point getAxlScopePos() {
+		if (player.axlWeapon == null) return new Point();
+		Point gunArmOrigin = getAxlGunArmOrigin();
+		Sprite sprite = getAxlArmSprite();
+		if (sprite.animData.frames[0].POIs.Length < 2) return new Point();
+		float angle = getShootAngle(ignoreXDir: true) + sprite.animData.frames[0].POIs[1].angle * axlXDir;
+		Point angleDir = Point.createFromAngle(angle).times(sprite.animData.frames[0].POIs[1].magnitude);
+		return gunArmOrigin.addxy(angleDir.x, angleDir.y);
+	}
+
+	public Point getMuzzleOffset(float angle) {
+		if (player.axlWeapon == null) return new Point();
+		Sprite sprite = getAxlArmSprite();
+		Point muzzlePOI = sprite.animData.frames[0].POIs[0];
+
+		float horizontalOffX = 0;// Helpers.cosd(angle) * muzzlePOI.x;
+		float horizontalOffY = 0;// Helpers.sind(angle) * muzzlePOI.x;
+
+		float verticalOffX = -axlXDir * Helpers.sind(angle) * muzzlePOI.y;
+		float verticalOffY = axlXDir * Helpers.cosd(angle) * muzzlePOI.y;
+
+		return new Point(horizontalOffX + verticalOffX, horizontalOffY + verticalOffY);
+	}
+
+
+	public float getShootAngle(bool ignoreXDir = false) {
+
+
+		Point gunArmOrigin = getAxlGunArmOrigin();
+		Point cursorPos = axlGenericCursorWorldPos;
+		float angle = gunArmOrigin.directionTo(cursorPos).angle;
+
+		Point adjustedOrigin = gunArmOrigin.add(getMuzzleOffset(angle));
+		float adjustedAngle = adjustedOrigin.directionTo(cursorPos).angle;
+
+		// DEBUG CODE
+		//Global.debugString1 = angle.ToString();
+		//Global.debugString2 = adjustedAngle.ToString();
+		//DrawWrappers.DrawPixel(adjustedOrigin.x, adjustedOrigin.y, Color.Red, ZIndex.Default + 1);
+		//DrawWrappers.DrawPixel(gunArmOrigin.x, gunArmOrigin.y, Color.Red, ZIndex.Default + 1);
+		//Point angleLine = Point.createFromAngle(angle).times(100);
+		//DrawWrappers.DrawLine(gunArmOrigin.x, gunArmOrigin.y, gunArmOrigin.x + angleLine.x, gunArmOrigin.y + angleLine.y, Color.Magenta, 1, ZIndex.Default + 1);
+		//Point angleLine2 = Point.createFromAngle(angleWithOffset).times(100);
+		//DrawWrappers.DrawLine(gunArmOrigin.x, gunArmOrigin.y, gunArmOrigin.x + angleLine2.x, gunArmOrigin.y + angleLine2.y, Color.Red, 1, ZIndex.Default + 1);
+		// END DEBUG CODE
+
+		if (axlXDir == -1 && !ignoreXDir) adjustedAngle += 180;
+
+		return adjustedAngle;
+	}
+
+
+
+
+
+	public RaycastHitData getFirstHitPos(float range, float backOffDist = 0, bool ignoreDamagables = false) {
+		var retData = new RaycastHitData();
+		Point bulletPos = getAxlBulletPos();
+		Point bulletDir = getAxlBulletDir();
+
+		Point maxPos = bulletPos.add(bulletDir.times(range));
+
+		List<CollideData> hits = Global.level.raycastAll(bulletPos, maxPos, new List<Type>() { typeof(Actor), typeof(Wall) });
+
+		CollideData? hit = null;
+
+		foreach (var p in Global.level.players) {
+			if (p.character == null || p.character.getHeadPos() == null) continue;
+			Rect headRect = p.character.getHeadRect();
+
+			Point startTestPoint = bulletPos.add(bulletDir.times(-range * 2));
+			Point endTestPoint = bulletPos.add(bulletDir.times(range * 2));
+			Line testLine = new Line(startTestPoint, endTestPoint);
+			Shape headShape = headRect.getShape();
+			List<CollideData> lineIntersections = headShape.getLineIntersectCollisions(testLine);
+			if (lineIntersections.Count > 0) {
+				hits.Add(new CollideData(null, p.character.globalCollider, bulletDir, false, p.character, new HitData(null, new List<Point>() { lineIntersections[0].getHitPointSafe() })));
+			}
+		}
+
+		hits.Sort((cd1, cd2) => {
+			float d1 = bulletPos.distanceTo(cd1.getHitPointSafe());
+			float d2 = bulletPos.distanceTo(cd2.getHitPointSafe());
+			if (d1 < d2) return -1;
+			else if (d1 > d2) return 1;
+			else return 0;
+		});
+
+		foreach (var h in hits) {
+			if (h.gameObject is Wall) {
+				hit = h;
+				break;
+			}
+			if (h.gameObject is IDamagable damagable && damagable.canBeDamaged(player.alliance, player.id, null)) {
+				retData.hitGos.Add(damagable);
+				if (h.gameObject is Character c) {
+					if (c.isAlwaysHeadshot()) {
+						retData.isHeadshot = true;
+					}
+					// Detect headshots
+					else if (h?.hitData?.hitPoint != null && c.getHeadPos() != null) {
+						Point headPos = c.getHeadPos().Value;
+						Rect headRect = c.getHeadRect();
+
+						Point hitPoint = h.hitData.hitPoint.Value;
+						// Bullet position inside head rect
+						if (headRect.containsPoint(bulletPos)) {
+							hitPoint = bulletPos;
+						}
+
+						float xLeeway = c.headshotRadius * 5f;
+						float yLeeway = c.headshotRadius;
+
+						float xDist = MathF.Abs(hitPoint.x - headPos.x);
+						float yDist = MathF.Abs(hitPoint.y - headPos.y);
+
+						if (xDist < xLeeway && yDist < yLeeway) {
+							Point startTestPoint = bulletPos.add(bulletDir.times(-range * 2));
+							Point endTestPoint = bulletPos.add(bulletDir.times(range * 2));
+							Line testLine = new Line(startTestPoint, endTestPoint);
+							Shape headShape = headRect.getShape();
+							List<CollideData> lineIntersections = headShape.getLineIntersectCollisions(testLine);
+							if (lineIntersections.Count > 0) {
+								retData.isHeadshot = true;
+							}
+						}
+					}
+				}
+				if (ignoreDamagables == false) {
+					hit = h;
+					break;
+				}
+			}
+		}
+
+		Point targetPos = hit?.hitData?.hitPoint ?? maxPos;
+		if (backOffDist > 0) {
+			retData.hitPos = bulletPos.add(bulletPos.directionTo(targetPos).unitInc(-backOffDist));
+		} else {
+			retData.hitPos = targetPos;
+		}
+
+		return retData;
+	}
+
+
+		public Character? getLockOnTarget() {
+		Character? newTarget = null;
+		foreach (var enemy in Global.level.players) {
+			if (enemy.character != null && enemy.character.canBeDamaged(player.alliance, player.id, null) && enemy.character.pos.distanceTo(pos) < 150 && !enemy.character.isStealthy(player.alliance)) {
+				float distPercent = 1 - (enemy.character.pos.distanceTo(pos) / 150);
+				var dirToEnemy = getAxlBulletPos().directionTo(enemy.character.getAimCenterPos());
+				var dirToCursor = getAxlBulletPos().directionTo(axlGenericCursorWorldPos);
+
+				float angle = dirToEnemy.angleWith(dirToCursor);
+
+				float leeway = 22.5f;
+				if (angle < leeway + (distPercent * (90 - leeway))) {
+					newTarget = enemy.character;
+					break;
+				}
+			}
+		}
+
+		return newTarget;
+	}
+
 	public void updateArmAngle() {
 		Point inputDir = new Point();
 		inputDir.y = player.input.getYDir(player);
@@ -264,6 +883,10 @@ public class AxlWC : Character {
 			armAngle = targetAngle;
 		}
 	}
+
+
+
+	
 
 	public override bool canTurn() {
 		if (ownedByLocalPlayer && !player.isAI && Options.main.axlDirLock &&
@@ -862,8 +1485,86 @@ public class AxlWC : Character {
 		);
 	}
 
+
+	float axlCursorAngle;
+
+
+		public void drawBloom() {
+		Global.sprites["axl_cursor_top"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_bottom"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y + 1, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_left"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_right"].draw(0, axlCursorWorldPos.x + 1, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+		Global.sprites["axl_cursor_dot"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+	}
+	
+	public void drawAxlCursor() {
+		if (!ownedByLocalPlayer) return;
+		if (Global.level.gameMode.isOver) return;
+		if (isZooming() && !isZoomOutPhase1Done) return;
+		// if (isWarpIn()) return;
+
+		if (Options.main.useMouseAim || Global.showHitboxes) {
+			drawBloom();
+			Global.sprites["axl_cursor"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+			if (player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
+				Global.sprites["hud_kill"].draw(0, axlCursorWorldPos.x, axlCursorWorldPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+			}
+		}
+		if (!Options.main.useMouseAim) {
+			if (player.axlWeapon != null && (player.axlWeapon is AssassinBullet || player.input.isCursorLocked(player))) {
+				Point bulletPos = getAxlBulletPos();
+				float radius = 120;
+				float ang = getShootAngle();
+				float x = Helpers.cosd(ang) * radius * getShootXDir();
+				float y = Helpers.sind(ang) * radius * getShootXDir();
+				DrawWrappers.DrawLine(bulletPos.x, bulletPos.y, bulletPos.x + x, bulletPos.y + y, new Color(255, 0, 0, 128), 2, ZIndex.HUD, true);
+				if (axlCursorTarget != null && player.assassinHitPos?.isHeadshot == true && player.weapon is AssassinBullet && Global.level.isTraining()) {
+					Global.sprites["hud_kill"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1);
+				}
+			}
+			if (axlCursorTarget != null && !isAnyZoom()) {
+				axlCursorAngle += Global.spf * 360;
+				if (axlCursorAngle > 360) axlCursorAngle -= 360;
+				Global.sprites["axl_cursor_x7"].draw(0, axlLockOnCursorPos.x, axlLockOnCursorPos.y, 1, 1, null, 1, 1, 1, ZIndex.Default + 1, angle: axlCursorAngle);
+				//drawBloom();
+			}
+		}
+
+		/*
+		if (player.weapon.ammo <= 0)
+		{
+			if (player.weapon.rechargeCooldown > 0)
+			{
+				float textPosX = axlCursorPos.x;
+				float textPosY = axlCursorPos.y - 20;
+				if (!Options.main.useMouseAim)
+				{
+					textPosX = pos.x - Global.level.camX / Global.viewSize;
+					textPosY = (pos.y - 50 - Global.level.camY) / Global.viewSize;
+				}
+				DrawWrappers.DeferTextDraw(() =>
+				{
+					Helpers.drawTextStd(
+						"Reload:" + player.weapon.rechargeCooldown.ToString("0.0"),
+						textPosX, textPosY, Alignment.Center, fontSize: 20,
+						outlineColor: Helpers.getAllianceColor()
+					);
+				});
+			}
+		}
+		*/
+	}
+
+
 	public override void render(float x, float y) {
 		base.render(x, y);
+
+
+		netArmAngle = getShootAngle();
+		drawAxlCursor();
+
+
+
 		if (!shouldRender(x, y) || !shouldDraw() || !visible) {
 			return;
 		}

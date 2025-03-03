@@ -1071,8 +1071,225 @@ public class OptionsMenu : IMainMenu {
 						);
 					},
 					"If yes, you can hover if you are holding DOWN."
-				),};
-		} else if (charNum == (int)CharIds.Sigma) {
+				),
+			//	};
+	//	} 
+	//	else if (charNum ==  (int)CharIds.AxlOld) {
+	//		menuOptions = new List<MenuOption>() {
+				// Axl Use Mouse Aim
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.axlAimMode = 0;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.axlAimMode = 2;
+						}
+					},
+					(Point pos, int index) => {
+						string aimMode = "Directional";
+						if (Options.main.axlAimMode == 1) aimMode = "Directional";
+						else if (Options.main.axlAimMode == 2) aimMode = "Cursor";
+						Fonts.drawText(
+							optionFontText, "Aim mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, aimMode,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor)."
+				),
+				// Axl Mouse sensitivity
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.aimSensitivity = Helpers.clamp(Options.main.aimSensitivity - 0.01f, 0, 1);
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.aimSensitivity = Helpers.clamp(Options.main.aimSensitivity + 0.01f, 0, 1);
+						}
+					},
+					(Point pos, int index) => {
+						var str = (int)Math.Round(Options.main.aimSensitivity * 100);
+						Fonts.drawText(
+							optionFontText, "Aim sensitivity:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, str.ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Change aim sensitivity (for Cursor aim mode only.)"
+				),
+				// Axl Lock On
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.lockOnSound = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.lockOnSound = true;
+						}
+					},
+					(Point pos, int index) => {
+						//ToDo: Add an actual option for the sound.
+						Fonts.drawText(
+							optionFontText, "Auto aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.lockOnSound),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Enable/disable auto-aim-\n(For Directional aim mode only.)"
+				),
+				// Axl Backwards Aim Invert
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.aimAnalog = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.aimAnalog = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Analog stick aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.aimAnalog),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Enables 360 degree aim if binding Axl aim controls\nto a controller analog stick."
+				),
+				// Aim key function
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightInc(ref Options.main.aimKeyFunction, 0, 2);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Aim key function:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, aimKeyFunctionToStr(Options.main.aimKeyFunction),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Change the behavior of Axl's \"aim key\"."
+				),
+				// Aim key toggle
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.aimKeyToggle);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Aim key behavior:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.aimKeyToggle ? "Toggle" : "Hold"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Change whether Axl's \"aim key\"\nis toggle or hold based."
+				),
+				// Diag aim movement
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.moveInDiagAim);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Move in diagonal aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.moveInDiagAim),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Allows Axl tomove when aiming diagonally,\notherwise he is locked in place when shooting."
+				),
+				// Axl Separate aim crouch
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.axlSeparateAimDownAndCrouch = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.axlSeparateAimDownAndCrouch = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Aim down & crouch:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Options.main.axlSeparateAimDownAndCrouch ? "Separate" : "Mixed",
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If \"mixed\" Aim down and crounch will bind to\n" +
+					"the same button and crouching will not aim down."
+				),
+				// Grid mode Axl
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightInc(ref Options.main.gridModeAxl, 0, 2);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "weapon switch grid mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, gridModeToStr(Options.main.gridModeAxl),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Enables Grid Mode for Axl,\nwhich works the same way as X's."
+				),
+				// Roll Cooldown HUD.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.showRollCooldown);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Show roll cooldown:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.showRollCooldown),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If enabled, shows a cooldown circle above Axl's head\n" +
+					"indicating Dodge Roll cooldown."
+				),
+			};
+		}
+		
+		
+		
+		
+		else if (charNum == (int)CharIds.Sigma) {
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,
@@ -1363,6 +1580,7 @@ public class OptionsMenu : IMainMenu {
 		else if (charNum == (int)CharIds.Zero) subtitle = "ZERO SETTINGS";
 		else if (charNum == (int)CharIds.Vile) subtitle = "VILE SETTINGS";
 		else if (charNum == (int)CharIds.AxlWC) subtitle = "AXL SETTINGS";
+		else if (charNum == (int)CharIds.AxlOld) subtitle = "AXL SETTINGS2";
 		else if (charNum == (int)CharIds.Sigma) subtitle = "SIGMA SETTINGS";
 		Fonts.drawText(FontType.Yellow, subtitle, Global.halfScreenW, 20, Alignment.Center);
 		Fonts.drawTextEX(

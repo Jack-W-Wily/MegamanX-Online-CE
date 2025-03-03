@@ -616,6 +616,77 @@ public class GameMode {
 				}
 			}
 		}
+
+
+
+
+		if (level.mainPlayer.character is AxlWC axlwc) {
+			if (axlwc.isZooming() && !axlwc.isZoomOutPhase1Done) {
+				Point charPos = axlwc.getCenterPos();
+
+				float xOff = axlwc.axlScopeCursorWorldPos.x - level.camCenterX;
+				float yOff = axlwc.axlScopeCursorWorldPos.y - level.camCenterY;
+
+				Point bulletPos = axlwc.getAxlBulletPos();
+				Point scopePos = axlwc.getAxlScopePos();
+				Point hitPos = axlwc.getCorrectedCursorPos();
+				//Point hitPos = bulletPos.add(axl.getAxlBulletDir().times(Global.level.adjustedZoomRange));
+				var hitData = axlwc.getFirstHitPos(level.mainPlayer.adjustedZoomRange, ignoreDamagables: true);
+				Point hitPos2 = hitData.hitPos;
+				if (hitPos2.distanceTo(charPos) < hitPos.distanceTo(charPos)) hitPos = hitPos2;
+				if (!axlwc.isZoomingOut && !axlwc.isZoomingIn) {
+					Color laserColor = new Color(255, 0, 0, 160);
+					DrawWrappers.DrawLine(scopePos.x, scopePos.y, hitPos.x, hitPos.y, laserColor, 2, ZIndex.HUD);
+					DrawWrappers.DrawCircle(hitPos.x, hitPos.y, 2f, true, laserColor, 1, ZIndex.HUD);
+					if (axlwc.ownedByLocalPlayer && Global.level.isSendMessageFrame()) {
+						RPC.syncAxlScopePos.sendRpc(level.mainPlayer.id, true, scopePos, hitPos);
+					}
+				}
+
+				Point cursorPos = new Point(Global.halfScreenW + (xOff / Global.viewSize), Global.halfScreenH + (yOff / Global.viewSize));
+				string scopeSprite = "scope";
+				if (axlwc.hasScopedTarget()) scopeSprite = "scope2";
+				Global.sprites[scopeSprite].drawToHUD(0, cursorPos.x, cursorPos.y);
+				float w = 298;
+				float h = 224;
+				float hw = 149;
+				float hh = 112;
+				DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y - h, cursorPos.x + w, cursorPos.y - hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
+				DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y + hh, cursorPos.x + w, cursorPos.y + h, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
+				DrawWrappers.DrawRect(cursorPos.x - w, cursorPos.y - hh, cursorPos.x - hw, cursorPos.y + hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
+				DrawWrappers.DrawRect(cursorPos.x + hw, cursorPos.y - hh, cursorPos.x + w, cursorPos.y + hh, true, Color.Black, 1, ZIndex.HUD, false, outlineColor: Color.Black);
+
+				DrawWrappers.DrawCircle(charPos.x, charPos.y, level.mainPlayer.zoomRange, false, Color.Red, 1f, ZIndex.HUD, outlineColor: Color.Red, pointCount: 250);
+
+				if (!axlwc.isZoomingIn && !axlwc.isZoomingOut) {
+					int zoomChargePercent = MathInt.Round(axlwc.zoomCharge * 100);
+					Fonts.drawText(
+						FontType.Orange, zoomChargePercent.ToString() + "%",
+						cursorPos.x + 5, cursorPos.y + 5, Alignment.Left,
+						true, depth: ZIndex.HUD
+					);
+				}
+
+				Helpers.decrementTime(ref flashCooldown);
+				if (axlwc.renderEffects.ContainsKey(RenderEffectType.Hit) && flashTime == 0 && flashCooldown == 0) {
+					flashTime = 0.075f;
+				}
+				if (flashTime > 0) {
+					float th = 2;
+					DrawWrappers.DrawRect(th, th, Global.screenW - th, Global.screenH - th, false, Color.Red, th, ZIndex.HUD, false, outlineColor: Color.Red);
+					flashTime -= Global.spf;
+					if (flashTime < 0) {
+						flashTime = 0;
+						flashCooldown = 0.15f;
+					}
+				}
+			} else {
+				if (axlwc.isAnyZoom() && Global.level.isSendMessageFrame()) {
+					RPC.syncAxlScopePos.sendRpc(level.mainPlayer.id, false, new Point(), new Point());
+				}
+			}
+		}
+
 		if (DevConsole.showConsole) {
 			return;
 		}

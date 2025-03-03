@@ -158,6 +158,20 @@ public class BlastLauncherWCProj : Projectile, IDamagable {
 	public bool canBeHealed(int healerAlliance) { return false; }
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
 	public bool isPlayableDamagable() { return false; }
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -800));
+		}
+	}
+
+
 }
 
 public class GreenSpinnerWCProj : Projectile {
@@ -213,4 +227,18 @@ public class GreenSpinnerWCProj : Projectile {
 			new GreenSpinnerExplosionProj(weapon, pos, xDir, owner, angle.Value, null, Math.Sign(vel.x), netId);
 		}
 	}
+
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -800));
+		}
+	}
+	
 }

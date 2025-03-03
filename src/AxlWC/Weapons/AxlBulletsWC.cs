@@ -102,7 +102,7 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new OcelotSpin(), true);
 			return true;
 		}
-		if (axl.autoChargeCooldown <= 0 && specialPressed && ammo > 0) {
+		if (axl.autoChargeCooldown <= 0 && specialPressed && ammo > 0 && axl.sprite.name.Contains("dash")) {
 			axl.changeState(new EvasionBarrage(), true);
 			return true;
 		}
@@ -170,6 +170,19 @@ public class AxlBulletWCProj : Projectile {
 			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
 		);
 	}
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -800));
+		}
+	}
+
 }
 
 public class CopyShotWCProj : Projectile {
@@ -229,5 +242,18 @@ public class CopyShotWCProj : Projectile {
 			args.owner, args.pos, args.extraData[0], args.byteAngle, args.netId, player: args.player
 		);
 	}
+
+
+		public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -800));
+		}
+	}
+	
 }
 

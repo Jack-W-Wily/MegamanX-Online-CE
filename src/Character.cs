@@ -926,7 +926,7 @@ public partial class Character : Actor, IDamagable {
 		|| sprite.name.Contains("grabbed")
 		|| sprite.name.Contains("lose")
 		|| sprite.name.Contains("stunned")) {
-			DamageScaling += Global.spf;
+			DamageScaling += Global.spf * 2;
 			DamageScalingCD = 0.5f;
 		}
 		//
@@ -1190,7 +1190,7 @@ public partial class Character : Actor, IDamagable {
 				if (burnHurtCooldown <= 0) {
 					burnHurtCooldown = 0;
 				}
-				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f);
+				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 0.5f);
 			}
 			if (isUnderwater() || charState.invincible || isStatusImmune()) {
 				burnTime = 0;
@@ -2257,6 +2257,11 @@ public partial class Character : Actor, IDamagable {
 	public override void render(float x, float y) {
 		if (!shouldRender(x, y)) {
 			return;
+		}
+		if (sprite.name.Contains("_frozen")) {
+			Global.sprites["frozen_block"].draw(
+				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
+			);
 		}
 		currentLabelY = -getLabelOffY();
 

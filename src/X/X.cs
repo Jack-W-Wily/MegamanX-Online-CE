@@ -365,7 +365,9 @@ public class MegamanX : Character {
 			
 		}
 		if (player.input.isPressed(Control.Special1, player)
-		&& !UnlockZsaber) {
+		&& !UnlockZsaber
+		&& !player.input.isPressed(Control.Down, player)
+		&& !player.input.isPressed(Control.Up, player)) {
 			changeState(new XUPPunchState(grounded), true);
 			
 		}
@@ -914,7 +916,7 @@ public class MegamanX : Character {
 		if (!shouldRender(x, y)) {
 			return;
 		} 
-		if (sprite.name == "mmx_frozen") {
+		if (sprite.name.Contains("_frozen")) {
 			Global.sprites["frozen_block"].draw(
 				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
@@ -953,9 +955,16 @@ public class MegamanX : Character {
 			return shaders;
 		}
 
-		if (index >= (int)WeaponIds.GigaCrush) {
-			index = 0;
+
+		if (index == 0) {
+			index = 40;
 		}
+
+		if (index >= (int)WeaponIds.GigaCrush) {
+			index = 40;
+		}
+
+
 		/*if (index >= (int)WeaponIds.XSaber) {
 			index = 0;
 		}*/

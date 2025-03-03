@@ -461,11 +461,13 @@ public class Axl : Character {
 		if (charState is Idle or WallSlide)hoverCount = 0;
 		// AXl Attacks
 
-
+/*
 		if ((player.weapon is AxlBullet || player.weapon is DoubleBullet) &&
 		  !sprite.name.Contains("hurt")
 			 && !sprite.name.Contains("grabbed")
 			  && !sprite.name.Contains("frozen")) {
+
+				
 			if (!isAttacking() || ComboTimer > 0) {
 				if (player.input.isPressed(Control.Special1, player)
 					&& !player.input.isHeld(Control.Up, player)
@@ -514,7 +516,7 @@ public class Axl : Character {
 					RainstormCooldown = 2.5f;
 				}
 			}
-		}
+		}*/
 
 
 		Helpers.decrementTime(ref RainstormCooldown);
@@ -1736,6 +1738,8 @@ public class Axl : Character {
 
 		return adjustedAngle;
 	}
+
+	
 
 	public Point getTwoHandedOffset() {
 		if (player.axlWeapon == null) return new Point();

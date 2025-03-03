@@ -644,6 +644,8 @@ public class ChainrodProj : Projectile {
 		startDir = xDir;
 		//xScale = 1;
 
+		
+
 		//Set character and player
 		mmx = player.character;
 		mmx.ChainrodProj = this;
@@ -675,6 +677,22 @@ public class ChainrodProj : Projectile {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
+
+		if (time == 0.1f){
+		damager.flinch = 2;
+		}
+		if (time == 0.2f){
+		damager.flinch = 5;
+		}
+		if (time == 0.3f){
+		damager.flinch = 12;
+		}
+		if (time == 0.5f){
+		damager.flinch = 18;
+		}
+		if (time >= 0.6f){
+		damager.flinch = 25;
+		}
 
 		//We destroy the chain if X faces to the opposite xDir
 		if (mmx.xDir != startDir && mmx.charState is not WallSlide) {

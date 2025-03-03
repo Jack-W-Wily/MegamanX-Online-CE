@@ -269,7 +269,7 @@ public class TailShot : CharState {
 		if (character.frameIndex >= 3 && !shot) {
 			shot = true;
 			character.playSound("axlBulletCharged", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+			//axl.mainWeapon.addAmmo(-2, player);
 		}
 
 		// Jack: Erhm stop changing the inputs of my stuff without asking. GRRRRRRRRRRRRR.
@@ -316,7 +316,7 @@ public class AxlString1 : CharState {
 				player.getNextActorNetId(), sendRpc: true
 			);
 			character.playSound("axlBulletCharged", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+			//axl.mainWeapon.addAmmo(-2, player);
 		}
 
 		if (character.frameIndex >= 4 && player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
@@ -369,7 +369,7 @@ public class AxlString2 : CharState {
 				character.xDir, player.getNextActorNetId(), sendRpc: true
 			);
 			character.playSound("axlBulletCharged", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+			//axl.mainWeapon.addAmmo(-2, player);
 		}
 
 		if (character.frameIndex >= 4 && player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
@@ -420,7 +420,7 @@ public class AxlString3 : CharState {
 				player.getNextActorNetId(), sendRpc: true
 			);
 			character.playSound("axlBulletCharged", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+			//axl.mainWeapon.addAmmo(-2, player);
 		}
 		if (character.isAnimOver()) {
 			axl.armAngle = -32;
@@ -472,7 +472,7 @@ public class AxlString4 : CharState {
 			);
 
 			character.playSound("axlBulletCharged", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+			//axl.mainWeapon.addAmmo(-2, player);
 		}
 
 		if (character.isAnimOver()) {
@@ -529,7 +529,7 @@ public class AxlString5 : CharState {
 				character.xDir, player.getNextActorNetId(), sendRpc: true
 			);
 			character.playSound("axlBulletCharged", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+		//	axl.mainWeapon.addAmmo(-2, player);
 		}
 
 		if (character.isAnimOver()) {
@@ -639,14 +639,14 @@ public class RisingBarrage : CharState {
 				);
 				anim.vel = new Point(-character.xDir * 50, 25);
 				new BlueBulletProj(
-					axl, gunpos.Value, axl.armDir == 1 ? -32 : 160,
+					axl, gunpos.Value, axl.armDir == 1 ? -45 : 160,
 					player.getNextActorNetId(), sendRpc: true
 				);
 				if (axl.frameIndex >= 4) {
 					new AxlMeleeBullet(
 						axl, gunpos.Value, character.xDir,
 						player.getNextActorNetId(),
-						byteAngle: -48 * axl.xDir, sendRpc: true
+						byteAngle: -64 * axl.xDir, sendRpc: true
 					);
 				}
 				axl.mainWeapon.addAmmo(-0.5f, player);
@@ -701,12 +701,12 @@ public class AxlRainDrop : CharState {
 			Point gunpos = character.getFirstPOI() ?? axl.pos;
 			shot = true;
 			new AxlMeleeBullet(
-				axl, gunpos.addxy(1 * character.xDir, -1),
-				character.xDir, player.getNextActorNetId(), sendRpc: true
+				axl, gunpos.addxy(0, -20), character.xDir,
+				 player.getNextActorNetId(), sendRpc: true, byteAngle: 64 * axl.xDir
 			);
 			new AxlMeleeBullet(
-				axl, gunpos.addxy(-1 * character.xDir, 1),
-				character.xDir, player.getNextActorNetId(), sendRpc: true
+				axl, gunpos.addxy(0, -20), character.xDir,
+				 player.getNextActorNetId(), sendRpc: true, byteAngle: 64 * axl.xDir
 			);
 			character.playSound("axlBulletCharged", sendRpc: true);
 			axl.mainWeapon.addAmmo(-2, player);
@@ -904,7 +904,7 @@ public class AxlRollBump : CharState {
 				character.xDir, player, player.getNextActorNetId(), true
 			);
 			character.playSound("punch1", sendRpc: true);
-			axl.mainWeapon.addAmmo(-2, player);
+		
 		}
 		if (player.input.isPressed(Control.Special1, player) && character.frameIndex >= 3) {
 			character.changeState(new AxlFlashKick(), true);

@@ -16,6 +16,11 @@ public class Iris : Character {
 
 	public float IrisGeneralizedCrystalCD;
 
+
+	public float CannonSlashCD;
+
+	public float CannonStabCD;
+
 	public bool usedcannonONce = false;
 	
 
@@ -36,25 +41,12 @@ public class Iris : Character {
 
 
 	public override bool attackCtrl() {
-	
-		
 
-			if (iriscannon == null && player.health > 0 
-		 && !usedcannonONce && 
-		 player.input.isPressed(Control.WeaponLeft, player) 
-		  && player.input.isHeld(Control.Up, player)
-		 && ownedByLocalPlayer && !Global.level.gameMode.isOver )	{
-			usedcannonONce = true;
-            new IrisCannon(new SigmaSlashWeapon(), pos.addxy(-30,-30), xDir, player, player.getNextActorNetId(), 4, 35, rpc: true);
-		}
-
-				if (IrisGeneralizedCrystalCD == 0f &&
-		 player.input.isPressed(Control.WeaponLeft, player)  && !player.input.isHeld(Control.Up, player) )
-			{
-				IrisGeneralizedCrystalCD = 1.5f;
-				
-                  	new IrisSlashProj(new SigmaSlashWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
-			}
+			if (player.input.isHeld(Control.Down, player) && !grounded &&
+		 player.input.isPressed(Control.Dash, player))
+				{	
+        changeState(new IrisDiveKick(), true);
+				}
 
 
 		if (!player.input.isHeld(Control.Up, player) &&
@@ -84,7 +76,50 @@ public class Iris : Character {
 		public override void update(){
 		base.update();
 
+
+		// Perifericos
+		if (!isInDamageSprite()){
+		
+
+		if (iriscannon == null && player.health > 0 
+		 && !usedcannonONce && 
+		 player.input.isPressed(Control.WeaponLeft, player) 
+		  && player.input.isHeld(Control.Up, player)
+		 && ownedByLocalPlayer && !Global.level.gameMode.isOver )	{
+			usedcannonONce = true;
+			playSound("distortion_a", true);
+            new IrisCannon(new IrisCrystal(), pos.addxy(-30,-30), xDir, player, player.getNextActorNetId(), 4, 35, rpc: true);
+		}
+
+
+		if (CannonSlashCD == 0f &&
+		 player.input.isPressed(Control.WeaponLeft, player) 
+		 && !player.input.isHeld(Control.Up, player)
+		  && !player.input.isHeld(Control.Left, player)
+		   && !player.input.isHeld(Control.Right, player) )
+			{
+
+				playSound("distortion_a", true);
+				CannonSlashCD = 1.5f;
+                new IrisSlashProj(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			}
+
+			if (CannonStabCD == 0f &&
+		 player.input.isPressed(Control.WeaponLeft, player) 
+		 && !player.input.isHeld(Control.Up, player) 
+		 && (player.input.isHeld(Control.Left, player)
+		  || player.input.isHeld(Control.Left, player)))
+			{
+				CannonStabCD = 1.25f;
+				playSound("distortion_a", true);
+                new IrisStabProj(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			}
+		}
+
+
 		// Cooldowns
+		Helpers.decrementTime(ref CannonSlashCD);
+		Helpers.decrementTime(ref CannonStabCD);
 		Helpers.decrementTime(ref IrisGeneralizedCrystalCD);
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -101,7 +136,9 @@ public class Iris : Character {
 
 
 		if (irisCrystal == null && player.health > 0 && ownedByLocalPlayer && !Global.level.gameMode.isOver){
-		irisCrystal = new NewIrisCrystal(new IrisCrystal(), pos, getShootXDir(), player, player.getNextActorNetId(), rpc: true);
+		irisCrystal = 	new NewIrisCrystal(new IrisCrystal(), pos, getShootXDir(), player,0,
+						player.getNextActorNetId(true), true);
+						
 		}
 
 	
@@ -136,8 +173,16 @@ public class Iris : Character {
 		}
 		 if (  sprite.name.Contains("rising"))
 		{
-			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.VirusSlash, player, 3f, 30, 20, ShouldClang : true);
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.VirusSlash, player, 3f, 30, 20, 
+			ShouldClang : true, isJuggleProjectile : true );
 		}
+
+		 if (  sprite.name.Contains("dive_kick"))
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.GBDKick, player, 2f, 30, 20, 
+			ShouldClang : true, isJuggleProjectile : true );
+		}
+
 
 		return proj;
 	}

@@ -200,6 +200,7 @@ public class IrisCrystalCharge : CharState
 	public override void onEnter(CharState oldState)
 	{
 		base.onEnter(oldState);
+		character.playSound("distortion_b", true);
 		character.stopMoving();
 		character.useGravity = false;
 	}
@@ -247,7 +248,7 @@ public class IrisSpawnBeam : CharState
 	public IrisSpawnBeam()
 		: base("spawn_lightbeam", "")
 	{
-
+			specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void onEnter(CharState oldState)
@@ -273,7 +274,7 @@ public class IrisSpawnBeam : CharState
 		fired = true;
 		 TriadThunder weapon = new TriadThunder();
 		if ((character as Iris).irisCrystal != null){
-      		character.playSound("crashX3", forcePlay: false, sendRpc: true);
+      		character.playSound("irislaser2", forcePlay: false, sendRpc: true);
 			new DynamoBeam(weapon, (character as Iris).irisCrystal.pos, character.xDir, player, player.getNextActorNetId(), sendRpc: true);
 			}
 		}
@@ -297,6 +298,7 @@ public class IrisSpawnIce : CharState {
 	public IrisSpawnIce(NapalmAttackType napalmAttackType, string transitionSprite = "") :
 		base(getSprite(napalmAttackType), "", "", transitionSprite) {
 		this.napalmAttackType = napalmAttackType;
+			specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public static string getSprite(NapalmAttackType napalmAttackType) {
@@ -312,10 +314,7 @@ public class IrisSpawnIce : CharState {
 			}
 
   			
-			if (!character.grounded){
-			if (player.input.isHeld(Control.Jump, player)){
-			character.useGravity = false;} else {character.useGravity = true;}
-			}
+		
 			shootTime += Global.spf;
 			var poi = character.getFirstPOI();
 			if (shootTime > 0.15f && poi != null) {
@@ -338,8 +337,10 @@ public class IrisSpawnIce : CharState {
 	}
 
 	public override void onEnter(CharState oldState) {
+		
 		base.onEnter(oldState);
 		character.stopMoving();
+		character.useGravity = false;
 
 	}
 
@@ -353,155 +354,62 @@ public class IrisSpawnIce : CharState {
 
 
 
-public class IrisCrystal : Weapon {
-	public float vileAmmoUsage;
-	public string projSprite;
-	public IrisCrystal() : base() {
-		index = (int)WeaponIds.IrisCrystal;
-		weaponBarBaseIndex = 0;
-		weaponBarIndex = weaponBarBaseIndex;
-		killFeedIndex = 31;
-		weaponSlotIndex = 45;
-			displayName = "Iris Crystal";
-			description = new string[] { "Iris's Mighty Crystal." };
-			killFeedIndex = 126;
-		
-		}
-}
-
-public class NewIrisCrystal : Projectile {
-
-public float angleDist = 0;
-
-	public float state = 0;
-	public float turnDir = 1;
-	public Pickup pickup;
-	public float angle2;
-	public float maxSpeed = 350;
-	public float returnTime = 0.15f;
-	public float turnSpeed = 300;
-	public float maxAngleDist = 180;
-	public float soundCooldown;
-	public float yPos;
-	public float initTime;
-	public Anim? anim;
-
-
-	public NewIrisCrystal(
-		IrisCrystal weapon, Point pos, int xDir, Player player, ushort netProjId,
-		float damage = 6, int flinch = 26, bool rpc = false
-	) : base(
-		weapon, pos, xDir, 0, damage, player, "iris_crystal_bb_behavior", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
-	) {
-		canBeLocal = false;
-		//fadeSprite = weapon.fadeSprite;
-		projId = (int)ProjIds.IrisCrystal;
-		destroyOnHit = false;
-		maxAngleDist = 45;
-		returnTime = 0;
-		damager.damage = 1;
-		damager.hitCooldown = 0.33f;
-		this.vel.y = 50;
-		angle2 = 0;
-		if (xDir == -1) angle2 = -180;
-
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, xDir);
-		}
-	}
+public class IrisDiveKick : CharState {
+	float stuckTime;
+	float diveTime;
 	
 
-
-
-	public override void onCollision(CollideData other) {
-		base.onCollision(other);
-		if (!ownedByLocalPlayer) return;
+	public IrisDiveKick() : base("dive_kick") {
+	
 	}
-
-	public override void onDestroy() {
-		base.onDestroy();
-		if (pickup != null) {
-			pickup.useGravity = true;
-			pickup.collider.isTrigger = false;
-		}
-	}
-
 
 	public override void update() {
+		if (character.frameIndex >= 1 && !once) {
+			character.vel.x = character.xDir * 400;
+			character.vel.y = 450;
+			character.playSound("punch2", sendRpc: true);
+			once = true;
+		}
 		base.update();
-
-		if (owner.character != null) xDir = owner.character.xDir;
-		if (owner.character == null || owner.character.charState is Die) destroySelf();
-		if (owner.character == null || !Global.level.gameObjects.Contains(owner.character)){ 
-			destroySelf();
+		if (!once) {
 			return;
 		}
-
-		if (owner.character.charState is IrisCrystalRisingBash )state = 1;
-		if (state == 1){
-			if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
-			changePos(owner.character.pos);
+		if (character.vel.y < 100) {
+			character.changeToLandingOrFall();
+			return;
 		}
-
-		if (owner.character.charState is IrisCrystalBashState )state = 2;		
-		if (state == 2){
-			if (sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
-			changePos(owner.character.pos);
-		}
-
-		
-		if (owner.character.charState is IrisCrystalCharge) state = 4;
-		if (state == 4) {
-		if (owner.input.isHeld(Control.Up, owner)) {
-				vel.y = -100;
-			} 
-			 if (owner.input.isHeld(Control.Down, owner)) {
-			    vel.y = 100;
-			}
-			 if (owner.input.isHeld(Control.Right, owner)) {
-				vel.x = 100;
-			}
-			 if (owner.input.isHeld(Control.Left, owner)) {
-				vel.x = -100;
-			}
-			 if (!owner.input.isHeld(Control.Left, owner)
-			    && !owner.input.isHeld(Control.Right, owner)
-				&& !owner.input.isHeld(Control.Up, owner)
-				&& !owner.input.isHeld(Control.Down, owner)
-				) {
-				vel.x = 0;
-				vel.y = 0;
+		CollideData hit = Global.level.checkTerrainCollisionOnce(
+			character, character.vel.x * Global.spf, character.vel.y * Global.spf
+		);
+		if (hit?.isSideWallHit() == true) {
+			character.changeState(new Fall(), true);
+			return;
+		} else if (hit != null) {
+			stuckTime += Global.speedMul;
+			if (stuckTime >= 6) {
+				character.changeToLandingOrFall();
+				return;
 			}
 		}
-
-
-		if( owner.character.charState is  IrisSpawnBeam
-		|| owner.character.charState is  IrisSpawnIce) state = 5;
-		
-		if (state == 5) {
-			vel.x = 0;
-			vel.y = 0;
+		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
+			character.changeToLandingOrFall();
+			return;
 		}
+		diveTime += Global.spf;
+	}
 
-		if (owner.character.charState is not IrisCrystalBashState 
-		&& owner.character.charState is not IrisCrystalRisingBash
-		&& owner.character.charState is not IrisSpawnBeam
-		&& owner.character.charState is not IrisSpawnIce
-		&& owner.character.charState is not IrisCrystalCharge){
-		state = 0;
-		}
-		if (state == 0) {
-		time += Global.spf;
-		if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
-		if (time > 2) time = 0;
-		float x = 20 * MathF.Sin(time * 5);
-		yPos = -15 * time;
-		Point newPos = owner.character.pos.addxy(x, yPos);
-		changePos(newPos);
-		}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	    character.stopMovingWeak();
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		character.stopMovingWeak();
 	}
 }
-
 
 
 
@@ -511,21 +419,30 @@ public class IrisSlashProj : Projectile {
 	public IrisSlashProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "iris_cannon_slash", Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 3, player, "iris_cannon_slash", 32, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		reflectable = true;
+		reflectable = false;
 		destroyOnHit = false;
-		shouldShieldBlock = true;
+		shouldShieldBlock = false;
 		setIndestructableProperties();
-		maxTime = 1.3f;
+		isJuggleProjectile = true;
+		shouldClang = true;
+		isShield = true;
+		isReflectShield = true;
+		maxTime = 1.5f;
 		projId = (int)ProjIds.IrisSlashProj;
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
+
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
 
-	public override void update(){
+		public override void update(){
 	base.update();
 
 		if (sprite.frameIndex >= 7 && !sound){
@@ -533,13 +450,75 @@ public class IrisSlashProj : Projectile {
 		sound = true;
 		}
 	}
+
 	public override void postUpdate() {
 		base.postUpdate();
 		if (owner?.character != null) {
 			incPos(owner.character.deltaPos);
 		}
 	}
+
+	
 }
+
+
+
+
+
+public class IrisStabProj : Projectile {
+
+	bool sound;
+	public IrisStabProj(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 1, player, "iris_cannon_stab", 30, 0.1f, netProjId, player.ownedByLocalPlayer
+	) {
+		reflectable = false;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		setIndestructableProperties();
+		shouldClang = true;
+		isShield = true;
+		isReflectShield = true;
+		maxTime = 1.5f;
+		projId = (int)ProjIds.IrisStabProj;
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+
+		public override void update(){
+	base.update();
+
+		if (sprite.frameIndex >= 7 && !sound){
+		playSound("rideX4-1", sendRpc: true);
+		sound = true;
+		}
+	}
+
+	public override void postUpdate() {
+		base.postUpdate();
+		if (owner?.character != null) {
+			incPos(owner.character.deltaPos);
+		}
+	}
+
+	
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -625,7 +604,10 @@ public class IrisCannon : Projectile {
 			}
 
 		
-				if (LaserCD == 0 && owner.character != null && owner.input.isPressed("special1", owner)){
+				if (LaserCD == 0 && owner.character != null && 
+				
+				owner.input.isPressed(Control.WeaponRight,owner)
+				&& owner.input.isHeld(Control.Up,owner)){
 				new RisingSpecterProj(new VileLaser(VileLaserType.RisingSpecter), pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
 				LaserCD = 4;
 				playSound("irislaser2", sendRpc: true);
@@ -692,6 +674,20 @@ public class IrisFireBallProj : Projectile {
 			}
 		}
 	}
+
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -800));
+		}
+	}
+	
+
 }
 
 

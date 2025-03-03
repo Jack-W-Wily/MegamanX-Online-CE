@@ -136,6 +136,13 @@ public class ZeroBurnKnuckle : CharState {
 
 public class SuperBurnKnuckle1 : CharState {
 
+
+public CrystalHunterCharged? CHC1;
+public CrystalHunterCharged? CHC2;
+public CrystalHunterCharged? CHC3;
+public CrystalHunterCharged? CHC4;
+
+
 public RekkohaEffect? effect;
 	public SuperBurnKnuckle1() : base("aok_start") {
 		superArmor = true;
@@ -165,6 +172,27 @@ public RekkohaEffect? effect;
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+
+		CHC1 = new CrystalHunterCharged(
+				character.pos, player, player.getNextActorNetId(),
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+			);
+		CHC2 = new CrystalHunterCharged(
+				character.pos, player, player.getNextActorNetId(),
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+			);
+		CHC3 = new CrystalHunterCharged(
+				character.pos, player, player.getNextActorNetId(),
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+			);
+		CHC4 = new CrystalHunterCharged(
+				character.pos, player, player.getNextActorNetId(),
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+			);
+
+
+			
 	}
 
 	public override void onExit(CharState newState) {

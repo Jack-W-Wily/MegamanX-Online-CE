@@ -454,7 +454,7 @@ public class Input {
 
 	public bool useAxlCursorControls(Player player) {
 		if (player != Global.level.mainPlayer) return false;
-		return (Global.level.mainPlayer.isAxlXOD) && Options.main.useMouseAim;
+		return (Global.level.mainPlayer.isAxlXOD || Global.level.mainPlayer.isAxlWC ) && Options.main.useMouseAim;
 	}
 
 	public bool isAimingBackwards(Player player) {
