@@ -86,7 +86,7 @@ public class Options {
 
 
 	//wcaxl
-	public bool moveWhileShooting;
+	public bool lockMoveOnShoot;
 	public bool autoCharge;
 	public bool blockInput;
 	public bool hoverWhileDown;

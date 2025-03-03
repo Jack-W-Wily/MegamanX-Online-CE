@@ -545,7 +545,10 @@ public class AxlString5 : CharState {
 public class EvasionBarrage : CharState {
 	public AxlWC axl = null!;
 	public float pushBackSpeed;
-	float projTime;
+	float projTime = 99;
+	public int bulletsFired;
+	public bool exitCond;
+	public int lastFrameFired;
 
 	public EvasionBarrage() : base("evasionshot") { }
 
@@ -560,30 +563,37 @@ public class EvasionBarrage : CharState {
 			if (!character.grounded || character.frameIndex >= 2) {
 				character.move(new Point(-80 * character.xDir, -pushBackSpeed));
 			}
-			pushBackSpeed -= 3.75f;
+			pushBackSpeed -= Physics.Gravity / 2f;
 		} else {
 			character.useGravity = true;
 		}
-		Point gunpos = character.getFirstPOI() ?? character.pos;
+		Point? gunpos = character.getFirstPOI();
 
 		if (character.sprite.frameIndex >= 2) {
-			character.move(new Point(character.xDir * -150, -120f));
-			projTime += character.speedMul;
-			if (projTime >= 4) {
-				projTime = 0;
+			character.move(new Point(character.xDir * -150, 0));
+			if (gunpos != null && lastFrameFired != character.frameIndex) {
+				lastFrameFired = character.frameIndex;
 				BlueBulletProj.newWithDir(
-					axl, gunpos, character.xDir,
+					axl, gunpos.Value, character.xDir,
 					player.getNextActorNetId(), sendRpc: true
 				);
-				new AxlMeleeBullet(
-					axl, gunpos.addxy(axl.xDir * -2, -4), character.xDir,
-					player.getNextActorNetId(), sendRpc: true
+				new Anim(
+					gunpos.Value.addxy(-2 * character.xDir, 0),
+					"x8_axl_bullet_flash", character.xDir,
+					player.getNextActorNetId(), true, sendRpc: true,
+					host: character
 				);
 				character.playSound("axlBullet", sendRpc: true);
 				axl.mainWeapon.addAmmo(-0.75f, player);
+				bulletsFired++;
 			}
 		}
-		if (stateFrames >= 30 || axl.mainWeapon.ammo <= 0) {
+		if ((bulletsFired >= 4 || axl.mainWeapon.ammo <= 0) &&
+			(character.frameIndex == 5 || character.frameIndex == 3)
+		) {
+			exitCond = true;
+		}
+		if (exitCond && character.frameIndex != 5 && character.frameIndex != 3) {
 			axl.armAngle = 0;
 			character.xPushVel = -100 * character.xDir;
 			if (pushBackSpeed > 0) {
@@ -599,7 +609,7 @@ public class EvasionBarrage : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMovingWeak();
-		pushBackSpeed = 50;
+		pushBackSpeed = 180;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 

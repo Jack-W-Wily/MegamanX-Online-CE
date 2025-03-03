@@ -640,10 +640,10 @@ public class Idle : CharState {
 
 		int xInput = player.input.getXDir(player);
 		if (xInput != 0) {
-			if (player.character.canTurn()) {
+			if (character.canTurn()) {
 				character.xDir = xInput;
 			}
-			if (player.character.canMove()) {
+			if (character.canMove()) {
 				character.changeState(new Run());
 			}
 		}
@@ -683,7 +683,7 @@ public class Run : CharState {
 			if (character.sprite.frameSpeed < 0) {
 				character.sprite.frameSpeed = 1;
 			}
-			if (character.canTurn()) {
+			if (character.canTurn() && (character as AxlWC)?.isCursorAim != true) {
 				character.xDir = dpadXDir;
 			} else if (character.xDir != dpadXDir) {
 				character.sprite.frameSpeed = -1;

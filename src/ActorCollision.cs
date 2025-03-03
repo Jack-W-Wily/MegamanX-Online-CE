@@ -8,6 +8,7 @@ namespace MMXOnline;
 // Everything strongly related to actor collision should go here
 public partial class Actor {
 	private Collider? _globalCollider;
+	private bool movedUp;
 
 	// One of the possible colliders of an actor.
 	// This is typically used for a collider shared across multiple sprites an actor can be.
@@ -336,6 +337,9 @@ public partial class Actor {
 	) {
 		if (amount == Point.zero) {
 			return;
+		}
+		if (amount.y < 0) {
+			movedUp = true;
 		}
 		var times = useDeltaTime ? Global.spf : 1;
 

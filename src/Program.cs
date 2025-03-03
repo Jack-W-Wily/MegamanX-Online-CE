@@ -615,6 +615,22 @@ class Program {
 	static void onMouseMove(object sender, MouseMoveEventArgs e) {
 		Input.mouseDeltaX = e.X - Global.halfScreenW;
 		Input.mouseDeltaY = e.Y - Global.halfScreenH;
+
+		float mulX = Global.screenW / (float)Global.window.Size.X;
+		float mulY = Global.screenH / (float)Global.window.Size.Y;
+		float offsetX = 0;
+		float offsetY = 0;
+		if (mulX < mulY) {
+			mulX = mulY;
+			offsetX = (Global.window.Size.X - (Global.screenW / mulX)) * mulX / 2f;
+		}
+		if (mulY < mulX) {
+			mulY = mulX;
+			offsetY = (Global.window.Size.Y - (Global.screenH / mulY)) * mulY / 2f;
+		}
+
+		Input.mouseX = e.X * mulX - offsetX;
+		Input.mouseY = e.Y * mulY - offsetY;
 		Global.input.setLastUpdateTime();
 	}
 
@@ -677,7 +693,6 @@ class Program {
 
 	private static void onJoystickMoved(object sender, JoystickMoveEventArgs e) {
 		Global.input.setLastUpdateTime();
-
 		Player currentPlayer = Global.level?.mainPlayer;
 
 		int threshold = 70;

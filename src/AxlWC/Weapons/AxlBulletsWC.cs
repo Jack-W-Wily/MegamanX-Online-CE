@@ -53,10 +53,11 @@ public class AxlBulletWC : AxlWeaponWC {
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		ushort netId = axl.player.getNextActorNetId();
 		ushort netIdEffect = axl.player.getNextActorNetId();
-		if(chargeLevel >= 2){
+		if (chargeLevel >= 2){
 			new CopyShotWCProj(axl, pos, chargeLevel, byteAngle, netId, sendRpc: true);
 			new Anim(pos, "x8_axl_bullet_cflash4", 1, netIdEffect, true, sendRpc: true) {
 			byteAngle = byteAngle, host = axl};
+			axl.autoChargeCooldown = 10;
 		}
 	}
 
@@ -73,16 +74,15 @@ public class AxlBulletWC : AxlWeaponWC {
 	}
 
 	public override bool attackCtrl(AxlWC axl) {
-		if(axl.isCharging()) return false;
 		Point inputDir = axl.player.input.getInputDir(axl.player);
 		bool specialPressed = wasSpecialHeld && !axl.player.input.isHeld(Control.Special1, axl.player);
 		// Shoryken does not use negative edge at all.
-		if (axl.autoChargeCooldown <= 0 && axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && ammo > 0) {
+		if (axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && ammo > 0) {
 			axl.changeState(new RainStorm(), true);
 			return true;
 		}
 		// Negative edge inputs.
-		if (axl.autoChargeCooldown <= 0 && axl.grounded && ammo > 0 && inputDir.y == -1 && axl.charState is not RisingBarrage && (
+		if (axl.grounded && ammo > 0 && inputDir.y == -1 && axl.charState is not RisingBarrage && (
 				axl.charState is Dash or AirDash ||
 				axl.player.input.isPressed(Control.Dash, axl.player)
 			)
@@ -90,7 +90,7 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new RisingBarrage(), true);
 			return true;
 		}
-		if (axl.autoChargeCooldown <= 0 && specialPressed && inputDir.y == -1 && ammo > 0) {
+		if (specialPressed && inputDir.y == -1 && ammo > 0) {
 			if (axl.grounded) {
 				axl.changeState(new TailShot(), true);
 			} else {
@@ -98,11 +98,11 @@ public class AxlBulletWC : AxlWeaponWC {
 			}
 			return true;
 		}
-		if (axl.autoChargeCooldown <= 0 && specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
+		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
 			axl.changeState(new OcelotSpin(), true);
 			return true;
 		}
-		if (axl.autoChargeCooldown <= 0 && specialPressed && ammo > 0 && axl.sprite.name.Contains("dash")) {
+		if (specialPressed && ammo > 0) {
 			axl.changeState(new EvasionBarrage(), true);
 			return true;
 		}
@@ -111,6 +111,10 @@ public class AxlBulletWC : AxlWeaponWC {
 
 	// Negative edge input shenanigans.
 	public override void preAxlUpdate(AxlWC axl, bool isSelected) {
+		if (axl.getChargeLevel() >= 2) {
+			wasSpecialHeld = false;
+			specialActive = false;
+		}
 		if (!isSelected) {
 			wasSpecialHeld = false;
 			specialActive = false;

@@ -993,9 +993,9 @@ public class OptionsMenu : IMainMenu {
 					30, startY,
 					() => {
 						if (Global.input.isHeldMenu(Control.MenuLeft)) {
-							Options.main.moveWhileShooting = true;
+							Options.main.lockMoveOnShoot = true;
 						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
-							Options.main.moveWhileShooting = false;
+							Options.main.lockMoveOnShoot = false;
 						}
 					},
 					(Point pos, int index) => {
@@ -1004,12 +1004,30 @@ public class OptionsMenu : IMainMenu {
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, Helpers.boolYesNo(Options.main.moveWhileShooting),
+							optionFontValue, Helpers.boolYesNo(!Options.main.lockMoveOnShoot),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
 					"If no, you wont move while shooting."
-				),new MenuOption(
+				),
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.axlDirLock);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Lock shoot direction:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.axlDirLock),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If enabled Axl will keep direction while holding shoot.\n(Directional Only)"
+				),
+				new MenuOption(
 					30, startY,
 					() => {
 						if (Global.input.isHeldMenu(Control.MenuLeft)) {
@@ -1030,7 +1048,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If yes, you wont need to hold SPECIAL\n" + 
 					"to charge copy shot."
-				),new MenuOption(
+				),
+				new MenuOption(
 					30, startY,
 					() => {
 						if (Global.input.isHeldMenu(Control.MenuLeft)) {
@@ -1051,7 +1070,8 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Choose block input. If 'down' you will block\n" +
 					"using DOWN else, you will block using BLOCK key."
-				),new MenuOption(
+				),
+				new MenuOption(
 					30, startY,
 					() => {
 						if (Global.input.isHeldMenu(Control.MenuLeft)) {
@@ -1072,10 +1092,35 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If yes, you can hover if you are holding DOWN."
 				),
-			//	};
-	//	} 
-	//	else if (charNum ==  (int)CharIds.AxlOld) {
-	//		menuOptions = new List<MenuOption>() {
+				// Axl Use Mouse Aim
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.axlAimMode = 0;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.axlAimMode = 2;
+						}
+					},
+					(Point pos, int index) => {
+						string aimMode = "Directional";
+						if (Options.main.axlAimMode == 1) aimMode = "Directional";
+						else if (Options.main.axlAimMode == 2) aimMode = "Cursor";
+						Fonts.drawText(
+							optionFontText, "Aim mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, aimMode,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor)."
+				),
+			};
+	} 
+	else if (charNum ==  (int)CharIds.AxlOld) {
+			menuOptions = new List<MenuOption>() {
 				// Axl Use Mouse Aim
 				new MenuOption(
 					30, startY,
