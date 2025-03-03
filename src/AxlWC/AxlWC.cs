@@ -62,7 +62,7 @@ public class AxlWC : Character {
 	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camX, Global.level.camY);
 	public float savedCamX;
 	public float savedCamY;
-	
+
 	// Backwards shoot dash debuff.
 	public float backwardsShootTime;
 
@@ -90,7 +90,7 @@ public class AxlWC : Character {
 		Helpers.decrementFrames(ref recoilTime);
 		Helpers.decrementFrames(ref autoChargeCooldown);
 		// Weapon input logic.
-		
+
 		foreach (AxlWeaponWC weapon in axlWeapons) {
 			weapon.preAxlUpdate(this, weapon == axlWeapon);
 		}
@@ -104,8 +104,8 @@ public class AxlWC : Character {
 			turnCooldown = 0;
 		}
 	}
-	public bool checkLockMoveCoditions(){
-		if (Options.main.lockMoveOnShoot){
+	public bool checkLockMoveCoditions() {
+		if (Options.main.lockMoveOnShoot) {
 			if (player.input.isHeld(Control.Shoot, player) || player.input.isPressed(Control.Shoot, player)) return true;
 			if (axlWeapon is not AxlBulletWC && player.input.isHeld(Control.Special1, player)) return true;
 			if (player.input.isPressed(Control.Special1, player)) return true;
@@ -132,17 +132,18 @@ public class AxlWC : Character {
 			if (!sprite.name.Contains("ra_hide")) {
 				int level = getChargeLevel();
 
-				if(level == 2){
-					if(chargeAnim == null){
-					//	Point animPos = ;
+				if (level == 2) {
+					if (chargeAnim == null) {
+						//	Point animPos = ;
 						chargeAnim = new Anim(getCenterPos(), "x8_axl_charge_part2", 1, null, true);
 						//chargeAnim.setzIndex(zIndex - 100);
 					}
-				addRenderEffect(RenderEffectType.ChargeYellow, 4, 6);
+					addRenderEffect(RenderEffectType.ChargeYellow, 4, 6);
 				}
 			}
 			chargeEffect.update(getChargeLevel(), 5);
-		}}
+		}
+	}
 	public override void update() {
 		bool wasGrounded = grounded;
 		base.update();
@@ -178,7 +179,7 @@ public class AxlWC : Character {
 				changeState(new DodgeRollAxlWC(), true);
 			}
 			if (//(wasGrounded || grounded) && 
-			// There's no need for this move to be Grounded only 
+				// There's no need for this move to be Grounded only 
 			 player.input.isHeld(Control.Up, player) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
@@ -192,7 +193,7 @@ public class AxlWC : Character {
 				&& player.input.isPressed(Control.Jump, player)) {
 				changeState(new AxlFlashKick(), true);
 			}
-			if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2){
+			if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
 				changeState(new EvasionBarrage(), true);
 			}
 		}
@@ -284,8 +285,7 @@ public class AxlWC : Character {
 		if (charState.normalCtrl && (canTurn() || charState is Run)) {
 			if (xDir == 1 && axlCursorPos.x < pos.x) {
 				xDir = -1;
-			}
-			else if (xDir == -1 && axlCursorPos.x > pos.x) {
+			} else if (xDir == -1 && axlCursorPos.x > pos.x) {
 				xDir = 1;
 			}
 		}
@@ -299,7 +299,8 @@ public class AxlWC : Character {
 
 		if (dist > 32) {
 			armAngle += Math.Sign(targetAngle - armAngle) * 16;
-		} if (dist > 4) {
+		}
+		if (dist > 4) {
 			armAngle += Math.Sign(targetAngle - armAngle) * 4;
 		} else {
 			armAngle = targetAngle;
@@ -387,9 +388,10 @@ public class AxlWC : Character {
 		if (oldWeapon == mainWeapon) {
 			mainWeapon.ammo = mainWeapon.maxAmmo;
 			stopCharge();
-			if(chargeAnim != null){
-			chargeAnim.destroySelf();
-			chargeAnim = null;}
+			if (chargeAnim != null) {
+				chargeAnim.destroySelf();
+				chargeAnim = null;
+			}
 		}
 		turnCooldown = 0;
 		lockDir = false;
@@ -472,9 +474,10 @@ public class AxlWC : Character {
 		}
 		return base.normalCtrl();
 	}
-	public bool getHoverConditions(){
-		if (!Options.main.hoverWhileDown){
-		if (player.input.isHeld(Control.Down, player)) return false;}
+	public bool getHoverConditions() {
+		if (!Options.main.hoverWhileDown) {
+			if (player.input.isHeld(Control.Down, player)) return false;
+		}
 		return true;
 	}
 
@@ -563,7 +566,7 @@ public class AxlWC : Character {
 			playSound(weapon.shootSounds[1], true, true);
 		}
 		if (weapon.chargedFlashSprite != "") {
-			if (muzzleFlash?.destroyed == false)  {
+			if (muzzleFlash?.destroyed == false) {
 				muzzleFlash.destroySelf();
 			}
 			muzzleFlash = new Anim(
@@ -584,7 +587,7 @@ public class AxlWC : Character {
 		if (armDir < 0) {
 			shootAngle = shootAngle * -1 + 128;
 		}
-		if(chargeAnim != null){
+		if (chargeAnim != null) {
 			chargeAnim.destroySelf();
 			chargeAnim = null;
 		}
@@ -602,7 +605,7 @@ public class AxlWC : Character {
 			playSound(axlBullet.shootSounds[3], true, true);
 		}
 		if (axlBullet.chargedFlashSprite != "") {
-			if (muzzleFlash?.destroyed == false)  {
+			if (muzzleFlash?.destroyed == false) {
 				muzzleFlash.destroySelf();
 			}
 			muzzleFlash = new Anim(
@@ -613,8 +616,8 @@ public class AxlWC : Character {
 		stopCharge();
 	}
 
-	public bool getAutoChargeConditions(){
-		if(axlWeapon is not AxlBulletWC || !Options.main.autoCharge) return false;
+	public bool getAutoChargeConditions() {
+		if (axlWeapon is not AxlBulletWC || !Options.main.autoCharge) return false;
 		return true;
 	}
 
@@ -623,7 +626,7 @@ public class AxlWC : Character {
 			if (autoChargeCooldown > 0) {
 				return false;
 			}
-			if (getAutoChargeConditions()){
+			if (getAutoChargeConditions()) {
 				return true;
 			}
 			return false;
@@ -826,12 +829,12 @@ public class AxlWC : Character {
 		AxlWCLoadout axlLoadout = player.loadout.axlWCLoadout;
 		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon1]);
 		axlWeapons.Add(getAllMainWeapons()[axlLoadout.sideArm]);
-		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon2]); 
+		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon2]);
 		mainWeapon = axlWeapons[1];
 		weaponSlot = 1;
 		weapons = axlWeapons.Cast<Weapon>().ToList();
 	}
-	
+
 
 	public AxlWeaponWC getWeaponFromIndex(int index) {
 		return index switch {
@@ -849,9 +852,9 @@ public class AxlWC : Character {
 
 	public override string getSprite(string spriteName) {
 		if ((Options.main.enableSkins == true)
-			&& Global.sprites.ContainsKey("axlalt_" + spriteName)){		
+			&& Global.sprites.ContainsKey("axlalt_" + spriteName)) {
 			return "axlalt_" + spriteName;
-			}
+		}
 		return "axl_" + spriteName;
 	}
 
@@ -1019,7 +1022,7 @@ public class AxlWC : Character {
 		isWhite = flags[1];
 	}
 }
-public enum ThrowID{
+public enum ThrowID {
 	AxlBullet,
 	RayGun,
 	SpiralMagnum,
