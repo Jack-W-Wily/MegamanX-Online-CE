@@ -715,12 +715,15 @@ public partial class Character : Actor, IDamagable {
 
 	public float getRunDebuffs() {
 		float runSpeed = 1;
+
+		if (player.isZain) runSpeed *= 0.75f;
 		if (acidTime > 0) runSpeed *= 0.75f;
 		if (slowdownTime > 0) runSpeed *= 0.75f;
 		if (igFreezeProgress >= 3) runSpeed *= 0.25f;
 		else if (igFreezeProgress >= 2) runSpeed *= 0.75f;
 		else if (igFreezeProgress >= 1) runSpeed *= 0.5f;
-		return runSpeed;
+		
+		return runSpeed; 
 	}
 
 	public virtual float getDashSpeed() {
@@ -1679,6 +1682,48 @@ public partial class Character : Actor, IDamagable {
 		charPos.x *= xDir;
 		return charPos;
 	}
+
+
+	public Point getVileShootVel(bool aimable) {
+		Point vel = new Point(1, 0);
+		if (!aimable) {
+			return vel;
+		}
+
+		if (rideArmor != null) {
+			if (player.input.isHeld(Control.Up, player)) {
+				vel = new Point(1, -0.5f);
+			} else {
+				vel = new Point(1, 0.5f);
+			}
+		} else if (charState is VileMK2GrabState) {
+			vel = new Point(1, -0.75f);
+		} else if (player.input.isHeld(Control.Up, player)) {
+			if ((player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
+			}
+		} else if (player.input.isHeld(Control.Down, player) && player.character.charState is not Crouch && charState is not MissileAttack) {
+			vel = new Point(1, 0.5f);
+		} else if (player.input.isHeld(Control.Down, player) && player.input.isLeftOrRightHeld(player) && player.character.charState is Crouch) {
+			vel = new Point(1, 0.5f);
+		}
+
+		if (charState is RisingSpecterState) {
+			vel = new Point(1, -0.75f);
+		}
+
+		/*
+		if (charState is CutterAttackState)
+		{
+			vel = new Point(1, -3);
+		}
+		*/
+
+		return vel;
+	}
+
 
 	public Point getMK5RideArmorPos() {
 		if (rideArmorPlatform == null || rideArmorPlatform.currentFrame.POIs.Length == 0) {

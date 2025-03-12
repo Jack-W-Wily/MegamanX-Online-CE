@@ -674,6 +674,14 @@ public class Run : CharState {
 	public override void update() {
 		base.update();
 		var move = new Point(0, 0);
+
+
+		if (character.xDir == 1 && character.vel.x < 0) {
+		character.changeSpriteFromName("run_back", false);
+		}
+		if (character.xDir == -1 && character.vel.x > 0) {
+		character.changeSpriteFromName("run_back", false);
+		}
 		float runSpeed = character.getRunSpeed();
 		if (stateFrames <= 4) {
 			runSpeed = 60 * character.getRunDebuffs();

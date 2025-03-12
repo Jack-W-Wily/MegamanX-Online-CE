@@ -68,6 +68,14 @@ public class ZainParryStartState : CharState {
 	
 		return character.frameIndex == 1;
 	}
+
+
+	
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+			character.playSound("distortion_d");
+		}
 }
 
 public class ZainParryMeleeState : CharState {
@@ -151,8 +159,11 @@ public class ZainProjSwingState : CharState {
 		
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
-			character.playSound("ZeroSaberX3", forcePlay: false, sendRpc: true);
+			character.playSound("dbzpunchwave_2", forcePlay: false, sendRpc: true);
+			
 			if (shootProj) {
+				character.playSound("flashysnd_1", forcePlay: false, sendRpc: true);
+			
 				new ZainSaberProj(
 					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
 					character.xDir, player, player.getNextActorNetId(), rpc: true
@@ -233,7 +244,7 @@ public class ZainKokuSlash : CharState {
 
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
-			character.playSound("ZeroSaberX3", forcePlay: false, sendRpc: true);
+			character.playSound("dbzpunchwave_1", forcePlay: false, sendRpc: true);
 			if (shootProj) {
 				new ZainSaberProj(
 					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
@@ -260,6 +271,385 @@ public class ZainKokuSlash : CharState {
 		}
 	}
 }
+
+
+
+
+
+
+public class ZainGrab : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+
+	public ZainGrab(string transitionSprite = "")
+		: base("grab_2", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+	enterSound = "punch1";
+	}
+
+	public override void update()
+	{
+	
+		base.update();
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+		if (player.input.isPressed(Control.Shoot, player) &&
+		character.downPressedTimes > 0 || player.isAI) {
+			character.changeState(new ZainGroundStab(), true);
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}		
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+
+public class ZainGroundStab : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+	bool fired;
+	public ZainGroundStab(string transitionSprite = "")
+		: base("groundstab", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+	enterSound = "dbzpunchwave_1";
+	}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+			if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+		}
+
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+
+
+}
+	
+
+public class ZainGrabStab : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+	bool fired;
+	public ZainGrabStab(string transitionSprite = "")
+		: base("stabgrab", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+			if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+			character.playSound("dbzpunchwave_1", forcePlay: false, sendRpc: true);
+		}
+
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}		
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+
+public class ZainAirDunk : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+	bool fired;
+	public ZainAirDunk(string transitionSprite = "")
+		: base("air_dunk", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+			if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("dbzpunchwave_3", forcePlay: false, sendRpc: true);
+		}
+
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}		
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+
+public class ZainGrabStabEnd : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+	bool fired;
+
+	bool fired2;
+	public ZainGrabStabEnd(string transitionSprite = "")
+		: base("stabgrab_end", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+	}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+			if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+			character.playSound("dbzpunchwave_1", forcePlay: false, sendRpc: true);
+		}
+
+
+
+			if (character.frameIndex >= 3 && !fired2) {
+			fired2 = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			}
+
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}		
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+public class ZainGrabSlash : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+
+	public ZainGrabSlash(string transitionSprite = "")
+		: base("grab", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+	enterSound = "dbzpunchwave_1";
+	}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+		
+	
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}		
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
 
 
 

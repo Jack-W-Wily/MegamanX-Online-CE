@@ -42,31 +42,26 @@ public class Iris : Character {
 
 	public override bool attackCtrl() {
 
-			if (player.input.isHeld(Control.Down, player) && !grounded &&
+		if (player.input.isHeld(Control.Down, player) && !grounded &&
 		 player.input.isPressed(Control.Dash, player))
-				{	
+		{	
         changeState(new IrisDiveKick(), true);
-				}
-
-
+		}
 		if (!player.input.isHeld(Control.Up, player) &&
 		 player.input.isPressed(Control.Shoot, player))
-				{	
+		{	
         changeState(new IrisCrystalBashState(), true);
-				}
+		}
 		if ( player.input.isHeld(Control.Up, player) &&
 		 player.input.isPressed(Control.Shoot, player))
-				{	
+		{	
         changeState(new IrisCrystalRisingBash(), true);
-				}
+		}
 		if ( !player.input.isHeld(Control.Up, player) &&
 		 player.input.isPressed(Control.Special1, player))
-				{	
+		{	
         changeState(new IrisCrystalCharge(), true);
-				}
-
-
-
+		}
 		return base.attackCtrl();
 	}
 
@@ -80,7 +75,6 @@ public class Iris : Character {
 		// Perifericos
 		if (!isInDamageSprite()){
 		
-
 		if (iriscannon == null && player.health > 0 
 		 && !usedcannonONce && 
 		 player.input.isPressed(Control.WeaponLeft, player) 
@@ -108,7 +102,9 @@ public class Iris : Character {
 		 player.input.isPressed(Control.WeaponLeft, player) 
 		 && !player.input.isHeld(Control.Up, player) 
 		 && (player.input.isHeld(Control.Left, player)
-		  || player.input.isHeld(Control.Left, player)))
+		  || player.input.isHeld(Control.Right, player))
+		  
+		  )
 			{
 				CannonStabCD = 1.25f;
 				playSound("distortion_a", true);

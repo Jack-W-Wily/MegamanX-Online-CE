@@ -149,6 +149,18 @@ public class Projectile : Actor {
 			}
 		}
 		canBeLocal = true;
+
+
+		getRaceModePropeties();
+
+	}
+
+
+	public void getRaceModePropeties() {
+		if (Global.level.isRace()){
+		maxTime = maxTime * 3;
+		//vel.x = vel.x * 3;
+		}
 	}
 
 	public void setIndestructableProperties() {

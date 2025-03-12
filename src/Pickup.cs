@@ -79,7 +79,7 @@ public class Pickup : Actor {
 
 			if (rideChaser.character != null) {
 				if (pickupType == PickupType.Health) {
-					if (rideChaser.health >= rideChaser.maxHealth) {
+					if (rideChaser.health >= rideChaser.maxHealth && !Global.level.isRace()) {
 						if (rideChaser.character != null &&
 							rideChaser.character.health >= rideChaser.character.maxHealth
 						) {
@@ -92,7 +92,12 @@ public class Pickup : Actor {
 					}
 					destroySelf(doRpcEvenIfNotOwned: true);
 				}
+				if (pickupType == PickupType.Ammo) {
+					rideChaser.ItemNum = Helpers.randomRange(1,6);
+					destroySelf(doRpcEvenIfNotOwned: true);
+				}
 			}
+			
 		} else if (other.gameObject is Maverick maverick && maverick.ownedByLocalPlayer) {
 			if (pickupType == PickupType.Health &&
 				(maverick.health < maverick.maxHealth || maverick.netOwner.hasSubtankCapacity())

@@ -9,6 +9,10 @@ public class Zain : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Zain;
+		spriteFrameToSounds["zain_run/3"] = "ridewalk";
+		spriteFrameToSounds["zain_run/0"] = "ridewalk";
+		spriteFrameToSounds["zain_land/1"] = "ridewalk";
+	
 	}
 
 	private float CounterTimer;
@@ -73,10 +77,30 @@ public override bool normalCtrl() {
 		changeSpriteFromName("spinslash", true);
 		}
 		if (player.input.isHeld(Control.Special1,player)
-		&& charState.attackCtrl && charState is not Dash or AirDash &&
+		&& (charState.attackCtrl || charState.bonusAttackCtrl) && charState is not Dash and not AirDash &&
 		!sprite.name.Contains("jab")){
+
+		if (grounded){
 		changeSpriteFromName("jab", true);
+		} else{
+		changeState(new ZainAirDunk(), true);
 		}
+
+		}
+
+
+		if (player.input.isHeld(Control.Special1,player)
+		&& (charState.attackCtrl || charState.bonusAttackCtrl) &&
+		player.input.isHeld(Control.Dash,player) &&
+		ZainCounters > 1
+		){
+		changeState(new GlobalParryState(), true);
+			ZainCounters -= 2;
+		}
+
+
+
+
 		if (sprite.name.Contains("jab") && isAnimOver()){
 		changeToIdleOrFall();
 		}
@@ -96,6 +120,18 @@ public override bool normalCtrl() {
 		{	
 			changeState(new ZainProjSwingState(grounded, shootProj: true), forceChange: true);
 			ZainCounters -= 4;
+		}
+
+
+
+		bool hadokenCheck2 = player.input.checkHadoken(player, xDir, Control.Special1);
+		
+
+		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 1 &&
+		hadokenCheck2)
+		{	
+			changeState(new ZainGrabStab(), forceChange: true);
+			ZainCounters -= 2;
 		}
 
 		if ((charState.attackCtrl || charState.bonusAttackCtrl) 
@@ -183,6 +219,18 @@ public override bool normalCtrl() {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.UPPunch, player, 2f, 10, 15f, ShouldClang : true);
 		}
+		if (  sprite.name.Contains("parry_start"))
+		{
+			return new GenericMeleeProj(new SilkShot(), centerPoint,
+			 ProjIds.ForceGrabState, player, 1f, 0, 15f, ShouldClang : true);
+		}
+
+		if (  sprite.name.Contains("stabgrab") && !sprite.name.Contains("end"))
+		{
+			return new GenericMeleeProj(new SilkShot(), centerPoint,
+			 ProjIds.ForceGrabState, player, 2f, 0, 15f, ShouldClang : true);
+		}
+
 		if (  sprite.name.Contains("slash") && !sprite.name.Contains("uppercut"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
@@ -194,6 +242,43 @@ public override bool normalCtrl() {
 			 ProjIds.ZSaber1, player, 3f, 20, 15f, ShouldClang : true,
 			 isJuggleProjectile : true);
 		}
+
+		if (  sprite.name.Contains("grab")  
+		&& !sprite.name.Contains("2") && !sprite.name.Contains("stab"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.ZSaber1, player, 3f, 20, 15f, ShouldClang : true,
+			 isJuggleProjectile : true);
+		}
+
+		if (  sprite.name.Contains("grab")  && sprite.name.Contains("2"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f, ShouldClang : true);
+		}
+
+		if (  sprite.name.Contains("groundstab"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.ZSaber3, player, 3f, 20, 15f, ShouldClang : true,
+			 isJuggleProjectile : true);
+		}
+
+
+		if (  sprite.name.Contains("stabgrab_end"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.HeavyPush, player, 4f, 0, 15f, ShouldClang : true,
+			 isJuggleProjectile : true);
+		}
+
+		if (  sprite.name.Contains("air_dunk"))
+		{
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.MechFrogGroundPound , player, 2f, 20, 15f, ShouldClang : true);
+		}
+
+
 		if (  sprite.name.Contains("projswing") && !sprite.name.Contains("air"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,

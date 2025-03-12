@@ -92,13 +92,13 @@ public class BoomerangKuwanger : Maverick {
 				}
 			}
 		} else {
-			if (!bald && (state is MIdle or MRun or MLand or BoomerKDashState)) {
+			if ((state is MIdle or MRun or MLand or BoomerKDashState)) {
 				foreach (var enemyPlayer in Global.level.players) {
 					if (enemyPlayer.character == null || enemyPlayer == player) continue;
 					var chr = enemyPlayer.character;
 					if (!chr.canBeDamaged(player.alliance, player.id, null)) return;
 					if (isFacing(chr) && getCenterPos().distanceTo(chr.getCenterPos()) < 10) {
-						changeState(new BoomerKDeadLiftState());
+					getRandomAttackState();
 					}
 				}
 			}
@@ -132,6 +132,9 @@ public class BoomerangKuwanger : Maverick {
 				getShootState(),
 				new BoomerKDeadLiftState(),
 				new BoomerKTeleportState(),
+				new BoomerKDeadKickState(),
+				new BoomerKDeadOraState(),
+				
 		};
 	}
 

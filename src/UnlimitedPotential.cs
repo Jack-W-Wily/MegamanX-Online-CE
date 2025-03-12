@@ -93,6 +93,10 @@ public class XUPParryStartState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+
+		if (player.isZain){
+			character.playSound("distortion_c");
+		}
 	//	mmx = character as RagingChargeX;
 	}
 

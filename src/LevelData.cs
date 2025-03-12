@@ -313,6 +313,9 @@ public class LevelData {
 			Global.sprites[spriteName] = sprite;
 		}
 
+		var customSpriteJsonPaths2 = Helpers.getFiles(Global.assetPath + "assets/maps/" + name + "/sprites", true, "json");
+		
+
 		string spritesChecksum = "";
 		foreach (var kvp in fileChecksumDict) {
 			spritesChecksum += kvp.Key + " " + kvp.Value;
@@ -607,6 +610,7 @@ public class LevelData {
 		{ "recyclingplant2","VavaFactory" },
 
 		// Others.
+		{ "airport2_md", "airManGB_megascf"},
 		{ "japetribute", "variableX" },
 		{ "nodetest", "credits_X1" },
 		{ "sigmazone", "virusSigma" },

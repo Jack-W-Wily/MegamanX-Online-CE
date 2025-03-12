@@ -89,7 +89,21 @@ public class FlameStag : Maverick {
 					if (sprite.name.EndsWith("wall_dash")) changeSpriteFromName("fall", true);
 				}
 			}
+		} else {
+			if ((state is MIdle or MRun or MLand or BoomerKDashState)) {
+				foreach (var enemyPlayer in Global.level.players) {
+					if (enemyPlayer.character == null || enemyPlayer == player) continue;
+					var chr = enemyPlayer.character;
+					if (!chr.canBeDamaged(player.alliance, player.id, null)) return;
+					if (isFacing(chr) && getCenterPos().distanceTo(chr.getCenterPos()) < 10) {
+					getRandomAttackState();
+					}
+				}
+			}
 		}
+	
+
+
 	}
 
 	public override string getMaverickPrefix() {

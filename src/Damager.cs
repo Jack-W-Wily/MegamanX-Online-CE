@@ -538,7 +538,22 @@ public class Damager {
 			&& !character.isStatusImmune()) {
 				character.changeState(new VileMK2Grabbed(owner.character), true);
 
-				if (owner.isDragoon) owner.character.changeState(new DragoonGrab(), true);
+			// WCUT Grab Shenanigans
+				if (owner.isDragoon){
+				 owner.character.changeState(new DragoonGrab(), true);
+				}
+				if (owner.isZain){
+				if (owner.character.charState is ZainParryStartState){
+				 owner.character.changeState(new ZainGrab(), true);
+				}
+				if (owner.character.charState is XUPParryStartState){
+				 owner.character.changeState(new ZainGrabSlash(), true);
+				}
+				if (owner.character.charState is ZainGrabStab){
+				 owner.character.changeState(new ZainGrabStabEnd(), true);
+				}
+				}
+			
 			}
 
 

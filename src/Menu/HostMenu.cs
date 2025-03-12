@@ -833,7 +833,7 @@ public class HostMenu : IMainMenu {
 
 	public string[] mapSortOrder = new string[] {
 		// Medium maps.
-		"factory_md", "airport_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
+		"factory_md", "airport_md", "airport2_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
 		// Small maps.
 		 "training",
 		"centralcomputer_1v1", "zerovirus_1v1", "sigma4_1v1", "dopplerlab_1v1", "sigma1_1v1",

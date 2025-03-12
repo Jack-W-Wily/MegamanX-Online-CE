@@ -21,6 +21,8 @@ public class RideChaser : Actor, IDamagable {
 	public Weapon gunWeapon;
 	public Weapon hitWeapon;
 	public float slowdownTime;
+
+	public float boostTime;
 	public static Weapon getGunWeapon() { return new Weapon(WeaponIds.RideChaserGun, 170); }
 	public bool mountedOnce;
 
@@ -53,6 +55,7 @@ public class RideChaser : Actor, IDamagable {
 		fadeXMomentum();
 
 		Helpers.decrementTime(ref slowdownTime);
+		Helpers.decrementTime(ref boostTime);
 
 		if (selfDestructTime > 0) {
 			int flashFrequency = 30;
@@ -235,6 +238,12 @@ public class RideChaser : Actor, IDamagable {
 	bool isJumping;
 	bool isDashing;
 	public bool isTurning;
+
+	bool UseItem;
+
+	public int ItemNum;
+
+
 	float speed = 0;
 	int destXDir;
 	float inclineTime;
@@ -256,6 +265,7 @@ public class RideChaser : Actor, IDamagable {
 		float acc = isDashing ? 600 : 300;
 		if (character.flag != null) topSpeed *= 0.5f;
 		else if (slowdownTime > 0) topSpeed *= 0.75f;
+			else if (boostTime > 0 && isDashing) topSpeed *= 3f;
 
 		if (!isTurning) {
 			float incAmount = Global.spf * acc;
@@ -350,6 +360,7 @@ public class RideChaser : Actor, IDamagable {
 		}
 
 		// Shooting code
+		if (!Global.level.isRace()){
 		if (!isShooting) {
 			if (player.input.isHeld(Control.Shoot, player) && (sprite.name == "ridechaser_idle" || sprite.name == "ridechaser_incline")) {
 				sprite.frameTime = 0;
@@ -373,16 +384,98 @@ public class RideChaser : Actor, IDamagable {
 				}
 			}
 		}
+		}
+
+
+			if (Global.level.isRace() && ItemNum > 0 && !UseItem){
+			
+
+			
+			if (player.input.isHeld(Control.Shoot, player) ){
+			
+				sprite.frameTime = 0;
+				isShooting = true;
+				shootTime = 0;
+				shouldDrawShoot = true;
+				if (ItemNum == 1){
+					character.addDamageText("T O R P E D O", 1);	
+					new TorpedoProj(player.weapon, pos, xDir, player, 3, player.getNextActorNetId(), 0, rpc: true);
+					ItemNum = 0;
+						character.playSound("torpedo", sendRpc : true);
+				
+				}
+				if (ItemNum == 2){
+				 character.invulnTime = 3;
+				 	character.addDamageText("I N V I N C I B L E", 0);
+							character.playSound("ching", sendRpc : true);
+				
+				 ItemNum = 0;
+				}
+				if (ItemNum == 3){
+					character.addDamageText("T O R P E D O E S", 1);
+					new TorpedoProj(player.weapon, pos.addxy(0,0), xDir, player, 3, player.getNextActorNetId(), 0, rpc: true);
+					new TorpedoProj(player.weapon, pos.addxy(0,10), xDir, player, 3, player.getNextActorNetId(), 0, rpc: true);
+					new TorpedoProj(player.weapon, pos.addxy(0,-10), xDir, player, 3, player.getNextActorNetId(), 0, rpc: true);
+					new TorpedoProj(player.weapon, pos.addxy(0,-20), xDir, player, 3, player.getNextActorNetId(), 0, rpc: true);
+					ItemNum = 0;
+						character.playSound("torpedo", sendRpc : true);
+						character.playSound("buster3", sendRpc : true);
+				
+				}
+				if (ItemNum == 4){
+					character.addDamageText("S T U N", 1);	
+							character.playSound("electricSpark", sendRpc : true);
+				
+					new StunShotProj(new VileMissile(VileMissileType.ElectricShock), pos.addxy(15 * xDir, -25), xDir, 0, player, player.getNextActorNetId(), character.getVileShootVel(true), rpc: true);
+					ItemNum = 0;
+				}
+				if (ItemNum == 5){
+					character.addDamageText("T U R B O", 3);
+					character.playSound("fstagUppercut", sendRpc : true);
+					boostTime = 10;
+					ItemNum = 0;
+				}
+				if (ItemNum == 6){
+					character.addDamageText("M I N E S", 2);
+					new MagnetMineProj(new ShieldBoomerang(), pos, xDir, player, player.getNextActorNetId(), true);
+					new MagnetMineProj(new ShieldBoomerang(), pos, xDir, player, player.getNextActorNetId(), true);
+					new MagnetMineProj(new ShieldBoomerang(), pos, xDir, player, player.getNextActorNetId(), true);
+					new MagnetMineProj(new ShieldBoomerang(), pos, xDir, player, player.getNextActorNetId(), true);
+					character.playSound("fireNappalmMK2", sendRpc : true);
+					
+					ItemNum = 0;
+				}
+			}
+	
+
+			}
+
+
+
+
+
+
 
 		// Jumping code
 		if (!isJumping) {
-			if (player.input.isPressed(Control.Jump, player) && sprite.name != "ridechaser_turn" && grounded) {
+			if (player.input.isPressed(Control.Jump, player) && //sprite.name != "ridechaser_turn" && 
+			grounded) {
+
+
 				isJumping = true;
-				vel.y = -225;
+				if (player.input.isHeld(Control.Up, player)){
+				vel.y = -225 * boostTime;
+				} else {
+				vel.y = -225;	
+				}
 			}
 		} else {
 			if (jumpTime < 0.15f && player.input.isHeld(Control.Jump, player)) {
-				vel.y = -225;
+				if (player.input.isHeld(Control.Up, player)){
+				vel.y = -225 * boostTime;
+				} else {
+				vel.y = -225;	
+				}
 			}
 			jumpTime += Global.spf;
 			if (jumpTime < jumpInterval) {
@@ -493,6 +586,9 @@ public class RideChaser : Actor, IDamagable {
 
 	public void addHealth(float amount) {
 		healAmount += amount;
+		boostTime += amount * 0.5f;
+		character.addDamageText("B O O S T", 3);	
+
 	}
 
 	public void explode() {

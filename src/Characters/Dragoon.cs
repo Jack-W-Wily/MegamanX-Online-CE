@@ -12,8 +12,8 @@ public class Dragoon : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Dragoon;
-		spriteFrameToSounds["magmadragoon_run/1"] = "dragoonfall_2";
-		spriteFrameToSounds["magmadragoon_run/4"] = "dragoonfall_2";
+		spriteFrameToSounds["magmadragoon_run/3"] = "dragoonfall_2";
+		spriteFrameToSounds["magmadragoon_run/8"] = "dragoonfall_2";
 	}
 
 	private float ItemThrowCooldown;

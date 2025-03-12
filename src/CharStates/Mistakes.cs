@@ -16,6 +16,11 @@ public class GlobalParryState : CharState {
 	public override void update() {
 		base.update();
 
+		if (player.isZain){
+			character.move(new Point(character.xDir * 350, 0));
+		}
+
+
 		if (stateTime < 0.1f) {
 			character.turnToInput(player.input, player);
 		}
@@ -48,6 +53,16 @@ public class GlobalParryState : CharState {
 			}
 			character.addHealth(1);
 			}
+
+			if (player.isZain){
+					if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new VileMK2Grabbed(character), true);
+				character.changeState(new ZainGrab(), true);
+			}
+			}
+
 		}
 		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
 
@@ -55,7 +70,9 @@ public class GlobalParryState : CharState {
 			character.addHealth(1);
 			character.changeState(new ParriedState(), true);
 		}
+		if (!player.isZain){
 		character.changeState(new Idle(), true);
+		}
 	}
 
 	public override void onExit(CharState newState) {
@@ -77,6 +94,14 @@ public class GlobalParryState : CharState {
 		if (player.isX || player.isXAnother) {
 		character.changeSpriteFromName("unpo_parry_start", true);
 		}
+
+			if (player.isZain){
+			character.changeSpriteFromName("parry_dash", true);
+			character.playSound("distortion_d");
+			character.playSound("zainDash");
+		}
+
+
 		//if (player.isVile){
 		//character.changeSpriteFromName("win", true);
 		//}

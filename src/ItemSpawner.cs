@@ -110,7 +110,7 @@ public class ItemSpawner {
 		}
 
 		time += Global.spf;
-		if (Global.level.levelData.isTraining()) respawnTime = 1;
+		if (Global.level.levelData.isTraining() ) respawnTime = 1;
 		if (time > respawnTime) {
 			time = 0;
 			if (itemType == typeof(LargeAmmoPickup)) {
