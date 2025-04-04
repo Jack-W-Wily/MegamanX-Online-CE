@@ -199,7 +199,7 @@ public class HogumerShot : CharState {
 				character.xDir, 0, player, 
 				player.getNextActorNetId(), rpc: true);
 		}
-
+		
 		base.update();
 		Helpers.decrementTime(ref specialPressTime);
 	
