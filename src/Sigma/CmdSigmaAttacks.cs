@@ -200,6 +200,8 @@ public class SigmaSlashState : CharState {
 	CharState prevCharState;
 	int attackFrame = 2;
 	bool fired;
+
+	bool isAmp;
 	public SigmaSlashState(CharState prevCharState) : base(prevCharState.attackSprite) {
 		this.prevCharState = prevCharState;
 		if (prevCharState is Dash || prevCharState is AirDash) {
@@ -240,18 +242,49 @@ public class SigmaSlashState : CharState {
 				off = new Point(20, -30);
 			}
 
+			if (!isAmp){
 			float damage = character.grounded ? 4 : 3;
 			int flinch = character.grounded ? Global.defFlinch : 13;
 			new SigmaSlashProj(
 				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
 				character.xDir, player, player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true
 			);
+			} 	else {
+			float damage = character.grounded ? 6 : 6;
+			int flinch = character.grounded ? Global.defFlinch : 40;
+			new SigmaSlashProjAmped(
+				SigmaSlashWeapon.netWeapon, character.pos.addxy(off.x * character.xDir, off.y),
+				character.xDir, player, player.getNextActorNetId(), damage: damage, flinch: flinch, rpc: true
+			);
+			}
 		}
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}
+
+
+
+	
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+		
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash,player)){
+			character.move(new Point( slideVel, 0));
+			
+		}
+
+		if (player.input.isHeld(Control.Special2,player) && player.currency >0){
+			character.playSound("genmureix5", sendRpc: true);
+			player.currency -= 1;
+			isAmp = true;
+		}
+	
+	}
+
 }
 
 
@@ -273,6 +306,45 @@ public class SigmaSlashProj : Projectile {
 		isReflectShield = true;
 		maxTime = 0.1f;
 		projId = (int)ProjIds.SigmaSlash;
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void postUpdate() {
+		base.postUpdate();
+		if (owner?.character != null) {
+			incPos(owner.character.deltaPos);
+		}
+	}
+
+	
+}
+
+
+
+public class SigmaSlashProjAmped : Projectile {
+	public SigmaSlashProjAmped(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId,
+		float damage = 4, int flinch = 26, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 6, player, "sigma_proj_slash_amp", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		reflectable = false;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		setIndestructableProperties();
+		isJuggleProjectile = true;
+		shouldClang = true;
+		isShield = true;
+		isReflectShield = true;
+		maxTime = 0.3f;
+		projId = (int)ProjIds.SigmaSlashAmp;
 		isMelee = true;
 		if (player.character != null) {
 			owningActor = player.character;

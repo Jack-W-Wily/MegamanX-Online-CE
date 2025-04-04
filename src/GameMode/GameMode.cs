@@ -773,6 +773,29 @@ public class GameMode {
 				}
 				Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
 			}
+
+			if (drawPlayer.character is Dragoon ma) {
+				int xStart = 25;
+				int yStart = 133;
+			
+				if(ma.player.superAmmo <= 0){
+					Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBarOff, xStart, yStart);}
+				else{
+					Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBar, xStart, yStart);}
+				
+				//Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.SuperBar, xStart, yStart);
+				yStart -= 14;
+				for (var i = 0; i < MathF.Ceiling(ma.player.superMaxAmmo ); i++) {
+				if (i < Math.Ceiling(ma.player.superAmmo)) {
+					Global.sprites["hud_bars_generic"].drawToHUD(5, xStart, yStart);
+				} else {
+					Global.sprites["hud_bars_generic"].drawToHUD(1, xStart, yStart);
+				}
+				yStart -= 2;
+				}
+				Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
+			}
+
 			if (drawPlayer.character is Axl axl2 && axl2.dodgeRollCooldown > 0) {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
@@ -788,6 +811,7 @@ public class GameMode {
 				drawRideArmorIcons();
 			}
 		}
+		
 
 		if (!Global.level.is1v1()) {
 			drawKillFeed();
@@ -1452,6 +1476,9 @@ public class GameMode {
 		float baseY = hudHealthPosition.y;
 
 		float twoLayerHealth = 0;
+
+		float twoLayerHealthPlayer = player.bonusHealth;
+
 		if (isMech && player.character?.rideArmor != null /*&& player.character.rideArmor.raNum != 5*/) {
 			spriteName = "hud_bars_ra_hp";
 			barIndex = 4;
@@ -1550,6 +1577,13 @@ public class GameMode {
 			} else {
 				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 			}
+
+
+
+			if (twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
+				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
+			}
+
 
 			// 2-layer health
 			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {

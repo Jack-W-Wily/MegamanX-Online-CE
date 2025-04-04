@@ -56,6 +56,9 @@ public class Vile : Character {
 	public float GizmoSpreadCD;
 	public float AirSplashHitCD;
 	public float ModeCD;
+
+
+	public float AiCD;
 	public float AirBombCD;
 	public float BumptyBoomCD;
 	public const float maxDodgeRollCooldown = 0.8f;
@@ -167,6 +170,77 @@ public class Vile : Character {
 			return;
 		}
 
+
+
+		if (player.isAI && charState.attackCtrl){
+			foreach (var otherPlayer in Global.level.players) {
+				if (otherPlayer.character == null) continue;
+				if (otherPlayer == player) continue;
+				if (otherPlayer == parasiteDamager?.owner) continue;
+				if (otherPlayer.character.isInvulnerable()) continue;
+				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+				if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+				Character target = otherPlayer.character;
+				if (pos.x > target.pos.x) {
+					if (xDir != -1) {
+					xDir = -1;
+					}
+				} else {
+					if (xDir != 1) {
+					xDir = 1;
+					}
+				}
+
+				dashGrabSpecial();
+
+
+				if (Helpers.randomRange(0,10) == 0){
+					changeState(new VileChainGrabState(), true);
+				}
+				if (Helpers.randomRange(0,10) == 1){
+					changeState(new InfinityGigAttack(), true);
+				}
+				if (Helpers.randomRange(0,10) == 2){
+						laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+					
+				}
+				if (Helpers.randomRange(0,10) == 3){
+						cannonWeapon.vileShoot(WeaponIds.FrontRunner, this);
+				}
+				if (Helpers.randomRange(0,10) == 4 && grounded){
+					changeState(new AirFireNadeLaunch(), true);
+					vel.y = -getJumpPower();
+				}
+				if (Helpers.randomRange(0,10) == 5 && grounded){
+					changeState(new AirSplashHitGranadeLaunch(), true);
+					vel.y = -getJumpPower();
+				}
+				if (Helpers.randomRange(0,10) == 6 && grounded){
+					changeState(new ExplosiveRoundState(), true);
+					vel.y = -getJumpPower();
+				}
+				if (Helpers.randomRange(0,10) == 7 && grounded){
+					changeState(new VileDashState(1f), true);
+					playSound("vilehyperdashattack", true);
+				}
+				if (Helpers.randomRange(0,10) == 8 && grounded){
+					changeState(new VileDodge(), true);
+				}
+				if (Helpers.randomRange(0,10) == 9 && grounded){
+					changeState(new VileSuperKickState(), true);
+				}
+				if (Helpers.randomRange(0,10) == 10 && grounded){
+				changeState(new VileChainGrabState(), true);
+				}
+				
+
+				
+				
+
+
+				break;
+			}
+		}
 		if (!isInDamageSprite()){
 		chargeLogic(shoot);
 		}

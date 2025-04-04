@@ -155,6 +155,8 @@ public partial class RPCCreateProj : RPC {
 
 		// Dynamo
 			{ (int)ProjIds.DynamoIceDagger, DynamoKnifeProj.rpcInvoke },
+			{ (int)ProjIds.DynamoAxeProj, DynamoAxeProj.rpcInvoke },
+	
 		// Mavericks
 		{ (int)ProjIds.VoltCSuck, VoltCSuckProj.rpcInvoke },
 		{ (int)ProjIds.TSeahorseAcid2, TSeahorseAcid2Proj.rpcInvoke },
@@ -171,6 +173,11 @@ public partial class RPCCreateProj : RPC {
 		// Iris
 		{ (int)ProjIds.IrisCrystal, NewIrisCrystal.rpcInvoke },
 		
+
+
+		// For Enemy RPC
+		{ (int)ProjIds.HGM2RPC, HGM2RPC.rpcInvoke },
+	
 	};
 
 }

@@ -463,10 +463,13 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.VelGIce:
 				proj = new VelGIceProj(new VelGIceWeapon(), pos, xDir, new Point(), player, netProjByte);
 				break;
+
 			case (int)ProjIds.SigmaSlash:
 				proj = new SigmaSlashProj(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
 				break;
-		
+			case (int)ProjIds.SigmaSlashAmp:
+				proj = new SigmaSlashProjAmped(new SigmaSlashWeapon(), pos, xDir, player, netProjByte);
+				break;
 
 				
 			case (int)ProjIds.SigmaBall:

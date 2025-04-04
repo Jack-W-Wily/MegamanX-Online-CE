@@ -113,6 +113,24 @@ public class Zero : Character {
 	public override void update() {
 
 
+
+			// Wcut Burst System
+
+		if (isInDamageSprite() && 
+		 player.input.isHeld(Control.Burst, player)
+		&& player.currency > 0) {
+
+			player.currency -= 1;
+			changeState(new Idle(), true);
+			invulnTime = 1.5f;
+			new MechFrogStompShockwave(new MechFrogStompWeapon(player),
+			pos.addxy(6 * xDir, 0f), xDir, player,
+			player.getNextActorNetId(), rpc: true);
+			playSound("crash", true);
+		}
+
+		
+
 		if (isViral && flag == null && (
 			 charState is AirDash)) {
 			changeState(new FSplasherState(), true);
@@ -538,9 +556,13 @@ public class Zero : Character {
 		
 		changeState(new SaberParryStartState(), true);
 		}
+
+
 		if (yDir != 1 && yDir != -1){
 			if (gigaAttack.ammo >= 10 &&
-				player.input.isPressed(Control.WeaponRight, player) ) {
+				player.input.isPressed(Control.WeaponRight, player) 
+				
+				) {
 					gigaAttack.addAmmo(-10, player);
 					if (charState is not AwakenedZeroHadangeki)changeState(new AwakenedZeroHadangeki(), true);
 					return true;
@@ -616,8 +638,15 @@ public class Zero : Character {
 			return true;
 		}
 		// Use special if pressed first.
-		if (specialPressed && specialPressTime > shootPressTime) {
+		if (specialPressed && specialPressTime > shootPressTime
+		&&	 !sprite.name.Contains("raijingeki")) {
+
+			if (!charState.normalCtrl){
+				groundSpecial.attack2(this);
+			} else {
 			groundSpecial.attack(this);
+			 }
+
 		}
 
 		if (grounded && player.dashPressed(out string dashControl)){

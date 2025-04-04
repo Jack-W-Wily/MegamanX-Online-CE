@@ -137,7 +137,7 @@ public class CmdSigma : BaseSigma {
 		if (grounded && charState is Idle || charState is Run || charState is Crouch) {
 			if (player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
 				sigmaAmmoRechargeCooldown = 0.5f;
-				changeState(new SigmaBallShootEX(), true);
+				changeState(new SigmaBallShoot(), true);
 				return true;
 			}
 		}

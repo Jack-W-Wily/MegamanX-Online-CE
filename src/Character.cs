@@ -243,6 +243,13 @@ public partial class Character : Actor, IDamagable {
 
 	public SoulBodyHologram2? sBodyHologram2;
 	public SoulBodyClone? sBodyClone;
+
+
+	public HogumerMK2? hgm2;
+	public HogumerMK2? hgm;
+
+
+
 	public List<Character> aLaserTargets = new();
 	public AimingLaserCursor? aLaserCursor;
 	public AimingLaserHud? aLaserHud;
@@ -340,6 +347,8 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
 		maxHealth = (decimal)player.getMaxHealth();
+
+		bonusHealth = (decimal)player.getMaxHealth();
 		health = 1;
 		if (player.disguise == null) {
 			healAmount = (float)maxHealth - 1;
@@ -982,17 +991,22 @@ public partial class Character : Actor, IDamagable {
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
+		if (Global.isOffline && !player.isAI){
+			var prevCamPos = getCamCenterPos();
+			Global.level.snapCamPos(getCamCenterPos(), prevCamPos);
+	
+		}
+
 		// Wcut Burst System
 
-		if ((sprite.name.Contains("hurt")
-		|| sprite.name.Contains("frozen")
-		|| sprite.name.Contains("knocked")
-		|| sprite.name.Contains("grabbed")
-		|| sprite.name.Contains("lose")
-		|| sprite.name.Contains("stunned"))
-		&& player.input.isHeld(Control.WeaponLeft, player)
+		if (isInDamageSprite() && 
+		(player.input.isHeld(Control.WeaponLeft, player)
 		&& player.input.isHeld(Control.WeaponRight, player)
+		|| player.input.isPressed(Control.Burst, player)
+
+		)
 		&& player.currency > 0) {
+
 			player.currency -= 1;
 			changeState(new Idle(), true);
 			invulnTime = 1.5f;
@@ -2906,6 +2920,10 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
+
+	public decimal bonusHealth = 0;
+
+
 	public virtual void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
 		if (!ownedByLocalPlayer) return;
 		decimal damage = decimal.Parse(fDamage.ToString());
@@ -2913,6 +2931,11 @@ public partial class Character : Actor, IDamagable {
 		decimal originalHP = health;
 		Axl? axl = this as Axl;
 		MegamanX? mmx = this as MegamanX;
+
+
+		
+
+
 
 		// For Dark Hold break.
 		if (damage > 0 && charState is DarkHoldState dhs && dhs.stateFrames > 10 && !Damager.isDot(projId)) {
@@ -2923,13 +2946,18 @@ public partial class Character : Actor, IDamagable {
 		if (attacker == player && axl?.isWhiteAxl() == true) {
 			damage = 0;
 		} */
+
+
+
+
+		/*
 		if (Global.level.isRace() &&
 			damage != (decimal)Damager.envKillDamage &&
 			damage != (decimal)Damager.switchKillDamage &&
 			attacker != player
 		) {
 			damage = 0;
-		}
+		}*/
 
 		bool isArmorPiercing = Damager.isArmorPiercing(projId);
 
@@ -2940,11 +2968,20 @@ public partial class Character : Actor, IDamagable {
 			crystalizedTime = 0; // Dash to destroy crystal
 		}
 
+
 		var inRideArmor = charState as InRideArmor;
 		if (inRideArmor != null && inRideArmor.crystalizeTime > 0) {
 			if (weaponIndex == 20 && damage > 0) inRideArmor.crystalizeTime = 0;   //Dash to destroy crystal
 			inRideArmor.checkCrystalizeTime();
 		}
+
+
+			// For Bonus Health
+			if (bonusHealth > 0) {
+			bonusHealth -= damage;
+			if (bonusHealth < 0) bonusHealth = 0;
+			} else {
+			
 
 		// For fractional damage shenanigans.
 		if (damage % 1 != 0) {
@@ -3148,7 +3185,7 @@ public partial class Character : Actor, IDamagable {
 		if ((damage > 0 || Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
 		}
-
+		}
 		if (health <= 0) {
 			if (player.showTrainingDps && player.trainingDpsStartTime > 0) {
 				float timeToKill = Global.time - player.trainingDpsStartTime;
@@ -3291,7 +3328,36 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void addAmmo(float amount) {
 		player.weapon?.addAmmoHeal(amount);
+
+
 	}
+
+
+	public virtual void SpawnEnemy() {
+	 //	var hgm = new Player("  ", 1,  (int)CharIds.Rock, null, true, true, 151, new Input(true), null);
+
+		new HogumerMK2(player, pos.x, pos.y, xDir, false,
+		player.getNextATransNetId(), ownedByLocalPlayer);
+		
+	//	Global.level.players.Add(player);
+
+	}
+
+
+	public virtual void SpawnBoss() {
+	 	var hgm = new Player("  ", 5,  (int)CharIds.Vile, null, true, true, 151, new Input(true), null);
+
+		new Vile(hgm, pos.x, pos.y, xDir, false,
+		player.getNextATransNetId(), ownedByLocalPlayer);
+		
+		Global.level.players.Add(hgm);
+
+	}
+
+
+	
+	
+
 
 	public virtual void addPercentAmmo(float amount) {
 		player.weapon?.addAmmoPercentHeal(amount);
@@ -3607,6 +3673,9 @@ public partial class Character : Actor, IDamagable {
 		|| sprite.name.Contains("pushed")
 		|| sprite.name.Contains("die");
 	}
+
+
+
 	public virtual bool isAttacking() {
 		return sprite.name.Contains("attack")
 		|| sprite.name.Contains("shoot")

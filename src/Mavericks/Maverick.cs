@@ -826,7 +826,14 @@ public class Maverick : Actor, IDamagable {
 			
 		}
 
-		health -= damage;
+		
+			// For Bonus Health
+			if (player.bonusHealth > 0 && player.maverick1v1 != null) {
+			player.bonusHealth -= damage;
+			if (player.bonusHealth < 0) player.bonusHealth = 0;
+			} else {
+			health -= damage;
+			}
 
 		if ((damage > 0 || Damager.alwaysAssist(projId)) && owner != null && weaponIndex != null) {
 			damageHistory.Add(new DamageEvent(owner, weaponIndex.Value, projId, false, Global.time));

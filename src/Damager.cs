@@ -414,14 +414,19 @@ public class Damager {
 				countered = true;
 			}
 
-		
+			// On Hit Connection Additions (WCUT)
 
-			if (owner.character is XAnother xa && owner.health > 0) {
+			if (owner.character is XAnother xa && owner.health > 0 && damage > 0) {
 				owner.superAmmo += 1;
 					xa.shootCooldown = 0;
 			}
+			if (owner.character is Dragoon md && owner.health > 0 && damage > 0) {
+				owner.superAmmo += 1;
+			}
 
-				if (owner.character is MegamanX x1 && owner.health > 0) {
+
+				if (owner.character is MegamanX x1 && owner.health > 0 
+				&& owner.weapon is not FireWave && damage > 0) {
 				x1.shootCooldown = 0;
 			}
 
@@ -429,7 +434,14 @@ public class Damager {
 
 			if (owner.character is Zero zeroz && owner.health > 0) {
 				zeroz.gigaAttack.addAmmo(1, owner);
+				if (!zeroz.isInDamageSprite()){
 				zeroz.charState.attackCtrl = true;
+				}
+			}
+
+			if (owner.character is PunchyZero zerox1 && owner.health > 0) {
+				zerox1.gigaAttack.addAmmo(1, owner);
+				
 			}
 		
 
@@ -699,6 +711,10 @@ public class Damager {
 					character.addIgFreezeProgress(3);
 					break;
 				case (int)ProjIds.Hyouretsuzan2:
+					character.addIgFreezeProgress(4);
+					flinch = 0;
+					break;
+				case (int)ProjIds.FrostTower:
 					character.addIgFreezeProgress(4);
 					flinch = 0;
 					break;

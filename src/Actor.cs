@@ -1497,7 +1497,8 @@ public partial class Actor : GameObject {
 				Zain => "zain",
 				Dynamo => "Dynamo",
 				GBD => "gbd",
-				Dragoon => "highmax",
+				Iris => "iris",
+				Dragoon => "dragoon",
 				_ => "error"
 			};
 
@@ -1835,6 +1836,9 @@ public partial class Actor : GameObject {
 				_ => -1
 			};
 		}
+
+
+
 		foreach (CollideData hit in hits) {
 			if (hit.gameObject is not Actor actor || actor == this) {
 				continue;

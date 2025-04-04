@@ -84,10 +84,7 @@ public class ZeroSlash2State : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (character.ComboTimer > 0 ){
-			attackCtrl = true;
-		}
-
+	
 		if (zero.shootPressed || player.isAI) {
 			zero.shootPressTime = 0;
 			zero.changeState(new ZeroSlash3State(), true);

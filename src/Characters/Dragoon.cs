@@ -14,6 +14,7 @@ public class Dragoon : Character {
 		charId = CharIds.Dragoon;
 		spriteFrameToSounds["magmadragoon_run/3"] = "dragoonfall_2";
 		spriteFrameToSounds["magmadragoon_run/8"] = "dragoonfall_2";
+		player.superAmmo = 0;
 	}
 
 	private float ItemThrowCooldown;
@@ -44,18 +45,18 @@ public override bool normalCtrl() {
 		
 		if (player.input.isHeld(Control.Up, player)&&
 		player.input.isHeld(Control.Special2, player)&&
-		player.currency > 2) {
+		player.superAmmo > 13) {
 			changeState(new DragoonRisingFire());
-			player.currency -= 3;
+			player.superAmmo -= 14;
 			
 		}
 
 		if (!player.input.isHeld(Control.Up, player)&&
 		player.input.isHeld(Control.Special2, player)&&
 	
-			player.currency > 2	) {
+			player.superAmmo > 13) {
 			changeState(new DragoonSpitFire());
-			player.currency -= 3;
+			player.superAmmo -= 14;
 			
 		}
 		
@@ -126,6 +127,16 @@ public override bool attackCtrl() {
 
 	public override void update(){
 		base.update();
+
+
+
+		//avoid issues like over gaining ammo and over losing ammo
+		if(player.superAmmo > player.superMaxAmmo){
+			player.superAmmo = player.superMaxAmmo;
+		}
+		if(player.superAmmo < 0){
+			player.superAmmo = 0;
+		}
 
 
 		if (sprite.name.Contains("air_raid"))invulnTime = 2;
@@ -239,6 +250,11 @@ public override bool attackCtrl() {
 		if (  sprite.name.Contains("risingfire"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableLaunch, player, 5f, 0, 10f, null, isShield: true, isDeflectShield: true);
+		}
+
+			if (  sprite.name.Contains("spit"))
+		{
+			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.HeavyPush, player, 5f, 0, 10f, null, isShield: true, isDeflectShield: true);
 		}
 
 

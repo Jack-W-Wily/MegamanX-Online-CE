@@ -48,6 +48,7 @@ public class ControlMenu : IMainMenu {
 				new string[] { Control.WeaponLeft, "WeaponL" },
 				new string[] { Control.WeaponRight, "WeaponR" },
 				new string[] { Control.Special2, "Command"},
+				new string[] { Control.Burst, "Burst"},
 				new string[] { Control.Taunt, "Taunt" }
 			};
 

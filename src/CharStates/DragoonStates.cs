@@ -392,6 +392,13 @@ public class DragoonRisingFire : CharState {
 		}
 	}
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+
 
     
 }

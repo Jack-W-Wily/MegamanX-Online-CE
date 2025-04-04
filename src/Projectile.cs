@@ -187,15 +187,18 @@ public class Projectile : Actor {
 		// This 
 
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		if (this is not RollingShieldProjCharged and 
+		if (this is 
+		not RollingShieldProjCharged and 
 		not HexaInvoluteProj and
+		not NecroBurstProj and
 		not MagnetMineProj and
 		not MagnetMineProj and
 		not IrisCannon and
 		not IrisSlashProj and
 		not NewIrisCrystal and
 		not GigaCrushProj
-		&& owner.character.isInDamageSprite())destroySelf();
+		&& owner.character.isInDamageSprite()
+		&& owner.character != null)destroySelf();
 		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// Jack to Do :
 		// Recode this as a Bool that declares rather the projectiles should

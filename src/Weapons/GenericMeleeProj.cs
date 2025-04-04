@@ -156,7 +156,7 @@ public class GenericMeleeProj : Projectile {
 			case (int)ProjIds.CrushCGrab when owningActor is CrushCrawfish cc:
 				maverickGrabCode(CommandGrabScenario.CrushCGrab, cc, damagable, new CrushCGrabbed(cc));
 				break;
-			case (int)ProjIds.BBuffaloDrag when owningActor is BlizzardBuffalo bb:
+			case (int)ProjIds.BBuffaloDrag when owningActor is Maverick bb:
 				maverickGrabCode(CommandGrabScenario.BBuffaloGrab, bb, damagable, new BBuffaloDragged(bb));
 				break;
 		}

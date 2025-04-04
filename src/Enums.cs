@@ -582,6 +582,7 @@ public enum ProjIds {
 	CircleBlazeExplosion,
 
 	SigmaSlash,
+	SigmaSlashAmp,
 
 	DragoonSpark,
 	VirusSlash,
@@ -802,6 +803,7 @@ public enum ProjIds {
 	DynamoDropSlash,
 	DynamoBoomerangProj,
 	DynamoIceDagger,
+	DynamoAxeProj,
 
 	DarkHoldD,
 
@@ -885,6 +887,9 @@ public enum ProjIds {
 	// Random non-projectiles.
 	AxlDiscardedWeapon,
 
+	// EnemyRPCs (PROJIDS)
+	HGM2RPC,
+
 	// Special damage types.
 	SelfDmg = 30000,
 
@@ -957,7 +962,9 @@ public enum WeaponBarIndex{
 	WeaponAmmoOff,
 	SuperBar,
 	SuperBarOff,
-	ZainCounter
+	ZainCounter,
+
+	LastIndex
 }
 public enum SlotIndex{
 	//X1

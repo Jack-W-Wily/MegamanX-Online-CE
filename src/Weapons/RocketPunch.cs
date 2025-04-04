@@ -107,14 +107,14 @@ public class RocketPunchProj : Projectile {
 		isJuggleProjectile = true;
 		shouldShieldBlock = false;
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
-		minTime = 0.2f;
-		maxReverseTime = 0.4f;
+		minTime = 0.15f;
+		maxReverseTime = 0.3f;
 		damager.flinch = Global.halfFlinch;
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
 			damager.damage = 0.5f;
 			//damager.hitCooldown = 6;
-			maxTime = 0.25f;
+			maxTime = 0.15f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBrat;
 			type = 1;
@@ -122,7 +122,7 @@ public class RocketPunchProj : Projectile {
 			projId = (int)ProjIds.InfinityGig;
 			type = 2;
 		} else {
-			maxReverseTime = 0.3f;
+			maxReverseTime = 0.2f;
 			type = 0;
 		}
 		if (rpc) {
@@ -135,6 +135,9 @@ public class RocketPunchProj : Projectile {
 
 	public override void update() {
 		base.update();
+
+		if (time > 2) 	destroySelf("explosion", "explosion");
+			
 		if (ownedByLocalPlayer && !ownerExists) {
 			destroySelf("explosion", "explosion");
 			return;

@@ -21,6 +21,8 @@ public class VileMK2GrabState : CharState {
 	public float fallY;
 	Vile vile = null!;
 
+	int AIExecution = 0;
+
 	bool violentcrusherspawn; 
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
@@ -72,7 +74,9 @@ public class VileMK2GrabState : CharState {
 		grabTime -= Global.spf;
 		
 
-
+		if (player.isAI){
+		AIExecution = Helpers.randomRange(1,3);
+		}
 			//if (vile.vileForm == 2){
 				if (vile.vileHoverTime > vile.vileMaxHoverTime) {
 				vile.vileHoverTime = vile.vileMaxHoverTime;
@@ -91,17 +95,20 @@ public class VileMK2GrabState : CharState {
 					}
 				}
 
-				if (player.input.isPressed(Control.Jump,player)){
+				if (player.input.isPressed(Control.Jump,player)
+				|| player.isAI && AIExecution == 2 && character.grounded){
 					character.vel.y = -character.getJumpPower();
 				}
 				
-				if (player.input.isHeld(Control.Jump, player)) {
+				if (player.input.isHeld(Control.Jump, player) || player.isAI && AIExecution == 2) {
 				
 				Point moveAmount = new Point(character.xDir * 50, -100);
 				character.move(moveAmount);
 				character.useGravity = false;
 				} else { character.useGravity = true; }
-				if (base.player.input.isHeld("jump", base.player) && !once) {
+				if ((base.player.input.isHeld("jump", base.player) || player.isAI && AIExecution == 2 )
+				
+				&& !once) {
 				once = true;
 				sound = character.playSound("vileHover", forcePlay: false, sendRpc: true);
 				}
@@ -134,7 +141,7 @@ public class VileMK2GrabState : CharState {
 		leechTime += Global.spf;
 		if (leechTime > 0.4f) {
 			leechTime = 0;
-			character.addHealth(1);
+			character.addHealth(0.5f);
 			var damager = new Damager(player, 1, 0, 0.1f);
 			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
@@ -145,8 +152,9 @@ public class VileMK2GrabState : CharState {
 		}
 
 
-		if ( player.input.isHeld(Control.Down, player) 
-			&& player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isHeld(Control.Down, player) 
+			&& player.input.isPressed(Control.Shoot, player)
+			 || player.isAI && AIExecution == 1) {
 			character.changeSpriteFromName("violentcrusher_grab", true);
 			return;	
 		}

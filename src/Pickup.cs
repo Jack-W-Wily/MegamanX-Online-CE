@@ -47,9 +47,17 @@ public class Pickup : Actor {
 				chr.addHealth(healAmount);
 				destroySelf(doRpcEvenIfNotOwned: true);
 			} else if (pickupType == PickupType.Ammo) {
+					// this is the test code for spawning Enemies but it doesnt
+					// Work Online sadly 
+		/*		if (Global.level.isRace() && chr is not HogumerMK2){
+				chr.SpawnEnemy();
+				destroySelf(doRpcEvenIfNotOwned: true);
+				} 	else  {*/ 
 				if (chr.canAddAmmo()) {
+					chr.player.superAmmo += 10;
 					chr.addPercentAmmo(healAmount);
 					destroySelf(doRpcEvenIfNotOwned: true);
+			//	}
 				}
 			}
 		} else if (other.gameObject is RideArmor rideArmor) {

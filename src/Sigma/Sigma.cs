@@ -306,6 +306,11 @@ public class BaseSigma : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+
+			if (player.maverick1v1 != null && charState is not WarpOut) {
+				changeState(new WarpOut(true), true);
+			}
+
 		Helpers.decrementTime(ref noBlockTime);
 
 		if (player.sigmaAmmo >= player.sigmaMaxAmmo) {
@@ -394,6 +399,7 @@ public class BaseSigma : Character {
 
 	public void becomeSigma(Point pos, int xDir) {
 		var prevCamPos = getCamCenterPos();
+		
 		if (player.isPuppeteer()) {
 			resetMaverickBehavior();
 			//stopCamUpdate = true;

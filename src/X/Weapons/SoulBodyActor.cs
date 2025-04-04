@@ -160,3 +160,6 @@ public class SoulBodyClone : MegamanX {
 		
 	}	
 }
+
+
+

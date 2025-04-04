@@ -481,6 +481,12 @@ public class BBuffaloDashState : MaverickState {
 	public BBuffaloDashState() : base("dash", "dash_start") {
 	}
 
+		public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.playSound("dashGG", sendRpc: true);
+	}
+
+
 	public override void update() {
 		base.update();
 
@@ -507,7 +513,13 @@ public class BBuffaloDashState : MaverickState {
 		var hitWall = Global.level.checkTerrainCollisionOnce(maverick, maverick.xDir * 20, -5);
 		if (hitWall?.isSideWallHit() == true) {
 			crashAndDamage();
+
+			if (maverick is BlizzardBuffalo){
 			maverick.changeState(new MIdle());
+			}
+			if (maverick is ArmoredArmadillo){
+				maverick.changeState(new ArmoredARollExitState());
+			}
 			return;
 		}
 
@@ -517,7 +529,7 @@ public class BBuffaloDashState : MaverickState {
 			maverick.changeToIdleOrFall();
 			return;
 		}
-		if (player.input.isHeld(Control.Up, player)) {
+		if (player.input.isHeld(Control.Up, player) || player.isAI) {
 			maverick.changeSpriteFromName("dash_grab", false);
 		}
 	}
@@ -576,7 +588,7 @@ public class BBuffaloCrashProj : Projectile {
 public class BBuffaloDragged : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public BBuffaloDragged(
-		BlizzardBuffalo grabber
+		Maverick grabber
 	) : base(
 		grabber, maxGrabTime, "_dash", reverseZIndex: true,
 		freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab"

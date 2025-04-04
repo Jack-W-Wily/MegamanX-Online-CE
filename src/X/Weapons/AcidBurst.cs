@@ -55,6 +55,8 @@ public class AcidBurstProj : Projectile {
 		projId = (int)ProjIds.AcidBurst;
 		vel = new Point(xDir * 100, -200);
 		fadeSound = "acidBurst";
+		fadeSprite = "dust";
+		fadeOnAutoDestroy = true;
 		checkUnderwater();
 
 		// TODO: Fix this
@@ -86,6 +88,35 @@ public class AcidBurstProj : Projectile {
 		}
 	}
 
+
+	
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+		if (damage > 0) {
+			destroySelf();
+		}
+	}
+
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
+
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
+	
+
 	public override void onHitWall(CollideData other) {
 		if (!ownedByLocalPlayer) return;
 		acidSplashEffect(other, ProjIds.AcidBurstSmall);
@@ -110,6 +141,8 @@ public class AcidBurstProjSmall : Projectile {
 		maxTime = 1.5f;
 		this.projId = (int)projId;
 		fadeSprite = "acidburst_fade";
+		
+		fadeOnAutoDestroy = true;
 		this.vel = vel;
 		// TODO: Fix this
 		canBeLocal = false;
@@ -140,6 +173,34 @@ public class AcidBurstProjSmall : Projectile {
 		}
 	}
 
+
+	
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+		if (damage > 0) {
+			destroySelf();
+		}
+	}
+
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
+
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
+
 	public override void onHitWall(CollideData other) {
 		if (!ownedByLocalPlayer) return;
 		destroySelf();
@@ -164,6 +225,8 @@ public class AcidBurstProjCharged : Projectile {
 		projId = (int)ProjIds.AcidBurstCharged;
 		useGravity = true;
 		fadeSound = "acidBurst";
+			fadeSprite = "dust";
+		fadeOnAutoDestroy = true;
 		if (type == 0) {
 			vel = new Point(xDir * 75, -270);
 		} else if (type == 1) {
@@ -177,6 +240,34 @@ public class AcidBurstProjCharged : Projectile {
 		// TODO: Fix this
 		canBeLocal = false;
 	}
+
+
+	
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+		if (damage > 0) {
+			destroySelf();
+		}
+	}
+
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
+
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+
+	public bool isPlayableDamagable() {
+		return false;
+	}
+
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new AcidBurstProjCharged(

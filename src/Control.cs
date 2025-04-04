@@ -45,6 +45,8 @@ public class Control {
 	public const string Taunt = "taunt";
 	public const string Special2 = "command";
 
+	public const string Burst = "burst";
+
 	public static JoystickInfo joystick;
 
 	public static bool isJoystick() {

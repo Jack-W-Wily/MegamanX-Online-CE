@@ -129,6 +129,7 @@ public class TorpedoProj : Projectile, IDamagable {
 		this.type = type;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
+		
 		this.angle = this.xDir == -1 ? 180 : 0;
 		if (angle != null) {
 			this.angle = angle + (this.xDir == -1 ? 180 : 0);

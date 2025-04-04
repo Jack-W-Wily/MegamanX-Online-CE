@@ -752,7 +752,7 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.SBurnKnUckle1 => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 2, 0, 30f,
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 6, 0, 30f,
 				addToLevel: addToLevel, ShouldClang : true
 			),
 			(int)MeleeIds.SBurnKnUckle2 => new GenericMeleeProj(

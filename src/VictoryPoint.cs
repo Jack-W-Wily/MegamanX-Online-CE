@@ -47,6 +47,16 @@ public class VictoryPoint : Actor {
 
 	bool once;
 	public void onWin(Player player) {
+
+		if (!once) once = true;
+		else return;
+
+
+	//	player.character.SpawnBoss();
+	//	Global.changeMusic("fortressBoss_X1");
+		
+
+		
 		if (!once) once = true;
 		else return;
 
@@ -63,5 +73,10 @@ public class VictoryPoint : Actor {
 
 		Global.level.gameMode.matchOverRpc(matchOverResponse);
 		Global.serverClient?.rpc(RPC.matchOver, JsonConvert.SerializeObject(matchOverResponse));
+	
+		
+
+
+
 	}
 }

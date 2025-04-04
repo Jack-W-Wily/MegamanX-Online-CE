@@ -2557,7 +2557,11 @@ public partial class Level {
 		Point originPoint = new Point(Global.level.camCenterX, Global.level.camCenterY);
 
 		Character mainChar = Global.level.mainPlayer?.character;
+		HogumerMK2 mainChar2 = Global.level.mainPlayer?.character?.hgm;
 		Maverick mainMaverick = Global.level.mainPlayer?.currentMaverick;
+		if (mainChar2 != null) {
+			originPoint = mainChar.pos;
+		}
 		if (mainChar != null && mainChar.isSoundCentered()) {
 			originPoint = mainChar.pos;
 		} else if (mainMaverick != null) {

@@ -149,6 +149,25 @@ public partial class Player {
 			}
 		}
 	}
+
+
+
+	public float bonusHealthBackup;
+
+	public float bonusHealth {
+		get => (float)(character?.bonusHealth ?? 0);
+		set {
+			if (character != null) {
+				character.bonusHealth = (decimal)value;
+			}
+		}
+	}
+
+
+
+	
+
+
 	public float _maxHealth = 16;
 	public float maxHealth {
 		get {
@@ -236,6 +255,10 @@ public partial class Player {
 		{ (int)CharIds.GBD, new List<SubTank>() },
 		{ (int)CharIds.Dynamo, new List<SubTank>() },
 		{ (int)CharIds.Dragoon, new List<SubTank>() },
+
+
+
+		{ (int)CharIds.HogumerMK2, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -256,6 +279,10 @@ public partial class Player {
 		{ (int)CharIds.GBD, new() },
 		{ (int)CharIds.Dynamo, new() },
 		{ (int)CharIds.Dragoon, new() },
+
+
+
+		{ (int)CharIds.HogumerMK2, new() },
 	};
 
 	// Getter functions.
@@ -276,7 +303,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 100;
+	public const int maxCharCurrencyId = 200;
 	public static int curMul = Helpers.randomRange(2, 8);
 
 	public ProtectedArrayInt charCurrency = new ProtectedArrayInt(maxCharCurrencyId);
@@ -292,7 +319,7 @@ public partial class Player {
 		}
 	}
 
-	public bool isSpectator {
+	public bool isSpectator{
 		get {
 			if (Global.serverClient == null) return isOfflineSpectator;
 			return serverPlayer.isSpectator;
@@ -304,6 +331,7 @@ public partial class Player {
 	}
 	private bool isOfflineSpectator;
 	public bool is1v1Combatant;
+	
 
 	public void setSpectate(bool newSpectateValue) {
 		if (Global.serverClient != null) {
@@ -471,7 +499,8 @@ public partial class Player {
 	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
 	public List<Actor> mechaniloids = new List<Actor>();
 	public SoulBodyClone? sClone;
-
+	
+	public HogumerMK2? hgm2;
 
 	public ExplodeDieEffect explodeDieEffect;
 	public Character limboChar;
@@ -696,8 +725,19 @@ public partial class Player {
 		if (isX) {
 			bonus = 12;
 		}
-		if (isAxlXOD) {
-			bonus = 8;
+
+		if (isVile && isAI) {
+			bonus = 20;
+		}
+
+		if (isX) {
+			bonus = 12;
+		}
+		if (charNum == (int)CharIds.Rock) {
+			bonus = -10;
+		}
+		if (charNum == (int)CharIds.HogumerMK2) {
+			bonus = -10;
 		}
 		if (charNum == (int)CharIds.AxlWC) {
 			bonus = 8;
@@ -740,6 +780,7 @@ public partial class Player {
 		loadout = LoadoutData.createFromOptions(id);
 		if (Global.level.is1v1() && isSigma) {
 			if (maverick1v1 != null) loadout.sigmaLoadout.commandMode = 3;
+			
 			else loadout.sigmaLoadout.commandMode = 2;
 		}
 		syncLoadout();
@@ -968,7 +1009,7 @@ public partial class Player {
 				reviveSigma(1, spawnPoint);
 				}
 			}
-		} else if (isX) {
+		} else if (isX || isXAnother) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
 				reviveX();
 			}
@@ -1272,7 +1313,19 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else {
+		}
+
+			else if (charNum == (int)CharIds.HogumerMK2) {
+			character = new HogumerMK2(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		
+		
+		
+		
+		 else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		// Do this once char has spawned and is not null.
@@ -1315,7 +1368,7 @@ public partial class Player {
 		if (character.rideArmor != null) {
 			character.rideArmor.xDir = xDir;
 		}
-		if (isCamPlayer) {
+		if (isCamPlayer && !isAI) {
 			Global.level.snapCamPos(character.getCamCenterPos(), null);
 			//console.log(Global.level.camX + "," + Global.level.camY);
 		}
@@ -2236,7 +2289,25 @@ public partial class Player {
 	}
 
 	public bool canReviveX() {
-		return character?.charState is Die && lastDeathCanRevive && isX && newCharNum == (int)CharIds.X && currency >= reviveXCost && !lastDeathWasXHyper;
+
+		if (character?.charState is Die 
+		&& lastDeathCanRevive && isX 
+		&& newCharNum == (int)CharIds.X 
+		&& currency >= reviveXCost 
+		&& !lastDeathWasXHyper){
+		return true;
+		}
+
+		if (character?.charState is Die 
+		&& lastDeathCanRevive  && isXAnother
+		&& newCharNum == (int)CharIds.XAnother
+		&& currency >= reviveXCost 
+		&& !lastDeathWasXHyper){
+		return true;
+		}
+
+
+		return false;
 	}
 
 	public void reviveVile(bool toMK5) {
@@ -2442,8 +2513,11 @@ public partial class Player {
 	public void forceKill() {
 		//if (maverick1v1 != null && Global.level.is1v1()) {
 			//character?.applyDamage(null, null, 1000, null);
+			if (character != null){
+			character.bonusHealth = 0;
+			}
 			currentMaverick?.applyDamage(1000, this, character, null, null);
-				character?.applyDamage(1000, this, character, null, null);
+			character?.applyDamage(1000, this, character, null, null);
 	
 		//}
 

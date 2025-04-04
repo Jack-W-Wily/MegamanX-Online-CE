@@ -511,7 +511,7 @@ public class WarpIn : CharState {
 		if (warpAnim != null) {
 			warpAnim.destroySelf();
 		}
-		if (addInvulnFrames && character.ownedByLocalPlayer) {
+		if (addInvulnFrames && character.ownedByLocalPlayer && !player.isAI) {
 			character.invulnTime = (player.warpedInOnce || Global.level.joinedLate) ? 2 : 0;
 		}
 		player.warpedInOnce = true;
@@ -627,7 +627,7 @@ public class Idle : CharState {
 	public override void update() {
 		base.update();
 
-		if (character is Vile && (character.wasFightingX ||
+		if (!Global.level.gameMode.isOver && character is Vile && (character.wasFightingX ||
 		character.wasFightingZeroEarly || character.wasFightingSigma ) && stateTime > 5) {
 			
 		
@@ -651,7 +651,8 @@ public class Idle : CharState {
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
+				//	character.changeSpriteFromName("win", true);
+					character.changeState(new Win());
 				}
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
@@ -1467,6 +1468,8 @@ public class LadderEnd : CharState {
 public class Taunt : CharState {
 	float tauntTime = 1;
 	Anim? zeroching;
+
+
 	public Taunt() : base("win") {
 	}
 
@@ -1475,6 +1478,11 @@ public class Taunt : CharState {
 		if (player.charNum == (int)CharIds.X) tauntTime = 0.75f;
 		if (player.charNum == (int)CharIds.Zero) tauntTime = 0.7f;
 		if (player.charNum == (int)CharIds.AxlWC) tauntTime = 0.75f;
+
+
+	
+
+
 	}
 
 	public override void onExit(CharState newState) {
@@ -1511,6 +1519,67 @@ public class Taunt : CharState {
 		}
 	}
 }
+
+
+
+
+
+public class Win : CharState {
+	float tauntTime = 1;
+	Anim? zeroching;
+
+
+	public Win() : base("win") {
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.charNum == (int)CharIds.X) tauntTime = 0.75f;
+		if (player.charNum == (int)CharIds.Zero) tauntTime = 0.7f;
+		if (player.charNum == (int)CharIds.AxlWC) tauntTime = 0.75f;
+
+
+	
+
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		zeroching?.destroySelf();
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.charNum == (int)CharIds.Vile) {
+			if (character.isAnimOver()) {
+				character.changeState(new WarpOut());
+			}
+		} else if (stateTime >= tauntTime) {
+			character.changeState(new WarpOut());
+						
+		}
+
+		if (player.charNum == (int)CharIds.Zero && player.input.isHeld(Control.Up, player)) {
+			character.changeSprite("zero_win2", true);
+			if (character.isAnimOver()) {
+				character.changeState(new WarpOut());
+			}
+		}
+		if (character.sprite.name == "zero_win2" && character.frameIndex == 1 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			zeroching = new Anim(
+				character.pos.addxy(character.xDir, -25f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}
+
 
 public class Die : CharState {
 	bool sigmaHasMavericks;

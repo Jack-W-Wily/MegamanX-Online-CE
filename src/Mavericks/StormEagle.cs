@@ -9,7 +9,7 @@ public class StormEagle : Maverick {
 		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
 		diveWeapon = new StormEDiveWeapon(player);
 
-		stateCooldowns.Add(typeof(StormEAirShootState), new MaverickStateCooldown(true, true, 2f));
+		stateCooldowns.Add(typeof(StormEAirShootState), new MaverickStateCooldown(true, true, 0.5f));
 		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
 		stateCooldowns.Add(typeof(StormEEggState), new MaverickStateCooldown(false, true, 1.5f));
 		stateCooldowns.Add(typeof(StormEGustState), new MaverickStateCooldown(false, true, 0.75f));

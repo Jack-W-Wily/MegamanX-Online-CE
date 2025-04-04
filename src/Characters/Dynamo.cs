@@ -28,6 +28,8 @@ public class Dynamo : Character {
 
 	public int DaggerCount = 0;
 
+	private float AxeCoolDown;
+
 	private float DaggerCooldown;
 
 
@@ -89,15 +91,6 @@ public override bool attackCtrl() {
 		}
 
 
-			if (player.input.isPressed(Control.Special1,player) && 
-		!player.input.isHeld(Control.Down,player )&&
-			!player.input.isHeld(Control.Up,player)  && ItemThrowCooldown ==0
-		){
-			changeState(new DynamoCross(), true);
-			ItemThrowCooldown = 1.2f;
-		}
-
-
 		if ((player.input.isHeld(Control.Left, player) 
 		|| player.input.isHeld(Control.Right, player)) &&
 			player.input.isPressed(Control.Special1,player) && 
@@ -107,6 +100,19 @@ public override bool attackCtrl() {
 			changeState(new DynamoCross(), true);
 			ItemThrowCooldown = 1.2f;
 		}
+
+
+		
+		if (
+			player.input.isPressed(Control.Special1,player) && 
+		!player.input.isHeld(Control.Down,player )&&
+			player.input.isHeld(Control.Up,player)  && AxeCoolDown ==0
+		){
+			changeState(new DynamoAxe(), true);
+			AxeCoolDown = 1.2f;
+		}
+
+
 
 		if ((!player.input.isHeld(Control.Left, player) 
 		&& !player.input.isHeld(Control.Right, player)) &&
@@ -202,6 +208,9 @@ public override bool attackCtrl() {
 		Helpers.decrementTime(ref DaggerCooldown);
 		Helpers.decrementTime(ref ItemThrowCooldown);
 		Helpers.decrementTime(ref SlashCooldown);
+		Helpers.decrementTime(ref AxeCoolDown);
+	
+	
 
 		if (grounded || charState is Idle or WallSlide){
 			backFlipCount = 0;
@@ -254,10 +263,17 @@ public override bool attackCtrl() {
 			 , isJuggleProjectile : true);
 		}
 
+
+		if (  sprite.name.Contains("slide") && !sprite.name.Contains("jump"))
+		{
+			return new GenericMeleeProj(new SpinningBlade(), centerPoint,
+			 ProjIds.ZSaber1, player, 1f, 15, 10f, ShouldClang : true);
+		}
+
 		if (  sprite.name.Contains("uppercut"))
 		{
 			return new GenericMeleeProj(new StrikeChain(), centerPoint,
-			 ProjIds.ZSaber1, player, 2f, 15, 10f, ShouldClang : true
+			 ProjIds.ZSaber3, player, 2f, 15, 10f, ShouldClang : true
 			 , isJuggleProjectile : true);
 		}
 

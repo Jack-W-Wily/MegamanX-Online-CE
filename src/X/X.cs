@@ -272,6 +272,8 @@ public class MegamanX : Character {
 	}
 
 	public override bool normalCtrl() {
+
+		if (this is not XAnother) {
 		if (grounded) {
 			if (legArmor == ArmorId.Max &&
 				player.input.isPressed(Control.Dash, player) &&
@@ -317,7 +319,7 @@ public class MegamanX : Character {
 				canJump() && !isDashing && canAirDash() && flag == null
 			) {
 				dashedInAir++;
-				changeState(new XHover(), true);
+		//		changeState(new XHover(), true);
 				return true;
 			}
 		}
@@ -329,10 +331,15 @@ public class MegamanX : Character {
 			changeState(new SwordBlock());
 			return true;
 		}
+		}
 		return base.normalCtrl();
 	}
 
 	public override bool attackCtrl() {
+
+
+		if (this is not XAnother) {
+
 		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
 			itemTracer.shootCooldown == 0
 		) {
@@ -359,6 +366,9 @@ public class MegamanX : Character {
 				return true;
 			}
 		}
+
+
+
 		if (player.input.isPressed(Control.Special1, player)
 		&& UnlockZsaber) {
 			changeState(new X6SaberState(grounded), true);
@@ -371,7 +381,7 @@ public class MegamanX : Character {
 			changeState(new XUPPunchState(grounded), true);
 			
 		}
-
+		}
 
 	
 		return base.attackCtrl();
@@ -723,6 +733,9 @@ public class MegamanX : Character {
 		strikeChainSemiChargedProj?.destroySelf();
 		strikeChainSemiChargedProj = null;
 		strikeChainChargedProj = null;
+		sBodyHologram?.destroySelf();
+		sBodyHologram2?.destroySelf();
+		sBodyClone?.destroySelf();
 	}
 	
 	public void popAllBubbles() {
@@ -956,13 +969,16 @@ public class MegamanX : Character {
 		}
 
 
-		if (index == 0) {
+
+		if (this is XAnother){
+		if (index == (int)WeaponIds.Buster) {
 			index = 40;
 		}
 
 		if (index >= (int)WeaponIds.GigaCrush) {
 			index = 40;
 		}
+		} 
 
 
 		/*if (index >= (int)WeaponIds.XSaber) {

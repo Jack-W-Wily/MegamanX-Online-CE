@@ -151,8 +151,31 @@ public class XBuster : Weapon {
 			}
 			else if (mmx.armArmor == ArmorId.Giga) {
 				new Buster3Proj(pos, xDir, 1, player, player.getNextActorNetId(), rpc: true);
-			} else {
+			} else if (mmx.armArmor == ArmorId.Light) {
+
+				if (chargeLevel == 3){
 				shootLightBuster4(player, pos, xDir);
+				} 
+				if (chargeLevel > 3) {
+				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+				new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
+				character.playSound("plasmaShot", sendRpc: true);	
+		
+				}
+
+			}
+			else {
+			
+				if (chargeLevel == 3){
+				new Buster3Proj(pos, xDir,	3, player, player.getNextActorNetId(), rpc: true);
+				} 
+				if (chargeLevel > 3) {
+				new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
+				new BusterPlasmaProj(pos, xDir, player, player.getNextActorNetId(), true);
+				character.playSound("plasmaShot", sendRpc: true);	
+		
+				}
+
 			}
 		}
 		} else {
@@ -204,6 +227,8 @@ public class XBuster : Weapon {
 		//Create the buster effect
 		int xOff = xDir * -5;
 		player.setNextActorNetId(player.getNextActorNetId());
+
+		
 		// Create first line instantly.
 		createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0f);
 		// Create 2nd with a delay.

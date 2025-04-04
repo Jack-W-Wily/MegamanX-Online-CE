@@ -62,9 +62,13 @@ public enum CharIds {
 	RagingChargeX,
 
 	SoulBodyClone,
+
+	HogumerMK2,
+
+	Rock,
 	
 	// Non-vanilla chars start here.
-	Rock = 10000,
+	
 }
 
 public class CharSelection {
@@ -93,6 +97,9 @@ public class CharSelection {
 		new CharSelection("Zain", (int)CharIds.Zain, sprite: "smenu_zain"),
 		new CharSelection("Magma Dragoon", (int)CharIds.Dragoon, sprite: "smenu_dragoon"),
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, sprite: "smenu_dynamo"),
+	
+		new CharSelection("Toggle Enemies", (int)CharIds.Rock, sprite: "drdoppler_idle"),
+		
 		//new CharSelection("High Max", (int)CharIds.Highmax, sprite: "smenu_highmax"),
 	];
 

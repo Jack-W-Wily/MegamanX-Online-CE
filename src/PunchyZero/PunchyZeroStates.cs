@@ -108,9 +108,13 @@ public class ZeroBurnKnuckle : CharState {
 	public override void update() {
 		base.update();
 
-		if (stateTime > 1f) {
+		if (stateTime > 0.5f) {
 			landingCode();
 			return;
+		}
+
+		if (character.isAnimOver()){
+			character.changeState(new Idle("land"));
 		}
 
 		
@@ -142,17 +146,25 @@ public CrystalHunterCharged? CHC2;
 public CrystalHunterCharged? CHC3;
 public CrystalHunterCharged? CHC4;
 
+bool sound;
+
 
 public RekkohaEffect? effect;
 	public SuperBurnKnuckle1() : base("aok_start") {
 		superArmor = true;
 		immuneToWind = true;
+		enterSound = "ching";
 	}
 
 	public override void update() {
 		base.update();
 
 		if (character.frameIndex >= 3){
+
+			if (!sound){
+				sound = true;
+			character.playSound("flamemShoot");
+			}
 			character.move(new Point(character.xDir * 350, 0));
 		}
 
@@ -176,19 +188,19 @@ public RekkohaEffect? effect;
 
 		CHC1 = new CrystalHunterCharged(
 				character.pos, player, player.getNextActorNetId(),
-				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+				player.ownedByLocalPlayer, overrideTime: 0.5f, sendRpc: true
 			);
 		CHC2 = new CrystalHunterCharged(
 				character.pos, player, player.getNextActorNetId(),
-				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+				player.ownedByLocalPlayer, overrideTime: 0.5f, sendRpc: true
 			);
 		CHC3 = new CrystalHunterCharged(
 				character.pos, player, player.getNextActorNetId(),
-				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+				player.ownedByLocalPlayer, overrideTime: 0.5f, sendRpc: true
 			);
 		CHC4 = new CrystalHunterCharged(
 				character.pos, player, player.getNextActorNetId(),
-				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true
+				player.ownedByLocalPlayer, overrideTime: 0.5f, sendRpc: true
 			);
 
 
@@ -211,6 +223,7 @@ public class SuperBurnKnuckle2 : CharState {
 	public SuperBurnKnuckle2() : base("aok_end") {
 		superArmor = true;
 		immuneToWind = true;
+		enterSound = "flamemOilBurn";
 	}
 
 	public override void update() {

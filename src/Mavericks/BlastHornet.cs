@@ -39,10 +39,46 @@ public class BlastHornet : Maverick {
 		//flyBarIndexes = (68, 57);
 	}
 
+	
+	public Damager? targetDamager;
+
+	float AtkCD;
 	public override void update() {
 		base.update();
-		wings.update();
 		if (!ownedByLocalPlayer) return;
+
+			Helpers.decrementTime(ref AtkCD);
+			if ((state is MIdle or MRun or MLand or MJump or MFall) && player.isAI){	
+			foreach (var otherPlayer in Global.level.players) {
+				if (otherPlayer.character == null) continue;
+				if (otherPlayer == player) continue;
+				if (otherPlayer == targetDamager?.owner) continue;
+				if (otherPlayer.character.isInvulnerable()) continue;
+				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+				if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+				Character target = otherPlayer.character;
+
+				if (pos.x > target.pos.x) {
+					if (xDir != -1) {
+					xDir = -1;
+					}
+				} else {
+					if (xDir != 1) {
+					xDir = 1;
+					}
+				}
+					getRandomAttackState();	
+				
+				break;
+			}
+	
+		AtkCD = 2;
+		}
+
+
+
+		wings.update();
+
 
 		if (cursor != null && cursor.destroyed) {
 			cursor = null;

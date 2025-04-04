@@ -13,6 +13,9 @@ public class XAnother : MegamanX {
 		charId = CharIds.XAnother;
 		player.superAmmo = 0;
 	}
+
+
+
 	public override bool normalCtrl() {
 		
 	if (player.superAmmo >= 5 && player.input.isPressed(Control.Dash, player) &&
@@ -30,20 +33,81 @@ public class XAnother : MegamanX {
 			slideVel = xDir * getDashSpeed() * 2;
 			return true;
 		}
+
+		if (player.input.isHeld(Control.Up, player) &&
+			!isAttacking() && grounded && 
+			charState is not SwordBlock
+		) {
+			changeState(new SwordBlock());
+			return true;
+		}
 		return base.normalCtrl();
 	}
+
+		public override bool attackCtrl() {
+
+
+		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
+			itemTracer.shootCooldown == 0
+		) {
+			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
+			itemTracer.shootCooldown = itemTracer.fireRate;
+		}
+		
+		if (player.input.isPressed(Control.Shoot, player) && stockedMaxBuster) {
+			shoot(1, specialBuster, false);
+			return true;
+		}
+		if (player.input.isPressed(Control.Shoot, player) && stockedBuster) {
+			shoot(1, currentWeapon, true);
+			return true;
+		}
+		if (!isCharging() && currentWeapon != null && (
+				player.input.isPressed(Control.Shoot, player) ||
+				currentWeapon.isStream && getChargeLevel() < 2 &&
+				player.input.isHeld(Control.Shoot, player)
+			)
+		) {
+			if (currentWeapon.shootCooldown <= 0) {
+				shoot(0);
+				return true;
+			}
+		}
+
+		if(player.superAmmo >= 5 && parryCooldown == 0 &&
+			player.input.isPressed(Control.Special1, player) &&
+			player.input.isHeld(Control.Down, player)){
+				player.superAmmo -= 5;
+				changeState(new XUPParryStartState(), true);
+			}
+		if (player.input.isPressed(Control.Special1, player)
+		&& !player.input.isHeld(Control.Down, player)
+		&& !player.input.isHeld(Control.Up, player)) {
+			changeState(new XUPPunchState(grounded), true);
+			
+		}
+		return base.attackCtrl();
+	}
+
+
 	public override void update() {
 		base.update();
+		if (charState is Dash or AirDash && player.input.isHeld(Control.Down,player)){
+		changeSpriteFromName("unpo_grab_dash", true);
+		}
 
 		if (player.superAmmo == 0){
 		hasUltimateArmor = false;
 		player.removeNovaStrike();
 		}
-		if (player.superAmmo > 14 && player.input.isPressed(Control.Special2, player)){
+		if (!hasUltimateArmor &&
+		player.superAmmo > 14 && player.input.isPressed(Control.Special2, player)){
 		hasUltimateArmor = true;
 		player.addNovaStrike();
-		changeSpriteFromName("warpin", true);
-	//	addHealth(5);
+		playSound("ching", true);
+		addDamageText("U L T I M A T E", 0);	
+	
+		//addHealth(5);
 		}
 		if (!ownedByLocalPlayer) {
 			return;
@@ -79,33 +143,15 @@ public class XAnother : MegamanX {
 			player.superAmmo -= 3;
 			changeState(new XlightKick(), true);
 		}
-
-
-			if(player.superAmmo >= 5 && parryCooldown == 0 &&
-			player.input.isPressed(Control.Special1, player) &&
-			player.input.isHeld(Control.Down, player) && sprite.name.Contains("unpo")){
-				player.superAmmo -= 5;
-				changeState(new XUPParryStartState(), true);
-			}
-
 		
 
 	//	if (musicSource == null && hasUltimateArmor) {
 	//		addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
 	//	}
 	}
-	public override bool attackCtrl() {
 
 
 
-		if(player.superAmmo >= 5 && parryCooldown == 0 &&
-			player.input.isPressed(Control.Special1, player) &&
-			player.input.isHeld(Control.Down, player)){
-				player.superAmmo -= 5;
-				changeState(new XUPParryStartState(), true);
-			}
-		return base.attackCtrl();
-	}
 	public override string getSprite(string spriteName) {
 		if ((Options.main.enableSkins == true)
 			&& Global.sprites.ContainsKey("rmxalt_" + spriteName)){		
@@ -181,8 +227,8 @@ public class XAnother : MegamanX {
 				4, Global.defFlinch, 20f, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
-				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
-				2, Global.defFlinch, 5f, addToLevel: addToLevel
+				ShoryukenWeapon.netWeapon, projPos, ProjIds.ForceGrabState, player,
+				2, 0, 5f, addToLevel: addToLevel
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,

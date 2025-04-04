@@ -11,7 +11,7 @@ public class AxlWCLoadout {
 	[ProtoMember(2)] public int weapon1;
 	[ProtoMember(3)] public int weapon2;
 
-	public List<int> getBassWeaponIndices() {
+	public List<int> getAxlWCWeaponIndices() {
 		return new List<int>() { sideArm, weapon1, weapon2 };
 	}
 
@@ -23,7 +23,7 @@ public class AxlWCLoadout {
 
 	public void validate() {
 		if (weapon1 < 0 || weapon1 > 9) weapon1 = 0;
-		if (weapon2 < 0 || weapon2 > 9) weapon2 = 0;
+		if (weapon2 < 0 || weapon2 > 9) weapon2 = 1;
 		//if (weapon3 < 0 || weapon3 > 9) weapon3 = 0;
 
 		/*if ((weapon1 == weapon2 && weapon1 >= 0) ||
@@ -153,7 +153,7 @@ public class AxlWCWeaponMenu : IMainMenu {
 		} else {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
-		Fonts.drawText(FontType.Blue, "Bass Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
+		Fonts.drawText(FontType.Blue, "AxlWC Loadout", Global.screenW * 0.5f, 24, Alignment.Center);
 
 		int startY = 55;
 		int startX = 30;

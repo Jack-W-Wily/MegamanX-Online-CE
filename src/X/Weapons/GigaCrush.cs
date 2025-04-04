@@ -302,10 +302,117 @@ public class GigaCrushEffect : Effect {
 	}
 }
 
+
+
+
+public class GigaCrushEffectMVK : Effect {
+	public Maverick character;
+	float frame1Time;
+	float frame2Time;
+	float time;
+	Color linesColor = new(136, 184, 248, 200);
+
+	public GigaCrushEffectMVK(Maverick character) : base(character.pos) {
+		this.character = character;
+	}
+
+	public override void update() {
+		base.update();
+
+		pos = character.pos;
+		time += Global.spf;
+		if (time > 3) {
+			destroySelf();
+			return;
+		}
+
+		if (character.frameIndex > 2) {
+			return;
+		}
+
+		if (character.frameIndex < 2) {
+			frame1Time += Global.spf;
+		}
+		if (character.frameIndex == 2) {
+			frame2Time += Global.spf;
+		}
+	}
+
+	public override void render(float offsetX, float offsetY) {
+		base.render(offsetX, offsetY);
+
+		if ( character.frameIndex > 2) {
+			return;
+		}
+
+		var pos = character.getCenterPos();
+		if (character.frameIndex < 2) {
+			for (int i = 0; i < 8; i++) {
+				float angle = i * 45;
+				float ox = Helpers.randomRange(10, 30) * Helpers.cosd(angle) * (MathF.Round(25 * frame1Time / 1.5f) % 5);
+				float oy = Helpers.randomRange(10, 30) * Helpers.sind(angle) * (MathF.Round(25 * frame1Time / 1.5f) % 5);
+				DrawWrappers.DrawLine(
+					pos.x + ox, pos.y + oy,
+					pos.x + ox * 2, pos.y + oy * 2,
+					linesColor, 1, character.zIndex, true
+				);
+			}
+		} else if (character.frameIndex == 2) {
+			float radius = 150 - (frame2Time * 150 / 0.5f);
+			if (radius <= 0) {
+				return;
+			}
+			byte colour2 = (byte)(255.0 - 255.0 * ((radius - 75) / 75.0));
+			byte colour1 = 255;
+			if (radius <= 75) {
+				colour2 = 0;
+				colour1 = (byte)(255.0 - 255.0 * (radius / 75.0));
+			}
+			Color colour = new(colour1, colour2, 255, 164);
+			DrawWrappers.DrawCircle(pos.x, pos.y, radius, filled: true, colour, 0f, -2000001L);
+		}
+	}
+}
+
+
 public class GigaCrushBackwall : Effect {
 	public Character rootChar;
 
 	public GigaCrushBackwall(Point pos, Character character) : base(pos) {
+		rootChar = character;
+	}
+
+	public override void update() {
+		base.update();
+		if (effectTime > 2.8) {
+			destroySelf();
+		}
+	}
+
+	public override void render(float offsetX, float offsetY) {
+		float transparecy = 100;
+		if (effectTime < 0.2) {
+			transparecy = effectTime * 500f;
+		}
+		if (effectTime > 2.6) {
+			transparecy = 100f - ((effectTime - 2.6f) * 500f);
+		}
+
+		DrawWrappers.DrawRect(
+			Global.level.camX, Global.level.camY,
+			Global.level.camX + 1000, Global.level.camY + 1000,
+			true, new Color(0, 0, 0, (byte)System.MathF.Round(transparecy)), 1, ZIndex.Backwall
+		);
+	}
+}
+
+
+
+
+public class GigaCrushBackwallMVK : Effect {
+	public Maverick rootChar;
+
+	public GigaCrushBackwallMVK(Point pos, Maverick character) : base(pos) {
 		rootChar = character;
 	}
 
