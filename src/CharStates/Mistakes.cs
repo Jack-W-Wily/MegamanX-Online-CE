@@ -5,6 +5,111 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+
+public class GlobalParryState : CharState {
+	public GlobalParryState() : base("parry_start", "", "", "") {
+		superArmor = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.isZain){
+			character.move(new Point(character.xDir * 350, 0));
+		}
+
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			character.parryCooldown = 30;
+		}
+	}
+
+	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
+		Actor? counterAttackTarget = null;
+		if (damagingActor is GenericMeleeProj gmp) {
+			counterAttackTarget = gmp.owningActor;
+		}
+		if (counterAttackTarget == null) {
+			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
+		}
+
+		Projectile? proj = damagingActor as Projectile;
+		bool stunnableParry = proj != null && proj.canBeParried();
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
+			counterAttackTarget is Character chr && stunnableParry
+		) {
+			if (player.isVile){
+			if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new ParriedState(), true);
+			}
+			character.addHealth(1);
+			}
+
+			if (player.isZain){
+					if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new VileMK2Grabbed(character), true);
+				character.changeState(new ZainGrab(), true);
+			}
+			}
+
+		}
+		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
+
+		if (Helpers.randomRange(0,5) == 5){
+			character.addHealth(1);
+			character.changeState(new ParriedState(), true);
+		}
+		if (!player.isZain){
+		character.changeState(new Idle(), true);
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+	public bool canParry(Actor damagingActor) {
+		if (damagingActor is not Projectile) {
+			return false;
+		}
+		if (player.isVile)return character.frameIndex < 5;
+		if (player.isDragoon)return character.frameIndex < 5;
+		
+		return character.frameIndex == 0;
+	}
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.isX || player.isXAnother) {
+		character.changeSpriteFromName("unpo_parry_start", true);
+		}
+
+			if (player.isZain){
+			character.changeSpriteFromName("parry_dash", true);
+			character.playSound("distortion_d");
+			character.playSound("zainDash");
+		}
+
+
+		//if (player.isVile){
+		//character.changeSpriteFromName("win", true);
+		//}
+		}
+	
+}
+
+
 public class XTeleportState : CharState {
 	public bool onceTeleportInSound;
 	bool isInvisible;
@@ -29,23 +134,23 @@ public class XTeleportState : CharState {
 			specialId = SpecialStateIds.None;
 			character.useGravity = true;
 			if (cloneG != null && canChangePos(cloneG)) {
-				Point prevCamPos = character.getCamCenterPos();
-				character.stopCamUpdate = true;
+				Point prevCamPos = player.character.getCamCenterPos();
+				player.character.stopCamUpdate = true;
 				character.changePos(cloneG.pos);
 			}
 			clone?.destroySelf();
 			clone = null;
 		}
-		if (clone != null && !clone.destroyed && cloneG != null) {
+		if (clone != null && !clone.destroyed) {
 			int xDir = player.input.getXDir(player);
 			float moveAmount = xDir * 6 * Global.speedMul;
 
-			CollideData? hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
+			CollideData hitWall = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -2);
 			if (hitWall != null && hitWall.getNormalSafe().y == 0) {
 				float rectW = hitWall.otherCollider.shape.getRect().w();
 				if (rectW < 75) {
 					float wallClipAmount = moveAmount + xDir * (rectW + width);
-					CollideData? hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
+					CollideData hitWall2 = Global.level.checkTerrainCollisionOnce(clone, wallClipAmount, -2);
 					if (hitWall2 == null && clone.pos.x + wallClipAmount > 0 &&
 						clone.pos.x + wallClipAmount < Global.level.width
 					) {
@@ -53,7 +158,7 @@ public class XTeleportState : CharState {
 						clone.visible = true;
 					}
 				} else if (xDir != 0) {
-					CollideData? hitWall2 = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -16);
+					CollideData hitWall2 = Global.level.checkTerrainCollisionOnce(clone, moveAmount, -16);
 					float wallY = MathInt.Floor(hitWall.otherCollider.shape.minY);
 					if (hitWall2 == null) {
 						clone.changePos(new Point(clone.pos.x + moveAmount, clone.pos.y - 64));
@@ -81,8 +186,8 @@ public class XTeleportState : CharState {
 					clone.getCenterPos().addxy(widthH, 200),
 					new List<Type> { typeof(Wall) }
 				);
-				CollideData? hit = hits.FirstOrDefault();
-				CollideData? hit2 = hits2.FirstOrDefault();
+				CollideData hit = hits.FirstOrDefault();
+				CollideData hit2 = hits2.FirstOrDefault();
 				if (hit != null && (
 					hit2 == null ||
 					hit2 != null && hit.otherCollider.shape.minY < hit2.otherCollider.shape.minY
@@ -138,7 +243,7 @@ public class XTeleportState : CharState {
 		cloneG = createClone();
 		character.sprite.frameIndex = 1;
 	}
-	public override void onExit(CharState? newState) {
+	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.visible = true;
 		character.useGravity = true;
@@ -179,3 +284,87 @@ public class XTeleportState : CharState {
 		return tempClone;
 	}
 }
+
+
+
+
+
+public class XIceSlide : CharState {
+	Anim? proj;
+
+	public XIceSlide() : base("sice_slide", "", "", "") {
+		enterSound = "chillpSlide";
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		character.move(new Point(character.xDir * 150, 0));
+
+	  if (stateTime > 0.4f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+		character.vel.y = 0;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+public class XlightKick : CharState {
+	Anim? proj;
+
+	public XlightKick() : base("kick_lightarmor", "", "", "") {
+		enterSound = "dash";
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		character.move(new Point(character.xDir * 50, 0));
+
+	  if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+		character.vel.y = 0;
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+

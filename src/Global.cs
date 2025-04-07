@@ -16,9 +16,9 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 20m;
-	public static string versionName = "Revision 20";
-	public static string subVersionName = "Alpha 13 [RELEASE CANDIDATE 1]";
-	public static string subVersionShortName = "A13 RC1-T3";
+	public static string versionName = "0.0";
+	public static string subVersionName = "WILY CUT 98 BETA";
+	public static string subVersionShortName = "WC98 0.0";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
