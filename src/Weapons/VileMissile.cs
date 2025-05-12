@@ -222,9 +222,6 @@ public class StunShotProj : Projectile {
 		}
 	}
 
-	public override void update() {
-		base.update();
-	}
 }
 
 public class VileMK2StunShotProj : Projectile {
@@ -250,9 +247,7 @@ public class VileMK2StunShotProj : Projectile {
 		}
 	}
 
-	public override void update() {
-		base.update();
-	}
+
 }
 
 public class MissileAttack : CharState {

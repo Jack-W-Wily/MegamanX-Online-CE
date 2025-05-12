@@ -13,7 +13,7 @@ public class BoomerangCutter : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = (int)SlotIndex.BCutter;
 		weaknessIndex = (int)WeaponIds.HomingTorpedo;
-		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" , ""};
+		shootSounds = new string[] { "boomerang", "boomerang", "boomerang", "buster3" , "buster3"};
 		fireRate = 30;
 		damage = "2/2";
 		effect = "Charged: Doesn't destroy on hit.\nCharged won't give assists.";

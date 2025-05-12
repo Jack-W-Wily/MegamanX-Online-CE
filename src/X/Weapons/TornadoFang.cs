@@ -8,7 +8,7 @@ public class TornadoFang : Weapon {
 	public static TornadoFang netWeapon = new();
 
 	public TornadoFang() : base() {
-		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" , ""};
+		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "tunnelFang" , "tunnelFang"};
 		fireRate = 60;
 		index = (int)WeaponIds.TornadoFang;
 		weaponBarBaseIndex = (int)WeaponBarIndex.TornadoFang;

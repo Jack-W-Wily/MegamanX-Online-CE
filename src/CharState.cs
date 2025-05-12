@@ -1780,6 +1780,7 @@ public class Die : CharState {
 	public override bool canExit(Character character, CharState newState) {
 		if (character.charState is Die &&
 			newState is not VileRevive and
+			not VileResistDeath and
 			not WolfSigmaRevive and
 			not ViralSigmaRevive and
 			not KaiserSigmaRevive and

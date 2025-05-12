@@ -13,6 +13,7 @@ public class VileMK2Grab : Weapon {
 
 public class VileMK2GrabState : CharState {
 	public Character? victim;
+
 	float leechTime = 1;
 	public SoundWrapper sound;
 	public Point flyVel;
@@ -36,6 +37,9 @@ public class VileMK2GrabState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		vile = character as Vile ?? throw new NullReferenceException();
+
+
+
 
 
 		if (vile.vileForm == 2){
@@ -73,6 +77,7 @@ public class VileMK2GrabState : CharState {
 		base.update();
 		grabTime -= Global.spf;
 		
+			
 
 		if (player.isAI){
 		AIExecution = Helpers.randomRange(1,3);
@@ -89,12 +94,14 @@ public class VileMK2GrabState : CharState {
 					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
 					if (!violentcrusherspawn){
 					character.shakeCamera(sendRpc: true);
+					character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+					new DynamoBeam(new ElectricSpark(), victim.pos.addxy(20 * victim.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
 					character.playSound("crash", true, true);
 					violentcrusherspawn = true;
-					new TriadThunderQuake(new VileMK2Grab(), victim.pos, 1, player, player.getNextActorNetId(), rpc: true);
 					}
 				}
 
+				
 				if (player.input.isPressed(Control.Jump,player)
 				|| player.isAI && AIExecution == 2 && character.grounded){
 					character.vel.y = -character.getJumpPower();
@@ -102,9 +109,16 @@ public class VileMK2GrabState : CharState {
 				
 				if (player.input.isHeld(Control.Jump, player) || player.isAI && AIExecution == 2) {
 				
-				Point moveAmount = new Point(character.xDir * 50, -100);
-				character.move(moveAmount);
-				character.useGravity = false;
+				Point moveAmount2 = new Point(character.xDir * 50, -100);
+				Point moveAmount = new Point(character.xDir * 50, 100);
+				if (!player.input.isHeld(Control.Down, player)){
+					character.move(moveAmount2);
+					character.useGravity = false;
+				} else {
+					character.move(moveAmount);
+					character.useGravity = true;
+				}
+				
 				} else { character.useGravity = true; }
 				if ((base.player.input.isHeld("jump", base.player) || player.isAI && AIExecution == 2 )
 				
@@ -152,6 +166,19 @@ public class VileMK2GrabState : CharState {
 		}
 
 
+		if (player.input.isHeld(Control.Jump, player) && player.input.isHeld(Control.Down, player)){
+		if (!violentcrusherspawn && character.grounded){
+			
+			character.angle = 180;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+			new DynamoBeam(new ElectricSpark(), victim.pos.addxy(20 * victim.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+			character.playSound("crash", true, true);
+			violentcrusherspawn = true;
+			}
+		}
+
+
 		if (player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Shoot, player)
 			 || player.isAI && AIExecution == 1) {
@@ -177,6 +204,7 @@ public class VileMK2GrabState : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		character.angle = 0;
 		if (character is Vile vile) {
 			vile.grabCooldown = 1;
 		}

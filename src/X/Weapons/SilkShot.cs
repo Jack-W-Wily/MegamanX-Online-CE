@@ -7,7 +7,7 @@ public class SilkShot : Weapon {
 	public static SilkShot netWeapon = new();
 
 	public SilkShot() : base() {
-		shootSounds = new string[] { "silkShot", "silkShot", "silkShot", "silkShotCharged", "" };
+		shootSounds = new string[] { "silkShot", "silkShot", "silkShot", "silkShotCharged", "silkShotCharged" };
 		fireRate = 45;
 		index = (int)WeaponIds.SilkShot;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SilkShot;

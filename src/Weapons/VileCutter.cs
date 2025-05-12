@@ -151,6 +151,19 @@ public class VileCutterProj : Projectile {
 	public VileCutterType vileCutterType;
 	public float soundCooldown;
 
+
+
+	public bool reversed;
+	public bool SummonSword;
+	public float maxReverseTime;
+	public float minTime;
+	public float smokeTime;
+	public Actor? target;
+	int type = 0;
+
+
+
+
 	public VileCutterProj(VileCutter weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
 		base(weapon, pos, xDir, 350, 2, player, weapon.projSprite, 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		fadeSprite = weapon.fadeSprite;
@@ -218,14 +231,54 @@ public class VileCutterProj : Projectile {
 		}
 	}
 
+
+	
+
 	public override void update() {
 		base.update();
+
+
+		minTime += Global.spf;
+
 
 		if (!destroyed && pickup != null) {
 			pickup.collider.isTrigger = true;
 			pickup.useGravity = false;
 			pickup.changePos(pos);
 		}
+
+
+		if ((owner.input.isPressed(Control.Taunt, owner)
+		|| owner.character.sprite.name.Contains("mk2") && owner.character != null
+		&& minTime > 1.2f)
+		 && !SummonSword){
+			SummonSword = true;
+			playSound("summonSwords", sendRpc: true);
+		}
+
+		if (SummonSword){
+
+				if (target == null && owner.character != null) {
+				var targets = Global.level.getTargets(owner.character.pos, damager.owner.alliance, true);
+				foreach (var t in targets) {
+					if (isFacing(t) && MathF.Abs(t.pos.y - owner.character.pos.y) < 120) {
+						target = t;
+						break;
+					}
+				}
+			} else if (target != null && target.destroyed) {
+				vel.x = 500 * xDir;
+			} else if (target != null) {
+				vel = new Point(0, 0);
+				Point targetPos = target.getCenterPos();
+				move(pos.directionToNorm(targetPos).times(speed));
+				if (pos.distanceTo(targetPos) < 5) {
+					reversed = true;
+				}
+				forceNetUpdateNextFrame = true;
+			}
+		}
+
 
 		soundCooldown -= Global.spf;
 		if (soundCooldown <= 0) {
@@ -254,11 +307,15 @@ public class VileCutterProj : Projectile {
 				var angInc = (-xDir * turnDir) * Global.spf * turnSpeed;
 				angle2 += angInc;
 				angleDist += MathF.Abs(angInc);
+				if (!SummonSword){
 				vel.x = Helpers.cosd(angle2) * maxSpeed;
 				vel.y = Helpers.sind(angle2) * maxSpeed;
+				}
 			} else if (vileCutterType == VileCutterType.MaroonedTomahawk) {
 				maxTime = 3;
+				if (!SummonSword){
 				vel = Point.zero;
+				}
 			} else if (vileCutterType == VileCutterType.ParasiteSword) {
 				maxTime = 1;
 			} else if (damager.owner.character != null) {

@@ -13,7 +13,7 @@ public class DarkHold : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = (int)SlotIndex.DHold;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;
-		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" , ""};
+		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" , "electricSpark"};
 		fireRate = 30;
 		damage = "0";
 		effect =  "Paralizes the time and slows projectiles. \nCharged: Bigger radious.";

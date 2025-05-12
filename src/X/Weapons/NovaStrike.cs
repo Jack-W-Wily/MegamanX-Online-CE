@@ -8,7 +8,7 @@ public class HyperNovaStrike : Weapon {
 
 	public HyperNovaStrike() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
-		shootSounds = new string[] { "", "", "", "" };
+		shootSounds = new string[] { "", "", "", "", ""  };
 		fireRate = 10;
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = (int)WeaponBarIndex.NovaStrike;

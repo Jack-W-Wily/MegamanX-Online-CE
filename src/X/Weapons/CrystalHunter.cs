@@ -9,7 +9,7 @@ public class CrystalHunter : Weapon {
 	public static CrystalHunter netWeapon = new();
 
 	public CrystalHunter() : base() {
-		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged", "" };
+		shootSounds = new string[] { "crystalHunter", "crystalHunter", "crystalHunter", "crystalHunterCharged", "crystalHunterCharged" };
 		fireRate = 75;
 		index = (int)WeaponIds.CrystalHunter;
 		weaponBarBaseIndex = (int)WeaponBarIndex.CrystalHunter;

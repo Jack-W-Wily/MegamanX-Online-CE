@@ -1560,7 +1560,8 @@ public class GameMode {
 			isMech && player.character?.rideArmorPlatform != null | 
 			isMech && player.character?.rideArmor != null) {
 			baseY -= 3;}
-		if (player.character is RagingChargeX mmx) {
+		if (player.character is RagingChargeX mmx || 
+		player.character is Vile vava1 && vava1.ResitDeathTimes > 0) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
 			if (hpPercent >= 75) barIndex = 1;
 			else if (hpPercent >= 50) barIndex = 3;

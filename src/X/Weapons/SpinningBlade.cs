@@ -9,7 +9,7 @@ public class SpinningBlade : Weapon {
 	public static SpinningBlade netWeapon = new();
 
 	public SpinningBlade() : base() {
-		shootSounds = new string[] { "", "", "", "spinningBladeCharged", "" };
+		shootSounds = new string[] { "", "", "", "spinningBladeCharged", "spinningBladeCharged" };
 		fireRate = 75;
 		index = (int)WeaponIds.SpinningBlade;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpinningBlade;

@@ -7,7 +7,7 @@ public class LightningWeb : Weapon {
 	public static LightningWeb netWeapon = new();
 	public LightningWeb()
 	{
-		shootSounds = new string[] { "busterX4", "busterX4", "busterX4", "busterX4" };
+		shootSounds = new string[] { "busterX4", "busterX4", "busterX4", "busterX4", "busterX4" };
 		fireRate = 60;
 		index = (int)WeaponIds.LightningWeb;
 		weaponBarBaseIndex = (int)WeaponBarIndex.LightningWeb;

@@ -215,6 +215,10 @@ public class VileDashChargeState : CharState {
 public class VileDashState : CharState {
 	float trailTime;
 	float chargeTime;
+
+	Character? target;
+
+
 	public VileDashState(float chargeTime) : base("hyperdash_attack", "") {
 		this.chargeTime = chargeTime;
 		superArmor = true;
@@ -231,15 +235,37 @@ public class VileDashState : CharState {
 
 
 
+
+				
+				
+
+
 		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
 		if (character.sprite.name.Contains("2") &&
 			collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
 			character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
-			new DynamoBeam(new ElectricSpark(), character.pos.addxy(20 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+			
+				new DynamoBeam(new ElectricSpark(), character.pos.addxy(20 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+			
 			character.changeToIdleOrFall();
+			character.shakeCamera(sendRpc: true);
+					
 			character.playSound("hurt", sendRpc: true);
-			return;
+			
+				foreach (var otherPlayer in Global.level.players) {
+				if (otherPlayer.character == null) continue;
+				if (otherPlayer == player) continue;
+				if (otherPlayer == character.parasiteDamager?.owner) continue;
+				if (otherPlayer.character.isInvulnerable()) continue;
+				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+				if (otherPlayer.character.getCenterPos().distanceTo(character.getCenterPos()) > ParasiticBomb.carryRange) continue;
+				Character target = otherPlayer.character;
+				if (target != null && target.isInDamageSprite()){
+				new DynamoBeam(new ElectricSpark(), target.pos, character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+				}	 
+				}
 		} 
+			
 
 		character.move(new Point(character.xDir * 400, 0));
 
@@ -725,4 +751,57 @@ public class VilePunch1 : CharState {
 		base.onExit(newState);
 	}
 }
+
+
+
+
+
+public class VileResistDeath : CharState {
+	public float radius = 200;
+	XReviveAnim reviveAnim;
+	Vile vile;
+
+	public VileResistDeath() : base("die") {
+		invincible = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.ownedByLocalPlayer) return;
+
+		if (!once && character.frameIndex >= 1 && sprite == "die") {
+			character.playSound("ching", sendRpc: true);
+			player.health = 1;
+			character.addHealth(player.maxHealth);
+
+
+			once = true;
+			var flash = new Anim(character.pos.addxy(0, -33), "up_flash", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+			flash.grow = true;
+		}
+
+		if (character.isAnimOver() || stateTime > 1.2f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
+		character.playSound("xRevive", sendRpc: true);
+		Vile? vile = Global.level.mainPlayer.character as Vile;
+		vile.ResitDeathTimes ++;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
 

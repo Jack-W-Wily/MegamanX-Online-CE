@@ -7,7 +7,7 @@ public class SpinWheel : Weapon {
 	public static SpinWheel netWeapon = new();
 
 	public SpinWheel() : base() {
-		shootSounds = new string[] { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged", "" };
+		shootSounds = new string[] { "spinWheel", "spinWheel", "spinWheel", "spinWheelCharged", "spinWheelCharged" };
 		fireRate = 60;
 		index = (int)WeaponIds.SpinWheel;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpinWheel;

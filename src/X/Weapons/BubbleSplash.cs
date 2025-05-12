@@ -12,7 +12,7 @@ public class BubbleSplash : Weapon {
 	public bool freeAmmoNextCharge;
 
 	public BubbleSplash() : base() {
-		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged", "" };
+		shootSounds = new string[] { "bubbleSplash", "bubbleSplash", "bubbleSplash", "bubbleSplashCharged", "buster3" };
 		fireRate = 6;
 		isStream = true;
 		index = (int)WeaponIds.BubbleSplash;

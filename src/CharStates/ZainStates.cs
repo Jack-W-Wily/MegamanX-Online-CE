@@ -657,7 +657,7 @@ public class ZainSaberProj : Projectile {
 	public ZainSaberProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 300, 12, player, "zain_projslash", 60, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 300, 6, player, "zain_projslash", 60, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "zsaber_shot_fade";
 		reflectable = true;

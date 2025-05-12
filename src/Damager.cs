@@ -978,6 +978,16 @@ public class Damager {
 		}
 		// Maverick section
 		else if (maverick != null) {
+
+
+			if (owner.character is Zero zeroz && owner.health > 0) {
+				zeroz.gigaAttack.addAmmo(1, owner);
+				if (!zeroz.isInDamageSprite()){
+				zeroz.charState.attackCtrl = true;
+				}
+			}
+
+			
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 2;
 			}

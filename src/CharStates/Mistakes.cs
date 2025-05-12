@@ -51,6 +51,13 @@ public class GlobalParryState : CharState {
 			} else {
 				chr.changeState(new ParriedState(), true);
 			}
+			if (player.isVile){
+		Point shootVel = new Point(1, -3);
+		new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), character.getCenterPos(), character.xDir, player, player.getNextActorNetId(), shootVel, rpc: true);
+		new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), character.getCenterPos().addxy(30, -20), character.xDir, player, player.getNextActorNetId(), shootVel, rpc: true);
+		new VileCutterProj(new VileCutter(VileCutterType.MaroonedTomahawk), character.getCenterPos().addxy(-30, 0), character.xDir, player, player.getNextActorNetId(), shootVel, rpc: true);
+		
+		}
 			character.addHealth(1);
 			}
 
@@ -102,9 +109,7 @@ public class GlobalParryState : CharState {
 		}
 
 
-		//if (player.isVile){
-		//character.changeSpriteFromName("win", true);
-		//}
+		
 		}
 	
 }

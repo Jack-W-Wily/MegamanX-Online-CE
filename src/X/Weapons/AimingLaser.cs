@@ -15,7 +15,7 @@ public class AimingLaser : Weapon {
 		weaponSlotIndex = (int)SlotIndex.ALaser;
         weaponBarBaseIndex = (int)WeaponBarIndex.AimingLaser;
         weaponBarIndex = weaponBarBaseIndex;
-		shootSounds = new string[] {"torpedo","torpedo","","dynamopillar","dynamopillar"};
+		shootSounds = new string[] {"torpedo","torpedo","torpedo","dynamopillar","dynamopillar"};
 		weaknessIndex = (int)WeaponIds.SoulBody;
 		type = index;
 		displayName = "Aiming Feather";

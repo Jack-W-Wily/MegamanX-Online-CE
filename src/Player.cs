@@ -954,12 +954,20 @@ public partial class Player {
 				}
 			}
 
+			if (canReviveVile2()) {
+			if (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive) {
+					reviveVile2();
+				} 
+			}
+
 			if (canReviveVile()) {
+				
 				if (input.isPressed(Control.Special1, this) || Global.shouldAiAutoRevive) {
 					reviveVile(false);
-				} else if (input.isPressed(Control.Special2, this) && !lastDeathWasVileMK2) {
+				} else if (input.isPressed(Control.Shoot, this) && !lastDeathWasVileMK2) {
 					reviveVile(true);
 				}
+
 			}
 		} else if (isSigma) {
 			if (isSelectingCommand()) {
@@ -2223,6 +2231,16 @@ public partial class Player {
 		return true;
 	}
 
+	
+	public bool canReviveVile2() {
+		
+		if (limboChar is not Vile vile ){//|| vile.summonedGoliath) {
+			return false;
+		}
+		return true;
+	}
+
+
 	public bool canReviveSigma(out Point spawnPoint) {
 		spawnPoint = Point.zero;
 
@@ -2309,6 +2327,25 @@ public partial class Player {
 
 		return false;
 	}
+
+
+	
+	public void reviveVile2() {
+	Vile vile = (limboChar as Vile);
+
+
+		respawnTime = 0;
+		character = limboChar;
+		character.visible = true;
+		if (explodeDieEffect != null) {
+			explodeDieEffect.destroySelf();
+			explodeDieEffect = null;
+		}
+		limboChar = null;
+		character.changeState(new VileResistDeath(), true);
+		
+	}
+
 
 	public void reviveVile(bool toMK5) {
 		currency -= reviveVileCost;

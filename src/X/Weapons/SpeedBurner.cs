@@ -8,7 +8,7 @@ public class SpeedBurner : Weapon {
 
 public SpeedBurner() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
-		shootSounds = new string[] { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" };
+		shootSounds = new string[] { "speedBurner", "speedBurner", "speedBurner", "speedBurnerCharged" , "speedBurnerCharged" };
 		fireRate = 60;
 		index = (int)WeaponIds.SpeedBurner;
 		weaponBarBaseIndex = (int)WeaponBarIndex.SpeedBurner;

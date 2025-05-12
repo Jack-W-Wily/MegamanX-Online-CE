@@ -5,6 +5,10 @@ using System.Linq;
 namespace MMXOnline;
 
 public class Vile : Character {
+
+
+
+
 	public const float maxCalldownMechCooldown = 2;
 	public float grabCooldown;
 	public bool vulcanActive;
@@ -22,6 +26,12 @@ public class Vile : Character {
 	public bool hasSpeedDevil;
 	public bool summonedGoliath;
 	public int vileForm;
+
+	public int ResitDeathTimes = 0;
+
+
+		public float selfDamageCooldown;
+
 	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
 	public bool isVileMK5 { get { return vileForm == 2; } }
@@ -86,7 +96,7 @@ public class Vile : Character {
 			}
 		}
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
-
+	
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
 		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
@@ -164,12 +174,65 @@ public class Vile : Character {
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}
 
+
+	public float deathsmoketime;
+
+	public float spawnTime = 0;
+
+	public int radius = 26;
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+		
 
+		if (ResitDeathTimes > 0){
+			
+			selfDamageCooldown += Global.spf;
+			if (selfDamageCooldown >= 1 && !isInDamageSprite()
+			&& !isAttacking() && !sprite.name.Contains("grab") )  {
+				selfDamageCooldown = 0;
+					applyDamage(0.5f * ResitDeathTimes, player, this, null, (int)ProjIds.SelfDmg);
+				}
+			
+			deathsmoketime += Global.spf;
+			if (deathsmoketime > 0.1f) {
+			deathsmoketime = 0;
+
+			if (ResitDeathTimes > 0){
+			new DashDustAnim(
+				pos.addxy(xDir * -8, -12), player.getNextActorNetId(), true, true
+			);
+			}
+			if (ResitDeathTimes > 2){
+			new DashDustAnim(
+				pos.addxy(xDir * 8, -20), player.getNextActorNetId(), true, true
+			);
+			}
+
+			if (ResitDeathTimes > 3 ){
+				spawnTime += Global.spf;
+		if (spawnTime >= 0.2f) {
+			
+			if (ResitDeathTimes == 4 )spawnTime = 0;
+			if (ResitDeathTimes == 5 )spawnTime = 0.1f;
+			int randX = Helpers.randomRange(-radius, radius);
+			int randY = Helpers.randomRange(-radius, radius);
+			var randomPos = pos.addxy(randX, randY);
+			new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);
+			playSound("explosion", sendRpc: true);		
+			}
+		}
+		
+
+		
+		}
+
+			if (ResitDeathTimes > 1){
+				oilTime = 1;
+			}
+		}
 
 
 		if (player.isAI && charState.attackCtrl){
@@ -313,10 +376,9 @@ public class Vile : Character {
 		
 
 
-		if (player.input.isHeld(Control.Up,player) && !grounded &&
-				  player.input.isPressed(Control.Taunt,player) && parryCooldown == 0 &&
-				  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is SwordBlock)
-			  ) {
+		if (player.input.isHeld(Control.Up,player) && !isInDamageSprite() &&
+				  player.input.isPressed(Control.Taunt,player) && parryCooldown == 0
+			){
 					changeState(new GlobalParryState(), true);	
 			}
 		

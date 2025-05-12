@@ -612,10 +612,10 @@ public class StrikeChainSemiCharged : Projectile {
 			if (chr == null && pickup == null) {
 				//Lo quitamo' o miedo- I mean
 				//It doesn't hook neither Mavericks nor Ride Armors.
-				if (actor is Maverick || actor is RideArmor) {
-					hookActor(null);
-				}
-				return;
+		//		if (actor is Maverick || actor is RideArmor) {
+		//			hookActor(null);
+		//		}
+		//		return;
 			}
 			//Character specific code.
 			if (chr != null) {
@@ -857,10 +857,10 @@ public class StrikeChainProjCharged : Projectile {
 			if (chr == null && pickup == null) {
 				//Lo quitamo' o miedo- I mean
 				//It doesn't hook neither Mavericks nor Ride Armors.
-				if (actor is Maverick || actor is RideArmor) {
-					hookActor(null);
-				}
-				return;
+		//		if (actor is Maverick || actor is RideArmor) {
+		//			hookActor(null);
+		//		}
+		//		return;
 			}
 			//Character specific code.
 			if (chr != null) {

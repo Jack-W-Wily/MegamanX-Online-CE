@@ -784,7 +784,7 @@ public class PunchyZero : Character {
 			}),*/
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
-				3, Global.defFlinch, 5f, isReflectShield: true,
+				3, Global.defFlinch, 5f, isReflectShield: true,ShouldClang : true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Gokumonken => new GenericMeleeProj(

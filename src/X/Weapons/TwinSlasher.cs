@@ -14,7 +14,7 @@ public class TwinSlasher : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = (int)SlotIndex.TSlasher;
 		weaknessIndex = (int)WeaponIds.GroundHunter;
-		shootSounds = new string[] { "buster2X4", "buster2X4", "buster2X4", "buster4X4" };
+		shootSounds = new string[] { "buster2X4", "buster2X4", "buster2X4", "buster4X4", "buster4X4" };
 		fireRate = 9;
 		switchCooldownFrames = 9;
 		killFeedIndex = 188;

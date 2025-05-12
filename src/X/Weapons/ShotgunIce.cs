@@ -37,8 +37,23 @@ public class ShotgunIce : Weapon {
 			pos = pos.addxy(xDir * 25, 0);
 			pos.y = character.pos.y;
 
-			//mmx.shotgunIceChargeTime = 1.5f;
-
+				new ShotgunIceProjCharged(this, pos,xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+				new ShotgunIceProjCharged(this, pos,xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				}, 0.025f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+				new ShotgunIceProjCharged(this, pos,xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				}, 0.055f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+				new ShotgunIceProjCharged(this, pos,xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				}, 0.075f));
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+				new ShotgunIceProjCharged(this, pos,xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				}, 0.1f));
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+				new ShotgunIceProjCharged(this, pos,xDir, player, 1, true, player.getNextActorNetId(), rpc: true);
+				}, 0.125f));
+			
 			new ShotgunIceProjSled(this, pos, xDir, player, player.getNextActorNetId(), true);
 		}
 	if (chargeLevel == 4 && !player.hasArmArmor(2)) {
