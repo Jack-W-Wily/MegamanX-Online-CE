@@ -542,7 +542,7 @@ public class Server {
 				periodicPing(s_server);
 			}
 			if (iterations % 24 == 0) {
-				RPC.periodicServerPing.sendFromServer(s_server, new byte[] { });
+				RPC.periodicServerPing.sendFromServer(s_server, []);
 			}
 
 			framesZeroPlayers = 0;
@@ -578,7 +578,6 @@ public class Server {
 				}
 			} else if (im.MessageType == NetIncomingMessageType.Data) {
 				byte rpcIndexByte = im.ReadByte();
-				ushort rpcChannel = im.ReadUInt16();
 				RPC rpcTemplate;
 				if (rpcIndexByte >= RPC.templates.Length) {
 					rpcTemplate = new RPCUnknown();
@@ -587,9 +586,9 @@ public class Server {
 					rpcTemplate = RPC.templates[rpcIndexByte];
 				}
 				if (rpcTemplate.isServerMessage) {
-					processServerMessage(im, rpcTemplate, rpcChannel);
+					processServerMessage(im, rpcTemplate);
 				} else {
-					processClientMessage(im, rpcTemplate, rpcIndexByte, rpcChannel, all);
+					processClientMessage(im, rpcTemplate, rpcIndexByte, all);
 				}
 			} else if (im.MessageType == NetIncomingMessageType.ConnectionApproval) {
 				if (im.SenderConnection != null) {
@@ -764,7 +763,7 @@ public class Server {
 							player.connection = host.connection;
 						}
 					}
-					RPC.hostPromotion.sendFromServer(s_server, new byte[] { (byte)host.id });
+					RPC.hostPromotion.sendFromServer(s_server, [(byte)host.id]);
 
 					// Remove all bots if host leaves, to prevent a class of unmaintainable bugs
 					foreach (var player in players.ToList()) {
@@ -792,7 +791,7 @@ public class Server {
 		}
 	}
 
-	public void processServerMessage(NetIncomingMessage im, RPC rpcTemplate, ushort channel) {
+	public void processServerMessage(NetIncomingMessage im, RPC rpcTemplate) {
 		if (rpcTemplate is RPCUpdateStarted) {
 			started = true;
 			nonSpecPlayerCountOnStart = players.Count(p => p.isSpectator);
@@ -804,7 +803,6 @@ public class Server {
 			if (player != null) {
 				NetOutgoingMessage om = s_server.CreateMessage();
 				om.Write((byte)RPC.templates.IndexOf(RPC.reportPlayerResponse));
-				om.Write((ushort)0);
 				ReportedPlayer reportedPlayer = new ReportedPlayer(
 					player.name, player.connection?.RemoteEndPoint?.Address?.ToString() ?? "", player.deviceId
 				);
@@ -827,7 +825,6 @@ public class Server {
 
 			NetOutgoingMessage om = s_server.CreateMessage();
 			om.Write((byte)RPC.templates.IndexOf(RPC.kickPlayerResponse));
-			om.Write((ushort)0);
 			om.Write(kickPlayerJson);
 			s_server.SendToAll(om, rpcTemplate.netDeliveryMethod, 0);
 		} else if (rpcTemplate is RPCUpdatePlayer) {
@@ -889,7 +886,7 @@ public class Server {
 	}
 
 	public void processClientMessage(
-		NetIncomingMessage im, RPC rpcTemplate, byte rpcIndexByte, ushort channel, List<NetConnection> all
+		NetIncomingMessage im, RPC rpcTemplate, byte rpcIndexByte, List<NetConnection> all
 	) {
 		NetOutgoingMessage om = s_server.CreateMessage();
 
@@ -897,7 +894,6 @@ public class Server {
 			ushort argCount = BitConverter.ToUInt16(im.ReadBytes(2), 0);
 
 			om.Write(rpcIndexByte);
-			om.Write(channel);
 			om.Write(argCount);
 			byte[] bytes;
 
@@ -953,7 +949,6 @@ public class Server {
 		} else {
 			var message = im.ReadString();
 			om.Write(rpcIndexByte);
-			om.Write(channel);
 			om.Write(message);
 
 			if (rpcIndexByte == RPC.templates.IndexOf(RPC.switchTeam)) {
@@ -974,10 +969,10 @@ public class Server {
 
 		if (rpcTemplate.toHostOnly) {
 			if (host?.connection != null) {
-				s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, channel);
+				s_server.SendMessage(om, host.connection, rpcTemplate.netDeliveryMethod, 0);
 			}
 		} else if (all.Count > 0) {
-			s_server.SendMessage(om, all, rpcTemplate.netDeliveryMethod, channel);
+			s_server.SendMessage(om, all, rpcTemplate.netDeliveryMethod, 0);
 		}
 	}
 

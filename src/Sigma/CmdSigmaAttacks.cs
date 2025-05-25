@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 namespace MMXOnline;
 
 public class SigmaSlashWeapon : Weapon {
@@ -8,17 +8,14 @@ public class SigmaSlashWeapon : Weapon {
 		killFeedIndex = 9;
 	}
 }
+
 public class SigmaSlashStateGround : CharState {
 	bool fired;
 	public CmdSigma Sigma = null!;
 	public SigmaSlashStateGround() : base("attack") {
-		useDashJumpSpeed = true;
 		airMove = true;
-		canJump = true;
-		canStopJump = true;
-		landSprite = "attack";
-		airSprite = "attack_air";
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
@@ -46,20 +43,21 @@ public class SigmaSlashStateAir : CharState {
 	public SigmaSlashStateAir() : base("attack_air") {
 		useDashJumpSpeed = true;
 		airMove = true;
-		canJump = true;
 		canStopJump = true;
 		landSprite = "attack";
 		airSprite = "attack_air";
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
 	}
+
 	public override void update() {
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
-			Point off = new Point(20, -30);
+			Point off = new Point(24, -22);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
 				Sigma, player, player.getNextActorNetId(), 3, 13, rpc: true
@@ -71,26 +69,25 @@ public class SigmaSlashStateAir : CharState {
 		base.update();
 	}
 }
+
 public class SigmaSlashStateDash : CharState {
 	bool fired;
 	public CmdSigma Sigma = null!;
 	public SigmaSlashStateDash() : base("attack_dash") {
-		useDashJumpSpeed = true;
 		airMove = true;
-		canJump = true;
 		canStopJump = true;
-		landSprite = "attack";
-		airSprite = "attack_dash";
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		Sigma = player.character as CmdSigma ?? throw new NullReferenceException();
 	}
+
 	public override void update() {
 		if (character.frameIndex >= 2 && !fired) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
-			Point off = new Point(30, -20);
+			Point off = new Point(26, -22);
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
 				Sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
@@ -167,7 +164,7 @@ public class SigmaSlashProj : Projectile {
 		damager.hitCooldown = 30;
 		reflectable = false;
 		setIndestructableProperties();
-		maxTime = 0.1f;
+		maxTime = 10f / 60f;
 		projId = (int)ProjIds.SigmaSlash;
 		isMelee = true;
 		if (rpc) {
@@ -182,6 +179,16 @@ public class SigmaSlashProj : Projectile {
 			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		if (frameIndex % 2 == 1) {
+			alpha = 0.125f;
+		} else {
+			alpha = 1f;
+		}
+	}
+
 	public override void postUpdate() {
 		base.postUpdate();
 		if (owner?.character != null) {
@@ -432,7 +439,7 @@ public class SigmaWallDashState : CharState {
 		character.move(vel);
 
 		if (stateTime > 0.7f) {
-			character.changeState(new Fall(), true);
+			character.changeState(character.getFallState(), true);
 		}
 		if (player.input.isPressed(Control.Shoot, player) &&
 			!fired && Sigma.saberCooldown == 0 && character.invulnTime == 0
