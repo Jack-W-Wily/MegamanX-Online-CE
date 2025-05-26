@@ -1578,6 +1578,26 @@ public class GameMode {
 			return;
 		}
 
+
+
+		if (player.character is Kurumitos) {
+			baseY += 25;
+			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
+			baseY -= 16;
+			for (var i = 0; i < MathF.Ceiling(player.vileMaxAmmo * ammoDisplayMultiplier); i++) {
+				if (i < Math.Ceiling(player.vileAmmo * ammoDisplayMultiplier)) {
+					Global.sprites["hud_weapon_full"].drawToHUD(32, baseX, baseY);
+				} else {
+					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				}
+				baseY -= 2;
+			}
+			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+			return;
+		}
+
+
+
 		// Return if there is no weapon to ren
 		if (weapon == null) {
 			return;

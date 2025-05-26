@@ -188,7 +188,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.ArmoredAProj, ArmoredAProj.rpcInvoke },
 		{ (int)ProjIds.LaunchOMissle, LaunchOMissile.rpcInvoke },
 		{ (int)ProjIds.LaunchOWhirlpool, LaunchOWhirlpoolProj.rpcInvoke },
-		{ (int)ProjIds.LaunchOTorpedo, TorpedoProjChargedOcto.rpcInvoke },	
+		{ (int)ProjIds.LaunchOTorpedo, TorpedoProjChargedOcto.rpcInvoke },
 		{ (int)ProjIds.BoomerangKBoomerang, BoomerangKBoomerangProj.rpcInvoke },
 		{ (int)ProjIds.StingCSting, StingCStingProj.rpcInvoke },
 		{ (int)ProjIds.StingCSpike, StingCSpikeProj.rpcInvoke },
@@ -230,10 +230,10 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.FakeZeroMelee, FakeZeroMeleeProj.rpcInvoke },
 		{ (int)ProjIds.FakeZeroGroundPunch, FakeZeroRockProj.rpcInvoke },
 		{ (int)ProjIds.TSeahorseAcid2, TSeahorseAcid2Proj.rpcInvoke },
-		{ (int)ProjIds.TSeahorseAcid1, AcidBurstProjSmall.rpcInvoke },	
-		{ (int)ProjIds.TSeahorseAcid3, TSeahorseAcidProj.rpcInvoke },	
-		{ (int)ProjIds.TunnelRTornadoFang, TunnelRTornadoFang.rpcInvoke },	
-		{ (int)ProjIds.TunnelRTornadoFang2, TunnelRTornadoFang.rpcInvoke },	
+		{ (int)ProjIds.TSeahorseAcid1, AcidBurstProjSmall.rpcInvoke },
+		{ (int)ProjIds.TSeahorseAcid3, TSeahorseAcidProj.rpcInvoke },
+		{ (int)ProjIds.TunnelRTornadoFang, TunnelRTornadoFang.rpcInvoke },
+		{ (int)ProjIds.TunnelRTornadoFang2, TunnelRTornadoFang.rpcInvoke },
 		{ (int)ProjIds.TunnelRTornadoFangDiag, TunnelRTornadoFangDiag.rpcInvoke },
 		{ (int)ProjIds.VoltCBall, TriadThunderProjCharged.rpcInvoke },
 		{ (int)ProjIds.VoltCTriadThunder, VoltCTriadThunderProj.rpcInvoke },
@@ -264,6 +264,13 @@ public partial class RPCCreateProj : RPC {
 		// Rides
 		{ (int)ProjIds.MechTorpedo, TorpedoProjMech.rpcInvoke },
 
+
+		// WCut Chars RPCEX
+
+		// Kurumitos
+
+		{ (int)ProjIds.OrochinagiProj, OrochinagiChargedProj.rpcInvoke },
+		{ (int)ProjIds.YamiBaraiProj, YamiBaraiProj.rpcInvoke },
 	};
 
 }

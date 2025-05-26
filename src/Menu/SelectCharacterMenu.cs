@@ -38,6 +38,11 @@ public enum CharIds {
 	RagingChargeX,
 	// Non-vanilla chars start here.
 	Rock = 10,
+	// WCUT CHARS 
+	Kurumitos,   // Always add the new characters bellow the Vanilla characters
+				 // Because otherwise the code gets really messy with the IDs
+				
+
 }
 
 public class CharSelection {
@@ -64,6 +69,18 @@ public class CharSelection {
 			offset = new Point(1, 45)
 		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
+
+
+		// Make sure to add your char here
+		new CharSelection("Kurumitos", // Display name in the menu
+		(int)CharIds.Kurumitos, // Char ID , you may notice that the ones above have numbers here 
+		// 							but adding it as  (int)Char.Ids."your character" is more effective
+		1,    // Mapped Char Armor (this is exclusive to make it so X's 1v1 Armors Work)
+		0,               // Mapped Char Maverick (This is for sigma's 1v1 mavericks)
+		"kr_idle",       // Sprite name to show in the menu, for this example I choose the idle
+		 0               // Frame that the sprite will be stuck in
+		 ),				 // Make sure to end the whole thing with a "," ion the end
+		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
 

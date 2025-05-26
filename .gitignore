@@ -6,3 +6,5 @@
 [Oo]bj/*
 omnisharp.json
 /.vs
+
+.fake

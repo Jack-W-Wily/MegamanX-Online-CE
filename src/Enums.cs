@@ -286,6 +286,18 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
+
+
+	// Wcut STuff
+
+
+
+	// Kurumitos Stuff
+	KRMelee,
+
+
+
+
 	DNACore = 250
 }
 
@@ -722,6 +734,19 @@ public enum ProjIds {
 	DZBuster4,
 	DZMelee,
 	DZHadangeki,
+
+
+	// Wcut STuff
+
+	BlockingProjID,
+
+	// Kurumitos Stuff
+	KRStandingKick,
+	KRAirDunk,
+	KROniaki,
+
+	YamiBaraiProj,
+	OrochinagiProj,
 
 	// Special damage types.
 	SelfDmg = 30000,

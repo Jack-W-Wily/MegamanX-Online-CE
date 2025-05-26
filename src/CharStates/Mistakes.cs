@@ -7,109 +7,6 @@ namespace MMXOnline;
 
 
 
-public class GlobalParryState : CharState {
-	public GlobalParryState() : base("parry_start", "", "", "") {
-		superArmor = true;
-		airMove = true;
-	}
-
-	public override void update() {
-		base.update();
-
-		if (player.isZain){
-			character.move(new Point(character.xDir * 350, 0));
-		}
-
-
-		if (stateTime < 0.1f) {
-			character.turnToInput(player.input, player);
-		}
-
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-			character.parryCooldown = 30;
-		}
-	}
-
-	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
-		Actor? counterAttackTarget = null;
-		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
-		}
-		if (counterAttackTarget == null) {
-			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
-		}
-
-		Projectile? proj = damagingActor as Projectile;
-		bool stunnableParry = proj != null && proj.canBeParried();
-		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
-			counterAttackTarget is Character chr && stunnableParry
-		) {
-			if (player.isVile){
-			if (!chr.ownedByLocalPlayer) {
-				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
-			} else {
-				chr.changeState(new ParriedState(), true);
-			}
-			character.addHealth(1);
-			}
-
-			if (player.isZain){
-					if (!chr.ownedByLocalPlayer) {
-				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
-			} else {
-				chr.changeState(new VileMK2Grabbed(character), true);
-				character.changeState(new ZainGrab(), true);
-			}
-			}
-
-		}
-		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
-
-		if (Helpers.randomRange(0,5) == 5){
-			character.addHealth(1);
-			character.changeState(new ParriedState(), true);
-		}
-		if (!player.isZain){
-		character.changeState(new Idle(), true);
-		}
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-
-	public bool canParry(Actor damagingActor) {
-		if (damagingActor is not Projectile) {
-			return false;
-		}
-		if (player.isVile)return character.frameIndex < 5;
-		if (player.isDragoon)return character.frameIndex < 5;
-		
-		return character.frameIndex == 0;
-	}
-
-		public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (player.isX || player.isXAnother) {
-		character.changeSpriteFromName("unpo_parry_start", true);
-		}
-
-			if (player.isZain){
-			character.changeSpriteFromName("parry_dash", true);
-			character.playSound("distortion_d");
-			character.playSound("zainDash");
-		}
-
-
-		//if (player.isVile){
-		//character.changeSpriteFromName("win", true);
-		//}
-		}
-	
-}
-
-
 public class XTeleportState : CharState {
 	public bool onceTeleportInSound;
 	bool isInvisible;
@@ -119,6 +16,7 @@ public class XTeleportState : CharState {
 	int width = 18;
 
 	public XTeleportState() : base("land") {
+
 	}
 
 	public override void update() {

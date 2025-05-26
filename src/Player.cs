@@ -215,6 +215,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new List<SubTank>() },
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
+		{ (int)CharIds.Kurumitos, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -227,6 +228,7 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new() },
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
+		{ (int)CharIds.Kurumitos, new() },
 	};
 
 	// Getter functions.
@@ -1188,6 +1190,15 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
+
+
+		// Kurumitos
+		else if  (charNum == (int)CharIds.Kurumitos) {
+			newChar = new Kurumitos(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+			);
+		}
 		// Error out if invalid id.
 		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
@@ -1421,7 +1432,19 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		} else {
+		} else if (data.charNum == (int)CharIds.Kurumitos) {
+			retChar = new Kurumitos(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}
+		
+		
+		
+		
+		
+		
+		 else {
 			throw new Exception("Error: Non-valid char ID: " + data.charNum);
 		}
 
@@ -1563,7 +1586,16 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				false, charNetId, ownedByLocalPlayer, isRevive: false
 			);
-		} else {
+		} else if (charNum == (int)CharIds.Kurumitos) {
+			retChar = new Kurumitos(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
+		
+		
+		
+		 else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		if (retChar is Vile vile) {
