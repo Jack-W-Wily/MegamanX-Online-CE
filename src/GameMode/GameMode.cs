@@ -1326,7 +1326,7 @@ public class GameMode {
 	public bool renderHealth(Player player, HUDHealthPosition position, bool isMech) {
 		bool mechBarExists = false;
 
-		string spriteName = "hud_health_base";
+		string spriteName = "hud_bars_char_hp";
 		float health = player.health;
 		float maxHealth = player.maxHealth;
 		float damageSavings = 0;
@@ -1359,10 +1359,11 @@ public class GameMode {
 		var hudHealthPosition = getHUDHealthPosition(position, true);
 		float baseX = hudHealthPosition.x;
 		float baseY = hudHealthPosition.y;
-
 		float twoLayerHealth = 0;
+		float twoLayerHealthPlayer = player.bonusHealth;
+
 		if (isMech && player.character?.rideArmor != null && player.character.rideArmor.raNum != 5) {
-			spriteName = "hud_health_base_mech";
+			spriteName = "hud_bars_ra_hp";
 			health = player.character.rideArmor.health;
 			maxHealth = player.character.rideArmor.maxHealth;
 			twoLayerHealth = player.character.rideArmor.goliathHealth;
@@ -1375,7 +1376,7 @@ public class GameMode {
 			damageSavings = 0;
 		}
 		if (isMech && player?.character?.rideArmorPlatform != null) {
-			spriteName = "hud_health_base_mech";
+			spriteName = "hud_bars_ra_hp";
 			health = player.character.rideArmorPlatform.health;
 			maxHealth = player.character.rideArmorPlatform.maxHealth;
 			twoLayerHealth = player.character.rideArmorPlatform.goliathHealth;
@@ -1389,7 +1390,7 @@ public class GameMode {
 		}
 
 		if (isMech && player?.character?.rideChaser != null) {
-			spriteName = "hud_health_base_bike";
+			spriteName = "hud_bars_ra_hp";
 			health = player.character.rideChaser.health;
 			maxHealth = player.character.rideChaser.maxHealth;
 			frameIndex = 0;
@@ -1416,26 +1417,31 @@ public class GameMode {
 			else barIndex = 5;
 		}
 
-		for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
+	for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
 			// Draw HP
 			if (i < MathF.Ceiling(health)) {
-				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(barIndex, baseX, baseY);
 			} else if (i < MathInt.Ceiling(health) + damageSavings) {
-				Global.sprites["hud_health_full"].drawToHUD(4, baseX, baseY);
-			} else if (i < MathInt.Ceiling(greyHp)) {
-				Global.sprites["hud_weapon_full"].drawToHUD(30, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(3, baseX, baseY);
 			} else {
-				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
 			}
+
+
+
+			if (twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
+				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
+			}
+
 
 			// 2-layer health
 			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {
-				Global.sprites["hud_health_full"].drawToHUD(2, baseX, baseY);
+				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
 			}
 
 			baseY -= 2;
 		}
-		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+		Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
 
 		return mechBarExists;
 	}
@@ -1486,6 +1492,8 @@ public class GameMode {
 		var hudHealthPosition = getHUDHealthPosition(position, false);
 		float baseX = hudHealthPosition.x;
 		float baseY = hudHealthPosition.y;
+		float baseX2 = hudHealthPosition.x;
+		float baseY2 = hudHealthPosition.y;
 		bool forceSmallBarsOff = false;
 
 		// This runs once per character.
@@ -1578,15 +1586,45 @@ public class GameMode {
 			return;
 		}
 
-
-
-		if (player.character is Kurumitos) {
+		if (player.character is VAVA1) {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
 			baseY -= 16;
 			for (var i = 0; i < MathF.Ceiling(player.vileMaxAmmo * ammoDisplayMultiplier); i++) {
 				if (i < Math.Ceiling(player.vileAmmo * ammoDisplayMultiplier)) {
 					Global.sprites["hud_weapon_full"].drawToHUD(32, baseX, baseY);
+				} else {
+					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				}
+				baseY -= 2;
+			}
+			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
+
+			baseY2 += 25;
+			baseX2 += 15;
+			Global.sprites["hud_bars_wp_base_x"].drawToHUD(5, baseX2, baseY2);
+			baseY2 -= 16;
+			for (var i = 0; i < MathF.Ceiling(player.character.superBarMaxAmmo * ammoDisplayMultiplier); i++) {
+				if (i < Math.Ceiling(player.character.superBarAmmo * ammoDisplayMultiplier)) {
+					Global.sprites["hud_bars_wp"].drawToHUD(32, baseX2, baseY2);
+				} else {
+					Global.sprites["hud_health_empty"].drawToHUD(0, baseX2, baseY2);
+				}
+				baseY -= 2;
+			}
+			Global.sprites["hud_health_top"].drawToHUD(0, baseX2, baseY2);
+			return;
+		}
+
+
+
+		if (player.character is Kurumitos) {
+			baseY += 25;
+			Global.sprites["hud_bars_wp_base_x"].drawToHUD(5, baseX, baseY);
+			baseY -= 16;
+			for (var i = 0; i < MathF.Ceiling(player.character.superBarMaxAmmo * ammoDisplayMultiplier); i++) {
+				if (i < Math.Ceiling(player.character.superBarAmmo * ammoDisplayMultiplier)) {
+					Global.sprites["hud_bars_wp"].drawToHUD(32, baseX, baseY);
 				} else {
 					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 				}

@@ -44,6 +44,8 @@ public class Control {
 	public const string AllChat = "menuallchat";
 	public const string Taunt = "taunt";
 	public const string Special2 = "command";
+	public const string R2 = "r2";
+	public const string L2 = "l2";
 
 	public static JoystickInfo? joystick;
 

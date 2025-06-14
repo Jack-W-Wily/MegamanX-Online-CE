@@ -152,6 +152,20 @@ public partial class Player {
 		}
 	}
 
+
+
+	
+	public float bonusHealthBackup;
+
+	public float bonusHealth {
+		get => (float)(character?.bonusHealth ?? 0);
+		set {
+			if (character != null) {
+				character.bonusHealth = (decimal)value;
+			}
+		}
+	}
+
 	public bool isDead {
 		get {
 			if (isSigma && currentMaverick != null) {
@@ -216,6 +230,7 @@ public partial class Player {
 		{ (int)CharIds.BusterZero, new List<SubTank>() },
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Kurumitos, new List<SubTank>() },
+		{ (int)CharIds.VAVA1, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -229,6 +244,7 @@ public partial class Player {
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Kurumitos, new() },
+		{ (int)CharIds.VAVA1, new() },
 	};
 
 	// Getter functions.
@@ -249,7 +265,7 @@ public partial class Player {
 	}
 
 	// Currency
-	public const int maxCharCurrencyId = 12;
+	public const int maxCharCurrencyId = 42;
 	public static int curMul = Helpers.randomRange(2, 8);
 
 	public ProtectedArrayInt charCurrency = new ProtectedArrayInt(maxCharCurrencyId);
@@ -1199,6 +1215,13 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
+		// Vile WCUT
+		else if  (charNum == (int)CharIds.VAVA1) {
+			newChar = new VAVA1(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+			);
+		}
 		// Error out if invalid id.
 		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
@@ -1437,6 +1460,11 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
+		}else if (data.charNum == (int)CharIds.VAVA1) {
+			retChar = new VAVA1(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
 		}
 		
 		
@@ -1588,6 +1616,11 @@ public partial class Player {
 			);
 		} else if (charNum == (int)CharIds.Kurumitos) {
 			retChar = new Kurumitos(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.VAVA1) {
+			retChar = new VAVA1(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);

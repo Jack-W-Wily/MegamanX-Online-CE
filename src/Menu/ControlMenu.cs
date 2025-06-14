@@ -42,11 +42,13 @@ public class ControlMenu : IMainMenu {
 				new string[] { Control.Left, "Left" },
 				new string[] { Control.Right, "Right" },
 				new string[] { Control.Jump, "Jump" },
-				new string[] { Control.Shoot, "Shoot" },
 				new string[] { Control.Dash, "Dash" },
-				new string[] { Control.Special1, "Special" },
-				new string[] { Control.WeaponLeft, "WeaponL" },
-				new string[] { Control.WeaponRight, "WeaponR" },
+				new string[] { Control.Shoot, "A" },
+				new string[] { Control.Special1, "B" },
+				new string[] { Control.WeaponLeft, "L1" },
+				new string[] { Control.WeaponRight, "R1" },
+				new string[] { Control.R2, "R2" },
+				new string[] { Control.L2, "L2" },
 				new string[] { Control.Special2, "Command"},
 				new string[] { Control.Taunt, "Taunt" }
 			};

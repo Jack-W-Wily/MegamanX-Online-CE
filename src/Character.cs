@@ -20,6 +20,8 @@ public partial class Character : Actor, IDamagable {
 	// Health.
 	public decimal health;
 	public decimal maxHealth;
+
+	public decimal bonusHealth = 0;
 	
 	// Player linked data.
 	public Player player;
@@ -127,7 +129,44 @@ public partial class Character : Actor, IDamagable {
 	public float dropFlagCooldown;
 	public bool dropFlagUnlocked;
 
+
+	// Input Stuff (WCUT)
+	public float inputdecreasedCD;
+	public int downPressedTimes = 0;
+	public int upPressedTimes = 0;
+	public int leftPressedTimes = 0;
+	public int rightPressedTimes = 0;
+	public int shootPressedTimes = 0;
+	public int specialPressedTimes = 0;
+	public int wRightPressedTimes = 0;
+	public bool stockedBuster;
+
+
+	//>>>>>>>>>>>>>>>>>
+
+	// For Overdrive and SUper Bars
+	public float superBarAmmo;
+
+	public float superBarMaxAmmo = 32;
+
+	public float overDriveTimer;
+
+	public bool OverDrive;
+
+
+	//StateCooldown System (wcut)
+	public float genericGrabCooldown;
+	public float genericParryCooldown;
+	public Projectile? AbsorbedProj;
+
+	public float ComboTimer;
+	public float ignoreStateCooldownTime;
+	public float DamageScaling;
+	public float DamageScalingCD;
+
+
 	// Status effects.
+
 	// Acid
 	public Damager? acidDamager;
 	public float acidTime;
@@ -237,6 +276,7 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
 		maxHealth = (decimal)player.getMaxHealth();
+		bonusHealth = (decimal)player.getMaxHealth();
 		health = 1;
 		if (player.disguise == null) {
 			healAmount = (float)maxHealth - 1;
@@ -907,6 +947,79 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public override void update() {
+
+
+	
+		//Wcut Damage Systems
+		Helpers.decrementFrames(ref ComboTimer);
+		Helpers.decrementFrames(ref ignoreStateCooldownTime);
+		Helpers.decrementFrames(ref DamageScalingCD);
+
+		if (DamageScalingCD == 0) {
+			Helpers.decrementFrames(ref DamageScaling);
+		}
+
+
+		if (sprite.name.Contains("hurt")
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("knocked")
+		|| sprite.name.Contains("grabbed")
+		|| sprite.name.Contains("lose")
+		|| sprite.name.Contains("stunned")) {
+			DamageScaling += Global.spf * 2;
+			DamageScalingCD = 0.5f;
+		}
+		//
+
+		Helpers.decrementFrames(ref genericGrabCooldown);
+		Helpers.decrementFrames(ref genericParryCooldown);
+
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+		// New Presing system
+		Helpers.decrementTime(ref inputdecreasedCD);
+		if (player.input.isPressed(Control.Shoot, player)) {
+			shootPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Special1, player)) {
+			specialPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.WeaponRight, player)) {
+			wRightPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+
+		if (player.input.isPressed(Control.Down, player)) {
+			downPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Up, player)) {
+			upPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Left, player)) {
+			leftPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+		if (player.input.isPressed(Control.Right, player)) {
+			rightPressedTimes += 1;
+			inputdecreasedCD = 0.75f;
+		}
+
+		if (inputdecreasedCD == 0) {
+			downPressedTimes = 0;
+			upPressedTimes = 0;
+			leftPressedTimes = 0;
+			rightPressedTimes = 0;
+			shootPressedTimes = 0;
+			specialPressedTimes = 0;
+			wRightPressedTimes = 0;
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+
 		if (charState is not InRideChaser) {
 			camOffsetX = MathInt.Round(Helpers.lerp(camOffsetX, 0, 10));
 		}
@@ -1495,6 +1608,63 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+	
+	public virtual bool isInDamageSprite() {
+		return sprite.name.Contains("hurt")
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("lose")
+		|| sprite.name.Contains("knocked")
+		|| sprite.name.Contains("grabbed")
+		|| sprite.name.Contains("stunned")
+		|| sprite.name.Contains("pushed")
+		|| sprite.name.Contains("die");
+	}
+
+
+
+	public virtual bool isAttacking() {
+		return sprite.name.Contains("attack")
+		|| sprite.name.Contains("shoot")
+		|| sprite.name.Contains("pipe")
+		|| sprite.name.Contains("punch")
+		|| sprite.name.Contains("kick")
+		|| sprite.name.Contains("swing")
+		|| sprite.name.Contains("proj")
+		|| sprite.name.Contains("shoryuken")
+		|| sprite.name.Contains("hadouken")
+		|| sprite.name.Contains("stab")
+		|| sprite.name.Contains("raijingeki")
+		|| sprite.name.Contains("megapunch")
+		|| sprite.name.Contains("throw")
+		|| sprite.name.Contains("rocket")
+		|| sprite.name.Contains("cannon")
+		|| sprite.name.Contains("spin")
+		|| sprite.name.Contains("air")
+		|| sprite.name.Contains("parry")
+		|| sprite.name.Contains("powerwave")
+		|| sprite.name.Contains("burn")
+		|| sprite.name.Contains("knuckle")
+		|| sprite.name.Contains("missle")
+		|| sprite.name.Contains("launch")
+		|| (player.isX && player.hasHelmetArmor(1) && sprite.name.Contains("jump"))
+		|| sprite.name.Contains("slash")
+		|| sprite.name.Contains("uppercut")
+		|| sprite.name.Contains("spin")
+		|| sprite.name.Contains("ground")
+		|| sprite.name.Contains("speedburner")
+		|| sprite.name.Contains("shot")
+		|| sprite.name.Contains("super")
+		|| sprite.name.Contains("charge")
+		|| sprite.name.Contains("tbreaker")
+		|| sprite.name.Contains("eblade")
+		|| sprite.name.Contains("rising")
+		|| sprite.name.Contains("eblade")
+		|| sprite.name.Contains("bomb")
+		|| sprite.name.Contains("whip");
+	}
+
+
+
 	public virtual bool isDebuffImmune() {
 		return isStatusImmune() || isNonDamageStatusImmune();
 	}
@@ -1853,6 +2023,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool changeState(CharState newState, bool forceChange = false) {
+
+		
 		// Set the character as soon as posible.
 		newState.character = this;
 		newState.altCtrls = new bool[altCtrlsLength];
@@ -2260,6 +2432,8 @@ public partial class Character : Actor, IDamagable {
 		float totalMashTime = 1;
 		float healthBarInnerWidth = 30;
 
+
+
 		if (charState is GenericStun gst) {
 			bool hasDrawn = false;
 			List<int> iconsToDraw = new();
@@ -2282,7 +2456,7 @@ public partial class Character : Actor, IDamagable {
 				hasDrawn = true;
 			}
 			if (hasDrawn) {
-				for(int i = 0; i < iconsToDraw.Count; i++) {
+				for (int i = 0; i < iconsToDraw.Count; i++) {
 					Global.sprites["hud_status_icon"].draw(
 						iconsToDraw[i],
 						pos.x - (iconsToDraw.Count - 1) * 6 + i * 12,
@@ -2337,6 +2511,10 @@ public partial class Character : Actor, IDamagable {
 			statusIndex = 13;
 			totalMashTime = DarkHoldState.totalStunTime;
 			statusProgress = darkHoldState.stunTime / totalMashTime;
+		} else if (charState is BlockWCUT blockstate) {
+			statusIndex = 3;
+			totalMashTime = BlockWCUT.maxBlockTime;
+			statusProgress = blockstate.blockTime;
 		} else {
 			player.lastMashAmount = 0;
 			return false;
@@ -2555,232 +2733,240 @@ public partial class Character : Actor, IDamagable {
 			inRideArmor.checkCrystalizeTime();
 		}
 
-		// For fractional damage shenanigans.
-		if (damage % 1 != 0) {
-			decimal decDamage = damage % 1;
-			damage = Math.Floor(damage);
-			// Fully nullyfy decimal using damage savings if posible.
-			if (damageSavings >= decDamage) {
-				damageSavings -= decDamage;
-			}
-			// If damage is over one we add it to damagedebt.
-			else if (damage >= 1) {
-				damageDebt += decDamage;
-			}
-			// If is under 1 we just apply it as is.
-			else {
-				damage += decDamage;
-			}
-		}
-		// First we apply debt then savings.
-		// This is done before defense calculation to allow to defend from debt.
-		while (damageDebt >= 1) {
-			damageDebt -= 1;
-			damage += 1;
-		}
-		while (damageSavings >= 1 && damage >= 1) {
-			damageSavings -= 1;
-			damage -= 1;
-		}
-		// Damage increase/reduction section
-		if (!isArmorPiercing && (
-			damage != (decimal)Damager.forceKillDamage ||
-			damage != (decimal)Damager.ohkoDamage ||
-			damage != (decimal)Damager.envKillDamage
-		)) {
-			if (charState is SwordBlock) {
-				damageSavings += (originalDamage * 0.5m);
-			}
-			if (charState is SigmaAutoBlock) {
-				damageSavings += (originalDamage * 0.25m);
-			}
-			if (charState is SigmaBlock) {
-				damageSavings += (originalDamage * 0.5m);
-			}
-			if (acidTime > 0) {
-				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
-				damageDebt += (originalDamage * extraDamage);
-			}
-			if (mmx != null) {
-				if (mmx.barrierActiveTime > 0) {
-					if (mmx.hyperChestArmor == ArmorId.Max) {
-						damageSavings += (originalDamage * 0.5m);
-					} else {
-						damageSavings += (originalDamage * 0.25m);
-					}
+
+		// For Bonus Health
+		if (bonusHealth > 0) {
+			bonusHealth -= damage;
+			if (bonusHealth < 0) bonusHealth = 0;
+		} else {
+
+			// For fractional damage shenanigans.
+			if (damage % 1 != 0) {
+				decimal decDamage = damage % 1;
+				damage = Math.Floor(damage);
+				// Fully nullyfy decimal using damage savings if posible.
+				if (damageSavings >= decDamage) {
+					damageSavings -= decDamage;
 				}
-				if (mmx.chestArmor == ArmorId.Light) {
-					damageSavings += (originalDamage * 0.125m);
+				// If damage is over one we add it to damagedebt.
+				else if (damage >= 1) {
+					damageDebt += decDamage;
 				}
-				if (mmx.chestArmor == ArmorId.Giga) {
-					damageSavings += (originalDamage * 0.125m);
+				// If is under 1 we just apply it as is.
+				else {
+					damage += decDamage;
 				}
 			}
-			if (vile != null && vile.hasFrozenCastle) {
-				damageSavings += originalDamage * Vile.frozenCastlePercent;
+			// First we apply debt then savings.
+			// This is done before defense calculation to allow to defend from debt.
+			while (damageDebt >= 1) {
+				damageDebt -= 1;
+				damage += 1;
 			}
-		}
-		// This is to defend from overkill damage.
-		// Or at least attempt to.
-		if (damageSavings > 0 &&
-			health - damage <= 0 &&
-			(health + damageSavings) - damage > 0
-		) {
-			// Apply in the normal way.
-			while (damageSavings >= 1) {
+			while (damageSavings >= 1 && damage >= 1) {
 				damageSavings -= 1;
 				damage -= 1;
 			}
-			// Decimal protection scenario.
-			if (damage > 0 && damageSavings > 0 && damageSavings + (1m/8m) >= damage) {
-				damage = 0;
-				damageSavings -= damage;
-				if (damageSavings <= 0) {
-					damageSavings = 0;
+			// Damage increase/reduction section
+			if (!isArmorPiercing && (
+				damage != (decimal)Damager.forceKillDamage ||
+				damage != (decimal)Damager.ohkoDamage ||
+				damage != (decimal)Damager.envKillDamage
+			)) {
+				if (charState is SwordBlock) {
+					damageSavings += (originalDamage * 0.5m);
 				}
-			} 
-		}
-
-		// If somehow the damage is negative.
-		// Heals are not really applied here.
-		if (damage < 0) { damage = 0; }
-		health -= damage;
-		// Clamp to 0. We do not want to go into the negatives here.
-		if (health < 0) {
-			health = 0;
-		}
-
-		if (player.showTrainingDps && health > 0 && originalDamage > 0) {
-			if (player.trainingDpsStartTime == 0) {
-				player.trainingDpsStartTime = Global.time;
-				Global.level.gameMode.dpsString = "";
-			}
-			player.trainingDpsTotalDamage += (float)damage;
-		}
-
-		if (damage > 0 && attacker != null) {
-			if (projId != (int)ProjIds.Burn && projId != (int)ProjIds.AcidBurstPoison) {
-				player.delaySubtank();
-			}
-		}
-		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
-			addDamageTextHelper(attacker, (float)damage, (float)maxHealth, true);
-		}
-		if (health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
-			decimal modifier = (32 / maxHealth);
-			decimal gigaDamage = damage;
-			if (originalDamage > damage) {
-				gigaDamage = originalDamage;
-			}
-			float gigaAmmoToAdd = (float)(gigaDamage * modifier);
-	
-			if (this is Zero zero) {
-				float currentAmmo = zero.gigaAttack.ammo;
-				zero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
-				if (player.isMainPlayer) {
-					Weapon.gigaAttackSoundLogic(
-						this, currentAmmo, zero.gigaAttack.ammo,
-						zero.gigaAttack.getAmmoUsage(0), zero.gigaAttack.maxAmmo
-					);
+				if (charState is SigmaAutoBlock) {
+					damageSavings += (originalDamage * 0.25m);
 				}
-			}
-			if (this is PunchyZero punchyZero) {
-				float currentAmmo = punchyZero.gigaAttack.ammo;
-				punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
-				if (player.isMainPlayer) {
-					Weapon.gigaAttackSoundLogic(
-						this, currentAmmo, punchyZero.gigaAttack.ammo,
-						punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
-					);
+				if (charState is SigmaBlock) {
+					damageSavings += (originalDamage * 0.5m);
 				}
-			}
-			if (this is MegamanX) {
-				var gigaCrush = weapons.FirstOrDefault(w => w is GigaCrush);
-				if (gigaCrush != null) {
-					float currentAmmo = gigaCrush.ammo;
-					gigaCrush.addAmmo(gigaAmmoToAdd, player);
-					if (player.isMainPlayer) {
-						Weapon.gigaAttackSoundLogic(
-							this, currentAmmo, gigaCrush.ammo,
-							gigaCrush.getAmmoUsage(0), gigaCrush.maxAmmo
-						);
-					}
-				}
-				var hyperBuster = weapons.FirstOrDefault(w => w is HyperCharge);
-				if (hyperBuster != null) {
-					float currentAmmo = hyperBuster.ammo;
-					hyperBuster.addAmmo(gigaAmmoToAdd, player);
-					if (player.isMainPlayer) {
-						Weapon.gigaAttackSoundLogic(
-							this, currentAmmo, hyperBuster.ammo,
-							hyperBuster.getAmmoUsage(0), hyperBuster.maxAmmo,
-							"hyperchargeRecharge", "hyperchargeFull"
-						);
-					}
-				}
-				var novaStrike = weapons.FirstOrDefault(w => w is HyperNovaStrike);
-				if (novaStrike != null) {
-					float currentAmmo = novaStrike.ammo;
-					novaStrike.addAmmo(gigaAmmoToAdd, player);
-					if (player.isMainPlayer) {
-						Weapon.gigaAttackSoundLogic(
-							this, currentAmmo, novaStrike.ammo,
-							novaStrike.getAmmoUsage(0), novaStrike.maxAmmo
-						);
-					}
+				if (acidTime > 0) {
+					decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
+					damageDebt += (originalDamage * extraDamage);
 				}
 				if (mmx != null) {
-					if (mmx.fullArmor == ArmorId.Light) {
-						player.hadoukenAmmo += (float)(originalDamage * 32);
+					if (mmx.barrierActiveTime > 0) {
+						if (mmx.hyperChestArmor == ArmorId.Max) {
+							damageSavings += (originalDamage * 0.5m);
+						} else {
+							damageSavings += (originalDamage * 0.25m);
+						}
 					}
-					if (mmx.fullArmor == ArmorId.Giga) {
-						player.shoryukenAmmo += (float)(originalDamage * 32);
+					if (mmx.chestArmor == ArmorId.Light) {
+						damageSavings += (originalDamage * 0.125m);
+					}
+					if (mmx.chestArmor == ArmorId.Giga) {
+						damageSavings += (originalDamage * 0.125m);
+					}
+				}
+				if (vile != null && vile.hasFrozenCastle) {
+					damageSavings += originalDamage * Vile.frozenCastlePercent;
+				}
+			}
+			// This is to defend from overkill damage.
+			// Or at least attempt to.
+			if (damageSavings > 0 &&
+				health - damage <= 0 &&
+				(health + damageSavings) - damage > 0
+			) {
+				// Apply in the normal way.
+				while (damageSavings >= 1) {
+					damageSavings -= 1;
+					damage -= 1;
+				}
+				// Decimal protection scenario.
+				if (damage > 0 && damageSavings > 0 && damageSavings + (1m / 8m) >= damage) {
+					damage = 0;
+					damageSavings -= damage;
+					if (damageSavings <= 0) {
+						damageSavings = 0;
 					}
 				}
 			}
-			if (this is NeoSigma) {
-				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + gigaAmmoToAdd, player.sigmaMaxAmmo);
-			}
-		}
 
-		if ((damage > 0 || originalDamage > 0 ||
-			Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null
-		) {
-			damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
-		}
-
-		if (damage > 0 && mmx != null) {
-			mmx.headChipHealthCooldown = 60 * 3;
-			decimal targetDamage = originalDamage > damage ? originalDamage : damage;
-			decimal newChipBaseHP = Math.Ceiling(health + (maxHealth * 0.15m));
-			decimal newChipBaseHPAlt = Math.Ceiling(health + targetDamage);
-			if (newChipBaseHPAlt > newChipBaseHP) {
-				newChipBaseHP = newChipBaseHPAlt;
+			// If somehow the damage is negative.
+			// Heals are not really applied here.
+			if (damage < 0) { damage = 0; }
+			health -= damage;
+			// Clamp to 0. We do not want to go into the negatives here.
+			if (health < 0) {
+				health = 0;
 			}
-			if (mmx.lastChipBaseHP > newChipBaseHP) {
-				mmx.lastChipBaseHP = newChipBaseHP;
-			}
-		}
 
-		if (health <= 0) {
-			if (player.showTrainingDps && player.trainingDpsStartTime > 0) {
-				float timeToKill = Global.time - player.trainingDpsStartTime;
-				float dps = player.trainingDpsTotalDamage / timeToKill;
-				Global.level.gameMode.dpsString = "DPS: " + dps.ToString("0.0");
-
-				player.trainingDpsTotalDamage = 0;
-				player.trainingDpsStartTime = 0;
+			if (player.showTrainingDps && health > 0 && originalDamage > 0) {
+				if (player.trainingDpsStartTime == 0) {
+					player.trainingDpsStartTime = Global.time;
+					Global.level.gameMode.dpsString = "";
+				}
+				player.trainingDpsTotalDamage += (float)damage;
 			}
-			killPlayer(attacker, null, weaponIndex, projId);
-		} else {
-			if (mmx != null && mmx.chestArmor == ArmorId.Max && damage > 0) {
-				mmx.activateMaxBarrier(
-					charState is Hurt or GenericGrabbedState or VileMK2Grabbed or GenericStun
-				);
+
+			if (damage > 0 && attacker != null) {
+				if (projId != (int)ProjIds.Burn && projId != (int)ProjIds.AcidBurstPoison) {
+					player.delaySubtank();
+				}
+			}
+			if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
+				addDamageTextHelper(attacker, (float)damage, (float)maxHealth, true);
+			}
+			if (health > 0 && (originalDamage > 0 || damage > 0) && ownedByLocalPlayer) {
+				decimal modifier = (32 / maxHealth);
+				decimal gigaDamage = damage;
+				if (originalDamage > damage) {
+					gigaDamage = originalDamage;
+				}
+				float gigaAmmoToAdd = (float)(gigaDamage * modifier);
+
+				if (this is Zero zero) {
+					float currentAmmo = zero.gigaAttack.ammo;
+					zero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, zero.gigaAttack.ammo,
+							zero.gigaAttack.getAmmoUsage(0), zero.gigaAttack.maxAmmo
+						);
+					}
+				}
+				if (this is PunchyZero punchyZero) {
+					float currentAmmo = punchyZero.gigaAttack.ammo;
+					punchyZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+					if (player.isMainPlayer) {
+						Weapon.gigaAttackSoundLogic(
+							this, currentAmmo, punchyZero.gigaAttack.ammo,
+							punchyZero.gigaAttack.getAmmoUsage(0), punchyZero.gigaAttack.maxAmmo
+						);
+					}
+				}
+				if (this is MegamanX) {
+					var gigaCrush = weapons.FirstOrDefault(w => w is GigaCrush);
+					if (gigaCrush != null) {
+						float currentAmmo = gigaCrush.ammo;
+						gigaCrush.addAmmo(gigaAmmoToAdd, player);
+						if (player.isMainPlayer) {
+							Weapon.gigaAttackSoundLogic(
+								this, currentAmmo, gigaCrush.ammo,
+								gigaCrush.getAmmoUsage(0), gigaCrush.maxAmmo
+							);
+						}
+					}
+					var hyperBuster = weapons.FirstOrDefault(w => w is HyperCharge);
+					if (hyperBuster != null) {
+						float currentAmmo = hyperBuster.ammo;
+						hyperBuster.addAmmo(gigaAmmoToAdd, player);
+						if (player.isMainPlayer) {
+							Weapon.gigaAttackSoundLogic(
+								this, currentAmmo, hyperBuster.ammo,
+								hyperBuster.getAmmoUsage(0), hyperBuster.maxAmmo,
+								"hyperchargeRecharge", "hyperchargeFull"
+							);
+						}
+					}
+					var novaStrike = weapons.FirstOrDefault(w => w is HyperNovaStrike);
+					if (novaStrike != null) {
+						float currentAmmo = novaStrike.ammo;
+						novaStrike.addAmmo(gigaAmmoToAdd, player);
+						if (player.isMainPlayer) {
+							Weapon.gigaAttackSoundLogic(
+								this, currentAmmo, novaStrike.ammo,
+								novaStrike.getAmmoUsage(0), novaStrike.maxAmmo
+							);
+						}
+					}
+					if (mmx != null) {
+						if (mmx.fullArmor == ArmorId.Light) {
+							player.hadoukenAmmo += (float)(originalDamage * 32);
+						}
+						if (mmx.fullArmor == ArmorId.Giga) {
+							player.shoryukenAmmo += (float)(originalDamage * 32);
+						}
+					}
+				}
+				if (this is NeoSigma) {
+					player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + gigaAmmoToAdd, player.sigmaMaxAmmo);
+				}
+			}
+
+			if ((damage > 0 || originalDamage > 0 ||
+				Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null
+			) {
+				damageHistory.Add(new DamageEvent(attacker, weaponIndex.Value, projId, false, Global.time));
+			}
+
+			if (damage > 0 && mmx != null) {
+				mmx.headChipHealthCooldown = 60 * 3;
+				decimal targetDamage = originalDamage > damage ? originalDamage : damage;
+				decimal newChipBaseHP = Math.Ceiling(health + (maxHealth * 0.15m));
+				decimal newChipBaseHPAlt = Math.Ceiling(health + targetDamage);
+				if (newChipBaseHPAlt > newChipBaseHP) {
+					newChipBaseHP = newChipBaseHPAlt;
+				}
+				if (mmx.lastChipBaseHP > newChipBaseHP) {
+					mmx.lastChipBaseHP = newChipBaseHP;
+				}
+			}
+
+			if (health <= 0) {
+				if (player.showTrainingDps && player.trainingDpsStartTime > 0) {
+					float timeToKill = Global.time - player.trainingDpsStartTime;
+					float dps = player.trainingDpsTotalDamage / timeToKill;
+					Global.level.gameMode.dpsString = "DPS: " + dps.ToString("0.0");
+
+					player.trainingDpsTotalDamage = 0;
+					player.trainingDpsStartTime = 0;
+				}
+				killPlayer(attacker, null, weaponIndex, projId);
+			} else {
+				if (mmx != null && mmx.chestArmor == ArmorId.Max && damage > 0) {
+					mmx.activateMaxBarrier(
+						charState is Hurt or GenericGrabbedState or VileMK2Grabbed or GenericStun
+					);
+				}
 			}
 		}
 	}
-
+	
 	public void killPlayer(Player? killer, Player? assister, int? weaponIndex, int? projId) {
 		health = 0;
 		int? assisterProjId = null;

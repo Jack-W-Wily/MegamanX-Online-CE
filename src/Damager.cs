@@ -335,6 +335,11 @@ public class Damager {
 			if ((owner.character as Zero)?.isViral == true) {
 				character.addVirusTime(owner, damage);
 			}
+
+			if (owner.character != null && owner.character.health > 0) {
+				character.charState.spcCancel = true;
+			}
+
 			if ((owner.character as PunchyZero)?.isViral == true) {
 				character.addVirusTime(owner, damage);
 			}
@@ -565,6 +570,20 @@ public class Damager {
 				}
 			}
 
+
+			// For WCUT Block to work
+			if (character.sprite.name.Contains("block") && damage > 0 && !isArmorPiercing(projId)) {
+				if (!hitFromBehind(character, damagingActor, owner, projId)) {
+					damage--;
+					flinch = 0;
+					if (damage < 3) {
+						damage = 0;
+						character.playSound("m10ding");
+					}
+				}
+			}
+
+			
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner, projId)) {
 					damage--;

@@ -23,11 +23,16 @@ public class Kurumitos : Character {
 
 	// Special For Special conditions and stuff
 
+	/* add it to Character.CS
+
 	public float superBarAmmo;
 
 	public float overDriveTimer;
 
 	public bool OverDrive;
+
+
+	*/
 	public float ShikiYamiBaraiCD;
 	public float stockedTime;
 
@@ -203,8 +208,8 @@ public static CharSelection[] selections => [
 
 
 		// For special conditions stuff
-		if (charState is WarpIn) player.vileAmmo = 0;
-		superBarAmmo = player.vileAmmo; // this vileAmmo isn't necessary and is here as a placeholder
+		if (charState is WarpIn) superBarAmmo = 0;
+
 	}
 
 
@@ -213,17 +218,20 @@ public static CharSelection[] selections => [
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-
-		// This is Where hypermode actiavtion happens
-		if (player.input.isPressed(Control.Special2, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-			changeState(new KurumitosOverDriveStart(), true); 
-		/* 
-		changeState() you'll be using this for every custom action your character does
-		*/
+		if (player.input.isHeld(Control.L2, player) && grounded){
+			changeState(new BlockWCUT());
+		
 		}
+		// This is Where hypermode actiavtion happens
+			if (player.input.isPressed(Control.Special2, player)
+			&& player.currency > 4
+			) {
+				player.currency -= 5;
+				changeState(new KurumitosOverDriveStart(), true);
+				/* 
+				changeState() you'll be using this for every custom action your character does
+				*/
+			}
 
 		return base.normalCtrl();
 	}
@@ -235,7 +243,11 @@ public static CharSelection[] selections => [
 
 		if (player.input.isPressed(Control.Shoot, player)) {
 			if (grounded) { // For grounded only moves always add a if (grounded) flag
-				changeState(new KurumitoStandingKick(), true);
+				if (player.input.isLeftOrRightHeld(player)) {
+					changeState(new KurumitoFowardKick(), true);
+				} else {
+					changeState(new KurumitoStandingKick(), true);
+				}
 			}
 			if (!grounded) { // For grounded only moves always add a if (!grounded) flag
 				/*the "!" in any bool means it's the opposite but I assume you know the fucking
@@ -247,13 +259,18 @@ public static CharSelection[] selections => [
 
 		
 
-		if (player.input.isPressed(Control.Special1, player)) {
-		
+		if (player.input.isPressed(Control.Special1, player)) {		
 			changeState(new KurumitosDokuGami(), true); 
 		}
 
+		if (player.input.isHeld(Control.L2, player)
+		&& player.input.isPressed(Control.Shoot, player)) {
+		
+			changeState(new KurumitoGrabStartState(), true); 
+		}
 
-		if (player.input.isPressed(Control.WeaponRight, player)) {
+
+		if (player.input.isPressed(Control.R2, player)) {
 			shoot(0);
 		}
 
@@ -264,14 +281,14 @@ public static CharSelection[] selections => [
 
 	public override void update() {
 		base.update();
-		superBarAmmo = player.vileAmmo;
 		// For the special cancels to work
 		if (charState.attackCtrl ||
 		charState.normalCtrl ||
 		charState is KurumitoStandingKick or
 		 KurumitosShikiYamiBaraiLv1 or
-		 KuromitosBatsuyomi or  KurumitosDokuGami ||
-		charState is KurumitosAirDunk
+		 KurumitoFowardKick or
+		 KuromitosBatsuyomi or  KurumitosDokuGami or
+		KurumitosAirDunk
 		) {
 			canSpecialCancel = true;
 		} else {
@@ -326,7 +343,7 @@ public static CharSelection[] selections => [
 
 
 
-		if (player.vileAmmo >= player.vileMaxAmmo) {
+		if (superBarAmmo >= superBarMaxAmmo) {
 			weaponHealAmount = 0;
 		}
 		if (weaponHealAmount > 0 && player.health > 0) {
@@ -334,7 +351,7 @@ public static CharSelection[] selections => [
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
-				player.vileAmmo = Helpers.clampMax(player.vileAmmo + 1, player.vileMaxAmmo);
+				superBarAmmo = Helpers.clampMax(superBarAmmo + 1, superBarMaxAmmo);
 				playSound("healX3", forcePlay: true, true);
 				
 			}
@@ -372,6 +389,12 @@ public static CharSelection[] selections => [
 		ShikiYamiBarai,
 		ShikiOniaki,
 		Orochinagi,
+		Grab,
+
+		Ombrada,
+		Dokugami,
+		Tsuyomi,
+		Batsuyomi,
 	}
 
 
@@ -380,10 +403,14 @@ public static CharSelection[] selections => [
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"kr_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
-			"kr_kick_1" or "kr_batsuyomi" or "kr_dokugami" or "kr_tsuyomi" => MeleeIds.StandingKick,
+			"kr_kick_1" or "kr_commandkick" => MeleeIds.StandingKick,
+			"kr_batsuyomi" => MeleeIds.Batsuyomi,
+			"kr_dokugami" => MeleeIds.Dokugami,
+			"kr_tsuyomi" => MeleeIds.Tsuyomi,
 			"kr_air_dunk" or "kr_ombrada" => MeleeIds.AirDunk,
 			"kr_shiki_yami_barai_melee" => MeleeIds.ShikiYamiBarai,
 			"kr_shiki_oniaki" => MeleeIds.ShikiOniaki,
+			"kr_grab_start" => MeleeIds.Grab,
 			"kr_orochinagi_fire" or "kr_orochinagi_fire_air" => MeleeIds.Orochinagi,
 
 			_ => MeleeIds.None
@@ -419,16 +446,39 @@ public static CharSelection[] selections => [
 
 
 			(int)MeleeIds.AirDunk => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.KRAirDunk, player,
-				 2, Global.halfFlinch, isReflectShield: true,
+				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
+				 2, Global.defFlinch, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 
 			(int)MeleeIds.StandingKick => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
-				 2, Global.halfFlinch, isReflectShield: true,
+				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
+				 2, Global.halfFlinch,20, isReflectShield: true,
+				isZSaberClang: true, isZSaberEffect: true,
+				addToLevel: addToLevel
+			),
+
+			
+
+			(int)MeleeIds.Dokugami => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.MagnetMine, player,
+				 2, Global.halfFlinch,10, isReflectShield: true,
+				isZSaberClang: true, isZSaberEffect: true,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.Tsuyomi => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.GravityWell, player,
+				 2, Global.halfFlinch,10, isReflectShield: true,
+				isZSaberClang: true, isZSaberEffect: true,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.Batsuyomi => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
+				 2, Global.defFlinch,10, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
@@ -451,6 +501,12 @@ public static CharSelection[] selections => [
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.Grab => new KRGenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
+				 0,0,0, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
 			_ => null
 		};
 		return proj;
@@ -468,7 +524,7 @@ public static CharSelection[] selections => [
 	}
 
 	public override bool canAddAmmo() {
-		return (player.vileAmmo < player.vileMaxAmmo);
+		return (superBarAmmo < superBarMaxAmmo);
 	}
 
 
@@ -523,7 +579,7 @@ public static CharSelection[] selections => [
 
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.WeaponRight, player);
+		return player.input.isHeld(Control.R2, player);
 	}
 
 	public override void increaseCharge() {

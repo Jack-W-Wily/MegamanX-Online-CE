@@ -740,6 +740,8 @@ public enum ProjIds {
 
 	BlockingProjID,
 
+	GenericWCUTGrabProjID,
+
 	// Kurumitos Stuff
 	KRStandingKick,
 	KRAirDunk,

@@ -37,6 +37,8 @@ public class CharState {
 	public bool invincible;
 	public bool stunResistant;
 	public bool superArmor;
+
+	public bool superArmor2;
 	public bool immuneToWind;
 	public int accuracy;
 	public bool isGrabbedState;
@@ -58,6 +60,10 @@ public class CharState {
 	// Control system.
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
+
+	public bool spcCancel;
+
+	public bool wiffCancel;
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
 	public bool airMove;

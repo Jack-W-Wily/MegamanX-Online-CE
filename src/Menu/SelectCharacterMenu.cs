@@ -41,6 +41,7 @@ public enum CharIds {
 	// WCUT CHARS 
 	Kurumitos,   // Always add the new characters bellow the Vanilla characters
 				 // Because otherwise the code gets really messy with the IDs
+	VAVA1,
 				
 
 }
@@ -70,6 +71,8 @@ public class CharSelection {
 		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 
+
+		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
 
 		// Make sure to add your char here
 		new CharSelection("Kurumitos", // Display name in the menu
