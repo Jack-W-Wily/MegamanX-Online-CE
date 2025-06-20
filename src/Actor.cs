@@ -938,8 +938,7 @@ public partial class Actor : GameObject {
 				// Non-suicide case: prevent assists aggressively
 				if (killer != ownPlayer && (
 						secondLastAttacker.envKillOnly && weaponIndex != null ||
-						Global.time - secondLastAttacker.time > 2 ||
-						Global.time - secondLastAttacker.time > 0.5f && Damager.lowTimeAssist(secondLastAttacker.projId) ||
+						Global.time - secondLastAttacker.time > (Global.level?.server?.customMatchSettings?.AssistTime ?? 2) ||	
 						Damager.unassistable(secondLastAttacker.projId)
 					)
 				) {

@@ -1076,23 +1076,13 @@ public class Damager {
 			_ => false
 		};
 	}
-	public static bool lowTimeAssist(int? projId) {
-		if (projId == null) {
-			return false;
-		}
-		// The GM19 list now only counts for FFA mode.
-		if (Global.level.gameMode is not FFADeathMatch) {
-			return false;
-		}
-		return projId switch {
-
-			_ => false
-		};
-	}
 
 	public static bool unassistable(int? projId) {
 		if (projId == null) {
 			return false;
+		}
+		if (Global.level.server?.customMatchSettings?.Assistable == false) {
+			return false;		
 		}
 		// Never assist in any mode as they are DOT or self-damage. (Also Volt Tornado)
 		bool alwaysNotAssist = (ProjIds)projId switch {
