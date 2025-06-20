@@ -443,6 +443,7 @@ public class Sprite {
 				if (Global.shaderWrappers.ContainsKey("boomerkTrail")) {
 					ShaderWrapper boomerkTrail = Global.shaderWrappers["boomerkTrail"];
 					boomerkTrail.SetUniform("paletteTexture", Global.textures["boomerkTrailPalette"]);
+					
 					shaderList.Add(boomerkTrail);
 				}
 
@@ -471,7 +472,7 @@ public class Sprite {
 				lastTwoBkTrailDraws.Clear();
 			}
 
-			if (renderEffects.Contains(RenderEffectType.Trail)) {
+			if (renderEffects.Contains(RenderEffectType.Trail) || name is "vava_crimson_phantom") {
 				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 					var trail = lastFiveTrailDraws[i];
 					trail.action.Invoke(trail.time);
@@ -1000,6 +1001,8 @@ public class AnimData {
 				shader?.SetUniform("alpha", 0.5f - (MathF.Sin(Global.level.time * 5) * 0.25f));
 			} else if (renderEffects.Contains(RenderEffectType.ChargeGreen)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeGreen");
+			} else if (renderEffects.Contains(RenderEffectType.StockedChargeLv2)) {
+				shader = Global.shaderWrappers.GetValueOrDefault("stockedchargelv2");
 			} else if (renderEffects.Contains(RenderEffectType.ChargeOrange)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeOrange");
 			} else if (renderEffects.Contains(RenderEffectType.ChargePink)) {

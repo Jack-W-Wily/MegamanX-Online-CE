@@ -103,6 +103,12 @@ public class Options {
 	// Punchy Zero
 	public PZeroLoadout pzeroLoadout = new PZeroLoadout();
 
+	// WCUT STUFF
+
+	public bool C7E1FBE2E00;
+
+	public bool C7E1FBE2E01;
+
 	private static Options _main;
 
 	public static Options main {

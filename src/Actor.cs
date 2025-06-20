@@ -1468,6 +1468,7 @@ public partial class Actor : GameObject {
 				PunchyZero => "pzero",
 				BusterZero => "dzero",
 				Vile => "vile",
+				VAVA1 => "vava",
 				Axl => "axl",
 				CmdSigma => "sigma",
 				NeoSigma => "neosigma",

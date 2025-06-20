@@ -183,7 +183,10 @@ public class Vile : Character {
 				}
 			}
 		}
-
+		if (player.currency > 3 && player.input.isHeld(Control.Down, player) &&
+		player.input.isHeld(Control.Taunt, player) && !isVileMK2) {
+			changeState(new VileRevive(false));
+		}
 		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
 			vulcanLingerTime += Global.spf;
 			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {

@@ -42,6 +42,11 @@ public enum CharIds {
 	Kurumitos,   // Always add the new characters bellow the Vanilla characters
 				 // Because otherwise the code gets really messy with the IDs
 	VAVA1,
+	RockmanX,
+	ZeroEarly,
+	ZeroMid,
+	ZeroEND,
+	ShigumaX1,
 				
 
 }
@@ -58,7 +63,36 @@ public class CharSelection {
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
 	public static CharSelection[] selections => [
-		new CharSelection("X", 0, 1, 0, "menu_mmx", 0),
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
+
+		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
+		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
+		},
+		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
+			offset = new Point(2, 45)
+		},
+		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
+		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
+			offset = new Point(1, 45)
+		},
+		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
+
+		// Make sure to add your char here
+		new CharSelection("Kurumitos", // Display name in the menu
+		(int)CharIds.Kurumitos, // Char ID , you may notice that the ones above have numbers here 
+		// 							but adding it as  (int)Char.Ids."your character" is more effective
+		1,    // Mapped Char Armor (this is exclusive to make it so X's 1v1 Armors Work)
+		0,               // Mapped Char Maverick (This is for sigma's 1v1 mavericks)
+		"kr_idle",       // Sprite name to show in the menu, for this example I choose the idle
+		 0               // Frame that the sprite will be stuck in
+		 ),				 // Make sure to end the whole thing with a "," ion the end
+		
+		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
+	];
+
+
+	public static CharSelection[] selectionsVavaUnlocked => [
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
 		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
 		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
 		},
@@ -88,6 +122,7 @@ public class CharSelection {
 	];
 
 	public static CharSelection[] selections1v1 => [
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
 		new CharSelection("X(X1)", 0, 1, 0, "menu_megaman", 1),
 		new CharSelection("X(X2)", 0, 2, 0, "menu_megaman", 2),
 		new CharSelection("X(X3)", 0, 3, 0, "menu_megaman", 3),
@@ -128,6 +163,7 @@ public class CharSelection {
 		new CharSelection("G.Beetle", 235, 1, 24, "gbeetle_idle", 0),
 		new CharSelection("B.Hornet", 236, 1, 25, "bhornet_idle", 0),
 		new CharSelection("Dr.Doppler", 237, 1, 26, "drdoppler_idle", 0),
+		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
 	];
 
 	public CharSelection(
@@ -185,6 +221,10 @@ public class SelectCharacterMenu : IMainMenu {
 		this.isHost = isHost;
 
 		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selections;
+
+		if (!is1v1 && Options.main.C7E1FBE2E00) {
+		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selectionsVavaUnlocked;
+		}
 		playerData.charNum = isInGame ? Global.level.mainPlayer.newCharNum : Options.main.preferredCharacter;
 
 		if (is1v1) {

@@ -1,4 +1,7 @@
 using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Text;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -372,6 +375,81 @@ public class VKote : CharState {
 
 
 
+
+
+
+
+public class VileDashChargeState : CharState {
+	
+	public VileDashChargeState() : base("hyperdash_start", "") {
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		character.turnToInput(player.input, player);
+
+
+		if (!player.isAI && !player.input.isHeld(Control.Dash, player) && stateTime > 0.2f) {
+			character.changeState(new VileDashState(stateTime));
+			character.playSound("vilehyperdashattack", true);
+		}
+
+		if (player.isAI && stateTime > Helpers.randomRange(0.3f,2)) {
+			character.changeState(new VileDashState(stateTime));
+			character.playSound("vilehyperdashattack", true);
+		}
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.playSound("vilehyperdashstart", true);
+}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+public class VileDashState : CharState {
+	float trailTime;
+	float chargeTime;
+
+	Character? target;
+
+
+	public VileDashState(float chargeTime) : base("hyperdash_attack", "") {
+		this.chargeTime = chargeTime;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;			
+		character.move(new Point(character.xDir * 400, 0));
+
+	if (player.input.isPressed(Control.Dash, player) || stateTime > chargeTime) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+
+
 public class CallDownMechWC : CharState {
 	VAVA1 vile = null!;
 	RideArmor rideArmor;
@@ -510,6 +588,88 @@ public class VileReviveWC : CharState {
 		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White);
 	}
 }
+
+
+
+
+public class VAVAPhase2Start : CharState {
+	public float radius = 200;
+	Anim? drDopplerAnim;
+	bool isMK5;
+	public VAVA1 vile = null!;
+
+	public VAVAPhase2Start(bool isMK5) : base(isMK5 ? "start_phase2" : "start_phase2") {
+		invincible = true;
+		this.isMK5 = isMK5;
+	}
+
+	public override void update() {
+		base.update();
+		if (radius >= 0) {
+			radius -= Global.spf * 150;
+		}
+		if (character.frameIndex < 2) {
+			if (Global.frameCount % 4 < 2) {
+				character.addRenderEffect(RenderEffectType.Flash);
+			} else {
+				character.removeRenderEffect(RenderEffectType.Flash);
+			}
+		} else {
+			character.removeRenderEffect(RenderEffectType.Flash);
+		}
+		if (character.frameIndex == 9 && !once) {
+			character.playSound("ching");
+			player.health = 1;
+			character.addHealth(player.maxHealth);
+			once = true;
+		}
+		if (character.ownedByLocalPlayer) {
+			if (character.health == character.maxHealth) {
+				setFlags();
+				character.changeState(character.getFallState(), true);
+			}
+		} else if (character?.sprite?.name != null) {
+			if (!character.sprite.name.EndsWith("start_phase2") && radius <= 0) {
+				setFlags();
+				character.changeState(character.getFallState(), true);
+			}
+		}
+	}
+
+	public void setFlags() {
+		vile.phase2 = true;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as VAVA1 ?? throw new NullReferenceException();
+		//character.setzIndex(ZIndex.Foreground);
+		character.playSound("revive");
+	
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		setFlags();
+		character.removeRenderEffect(RenderEffectType.Flash);
+		Global.level.delayedActions.Add(new DelayedAction(() => { character.destroyMusicSource(); }, 0.75f));
+		if (character != null) {
+			character.invulnTime = 0.5f;
+		}
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		if (!character.ownedByLocalPlayer) return;
+
+		if (radius <= 0) return;
+		Point pos = character.getCenterPos();
+		DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, Color.White, 5, character.zIndex + 1, true, Color.White);
+	}
+}
+
+
 
 public class VileHoverWC : CharState {
 	public SoundWrapper? soundh;
@@ -658,6 +818,60 @@ public class VileHoverWC : CharState {
 
 	}
 }
+
+
+
+
+public class VAVADodge : CharState {
+	public float dashTime = 0;
+	public int initialDashDir;
+
+	public VAVADodge() : base("dodge") {
+		attackCtrl = true;
+		normalCtrl = true;
+		specialId = SpecialStateIds.AxlRoll;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.isDashing = true;
+		character.burnTime -= 1;
+		if (character.burnTime < 0) {
+			character.burnTime = 0;
+		}
+
+		initialDashDir = character.xDir;
+		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
+		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+		if (character.frameIndex >= 4) return;
+
+		dashTime += Global.spf;
+
+		var move = new Point(0, 0);
+		move.x = character.getDashSpeed() * initialDashDir;
+		character.move(move);
+		if (stateTime > 0.1) {
+			stateTime = 0;
+			new Anim(this.character.pos.addxy(0, -4), "dust", this.character.xDir, null, true);
+		}
+	}
+}
+
 
 
 

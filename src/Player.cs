@@ -231,6 +231,7 @@ public partial class Player {
 		{ (int)CharIds.Rock, new List<SubTank>() },
 		{ (int)CharIds.Kurumitos, new List<SubTank>() },
 		{ (int)CharIds.VAVA1, new List<SubTank>() },
+		{ (int)CharIds.RockmanX, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -245,6 +246,7 @@ public partial class Player {
 		{ (int)CharIds.Rock, new() },
 		{ (int)CharIds.Kurumitos, new() },
 		{ (int)CharIds.VAVA1, new() },
+		{ (int)CharIds.RockmanX, new() },
 	};
 
 	// Getter functions.
@@ -417,6 +419,15 @@ public partial class Player {
 	public ShaderWrapper vaccineShader = Helpers.cloneShaderSafe("vaccine");
 	public static ShaderWrapper darkHoldShader = Helpers.cloneShaderSafe("darkhold");
 	public ShaderWrapper speedDevilShader = Helpers.cloneShaderSafe("speedDevilTrail");
+	
+	public ShaderWrapper speedDevilShader2 = Helpers.cloneShaderSafe("speedDevilTrail2");
+
+	public List<ShaderWrapper> omegaAuraShader;
+
+	public void intitalizeShaders() {
+		omegaAuraShader = new(){Helpers.cloneShaderSafe("omega")};
+	
+	}
 
 	// Maverick shaders.
 	// Duplicated mavericks are not a thing so this should not be a problem.
@@ -563,6 +574,7 @@ public partial class Player {
 		string name, int id, int charNum, PlayerCharData playerData,
 		bool isAI, bool ownedByLocalPlayer, int alliance, Input input, ServerPlayer serverPlayer
 	) {
+		intitalizeShaders();
 		this.name = name;
 		this.id = id;
 		curMaxNetId = getFirstAvailableNetId();
@@ -691,8 +703,11 @@ public partial class Player {
 		if (isSigma && isPuppeteer()) {
 			bonus = 4;
 		}
+		if (isX) {
+			bonus = 10;
+		}
 		return MathF.Ceiling(
-			getModifiedHealth(16 + bonus) + (heartTanks * getHeartTankModifier())
+			getModifiedHealth(20 + bonus) + (heartTanks * getHeartTankModifier())
 		);
 	}
 
@@ -1221,6 +1236,12 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
+		} else if (charNum == (int)CharIds.RockmanX) {
+			
+			newChar = new RockmanX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+			);
 		}
 		// Error out if invalid id.
 		else {
@@ -1465,6 +1486,11 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
+		} else if (data.charNum == (int)CharIds.RockmanX) {
+			retChar = new RockmanX(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
 		}
 		
 		
@@ -1621,6 +1647,11 @@ public partial class Player {
 			);
 		} else if (charNum == (int)CharIds.VAVA1) {
 			retChar = new VAVA1(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.RockmanX) {
+			retChar = new RockmanX(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
@@ -2542,6 +2573,17 @@ public partial class Player {
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}
 	}
+
+
+	public void UnlockVAVA() {
+		Options.main.C7E1FBE2E00 = true;
+		Global.level.gameMode.setHUDErrorMessage(
+				this, "Unlocked Character - VAVA!",
+				playSound: true, resetCooldown: true
+			);
+		Options.main.saveToFile();
+	}
+
 
 	public void addAssist() {
 		assists++;

@@ -24,6 +24,10 @@ public enum RenderEffectType {
 	ChargePink,
 	ChargeYellow,
 	ChargeBlue,
+
+	StockedChargeLv2,	
+
+	SpeedDevilTrail2,
 }
 
 public class RenderEffect {

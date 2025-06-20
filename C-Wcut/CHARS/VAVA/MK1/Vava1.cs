@@ -29,6 +29,8 @@ public class VAVA1 : Character {
 	public bool hasSpeedDevil;
 	public bool summonedGoliath;
 	public int vileForm;
+
+	public bool phase2;
 	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
 	public bool isVileMK5 { get { return vileForm == 2; } }
@@ -42,7 +44,7 @@ public class VAVA1 : Character {
 	public bool lastFrameWeaponLeftHeld;
 	public bool lastFrameWeaponRightHeld;
 	public int cannonAimNum;
-	
+
 	public float calldownMechCooldown;
 
 	public VileCannon cannonWeapon;
@@ -56,9 +58,9 @@ public class VAVA1 : Character {
 	public VileLaser laserWeapon;
 	public MechMenuWeapon rideMenuWeapon;
 
-	
 
-	
+
+
 	public float stockedTime;
 
 	public bool canSpecialCancel = false;
@@ -77,7 +79,6 @@ public class VAVA1 : Character {
 
 		if (charState is WarpIn) superBarAmmo = 0;
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
-
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
 		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
@@ -93,6 +94,7 @@ public class VAVA1 : Character {
 		};
 		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
 
@@ -102,15 +104,15 @@ public class VAVA1 : Character {
 
 	public override bool normalCtrl() {
 
-		if (player.input.isHeld(Control.L2, player) && grounded){
+		if (player.input.isHeld(Control.L2, player) && grounded) {
 			changeState(new BlockWCUT());
-		
+
 		}
-			if (player.input.isPressed(Control.Special2, player)
-			&& player.currency > 4
-			) {
-				player.currency -= 5;
-			}
+		if (player.input.isPressed(Control.Special2, player)
+		&& player.currency > 4
+		) {
+			player.currency -= 5;
+		}
 
 		return base.normalCtrl();
 	}
@@ -118,27 +120,52 @@ public class VAVA1 : Character {
 	public override bool attackCtrl() {
 
 		if (player.input.isPressed(Control.Shoot, player)) {
-			changeState(new VAVAJab1(), true);
+			if (grounded) {
+				if (player.input.isLeftOrRightHeld(player)) {
+					changeState(new GoGetterRightAttack(), true);
+				} else {
+					changeState(new VAVAJab1(), true);
+				}
+			} else {
+				if (player.input.isHeld(Control.Down, player)) {
+					changeState(new InfinityGigAttack(), true);
+				} else {
+					changeState(new SpoiledBratPunch(), true);
+				}
+			}
 		}
 
-		
 
-		if (player.input.isPressed(Control.Special1, player)) {		
-			
+
+		if (player.input.isPressed(Control.Special1, player)) {
+			if (grounded) {
+				changeState(new PopcornHell(grounded), true);
+			} else {
+				changeState(new ExplosiveRoundState(), true);
+			}
 		}
 
-		if (player.input.isHeld(Control.L2, player)){
+		if (player.input.isHeld(Control.L2, player)) {
+			if (player.input.isPressed(Control.Shoot, player)) {
+				changeState(new Vava1GrabStartState(), true);
+			}
+			if (player.input.isPressed(Control.Dash, player)) {
+				changeState(new CrimsonPhantomState(grounded), true);
+			}
+			if (player.input.isPressed(Control.Special1, player)) {
+				changeState(new VavaBurensen1(), true);
+			}
 		}
 
 
 		if (player.input.isPressed(Control.R2, player)) {
-				shoot(0);
-			}
+			shoot(0);
+		}
 
 
 		return base.attackCtrl();
 	}
-	
+
 
 	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
@@ -156,7 +183,7 @@ public class VAVA1 : Character {
 				}
 				if (stunShotPressed && !HeldDown) {
 					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-					
+
 					}
 				}
 				if (goliathShotPressed) {
@@ -180,8 +207,9 @@ public class VAVA1 : Character {
 		base.update();
 		// For the special cancels to work
 		if (charState.attackCtrl ||
-		charState.normalCtrl || charState.spcCancel
-		|| charState.wiffCancel
+		charState.normalCtrl ||
+		charState.spcCancel ||
+		charState.wiffCancel
 		) {
 			canSpecialCancel = true;
 		} else {
@@ -193,9 +221,32 @@ public class VAVA1 : Character {
 		} else {
 			OverDrive = false;
 		}
+
+
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
+		Helpers.decrementTime(ref grabCooldown);
+		Helpers.decrementTime(ref mechBusterCooldown);
+		Helpers.decrementTime(ref gizmoCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 
+
+
+		if (player.isAI && health < 5 && !phase2 && !isWarpIn()) {
+			changeState(new VAVAPhase2Start(false), true);
+			stopMoving();
+		}
+
+			// Hypermode music.
+		if (!Global.level.isHyper1v1()) {
+			if (phase2 && ownedByLocalPlayer) {
+				if (musicSource == null) {
+					addMusicSource("fortressBoss_X1", getCenterPos(), true);
+				}
+			} else {
+				destroyMusicSource();
+			}
+		}
 
 
 		if (canSpecialCancel) {
@@ -214,12 +265,6 @@ public class VAVA1 : Character {
 			}
 		}
 
-
-
-
-
-
-
 		if (superBarAmmo >= superBarMaxAmmo) {
 			weaponHealAmount = 0;
 		}
@@ -230,10 +275,8 @@ public class VAVA1 : Character {
 				weaponHealAmount--;
 				superBarAmmo = Helpers.clampMax(superBarAmmo + 1, superBarMaxAmmo);
 				playSound("healX3", forcePlay: true, true);
-
 			}
 		}
-
 
 		if ((grounded || charState is LadderClimb || charState is LadderEnd || charState is WallSlide) && vileHoverTime > 0) {
 			vileHoverTime -= Global.spf * 6;
@@ -255,7 +298,6 @@ public class VAVA1 : Character {
 				player.vileAmmo = player.vileMaxAmmo;
 			}
 		}
-
 
 		if (player.vileAmmo >= player.vileMaxAmmo) {
 			weaponHealAmount = 0;
@@ -294,10 +336,6 @@ public class VAVA1 : Character {
 			calldownMechCooldown -= Global.spf;
 			if (calldownMechCooldown < 0) calldownMechCooldown = 0;
 		}
-		Helpers.decrementTime(ref grabCooldown);
-		Helpers.decrementTime(ref mechBusterCooldown);
-		Helpers.decrementTime(ref gizmoCooldown);
-		Helpers.decrementFrames(ref aiAttackCooldown);
 
 
 		if (charState is InRideChaser) {
@@ -305,8 +343,7 @@ public class VAVA1 : Character {
 		}
 		RideArmorAttacks();
 		RideLinkMK5();
-		// GMTODO: Consider a better way here instead of a hard-coded deny list
-		// Gacel: Done, now it uses attackCtrl
+
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
 			return;
 		}
@@ -315,7 +352,7 @@ public class VAVA1 : Character {
 	}
 
 
-	
+
 	public Sprite? getCannonSprite(out Point poiPos, out int zIndexDir) {
 		poiPos = getCenterPos();
 		zIndexDir = 0;
@@ -359,7 +396,7 @@ public class VAVA1 : Character {
 
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}
-	
+
 
 	public override bool canDash() {
 		return true;
@@ -372,14 +409,15 @@ public class VAVA1 : Character {
 
 	public enum MeleeIds {
 		None = -1,
-
 		Blocking,
 		Jab,
 		Grab,
+		Grabmk2dash,
 		KamaeUnB,
-
 		HotIcecle,
-
+		BurensenStart,
+		BurensenStomp,
+		BurensenEND,
 		Kote,
 	}
 
@@ -387,53 +425,83 @@ public class VAVA1 : Character {
 	// VAva melee stuff
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"vava_block" or "vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.Blocking, 
-			"vava_jab_1"  or "vava_jab_2" => MeleeIds.Jab, 
-			"vava_kamae_unblockable"  or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB, 
+			"vava_block" or "vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.Blocking,
+			"vava_jab_1" or "vava_jab_2" => MeleeIds.Jab,
+			"vava_kamae_unblockable" or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB,
 			"vava_kamae_kote" => MeleeIds.Kote,
+			"vava_spring_grab" => MeleeIds.Grab,
+			"vava_dash_grab" => MeleeIds.Grabmk2dash,
 			"vava_hoticecle" => MeleeIds.HotIcecle,
-
-
+			"vava_burensen_1" => MeleeIds.BurensenStart,
+			"vava_burensen_2" => MeleeIds.BurensenStomp,
+			"vava_burensen_finish" or "vava_hyperdash_attack" => MeleeIds.BurensenEND,
 			_ => MeleeIds.None
 		});
 	}
 
-public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
-			(int)MeleeIds.Blocking => new GenericMeleeProj(
-				new KRMelee(), 	projPos,ProjIds.BlockingProjID,	player, damage: 0.0f, 
-				flinch: 0, hitCooldown: 0, 	isShield: false,isReflectShield: false,
-				isDeflectShield: true,	isZSaberClang: false,	isZSaberEffect: false,
-				addToLevel: addToLevel ),
+			(int)MeleeIds.Blocking => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
+				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
+				isDeflectShield: true, isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel),
 
-			(int)MeleeIds.Grab => new KRGenericMeleeProj(
+			(int)MeleeIds.Grab => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 0,0,0, isReflectShield: false,
+				 0, 0, 0, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
-				(int)MeleeIds.Jab => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
-				 1, Global.halfFlinch,20, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+			(int)MeleeIds.Grabmk2dash => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.VileMK2Grab, player,
+				 0, 0, 0, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.Jab => new Vava1GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.KRStandingKick, player,
+			 1, Global.halfFlinch, 20, isReflectShield: true,
+			isZSaberClang: true, isZSaberEffect: true,
+			addToLevel: addToLevel
+		),
 
-			(int)MeleeIds.KamaeUnB => new GenericMeleeProj(
+			(int)MeleeIds.KamaeUnB => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
-			(int)MeleeIds.Kote => new GenericMeleeProj(
+			(int)MeleeIds.Kote => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				3, 30, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
-			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
+			(int)MeleeIds.BurensenStart => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenStart, player,
+				2, 0, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.BurensenStomp => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
+				1, 0, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.BurensenEND => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenEND, player,
+				4, 0, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.HotIcecle => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
 				3, 30, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
@@ -510,16 +578,16 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 		if (chargeLevel == 0) {
 			stopCharge();
 		} else if (chargeLevel == 1) {
-		
+
 			stopCharge();
 		} else if (chargeLevel == 2) {
-			
+
 			stopCharge();
 		} else if (chargeLevel == 3) {
-		
+
 			stopCharge();
 		} else if (chargeLevel >= 4) {
-			
+
 			stopCharge();
 		}
 		if (chargeLevel >= 1) {
@@ -573,7 +641,7 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 				onMechSlotSelect(rideMenuWeapon);
 				return;
 			}
-		//Ride Menu
+			//Ride Menu
 		} else if (player.input.isPressed(Control.Special2, player) && !player.input.isHeld(Control.Down, player)) {
 			onMechSlotSelect(rideMenuWeapon);
 			return;
@@ -706,6 +774,149 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 		}
 	}
 
+	public Point getVileShootVel(bool aimable) {
+		Point vel = new Point(1, 0);
+		if (!aimable) {
+			return vel;
+		}
+
+		if (rideArmor != null) {
+			if (player.input.isHeld(Control.Up, player)) {
+				vel = new Point(1, -0.5f);
+			} else {
+				vel = new Point(1, 0.5f);
+			}
+		} else if (charState is VileMK2GrabState) {
+			vel = new Point(1, -0.75f);
+		} else if (charState is ShoulderCannon) {
+			if (frameIndex == 12) vel = new Point(1, 0.5f);
+			if (frameIndex == 15) vel = new Point(1, -0.5f);
+		} else if (player.input.isHeld(Control.Up, player)) {
+			if (!canVileAim60Degrees() || (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
+			}
+		} else if (player.input.isHeld(Control.Down, player) && charState is not Crouch) {
+			vel = new Point(1, 0.5f);
+		} else if (player.input.isHeld(Control.Down, player) && player.input.isLeftOrRightHeld(player) && charState is Crouch) {
+			vel = new Point(1, 0.5f);
+		}
+
+		if (charState is RisingSpecterState) {
+			vel = new Point(1, -0.75f);
+		}
+
+		/*
+		if (charState is CutterAttackState)
+		{
+			vel = new Point(1, -3);
+		}
+		*/
+
+		return vel;
+	}
+
+	public bool canVileAim60Degrees() {
+		return charState is MissileAttack || charState is Idle || charState is CannonAttack;
+	}
+
+	public Point? getVileMK2StunShotPos() {
+		if (charState is InRideArmor) {
+			return pos.addxy(xDir * -8, -12);
+		}
+
+		var headPos = getHeadPos();
+		if (headPos == null) return null;
+		return headPos.Value.addxy(-xDir * 5, 3);
+	}
+
+	public void setVileShootTime(Weapon weapon, float modifier = 1f, Weapon? targetCooldownWeapon = null) {
+		targetCooldownWeapon = targetCooldownWeapon ?? weapon;
+		if (isVileMK2) {
+			float innerModifier = 1f;
+			if (weapon is VileMissile) innerModifier = 0.3333f;
+			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * innerModifier * modifier);
+		} else {
+			weapon.shootCooldown = MathF.Ceiling(targetCooldownWeapon.fireRate * modifier);
+		}
+	}
+
+
+	(float twitch, float grow, int time) omegaAura = new(0.015f, 0, 0);
+    private object isThundergodRageActiveBS;
+
+    void updateOmegaAura() {
+		omegaAura.twitch -= 0.05f;
+		if (omegaAura.twitch < 0.05)
+			omegaAura.twitch = 0.15f;
+
+		if (omegaAura.time >= 0 && omegaAura.time < 50)
+			omegaAura.grow += 0.0025f;
+		else if (omegaAura.time >= 55 && omegaAura.time < 105)	
+			omegaAura.grow -= 0.0025f;
+
+		omegaAura.time++;
+		if (omegaAura.time > 110) {
+			omegaAura.time = 0;
+		}
+	}
+
+	public override void render(float x, float y) {
+	if (charState is CrimsonPhantomState) {
+		addRenderEffect(RenderEffectType.SpeedDevilTrail);
+	} else {
+		removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+	}
+	if (currentFrame.POIs.Length > 0) {
+		Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
+		cannonSprite?.draw(
+			cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),
+			1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir,
+			getShaders(), actor: this
+		);
+	}
+	
+
+	// For drawing the growing aura that LastStand and Eigengrau Zero uses.
+		if (visible && phase2) {
+			// Position to draw the sprite to.
+			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraAlpha = 0.75f;
+			if (player.isVile) {
+				auraAlpha = 0.4f;
+			}
+
+
+			// Draw aura.
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex, 
+				drawX, drawY,
+				xDir, yDir,
+				null, auraAlpha,
+				auraSize,
+				auraSize,
+				zIndex -1,
+				player.omegaAuraShader
+			);
+			updateOmegaAura();
+		}
+
+
+	if (player.isMainPlayer && isVileMK5 && vileHoverTime > 0 && charState is not HexaInvoluteState) {
+			float healthPct = Helpers.clamp01((vileMaxHoverTime - vileHoverTime) / vileMaxHoverTime);
+			float sy = -27;
+			float sx = 20;
+			if (xDir == -1) sx = 90 - 20;
+			drawFuelMeter(healthPct, sx, sy);
+		}
+	base.render(x, y);
+}
+
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([
@@ -723,5 +934,175 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 
 
 
+		public bool dashGrabSpecial() {
+		if (charState is Dash || charState is AirDash) {
+				charState.isGrabbing = true;
+				charState.superArmor = true; //peakbalance
+				changeSpriteFromName("dash_grab", true);
+			return true;
+		}
+		return false;
+	} 
+
+
+
+	public float AIHellBarrageCD;
+
+	public override void aiAttack(Actor? target) {
+		int Vattack = Helpers.randomRange(1, 7);
+		Helpers.decrementFrames(ref AIHellBarrageCD);
+		bool isTargetInAir = pos.y > target?.pos.y - 20;
+		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
+		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+
+		
+		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+			&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+
+			if (charState is Dash or AirDash && isFacingTarget) {
+				charState.isGrabbing = true;
+				charState.superArmor = true; // yes Cry Gsu I'm adding the annoying SuperArmor
+				changeSpriteFromName("dash_grab", true);
+			}
+
+
+
+
+			if (isTargetClose && grounded) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+						changeState(new VavaBurensen1());
+						break;
+					case 2 when isFacingTarget:
+						changeState(new SpoiledBratPunch());
+						break;
+					case 3 when isFacingTarget:
+						changeState(new InfinityGigAttack());
+						break;
+					case 4 when isFacingTarget:
+						changeState(new Vava1GrabStartState());
+						break;
+					case 5 when isFacingTarget:
+						changeState(new VKamaeHotIcecle());
+						break;
+					case 6 when isFacingTarget:
+						changeState(new VAVAKamae());
+						break;
+					case 7 when isFacingTarget:
+						changeState(new VavaBurensen1());
+						break;
+				}
+			}
+
+			if (!grounded) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+						changeState(new ExplosiveRoundState());
+						break;
+					case 2 when isFacingTarget:
+						changeState(new SpoiledBratPunch());
+						break;
+					case 3 when isFacingTarget:
+						changeState(new InfinityGigAttack());
+						break;
+					case 4 when isFacingTarget:
+						changeState(new SpreadShotKnee());
+						break;
+					case 5 when isFacingTarget:
+						changeState(new PeaceOutRollerAttack());
+						break;
+					case 6 when isFacingTarget:
+						changeState(new VKamaeUnblockableStart());
+						break;
+					case 7 when isFacingTarget:
+						changeState(new ExplosiveRoundStateBoss());
+						break;
+				}
+			}
+
+			if (!isTargetClose && grounded && isWishinRangedMoves) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+						changeState(new ShoulderCannon(grounded));
+						break;
+					case 2 when isFacingTarget:
+						changeState(new SpoiledBratPunch());
+						break;
+					case 3 when isFacingTarget:
+						changeState(new InfinityGigAttack());
+						break;
+					case 4 when isFacingTarget:
+						changeState(new VKamaeUnblockableStart());
+						break;
+					case 5 when isFacingTarget:
+						changeState(new VKamaeDash());
+						break;
+					case 6 when isFacingTarget:
+						changeState(new VileDashChargeState());
+						break;
+					case 7 when isFacingTarget:
+						changeState(new PopcornHell(grounded));
+						break;
+				}
+			}
+
+			aiAttackCooldown = Helpers.randomRange(0,30);
+		}
+
+		if (charState is VAVAKamae or  VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
+				if (Helpers.randomRange(0, 4) == 0) {
+					changeState(new VKamaeHotIcecle());
+				}
+				if (Helpers.randomRange(0, 4) == 1) {
+					changeState(new VKamaeBDash());
+				}
+				if (Helpers.randomRange(0, 4) == 2) {
+					changeState(new VKamaeDash());
+				}
+				if (Helpers.randomRange(0, 4) == 3) {
+					changeState(new VKamaeUnblockableStart());
+				}
+				if (Helpers.randomRange(0, 4) == 4) {
+					changeState(new VKote());
+				}
+			}
+			
+		base.aiAttack(target);
+	}
+
+		public float aiBlocktime;
+		
+			public float aiDodgeCD;
+		public override void aiDodge(Actor? target) {
+		Helpers.decrementFrames(ref aiBlocktime);
+		Helpers.decrementFrames(ref aiDodgeCD);
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance &&
+			(charState.attackCtrl || charState is ShoulderCannon or PopcornHell)) {
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (aiDodgeCD == 0) {
+						aiDodgeCD = Helpers.randomRange(0, 20);
+						if (Helpers.randomRange(0, 1) == 1) {
+							changeState(new CrimsonPhantomState(grounded), true);
+						} else {
+							changeState(new CrimsonPhantomState2(grounded), true);
+						}
+					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
+						&& aiBlocktime <= 0) {
+							turnToInput(player.input, player);
+							changeState(new BlockWCUT(), true);
+							aiBlocktime = 40;
+						}
+				}
+			}
+		}
+		base.aiDodge(target);
+	}
+	
 
 }

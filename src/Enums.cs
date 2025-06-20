@@ -750,6 +750,11 @@ public enum ProjIds {
 	YamiBaraiProj,
 	OrochinagiProj,
 
+	// VAVA (WCUT)
+	BurensenStart,
+	BurensenStomp,
+	BurensenEND,
+
 	// Special damage types.
 	SelfDmg = 30000,
 

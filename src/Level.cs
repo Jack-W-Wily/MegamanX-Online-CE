@@ -364,13 +364,13 @@ public partial class Level {
 		height = levelData.height;
 
 		if (server.fixedCamera) {
-			Global.viewSize = 2;
+			Global.viewSize = 1;
 			Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 			Global.screenRenderTexture = Global.screenRenderTextureL;
 			Global.srtBuffer1 = Global.srtBuffer1L;
 			Global.srtBuffer2 = Global.srtBuffer2L;
 		} else {
-			Global.viewSize = 1;
+			Global.viewSize = 0.8f;
 			Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 			Global.screenRenderTexture = Global.screenRenderTextureS;
 			Global.srtBuffer1 = Global.srtBuffer1S;

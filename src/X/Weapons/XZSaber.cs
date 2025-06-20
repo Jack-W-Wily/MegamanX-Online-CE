@@ -87,6 +87,7 @@ public class X6SaberState : CharState {
 		airMove = true;
 		useDashJumpSpeed = true;
 		canStopJump = true;
+		exitOnLanding = !grounded;
 	}
 
 	public override void update() {

@@ -596,7 +596,7 @@ public class LevelData {
 		// Alt music.
 		{ "dopplerlab_1v1", "fortressBoss_X3" },
 		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
-		{ "centralcomputer_1v1", "boss_X2" },
+		{ "centralcomputer_1v1", "BossBattleL" },
 		{ "sigma4_1v1", "boss_X1" },
 
 		// Others.

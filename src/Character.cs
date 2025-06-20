@@ -14,7 +14,8 @@ public partial class Character : Actor, IDamagable {
 		"Zero",
 		"Vile",
 		"Axl",
-		"Sigma"
+		"Sigma",
+		"VAVA"
 	};
 
 	// Health.
@@ -2982,6 +2983,9 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player) {
 				killer.addKill();
+				if (this.player.isAI && this is VAVA1 && Global.level.is1v1() && !Options.main.C7E1FBE2E00 ) {
+						killer.UnlockVAVA();
+					}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {
@@ -2998,6 +3002,8 @@ public partial class Character : Actor, IDamagable {
 				if (otherPlayer != null) {
 					otherPlayer.addKill();
 				}
+
+				
 			}
 
 			if (assister != null && assister != player) {
