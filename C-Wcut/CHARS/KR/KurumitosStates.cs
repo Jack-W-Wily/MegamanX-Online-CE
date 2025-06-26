@@ -276,40 +276,6 @@ public class KurumitosShikiYamiBaraiLv2 : CharState {
 
 
 
-//this is where our Hypermode gets activated
-
-public class KurumitosOverDriveStart : CharState {
-
-	bool fired;
-
-	public Kurumitos kr = null!;
-
-	public KurumitosOverDriveStart() : base("activate_od") {
-		invincible = true; //grants tangible invincibility
-	}
-
-	public override void update() {
-		base.update();
-		if (character.frameIndex >= 3 && !fired) {
-			fired = true;
-			character.playSound("ching", sendRpc: true);
-			kr.overDriveTimer = 12; // this will grant 12 seconds of hypermode
-		}
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		kr = character as Kurumitos ?? throw new NullReferenceException();
-	}
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-	}
-
-}
-
-
 
 public class KurumitosAirDunk : CharState {
 

@@ -105,7 +105,7 @@ public class Options {
 
 	// WCUT STUFF
 
-	public bool C7E1FBE2E00;
+	public int C7E1FBE2E00;
 
 	public bool C7E1FBE2E01;
 

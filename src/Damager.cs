@@ -21,50 +21,52 @@ public class Damager {
 	public const float headshotModifier = 2;
 
 	public static readonly Dictionary<int, float> projectileFlinchCooldowns = new Dictionary<int, float>() {
-		{ (int)ProjIds.ElectricSpark, 60 },
-		{ (int)ProjIds.TriadThunder, 135 },
-		{ (int)ProjIds.TriadThunderBall, 135 },
-		{ (int)ProjIds.TriadThunderBeam, 135 },
-		{ (int)ProjIds.PlasmaGunBeamProj, 60 },
-		{ (int)ProjIds.VoltTornado, 60 },
-		{ (int)ProjIds.TornadoCharged, 60 },
-		//{ (int)ProjIds.KKnuckle, 60 },
-		{ (int)ProjIds.PZeroPunch2, 60 },
-		{ (int)ProjIds.PZeroSenpuukyaku, 60 },
-		{ (int)ProjIds.PZeroAirKick, 60 },
-		{ (int)ProjIds.MechPunch, 60 },
-		{ (int)ProjIds.MechKangarooPunch, 60 },
-		{ (int)ProjIds.MechGoliathPunch, 60 },
-		{ (int)ProjIds.MechDevilBearPunch, 60 },
-		{ (int)ProjIds.MechStomp, 60 },
-		{ (int)ProjIds.MechChain, 60 },
-		{ (int)ProjIds.TornadoFangCharged, 60 },
-		{ (int)ProjIds.Headbutt, 60 },
-		{ (int)ProjIds.RocketPunch, 60 },
-		{ (int)ProjIds.InfinityGig, 60 },
-		{ (int)ProjIds.SpoiledBrat, 60 },
-		{ (int)ProjIds.SpinningBladeCharged, 60 },
-		{ (int)ProjIds.Shingetsurin, 60 },
-		{ (int)ProjIds.MagnetMineCharged, 60 },
-		{ (int)ProjIds.Sigma2ViralBeam, 60 },
-		{ (int)ProjIds.Sigma2HopperDrill, 54 },
-		{ (int)ProjIds.WSpongeChainSpin, 60 },
-		{ (int)ProjIds.MorphMCSpin, 60 },
-		{ (int)ProjIds.BCrabClaw, 60 },
-		{ (int)ProjIds.SpeedBurnerCharged, 30 },
-		{ (int)ProjIds.VelGMelee, 60 },
-		{ (int)ProjIds.OverdriveOMelee, 60 },
-		{ (int)ProjIds.WheelGSpinWheel, 60 },
-		{ (int)ProjIds.Sigma3KaiserStomp, 60 },
-		{ (int)ProjIds.Sigma3KaiserBeam, 60 },
-		{ (int)ProjIds.UPPunch, 60 },
-		{ (int)ProjIds.CopyShot, 60 },
-		{ (int)ProjIds.NeonTClawAir, 60 },
-		{ (int)ProjIds.NeonTClawDash, 60 },
-		{ (int)ProjIds.VoltCTriadThunder, 60 },
-		{ (int)ProjIds.Rekkoha, 60 },
+		/*
+				{ (int)ProjIds.ElectricSpark, 60 },
+				{ (int)ProjIds.TriadThunder, 135 },
+				{ (int)ProjIds.TriadThunderBall, 135 },
+				{ (int)ProjIds.TriadThunderBeam, 135 },
+				{ (int)ProjIds.PlasmaGunBeamProj, 60 },
+				{ (int)ProjIds.VoltTornado, 60 },
+				{ (int)ProjIds.TornadoCharged, 60 },
+				//{ (int)ProjIds.KKnuckle, 60 },
+				{ (int)ProjIds.PZeroPunch2, 60 },
+				{ (int)ProjIds.PZeroSenpuukyaku, 60 },
+				{ (int)ProjIds.PZeroAirKick, 60 },
+				{ (int)ProjIds.MechPunch, 60 },
+				{ (int)ProjIds.MechKangarooPunch, 60 },
+				{ (int)ProjIds.MechGoliathPunch, 60 },
+				{ (int)ProjIds.MechDevilBearPunch, 60 },
+				{ (int)ProjIds.MechStomp, 60 },
+				{ (int)ProjIds.MechChain, 60 },
+				{ (int)ProjIds.TornadoFangCharged, 60 },
+				{ (int)ProjIds.Headbutt, 60 },
+				{ (int)ProjIds.RocketPunch, 60 },
+				{ (int)ProjIds.InfinityGig, 60 },
+				{ (int)ProjIds.SpoiledBrat, 60 },
+				{ (int)ProjIds.SpinningBladeCharged, 60 },
+				{ (int)ProjIds.Shingetsurin, 60 },
+				{ (int)ProjIds.MagnetMineCharged, 60 },
+				{ (int)ProjIds.Sigma2ViralBeam, 60 },
+				{ (int)ProjIds.Sigma2HopperDrill, 54 },
+				{ (int)ProjIds.WSpongeChainSpin, 60 },
+				{ (int)ProjIds.MorphMCSpin, 60 },
+				{ (int)ProjIds.BCrabClaw, 60 },
+				{ (int)ProjIds.SpeedBurnerCharged, 30 },
+				{ (int)ProjIds.VelGMelee, 60 },
+				{ (int)ProjIds.OverdriveOMelee, 60 },
+				{ (int)ProjIds.WheelGSpinWheel, 60 },
+				{ (int)ProjIds.Sigma3KaiserStomp, 60 },
+				{ (int)ProjIds.Sigma3KaiserBeam, 60 },
+				{ (int)ProjIds.UPPunch, 60 },
+				{ (int)ProjIds.CopyShot, 60 },
+				{ (int)ProjIds.NeonTClawAir, 60 },
+				{ (int)ProjIds.NeonTClawDash, 60 },
+				{ (int)ProjIds.VoltCTriadThunder, 60 },
+				{ (int)ProjIds.Rekkoha, 60 },
+				{ (int)ProjIds.HexaInvolute, 60 },
+				{ (int)ProjIds.ZSaber3, 60 },/*/
 		{ (int)ProjIds.HexaInvolute, 60 },
-		{ (int)ProjIds.ZSaber3, 60 },
 	};
 
 	public Damager(Player owner, float damage, int flinch, float hitCooldown, float knockback = 0) {
@@ -336,12 +338,21 @@ public class Damager {
 				character.addVirusTime(owner, damage);
 			}
 
-			if (owner.character != null && owner.character.health > 0) {
-				character.charState.spcCancel = true;
-			}
+			
 
 			if ((owner.character as PunchyZero)?.isViral == true) {
 				character.addVirusTime(owner, damage);
+			}
+
+
+			if (owner.character is ZeroMID zarzo && zarzo.health > 0) {
+				if (zarzo.OverDrive) {
+					zarzo.charState.attackCtrl = true;
+				}
+				if (zarzo.charState.canSpecialCancel) {
+					zarzo.charState.spcCancel = true;
+				}
+				zarzo.gigaAttack.ammo += 1;
 			}
 
 			switch (projId) {

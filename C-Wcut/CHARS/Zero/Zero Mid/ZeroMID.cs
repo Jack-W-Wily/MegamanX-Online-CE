@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class Zero : Character {
+public class ZeroMID : Zero {
 	// Hypermode stuff.
 	public bool isViral;
 	public int awakenedPhase;
@@ -22,8 +22,6 @@ public class Zero : Character {
 	public int awakenedAuraFrame;
 	public float awakenedAuraAnimTime;
 	public byte hypermodeBlink;
-	public Sprite auraSprite = new Sprite("zero_awakened_aura");
-	public Sprite auraSprite2 = new Sprite("zero_awakened_aura2");
 
 	// Weapons.
 	public ZSaber meleeWeapon = new();
@@ -33,13 +31,13 @@ public class Zero : Character {
 	public ZeroBuster busterWeapon = new();
 
 	// Loadout weapons.
-	public Weapon groundSpecial;
-	public Weapon airSpecial;
-	public Weapon uppercutA;
-	public Weapon uppercutS;
-	public Weapon downThrustA;
-	public Weapon downThrustS;
-	public Weapon gigaAttack;
+	public Weapon groundSpecial = new RaijingekiWeapon();
+	public Weapon airSpecial = new KuuenzanWeapon();
+	public Weapon uppercutA  = new RisingFangWeapon();
+	public Weapon uppercutS  = new RyuenjinWeapon();
+	public Weapon downThrustA  = new RakukojinWeapon();
+	public Weapon downThrustS = new HyouretsuzanWeapon();
+	public Weapon gigaAttack = new RakuhouhaWeapon();
 	public int gigaAttackSelected;
 
 	// Inputs.
@@ -71,13 +69,13 @@ public class Zero : Character {
 	public float aiAttackCooldown;
 
 	// Creation code.
-	public Zero(
+	public ZeroMID(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-		charId = CharIds.Zero;
+		charId = CharIds.ZeroMID;
 		// Loadout stuff.
 		ZeroLoadout zeroLoadout = player.loadout.zeroLoadout;
 
@@ -248,7 +246,7 @@ public class Zero : Character {
 	}
 
 	public void shoot(int chargeLevel) {
-		if (player.currency <= 0 && freeBusterShots <= 0) { return; }
+		if (gigaAttack.ammo <= 4 && freeBusterShots <= 0) { return; }
 		if (chargeLevel == 0) { return; }
 		int currencyUse = 0;
 
@@ -281,13 +279,11 @@ public class Zero : Character {
 				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		}
-		if (this is not ZeroMID) {
-			if (currencyUse > 0) {
-				if (freeBusterShots > 0) {
-					freeBusterShots--;
-				} else if (player.currency > 0) {
-					player.currency--;
-				}
+		if (currencyUse > 0) {
+			if (freeBusterShots > 0) {
+				freeBusterShots--;
+			} else if (gigaAttack.ammo > 3) {
+				gigaAttack.ammo =- 4;
 			}
 		}
 	}
@@ -393,6 +389,16 @@ public class Zero : Character {
 		if (isAwakened) {
 			cost = 4;
 		}
+
+			if (player.input.isPressed(Control.WeaponLeft, player)
+			&& player.currency > 4
+			) {
+				player.currency -= 5;
+				changeState(new OverDriveStart(), true);
+				/* 
+				changeState() you'll be using this for every custom action your character does
+				*/
+			}
 		if (player.currency >= cost &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart and not WarpIn && (
@@ -421,31 +427,15 @@ public class Zero : Character {
 			return true;
 		}
 		// Guard! (You can thank Axl for this mess)
-		if (charState.attackCtrl && charState is not Dash && grounded && (
-				player.input.isHeld(Control.WeaponLeft, player) ||
-				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
-			) && (
-				!player.isDisguisedAxl ||
-				player.input.isHeld(Control.Down, player)
+		if (
+				player.input.isHeld(Control.L2, player)
 			)
-		) {
-			turnToInput(player.input, player);
-			changeState(new SwordBlock());
+		{
+
+			changeState(new BlockWCUT());
 			return true;
-		} else if (
-			charState.attackCtrl && !isDashing && (
-				player.input.isPressed(Control.WeaponLeft, player) ||
-				(player.input.isHeld(Control.WeaponRight, player) && !isAwakened)
-			  ) && (
-				  !player.isDisguisedAxl || player.input.isHeld(Control.Down, player)
-			  )
-			) {
-			if (grounded) {
-				turnToInput(player.input, player);
-				changeState(new SwordBlock());
-			}
-			return true;
-		}
+		} 
+		
 		return false;
 	}
 
@@ -482,6 +472,29 @@ public class Zero : Character {
 		}
 	}
 
+
+
+	public override bool spcCancel() {
+		// Uppercuts.
+		if (player.input.isHeld(Control.Up, player) && charState is not ZeroUppercut) {
+			if (player.input.isPressed(Control.R2, player)) {
+
+				changeState(new ZeroUppercut(RisingType.Denjin, true), true);
+			}
+			if (player.input.isPressed(Control.Special1, player)) {
+				changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
+			}
+			if (player.input.isPressed(Control.Shoot, player)) {
+				changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
+			}
+			return true;
+		}
+
+
+
+		return base.spcCancel();
+	}
+
 	public bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
@@ -495,14 +508,17 @@ public class Zero : Character {
 			}
 		}
 		// Uppercuts.
-		if (yDir == -1 && (shootPressed || specialPressed)) {
-			// Weapon type to use.
-			int weaponType = uppercutA.type;
-			// If special was pressed first.
-			if (specialPressTime > shootPressTime) {
-				weaponType = uppercutS.type;
+		if (yDir == -1 && charState is not ZeroUppercut) {
+			if (player.input.isPressed(Control.R2, player)) {
+
+				changeState(new ZeroUppercut(RisingType.Denjin, true), true);
 			}
-			changeState(new ZeroUppercut(weaponType, isUnderwater()), true);
+			if (player.input.isPressed(Control.Special1, player)) {
+				changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
+			}
+			if (player.input.isPressed(Control.Shoot, player)) {
+				changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
+			}
 			return true;
 		}
 		// Dash attacks.
@@ -528,14 +544,21 @@ public class Zero : Character {
 		if (shootPressed) {
 			// Crounch variant.
 			if (yDir == 1) {
-				changeState(new ZeroCrouchSlashState(), true);
+				if (charState is not ZeroCrouchSlashState) {
+					changeState(new ZeroCrouchSlashState(), true);
+				}
 				return true;
 			}
-			changeState(new ZeroSlash1State(), true);
+			if (charState is not ZeroSlash1State or ZeroSlash2State or ZeroSlash3State) {
+				changeState(new ZeroSlash1State(), true);
+			}
 			return true;
 		}
 		return false;
 	}
+	
+
+
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
@@ -561,7 +584,7 @@ public class Zero : Character {
 		if (specialPressed) {
 			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
 				if (Options.main.swapAirAttacks == false) {
-					changeState(new ZeroRollingSlashtate(), true);					
+					changeState(new ZeroRollingSlashtate(), true);
 				} else {
 					changeState(new ZeroAirSlashState(), true);
 				}
@@ -577,7 +600,7 @@ public class Zero : Character {
 				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 			} else {
 				if (Options.main.swapAirAttacks == false) {
-					changeState(new ZeroAirSlashState(), true);					
+					changeState(new ZeroAirSlashState(), true);
 				} else {
 					changeState(new ZeroRollingSlashtate(), true);
 				}
@@ -638,7 +661,7 @@ public class Zero : Character {
 		return dashSpeed * getRunDebuffs();
 	}
 	public override string getSprite(string spriteName) {
-		return "zero_" + spriteName;
+		return "zarzo_" + spriteName;
 	}
 
 	// Simple giga ammo logic.
@@ -675,17 +698,17 @@ public class Zero : Character {
 		// Damage based on tripleSlash time.
 		if (meleeId == (int)MeleeIds.HuhSlash) {
 			float timeSinceStart = zeroTripleSlashEndTime - zeroTripleStartTime;
-			float overrideDamage = 4;
-			int overrideFlinch = Global.defFlinch;
+			float overrideDamage = 1;
+			int overrideFlinch = Global.superFlinch;
 			if (timeSinceStart < 0.5f) {
-				overrideDamage = 3;
+				overrideDamage = 1;
 			}
 			proj.damager.damage = overrideDamage;
 			proj.damager.flinch = overrideFlinch;
 		}
 		// Damage based on fall speed.
 		else if (meleeId == (int)MeleeIds.Rakukojin) {
-			float damage = 3 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
+			float damage = 1 + Helpers.clamp(MathF.Floor(deltaPos.y * 0.8f), 0, 10);
 			proj.damager.damage = damage;
 		}
 		updateProjFromHitbox(proj);
@@ -719,6 +742,7 @@ public class Zero : Character {
 		Hyouretsuzan,
 		Danchien,
 		Rakukojin,
+		DrillCrush,
 		// Others
 		LadderSlash,
 		WallSlash,
@@ -730,35 +754,35 @@ public class Zero : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			// Ground
-			"zero_attack" => MeleeIds.HuSlash,
-			"zero_attack2" => MeleeIds.HaSlash,
-			"zero_attack3" => MeleeIds.HuhSlash,
-			"zero_attack_crouch" => MeleeIds.CrouchSlash,
+			"zarzo_attack" => MeleeIds.HuSlash,
+			"zarzo_attack2" => MeleeIds.HaSlash,
+			"zarzo_attack3" => MeleeIds.HuhSlash,
+			"zarzo_attack_crouch" => MeleeIds.CrouchSlash,
 			// Dash
-			"zero_attack_dash" => MeleeIds.DashSlash,
-			"zero_attack_dash2" => MeleeIds.Shippuuga,
+			"zarzo_attack_dash" => MeleeIds.DashSlash,
+			"zarzo_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
-			"zero_attack_air" => MeleeIds.AirSlash,
-			"zero_attack_air2" => MeleeIds.RollingSlash,
-			"zero_hyoroga_attack"  => MeleeIds.Hyoroga,
+			"zarzo_attack_air" => MeleeIds.AirSlash,
+			"zarzo_attack_air2" => MeleeIds.RollingSlash,
+			"zarzo_hyoroga_attack"  => MeleeIds.Hyoroga,
 			// Ground Speiclas
-			"zero_raijingeki" => MeleeIds.Raijingeki,
-			"zero_raijingeki2" => MeleeIds.RaijingekiWeak,
-			"zero_tbreaker" => MeleeIds.Dairettsui,
-			"zero_spear" => MeleeIds.Suiretsusen,
+			"zarzo_raijingeki" => MeleeIds.Raijingeki,
+			"zarzo_raijingeki2" => MeleeIds.RaijingekiWeak,
+			"zarzo_tbreaker" => MeleeIds.Dairettsui,
+			"zarzo_spear" => MeleeIds.Suiretsusen,
 			// Up Specials
-			"zero_ryuenjin" => MeleeIds.Ryuenjin,
-			"zero_eblade" => MeleeIds.Denjin,
-			"zero_rising" => MeleeIds.RisingFang,
+			"zarzo_ryuenjin" => MeleeIds.Ryuenjin,
+			"zarzo_eblade" => MeleeIds.Denjin,
+			"zarzo_rising" => MeleeIds.RisingFang,
 			// Down specials
-			"zero_hyouretsuzan_start" or "zero_hyouretsuzan_fall" => MeleeIds.Hyouretsuzan,
-			"zero_quakeblazer_start" or "zero_quakeblazer_fall" => MeleeIds.Danchien,
-			"zero_rakukojin_start" or "zero_rakukojin_fall" => MeleeIds.Rakukojin,
+			"zarzo_hyouretsuzan_start" or "zarzo_hyouretsuzan_fall" => MeleeIds.Hyouretsuzan,
+			"zarzo_quakeblazer_start" or "zarzo_quakeblazer_fall" => MeleeIds.Danchien,
+			"zarzo_rakukojin_start" or "zarzo_rakukojin_fall" => MeleeIds.DrillCrush,
 			// Others.
-			"zero_ladder_attack" => MeleeIds.LadderSlash,
-			"zero_wall_slide_attack" => MeleeIds.WallSlash,
-			"zero_block" => MeleeIds.Gokumonken,
-			"zero_projswing" => MeleeIds.Hadangeki,
+			"zarzo_ladder_attack" => MeleeIds.LadderSlash,
+			"zarzo_wall_slide_attack" => MeleeIds.WallSlash,
+			"zarzo_block" => MeleeIds.Gokumonken,
+			"zarzo_projswing" => MeleeIds.Hadangeki,
 			_ => MeleeIds.None
 		});
 	}
@@ -767,60 +791,60 @@ public class Zero : Character {
 		return id switch {
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber1, player, 2, 0, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber1, player, 1, Global.miniFlinch, 15, isReflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber2, player, 2, 0, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber2, player, 1, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect2B: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
-				3, Global.defFlinch, 15, isReflectShield: true,
+				1, Global.defFlinch, 5, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, 0, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 2, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, 0, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
-				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.halfFlinch, 15,
+				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.defFlinch, 15,
 				isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 2, 0, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 1, Global.miniFlinch, 5, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
-				1, 0, 8, isDeflectShield: true,
+				1, Global.miniFlinch, 5, isDeflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
-				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, 0, 15,
+				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, Global.superFlinch, 15,
 				addToLevel: addToLevel
 			),
 			// Ground Specials
 			(int)MeleeIds.Raijingeki => new GenericMeleeProj(
-				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 2, Global.defFlinch, 4,
+				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 1, Global.defFlinch, 4,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RaijingekiWeak => new GenericMeleeProj(
-				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 2, Global.defFlinch, 4,
+				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 4,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Dairettsui => new GenericMeleeProj(
@@ -833,15 +857,15 @@ public class Zero : Character {
 			),
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
-				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 4, 0, 15,
+				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 2, Global.defFlinch, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
-				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 3, Global.defFlinch, 6,
+				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, Global.defFlinch, 6,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 30,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, Global.halfFlinch, 30,
 				isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
@@ -854,8 +878,8 @@ public class Zero : Character {
 				DanchienWeapon.staticWeapon, projPos, ProjIds.QuakeBlazer, player, 2, 0, 30,
 				addToLevel: addToLevel
 			),
-			(int)MeleeIds.Rakukojin => new GenericMeleeProj(
-				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 2, 12, 30,
+			(int)MeleeIds.DrillCrush => new GenericMeleeProj(
+				RakukojinWeapon.staticWeapon, projPos, ProjIds.Rakukojin, player, 1, 12, 4,
 				addToLevel: addToLevel
 			),
 			// Others
@@ -955,6 +979,8 @@ public class Zero : Character {
 			float blinkRate = MathInt.Ceiling(hypermodeBlink / 30f);
 			palette = ((Global.frameCount % (blinkRate * 2) >= blinkRate) ? null : palette);
 		}
+
+	
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {
 				case 1:
@@ -963,11 +989,13 @@ public class Zero : Character {
 				case 2:
 					palette = Player.ZeroBlueC;
 					break;
-				case >=3:
+				case >= 3:
 					palette = Player.ZeroPinkC;
 					break;
 			}
 		}
+
+		
 		if (palette != null) {
 			shaders.Add(palette);
 		}
@@ -991,8 +1019,58 @@ public class Zero : Character {
 		}
 		return 45;
 	}
+
+
 	
+	(float twitch, float grow, int time) omegaAura = new(0.015f, 0, 0);
+
+	void updateOmegaAura() {
+		omegaAura.twitch -= 0.05f;
+		if (omegaAura.twitch < 0.05)
+			omegaAura.twitch = 0.15f;
+
+		if (omegaAura.time >= 0 && omegaAura.time < 50)
+			omegaAura.grow += 0.0025f;
+		else if (omegaAura.time >= 55 && omegaAura.time < 105)
+			omegaAura.grow -= 0.0025f;
+
+		omegaAura.time++;
+		if (omegaAura.time > 110) {
+			omegaAura.time = 0;
+		}
+	}
+
+
+
 	public override void render(float x, float y) {
+
+
+		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
+		if (visible && base.OverDrive) {
+			// Position to draw the sprite to.
+			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraAlpha2 = 0.75f;
+			
+
+			// Draw aura.
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex,
+				drawX, drawY,
+				xDir, yDir,
+				null, auraAlpha2,
+				auraSize,
+				auraSize,
+				zIndex - 1,
+				player.omegaAuraShaderRed
+			);
+			updateOmegaAura();
+		}
+
+
+
 		if (isViral && visible) {
 			addRenderEffect(RenderEffectType.Trail);
 		} else {

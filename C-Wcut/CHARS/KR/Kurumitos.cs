@@ -227,7 +227,7 @@ public static CharSelection[] selections => [
 			&& player.currency > 4
 			) {
 				player.currency -= 5;
-				changeState(new KurumitosOverDriveStart(), true);
+				changeState(new OverDriveStart(), true);
 				/* 
 				changeState() you'll be using this for every custom action your character does
 				*/
@@ -294,15 +294,16 @@ public static CharSelection[] selections => [
 		} else {
 			canSpecialCancel = false;
 		}
-
+		// For Overdrive to work
 		if (overDriveTimer > 0) {
 		OverDrive = true;
 		} else {
 			OverDrive = false;
 		}
+		Helpers.decrementTime(ref overDriveTimer);
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref ShikiYamiBaraiCD);
-		Helpers.decrementTime(ref overDriveTimer);
+		
 
 		// Charge and release charge logic.
 		chargeLogic(shoot);

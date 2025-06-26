@@ -950,8 +950,16 @@ public partial class Character : Actor, IDamagable {
 	public override void update() {
 
 
-	
-		//Wcut Damage Systems
+		// For Overdrive to work (WCUT)
+		if (overDriveTimer > 0) {
+		OverDrive = true;
+		} else {
+			OverDrive = false;
+		}
+		Helpers.decrementTime(ref overDriveTimer);
+
+
+		//Damage Systems (WCUT)
 		Helpers.decrementFrames(ref ComboTimer);
 		Helpers.decrementFrames(ref ignoreStateCooldownTime);
 		Helpers.decrementFrames(ref DamageScalingCD);
@@ -976,7 +984,7 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementFrames(ref genericParryCooldown);
 
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		// New Presing system
+		// New Presing system (WCUT)
 		Helpers.decrementTime(ref inputdecreasedCD);
 		if (player.input.isPressed(Control.Shoot, player)) {
 			shootPressedTimes += 1;
@@ -1321,6 +1329,9 @@ public partial class Character : Actor, IDamagable {
 		if (charState.attackCtrl && invulnTime <= 0) {
 			return attackCtrl();
 		}
+		if (charState.spcCancel) {
+			spcCancel();
+		}
 		if (charState.altCtrls.Any(b => b)) {
 			return altCtrl(charState.altCtrls);
 		}
@@ -1451,6 +1462,11 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool attackCtrl() {
 		return false;
 	}
+
+	public virtual bool spcCancel() {
+		return false;
+	}
+
 
 	public virtual bool altCtrl(bool[] ctrls) {
 		return false;
@@ -2983,7 +2999,7 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player) {
 				killer.addKill();
-				if (this.player.isAI && this is VAVA1 && Global.level.is1v1() && !Options.main.C7E1FBE2E00 ) {
+				if (this.player.isAI && this is VAVA1 && Global.level.is1v1() && Options.main.C7E1FBE2E00 != 123) {
 						killer.UnlockVAVA();
 					}
 				if (Global.level.gameMode is TeamDeathMatch) {

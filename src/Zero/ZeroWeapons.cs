@@ -107,10 +107,12 @@ public class RaijingekiWeapon : Weapon {
 	}
 
 	public override void attack(Character character) {
+		if (character.charState is Raijingeki) { return;  }
 		character.changeState(new Raijingeki(false), true);
 	}
 
 	public override void attack2(Character character) {
+		if (character.charState is Raijingeki) { return;  }
 		character.changeState(new Raijingeki(true), true);
 	}
 }

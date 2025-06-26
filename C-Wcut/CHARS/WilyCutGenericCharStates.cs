@@ -347,3 +347,151 @@ public class LaunchedFowardState : CharState {
 }
 
 
+
+
+
+public class WcutGenericDodgeF : CharState {
+
+
+	public WcutGenericDodgeF() : base("dodge_f") {
+		immuneToWind = true;
+		enterSound = "dash";
+		specialId = SpecialStateIds.AxlRoll;
+	}
+
+	public override void update() {
+		base.update();
+
+		character.move(new Point(character.xDir * 250, 0));
+
+
+
+		if (stateTime > 0.2f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		character.slideVel = character.xDir * character.getDashSpeed() * 0.9f;
+	}
+}
+
+
+
+
+//this is where our Hypermode gets activated
+
+public class OverDriveStart : CharState {
+
+	bool fired;
+
+	public OverDriveStart() : base("activate_od") {
+		invincible = true; //grants tangible invincibility
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+			character.playSound("ching", sendRpc: true);
+			character.overDriveTimer = 12; // this will grant 12 seconds of hypermode
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+}
+
+
+
+public class WcutGenericDodgeU : CharState {
+
+
+	public WcutGenericDodgeU() : base("dodge_up") {
+		immuneToWind = true;
+		enterSound = "dash";
+		specialId = SpecialStateIds.AxlRoll;
+	}
+
+	public override void update() {
+		base.update();
+
+	
+
+
+
+		if (stateTime > 0.4f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -character.getJumpPower();
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+public class WcutGenericDodgeB : CharState {
+
+
+	public WcutGenericDodgeB() : base("dash_end") {
+		immuneToWind = true;
+		enterSound = "dash";
+		specialId = SpecialStateIds.AxlRoll;
+	}
+
+	public override void update() {
+		base.update();
+
+		character.move(new Point(character.xDir * -250, 0));
+
+		if (stateTime > 0.2f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = true;
+
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		character.slideVel = character.xDir * -character.getDashSpeed() * 0.9f;
+	}
+}
+
+
+

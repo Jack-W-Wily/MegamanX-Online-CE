@@ -45,6 +45,7 @@ public class ZeroSlash1State : ZeroGenericMeleeState {
 		sound = "saber1";
 		soundFrame = 4;
 		comboFrame = 6;
+		canSpecialCancel = true;
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -75,6 +76,7 @@ public class ZeroSlash2State : ZeroGenericMeleeState {
 		sound = "saber2";
 		soundFrame = 1;
 		comboFrame = 3;
+		canSpecialCancel = true;
 	}
 
 	public override bool altCtrlUpdate(bool[] ctrls) {
@@ -98,11 +100,13 @@ public class ZeroSlash3State : ZeroGenericMeleeState {
 	public ZeroSlash3State() : base("attack3") {
 		sound = "saber3";
 		soundFrame = 1;
+		canSpecialCancel = true;
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		zero.zeroTripleSlashEndTime = Global.time;
+		
 	}
 }
 
@@ -117,6 +121,7 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		canStopJump = true;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -138,6 +143,7 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
 		canStopJump = true;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -153,6 +159,7 @@ public class ZeroCrouchSlashState : ZeroGenericMeleeState {
 	public ZeroCrouchSlashState() : base("attack_crouch") {
 		sound = "saber1";
 		soundFrame = 1;
+		canSpecialCancel = true;
 	}
 }
 
@@ -160,6 +167,7 @@ public class ZeroDashSlashState : ZeroGenericMeleeState {
 	public ZeroDashSlashState() : base("attack_dash") {
 		sound = "saber1";
 		soundFrame = 1;
+		canSpecialCancel = true;
 	}
 }
 

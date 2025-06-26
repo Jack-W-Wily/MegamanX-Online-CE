@@ -63,6 +63,8 @@ public class CharState {
 
 	public bool spcCancel;
 
+	public bool canSpecialCancel;
+
 	public bool wiffCancel;
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;

@@ -67,6 +67,12 @@ public class RockmanX : MegamanX {
 			
 		}
 
+		if (player.input.isHeld(Control.L2, player)
+		&& player.input.isPressed(Control.Dash, player)) {
+		
+			
+		}
+
 
 
 		return base.attackCtrl();

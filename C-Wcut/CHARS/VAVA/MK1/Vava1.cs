@@ -47,6 +47,8 @@ public class VAVA1 : Character {
 
 	public float calldownMechCooldown;
 
+	
+
 	public VileCannon cannonWeapon;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
@@ -139,7 +141,7 @@ public class VAVA1 : Character {
 
 		if (player.input.isPressed(Control.Special1, player)) {
 			if (grounded) {
-				changeState(new PopcornHell(grounded), true);
+				
 			} else {
 				changeState(new ExplosiveRoundState(), true);
 			}
@@ -149,11 +151,9 @@ public class VAVA1 : Character {
 			if (player.input.isPressed(Control.Shoot, player)) {
 				changeState(new Vava1GrabStartState(), true);
 			}
-			if (player.input.isPressed(Control.Dash, player)) {
+			if (player.input.isPressed(Control.Dash, player) && CrimsonphantomCD == 0) {
 				changeState(new CrimsonPhantomState(grounded), true);
-			}
-			if (player.input.isPressed(Control.Special1, player)) {
-				changeState(new VavaBurensen1(), true);
+				CrimsonphantomCD = 0.3f;
 			}
 		}
 
@@ -202,7 +202,9 @@ public class VAVA1 : Character {
 
 
 
-
+	//Bonus VAVA CD Stuff
+	public float CrimsonphantomCD;
+	
 	public override void update() {
 		base.update();
 		// For the special cancels to work
@@ -225,6 +227,7 @@ public class VAVA1 : Character {
 
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
+		Helpers.decrementTime(ref CrimsonphantomCD);
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
@@ -235,9 +238,10 @@ public class VAVA1 : Character {
 		if (player.isAI && health < 5 && !phase2 && !isWarpIn()) {
 			changeState(new VAVAPhase2Start(false), true);
 			stopMoving();
+			bonusHealth = 40;
 		}
 
-			// Hypermode music.
+		// Hypermode music.
 		if (!Global.level.isHyper1v1()) {
 			if (phase2 && ownedByLocalPlayer) {
 				if (musicSource == null) {
@@ -844,16 +848,15 @@ public class VAVA1 : Character {
 
 
 	(float twitch, float grow, int time) omegaAura = new(0.015f, 0, 0);
-    private object isThundergodRageActiveBS;
 
-    void updateOmegaAura() {
+	void updateOmegaAura() {
 		omegaAura.twitch -= 0.05f;
 		if (omegaAura.twitch < 0.05)
 			omegaAura.twitch = 0.15f;
 
 		if (omegaAura.time >= 0 && omegaAura.time < 50)
 			omegaAura.grow += 0.0025f;
-		else if (omegaAura.time >= 55 && omegaAura.time < 105)	
+		else if (omegaAura.time >= 55 && omegaAura.time < 105)
 			omegaAura.grow -= 0.0025f;
 
 		omegaAura.time++;
@@ -863,22 +866,22 @@ public class VAVA1 : Character {
 	}
 
 	public override void render(float x, float y) {
-	if (charState is CrimsonPhantomState) {
-		addRenderEffect(RenderEffectType.SpeedDevilTrail);
-	} else {
-		removeRenderEffect(RenderEffectType.SpeedDevilTrail);
-	}
-	if (currentFrame.POIs.Length > 0) {
-		Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
-		cannonSprite?.draw(
-			cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),
-			1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir,
-			getShaders(), actor: this
-		);
-	}
-	
+		if (charState is CrimsonPhantomState) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} else {
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+		}
+		if (currentFrame.POIs.Length > 0) {
+			Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
+			cannonSprite?.draw(
+				cannonAimNum, poiPos.x, poiPos.y, getShootXDirSynced(),
+				1, getRenderEffectSet(), alpha, 1, 1, zIndex + zIndexDir,
+				getShaders(), actor: this
+			);
+		}
 
-	// For drawing the growing aura that LastStand and Eigengrau Zero uses.
+
+		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
 		if (visible && phase2) {
 			// Position to draw the sprite to.
 			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
@@ -893,28 +896,28 @@ public class VAVA1 : Character {
 
 			// Draw aura.
 			Global.sprites[sprite.name].draw(
-				sprite.frameIndex, 
+				sprite.frameIndex,
 				drawX, drawY,
 				xDir, yDir,
 				null, auraAlpha,
 				auraSize,
 				auraSize,
-				zIndex -1,
+				zIndex - 1,
 				player.omegaAuraShader
 			);
 			updateOmegaAura();
 		}
 
 
-	if (player.isMainPlayer && isVileMK5 && vileHoverTime > 0 && charState is not HexaInvoluteState) {
+		if (player.isMainPlayer && isVileMK5 && vileHoverTime > 0 && charState is not HexaInvoluteState) {
 			float healthPct = Helpers.clamp01((vileMaxHoverTime - vileHoverTime) / vileMaxHoverTime);
 			float sy = -27;
 			float sx = 20;
 			if (xDir == -1) sx = 90 - 20;
 			drawFuelMeter(healthPct, sx, sy);
 		}
-	base.render(x, y);
-}
+		base.render(x, y);
+	}
 
 
 	public override List<byte> getCustomActorNetData() {
@@ -934,15 +937,15 @@ public class VAVA1 : Character {
 
 
 
-		public bool dashGrabSpecial() {
+	public bool dashGrabSpecial() {
 		if (charState is Dash || charState is AirDash) {
-				charState.isGrabbing = true;
-				charState.superArmor = true; //peakbalance
-				changeSpriteFromName("dash_grab", true);
+			charState.isGrabbing = true;
+			charState.superArmor = true; //peakbalance
+			changeSpriteFromName("dash_grab", true);
 			return true;
 		}
 		return false;
-	} 
+	}
 
 
 
@@ -956,7 +959,7 @@ public class VAVA1 : Character {
 		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 
-		
+
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 			&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
@@ -1047,34 +1050,34 @@ public class VAVA1 : Character {
 				}
 			}
 
-			aiAttackCooldown = Helpers.randomRange(0,30);
+			aiAttackCooldown = Helpers.randomRange(0, 30);
 		}
 
-		if (charState is VAVAKamae or  VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
-				if (Helpers.randomRange(0, 4) == 0) {
-					changeState(new VKamaeHotIcecle());
-				}
-				if (Helpers.randomRange(0, 4) == 1) {
-					changeState(new VKamaeBDash());
-				}
-				if (Helpers.randomRange(0, 4) == 2) {
-					changeState(new VKamaeDash());
-				}
-				if (Helpers.randomRange(0, 4) == 3) {
-					changeState(new VKamaeUnblockableStart());
-				}
-				if (Helpers.randomRange(0, 4) == 4) {
-					changeState(new VKote());
-				}
+		if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
+			if (Helpers.randomRange(0, 4) == 0) {
+				changeState(new VKamaeHotIcecle());
 			}
-			
+			if (Helpers.randomRange(0, 4) == 1) {
+				changeState(new VKamaeBDash());
+			}
+			if (Helpers.randomRange(0, 4) == 2) {
+				changeState(new VKamaeDash());
+			}
+			if (Helpers.randomRange(0, 4) == 3) {
+				changeState(new VKamaeUnblockableStart());
+			}
+			if (Helpers.randomRange(0, 4) == 4) {
+				changeState(new VKote());
+			}
+		}
+
 		base.aiAttack(target);
 	}
 
-		public float aiBlocktime;
-		
-			public float aiDodgeCD;
-		public override void aiDodge(Actor? target) {
+	public float aiBlocktime;
+
+	public float aiDodgeCD;
+	public override void aiDodge(Actor? target) {
 		Helpers.decrementFrames(ref aiBlocktime);
 		Helpers.decrementFrames(ref aiDodgeCD);
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
@@ -1085,22 +1088,30 @@ public class VAVA1 : Character {
 					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
 					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
 				) {
-					if (aiDodgeCD == 0) {
-						aiDodgeCD = Helpers.randomRange(0, 20);
-						if (Helpers.randomRange(0, 1) == 1) {
-							changeState(new CrimsonPhantomState(grounded), true);
-						} else {
-							changeState(new CrimsonPhantomState2(grounded), true);
+					if (Helpers.randomRange(0, 1) == 1) {
+						if (aiDodgeCD == 0) {
+							if (phase2) {
+								aiDodgeCD = Helpers.randomRange(0, 20);
+							} else {
+								aiDodgeCD = Helpers.randomRange(0, 60);
+							}
+							if (Helpers.randomRange(0, 1) == 1) {
+								changeState(new CrimsonPhantomState(grounded), true);
+							} else {
+								changeState(new CrimsonPhantomState2(grounded), true);
+							}
+
 						}
 					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
-						&& aiBlocktime <= 0) {
-							turnToInput(player.input, player);
-							changeState(new BlockWCUT(), true);
-							aiBlocktime = 40;
-						}
+							&& aiBlocktime <= 0) {
+						turnToInput(player.input, player);
+						changeState(new BlockWCUT(), true);
+						aiBlocktime = Helpers.randomRange(0, 60);
+					}
 				}
 			}
 		}
+	
 		base.aiDodge(target);
 	}
 	

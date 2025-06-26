@@ -232,6 +232,7 @@ public partial class Player {
 		{ (int)CharIds.Kurumitos, new List<SubTank>() },
 		{ (int)CharIds.VAVA1, new List<SubTank>() },
 		{ (int)CharIds.RockmanX, new List<SubTank>() },
+		{ (int)CharIds.ZeroMID, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -247,6 +248,7 @@ public partial class Player {
 		{ (int)CharIds.Kurumitos, new() },
 		{ (int)CharIds.VAVA1, new() },
 		{ (int)CharIds.RockmanX, new() },
+		{ (int)CharIds.ZeroMID, new() },
 	};
 
 	// Getter functions.
@@ -423,10 +425,12 @@ public partial class Player {
 	public ShaderWrapper speedDevilShader2 = Helpers.cloneShaderSafe("speedDevilTrail2");
 
 	public List<ShaderWrapper> omegaAuraShader;
+	
+	public List<ShaderWrapper> omegaAuraShaderRed;
 
 	public void intitalizeShaders() {
-		omegaAuraShader = new(){Helpers.cloneShaderSafe("omega")};
-	
+		omegaAuraShader = new() { Helpers.cloneShaderSafe("omega") };
+		omegaAuraShaderRed = new() { Helpers.cloneShaderSafe("omegaRed") };
 	}
 
 	// Maverick shaders.
@@ -1208,14 +1212,14 @@ public partial class Player {
 			);
 		}
 		// Kaiser Sigma (Hypermode)
-		else if  (charNum == (int)CharIds.KaiserSigma) {
+		else if (charNum == (int)CharIds.KaiserSigma) {
 			newChar = new KaiserSigma(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Raging Charge X.
-		else if  (charNum == (int)CharIds.RagingChargeX) {
+		else if (charNum == (int)CharIds.RagingChargeX) {
 			newChar = new RagingChargeX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
@@ -1224,23 +1228,29 @@ public partial class Player {
 
 
 		// Kurumitos
-		else if  (charNum == (int)CharIds.Kurumitos) {
+		else if (charNum == (int)CharIds.Kurumitos) {
 			newChar = new Kurumitos(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
 		// Vile WCUT
-		else if  (charNum == (int)CharIds.VAVA1) {
+		else if (charNum == (int)CharIds.VAVA1) {
 			newChar = new VAVA1(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		} else if (charNum == (int)CharIds.RockmanX) {
-			
+
 			newChar = new RockmanX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.ZeroMID) {
+			
+			newChar = new ZeroMID(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
 			);
 		}
 		// Error out if invalid id.
@@ -1491,7 +1501,12 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
-		}
+		}	else if (data.charNum == (int)CharIds.ZeroMID) {
+			retChar = new ZeroMID(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		} 
 		
 		
 		
@@ -1652,6 +1667,11 @@ public partial class Player {
 			);
 		} else if (charNum == (int)CharIds.RockmanX) {
 			retChar = new RockmanX(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.ZeroMID) {
+			retChar = new ZeroMID(
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
@@ -2576,7 +2596,7 @@ public partial class Player {
 
 
 	public void UnlockVAVA() {
-		Options.main.C7E1FBE2E00 = true;
+		Options.main.C7E1FBE2E00 = 123;
 		Global.level.gameMode.setHUDErrorMessage(
 				this, "Unlocked Character - VAVA!",
 				playSound: true, resetCooldown: true

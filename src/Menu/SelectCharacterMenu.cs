@@ -44,7 +44,7 @@ public enum CharIds {
 	VAVA1,
 	RockmanX,
 	ZeroEarly,
-	ZeroMid,
+	ZeroMID,
 	ZeroEND,
 	ShigumaX1,
 				
@@ -65,7 +65,7 @@ public class CharSelection {
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
 
-		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
+		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
 		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
 		},
 		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
@@ -93,19 +93,8 @@ public class CharSelection {
 
 	public static CharSelection[] selectionsVavaUnlocked => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
-		new CharSelection("Zero", 1, 1, 0, "menu_szero", 0),
-		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
-		},
-		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
-			offset = new Point(2, 45)
-		},
-		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
-		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
-			offset = new Point(1, 45)
-		},
-		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
-
-
+		new CharSelection("Zero (Vanilla)", (int)CharIds.Zero, 1, 0, "menu_szero", 0),
+		new CharSelection("Zero (WCUT)", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
 
 		// Make sure to add your char here
@@ -123,6 +112,8 @@ public class CharSelection {
 
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
+		new CharSelection("Zero (WCUT)", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
+		/*
 		new CharSelection("X(X1)", 0, 1, 0, "menu_megaman", 1),
 		new CharSelection("X(X2)", 0, 2, 0, "menu_megaman", 2),
 		new CharSelection("X(X3)", 0, 3, 0, "menu_megaman", 3),
@@ -163,6 +154,7 @@ public class CharSelection {
 		new CharSelection("G.Beetle", 235, 1, 24, "gbeetle_idle", 0),
 		new CharSelection("B.Hornet", 236, 1, 25, "bhornet_idle", 0),
 		new CharSelection("Dr.Doppler", 237, 1, 26, "drdoppler_idle", 0),
+		*/
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
 	];
 
@@ -222,7 +214,7 @@ public class SelectCharacterMenu : IMainMenu {
 
 		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selections;
 
-		if (!is1v1 && Options.main.C7E1FBE2E00) {
+		if (!is1v1 && Options.main.C7E1FBE2E00 == 123) {
 		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selectionsVavaUnlocked;
 		}
 		playerData.charNum = isInGame ? Global.level.mainPlayer.newCharNum : Options.main.preferredCharacter;
