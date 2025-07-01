@@ -10,6 +10,75 @@ namespace MMXOnline;
 
 
 
+public class RagingDemonStart : CharState {
+	
+	public RagingDemonStart() : base("ragingdemon_start", "") {
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		character.turnToInput(player.input, player);
+
+
+		if (stateTime > 0.4f) {
+			character.changeState(new RagingDemonDash(1));
+			character.playSound("vilehyperdashattack", true);
+		}
+
+	
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.playSound("ching", true);
+}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+public class RagingDemonDash : CharState {
+	float trailTime;
+	float chargeTime;
+
+	Character? target;
+
+
+	public RagingDemonDash(float chargeTime) : base("ragingdemon_dash", "") {
+		this.chargeTime = chargeTime;
+		superArmor = true;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+		character.move(new Point(character.xDir * 400, 0));
+
+		if (stateTime > chargeTime) {
+				character.changeState(new VB3(character.grounded));
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.turnToInput(player.input, player);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+}
+
+
 public class PopcornHell : CharState {
 	public VAVA1 vile = null!;
 
@@ -58,7 +127,7 @@ public class PopcornHell : CharState {
 		}
 		vile.playSound("mk2stunshot", sendRpc: true);
 		new VileMissileProj(
-				vile.getCenterPos(), xDir, 2, MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
+				vile.pos, xDir, 2, MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
 				vile, vile.player, vile.player.getNextActorNetId(), rpc: true
 			);
 
@@ -227,6 +296,7 @@ public class CrimsonPhantomState : CharState {
 		invincible = true;
 		vileAmmoUsage = 16f;
 		enterSound = "distortion_a";
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 
@@ -268,6 +338,90 @@ public class CrimsonPhantomState : CharState {
 
 
 
+public class InfinityGigAttackBossVer : CharState {
+	bool shot = false;
+	RocketPunchProjWC? proj;
+	float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public InfinityGigAttackBossVer(string transitionSprite = "") : base("infinity_gig_boss", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+			proj.reversed = true;
+		}
+
+		if (!shot && character.sprite.frameIndex == 3) {
+			shoot();
+		}
+
+		
+		if (proj != null) {
+			if (player.input.isPressed(Control.Special1, player)) {
+					specialPressTime = 0.25f;
+				}
+
+				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+					character.frameIndex = 4;
+					character.frameTime = 0;
+				} else if (character.isAnimOver()) {
+					character.changeToIdleOrFall();
+					return;
+				}
+			
+		}
+			if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("rocketPunch", sendRpc: true);
+		character.frameIndex = 3;
+		character.frameTime = 0;
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.InfinityGig), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+	}
+
+	public void reset() {
+		character.frameIndex = 0;
+		stateTime = 0;
+		shot = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+
+}
+
+
 public class CrimsonPhantomState2 : CharState {
 
 	public float vileAmmoUsage;
@@ -280,6 +434,7 @@ public class CrimsonPhantomState2 : CharState {
 		invincible = true;
 		vileAmmoUsage = 16f;
 		enterSound = "distortion_a";
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 

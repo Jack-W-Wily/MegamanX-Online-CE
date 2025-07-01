@@ -35,6 +35,7 @@ public partial class Level {
 	public List<MusicWrapper> musicSources = new List<MusicWrapper>();
 	public List<BoundBlasterAltProj> boundBlasterAltProjs = new List<BoundBlasterAltProj>();
 	public List<CrystalHunterCharged> chargedCrystalHunters = new List<CrystalHunterCharged>();
+	public List<HitStop> HitStops = new List<HitStop>();
 	public List<DarkHoldProj> darkHoldProjs = new List<DarkHoldProj>();
 	public List<GravityWellProj> unchargedGravityWells = new List<GravityWellProj>();
 	public List<BackloggedSpawns> backloggedSpawns = new List<BackloggedSpawns>();
@@ -1810,6 +1811,27 @@ public partial class Level {
 			}
 		}
 
+
+		if (actor is Projectile || actor is Character || actor is Anim || actor is RideArmor || actor is Maverick) {
+			foreach (var cch in HitStops) {
+				var chr = go as Character;
+				if (chr != null && chr.isTimeImmune()) continue;
+				var proj = go as Projectile;
+				var mech = go as RideArmor;
+				var mvrk = actor as Maverick;
+
+				if (cch.pos.distanceTo(actor.getCenterPos()) < HitStop.radius) {
+					slowAmount = 0.1f;
+					isSlown = true;
+
+				} else {
+					isSlown = false;
+					slowAmount = 1f;
+				}
+				return isSlown;
+			}
+		} 
+
 		if (actor is Character chr2) {
 			if (chr2.virusTime > 0) {
 				if (!isSlown) {
@@ -1817,10 +1839,11 @@ public partial class Level {
 				}
 				slowAmount *= 1 - (0.25f * (chr2.virusTime / 8));
 				isSlown = true;
+				return isSlown;
 			}
-		}
+		} 
 
-		return isSlown;
+		return false;
 	}
 
 	public void render() {

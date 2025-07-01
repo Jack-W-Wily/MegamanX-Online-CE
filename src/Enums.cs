@@ -742,6 +742,8 @@ public enum ProjIds {
 
 	GenericWCUTGrabProjID,
 
+	ForceGrabState,
+
 	// Kurumitos Stuff
 	KRStandingKick,
 	KRAirDunk,
@@ -754,7 +756,7 @@ public enum ProjIds {
 	BurensenStart,
 	BurensenStomp,
 	BurensenEND,
-
+	RagingDemon,
 	// Special damage types.
 	SelfDmg = 30000,
 

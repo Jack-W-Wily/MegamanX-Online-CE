@@ -6,6 +6,71 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+
+public class HitStop : Actor {
+	public float time;
+	public Player owner;
+//	public ShaderWrapper? timeSlowShader;
+	public const int radius = 120;
+	public float drawRadius = 120;
+	public float drawAlpha = 255;
+	public bool isSnails;
+	float maxTime = 4;
+	float soundTime;
+	public HitStop(
+		Point pos, Player owner, ushort? netId, bool ownedByLocalPlayer, 
+		float? overrideTime = null, bool sendRpc = false
+	) : base(
+		"empty", pos, netId, ownedByLocalPlayer, false
+	) {
+		useGravity = false;
+		this.owner = owner;
+		isSnails = overrideTime != null;
+
+	//	if (Options.main.enablePostProcessing) {
+	//		timeSlowShader = owner.timeSlowShader;
+	//	}
+
+		Global.level.HitStops.Add(this);
+
+		if (isSnails) {
+			maxTime = overrideTime!.Value;
+		}
+
+		netOwner = owner;
+		netActorCreateId = NetActorCreateId.HitStop;
+		if (sendRpc) {
+			createActorRpc(owner.id);
+		}
+
+		canBeLocal = false;
+	}
+
+	public override void update() {
+		base.update();
+		var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
+		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
+
+	
+
+
+		time += Global.spf;
+		if (time > maxTime) {
+			destroySelf(disableRpc: true);
+		}
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		Global.level.HitStops.Remove(this);
+	}
+
+	
+}
+
+
+
 /*
 in Order for this to work as intended I added this to Damager.cs's applydamage section
 
@@ -304,6 +369,56 @@ public class LaunchedState : GenericGrabbedState {
 
 
 
+
+
+public class LaunchedStateWeak : GenericGrabbedState {
+	public Character grabbedChar;
+	//private bool once;
+	public bool launched;
+	float launchTime;
+	bool once;
+	public LaunchedStateWeak(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+		superArmor = true;
+	}
+
+
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.33f) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+			for (int i = 1; i <= 4; i++) {
+				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
+				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
+					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
+					if (!once) {
+						once = true;
+						character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+						character.playSound("crash", sendRpc: true);
+						character.shakeCamera(sendRpc: true);
+					}
+				}
+			}
+
+		}
+
+		if (!launched) {
+			launched = true;
+			character.unstickFromGround();
+			character.vel.y = -200;
+		}
+	}
+}
+
+
+
+
 public class LaunchedFowardState : CharState {
 
 
@@ -315,12 +430,12 @@ public class LaunchedFowardState : CharState {
 	public override void update() {
 		base.update();
 
-	
+
 		character.move(new Point(character.xDir * -350, 0));
 
 		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, -character.xDir, 0);
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer ||
-		(character.vel.x == 0 || character.grounded) && stateTime > 0.2f ) {
+		(character.vel.x == 0 || character.grounded) && stateTime > 0.2f) {
 			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 			character.changeToIdleOrFall();
 			character.playSound("hurt", sendRpc: true);
@@ -332,7 +447,7 @@ public class LaunchedFowardState : CharState {
 			return;
 		}
 
-	
+
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -494,4 +609,25 @@ public class WcutGenericDodgeB : CharState {
 }
 
 
+
+
+public class ForceGrabbed : GenericGrabbedState {
+	public const float maxGrabTime = 4;
+	public ForceGrabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
+	}
+
+
+	public override void update() {
+		trySnapToGrabPoint(true);
+		if (grabber.sprite.name.Contains("idle") ||
+		grabber.sprite.name.Contains("crouch") ||
+		grabber.sprite.name.Contains("run") ||
+		grabber.sprite.name.Contains("hurt") ||
+		grabber.sprite.name.Contains("grabbed")
+	
+		) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
 

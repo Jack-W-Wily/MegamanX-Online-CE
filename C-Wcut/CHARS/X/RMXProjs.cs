@@ -8,24 +8,8 @@ namespace MMXOnline;
 
 
 
-// Adding a Weapon
-public class Vava1Melee : Weapon {
-	public static Vava1Melee netWeapon = new();
-
-	public Vava1Melee() : base() {
-		fireRate = 45;// frames
-		index = (int)WeaponIds.KRMelee;// Make sure to add to "WeaponIds" on Enums.cs for it to work
-		killFeedIndex = 167;//what sprite will appear in the kill index
-	}
-}
-
-
-
-
-
-
-public class Vava1GenericMeleeProj : Projectile {
-	public Vava1GenericMeleeProj(
+public class RMXGenericMeleeProj : Projectile {
+	public RMXGenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
@@ -132,26 +116,15 @@ public class Vava1GenericMeleeProj : Projectile {
 		// Command grab section
 		Character? grabberChar = owner.character;
 		Character? grabbedChar = damagable as Character;
+		
 		switch (projId) {
 			case (int)ProjIds.GenericWCUTGrabProjID:
-				grabberChar?.changeState(new Vava1GrabState(grabbedChar));
-				grabbedChar?.changeState(new Vava1Grabbed(grabberChar));
+				grabberChar.changeState(new RMXGrabState(grabbedChar));
+				grabbedChar.changeState(new RMXGrabbed(grabberChar));
 				break;
-			case (int)ProjIds.RagingDemon:
-				grabberChar?.changeState(new RagingDemonSuccess(grabbedChar));
-				grabbedChar?.changeState(new Vava1Grabbed(grabberChar));
+			case (int)ProjIds.ForceGrabState:
+				grabbedChar.changeState(new ForceGrabbed(grabberChar));
 				break;
-			case (int)ProjIds.BurensenStart:
-				grabberChar?.changeState(new VavaBurensen2(grabbedChar));
-				grabbedChar?.changeState(new PushedOver2(grabberChar.xDir));
-				break;
-			case (int)ProjIds.BurensenStomp:
-				grabbedChar?.changeState(new VileStomped(grabberChar));
-				break;
-			case (int)ProjIds.BurensenEND:
-			grabbedChar?.shakeCamera(sendRpc: true);
-			grabbedChar?.changeState(new LaunchedFowardState());
-			break;
 		}
 	}
 

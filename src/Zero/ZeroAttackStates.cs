@@ -169,6 +169,21 @@ public class ZeroDashSlashState : ZeroGenericMeleeState {
 		soundFrame = 1;
 		canSpecialCancel = true;
 	}
+public override bool altCtrlUpdate(bool[] ctrls) {
+		if (zero.specialPressed &&
+			zero.specialPressTime > zero.shootPressTime &&
+			character.sprite.frameIndex >= 6 
+		) {
+			zero.groundSpecial.attack2(zero);
+			return true;
+		}
+		if (zero.shootPressed || player.isAI) {
+			zero.shootPressTime = 0;
+			zero.changeState(new ZeroSlash3State(), true);
+			return true;
+		}
+		return false;
+	}
 }
 
 public class ZeroShippuugaState : ZeroGenericMeleeState {

@@ -3159,6 +3159,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (charState is not Die and not InRideArmor and not InRideChaser) {
 			changeState(new Hurt(dir, flinchFrames, spiked), true);
+			new HitStop(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: flinchFrames * 0.01f, sendRpc: true);
 			return;
 		}
 	}

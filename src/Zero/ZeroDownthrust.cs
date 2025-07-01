@@ -86,6 +86,7 @@ public class ZeroDownthrust : CharState {
 		transitionSprite: getSpriteName(type) + "_start"
 	) {
 		this.type = type;
+		airMove = true;
 	}
 
 	public ZeroDownthrust(

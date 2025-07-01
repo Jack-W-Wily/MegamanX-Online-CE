@@ -36,6 +36,7 @@ public enum NetActorCreateId {
 	OverdriveOstrich,
 	FakeZero,
 	CrystalHunterCharged,
+	HitStop,
 	CrystalSnailShell,
 	BlizzardBuffalo,
 	ToxicSeahorse,
@@ -157,6 +158,9 @@ public class RPCCreateActor : RPC {
 				break;
 			case (int)NetActorCreateId.CrystalHunterCharged:
 				new CrystalHunterCharged(pos, player, netProjByte, false, 2, false);
+				break;
+			case (int)NetActorCreateId.HitStop:
+				new HitStop(pos, player, netProjByte, false, 2, false);
 				break;
 			case (int)NetActorCreateId.MechaniloidTank:
 				new Mechaniloid(pos, player, xDir, new MechaniloidWeapon(player, MechaniloidType.Tank), MechaniloidType.Tank, netProjByte, false);

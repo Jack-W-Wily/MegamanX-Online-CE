@@ -1,8 +1,7 @@
 ﻿namespace MMXOnline;
 
-
-public class Vava1Grab : Weapon {
-	public Vava1Grab() : base() {
+public class RMXGrab : Weapon {
+	public RMXGrab() : base() {
 		fireRate = 45;
 		index = (int)WeaponIds.VileMK2Grab;
 		killFeedIndex = 63;
@@ -11,10 +10,10 @@ public class Vava1Grab : Weapon {
 
 
 
-public class Vava1GrabStartState : CharState {
+public class RMXGrabStartState : CharState {
 
 
-	public Vava1GrabStartState() : base("spring_grab") {
+	public RMXGrabStartState() : base("grab_start") {
 
 	}
 
@@ -37,27 +36,28 @@ public class Vava1GrabStartState : CharState {
 
 
 
-public class Vava1GrabState : CharState {
+public class RMXGrabState : CharState {
 	public Character? victim;
 	float leechTime = 1;
-
-	float regenTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 
 	public bool UsedGrabFinisherOnce;
 	float timeWaiting;
 
-	public Vava1GrabState(Character? victim) : base("grab") {
+	public RMXGrabState(Character? victim) : base("grab") {
 		this.victim = victim;
-		grabTime = Vava1Grabbed.maxGrabTime;
+		grabTime = KurumaGrabbed.maxGrabTime;
 	}
 
 	public override void update() {
 		base.update();
 		grabTime -= Global.spf;
-		regenTime += Global.spf;
 		leechTime += Global.spf;
-
+		if (character.xDir == -1) {
+			victim.xDir = 1;
+		} else {
+			victim.xDir = -1;
+		}
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")
 		) {
 			//	character.changeToIdleOrFall();
@@ -87,7 +87,7 @@ public class Vava1GrabState : CharState {
 
 		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
-			character.changeSpriteFromName("violentcrusher_grab", true);
+			character.changeSpriteFromName("grab_down", true);
 		}
 		
 			if ((player.input.isPressed(Control.Left, player)
@@ -107,58 +107,44 @@ public class Vava1GrabState : CharState {
 			}
 		}
 		
-		if (character.sprite.name.Contains("up") && character.frameIndex == 1) {
+		if (character.sprite.name.Contains("up") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 25, 0);
-					new Anim(victim.pos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, character.ownedByLocalPlayer);
-				character.playSound("explosionX3", sendRpc: true);
-				character.shakeCamera(sendRpc: true);
+				
+			character.shakeCamera(sendRpc: true);
 				victim.shakeCamera(sendRpc: true);
-				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.Ryuenjin);
+				victim.changeState(new PushedOver(victim.xDir), true);
 			}
 		}
 
-		if (character.sprite.name.Contains("violentcrusher_grab") && character.frameIndex == 1) {
+		if (character.sprite.name.Contains("down") && character.frameIndex == 8) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
 				var damager = new Damager(player, 3, 0, 0);
 				damager.applyDamage(victim, false, new FireWave(), character,
 				(int)ProjIds.MechFrogStompShockwave);
 				new MechFrogStompShockwave(new FireWave(),
-				character.pos.addxy(6 * victim.xDir, 0f), victim.xDir, player,
+				character.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
 				player.getNextActorNetId(), rpc: true);
-				victim.changeState(new KnockedDown(victim.pos.x < character?.pos.x ? -1 : 1), true);
+				victim.changeState(new LaunchedStateWeak(character), true);
 				victim.playSound("crash", true);
 			}
 		}
 
-		if (character.sprite.name.Contains("foward") && character.frameIndex == 1) {
+		if (character.sprite.name.Contains("foward") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 20, 0);
-				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.UPPunch);
+				victim.changeState(new LaunchedFowardState(), true);
 			}
 		}
 
-		if (regenTime > 0.4f) {
-			regenTime = 0;
-			character.addHealth(0.5f);
-			var damager = new Damager(player, 1, 0, 0.1f);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
-		}
 
 
-
-		if ((character.sprite.name.Contains("up"))
-		&& character.isAnimOver()) {
-			character.changeToIdleOrFall();
-			return;
-		}
+	
 
 		
 		if ((character.sprite.name.Contains("up")
-		|| character.sprite.name.Contains("violentcrusher_grab")
+		|| character.sprite.name.Contains("down")
 		|| character.sprite.name.Contains("foward")
 		)
 		&& character.isAnimOver()) {
@@ -186,7 +172,7 @@ public class Vava1GrabState : CharState {
 		if (newState is not VileMK2GrabState && victim != null &&
 
 		!character.sprite.name.Contains("up") &&
-		 !character.sprite.name.Contains("violentcrusher_grab")&&
+		 !character.sprite.name.Contains("down")&&
 		 !character.sprite.name.Contains("foward")	) {
 			victim.grabInvulnTime = 2;
 			victim.stunInvulnTime = 1;
@@ -195,9 +181,9 @@ public class Vava1GrabState : CharState {
 	}
 }
 
-public class Vava1Grabbed : GenericGrabbedState {
+public class RMXGrabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
-	public Vava1Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
+	public RMXGrabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
 	}
 
 
@@ -205,45 +191,5 @@ public class Vava1Grabbed : GenericGrabbedState {
 	trySnapToGrabPoint(true);
 	}
 }
-
-
-
-public class VileStomped : CharState {
-	public const float maxGrabTime = 4;
-	public Character? grabber;
-	public long savedZIndex;
-	public VileStomped(Character? grabber) : base("knocked_down") {
-		this.grabber = grabber;
-	}
-
-	public override bool canEnter(Character character) {
-		if (!base.canEnter(character)) return false;
-		return !character.isInvulnerable() && !character.charState.invincible;
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		character.stopMoving();
-		character.stopCharge();
-		savedZIndex = character.zIndex;
-		character.setzIndex(grabber.zIndex - 100);
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.grabInvulnTime = 0.5f;
-		character.setzIndex(savedZIndex);
-	}
-
-	public override void update() {
-		base.update();
-
-		grabTime -= player.mashValue();
-		if (grabTime <= 0) {
-			character.changeToIdleOrFall();
-		}
-	}
-}
-
 
 

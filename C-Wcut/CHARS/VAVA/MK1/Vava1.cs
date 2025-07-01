@@ -422,6 +422,7 @@ public class VAVA1 : Character {
 		BurensenStart,
 		BurensenStomp,
 		BurensenEND,
+		RagingDemon,
 		Kote,
 	}
 
@@ -438,6 +439,7 @@ public class VAVA1 : Character {
 			"vava_hoticecle" => MeleeIds.HotIcecle,
 			"vava_burensen_1" => MeleeIds.BurensenStart,
 			"vava_burensen_2" => MeleeIds.BurensenStomp,
+			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
 			"vava_burensen_finish" or "vava_hyperdash_attack" => MeleeIds.BurensenEND,
 			_ => MeleeIds.None
 		});
@@ -501,6 +503,13 @@ public class VAVA1 : Character {
 			(int)MeleeIds.BurensenEND => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				4, 0, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.RagingDemon => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.RagingDemon, player,
+				5, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
@@ -951,6 +960,8 @@ public class VAVA1 : Character {
 
 	public float AIHellBarrageCD;
 
+	public bool AIStart;
+
 	public override void aiAttack(Actor? target) {
 		int Vattack = Helpers.randomRange(1, 7);
 		Helpers.decrementFrames(ref AIHellBarrageCD);
@@ -960,117 +971,126 @@ public class VAVA1 : Character {
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 
 
-		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-			&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+		if (!AIStart  && charState.attackCtrl ) {
+			changeState(new VB1(), true);
+			AIStart = true;
+		} else {
 
-			if (charState is Dash or AirDash && isFacingTarget) {
-				charState.isGrabbing = true;
-				charState.superArmor = true; // yes Cry Gsu I'm adding the annoying SuperArmor
-				changeSpriteFromName("dash_grab", true);
+			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+
+				if (charState is Dash or AirDash && isFacingTarget) {
+					charState.isGrabbing = true;
+					charState.superArmor = true; // yes Cry Gsu I'm adding the annoying SuperArmor
+					changeSpriteFromName("dash_grab", true);
+				}
+
+
+
+
+				if (isTargetClose && grounded) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+							changeState(new VavaBurensen1());
+							break;
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
+							break;
+						case 3 when isFacingTarget:
+							changeState(new InfinityGigAttackBossVer());
+							break;
+						case 4 when isFacingTarget:
+							if (phase2) {
+									changeState(new RagingDemonStart());
+							} else {
+								changeState(new Vava1GrabStartState());
+							}
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VKamaeHotIcecle());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new VAVAKamae());
+							break;
+						case 7 when isFacingTarget:
+							changeState(new VavaBurensen1());
+							break;
+					}
+				}
+
+				if (!grounded) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+							changeState(new ExplosiveRoundState());
+							break;
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
+							break;
+						case 3 when isFacingTarget:
+							changeState(new InfinityGigAttackBossVer());
+							break;
+						case 4 when isFacingTarget:
+							changeState(new SpreadShotKnee());
+							break;
+						case 5 when isFacingTarget:
+							changeState(new PeaceOutRollerAttack());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new VKamaeUnblockableStart());
+							break;
+						case 7 when isFacingTarget:
+							changeState(new ExplosiveRoundStateBoss());
+							break;
+					}
+				}
+
+				if (!isTargetClose && grounded && isWishinRangedMoves) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+							changeState(new ShoulderCannon(grounded));
+							break;
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
+							break;
+						case 3 when isFacingTarget:
+							changeState(new InfinityGigAttackBossVer());
+							break;
+						case 4 when isFacingTarget:
+							changeState(new VKamaeUnblockableStart());
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VKamaeDash());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new VileDashChargeState());
+							break;
+						case 7 when isFacingTarget:
+							changeState(new PopcornHell(grounded));
+							break;
+					}
+				}
+
+				aiAttackCooldown = Helpers.randomRange(0, 30);
 			}
 
-
-
-
-			if (isTargetClose && grounded) {
-				switch (Vattack) {
-					case 1 when isFacingTarget:
-						changeState(new VavaBurensen1());
-						break;
-					case 2 when isFacingTarget:
-						changeState(new SpoiledBratPunch());
-						break;
-					case 3 when isFacingTarget:
-						changeState(new InfinityGigAttack());
-						break;
-					case 4 when isFacingTarget:
-						changeState(new Vava1GrabStartState());
-						break;
-					case 5 when isFacingTarget:
-						changeState(new VKamaeHotIcecle());
-						break;
-					case 6 when isFacingTarget:
-						changeState(new VAVAKamae());
-						break;
-					case 7 when isFacingTarget:
-						changeState(new VavaBurensen1());
-						break;
+			if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
+				if (Helpers.randomRange(0, 4) == 0) {
+					changeState(new VKamaeHotIcecle());
+				}
+				if (Helpers.randomRange(0, 4) == 1) {
+					changeState(new VKamaeBDash());
+				}
+				if (Helpers.randomRange(0, 4) == 2) {
+					changeState(new VKamaeDash());
+				}
+				if (Helpers.randomRange(0, 4) == 3) {
+					changeState(new VKamaeUnblockableStart());
+				}
+				if (Helpers.randomRange(0, 4) == 4) {
+					changeState(new VKote());
 				}
 			}
-
-			if (!grounded) {
-				switch (Vattack) {
-					case 1 when isFacingTarget:
-						changeState(new ExplosiveRoundState());
-						break;
-					case 2 when isFacingTarget:
-						changeState(new SpoiledBratPunch());
-						break;
-					case 3 when isFacingTarget:
-						changeState(new InfinityGigAttack());
-						break;
-					case 4 when isFacingTarget:
-						changeState(new SpreadShotKnee());
-						break;
-					case 5 when isFacingTarget:
-						changeState(new PeaceOutRollerAttack());
-						break;
-					case 6 when isFacingTarget:
-						changeState(new VKamaeUnblockableStart());
-						break;
-					case 7 when isFacingTarget:
-						changeState(new ExplosiveRoundStateBoss());
-						break;
-				}
-			}
-
-			if (!isTargetClose && grounded && isWishinRangedMoves) {
-				switch (Vattack) {
-					case 1 when isFacingTarget:
-						changeState(new ShoulderCannon(grounded));
-						break;
-					case 2 when isFacingTarget:
-						changeState(new SpoiledBratPunch());
-						break;
-					case 3 when isFacingTarget:
-						changeState(new InfinityGigAttack());
-						break;
-					case 4 when isFacingTarget:
-						changeState(new VKamaeUnblockableStart());
-						break;
-					case 5 when isFacingTarget:
-						changeState(new VKamaeDash());
-						break;
-					case 6 when isFacingTarget:
-						changeState(new VileDashChargeState());
-						break;
-					case 7 when isFacingTarget:
-						changeState(new PopcornHell(grounded));
-						break;
-				}
-			}
-
-			aiAttackCooldown = Helpers.randomRange(0, 30);
 		}
-
-		if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
-			if (Helpers.randomRange(0, 4) == 0) {
-				changeState(new VKamaeHotIcecle());
-			}
-			if (Helpers.randomRange(0, 4) == 1) {
-				changeState(new VKamaeBDash());
-			}
-			if (Helpers.randomRange(0, 4) == 2) {
-				changeState(new VKamaeDash());
-			}
-			if (Helpers.randomRange(0, 4) == 3) {
-				changeState(new VKamaeUnblockableStart());
-			}
-			if (Helpers.randomRange(0, 4) == 4) {
-				changeState(new VKote());
-			}
-		}
-
 		base.aiAttack(target);
 	}
 

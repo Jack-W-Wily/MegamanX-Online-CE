@@ -15,6 +15,8 @@ public class RockmanX : MegamanX {
 	
 	public bool canSpecialCancel = false;
 
+	public float DodgeCD;
+
 
 	public RockmanX(
 		Player player, float x, float y, int xDir,
@@ -24,7 +26,7 @@ public class RockmanX : MegamanX {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 
-		charId = CharIds.RockmanX; 
+		charId = CharIds.RockmanX;
 
 		// For special conditions stuff
 		if (charState is WarpIn) superBarAmmo = 0;
@@ -63,14 +65,28 @@ public class RockmanX : MegamanX {
 		
 		if (player.input.isHeld(Control.L2, player)
 		&& player.input.isPressed(Control.Shoot, player)) {
-		
+			changeState(new RMXGrabStartState(), true);
 			
 		}
 
 		if (player.input.isHeld(Control.L2, player)
-		&& player.input.isPressed(Control.Dash, player)) {
+		&& player.input.isPressed(Control.Dash, player) && DodgeCD == 0) {
+
 		
+				changeState(new WarpDodge(pos), true);
 			
+			DodgeCD = 0.43f;
+		}
+
+
+		if (player.input.checkShoryuken(player, xDir, Control.R2)) {
+				changeState(new RMXDoubleKick(), true);
+		}
+
+		if (player.input.isPressed(Control.R2, player) &&
+		!player.input.checkShoryuken(player, xDir, Control.R2)
+		&& charState is not RMXDoubleKick) {
+				changeState(new RMXPunch(), true);
 		}
 
 
@@ -81,19 +97,7 @@ public class RockmanX : MegamanX {
 
 	public override void update() {
 		base.update();
-		// For the special cancels to work
-		if (charState.attackCtrl ||
-		charState.normalCtrl ||
-		charState is KurumitoStandingKick or
-		 KurumitosShikiYamiBaraiLv1 or
-		 KurumitoFowardKick or
-		 KuromitosBatsuyomi or  KurumitosDokuGami or
-		KurumitosAirDunk
-		) {
-			canSpecialCancel = true;
-		} else {
-			canSpecialCancel = false;
-		}
+	
 
 		if (overDriveTimer > 0) {
 		OverDrive = true;
@@ -102,6 +106,7 @@ public class RockmanX : MegamanX {
 		}
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
+		Helpers.decrementTime(ref DodgeCD);
 
 	
 
@@ -178,6 +183,12 @@ public class RockmanX : MegamanX {
 		ZSaberAir,
 		NovaStrike,
 
+		DoubleKick,
+		DoubleKick2,
+
+		Punch1,
+		Punch2,
+
 
 	}
 
@@ -189,8 +200,13 @@ public class RockmanX : MegamanX {
 			"rmx_block"   => MeleeIds.Blocking, 
 			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
 			"mmx_shoryuken" => MeleeIds.Shoryuken,
+			"rmx_punch_1" => MeleeIds.Punch1,
+			"rmx_grab_start" => MeleeIds.Grab,
+			"rmx_punch_2" => MeleeIds.Punch2,
 			"mmx_beam_saber" or "mmx_beam_saber_air" => MeleeIds.MaxZSaber,
 			"mmx_beam_saber2" => MeleeIds.ZSaber,
+			"rmx_double_kick" when frameIndex < 5 => MeleeIds.DoubleKick,
+			"rmx_double_kick" when frameIndex > 5 => MeleeIds.DoubleKick2,
 			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
 			"mmx_nova_strike" or "mmx_nova_strike_down" or "mmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
@@ -208,42 +224,64 @@ public class RockmanX : MegamanX {
 	// this is where you effectively make the melee hitboxes trigger
 	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
-					(int)MeleeIds.Blocking => new GenericMeleeProj(
+					(int)MeleeIds.Blocking => new RMXGenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				isZSaberClang: true, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+				(int)MeleeIds.Grab => new RMXGenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
+				 0, 0, isDeflectShield: true,
+				isZSaberClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
-			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
+			(int)MeleeIds.SpeedBurnerCharged => new RMXGenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
+			(int)MeleeIds.LightHeadbutt => new RMXGenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				2, Global.halfFlinch, 30, addToLevel: addToLevel
+			),
+			(int)MeleeIds.DoubleKick => new RMXGenericMeleeProj(
+				LhHeadbutt.netWeapon, projPos, ProjIds.ForceGrabState, player,
+				2, 0, 10, addToLevel: addToLevel
+			),
+			(int)MeleeIds.DoubleKick2 => new RMXGenericMeleeProj(
+				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
+				2, Global.defFlinch, 10, addToLevel: addToLevel
+			),
+			(int)MeleeIds.Punch1 => new RMXGenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
+				2, Global.defFlinch, 10, addToLevel: addToLevel
+			),
+			(int)MeleeIds.Punch2 => new RMXGenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
+				2, Global.defFlinch, 10, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
+			(int)MeleeIds.Shoryuken => new RMXGenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
 				2, Global.defFlinch, 10, addToLevel: addToLevel
 			),
-			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
+			(int)MeleeIds.MaxZSaber => new RMXGenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
-			(int)MeleeIds.ZSaber => new GenericMeleeProj(
+			(int)MeleeIds.ZSaber => new RMXGenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
 				1, Global.halfFlinch, 5, addToLevel: addToLevel, isZSaberEffect: true
 			),
-			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
+			(int)MeleeIds.ZSaberAir => new RMXGenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
 				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
-			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
+			(int)MeleeIds.NovaStrike => new RMXGenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
