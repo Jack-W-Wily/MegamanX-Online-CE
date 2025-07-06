@@ -247,19 +247,19 @@ public class RockmanX : MegamanX {
 			),
 			(int)MeleeIds.DoubleKick => new RMXGenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 10, addToLevel: addToLevel
+				2, 0, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.DoubleKick2 => new RMXGenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 10, addToLevel: addToLevel
+				2, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch1 => new RMXGenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				2, Global.defFlinch, 10, addToLevel: addToLevel
+				2, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new RMXGenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				2, Global.defFlinch, 10, addToLevel: addToLevel
+				2, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,

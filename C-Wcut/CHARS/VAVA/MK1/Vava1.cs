@@ -121,23 +121,27 @@ public class VAVA1 : Character {
 
 	public override bool attackCtrl() {
 
-		if (player.input.isPressed(Control.Shoot, player)) {
-			if (grounded) {
-				if (player.input.isLeftOrRightHeld(player)) {
-					changeState(new GoGetterRightAttack(), true);
+		if (player.input.checkHadoken(player, xDir, Control.Shoot)) {
+				changeState(new VAVAKamae(), true);
+		}
+		if (!player.input.checkHadoken(player, xDir, Control.Shoot)) {
+			if (player.input.isPressed(Control.Shoot, player)) {
+				if (grounded) {
+					if (player.input.isLeftOrRightHeld(player)) {
+						changeState(new GoGetterRightAttack(), true);
+					} else {
+						changeState(new VAVAJab1(), true);
+					}
 				} else {
-					changeState(new VAVAJab1(), true);
-				}
-			} else {
-				if (player.input.isHeld(Control.Down, player)) {
-					changeState(new InfinityGigAttack(), true);
-				} else {
-					changeState(new SpoiledBratPunch(), true);
+					if (player.input.isHeld(Control.Down, player)) {
+						changeState(new InfinityGigAttack(), true);
+					} else {
+						changeState(new SpoiledBratPunch(), true);
+					}
 				}
 			}
 		}
-
-
+		
 
 		if (player.input.isPressed(Control.Special1, player)) {
 			if (grounded) {

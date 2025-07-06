@@ -489,6 +489,15 @@ public class ZeroMID : Zero {
 			}
 			return true;
 		}
+		// Dash Cancel
+		else if (player.dashPressed(out string dashControl)) {
+			if (grounded) {
+				changeState(new Dash(dashControl), true);
+			} else {
+				changeState(new AirDash(dashControl), true);
+			}
+				return true;
+		}
 
 
 

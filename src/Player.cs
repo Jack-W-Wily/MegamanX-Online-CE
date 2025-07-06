@@ -2540,9 +2540,11 @@ public partial class Player {
 		} else if (!Options.main.disableDoubleDash) {
 			if (input.isPressed(Control.Left, this) && input.checkDoubleTap(Control.Left)) {
 				dashControl = Control.Left;
+				character.slideVel = character.xDir * character.getDashSpeed();
 				return true;
 			} else if (input.isPressed(Control.Right, this) && input.checkDoubleTap(Control.Right)) {
 				dashControl = Control.Right;
+				character.slideVel = character.xDir * character.getDashSpeed();
 				return true;
 			}
 		}

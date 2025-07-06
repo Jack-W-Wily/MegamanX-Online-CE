@@ -798,6 +798,7 @@ public class Dash : CharState {
 	public float dashTime;
 	public float dustTime;
 	public string initialDashButton;
+
 	public int dashDir;
 	public bool stop;
 	public Anim? dashSpark;
@@ -873,6 +874,9 @@ public class Dash : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+				if (player.input.isHeld(Control.Left, player)) dashDir = -1;
+			else if (player.input.isHeld(Control.Right, player)) dashDir = 1;
+		
 		dashDir = character.xDir;
 		character.isDashing = true;
 		//character.globalCollider = character.getDashingCollider();
@@ -990,6 +994,9 @@ public class AirDash : CharState {
 		if (character is CmdSigma or Doppma) {
 			character.frameIndex = 1;
 		}
+			if (player.input.isHeld(Control.Left, player)) dashDir = -1;
+			else if (player.input.isHeld(Control.Right, player)) dashDir = 1;
+		
 	}
 
 	public override void onExit(CharState? newState) {
