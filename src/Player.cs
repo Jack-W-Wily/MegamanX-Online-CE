@@ -1091,7 +1091,7 @@ public partial class Player {
 			alliance = newAlliance;
 		}
 
-		if (forceSpawn || isMainChar && character != null && charNetId == character.netId) {
+		if (isMainChar && character != null && charNetId == character.netId) {
 			return null;
 		}
 
