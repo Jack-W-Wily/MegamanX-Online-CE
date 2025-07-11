@@ -145,10 +145,7 @@ public partial class Character : Actor, IDamagable {
 
 	//>>>>>>>>>>>>>>>>>
 
-	// For Overdrive and SUper Bars
-	public float superBarAmmo;
-
-	public float superBarMaxAmmo = 32;
+	// For Overdrive
 
 	public float overDriveTimer;
 
@@ -1361,6 +1358,12 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Ground normal states.
 		if (grounded) {
+			if (player.input.isPressed(Control.Left, player) && player.input.checkDoubleTap(Control.Left)) {
+				slideVel = xDir * getDashSpeed();			
+			}
+			if (player.input.isPressed(Control.Right, player) && player.input.checkDoubleTap(Control.Right)) {
+				slideVel = xDir * getDashSpeed();
+			}
 			if (player.input.isPressed(Control.Jump, player) && canJump()) {
 				vel.y = -getJumpPower();
 				isDashing = (
@@ -3143,6 +3146,8 @@ public partial class Character : Actor, IDamagable {
 		this.flag = flag;
 	}
 
+	public HitStop hitstops;
+
 	public void setHurt(int dir, int flinchFrames, bool spiked) {
 		if (!ownedByLocalPlayer) {
 			return;
@@ -3171,7 +3176,9 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (charState is not Die and not InRideArmor and not InRideChaser) {
 			changeState(new Hurt(dir, flinchFrames, spiked), true);
-			new HitStop(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: flinchFrames * 0.01f, sendRpc: true);
+		//	if (hitstops == null){
+		//	hitstops = new HitStop(pos, player, player.getNextActorNetId(), player.ownedByLocalPlayer, overrideTime: flinchFrames * 0.01f, sendRpc: true);
+		//	}
 			return;
 		}
 	}

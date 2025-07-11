@@ -64,6 +64,7 @@ public class HitStop : Actor {
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.HitStops.Remove(this);
+		owner.character.hitstops = null;
 	}
 
 	

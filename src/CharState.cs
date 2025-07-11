@@ -717,6 +717,10 @@ public class ZeroClang : CharState {
 			this.character.changeToIdleOrFall();
 		}
 		*/
+
+		if (!character.sprite.name.Contains("clang")) {
+			character.changeSpriteFromName("land", true);
+		}
 		if (hurtSpeed == 0) {
 			character.changeToIdleOrFall();
 		}

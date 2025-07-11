@@ -594,6 +594,31 @@ public class Damager {
 				}
 			}
 
+			// For Grabs to work (WCUT)
+
+			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
+				if (owner?.character is RockmanX) {
+					character?.changeState(new RMXGrabbed(owner.character));
+					owner.character?.changeState(new RMXGrabState(character));
+				}
+
+				if (owner?.character is VAVA1) {
+					character?.changeState(new Vava1Grabbed(owner.character));
+					owner.character?.changeState(new Vava1GrabState(character));
+				}
+				if (owner?.character is Kurumitos) {
+					character?.changeState(new KurumaGrabbed(owner.character));
+					owner.character?.changeState(new KurumaGrabState(character));
+				}
+			}
+
+			if (projId == (int)ProjIds.GizmoGrab) {
+				if (owner?.character is VAVA1) {
+					character?.changeState(new VileMK2GrabState(owner.character));
+					owner.character?.changeState(new VavaGizmoGrabState(character));
+				}
+			}
+
 			
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner, projId)) {
@@ -901,6 +926,20 @@ public class Damager {
 			zeroParryState.counterAttack(owner, damagingActor);
 			return true;
 		}
+
+		if ((damage > 0 || finalDamage > 0) && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			charState is RMXGrabStartState && preCharacter.frameIndex < 3 
+			
+		) {
+			preCharacter.addHealth(1);
+			preCharacter.charState.invincible = true;
+			preCharacter.playSound("zeroParry");
+			victim.addDamageText("Parry!!", 1);
+			owner.character.changeState(new ZeroClang(preCharacter.xDir), true);
+			return true;
+		}
+
 		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 
 		return true;

@@ -363,14 +363,10 @@ public class InfinityGigAttackBossVer : CharState {
 
 		
 		if (proj != null) {
-			if (player.input.isPressed(Control.Special1, player)) {
-					specialPressTime = 0.25f;
-				}
+				specialPressTime = 0.25f;
+				
 
-				if (specialPressTime > 0 && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
-					character.frameIndex = 4;
-					character.frameTime = 0;
-				} else if (character.isAnimOver()) {
+				if (character.isAnimOver()) {
 					character.changeToIdleOrFall();
 					return;
 				}

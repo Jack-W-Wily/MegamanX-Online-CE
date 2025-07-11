@@ -467,6 +467,9 @@ public partial class Player {
 
 	public int hyperChargeSlot;
 	public int xArmor1v1;
+
+	public float superAmmo = 32;
+	public float superMaxAmmo = 32;
 	public float vileAmmo = 32;
 	public float vileMaxAmmo = 32;
 	public float sigmaAmmo = 32;
@@ -2542,12 +2545,10 @@ public partial class Player {
 			return true;
 		} else if (!Options.main.disableDoubleDash) {
 			if (input.isPressed(Control.Left, this) && input.checkDoubleTap(Control.Left)) {
-				dashControl = Control.Left;
-				character.slideVel = character.xDir * character.getDashSpeed();
+				dashControl = Control.Left;			
 				return true;
 			} else if (input.isPressed(Control.Right, this) && input.checkDoubleTap(Control.Right)) {
 				dashControl = Control.Right;
-				character.slideVel = character.xDir * character.getDashSpeed();
 				return true;
 			}
 		}

@@ -23,7 +23,7 @@ public class RocketPunchProjWC : Projectile {
 		weapon, pos, xDir, getSpeed(weapon.type), 1,
 		player, weapon.projSprite, Global.defFlinch, 0.3f, netProjId, player.ownedByLocalPlayer
 	) {
-		projId = (int)ProjIds.RocketPunch;
+		projId = (int)ProjIds.RocketPunchWC;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
@@ -36,10 +36,10 @@ public class RocketPunchProjWC : Projectile {
 			//damager.hitCooldown = 6;
 			maxTime = 0.15f;
 			destroyOnHit = true;
-			projId = (int)ProjIds.SpoiledBrat;
+			projId = (int)ProjIds.SpoiledBratWC;
 			type = 1;
 		} else if (weapon.type == (int)RocketPunchType.InfinityGig) {
-			projId = (int)ProjIds.InfinityGig;
+			projId = (int)ProjIds.InfinityGigWC;
 			type = 2;
 		} else {
 			maxReverseTime = 0.2f;
@@ -169,6 +169,7 @@ public class GoGetterRightAttack : CharState {
 
 		if (!shot && character.sprite.frameIndex == 3) {
 			shoot();
+			player.vileAmmo -= 8;
 		}
 
 	
@@ -259,6 +260,7 @@ public class InfinityGigAttack : CharState {
 
 		if (!shot && character.sprite.frameIndex == 3) {
 			shoot();
+			player.vileAmmo -= 14;
 		}
 
 		

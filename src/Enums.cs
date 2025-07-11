@@ -762,10 +762,18 @@ public enum ProjIds {
 	OrochinagiProj,
 
 	// VAVA (WCUT)
+
+	TridentLine,
+	VJab1,
+	VJab2,
+	RocketPunchWC,
+	InfinityGigWC,
+	SpoiledBratWC,
 	BurensenStart,
 	BurensenStomp,
 	BurensenEND,
 	RagingDemon,
+	GizmoGrab,
 	// Special damage types.
 	SelfDmg = 30000,
 

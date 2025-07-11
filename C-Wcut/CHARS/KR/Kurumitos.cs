@@ -25,11 +25,18 @@ public class Kurumitos : Character {
 
 	/* add it to Character.CS
 
-	public float superBarAmmo;
+
 
 	public float overDriveTimer;
 
 	public bool OverDrive;
+
+
+	///////////////////////////////////////////
+
+	add it to Player.CS
+
+	public float player.superAmmo;
 
 
 	*/
@@ -208,7 +215,7 @@ public static CharSelection[] selections => [
 
 
 		// For special conditions stuff
-		if (charState is WarpIn) superBarAmmo = 0;
+		if (charState is WarpIn) player.superAmmo = 0;
 
 	}
 
@@ -317,9 +324,9 @@ public static CharSelection[] selections => [
 			}
 
 
-			if (player.input.checkShoryuken(player, xDir, Control.Special1) && superBarAmmo > 26) {
+			if (player.input.checkShoryuken(player, xDir, Control.Special1) && player.superAmmo > 26) {
 				changeState(new KurumitosOrochinagiCharge(), true);
-				player.vileAmmo = 0;
+				player.superAmmo = 0;
 
 			}
 
@@ -344,7 +351,7 @@ public static CharSelection[] selections => [
 
 
 
-		if (superBarAmmo >= superBarMaxAmmo) {
+		if (player.superAmmo >= player.superMaxAmmo) {
 			weaponHealAmount = 0;
 		}
 		if (weaponHealAmount > 0 && player.health > 0) {
@@ -352,7 +359,7 @@ public static CharSelection[] selections => [
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
-				superBarAmmo = Helpers.clampMax(superBarAmmo + 1, superBarMaxAmmo);
+				player.superAmmo = Helpers.clampMax(player.superAmmo + 1, player.superMaxAmmo);
 				playSound("healX3", forcePlay: true, true);
 				
 			}
@@ -504,7 +511,7 @@ public static CharSelection[] selections => [
 			),
 			(int)MeleeIds.Grab => new KRGenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 0,0,0, isReflectShield: false,
+				 1,0,10, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
@@ -525,7 +532,7 @@ public static CharSelection[] selections => [
 	}
 
 	public override bool canAddAmmo() {
-		return (superBarAmmo < superBarMaxAmmo);
+		return (player.superAmmo < player.superMaxAmmo);
 	}
 
 

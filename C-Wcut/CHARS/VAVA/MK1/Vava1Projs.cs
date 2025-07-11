@@ -134,23 +134,23 @@ public class Vava1GenericMeleeProj : Projectile {
 		Character? grabbedChar = damagable as Character;
 		switch (projId) {
 			case (int)ProjIds.GenericWCUTGrabProjID:
-				grabberChar?.changeState(new Vava1GrabState(grabbedChar));
-				grabbedChar?.changeState(new Vava1Grabbed(grabberChar));
+				grabberChar?.changeState(new Vava1GrabState(grabbedChar), true);
+				grabbedChar?.changeState(new Vava1Grabbed(grabberChar), true);
 				break;
 			case (int)ProjIds.RagingDemon:
-				grabberChar?.changeState(new RagingDemonSuccess(grabbedChar));
-				grabbedChar?.changeState(new Vava1Grabbed(grabberChar));
+				grabberChar?.changeState(new RagingDemonSuccess(grabbedChar), true);
+				grabbedChar?.changeState(new Vava1Grabbed(grabberChar), true);
 				break;
 			case (int)ProjIds.BurensenStart:
-				grabberChar?.changeState(new VavaBurensen2(grabbedChar));
-				grabbedChar?.changeState(new PushedOver2(grabberChar.xDir));
+				grabberChar?.changeState(new VavaBurensen2(grabbedChar), true);
+				grabbedChar?.changeState(new PushedOver2(grabberChar.xDir), true);
 				break;
 			case (int)ProjIds.BurensenStomp:
-				grabbedChar?.changeState(new VileStomped(grabberChar));
+				grabbedChar?.changeState(new VileStomped(grabberChar), true);
 				break;
 			case (int)ProjIds.BurensenEND:
 			grabbedChar?.shakeCamera(sendRpc: true);
-			grabbedChar?.changeState(new LaunchedFowardState());
+			grabbedChar?.changeState(new LaunchedFowardState(), true);
 			break;
 		}
 	}

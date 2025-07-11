@@ -87,6 +87,11 @@ public class RMXGrabState : CharState {
 
 		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
+			if (character.xDir == 1) {
+				character.xDir = -1;
+			} else {
+				character.xDir = 1;
+			}
 			character.changeSpriteFromName("grab_down", true);
 		}
 		
@@ -183,12 +188,21 @@ public class RMXGrabState : CharState {
 
 public class RMXGrabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
-	public RMXGrabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
+	public RMXGrabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
 	}
 
 
 	public override void update() {
-	trySnapToGrabPoint(true);
+		trySnapToGrabPoint(true);
+		if (grabber.sprite.name.Contains("idle") ||
+		grabber.sprite.name.Contains("crouch") ||
+		grabber.sprite.name.Contains("run") ||
+		grabber.sprite.name.Contains("hurt") ||
+		grabber.sprite.name.Contains("grabbed")
+	
+		) {
+			character.changeToIdleOrFall();
+		}
 	}
 }
 

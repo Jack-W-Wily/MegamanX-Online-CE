@@ -27,14 +27,14 @@ public partial class Global {
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
-	public const string checksumPrefix = "[Community Edition]";
+	public const string checksumPrefix = "[Wily Cut 98]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumPrefix2 = "CE-A13-RC1-T3";
+	public const string checksumPrefix2 = "WC98 V0.0";
 	// Final checksum key.
 	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.
-	public static string shortForkName = "CE";
+	public static string shortForkName = "WC98";
 
 	public static string prodChecksum = checksumPrefix + " " + assetChecksum;
 

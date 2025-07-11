@@ -625,6 +625,7 @@ public class GameMode {
 			} else {
 				renderHealthAndWeapon(drawPlayer, HUDHealthPosition.Left);
 			}
+			drawSuperHud();
 			// Currency
 			if (!Global.level.is1v1()) {
 				Global.sprites["hud_scrap"].drawToHUD(0, 4, 138);
@@ -753,6 +754,7 @@ public class GameMode {
 		} else {
 			drawTopHUD();
 		}
+		
 
 		if (isOver) {
 			drawWinScreen();
@@ -1347,6 +1349,7 @@ public class GameMode {
 
 	public bool renderHealth(Player player, HUDHealthPosition position, bool isMech) {
 		bool mechBarExists = false;
+		
 
 		string spriteName = "hud_bars_char_hp";
 		float health = player.health;
@@ -1621,41 +1624,8 @@ public class GameMode {
 				baseY -= 2;
 			}
 			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
-
-			baseY2 += 25;
-			baseX2 += 15;
-			Global.sprites["hud_bars_wp_base_x"].drawToHUD(5, baseX2, baseY2);
-			baseY2 -= 16;
-			for (var i = 0; i < MathF.Ceiling(player.character.superBarMaxAmmo * ammoDisplayMultiplier); i++) {
-				if (i < Math.Ceiling(player.character.superBarAmmo * ammoDisplayMultiplier)) {
-					Global.sprites["hud_bars_wp"].drawToHUD(32, baseX2, baseY2);
-				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, baseX2, baseY2);
-				}
-				baseY -= 2;
-			}
-			Global.sprites["hud_health_top"].drawToHUD(0, baseX2, baseY2);
 			return;
 		}
-
-
-
-		if (player.character is Kurumitos) {
-			baseY += 25;
-			Global.sprites["hud_bars_wp_base_x"].drawToHUD(5, baseX, baseY);
-			baseY -= 16;
-			for (var i = 0; i < MathF.Ceiling(player.character.superBarMaxAmmo * ammoDisplayMultiplier); i++) {
-				if (i < Math.Ceiling(player.character.superBarAmmo * ammoDisplayMultiplier)) {
-					Global.sprites["hud_bars_wp"].drawToHUD(32, baseX, baseY);
-				} else {
-					Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
-				}
-				baseY -= 2;
-			}
-			Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
-			return;
-		}
-
 
 
 		// Return if there is no weapon to ren
@@ -3026,6 +2996,29 @@ public class GameMode {
 	public virtual void drawTopHUD() {
 
 	}
+
+
+	public virtual void drawSuperHud() {
+		int hudcpY = 0;
+			float perc = Global.level.mainPlayer.superAmmo / Global.level.mainPlayer.superMaxAmmo;
+	
+		
+		FontType textColor;
+	
+
+	
+		Global.sprites["hud_super_gauge"].drawToHUD(0, 5, 5 + hudcpY);
+		perc = Math.Max(Global.level.mainPlayer.superAmmo, Global.level.mainPlayer.superAmmo) / 16;
+		
+
+		int barsFull = MathInt.Round(perc * 16f);
+		for (int i = 0; i < barsFull; i++) {
+			Global.sprites["hud_cp_bar"].drawToHUD(0, 5 + 17 + (i * 2), 5 + 3 + hudcpY);
+		}
+	
+		drawTimeIfSet(22);
+	}
+
 
 	public void drawRespawnHUD() {
 		if (level.mainPlayer.character != null && level.mainPlayer.readyTextOver && level.mainPlayer.canReviveX()) {

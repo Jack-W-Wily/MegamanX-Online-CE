@@ -9,7 +9,10 @@ public enum VileCannonType {
 	None = -1,
 	FrontRunner,
 	FatBoy,
-	LongshotGizmo
+	LongshotGizmo,
+	TridentLine,
+	BigBoy,
+	FireMourain,
 }
 
 public class VileCannon : Weapon {
@@ -157,6 +160,7 @@ public class VileCannonProj : Projectile {
 			fadeSprite = "vile_mk2_proj_fade";
 			fadeOnAutoDestroy = true;
 			damager.damage = 3;
+			damager.flinch = Global.halfFlinch;
 			projId = (int)ProjIds.FrontRunner;
 		} else if (type == (int)VileCannonType.FatBoy) {
 			weapon = VileCannon.netWeaponFB;
@@ -173,7 +177,16 @@ public class VileCannonProj : Projectile {
 			fadeSprite = "vile_mk2_lg_proj_fade";
 			fadeOnAutoDestroy = true;	
 			damager.damage = 1;
+			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.LongshotGizmo;
+		} else if (type == (int)VileCannonType.TridentLine) {
+			weapon = VileCannon.netWeaponLG;	
+			sprite = "vava_proj_trident_line";
+			fadeSprite = "buster2_fade";
+			fadeOnAutoDestroy = true;	
+			damager.damage = 2;
+			damager.flinch = Global.defFlinch;
+			projId = (int)ProjIds.TridentLine;
 		}
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;

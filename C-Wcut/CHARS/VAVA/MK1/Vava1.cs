@@ -49,7 +49,7 @@ public class VAVA1 : Character {
 
 	
 
-	public VileCannon cannonWeapon;
+	public VileCannonWC cannonWeapon;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
@@ -79,10 +79,10 @@ public class VAVA1 : Character {
 		charId = CharIds.VAVA1;
 
 
-		if (charState is WarpIn) superBarAmmo = 0;
+		if (charState is WarpIn) player.superAmmo = 0;
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
+		cannonWeapon = new VileCannonWC((VileCannonType)vileLoadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
 		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
@@ -122,21 +122,32 @@ public class VAVA1 : Character {
 	public override bool attackCtrl() {
 
 		if (player.input.checkHadoken(player, xDir, Control.Shoot)) {
-				changeState(new VAVAKamae(), true);
+			changeState(new VAVAKamae(), true);
+				
 		}
-		if (!player.input.checkHadoken(player, xDir, Control.Shoot)) {
+		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
+		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
+		&& charState is not VAVAKamae
+		) {
 			if (player.input.isPressed(Control.Shoot, player)) {
 				if (grounded) {
 					if (player.input.isLeftOrRightHeld(player)) {
-						changeState(new GoGetterRightAttack(), true);
+						if (player.vileAmmo >= 8) {
+							changeState(new GoGetterRightAttack(), true);
+						}
 					} else {
-						changeState(new VAVAJab1(), true);
-					}
+							changeState(new VAVAJab1(), true);
+						}
 				} else {
 					if (player.input.isHeld(Control.Down, player)) {
+						if (player.vileAmmo >= 14) {
 						changeState(new InfinityGigAttack(), true);
+						}
+						
 					} else {
-						changeState(new SpoiledBratPunch(), true);
+						if (player.vileAmmo >= 4) {
+							changeState(new SpoiledBratPunch(), true);
+						}
 					}
 				}
 			}
@@ -161,11 +172,32 @@ public class VAVA1 : Character {
 			}
 		}
 
-
-		if (player.input.isPressed(Control.R2, player)) {
-			shoot(0);
+		if (player.input.checkShoryuken(player, xDir, Control.R2)){
+			changeState(new Vava1GizmoDash(), true);	
+		}
+		if (!player.input.checkHadoken(player, xDir, Control.R2)
+		&& !player.input.checkShoryuken(player, xDir, Control.R2)
+		&& charState is not Vava1GizmoDash
+		) {
+			if (player.input.isPressed(Control.R2, player)) {
+				if (downPressedTimes >= 2) {
+					changeState(new Vava1TridentLine(grounded), true);
+				} else {
+					shoot(0);
+				}
+			}
 		}
 
+			if (player.input.isHeld(Control.Down, player)) {
+
+				if (player.input.isPressed(Control.Dash, player)) {
+					changeState(new VileDashChargeState());
+
+				}
+			}
+
+
+		
 
 		return base.attackCtrl();
 	}
@@ -273,7 +305,7 @@ public class VAVA1 : Character {
 			}
 		}
 
-		if (superBarAmmo >= superBarMaxAmmo) {
+		if (player.superAmmo >= player.superMaxAmmo) {
 			weaponHealAmount = 0;
 		}
 		if (weaponHealAmount > 0 && player.health > 0) {
@@ -281,7 +313,7 @@ public class VAVA1 : Character {
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
-				superBarAmmo = Helpers.clampMax(superBarAmmo + 1, superBarMaxAmmo);
+				player.superAmmo = Helpers.clampMax(player.superAmmo + 1, player.superMaxAmmo);
 				playSound("healX3", forcePlay: true, true);
 			}
 		}
@@ -418,7 +450,9 @@ public class VAVA1 : Character {
 	public enum MeleeIds {
 		None = -1,
 		Blocking,
+		KamaeBlock,
 		Jab,
+		Jab2,
 		Grab,
 		Grabmk2dash,
 		KamaeUnB,
@@ -426,16 +460,23 @@ public class VAVA1 : Character {
 		BurensenStart,
 		BurensenStomp,
 		BurensenEND,
+
+		BurensenENDCPU,
 		RagingDemon,
 		Kote,
+
+		GizmoGrab,
 	}
 
 
 	// VAva melee stuff
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"vava_block" or "vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.Blocking,
-			"vava_jab_1" or "vava_jab_2" => MeleeIds.Jab,
+			"vava_block"  => MeleeIds.Blocking,
+			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
+			"vava_jab_1" => MeleeIds.Jab,
+			"vava_jab_2" => MeleeIds.Jab2,
+			"vava_gizmo_dash_grab" => MeleeIds.GizmoGrab,
 			"vava_kamae_unblockable" or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB,
 			"vava_kamae_kote" => MeleeIds.Kote,
 			"vava_spring_grab" => MeleeIds.Grab,
@@ -444,7 +485,8 @@ public class VAVA1 : Character {
 			"vava_burensen_1" => MeleeIds.BurensenStart,
 			"vava_burensen_2" => MeleeIds.BurensenStomp,
 			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
-			"vava_burensen_finish" or "vava_hyperdash_attack" => MeleeIds.BurensenEND,
+			"vava_burensen_finish" or "vava_hyperdash_attack" when !player.isAI => MeleeIds.BurensenEND,
+			"vava_burensen_finish" or "vava_hyperdash_attack" when player.isAI => MeleeIds.BurensenENDCPU,
 			_ => MeleeIds.None
 		});
 	}
@@ -463,18 +505,37 @@ public class VAVA1 : Character {
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
+
+			(int)MeleeIds.GizmoGrab => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.GizmoGrab, player,
+				 0, 0, 0, isReflectShield: false,
+				isZSaberClang: true, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
 			(int)MeleeIds.Grabmk2dash => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.VileMK2Grab, player,
 				 0, 0, 0, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
-			(int)MeleeIds.Jab => new Vava1GenericMeleeProj(
-			new KRMelee(), projPos, ProjIds.KRStandingKick, player,
-			 1, Global.halfFlinch, 20, isReflectShield: true,
+			(int)MeleeIds.KamaeBlock => new Vava1GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.VJab1, player,
+			 0.25f, 5, 10, isReflectShield: true,
 			isZSaberClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel
-		),
+			),
+			(int)MeleeIds.Jab => new Vava1GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.VJab1, player,
+			 1, 20, 20, isReflectShield: true,
+			isZSaberClang: true, isZSaberEffect: true,
+			addToLevel: addToLevel
+			),
+			(int)MeleeIds.Jab2 => new Vava1GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.VJab2, player,
+			 1, 26, 20, isReflectShield: true,
+			isZSaberClang: true, isZSaberEffect: true,
+			addToLevel: addToLevel
+			),
 
 			(int)MeleeIds.KamaeUnB => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
@@ -505,6 +566,13 @@ public class VAVA1 : Character {
 			),
 
 			(int)MeleeIds.BurensenEND => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenEND, player,
+				2, 0, 30, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.BurensenENDCPU => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				4, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
@@ -542,7 +610,7 @@ public class VAVA1 : Character {
 	}
 
 	public override bool canAddAmmo() {
-		return (superBarAmmo < superBarMaxAmmo);
+		return (player.superAmmo < player.superMaxAmmo);
 	}
 
 	public override bool canCharge() {
@@ -588,23 +656,29 @@ public class VAVA1 : Character {
 
 
 
-	// Shoots stuff.
+	// Shoots stuff. VAVA(WCUT)
 	public void shoot(int chargeLevel) {
 
 
 		if (chargeLevel == 0) {
 			stopCharge();
+			cannonWeapon.type = (int)VileCannonType.FrontRunner;
+			cannonWeapon.vavaShoot(0, this);
 		} else if (chargeLevel == 1) {
-
+			cannonWeapon.type = (int)VileCannonType.FatBoy;
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel == 2) {
-
+			cannonWeapon.type = (int)VileCannonType.FatBoy;
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel == 3) {
-
+			cannonWeapon.type = (int)VileCannonType.FatBoy;
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel >= 4) {
-
+			cannonWeapon.type = (int)VileCannonType.FatBoy;
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		}
 		if (chargeLevel >= 1) {
@@ -805,7 +879,7 @@ public class VAVA1 : Character {
 			}
 		} else if (charState is VileMK2GrabState) {
 			vel = new Point(1, -0.75f);
-		} else if (charState is ShoulderCannon) {
+		} else if (charState is ShoulderCannon or Vava1TridentLine) {
 			if (frameIndex == 12) vel = new Point(1, 0.5f);
 			if (frameIndex == 15) vel = new Point(1, -0.5f);
 		} else if (player.input.isHeld(Control.Up, player)) {
@@ -1124,13 +1198,14 @@ public class VAVA1 : Character {
 							} else {
 								changeState(new CrimsonPhantomState2(grounded), true);
 							}
-
 						}
-					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
-							&& aiBlocktime <= 0) {
-						turnToInput(player.input, player);
-						changeState(new BlockWCUT(), true);
-						aiBlocktime = Helpers.randomRange(0, 60);
+					} else {
+						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
+								&& aiBlocktime <= 0) {
+							turnToInput(player.input, player);
+							changeState(new BlockWCUT(), true);
+							aiBlocktime = Helpers.randomRange(0, 60);
+						}
 					}
 				}
 			}

@@ -266,7 +266,9 @@ public partial class RPCCreateProj : RPC {
 
 
 		// WCut Chars RPCEX
-
+		// VAVA
+		{ (int)ProjIds.TridentLine, VileCannonProj.rpcInvoke },
+	
 		// Kurumitos
 
 		{ (int)ProjIds.OrochinagiProj, OrochinagiChargedProj.rpcInvoke },

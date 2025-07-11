@@ -119,8 +119,9 @@ public class RMXGenericMeleeProj : Projectile {
 		
 		switch (projId) {
 			case (int)ProjIds.GenericWCUTGrabProjID:
-				grabberChar.changeState(new RMXGrabState(grabbedChar));
+				
 				grabbedChar.changeState(new RMXGrabbed(grabberChar));
+				grabberChar.changeState(new RMXGrabState(grabbedChar));
 				break;
 			case (int)ProjIds.ForceGrabState:
 				grabbedChar.changeState(new ForceGrabbed(grabberChar));

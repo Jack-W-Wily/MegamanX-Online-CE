@@ -29,7 +29,7 @@ public class RockmanX : MegamanX {
 		charId = CharIds.RockmanX;
 
 		// For special conditions stuff
-		if (charState is WarpIn) superBarAmmo = 0;
+		if (charState is WarpIn) player.superAmmo = 0;
 
 	}
 
@@ -129,7 +129,7 @@ public class RockmanX : MegamanX {
 
 
 
-		if (superBarAmmo >= superBarMaxAmmo) {
+		if (player.superAmmo >= player.superMaxAmmo) {
 			weaponHealAmount = 0;
 		}
 		if (weaponHealAmount > 0 && player.health > 0) {
@@ -137,7 +137,7 @@ public class RockmanX : MegamanX {
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
 				weaponHealAmount--;
-				superBarAmmo = Helpers.clampMax(superBarAmmo + 1, superBarMaxAmmo);
+				player.superAmmo = Helpers.clampMax(player.superAmmo + 1, player.superMaxAmmo);
 				playSound("healX3", forcePlay: true, true);
 				
 			}
@@ -232,7 +232,7 @@ public class RockmanX : MegamanX {
 			),
 				(int)MeleeIds.Grab => new RMXGenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 0, 0, isDeflectShield: true,
+				 1, 0, isDeflectShield: true,
 				isZSaberClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
@@ -303,7 +303,7 @@ public class RockmanX : MegamanX {
 	}
 
 	public override bool canAddAmmo() {
-		return (superBarAmmo < superBarMaxAmmo);
+		return (player.superAmmo < player.superMaxAmmo);
 	}
 
 	public override bool canCharge() {

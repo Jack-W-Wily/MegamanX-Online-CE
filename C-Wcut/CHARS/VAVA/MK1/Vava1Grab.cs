@@ -197,12 +197,21 @@ public class Vava1GrabState : CharState {
 
 public class Vava1Grabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
-	public Vava1Grabbed(Character? grabber) : base(grabber, maxGrabTime, "grab") {
+	public Vava1Grabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
 	}
 
 
 	public override void update() {
-	trySnapToGrabPoint(true);
+		trySnapToGrabPoint(true);
+		if (grabber.sprite.name.Contains("idle") ||
+		grabber.sprite.name.Contains("crouch") ||
+		grabber.sprite.name.Contains("run") ||
+		grabber.sprite.name.Contains("hurt") ||
+		grabber.sprite.name.Contains("grabbed")
+	
+		) {
+			character.changeToIdleOrFall();
+		}
 	}
 }
 

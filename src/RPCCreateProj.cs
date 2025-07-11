@@ -191,15 +191,15 @@ public partial class RPCCreateProj : RPC {
 				proj = new MK2NapalmFlame(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			*/
-			//case (int)ProjIds.RocketPunch:
-			//	proj = new RocketPunchProj(new RocketPunch(RocketPunchType.GoGetterRight), pos, xDir, player, netProjByte);
-			//	break;
-			//case (int)ProjIds.SpoiledBrat:
-			//	proj = new RocketPunchProj(new RocketPunch(RocketPunchType.SpoiledBrat), pos, xDir, player, netProjByte);
-			//	break;
-			//case (int)ProjIds.InfinityGig:
-			//	proj = new RocketPunchProj(new RocketPunch(RocketPunchType.InfinityGig), pos, xDir, player, netProjByte);
-			//	break;
+			case (int)ProjIds.RocketPunchWC:
+				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.GoGetterRight), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.SpoiledBratWC:
+				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.SpoiledBrat), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.InfinityGigWC:
+				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.InfinityGig), pos, xDir, player, netProjByte);
+				break;
 			//case (int)ProjIds.Vulcan:
 			//	proj = new VulcanProj(new Vulcan(VulcanType.CherryBlast), pos, xDir, player, netProjByte);
 			//	break;
