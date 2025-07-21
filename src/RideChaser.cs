@@ -351,7 +351,7 @@ public class RideChaser : Actor, IDamagable {
 
 		// Shooting code
 		if (!isShooting) {
-			if (player.input.isHeld(Control.Shoot, player) && (sprite.name == "ridechaser_idle" || sprite.name == "ridechaser_incline")) {
+			if (player.input.isAHeld(player) && (sprite.name == "ridechaser_idle" || sprite.name == "ridechaser_incline")) {
 				sprite.frameTime = 0;
 				isShooting = true;
 				shootTime = 0;
@@ -366,7 +366,7 @@ public class RideChaser : Actor, IDamagable {
 			}
 			shootTime += Global.spf;
 			if (shootTime > 0.15f) {
-				if (player.input.isHeld(Control.Shoot, player)) {
+				if (player.input.isAHeld(player)) {
 					shootTime = 0;
 				} else {
 					isShooting = false;

@@ -61,6 +61,9 @@ public class CharState {
 	// This dictates if it can attack or land.
 	public bool attackCtrl;
 
+	public bool bonusAttackCtrl;
+	
+
 	public bool spcCancel;
 
 	public bool canSpecialCancel;
@@ -1055,7 +1058,7 @@ public class WallSlide : CharState {
 			return;
 		}
 		*/
-		if (character is CmdSigma && player.input.isPressed(Control.Special1, player) && character.flag == null) {
+		if (character is CmdSigma && player.input.isBPressed(player) && character.flag == null) {
 			int yDir = player.input.isHeld(Control.Down, player) ? 1 : -1;
 			character.changeState(new SigmaWallDashState(yDir, false), true);
 			return;

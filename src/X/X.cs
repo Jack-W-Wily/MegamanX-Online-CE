@@ -8,7 +8,7 @@ public class MegamanX : Character {
 	// Shoot variables.
 	public float shootCooldown;
 	public int lastShootPressed;
-	public bool bufferedShotPressed => lastShootPressed < 6 || player.input.isPressed(Control.Shoot, player);
+	public bool bufferedShotPressed => lastShootPressed < 6 || player.input.isAPressed(player);
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
@@ -263,9 +263,9 @@ public class MegamanX : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		if (player.input.isPressed(Control.Shoot, player) ||
+		if (player.input.isAPressed(player) ||
 			(specialButtonMode == 0 &&
-			player.input.isPressed(Control.Special1, player))
+			player.input.isBPressed(player))
 		) {
 			lastShootPressed = 6;
 		}
@@ -340,11 +340,11 @@ public class MegamanX : Character {
 	}
 
 	public override bool attackCtrl() {
-		if (stockedSaber && player.input.isPressed(Control.Special1, player)) {
+		if (stockedSaber && player.input.isBPressed(player)) {
 			changeState(new XMaxWaveSaberState(), true);
 			return true;
 		}
-		if (player.input.isPressed(Control.Special1, player) && !hasAnyArmor &&
+		if (player.input.isBPressed(player) && !hasAnyArmor &&
 			stingActiveTime <= 0
 		) {
 			if (specialButtonMode == 1 && specialSaberCooldown <= 0) {
@@ -356,7 +356,7 @@ public class MegamanX : Character {
 				return true;
 			}
 		}
-		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
+		if (player.input.isBPressed(player) && helmetArmor == ArmorId.Giga &&
 			itemTracer.shootCooldown == 0
 		) {
 			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
@@ -377,9 +377,9 @@ public class MegamanX : Character {
 			return true;
 		}
 		if (currentWeapon != null && canShoot() && (
-				player.input.isPressed(Control.Shoot, player) && !isCharging() ||
+				player.input.isAPressed(player) && !isCharging() ||
 				currentWeapon.isStream && getChargeLevel() < 2 &&
-				player.input.isHeld(Control.Shoot, player)
+				player.input.isAHeld(player)
 			)
 		) {
 			if (currentWeapon.shootCooldown <= 0) {
@@ -394,7 +394,7 @@ public class MegamanX : Character {
 		Point inputDir = player.input.getInputDir(player);
 		int oldSlot, newSlot;
 		if (Options.main.gigaCrushSpecial &&
-			player.input.isPressed(Control.Special1, player) &&
+			player.input.isBPressed(player) &&
 			player.input.isHeld(Control.Down, player) &&
 			player.weapons.Any(w => w is GigaCrush)
 		) {
@@ -405,7 +405,7 @@ public class MegamanX : Character {
 			player.changeWeaponSlot(oldSlot);
 			return true;
 		} else if (Options.main.novaStrikeSpecial &&
-			  player.input.isPressed(Control.Special1, player) &&
+			  player.input.isBPressed(player) &&
 			  player.weapons.Any(w => w is HyperNovaStrike) &&
 			  !inputDir.isZero()
 		  ) {
@@ -562,7 +562,7 @@ public class MegamanX : Character {
 	public void fastChipActivation() {
 		if (charState is not Die && fullArmor == ArmorId.Max &&
 			!hasFullHyperMaxArmor && !hasUltimateArmor &&
-			player.input.isPressed(Control.Special1, player)
+			player.input.isBPressed(player)
 		) {
 			if (player.input.isHeld(Control.Down, player)) {
 				fastChipActive(false, false, false, true);
@@ -707,10 +707,10 @@ public class MegamanX : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (specialButtonMode == 0 && player.input.isHeld(Control.Special1, player)) {
+		if (specialButtonMode == 0 && player.input.isBHeld(player)) {
 			return true;
 		}
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player);
 	}
 
 	public override void onWeaponChange(Weapon oldWeapon, Weapon newWeapon) {

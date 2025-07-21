@@ -108,8 +108,8 @@ public class BusterZero : Character {
 	}
 
 	public override bool attackCtrl() {
-		bool shootPressed = player.input.isPressed(Control.Shoot, player);
-		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool shootPressed = player.input.isAPressed(player);
+		bool specialPressed = player.input.isBPressed(player);
 		if (specialPressed) {
 			if (zSaberCooldown == 0) {
 				if (stockedSaber) {
@@ -280,7 +280,7 @@ public class BusterZero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player);
 	}
 
 	public override void increaseCharge() {

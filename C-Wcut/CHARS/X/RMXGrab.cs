@@ -75,7 +75,7 @@ public class RMXGrabState : CharState {
 		}
 
 		
-		if (player.input.isPressed(Control.Shoot, player) && !UsedGrabFinisherOnce) {
+		if (player.input.isAPressed(player) && !UsedGrabFinisherOnce) {
 
 			character.changeSpriteFromName("grab_attack", true);
 		}
@@ -158,7 +158,7 @@ public class RMXGrabState : CharState {
 		}
 
 
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			character.changeToIdleOrFall();
 			return;
 		}

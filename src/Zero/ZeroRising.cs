@@ -131,7 +131,7 @@ public class ZeroUppercut : CharState {
 			}
 		}
 
-		if (!player.input.isHeld(Control.Special1, player) && !player.input.isHeld(Control.Shoot, player)) {
+		if (!player.input.isBHeld(player) && !player.input.isAHeld(player)) {
 			isHeld = false;
 		}
 
@@ -164,12 +164,12 @@ public class ZeroUppercut : CharState {
 		}
 
 		if (canDownSpecial()) {
-			if (player.input.isPressed(Control.Shoot, player) && player.input.isHeld(Control.Down, player)) {
+			if (player.input.isAPressed(player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
 					character.changeState(new ZeroDownthrust(zero.downThrustA.type), true);
 					return;
 				}
-			} else if (player.input.isPressed(Control.Special1, player) && player.input.isHeld(Control.Down, player)) {
+			} else if (player.input.isBPressed(player) && player.input.isHeld(Control.Down, player)) {
 				if (zero != null) {
 					character.changeState(new ZeroDownthrust(zero.downThrustS.type), true);
 					return;

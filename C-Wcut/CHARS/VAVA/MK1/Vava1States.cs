@@ -15,6 +15,7 @@ public class VAVAJab1 : CharState {
 
 	public VAVAJab1() : base("jab_1") {
 		wiffCancel = true;
+		canSpecialCancel = true;
 		enterSound = "punch2";
 	}
 
@@ -25,7 +26,7 @@ public class VAVAJab1 : CharState {
 		}
 
 		if (character.frameIndex > 3) {
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				character.changeState(new VAVAJab2(), true);
 		}
 		}
@@ -46,6 +47,34 @@ public class VAVAJab2 : CharState {
 
 	public VAVAJab2() : base("jab_2") {
 		wiffCancel = true;
+		canSpecialCancel = true;
+		enterSound = "punch2";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+public class VAVAUpperCutPunch : CharState {
+
+
+	public VAVAUpperCutPunch() : base("punch_2") {
+		wiffCancel = true;
+		canSpecialCancel = true;
 		enterSound = "punch2";
 	}
 
@@ -86,15 +115,15 @@ public class VAVAKamae : CharState {
 			}
 
 
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				character.changeState(new VKamaeUnblockableStart(), true);
 			}
 
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 				character.changeState(new VKamaeHotIcecle(), true);
 			}
 
-			if (player.input.isPressed(Control.R2, player)) {
+			if (player.input.isR2Pressed(player)) {
 				character.changeState(new VKote(), true);
 			}
 
@@ -252,15 +281,15 @@ public class VKamaeDash : CharState {
 
 		character.move(new Point(character.xDir * 350, 0));
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 				character.changeState(new VKamaeUnblockableStart(), true);
 			}
 
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 				character.changeState(new VKamaeHotIcecle(), true);
 			}
 
-			if (player.input.isPressed(Control.R2, player)) {
+			if (player.input.isR2Pressed(player)) {
 				character.changeState(new VKote(), true);
 			}
 
@@ -298,15 +327,15 @@ public class VKamaeBDash : CharState {
 
 			character.move(new Point(character.xDir * -350, 0));
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 				character.changeState(new VKamaeUnblockableStart(), true);
 			}
 
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 				character.changeState(new VKamaeHotIcecle(), true);
 			}
 
-			if (player.input.isPressed(Control.R2, player)) {
+			if (player.input.isR2Pressed(player)) {
 				character.changeState(new VKote(), true);
 			}
 

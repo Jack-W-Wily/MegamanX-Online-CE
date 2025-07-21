@@ -125,6 +125,12 @@ public partial class Player {
 	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
+	public bool isRMX { get { return charNum == (int)CharIds.RockmanX; } }
+	public bool isZMID { get { return charNum == (int)CharIds.ZeroMID; } }
+
+	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
+
+
 
 	public float healthBackup;
 
@@ -233,6 +239,7 @@ public partial class Player {
 		{ (int)CharIds.VAVA1, new List<SubTank>() },
 		{ (int)CharIds.RockmanX, new List<SubTank>() },
 		{ (int)CharIds.ZeroMID, new List<SubTank>() },
+		{ (int)CharIds.Zain, new List<SubTank>() },
 	};
 
 	// Heart tanks
@@ -249,6 +256,7 @@ public partial class Player {
 		{ (int)CharIds.VAVA1, new() },
 		{ (int)CharIds.RockmanX, new() },
 		{ (int)CharIds.ZeroMID, new() },
+		{ (int)CharIds.Zain, new() },
 	};
 
 	// Getter functions.
@@ -707,12 +715,13 @@ public partial class Player {
 			return getModifiedHealth(28);
 		}
 		int bonus = 0;
-		if (isSigma) {
-			bonus = 6;
+		if (isSigma || isZMID) {
+			bonus = 12;
 		}
-		if (isX) {
+		if (isRMX ) {
 			bonus = 10;
 		}
+
 		return MathF.Ceiling(
 			getModifiedHealth(20 + bonus) + (heartTanks * getHeartTankModifier())
 		);
@@ -1161,7 +1170,7 @@ public partial class Player {
 			AxlLoadout axlLoadout = loadout?.axlLoadout?.clone() ?? new();
 			axlLoadout.weapon2 = extraData[0];
 			axlLoadout.weapon3 = extraData[1];
-			axlLoadout.hyperMode = extraData[2];
+		//	axlLoadout.hyperMode = extraData[2];
 
 			if (isMainChar) {
 				loadout.axlLoadout = axlLoadout;

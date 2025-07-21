@@ -479,7 +479,7 @@ public class RideArmor : Actor, IDamagable {
 				punchCooldown == 0 &&
 				raNum == 2 &&
 				vile.napalmWeapon.shootCooldown == 0 &&
-				player.input.isPressed(Control.Special1, player) &&
+				player.input.isBPressed(player) &&
 				player.input.isHeld(Control.Down, player) &&
 				!rideArmorState.inTransition()
 			) {
@@ -1405,7 +1405,7 @@ public class RAIdle : RideArmorState {
 
 		Helpers.decrementTime(ref attackCooldown);
 
-		if (player != null && rideArmor.raNum == 1 && player.input.isHeld(Control.Shoot, player) && !rideArmor.isAttacking()) {
+		if (player != null && rideArmor.raNum == 1 && player.input.isAHeld(player) && !rideArmor.isAttacking()) {
 			shootHeldTime += Global.spf;
 			if (shootHeldTime > 0.5f) {
 				shootHeldTime = 0;
@@ -1835,7 +1835,7 @@ public class RADash : RideArmorState {
 		var move = getDashVel();
 		rideArmor.move(move);
 		if (player != null) {
-			bool isHeldDashAttack = rideArmor.raNum == 4 && player.input.isHeld(Control.Shoot, player);
+			bool isHeldDashAttack = rideArmor.raNum == 4 && player.input.isAHeld(player);
 			if (isHeldDashAttack) {
 				dashTime = 0;
 				dashAttackTime += Global.spf;
@@ -1951,7 +1951,7 @@ public class RAChainCharge : RideArmorState {
 		base.update();
 		if (!rideArmor.ownedByLocalPlayer) return;
 	if (player != null) {
-			if (!player.input.isHeld(Control.Shoot, player)) {
+			if (!player.input.isAHeld(player)) {
 				rideArmor.changeState(new RAChainAttack(), true);
 				return;
 			}
@@ -2017,7 +2017,7 @@ public class RAChainChargeDash : RideArmorState {
 			if (!player.input.isHeld(dashControl, player)) {
 				rideArmor.changeState(new RAChainCharge(), true);
 				return;
-			} else if (!player.input.isHeld(Control.Shoot, player)) {
+			} else if (!player.input.isAHeld(player)) {
 				rideArmor.changeState(new RAChainAttack(), true);
 				return;
 			}
@@ -2059,7 +2059,7 @@ public class RAChainAttack : RideArmorState {
 			return;
 		}
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			if (rideArmor.frameIndex < 8) {
 				//rideArmor.frameIndex = 15 - rideArmor.frameIndex;
 			} else if (rideArmor.frameIndex == 8) {
@@ -2231,7 +2231,7 @@ public class InRideArmor : CharState {
 				character.changeSpriteFromName("ra_idle", true);
 			}
 		} else {
-			if (character is Vile vile && player.input.isPressed(Control.Special1, player)) {
+			if (character is Vile vile && player.input.isBPressed(player)) {
 				tossGrenade(vile);
 			}
 		}

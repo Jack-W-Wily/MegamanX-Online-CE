@@ -78,7 +78,7 @@ public class RagingChargeX : Character {
 	}
 
 	public override bool normalCtrl() {
-		if (player.input.isPressed(Control.Special1, player) && charState is Dash or AirDash) {
+		if (player.input.isBPressed(player) && charState is Dash or AirDash) {
 			charState.isGrabbing = true;
 			changeSpriteFromName("unpo_grab_dash", true);
 		}
@@ -90,12 +90,12 @@ public class RagingChargeX : Character {
 			enterParry();
 			return true;
 		}
-		if (player.input.isPressed(Control.Shoot, player) && shotCount <= 0) {
+		if (player.input.isAPressed(player) && shotCount <= 0) {
 			punchCooldown = 0.5f;
 			changeState(new XUPPunchState(grounded), true);
 			return true;
 		}
-		if (player.input.isPressed(Control.Special1, player) && saberCooldown == 0) {
+		if (player.input.isBPressed(player) && saberCooldown == 0) {
 			saberCooldown = 60;
 			changeState(new X6SaberState(grounded), true);
 			return true;

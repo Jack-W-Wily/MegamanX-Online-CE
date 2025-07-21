@@ -116,12 +116,22 @@ public class ZeroDownthrust : CharState {
 				character.changeSpriteFromName(sprite, false);
 			}
 		}
-		if (type == ZeroDownthrustType.QuakeBlazer) {
+		//	if (type == ZeroDownthrustType.QuakeBlazer) {
 			int xDir = player.input.getXDir(player);
 			if (xDir != 0) {
 				character.xDir = xDir;
 				character.move(new Point(100 * xDir, 0));
 			}
+		//	}
+		if (type == ZeroDownthrustType.Hyouretsuzan) {
+			airMove = true;
+		}
+
+		if (character.dashedInAir == 0 && player.input.isPressed(Control.Jump, player)){
+				character.dashedInAir++;
+				character.vel.y = -character.getJumpPower();
+				character.changeState(new Jump(), true);
+
 		}
 		if (character.grounded) {
 			character.changeState(new ZeroDownthrustLand(type), true);

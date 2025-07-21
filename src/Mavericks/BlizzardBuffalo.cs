@@ -531,7 +531,7 @@ public class BBuffaloDashState : MaverickState {
 			maverick.changeToIdleOrFall();
 			return;
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			maverick.changeSpriteFromName("dash_grab", false);
 		}
 	}

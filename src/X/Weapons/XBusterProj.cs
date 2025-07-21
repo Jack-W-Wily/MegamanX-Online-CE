@@ -91,6 +91,8 @@ public class Buster3LightProj : Projectile {
 		);
 	}
 }
+
+
 public class Buster3GigaProj : Projectile {
 	public Buster3GigaProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
@@ -117,6 +119,37 @@ public class Buster3GigaProj : Projectile {
 		);
 	}
 }
+
+
+public class Buster3GigaProjMelee : Projectile {
+	public Buster3GigaProjMelee(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "buster3_x2", netId, player	
+	) {
+		weapon = XBuster.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.halfFlinch;
+		vel = new Point(350 * xDir, 0);
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster3_fade";
+		reflectable = true;
+		useGravity = true;
+		maxTime = 0.1f;
+		projId = (int)ProjIds.Buster3GigaMelee;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new Buster3GigaProjMelee(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+}
+
+
 public class Buster3MaxProj : Projectile {
 	float partTime;
 	public Buster3MaxProj(

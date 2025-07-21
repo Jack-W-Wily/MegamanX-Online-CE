@@ -287,7 +287,7 @@ public class ArmoredAGuardState : MaverickState {
 			return;
 		}
 
-		if (maverick.aiBehavior == MaverickAIBehavior.Control && !player.input.isHeld(Control.Special1, player)) {
+		if (maverick.aiBehavior == MaverickAIBehavior.Control && !player.input.isBHeld(player)) {
 			maverick.changeState(new MIdle());
 			return;
 		}

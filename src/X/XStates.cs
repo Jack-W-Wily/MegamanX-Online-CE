@@ -428,7 +428,7 @@ public class X2ChargeShot : CharState {
 				character.changeToIdleOrFall();
 			}
 		} else if (
-			!pressFire && stateTime > 6f / 60f && player.input.isPressed(Control.Shoot, player)
+			!pressFire && stateTime > 6f / 60f && player.input.isAPressed(player)
 		) {
 			pressFire = true;
 		}
@@ -550,7 +550,7 @@ public class X3ChargeShot : CharState {
 				character.changeToIdleOrFall();
 			}
 		} else {
-			if (!pressFire && stateTime > Global.spf && player.input.isPressed(Control.Shoot, player)) {
+			if (!pressFire && stateTime > Global.spf && player.input.isAPressed(player)) {
 				pressFire = true;
 			}
 			if (character.grounded && player.input.isPressed(Control.Jump, player)) {

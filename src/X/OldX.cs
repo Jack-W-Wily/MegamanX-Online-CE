@@ -253,7 +253,7 @@ public partial class MegamanXA : Character {
 
 		//Fast Chip Activation.
 		if (charState is not Die &&
-			player.input.isPressed(Control.Special1, player) &&
+			player.input.isBPressed(player) &&
 			player.hasAllX3Armor() && !player.hasGoldenArmor() && !player.hasUltimateArmor()) {
 			if (player.input.isHeld(Control.Down, player)) {
 				player.setChipNum(0, false);
@@ -317,7 +317,7 @@ public partial class MegamanXA : Character {
 				!chr.isStealthy(player.alliance)
 			) {
 				new ItemTracer().getProjectile(scanPos, getShootXDir(), player, 0, player.getNextActorNetId());
-			} else if (player.input.isPressed(Control.Special1, player)) {
+			} else if (player.input.isBPressed(player)) {
 				new ItemTracer().getProjectile(scanPos, getShootXDir(), player, 0, player.getNextActorNetId());
 			}
 		}
@@ -455,9 +455,9 @@ public partial class MegamanXA : Character {
 	}
 
 	public override bool attackCtrl() {
-		bool shootPressed = player.input.isPressed(Control.Shoot, player);
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
-		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool shootPressed = player.input.isAPressed(player);
+		bool shootHeld = player.input.isAHeld(player);
+		bool specialPressed = player.input.isBPressed(player);
 		
 		if (isHyperX) {
 			if (shootPressed && upPunchCooldown <= 0 && unpoShotCount <= 0 ) {
@@ -522,7 +522,7 @@ public partial class MegamanXA : Character {
 				player.weapons[9].update();
 			}
 
-			if (player.input.isPressed(Control.Special1, player) && chargeTime == 0) {
+			if (player.input.isBPressed(player) && chargeTime == 0) {
 				oldSlot = player.weaponSlot;
 				player.changeWeaponSlot(9);
 				if (shootCooldown <= 0) {
@@ -534,7 +534,7 @@ public partial class MegamanXA : Character {
 		}
 
 		if (Options.main.gigaCrushSpecial &&
-			player.input.isPressed(Control.Special1, player) &&
+			player.input.isBPressed(player) &&
 			player.input.isHeld(Control.Down, player) &&
 			player.weapons.Any(w => w is GigaCrush)
 		) {
@@ -546,7 +546,7 @@ public partial class MegamanXA : Character {
 			return true;
 		} 
 		else if (Options.main.novaStrikeSpecial &&
-			player.input.isPressed(Control.Special1, player) &&
+			player.input.isBPressed(player) &&
 			player.weapons.Any(w => w is HyperNovaStrike) &&
 			!inputDir.isZero()
 		) {
@@ -1365,10 +1365,10 @@ public partial class MegamanXA : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (isSpecialBuster() && player.input.isHeld(Control.Special1, player)) {
+		if (isSpecialBuster() && player.input.isBHeld(player)) {
 			return true;
 		}
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player);
 	}
 
 	public override bool canAirDash() {

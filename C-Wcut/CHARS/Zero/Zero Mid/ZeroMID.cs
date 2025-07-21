@@ -109,6 +109,7 @@ public class ZeroMID : Zero {
 	}
 
 	public override void update() {
+	
 		// Hypermode effects.
 		if (isAwakened) {
 			updateAwakenedAura();
@@ -135,6 +136,7 @@ public class ZeroMID : Zero {
 			base.update();
 			return;
 		}
+		player.superAmmo = gigaAttack.ammo;
 
 		// Local update starts here.
 		inputUpdate();
@@ -242,10 +244,10 @@ public class ZeroMID : Zero {
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player);
 	}
 
-	public void shoot(int chargeLevel) {
+	public override void shoot(int chargeLevel) {
 		if (gigaAttack.ammo <= 4 && freeBusterShots <= 0) { return; }
 		if (chargeLevel == 0) { return; }
 		int currencyUse = 0;
@@ -283,7 +285,7 @@ public class ZeroMID : Zero {
 			if (freeBusterShots > 0) {
 				freeBusterShots--;
 			} else if (gigaAttack.ammo > 3) {
-				gigaAttack.ammo =- 4;
+				gigaAttack.ammo -= 4;
 			}
 		}
 	}
@@ -371,10 +373,10 @@ public class ZeroMID : Zero {
 		if (swingPressTime > 0) {
 			swingPressTime--;
 		}
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			shootPressTime = 6;
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			specialPressTime = 6;
 		}
 		if (player.input.isPressed(Control.WeaponRight, player) && isAwakened) {
@@ -428,7 +430,7 @@ public class ZeroMID : Zero {
 		}
 		// Guard! (You can thank Axl for this mess)
 		if (
-				player.input.isHeld(Control.L2, player)
+				player.input.isL2Held(player)
 			)
 		{
 
@@ -445,6 +447,18 @@ public class ZeroMID : Zero {
 		if (donutsPending != 0) {
 			return false;
 		}
+
+
+		if (grounded && player.superAmmo == player.superMaxAmmo && 
+		downPressedTimes >= 2 && player.input.isR2Held(player)) {
+					changeState(new GenmureiState(), true);
+				downPressedTimes = 0;
+				player.superAmmo = 0;
+					return true;
+		}
+		
+
+
 		if (isAwakened && swingPressTime > 0 && hadangekiCooldown == 0) {
 			hadangekiCooldown = 60;
 			if (charState is WallSlide wallSlide) {
@@ -477,14 +491,14 @@ public class ZeroMID : Zero {
 	public override bool spcCancel() {
 		// Uppercuts.
 		if (player.input.isHeld(Control.Up, player) && charState is not ZeroUppercut) {
-			if (player.input.isPressed(Control.R2, player)) {
+			if (player.input.isR2Pressed(player)) {
 
 				changeState(new ZeroUppercut(RisingType.Denjin, true), true);
 			}
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 				changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
 			}
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
 			}
 			return true;
@@ -518,14 +532,14 @@ public class ZeroMID : Zero {
 		}
 		// Uppercuts.
 		if (yDir == -1 && charState is not ZeroUppercut) {
-			if (player.input.isPressed(Control.R2, player)) {
+			if (player.input.isR2Pressed(player)) {
 
 				changeState(new ZeroUppercut(RisingType.Denjin, true), true);
 			}
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 				changeState(new ZeroUppercut(RisingType.Ryuenjin, false), true);
 			}
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				changeState(new ZeroUppercut(RisingType.RisingFang, true), true);
 			}
 			return true;
@@ -838,8 +852,8 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
-				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
-				1, Global.miniFlinch, 5, isDeflectShield: true,
+				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player,
+				1, 0, 5, isDeflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
 				addToLevel: addToLevel
 			),
@@ -870,11 +884,11 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
-				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, Global.defFlinch, 6,
+				DenjinWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 1, 0, 6,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, Global.halfFlinch, 30,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 2, 0, 30,
 				isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
@@ -1131,6 +1145,7 @@ public class ZeroMID : Zero {
 			isGenmuZero,
 			isBlack,
 			isViral,
+			OverDrive,
 		]));
 		if (hypermodeBlink > 0) {
 			customData.Add(hypermodeBlink);

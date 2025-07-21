@@ -156,6 +156,7 @@ public class GoGetterRightAttack : CharState {
 	public float pushBackSpeed;
 
 	public GoGetterRightAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -163,7 +164,7 @@ public class GoGetterRightAttack : CharState {
 
 		Helpers.decrementTime(ref specialPressTime);
 
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+		if (proj != null && !player.input.isBHeld(player) && proj.time >= proj.minTime) {
 			proj.reversed = true;
 		}
 
@@ -175,7 +176,7 @@ public class GoGetterRightAttack : CharState {
 	
 		
 		if (proj != null) {
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 					specialPressTime = 0.25f;
 				}
 
@@ -247,6 +248,7 @@ public class InfinityGigAttack : CharState {
 	public float pushBackSpeed;
 
 	public InfinityGigAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
+	canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -254,7 +256,7 @@ public class InfinityGigAttack : CharState {
 
 		Helpers.decrementTime(ref specialPressTime);
 
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+		if (proj != null && !player.input.isBHeld(player) && proj.time >= proj.minTime) {
 			proj.reversed = true;
 		}
 
@@ -265,7 +267,7 @@ public class InfinityGigAttack : CharState {
 
 		
 		if (proj != null) {
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 					specialPressTime = 0.25f;
 				}
 
@@ -340,7 +342,7 @@ public class SpoiledBratPunch : CharState {
 	public SpoiledBratPunch(string transitionSprite = "") : base("spoiled_brat", "", "", transitionSprite) {
 	this.grounded = grounded;
 	airMove = true;
-
+	canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -349,7 +351,7 @@ public class SpoiledBratPunch : CharState {
 		Helpers.decrementTime(ref specialPressTime);
 			Helpers.decrementTime(ref shootcd);
 
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+		if (proj != null && !player.input.isBHeld(player) && proj.time >= proj.minTime) {
 			proj.reversed = true;
 		}
 
@@ -358,7 +360,7 @@ public class SpoiledBratPunch : CharState {
 			shootcd = 0.1f;
 			player.vileAmmo -= 4;
 		}
-			if (player.input.isPressed(Control.Shoot, player) || AIloopit && stateTime < 1.2f) {
+			if (player.input.isAPressed(player) || AIloopit && stateTime < 1.2f) {
 					specialPressTime = 0.25f;
 				}
 

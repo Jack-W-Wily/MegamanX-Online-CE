@@ -195,7 +195,7 @@ public class FlamethrowerState : CharState {
 			}
 		}
 
-		if (character.loopCount >= 5 || !player.input.isHeld(Control.Special1, player)) {
+		if (character.loopCount >= 5 || !player.input.isBHeld(player)) {
 			character.changeToIdleOrFall();
 		}
 	}

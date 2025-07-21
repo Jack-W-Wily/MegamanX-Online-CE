@@ -65,7 +65,7 @@ public class KaiserSigmaBaseState : CharState {
 	public void ballisticAttackLogic() {
 		bool weaponL = player.input.isPressed(Control.WeaponLeft, player);
 		bool weaponR = player.input.isPressed(Control.WeaponRight, player);
-		if (player.input.isPressed(Control.Special1, player) && kaiserSigma.isKaiserSigmaGrounded()) {
+		if (player.input.isBPressed(player) && kaiserSigma.isKaiserSigmaGrounded()) {
 			if (kaiserSigma.kaiserMissileShootTime == 0) {
 				kaiserSigma.kaiserMissileShootTime = 2f;
 				var posL = character.getFirstPOIOrDefault("missileL");
@@ -154,7 +154,7 @@ public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 	public override void update() {
 		base.update();
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			character.changeState(new KaiserSigmaBeamState(player.input.isHeld(Control.Down, player)));
 		}
 		// Jump
@@ -206,7 +206,7 @@ public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 	public override void update() {
 		base.update();
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			character.changeState(new KaiserSigmaBeamState(player.input.isHeld(Control.Down, player)));
 		} else if (
 			player.input.isHeld(Control.Up, player)
@@ -493,7 +493,7 @@ public class KaiserSigmaVirusState : CharState {
 		clampViralSigmaPos();
 
 		bool canSpawnAtPos = KaiserSigma.canKaiserSpawn(kaiserSigma, out var spawnPoint);
-		if (player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Jump, player)) {
+		if (player.input.isAPressed(player) || player.input.isPressed(Control.Jump, player)) {
 			if (canSpawnAtPos) {
 				lerpBack(spawnPoint, true);
 				return;
@@ -948,7 +948,7 @@ public class KaiserSigmaRevive : CharState {
 				state = 2;
 			}
 		} else if (state == 2) {
-			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+			if (Global.debug && player.input.isBPressed(player)) {
 				character.frameIndex = character.sprite.totalFrameNum - 1;
 			}
 
@@ -962,7 +962,7 @@ public class KaiserSigmaRevive : CharState {
 				state = 4;
 			}
 		} else if (state == 4) {
-			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+			if (Global.debug && player.input.isBPressed(player)) {
 				player.health = player.maxHealth;
 			}
 

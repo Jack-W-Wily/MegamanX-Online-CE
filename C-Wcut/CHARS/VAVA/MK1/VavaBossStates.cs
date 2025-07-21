@@ -163,7 +163,7 @@ public class ExplosiveRoundStateBoss : CharState {
 
 
 
-		if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+		if (bombNum > 0 && player.input.isBPressed(player)) {
 			character.changeState(new Fall(), true);
 		}
 
@@ -353,7 +353,7 @@ public class InfinityGigAttackBossVer : CharState {
 
 		Helpers.decrementTime(ref specialPressTime);
 
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+		if (proj != null && !player.input.isBHeld(player) && proj.time >= proj.minTime) {
 			proj.reversed = true;
 		}
 

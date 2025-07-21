@@ -42,7 +42,7 @@ public class SigmaClawState : CharState {
 		}
 
 		/*
-		if (!player.input.isHeld(Control.Shoot, player))
+		if (!player.input.isAHeld(player))
 		{
 			shootHeldContinuously = false;
 		}
@@ -53,7 +53,7 @@ public class SigmaClawState : CharState {
 		}
 		*/
 
-		if (player.input.isPressed(Control.Shoot, player) &&
+		if (player.input.isAPressed(player) &&
 			character.grounded && character.frameIndex >= 4 &&
 			sprite != "attack2" &&
 			!once

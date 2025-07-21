@@ -332,7 +332,7 @@ public class KnockedDown : CharState {
 			character.move(new Point(hurtSpeed, 0));
 		}
 
-		if (character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+		if (character.canCharge() && player.input.isAHeld(player)) {
 			character.increaseCharge();
 		}
 

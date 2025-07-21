@@ -53,7 +53,7 @@ public class VileMK2GrabState : CharState {
 			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
 
-		if (stateFrames >= 2 && player.input.isPressed(Control.Special1, player)) {
+		if (stateFrames >= 2 && player.input.isBPressed(player)) {
 			character.changeToIdleOrFall();
 			return;
 		}

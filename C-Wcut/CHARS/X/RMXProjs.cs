@@ -113,20 +113,7 @@ public class RMXGenericMeleeProj : Projectile {
 			}
 		}
 
-		// Command grab section
-		Character? grabberChar = owner.character;
-		Character? grabbedChar = damagable as Character;
-		
-		switch (projId) {
-			case (int)ProjIds.GenericWCUTGrabProjID:
-				
-				grabbedChar.changeState(new RMXGrabbed(grabberChar));
-				grabberChar.changeState(new RMXGrabState(grabbedChar));
-				break;
-			case (int)ProjIds.ForceGrabState:
-				grabbedChar.changeState(new ForceGrabbed(grabberChar));
-				break;
-		}
+
 	}
 
 	public override DamagerMessage? onDamage(IDamagable? damagable, Player? attacker) {	

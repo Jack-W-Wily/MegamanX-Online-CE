@@ -45,7 +45,7 @@ public class HexaInvoluteStateWC : CharState {
 			}
 		}
 
-		if (player.vileAmmo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
+		if (player.vileAmmo <= 0 || (player.input.isBPressed(player) && stateTime > 1)) {
 			character.changeToIdleOrFall();
 		}
 	}

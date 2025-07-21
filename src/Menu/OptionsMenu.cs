@@ -444,6 +444,44 @@ public class OptionsMenu : IMainMenu {
 					"If Yes, will instantly die on loadout change mid-match.\n" +
 					"If No, on next death loadout changes will apply."
 				),
+				// Disable R2 Shortcut
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.DisableR2Shortcut);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "R2 Shortcut",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.DisableR2Shortcut),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If Enabled, R2 and A+B will be separate.\n" +
+					"If Disabled, A+B will have the same effect as pressing R2."
+				),
+				// Disable L2 Shortcut
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.DisableL2Shortcut);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "L2 Shortcut",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.DisableL2Shortcut),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If Enabled, L2 and R1+L1 will be separate.\n" +
+					"If Disabled, L1+R1 will have the same effect as pressing L2."
+				),
 				// Kill on character change.
 				new MenuOption(
 					30, startY,

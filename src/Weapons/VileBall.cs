@@ -310,7 +310,7 @@ public class AirBombAttack : CharState {
 	public override void update() {
 		base.update();
 		if (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound) {
-			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+			if (bombNum > 0 && player.input.isBPressed(player)) {
 				character.changeState(character.getFallState(), true);
 				return;
 			}
@@ -325,7 +325,7 @@ public class AirBombAttack : CharState {
 				character.changeToIdleOrFall();
 			}
 		} else if (vile.grenadeWeapon.type == (int)VileBallType.SpreadShot) {
-			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+			if (bombNum > 0 && player.input.isBPressed(player)) {
 				character.changeToIdleOrFall();
 				return;
 			}

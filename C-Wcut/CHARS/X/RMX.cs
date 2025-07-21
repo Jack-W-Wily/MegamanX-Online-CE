@@ -39,7 +39,7 @@ public class RockmanX : MegamanX {
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isHeld(Control.L2, player) && grounded){
+		if (player.input.isL2Held(player) && grounded){
 			changeState(new BlockWCUT());
 		
 		}
@@ -62,14 +62,30 @@ public class RockmanX : MegamanX {
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
 
+			if (player.superAmmo == player.superMaxAmmo && 
+		downPressedTimes >= 2 && player.input.isR2Pressed(player)) {
+					changeState(new GigaCrushCharState(), true);
+				downPressedTimes = 0;
+				player.superAmmo = 0;
+					return true;
+		}
+
+		if (player.input.checkShoryuken(player, xDir, Control.Shoot) &&
+		player.superAmmo == player.superMaxAmmo 
+		) {
+			changeState(new Shoryuken(isUnderwater()), true);
+				player.superAmmo = 0;
+		}
 		
-		if (player.input.isHeld(Control.L2, player)
-		&& player.input.isPressed(Control.Shoot, player)) {
+
+
+		if (player.input.isL2Held(player)
+		&& player.input.isAPressed(player)) {
 			changeState(new RMXGrabStartState(), true);
 			
 		}
 
-		if (player.input.isHeld(Control.L2, player)
+		if (player.input.isL2Held(player)
 		&& player.input.isPressed(Control.Dash, player) && DodgeCD == 0) {
 
 		
@@ -79,14 +95,31 @@ public class RockmanX : MegamanX {
 		}
 
 
-		if (player.input.checkShoryuken(player, xDir, Control.R2)) {
+		
+		
+		if (player.input.isR2Pressed(player) &&
+		player.input.isHeld(Control.Up, player) &&
+		player.input.isLeftOrRightHeld(player) &&
+		!player.input.checkShoryuken(player, xDir, Control.R2)
+		&& charState is not RMXDoubleKick) {
 				changeState(new RMXDoubleKick(), true);
 		}
 
-		if (player.input.isPressed(Control.R2, player) &&
+		if (player.input.isR2Pressed(player) &&
+		!player.input.isHeld(Control.Up, player) &&
+		!player.input.isLeftOrRightHeld(player) &&
 		!player.input.checkShoryuken(player, xDir, Control.R2)
 		&& charState is not RMXDoubleKick) {
-				changeState(new RMXPunch(), true);
+			changeState(new RMXPunch(), true);
+		}
+
+		if (player.input.isR2Pressed(player) &&
+		!player.input.isHeld(Control.Up, player) &&
+		player.input.isLeftOrRightHeld(player) &&
+		!player.input.checkShoryuken(player, xDir, Control.R2)
+		&& charState is not RMXDoubleKick) {
+			changeState(new RMXPunch(), true);
+			slideVel = xDir * getDashSpeed() * 0.9f;
 		}
 
 
@@ -126,7 +159,9 @@ public class RockmanX : MegamanX {
 
 
 
-
+		if (player.input.isWeaponLeftOrRightPressed(player)) {
+			shootCooldown = 0;
+		}
 
 
 		if (player.superAmmo >= player.superMaxAmmo) {
@@ -258,7 +293,7 @@ public class RockmanX : MegamanX {
 				2, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new RMXGenericMeleeProj(
-				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
+				RCXPunch.netWeapon, projPos, ProjIds.VJab1, player,
 				2, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
@@ -308,6 +343,10 @@ public class RockmanX : MegamanX {
 
 	public override bool canCharge() {
 		return !isInvulnerableAttack();
+	}
+
+	public override bool chargeButtonHeld() {
+		return player.input.isR2Held(player) || player.input.isAHeld(player)  || player.input.isBHeld(player);
 	}
 
 	public override void chargeGfx() {

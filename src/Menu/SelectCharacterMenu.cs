@@ -47,6 +47,8 @@ public enum CharIds {
 	ZeroMID,
 	ZeroEND,
 	ShigumaX1,
+
+	Zain,
 				
 
 }
@@ -64,7 +66,6 @@ public class CharSelection {
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
-
 		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
 		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
 		},
@@ -77,16 +78,6 @@ public class CharSelection {
 		},
 		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
 
-		// Make sure to add your char here
-		new CharSelection("Kurumitos", // Display name in the menu
-		(int)CharIds.Kurumitos, // Char ID , you may notice that the ones above have numbers here 
-		// 							but adding it as  (int)Char.Ids."your character" is more effective
-		1,    // Mapped Char Armor (this is exclusive to make it so X's 1v1 Armors Work)
-		0,               // Mapped Char Maverick (This is for sigma's 1v1 mavericks)
-		"kr_idle",       // Sprite name to show in the menu, for this example I choose the idle
-		 0               // Frame that the sprite will be stuck in
-		 ),				 // Make sure to end the whole thing with a "," ion the end
-		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
 
@@ -95,8 +86,13 @@ public class CharSelection {
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
 		new CharSelection("Zero (Vanilla)", (int)CharIds.Zero, 1, 0, "menu_szero", 0),
 		new CharSelection("Zero (WCUT)", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
+		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
-
+		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "zain_idle", 0),
+		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
+		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
+			offset = new Point(1, 45)
+		},
 		// Make sure to add your char here
 		new CharSelection("Kurumitos", // Display name in the menu
 		(int)CharIds.Kurumitos, // Char ID , you may notice that the ones above have numbers here 

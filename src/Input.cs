@@ -152,6 +152,15 @@ public class Input {
 		return false;
 	}
 
+	public bool checkShoryuken2(Player player, int xDir, string triggerBtn) {
+		if (xDir == 1) {
+			return checkShoryukenHelper2("right", player, triggerBtn);
+		} else if (xDir == -1) {
+			return checkShoryukenHelper2("left", player, triggerBtn);
+		}
+		return false;
+	}
+
 	private int[][] commandList = {
 		new int[3],
 		new int[3]
@@ -228,6 +237,43 @@ public class Input {
 		}
 		return completed;
 	}
+
+
+	private bool checkShoryukenHelper2(string forwardDir, Player player, string triggerBtn) {
+		int[] command = commandList[1];
+		int time = 30;
+		bool completed = false;
+
+		if (command[2] > 0) {
+			if (isPressed(triggerBtn, player)) {
+				command[2] = 0;
+				completed = true;
+			} else {
+				command[2]--;
+			}
+		}
+		if (command[1] > 0) {
+			if (isHeld("up", player) && isHeld(forwardDir, player)) {
+				command[2] = command[1];
+				command[1] = 0;
+			} else {
+				command[1]--;
+			}
+		}
+		if (command[0] > 0) {
+			if (isHeld("up", player) && !isHeld(forwardDir, player)) {
+				command[1] = command[0];
+				command[0] = 0;
+			} else {
+				command[0]--;
+			}
+		}
+		if (!isHeld("up", player) && isHeld(forwardDir, player)) {
+			command[0] = time;
+		}
+		return completed;
+	}
+
 
 	public Dictionary<Key, char> capsLockMapping = new Dictionary<Key, char>() {
 		{ Key.A, 'A' },
@@ -657,6 +703,63 @@ public class Input {
 	// We use XOR (^) for this.
 	public bool isLeftOrRightHeld(Player player) {
 		return (isHeld(Control.Left, player) ^ isHeld(Control.Right, player));
+	}
+
+
+	public bool isL2Pressed(Player player) {
+		if (Options.main.DisableL2Shortcut){
+		return isPressed(Control.L2, player);
+		} 
+		return (isPressed(Control.WeaponLeft, player) && isPressed(Control.WeaponRight, player)) || isPressed(Control.L2, player);
+	}
+
+	public bool isL2Held(Player player) {
+		if (Options.main.DisableL2Shortcut){
+		return isHeld(Control.L2, player);
+		} 
+		return (isHeld(Control.WeaponLeft, player) && isHeld(Control.WeaponRight, player)) || isHeld(Control.L2, player);
+	}
+
+	public bool isR2Pressed(Player player) {
+		if (Options.main.DisableR2Shortcut){
+		return isPressed(Control.R2, player);
+		} 
+		return (isPressed(Control.Shoot, player) && isPressed(Control.Special1, player)) || isPressed(Control.R2, player);
+	}
+
+	public bool isR2Held(Player player) {
+		if (Options.main.DisableR2Shortcut){
+		return isHeld(Control.R2, player);
+		} 
+		return (isHeld(Control.Shoot, player) && isHeld(Control.Special1, player)) || isHeld(Control.R2, player);
+	}
+
+	public bool isAPressed(Player player) {
+		if (Options.main.DisableR2Shortcut){
+		return isPressed(Control.Shoot, player);
+		} 
+		return isPressed(Control.Shoot, player) && !isPressed(Control.Special1, player);
+	}
+
+	public bool isAHeld(Player player) {
+		if (Options.main.DisableR2Shortcut){
+		return isHeld(Control.Shoot, player);
+		} 
+		return isHeld(Control.Shoot, player) && !isHeld(Control.Special1, player);
+	}
+
+	public bool isBPressed(Player player) {
+		if (Options.main.DisableR2Shortcut){
+		return isPressed(Control.Special1, player);
+		} 
+		return isPressed(Control.Special1, player) && !isPressed(Control.Shoot, player);
+	}
+
+	public bool isBHeld(Player player) {
+		if (Options.main.DisableR2Shortcut){
+		return isHeld(Control.Special1, player);
+		} 
+		return isHeld(Control.Special1, player) && !isHeld(Control.Shoot, player);
 	}
 
 	public bool isCommandButtonPressed(Player player) {

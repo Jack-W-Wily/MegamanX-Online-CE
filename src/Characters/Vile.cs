@@ -226,8 +226,8 @@ public class Vile : Character {
 		chargeLogic(shoot);
 	}
 	public override bool attackCtrl() {
-		bool specialPressed = player.input.isPressed(Control.Special1, player);
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
+		bool specialPressed = player.input.isBPressed(player);
+		bool shootHeld = player.input.isAHeld(player);
 		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 		if (specialPressed) {
 			dashGrabSpecial();
@@ -303,7 +303,7 @@ public class Vile : Character {
 	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
 		bool Goliath = rideArmor?.raNum == 4;
-		bool stunShotPressed = player.input.isPressed(Control.Special1, player);
+		bool stunShotPressed = player.input.isBPressed(player);
 		bool HeldDown = player.input.isHeld(Control.Down, player);
 		bool goliathShotPressed = player.input.isPressed(Control.WeaponLeft, player) || player.input.isPressed(Control.WeaponRight, player);
 		bool raStates = rideArmor?.rideArmorState is RAIdle || rideArmor?.rideArmorState is RAJump || rideArmor?.rideArmorState is RAFall || rideArmor?.rideArmorState is RADash;
@@ -356,7 +356,7 @@ public class Vile : Character {
 	}
 	public override bool chargeButtonHeld() {
 		if (currentWeapon is AssassinBulletChar) return player.input.isHeld(Control.Up, player);
-		return player.input.isHeld(Control.Special1, player);
+		return player.input.isBHeld(player);
 	}
 	public override bool canCharge() {
 		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
@@ -422,7 +422,7 @@ public class Vile : Character {
 			return;
 		}
 		if (rideMenuWeapon?.isMenuOpened == true) {
-			if (player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.WeaponLeft, player)) {
+			if (player.input.isBPressed(player) || player.input.isPressed(Control.WeaponLeft, player)) {
 				rideMenuWeapon.isMenuOpened = false;
 			}
 		}

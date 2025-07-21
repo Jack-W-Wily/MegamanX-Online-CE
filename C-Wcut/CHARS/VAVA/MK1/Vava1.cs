@@ -65,7 +65,7 @@ public class VAVA1 : Character {
 
 	public float stockedTime;
 
-	public bool canSpecialCancel = false;
+
 
 
 	public VAVA1(
@@ -105,8 +105,7 @@ public class VAVA1 : Character {
 
 
 	public override bool normalCtrl() {
-
-		if (player.input.isHeld(Control.L2, player) && grounded) {
+		if (player.input.isL2Held(player) && grounded) {
 			changeState(new BlockWCUT());
 
 		}
@@ -119,24 +118,111 @@ public class VAVA1 : Character {
 		return base.normalCtrl();
 	}
 
+
+	
+
+	public override bool spcCancel() {
+	
+		// Dash Cancel
+		if (player.dashPressed(out string dashControl)) {
+			if (grounded) {
+				changeState(new Dash(dashControl), true);
+			} else {
+				changeState(new AirDash(dashControl), true);
+			}
+				return true;
+		}
+
+		// JumpCancel
+		if (player.input.isPressed(Control.Jump, player) && canJump()) {
+				vel.y = -getJumpPower();
+				isDashing = true;
+				changeState(getJumpState());
+				return true;
+		} 
+
+		
+
+
+		SpecialMoves();
+
+
+		return base.spcCancel();
+	}
+
+	public bool AirCheckExplosiveRound = false;
+	public bool AirCheckGreenEyedLamp = false;
+
+
+
+		public bool Supers() {
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= player.superMaxAmmo){
+			changeState(new VavaBurensen1(), true);	
+			player.superAmmo = 0;
+			playSound("chingX4");
+		}
+		return !sprite.name.Contains("hurt") ||
+		!sprite.name.Contains("frozen") ||
+		!sprite.name.Contains("grabbed") || 
+		!sprite.name.Contains("knocked") || 
+		!sprite.name.Contains("launched") || 
+		!sprite.name.Contains("thrown") || 
+		!sprite.name.Contains("die") || 
+		!sprite.name.Contains("lose") ||
+		!sprite.name.Contains("stunned");
+	}
+
+
+	public bool SpecialMoves() {
+		
+		if (player.input.checkHadoken(player, xDir, Control.Shoot) 
+		){
+			changeState(new VAVAKamae(), true);	
+			return true;
+		}
+
+		if (player.input.checkHadoken(player, xDir, Control.Special1) && !grounded
+		&& !AirCheckGreenEyedLamp){
+			changeState(new GreenEyedLampState(), true);	
+			AirCheckGreenEyedLamp = true;
+			return true;
+		}
+
+		if (player.input.checkShoryuken(player, xDir, Control.R2)){
+			changeState(new Vava1GizmoDash(), true);	
+			return true;
+		}
+
+		if (player.vileAmmo >= 15 &&
+			player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new VileDashChargeState());
+			player.vileAmmo -= 15;
+			return true;
+		}
+
+		return false ;
+	}
+
 	public override bool attackCtrl() {
 
-		if (player.input.checkHadoken(player, xDir, Control.Shoot)) {
-			changeState(new VAVAKamae(), true);
-				
-		}
+			SpecialMoves();
+		
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
 		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
 		&& charState is not VAVAKamae
 		) {
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				if (grounded) {
 					if (player.input.isLeftOrRightHeld(player)) {
 						if (player.vileAmmo >= 8) {
 							changeState(new GoGetterRightAttack(), true);
 						}
 					} else {
+							if (!player.input.isHeld(Control.Down, player)) {
 							changeState(new VAVAJab1(), true);
+							} else {
+							changeState(new VAVAUpperCutPunch(), true);	
+							}
 						}
 				} else {
 					if (player.input.isHeld(Control.Down, player)) {
@@ -154,16 +240,19 @@ public class VAVA1 : Character {
 		}
 		
 
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			if (grounded) {
 				
 			} else {
+				if (!AirCheckExplosiveRound && charState is not GreenEyedLampState){
 				changeState(new ExplosiveRoundState(), true);
+				AirCheckExplosiveRound = true;
+				}
 			}
-		}
+			}
 
-		if (player.input.isHeld(Control.L2, player)) {
-			if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isL2Held(player)) {
+			if (player.input.isAPressed(player)) {
 				changeState(new Vava1GrabStartState(), true);
 			}
 			if (player.input.isPressed(Control.Dash, player) && CrimsonphantomCD == 0) {
@@ -172,41 +261,42 @@ public class VAVA1 : Character {
 			}
 		}
 
-		if (player.input.checkShoryuken(player, xDir, Control.R2)){
-			changeState(new Vava1GizmoDash(), true);	
-		}
 		if (!player.input.checkHadoken(player, xDir, Control.R2)
 		&& !player.input.checkShoryuken(player, xDir, Control.R2)
 		&& charState is not Vava1GizmoDash
 		) {
-			if (player.input.isPressed(Control.R2, player)) {
-				if (downPressedTimes >= 2) {
+			// finally added Tridentline
+			if (player.input.isR2Pressed(player)) {
+				if (downPressedTimes >= 2 && player.vileAmmo > 15) {
 					changeState(new Vava1TridentLine(grounded), true);
+					downPressedTimes = 0;
+					player.vileAmmo -= 15;
 				} else {
 					shoot(0);
 				}
 			}
-		}
-
-			if (player.input.isHeld(Control.Down, player)) {
-
-				if (player.input.isPressed(Control.Dash, player)) {
-					changeState(new VileDashChargeState());
-
-				}
-			}
-
-
+		}	
 		
+
 
 		return base.attackCtrl();
 	}
 
 
+	public bool SetAirChecks() {
+		if (grounded) {
+			AirCheckGreenEyedLamp = false;
+			AirCheckExplosiveRound = false;
+			return true;
+		}
+		return false;
+	} 
+
+
 	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
 		bool Goliath = rideArmor?.raNum == 4;
-		bool stunShotPressed = player.input.isPressed(Control.Special1, player);
+		bool stunShotPressed = player.input.isBPressed(player);
 		bool HeldDown = player.input.isHeld(Control.Down, player);
 		bool goliathShotPressed = player.input.isPressed(Control.WeaponLeft, player) || player.input.isPressed(Control.WeaponRight, player);
 		bool raStates = rideArmor?.rideArmorState is RAIdle || rideArmor?.rideArmorState is RAJump || rideArmor?.rideArmorState is RAFall || rideArmor?.rideArmorState is RADash;
@@ -243,17 +333,7 @@ public class VAVA1 : Character {
 	
 	public override void update() {
 		base.update();
-		// For the special cancels to work
-		if (charState.attackCtrl ||
-		charState.normalCtrl ||
-		charState.spcCancel ||
-		charState.wiffCancel
-		) {
-			canSpecialCancel = true;
-		} else {
-			canSpecialCancel = false;
-		}
-
+		
 		if (overDriveTimer > 0) {
 			OverDrive = true;
 		} else {
@@ -288,15 +368,6 @@ public class VAVA1 : Character {
 			}
 		}
 
-
-		if (canSpecialCancel) {
-
-			if (player.input.checkHadoken(player, xDir, Control.Shoot)) {
-				changeState(new VAVAKamae(), true);
-
-			}
-
-		}
 		if (OverDrive) {
 			stockedTime += Global.spf;
 			if (stockedTime >= 61f / 60f) {
@@ -383,13 +454,18 @@ public class VAVA1 : Character {
 		}
 		RideArmorAttacks();
 		RideLinkMK5();
-
+		SetAirChecks();
+		Supers();
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
 			return;
 		}
 		chargeLogic(shoot);
 
+
+
+
 	}
+
 
 
 
@@ -453,6 +529,7 @@ public class VAVA1 : Character {
 		KamaeBlock,
 		Jab,
 		Jab2,
+		UpperCut,
 		Grab,
 		Grabmk2dash,
 		KamaeUnB,
@@ -460,7 +537,7 @@ public class VAVA1 : Character {
 		BurensenStart,
 		BurensenStomp,
 		BurensenEND,
-
+		GreenEyedLamp,
 		BurensenENDCPU,
 		RagingDemon,
 		Kote,
@@ -476,12 +553,14 @@ public class VAVA1 : Character {
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vava_jab_1" => MeleeIds.Jab,
 			"vava_jab_2" => MeleeIds.Jab2,
+			"vava_punch_2" => MeleeIds.UpperCut,
 			"vava_gizmo_dash_grab" => MeleeIds.GizmoGrab,
 			"vava_kamae_unblockable" or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB,
 			"vava_kamae_kote" => MeleeIds.Kote,
 			"vava_spring_grab" => MeleeIds.Grab,
 			"vava_dash_grab" => MeleeIds.Grabmk2dash,
 			"vava_hoticecle" => MeleeIds.HotIcecle,
+			"vava_green_eyed_lamp" => MeleeIds.GreenEyedLamp,
 			"vava_burensen_1" => MeleeIds.BurensenStart,
 			"vava_burensen_2" => MeleeIds.BurensenStomp,
 			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
@@ -518,6 +597,12 @@ public class VAVA1 : Character {
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.UpperCut => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
+				 2, 40, 42, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
 			(int)MeleeIds.KamaeBlock => new Vava1GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 0.25f, 5, 10, isReflectShield: true,
@@ -526,7 +611,7 @@ public class VAVA1 : Character {
 			),
 			(int)MeleeIds.Jab => new Vava1GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
-			 1, 20, 20, isReflectShield: true,
+			 1, 20, 25, isReflectShield: true,
 			isZSaberClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
@@ -536,6 +621,7 @@ public class VAVA1 : Character {
 			isZSaberClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
+
 
 			(int)MeleeIds.KamaeUnB => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
@@ -593,6 +679,13 @@ public class VAVA1 : Character {
 				addToLevel: addToLevel
 			),
 
+			(int)MeleeIds.GreenEyedLamp => new Vava1GenericMeleeProj(
+				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
+				3, 30, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel
+			),
+
 			_ => null
 		};
 		return proj;
@@ -636,7 +729,7 @@ public class VAVA1 : Character {
 
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.R2, player);
+		return player.input.isR2Held(player);
 	}
 
 	public override void increaseCharge() {
@@ -738,7 +831,7 @@ public class VAVA1 : Character {
 			return;
 		}
 		if (rideMenuWeapon?.isMenuOpened == true) {
-			if (player.input.isPressed(Control.Special1, player) || player.input.isPressed(Control.WeaponLeft, player)) {
+			if (player.input.isBPressed(player) || player.input.isPressed(Control.WeaponLeft, player)) {
 				rideMenuWeapon.isMenuOpened = false;
 			}
 		}

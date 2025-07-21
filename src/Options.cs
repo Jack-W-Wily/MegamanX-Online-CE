@@ -26,6 +26,8 @@ public class Options {
 	public bool useOptimizedAssets = false;
 	public bool killOnLoadoutChange = true;
 	public bool killOnCharChange = true;
+	public bool DisableR2Shortcut = true;
+	public bool DisableL2Shortcut = true;
 	public float networkTimeoutSeconds = 3;
 	public bool autoCreateDocFolderPromptShown = false;
 

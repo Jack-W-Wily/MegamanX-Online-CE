@@ -193,7 +193,7 @@ public class PunchyZero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player);
 	}
 
 	public void setShootAnim() {
@@ -322,10 +322,10 @@ public class PunchyZero : Character {
 		if (swingPressTime > 0) {
 			swingPressTime--;
 		}
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			shootPressTime = 6;
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			specialPressTime = 6;
 		}
 		if (player.input.isPressed(Control.WeaponLeft, player) ||

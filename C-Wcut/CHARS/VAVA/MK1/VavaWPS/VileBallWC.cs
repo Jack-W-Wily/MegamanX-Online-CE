@@ -19,7 +19,7 @@ public class ExplosiveRoundState : CharState {
 
 		
 
-			if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+			if (bombNum > 0 && player.input.isBPressed(player)) {
 				character.changeState(new Fall(), true);
 			}
 
@@ -123,7 +123,7 @@ public class SpreadShotKnee : CharState {
 		base.update();
 
 		var ebw = new VileElectricBomb();
-		if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
+		if (bombNum > 0 && player.input.isBPressed(player)) {
 			character.changeToIdleOrFall();
 			return;
 		}

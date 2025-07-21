@@ -257,7 +257,7 @@ public class SigmaBallShootEX : CharState {
 			character.changeToIdleOrFall();
 		}
 		//By disabling the code bellow, you can sort of make it MMX1 Accurate
-		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
+		if (character.sprite.loopCount > 0 && !player.input.isBHeld(player)) {
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -313,7 +313,7 @@ public class SigmaBallShoot : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.sprite.loopCount > 0 && !player.input.isHeld(Control.Special1, player)) {
+		if (character.sprite.loopCount > 0 && !player.input.isBHeld(player)) {
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -441,7 +441,7 @@ public class SigmaWallDashState : CharState {
 		if (stateTime > 0.7f) {
 			character.changeState(character.getFallState(), true);
 		}
-		if (player.input.isPressed(Control.Shoot, player) &&
+		if (player.input.isAPressed(player) &&
 			!fired && Sigma.saberCooldown == 0 && character.invulnTime == 0
 		) {
 			if (yDir == 0) {

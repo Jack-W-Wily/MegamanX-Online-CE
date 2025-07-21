@@ -109,8 +109,11 @@ public class BlockWCUT : CharState {
 		base.update();
 		blockTime -= Global.spf;
 		bool isHoldingGuard = (
-			player.input.isHeld(Control.L2, player)
+			player.input.isL2Held(player)
 		);
+
+		character.turnToInput(player.input, player);
+
 		if (blockTime == 0) {
 			character.changeState(new BlockBreak(character.xDir), true);
 		}
@@ -131,6 +134,117 @@ public class BlockWCUT : CharState {
 		}
 	}
 }
+
+
+
+
+
+
+public class GlobalParryState : CharState {
+	public GlobalParryState() : base("parry_start", "", "", "") {
+		superArmor = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.isZain){
+			character.move(new Point(character.xDir * 350, 0));
+		}
+
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			character.genericParryCooldown = 30;
+		}
+	}
+
+	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
+		Actor? counterAttackTarget = null;
+		if (damagingActor is GenericMeleeProj gmp) {
+			counterAttackTarget = gmp.owningActor;
+		}
+		if (counterAttackTarget == null) {
+			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
+		}
+
+		Projectile? proj = damagingActor as Projectile;
+		bool stunnableParry = proj != null && proj.canBeParried();
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
+			counterAttackTarget is Character chr && stunnableParry
+		) {
+			if (player.isVile){
+			if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new ParriedState(), true);
+			}
+			if (player.isVile){
+		Point shootVel = new Point(1, -3);
+	
+		}
+			character.addHealth(1);
+			}
+
+			if (player.isZain){
+					if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new VileMK2Grabbed(character), true);
+				character.changeState(new ZainGrab(), true);
+			}
+			}
+
+		}
+		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
+
+		if (Helpers.randomRange(0,5) == 5){
+			character.addHealth(1);
+			character.changeState(new ParriedState(), true);
+		}
+		if (!player.isZain){
+		character.changeState(new Idle(), true);
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+	public bool canParry(Actor damagingActor) {
+		if (damagingActor is not Projectile) {
+			return false;
+		}
+		if (player.isVile)return character.frameIndex < 5;
+	//	if (player.isDragoon)return character.frameIndex < 5;
+		
+		return character.frameIndex == 0;
+	}
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.isX || player.isRMX) {
+		character.changeSpriteFromName("unpo_parry_start", true);
+		}
+
+			if (player.isZain){
+			character.changeSpriteFromName("parry_dash", true);
+			character.playSound("distortion_d");
+			character.playSound("zainDash");
+		}
+
+
+		
+		}
+	
+}
+
+
 
 
 
@@ -222,7 +336,7 @@ public class HurtByEnemy : CharState {
 			character.move(new Point(hurtSpeed, 0));
 		}
 
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+		if (player.character.canCharge() && player.input.isAHeld(player)) {
 			player.character.increaseCharge();
 		}
 
@@ -267,7 +381,7 @@ public class PushedOver : CharState {
 			character.move(new Point(hurtSpeed, 0));
 		}
 
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+		if (player.character.canCharge() && player.input.isAHeld(player)) {
 			player.character.increaseCharge();
 		}
 
@@ -310,7 +424,7 @@ public class PushedOver2 : CharState {
 			character.move(new Point(hurtSpeed, 0));
 		}
 
-		if (player.character.canCharge() && player.input.isHeld(Control.Shoot, player)) {
+		if (player.character.canCharge() && player.input.isAHeld(player)) {
 			player.character.increaseCharge();
 		}
 
@@ -436,13 +550,14 @@ public class LaunchedFowardState : CharState {
 
 		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, -character.xDir, 0);
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer ||
-		(character.vel.x == 0 || character.grounded) && stateTime > 0.2f) {
+		(character.grounded) && stateTime > 0.2f) {
 			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 			character.changeToIdleOrFall();
 			character.playSound("hurt", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 			return;
-		} else if (stateTime > 3f) {
+		} 
+		if (stateTime > 3f) {
 			character.changeToIdleOrFall();
 			character.shakeCamera(sendRpc: true);
 			return;
@@ -612,6 +727,53 @@ public class WcutGenericDodgeB : CharState {
 
 
 
+public class DropDown : CharState {
+	public int hurtDir;
+	public float hurtSpeed;
+	public float flinchTime;
+	public DropDown(int dir) : base("knocked_down") {
+		hurtDir = dir;
+		hurtSpeed = dir * 100;
+		flinchTime = 0.5f;
+	}
+
+	public override bool canEnter(Character character) {
+		if (character.isStatusImmune()) return false;
+		if (character.isFlinchImmune()) return false;
+		if (character.isInvulnerable()) return false;
+		if (character.vaccineTime > 0) return false;
+		return base.canEnter(character);
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = 300;
+	}
+
+	public override void update() {
+		base.update();
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
+			character.move(new Point(hurtSpeed, 0));
+		}
+
+		if (character.canCharge() && player.input.isAHeld(player)) {
+			character.increaseCharge();
+		}
+
+		if (character is Axl axl) {
+			axl.stealthRevealTime = Axl.maxStealthRevealTime;
+		}
+
+		if (stateTime >= flinchTime) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
+
 public class ForceGrabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public ForceGrabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
@@ -623,6 +785,8 @@ public class ForceGrabbed : GenericGrabbedState {
 		if (grabber.sprite.name.Contains("idle") ||
 		grabber.sprite.name.Contains("crouch") ||
 		grabber.sprite.name.Contains("run") ||
+		grabber.sprite.name.Contains("fall") ||
+		grabber.sprite.name.Contains("jump") ||
 		grabber.sprite.name.Contains("hurt") ||
 		grabber.sprite.name.Contains("grabbed")
 	

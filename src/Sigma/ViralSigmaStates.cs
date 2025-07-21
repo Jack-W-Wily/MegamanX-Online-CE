@@ -44,12 +44,12 @@ public class ViralSigmaIdle : CharState {
 				return;
 			}
 
-			if (player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isBPressed(player)) {
 				character.changeState(new ViralSigmaBeamState(), true);
 				return;
 			}
 
-			if (player.input.isPressed(Control.Shoot, player) && player.sigmaAmmo >= player.weapon.getAmmoUsage(0)) {
+			if (player.input.isAPressed(player) && player.sigmaAmmo >= player.weapon.getAmmoUsage(0)) {
 				character.changeState(new ViralSigmaShoot(inputDir.x != 0 ? inputDir.x : sigma.lastViralXDir), true);
 				return;
 			}
@@ -156,7 +156,7 @@ public class ViralSigmaPossess : CharState {
 			if (character.xScale < 0) character.xScale = 0;
 			character.yScale = character.xScale;
 			character.changePos(target.pos.addxy(0, -20));
-			bool unpossessButtonPressed = player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Special1, player);
+			bool unpossessButtonPressed = player.input.isAPressed(player) || player.input.isBPressed(player);
 			if (target.player.possessedTime == 0 || target.destroyed || unpossessButtonPressed) {
 				unpossess();
 			} else {
@@ -212,7 +212,7 @@ public class ViralSigmaShoot : CharState {
 			proj = new ViralSigmaShootProj(mechaniloidWeapon, poi.Value, xDir, player, player.getNextActorNetId(), rpc: true);
 		}
 
-		if (player.input.isPressed(Control.Shoot, player) && proj != null && proj.time > 0.05f && (mechaniloidWeapon.mechaniloidType == MechaniloidType.Bird || mechaniloidWeapon.mechaniloidType == MechaniloidType.Fish)) {
+		if (player.input.isAPressed(player) && proj != null && proj.time > 0.05f && (mechaniloidWeapon.mechaniloidType == MechaniloidType.Bird || mechaniloidWeapon.mechaniloidType == MechaniloidType.Fish)) {
 			proj.destroySelf();
 		}
 
@@ -336,7 +336,7 @@ public class ViralSigmaBeamState : CharState {
 			return;
 		}
 
-		if ((stateTime > 0.2f && !player.input.isHeld(Control.Special1, player))) {
+		if ((stateTime > 0.2f && !player.input.isBHeld(player))) {
 			character.changeState(new ViralSigmaIdle(), true);
 		}
 		proj?.changePos(character.getFirstPOIOrDefault());
@@ -463,7 +463,7 @@ public class ViralSigmaRevive : CharState {
 				character.visible = true;
 			}
 		} else if (state == 1) {
-			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+			if (Global.debug && player.input.isBPressed(player)) {
 				character.xScale = 1;
 				character.yScale = 1;
 				state = 2;
@@ -494,7 +494,7 @@ public class ViralSigmaRevive : CharState {
 				state = 3;
 			}
 		} else if (state == 3) {
-			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+			if (Global.debug && player.input.isBPressed(player)) {
 				player.health = player.maxHealth;
 			}
 

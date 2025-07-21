@@ -387,7 +387,7 @@ public class XUPGrabState : CharState {
 			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
 		}
 
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			character.changeToIdleOrFall();
 			return;
 		}

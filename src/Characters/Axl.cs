@@ -462,10 +462,10 @@ public class Axl : Character {
 
 		var axlBullet = player.weapons.FirstOrDefault(w => w is AxlBullet) as AxlBullet;
 
-		bool shootPressed = player.input.isPressed(Control.Shoot, player);
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
-		bool altShootPressed = player.input.isPressed(Control.Special1, player);
-		bool altShootHeld = player.input.isHeld(Control.Special1, player);
+		bool shootPressed = player.input.isAPressed(player);
+		bool shootHeld = player.input.isAHeld(player);
+		bool altShootPressed = player.input.isBPressed(player);
+		bool altShootHeld = player.input.isBHeld(player);
 		bool altShootRecentlyPressed = false;
 
 		if (!player.isAI) {
@@ -1284,7 +1284,7 @@ public class Axl : Character {
 			canShoot() && currentWeapon?.noAmmo() == true && player.axlWeapon != null &&
 			!player.axlWeapon.isTwoHanded(true) && shootTime == 0
 		);
-		if (player.input.isHeld(Control.Shoot, player) && canShootBool) {
+		if (player.input.isAHeld(player) && canShootBool) {
 			return true;
 		}
 		return false;
@@ -1957,7 +1957,7 @@ public class Axl : Character {
 			return true;
 		}
 		if (Options.main.axlAimMode == 0 && !Options.main.moveInDiagAim && !isDashing &&
-			(grounded || charState is Hover || player.input.isHeld(Control.Shoot, player) || player.input.isHeld(Control.Special1, player)) &&
+			(grounded || charState is Hover || player.input.isAHeld(player) || player.input.isBHeld(player)) &&
 			(player.input.isHeld(Control.Up, player) || player.input.isHeld(Control.Down, player))) {
 			return true;
 		}
@@ -2012,7 +2012,7 @@ public class Axl : Character {
 	}
 	public void customSettingReloadWeapon() {
 		//Reload Weapon Custom Setting
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
+		bool shootHeld = player.input.isAHeld(player);
 		switch (player.weapon) {
 			case RayGun:
 				(player.weapon as RayGun)?.rechargeAmmoCustomSetting(player, this, shootHeld, 1, 1);

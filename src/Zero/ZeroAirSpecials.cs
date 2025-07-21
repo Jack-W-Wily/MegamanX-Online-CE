@@ -244,10 +244,10 @@ public class HyorogaState : CharState {
 	}
 	public override void update() {
 		base.update();
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			character.changeState(new HyorogaStateA(), true);
 		}	
-		if (player.input.isPressed(Control.Shoot, player) && character.getChargeLevel() >= 1) {
+		if (player.input.isAPressed(player) && character.getChargeLevel() >= 1) {
 			character.changeState(new HyorogaStateB(), true);	
 		}
 		if (player.input.isPressed(Control.Jump, player)) {

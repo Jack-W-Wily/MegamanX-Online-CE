@@ -74,7 +74,7 @@ public class Doppma : BaseSigma {
 		}
 		bool attackPressed = false;
 		if (player.weapon is not AssassinBulletChar) {
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				attackPressed = true;
 				lastAttackFrame = Global.level.frameCount;
 			}
@@ -102,7 +102,7 @@ public class Doppma : BaseSigma {
 				return true;
 			}
 		}
-		if (grounded && player.input.isPressed(Control.Special1, player) &&
+		if (grounded && player.input.isBPressed(player) &&
 			charState is not SigmaThrowShieldState && shieldCooldown == 0
 		) {
 			shieldCooldown = maxShieldCooldown;

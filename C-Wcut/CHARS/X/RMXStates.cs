@@ -84,7 +84,7 @@ public class RMXDoubleKick : CharState {
 			snd2 = true;
 			character.playSound("punch2");
 		}
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			character.changeState(new RMXDoubleKickShoot(), true);
 		}
 
@@ -113,7 +113,7 @@ public class RMXDoubleKick : CharState {
 
 public class RMXDoubleKickShoot : CharState {
 	bool shot = false;
-	Buster3GigaProj? proj;
+	Buster3GigaProjMelee? proj;
 	float specialPressTime;
 
 	public float pushBackSpeed;
@@ -166,7 +166,7 @@ public class RMXDoubleKickShoot : CharState {
 		character.frameTime = 0;
 		var poi = character.sprite.getCurrentFrame().POIs[0];
 		poi.x *= character.xDir;
-		proj = new Buster3GigaProj(character.getShootPos(), character.xDir, character, player, player.getNextActorNetId(), true);
+		proj = new Buster3GigaProjMelee(character.getShootPos(), character.xDir, character, player, player.getNextActorNetId(), true);
 	}
 
 	public override void onExit(CharState newState) {
@@ -198,8 +198,12 @@ public class RMXPunch : CharState {
 			shoot();
 		}
 
+		if (player.input.isAPressed(player)) {
+			character.changeState(new RMXDoubleKickShoot(), true);
+		}
 
-		if (player.input.isPressed(Control.Shoot, player) && character.sprite.frameIndex >= 3) {
+
+		if (player.input.isR2Pressed(player) && character.sprite.frameIndex >= 3) {
 			character.changeState(new RMXPunch2(), true);
 		}
 
@@ -260,7 +264,9 @@ public class RMXPunch2 : CharState {
 		base.update();
 
 
-
+		if (player.input.isAPressed(player)) {
+			character.changeState(new RMXDoubleKickShoot(), true);
+		}
 
 		if (!shot && character.sprite.frameIndex == 3) {
 			shoot();

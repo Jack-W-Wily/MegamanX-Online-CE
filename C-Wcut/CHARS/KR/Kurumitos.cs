@@ -225,7 +225,7 @@ public static CharSelection[] selections => [
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isHeld(Control.L2, player) && grounded){
+		if (player.input.isL2Held(player) && grounded){
 			changeState(new BlockWCUT());
 		
 		}
@@ -248,7 +248,7 @@ public static CharSelection[] selections => [
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			if (grounded) { // For grounded only moves always add a if (grounded) flag
 				if (player.input.isLeftOrRightHeld(player)) {
 					changeState(new KurumitoFowardKick(), true);
@@ -266,18 +266,18 @@ public static CharSelection[] selections => [
 
 		
 
-		if (player.input.isPressed(Control.Special1, player)) {		
+		if (player.input.isBPressed(player)) {		
 			changeState(new KurumitosDokuGami(), true); 
 		}
 
-		if (player.input.isHeld(Control.L2, player)
-		&& player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isL2Held(player)
+		&& player.input.isAPressed(player)) {
 		
 			changeState(new KurumitoGrabStartState(), true); 
 		}
 
 
-		if (player.input.isPressed(Control.R2, player)) {
+		if (player.input.isR2Pressed(player)) {
 			shoot(0);
 		}
 
@@ -587,7 +587,7 @@ public static CharSelection[] selections => [
 
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.R2, player);
+		return player.input.isR2Held(player);
 	}
 
 	public override void increaseCharge() {

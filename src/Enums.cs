@@ -300,6 +300,10 @@ public enum WeaponIds {
 	// Wcut STuff
 
 
+	// Zain
+
+	ZainParry,
+
 
 	// Kurumitos Stuff
 	KRMelee,
@@ -315,6 +319,7 @@ public enum ProjIds {
 	Buster2,
 	Buster3,
 	Buster3Giga,
+	Buster3GigaMelee,
 	Buster3Max,
 	Buster4,
 	Buster4Giga,
@@ -774,6 +779,117 @@ public enum ProjIds {
 	BurensenEND,
 	RagingDemon,
 	GizmoGrab,
+
+	// Zain 
+
+	ZainSaberProj,
+
+	
+	// X another
+	SiceSlide,
+
+	// GBD stuff
+
+	GBDKick,
+	ShieldBoomerang,
+	ShieldBoomerang2,
+	ChainrodProj,
+
+
+	// Dynamo Stuff
+
+	DynamoCross,
+	DynamoAirBuster,
+	DynamoAirBuster2,
+	DynamoBeam,
+	DynamoDropSlash,
+	DynamoBoomerangProj,
+	DynamoIceDagger,
+	DynamoAxeProj,
+
+	DarkHoldD,
+
+	// Extras
+	BlockableLaunch,
+
+	NormalPush,
+	HeavyPush,
+
+	// NEUTRAL ENEMIES
+
+	GunVoltSpark,
+	GunVoltTorpedo,
+
+	//Force Busters
+	StockBuster,
+	PlasmaBuster,
+	PlasmaBusterHit,
+	PlasmaBuster3,
+
+	// EXtra bonus weapons for X
+	RayClaw,
+
+	// X4 Wps
+
+	LightningWebProj,
+	LightningWeb,
+	LightningWebChargedProj,
+	LightningWebCharged,
+	FrostTower,
+	FrostTowerCharged,
+	SoulBodyHologram,
+	SoulBodyHologram2,
+	SoulBodyX5,
+	RisingFire,
+	RisingFireChargedStart,
+	RisingFireCharged,
+	RisingFireUnderwater,
+	RisingFireUnderwaterCharged,
+	GroundHunter,
+	GroundHunterCharged,
+	GroundHunterSmall,
+	AimingLaser,
+	AimingLaserCharged,
+	AimingLaserMissle,
+	AimingLaserBlade,
+	TwinSlasher,
+	TwinSlasher2,
+	TwinSlasherCharged,
+	TwinSlasherCharged2,
+	TwinSlasherCharged3,
+	TwinSlasherCharged4,
+	TwinSlasherCharged5,
+	TwinSlasherCharged6,
+	TwinSlasherCharged7,
+	TwinSlasherCharged8,
+
+	// Wily Cut Axl.
+
+	AxlMeleeBullet,
+	AxlFlashKickProj,
+	AxlBulletWC,
+	CopyShotWC,
+	BlastLauncherWC,
+	GreenSpinnerWC,
+	IceGattlingWC,
+	IceGattlingAltWC,
+	RayGunWC,
+	SpiralMagnumWC,
+	FormicAcidWC,
+	FormicAcidSmallWC,
+	// Iris Stuff
+	IrisFireBallProj,
+	IrisCrystal,
+	IrisSlashProj,
+	IrisStabProj,
+	IrisCannon,
+
+	// Random non-projectiles.
+	AxlDiscardedWeapon,
+
+	// EnemyRPCs (PROJIDS)
+	HGM2RPC,
+
 	// Special damage types.
 	SelfDmg = 30000,
 

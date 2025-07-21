@@ -70,7 +70,7 @@ public class KurumitosOrochinagiCharge : CharState {
 
 	public override void update() {
 		base.update();
-		if (!player.input.isHeld(Control.Special1, player)) {
+		if (!player.input.isBHeld(player)) {
 			character.changeState(new KurumitosOrochinagiCharged(), true);
 			//this is a Release button type action so you use ! with the "isheld" input call
 		}
@@ -322,7 +322,7 @@ public class KurumitosDokuGami : CharState {
 			character.move(new Point(character.xDir * speed, 0));
 		}
 
-		if (character.sprite.frameIndex >= 3  && player.input.isPressed(Control.Special1, player)) {
+		if (character.sprite.frameIndex >= 3  && player.input.isBPressed(player)) {
 			character.changeState(new KuromitosTsuyomi(), true);
 		}
 
@@ -343,7 +343,7 @@ public class KuromitosTsuyomi : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.sprite.frameIndex >= 3  && player.input.isPressed(Control.Special1, player)) {
+		if (character.sprite.frameIndex >= 3  && player.input.isBPressed(player)) {
 			character.changeState(new KuromitosBatsuyomi(), true);
 		}
 		if (character.isAnimOver()) {

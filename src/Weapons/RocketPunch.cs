@@ -269,7 +269,7 @@ public class RocketPunchAttack : CharState {
 
 		Helpers.decrementTime(ref specialPressTime);
 
-		if (proj != null && !player.input.isHeld(Control.Special1, player) && proj.time >= proj.minTime) {
+		if (proj != null && !player.input.isBHeld(player) && proj.time >= proj.minTime) {
 			proj.reversed = true;
 		}
 
@@ -278,7 +278,7 @@ public class RocketPunchAttack : CharState {
 		}
 		if (proj != null) {
 			if (vile.rocketPunchWeapon.type == (int)RocketPunchType.SpoiledBrat) {
-				if (player.input.isPressed(Control.Special1, player)) {
+				if (player.input.isBPressed(player)) {
 					specialPressTime = 0.25f;
 				}
 

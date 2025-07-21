@@ -711,7 +711,7 @@ public class NapalmAttackFlamethrower: NapalmAttackTypes {
 					character.playSound("flamethrower");
 				}
 			}
-		if (!player.input.isHeld(Control.Special1, player)) {
+		if (!player.input.isBHeld(player)) {
 			character.changeState(new Crouch(""), true);
 		}
 

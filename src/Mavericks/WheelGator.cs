@@ -454,7 +454,7 @@ public class WheelGSpitState : MaverickState {
 		bool downHeld = player.input.isHeld(Control.Down, player);
 		bool LeftOrRightHeld = player.input.isHeld(Control.Left, player) || 
 							   player.input.isHeld(Control.Right, player);
-		bool SpecialPressed = player.input.isHeld(Control.Special1, player);
+		bool SpecialPressed = player.input.isBHeld(player);
 		//if (!SpecialPressed) {
 		//	maverick.frameIndex = 5;
 		//}

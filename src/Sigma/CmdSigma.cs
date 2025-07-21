@@ -68,7 +68,7 @@ public class CmdSigma : BaseSigma {
 		}
 		bool attackPressed = false;
 		if (player.weapon is not AssassinBulletChar) {
-			if (player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isAPressed(player)) {
 				attackPressed = true;
 				lastAttackFrame = Global.level.frameCount;
 			}
@@ -77,7 +77,7 @@ public class CmdSigma : BaseSigma {
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		if (charState is Dash dashState) {
-			if (!dashState.stop && player.input.isPressed(Control.Special1, player) &&
+			if (!dashState.stop && player.input.isBPressed(player) &&
 				flag == null && leapSlashCooldown == 0
 			) {
 				changeState(new SigmaWallDashState(-1, true), true);
@@ -112,7 +112,7 @@ public class CmdSigma : BaseSigma {
 			return true;
 		}
 		if (grounded && charState is Idle || charState is Run || charState is Crouch) {
-			if (player.input.isHeld(Control.Special1, player) && player.sigmaAmmo > 0) {
+			if (player.input.isBHeld(player) && player.sigmaAmmo > 0) {
 				sigmaAmmoRechargeCooldown = 0.5f;
 				changeState(new SigmaBallShootEX(), true);
 				return true;

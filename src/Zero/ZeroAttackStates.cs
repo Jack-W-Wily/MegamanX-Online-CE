@@ -241,7 +241,7 @@ public class ZeroDoubleBuster : CharState {
 		base.update();
 		if (!character.ownedByLocalPlayer) return;
 
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			shootPressedAgain = true;
 		}
 

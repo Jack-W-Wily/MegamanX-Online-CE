@@ -139,8 +139,8 @@ public class BaseSigma : Character {
 
 		if (invulnTime > 0) return;
 
-		bool shootPressed = player.input.isPressed(Control.Shoot, player);
-		bool spcPressed = player.input.isPressed(Control.Special1, player);
+		bool shootPressed = player.input.isAPressed(player);
+		bool spcPressed = player.input.isBPressed(player);
 		if (flag != null) {
 			shootPressed = false;
 			spcPressed = false;
@@ -267,9 +267,9 @@ public class BaseSigma : Character {
 						var maverick = mw.summon(player, pos.addxy(0, -112), pos, xDir);
 						if (mw.controlMode == MaverickMode.Striker) {
 							mw.maverick.health = mw.lastHealth;
-							if (player.input.isPressed(Control.Shoot, player)) {
+							if (player.input.isAPressed(player)) {
 								maverick.startMoveControl = Control.Shoot;
-							} else if (player.input.isPressed(Control.Special1, player)) {
+							} else if (player.input.isBPressed(player)) {
 								maverick.startMoveControl = Control.Special1;
 							}
 						}
@@ -277,11 +277,11 @@ public class BaseSigma : Character {
 						else if (isSummoner)
 						{
 							mw.shootTime = MaverickWeapon.summonerCooldown;
-							if (player.input.isPressed(Control.Shoot, player))
+							if (player.input.isAPressed(player))
 							{
 								maverick.startMoveControl = Control.Shoot;
 							}
-							else if (player.input.isPressed(Control.Special1, player))
+							else if (player.input.isBPressed(player))
 							{
 								maverick.startMoveControl = Control.Special1;
 							}
@@ -430,8 +430,8 @@ public class BaseSigma : Character {
 			return;
 		}
 		if (player.weapon is MaverickWeapon && (
-			player.input.isHeld(Control.Shoot, player) ||
-			player.input.isHeld(Control.Special1, player))
+			player.input.isAHeld(player) ||
+			player.input.isBHeld(player))
 		) {
 			return;
 		}

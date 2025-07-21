@@ -75,6 +75,8 @@ public partial class Character : Actor, IDamagable {
 	public bool insideCharacter;
 	public float invulnTime = 0;
 
+		public float counterCooldown;
+
 	public List<Trail> lastFiveTrailDraws = new List<Trail>();
 	public LoopingSound chargeSound;
 
@@ -150,6 +152,10 @@ public partial class Character : Actor, IDamagable {
 	public float overDriveTimer;
 
 	public bool OverDrive;
+
+	// For Absorption
+
+	public Projectile? unpoAbsorbedProj;
 
 
 	//StateCooldown System (wcut)
@@ -958,8 +964,8 @@ public partial class Character : Actor, IDamagable {
 
 	public override void update() {
 
-
-		// For Overdrive to work (WCUT)
+		
+				// For Overdrive to work (WCUT)
 		if (overDriveTimer > 0) {
 		OverDrive = true;
 		} else {
@@ -987,7 +993,25 @@ public partial class Character : Actor, IDamagable {
 			DamageScaling += Global.spf * 2;
 			DamageScalingCD = 0.5f;
 		}
-		//
+		// Wcut Burst System
+
+		if (isInDamageSprite() && 
+		(player.input.isHeld(Control.WeaponLeft, player)
+		&& player.input.isHeld(Control.WeaponRight, player)
+		|| player.input.isPressed(Control.L2, player))
+		&& player.input.isHeld(Control.Up, player)
+		&& player.currency > 0) {
+			player.currency -= 1;
+			changeState(new Idle(), true);
+			invulnTime = 1.5f;
+			new MechFrogStompShockwave(new XBuster(),
+			pos.addxy(6 * xDir, 0f), xDir, player,
+			player.getNextActorNetId(), rpc: true);
+			playSound("crash", true);
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
 
 		Helpers.decrementFrames(ref genericGrabCooldown);
 		Helpers.decrementFrames(ref genericParryCooldown);
@@ -995,34 +1019,34 @@ public partial class Character : Actor, IDamagable {
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// New Presing system (WCUT)
 		Helpers.decrementTime(ref inputdecreasedCD);
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			shootPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			specialPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.WeaponRight, player)) {
 			wRightPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
 
 		if (player.input.isPressed(Control.Down, player)) {
 			downPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Up, player)) {
 			upPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Left, player)) {
 			leftPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Right, player)) {
 			rightPressedTimes += 1;
-			inputdecreasedCD = 0.75f;
+			inputdecreasedCD = 0.3f;
 		}
 
 		if (inputdecreasedCD == 0) {
@@ -1650,6 +1674,11 @@ public partial class Character : Actor, IDamagable {
 		|| sprite.name.Contains("stunned")
 		|| sprite.name.Contains("pushed")
 		|| sprite.name.Contains("die");
+	}
+
+	public virtual bool isBlocking() {
+		return sprite.name.Contains("block")
+		|| sprite.name.Contains("guard");
 	}
 
 
@@ -3421,9 +3450,9 @@ public partial class Character : Actor, IDamagable {
 		if (this is Zero or PunchyZero or BusterZero or Vile) {
 			player.changeWeaponControls();
 		}
-		bool shootPressed = player.input.isHeld(Control.Shoot, player);
-		bool altShootPressed = player.input.isHeld(Control.Special1, player);
-		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool shootPressed = player.input.isAHeld(player);
+		bool altShootPressed = player.input.isBHeld(player);
+		bool specialPressed = player.input.isBPressed(player);
 		bool upPressed = player.input.isHeld(Control.Up, player);
 		if (currentWeapon is UndisguiseWeapon) {
 			if ((shootPressed || altShootPressed)) {

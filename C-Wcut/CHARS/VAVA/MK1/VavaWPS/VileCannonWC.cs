@@ -364,7 +364,7 @@ public class VavaGizmoGrabState : CharState {
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
 
-	public VavaGizmoGrabState(Character? victim) : base("idle_gizmo") {
+	public VavaGizmoGrabState(Character? victim) : base("gizmo_grab_success") {
 		this.victim = victim;
 		grabTime = VileMK2Grabbed.maxGrabTime;
 	}
@@ -403,7 +403,7 @@ public class VavaGizmoGrabState : CharState {
 			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
 
-		if (stateFrames >= 2 && player.input.isPressed(Control.R2, player)) {
+		if (stateFrames >= 2 && player.input.isR2Pressed(player)) {
 			vile.cannonWeapon.type = (int)VileCannonType.LongshotGizmo;
 			vile.cannonWeapon.vavaShoot(0, vile);
 			return;

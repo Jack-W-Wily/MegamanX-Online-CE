@@ -2999,7 +2999,7 @@ public class GameMode {
 
 
 	public virtual void drawSuperHud() {
-		int hudcpY = 0;
+		int hudcpY = 180;
 			float perc = Global.level.mainPlayer.superAmmo / Global.level.mainPlayer.superMaxAmmo;
 	
 		

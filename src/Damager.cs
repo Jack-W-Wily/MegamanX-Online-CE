@@ -352,7 +352,19 @@ public class Damager {
 				if (zarzo.charState.canSpecialCancel) {
 					zarzo.charState.spcCancel = true;
 				}
-				zarzo.gigaAttack.ammo += 1;
+				if (owner.superAmmo != owner.superMaxAmmo) {
+					zarzo.gigaAttack.ammo += 1;
+				}
+			}
+
+			if (owner.character is VAVA1 vava1 && vava1.health > 0) {
+			
+				if (vava1.charState.canSpecialCancel) {
+					vava1.charState.spcCancel = true;
+				}
+				if (owner.superAmmo != owner.superMaxAmmo && vava1.charState is not VavaBurensen2){
+				owner.superAmmo += 1;
+				}
 			}
 
 			switch (projId) {
@@ -594,42 +606,110 @@ public class Damager {
 				}
 			}
 
-			// For Grabs to work (WCUT)
+			
+			bool countered = false;
 
+
+			// Counter system (WCUT)
+			if (character.isAttacking() &&
+				!character.isFlinchImmune() &&
+				flinch >= 0 &&
+				projId != (int)ProjIds.HexaInvolute &&
+				projId != (int)ProjIds.AwakenedAura &&
+				projId != (int)ProjIds.Burn &&
+				projId != (int)ProjIds.FireWave &&
+				projId != (int)ProjIds.VelGFire &&
+				projId != (int)ProjIds.Burn
+			) {
+				if (
+				projId != (int)ProjIds.MechFrogStompShockwave &&
+				projId != (int)ProjIds.ForceGrabState &&
+				projId != (int)ProjIds.BoomerangKDeadLift &&
+				projId != (int)ProjIds.BurensenEND
+				) {
+					if (flinch < Global.halfFlinch) {
+						flinch = Global.halfFlinch;
+					} else if (flinch < Global.defFlinch) {
+						flinch = Global.defFlinch;
+					} else {
+						flinch = Global.superFlinch;
+					}
+				}
+				countered = true;
+			}
+
+
+			// For Grabs to work (WCUT)
+		
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 				if (owner?.character is RockmanX) {
-					character?.changeState(new RMXGrabbed(owner.character));
-					owner.character?.changeState(new RMXGrabState(character));
+					character.changeState(new RMXGrabbed(owner.character));
+					owner.character.changeState(new RMXGrabState(character));
 				}
 
 				if (owner?.character is VAVA1) {
-					character?.changeState(new Vava1Grabbed(owner.character));
+					character.changeState(new Vava1Grabbed(owner.character));
 					owner.character?.changeState(new Vava1GrabState(character));
 				}
 				if (owner?.character is Kurumitos) {
-					character?.changeState(new KurumaGrabbed(owner.character));
+					character.changeState(new KurumaGrabbed(owner.character));
 					owner.character?.changeState(new KurumaGrabState(character));
 				}
 			}
 
 			if (projId == (int)ProjIds.GizmoGrab) {
 				if (owner?.character is VAVA1) {
-					character?.changeState(new VileMK2GrabState(owner.character));
+					character.changeState(new ForceGrabbed(owner.character));
 					owner.character?.changeState(new VavaGizmoGrabState(character));
 				}
 			}
 
-			
-			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
-				if (hitFromBehind(character, damagingActor, owner, projId)) {
-					damage--;
 
-					if (damage < 1) {
-						damage = 0;
-						character.playSound("m10ding");
-					}
+			if (owner?.character is VAVA1) {
+				switch (projId) {
+				case (int)ProjIds.GenericWCUTGrabProjID:
+				owner.character.changeState(new Vava1GrabState(character), true);
+				character.changeState(new Vava1Grabbed(owner.character), true);
+				break;
+				case (int)ProjIds.RagingDemon:
+				owner.character.changeState(new RagingDemonSuccess(character), true);
+				character.changeState(new Vava1Grabbed(owner.character), true);
+				break;
+				case (int)ProjIds.BurensenStart:
+				owner.character.changeState(new VavaBurensen2(character), true);
+				character.changeState(new PushedOver2(owner.character.xDir), true);
+				break;
+				case (int)ProjIds.BurensenStomp:
+				character.changeState(new VileStomped(owner.character), true);
+				break;
+				case (int)ProjIds.BurensenEND:
+				character.shakeCamera(sendRpc: true);
+				character.changeState(new LaunchedFowardState(), true);
+				break;
+				case (int)ProjIds.Ryuenjin:
+				character.shakeCamera(sendRpc: true);
+				character.changeState(new DropDown(character.pos.x < character.pos.x ? -1 : 1), true);
+				break;
 				}
 			}
+
+
+			if (projId == (int)ProjIds.ForceGrabState && !character.isBlocking()) {
+
+				character?.changeState(new ForceGrabbed(owner.character));
+			}
+
+			
+			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
+					if (hitFromBehind(character, damagingActor, owner, projId)) {
+						damage--;
+
+						if (damage < 1) {
+							damage = 0;
+							character.playSound("m10ding");
+						}
+					}
+				}
 			//Damage above 0
 			if (damage > 0) {
 				//bool if the character is frozen
@@ -643,6 +723,18 @@ public class Damager {
 				if (projId == (int)ProjIds.GravityWellCharged) {
 					hurtDir = 0;
 				}
+				
+				// Counter effect.
+				if (flinch > Global.miniFlinch && countered) {
+					character.addDamageText("COUNTER!", (int)FontType.Red);
+				}
+				if (flinch > Global.miniFlinch && countered && character.counterCooldown == 0) {
+					character.counterCooldown = 60;
+					character.shakeCamera();
+					character.playSound("weakness");
+					character.setHurt(hurtDir, flinch, spiked);
+				}
+
 				// Flinch above 0 and is not weakness
 				if (flinch > 0 && !weakness) {
 					character.playAltSound("hurt", altParams: "carmor");
@@ -662,15 +754,14 @@ public class Damager {
 						}
 						if (flinch < Global.halfFlinch) {
 							flinch = Global.halfFlinch;
-						}
-						else if (flinch < Global.defFlinch) {
+						} else if (flinch < Global.defFlinch) {
 							flinch = Global.defFlinch;
 						}
 						if (character.ownedByLocalPlayer) {
 							character.setHurt(hurtDir, flinch, spiked);
 						}
 					}
-				} else {			  
+				} else {
 					if (character.altSoundId == Character.AltSoundIds.X1) {
 						victim.playSound("hit");
 					} else if (character.altSoundId == Character.AltSoundIds.X2) {

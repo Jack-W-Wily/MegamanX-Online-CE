@@ -103,7 +103,7 @@ public class BusterZeroDoubleBuster : CharState {
 
 	public override void update() {
 		base.update();
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			shootPressedAgain = true;
 		}
 		if (!fired1 && character.frameIndex == 3) {

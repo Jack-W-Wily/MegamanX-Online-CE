@@ -244,10 +244,10 @@ public class Zero : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player);
 	}
 
-	public void shoot(int chargeLevel) {
+	public virtual void shoot(int chargeLevel) {
 		if (player.currency <= 0 && freeBusterShots <= 0) { return; }
 		if (chargeLevel == 0) { return; }
 		int currencyUse = 0;
@@ -281,7 +281,6 @@ public class Zero : Character {
 				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 		}
-		if (this is not ZeroMID) {
 			if (currencyUse > 0) {
 				if (freeBusterShots > 0) {
 					freeBusterShots--;
@@ -289,7 +288,7 @@ public class Zero : Character {
 					player.currency--;
 				}
 			}
-		}
+		
 	}
 
 	public void setShootAnim() {
@@ -375,10 +374,10 @@ public class Zero : Character {
 		if (swingPressTime > 0) {
 			swingPressTime--;
 		}
-		if (player.input.isPressed(Control.Shoot, player)) {
+		if (player.input.isAPressed(player)) {
 			shootPressTime = 6;
 		}
-		if (player.input.isPressed(Control.Special1, player)) {
+		if (player.input.isBPressed(player)) {
 			specialPressTime = 6;
 		}
 		if (player.input.isPressed(Control.WeaponRight, player) && isAwakened) {
