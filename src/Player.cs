@@ -245,6 +245,11 @@ public partial class Player {
 		{ (int)CharIds.PunchyZero, new() },
 		{ (int)CharIds.BusterZero, new() },
 		{ (int)CharIds.Rock, new() },
+		{ (int)CharIds.VAVA1, new() },
+		{ (int)CharIds.Zain, new() },
+		{ (int)CharIds.RockmanX, new() },
+		{ (int)CharIds.ZeroMID, new() },
+		{ (int)CharIds.Kurumitos, new() },
 	};
 
 	// Heart tanks
@@ -1268,6 +1273,13 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
+		 else if (charNum == (int)CharIds.Zain) {
+			
+			newChar = new Zain(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
 		// Error out if invalid id.
 		else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
@@ -1519,6 +1531,11 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, data.dnaNetId, false, isWarpIn: false
 			);
+		} else if (data.charNum == (int)CharIds.Zain) {
+			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
 		} 
 		
 		
@@ -1711,6 +1728,11 @@ public partial class Player {
 				this, character.pos.x, character.pos.y, character.xDir,
 				true, dnaNetId, true, isWarpIn: false
 			);
+		}  else if (charNum == (int)CharIds.Zain) {
+			retChar = new Zain(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
 		}
 		
 		
@@ -1741,6 +1763,15 @@ public partial class Player {
 		}
 		if (charNum == (int)CharIds.Vile) {
 			retChar.weapons.Add((retChar as Vile)?.energy ?? new VileAmmoWeapon());
+		}
+		if (charNum == (int)CharIds.VAVA1
+		|| charNum == (int)CharIds.Kurumitos
+		|| charNum == (int)CharIds.Zain
+		) {
+			retChar.weapons.Add(new SigmaMenuWeapon());
+		}
+		if (charNum == (int)CharIds.ZeroMID) {
+			retChar.weapons.Add(new ZSaber());
 		}
 		if (oldATrans) {
 			retChar.weapons.Add(new AssassinBulletChar());

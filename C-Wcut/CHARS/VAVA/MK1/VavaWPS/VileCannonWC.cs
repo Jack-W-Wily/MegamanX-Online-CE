@@ -36,7 +36,6 @@ public class VileCannonWC : Weapon {
 			fireRate = 45;
 			vileAmmoUsage = 8;
 			ammousage = vileAmmoUsage;
-			damage = "3";
 			displayName = "Front Runner";
 			projSprite = "vile_mk2_proj";
 			fadeSprite = "vile_mk2_proj_fade";
@@ -46,7 +45,6 @@ public class VileCannonWC : Weapon {
 		} else if (vileCannonType == VileCannonType.FatBoy) {
 			fireRate = 45;
 			damage = "4";
-			Flinch = "26";
 			vileAmmoUsage = 24;
 			ammousage = vileAmmoUsage;
 			displayName = "Fat Boy";
