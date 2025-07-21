@@ -67,6 +67,7 @@ public class Axl : Character {
 	public float dodgeRollCooldown;
 	public const float maxDodgeRollCooldown = 1.5f;
 	public bool hyperAxlUsed;
+	public bool hyperAxlFix;
 	//public ShaderWrapper axlPaletteShader;
 	public float maxHyperAxlTime = 30;
 	public List<int> ammoUsages = new List<int>();
@@ -125,6 +126,8 @@ public class Axl : Character {
 		configureWeapons(axlLoadout);
 		altSoundId = AltSoundIds.X3;
 	}
+
+	public override CharState getTauntState() => new AxlTaunt();
 
 	public void zoomIn() {
 		if (isZoomingIn) return;
@@ -288,7 +291,6 @@ public class Axl : Character {
 		return !(charState is InRideArmor) && !(charState is Die) && !(charState is GenericStun);
 	}
 
-	float assassinSmokeTime;
 	float lastAltShootPressedTime;
 	float voltTornadoTime;
 
@@ -296,33 +298,6 @@ public class Axl : Character {
 	public override void preUpdate() {
 		lastXDir = xDir;
 		base.preUpdate();
-
-		if (player.weapon is MaverickWeapon mw2 && mw2.maverick != null) {
-			if (mw2.maverick.aiBehavior != MaverickAIBehavior.Control && mw2.maverick.state is not MExit) {
-				foreach (var weapon in player.weapons) {
-					if (weapon is MaverickWeapon mw) {
-						if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
-							mw.maverick.aiBehavior = MaverickAIBehavior.Follow;
-						}
-						if (mw.isMenuOpened) {
-							mw.isMenuOpened = false;
-						}
-					}
-				}
-				mw2.maverick.aiBehavior = MaverickAIBehavior.Control;
-			}
-		} else if (currentMaverick != null) {
-			foreach (var weapon in weapons) {
-				if (weapon is MaverickWeapon mw) {
-					if (mw.maverick != null && mw.maverick.aiBehavior == MaverickAIBehavior.Control) {
-						mw.maverick.aiBehavior = MaverickAIBehavior.Follow;
-					}
-					if (mw.isMenuOpened) {
-						mw.isMenuOpened = false;
-					}
-				}
-			}
-		}
 	}
 
 	public override void update() {
@@ -408,25 +383,18 @@ public class Axl : Character {
 			if (isWhiteAxl()) zoomCharge = 1;
 			if (zoomCharge > 1) zoomCharge = 1;
 		}
-
 		if (assassinTime > 0) {
-			assassinSmokeTime += Global.spf;
-			if (assassinSmokeTime > 0.06f) {
-				assassinSmokeTime = 0;
-				// new Anim(getAxlBulletPos(0), "torpedo_smoke", 1, player.getNextActorNetId(), false, true, true) { vel = new Point(0, -100) };
-			}
-			assassinTime -= Global.spf;
-			if (assassinTime < 0) {
-				assassinTime = 0;
+			stopMoving();
+			useGravity = false;
+			Helpers.decrementFrames(ref assassinTime);
+			if (assassinTime <= 0) {
 				useGravity = true;
+				return;
 			}
-			return;
 		}
 		if (targetSoundCooldown > 0) targetSoundCooldown += Global.spf;
 		if (targetSoundCooldown >= 1) targetSoundCooldown = 0;
-
 		Helpers.decrementTime(ref dodgeRollCooldown);
-		Helpers.decrementTime(ref undisguiseTime);
 		Helpers.decrementTime(ref axlSwapTime);
 		Helpers.decrementTime(ref axlAltSwapTime);
 		Helpers.decrementTime(ref switchTime);
@@ -438,7 +406,7 @@ public class Axl : Character {
 		if (currentWeapon != null && currentWeapon.ammo >= currentWeapon.maxAmmo) {
 			weaponHealAmount = 0;
 		}
-		if (currentWeapon != null && weaponHealAmount > 0 && player.health > 0) {
+		if (currentWeapon != null && weaponHealAmount > 0 && alive) {
 			weaponHealTime += Global.spf;
 			if (weaponHealTime > 0.05) {
 				weaponHealTime = 0;
@@ -545,6 +513,7 @@ public class Axl : Character {
 				if (isCharging() && getChargeLevel() >= 3 && isStealthMode()) {
 					stingChargeTime = 0;
 					playSound("stingCharge", sendRpc: true);
+					hyperAxlFix = true;
 				} else if (isCharging()) {
 					if (player.weapon is AxlBullet || player.weapon is DoubleBullet ||
 						player.weapon is MettaurCrash || player.weapon is BeastKiller || player.weapon is MachineBullets ||
@@ -560,16 +529,21 @@ public class Axl : Character {
 				stopCharge();
 
 				// Handles Hyper activation.
-
+				if (isStealthMode() || isWhiteAxl()) {
+					hyperAxlUsed = true;
+				} else {
+					hyperAxlUsed = false;
+				}
 				if (player.input.isHeld(Control.Special2, player) &&
-					player.currency >= 10 && (!(charState is HyperAxlStart)) &&
-					(!hyperAxlUsed) && (!(charState is WarpIn))
+					player.currency >= Player.AxlHyperCost &&
+					charState is not HyperAxlStart and not WarpIn &&
+					(!hyperAxlUsed)
 				) {
 					hyperProgress += Global.spf;
 				} else {
 					hyperProgress = 0;
 				}
-				if (hyperProgress >= 1 && player.currency >= 10) {
+				if (hyperProgress >= 1 && player.currency >= Player.AxlHyperCost) {
 					hyperProgress = 0;
 					if (axlHyperMode == 0) {
 						changeState(new HyperAxlStart(grounded), true);
@@ -577,8 +551,9 @@ public class Axl : Character {
 						if (!hyperAxlUsed) {
 							hyperAxlUsed = true;
 							//addHealth(player.maxHealth);
-							foreach (var weapon in player.weapons) {
-								weapon.ammo = weapon.maxAmmo;
+							if (!hyperAxlFix) {
+								foreach (var weapon in player.weapons)
+									weapon.ammo = weapon.maxAmmo;
 							}
 							stingChargeTime = 12;
 							playSound("stingCharge", sendRpc: true);
@@ -794,20 +769,10 @@ public class Axl : Character {
 				}
 
 				// DNA Core
-				if (player.weapon is DNACore && canShoot()) {
-					AxlWeapon? realWeapon = player.weapons[player.weaponSlot] as AxlWeapon;
-					if (realWeapon != null) {
+				if (currentWeapon is DNACore && canShoot()) {
+					if (currentWeapon is AxlWeapon realWeapon) {
 						if (shootPressed && shootTime == 0) {
-							if (flag != null) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
-							} else if (player.currency < 1) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Transformation requires 1 Metal");
-							} else if (isWhiteAxl() || isStealthMode()) {
-								Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
-							} else {
-								player.currency--;
-								realWeapon.axlShoot(player);
-							}
+							realWeapon.axlShoot(player);
 						}
 					}
 				}
@@ -1063,7 +1028,8 @@ public class Axl : Character {
 		assassinCursorPos = null;
 
 		if (!Options.main.lockOnSound) return;
-		if (player.isDisguisedAxl && !player.isAxl && player.weapon is not AssassinBulletChar) return;
+		//This sht was bugging assassin time, i was like +2 hours trying to see whats wrong with it
+		//if (player.isDisguisedAxl && !player.isAxl && player.weapon is not AssassinBulletChar) return;
 		if (player.isDisguisedAxl && player.axlWeapon is UndisguiseWeapon) return;
 		if (player.input.isCursorLocked(player)) return;
 
@@ -1748,8 +1714,7 @@ public class Axl : Character {
 		if (isAnyZoom() || sniperMissileProj != null) {
 			return true;
 		}
-		if (currentMaverick != null) return true;
-
+		if (assassinTime > 0) return true;
 		return base.isSoftLocked();
 	}
 
@@ -1816,7 +1781,7 @@ public class Axl : Character {
 		return base.getCamCenterPos(ignoreZoom);
 	}
 
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		bool hasChanged = base.changeState(newState, forceChange);
 		if (!hasChanged) {
 			return false;

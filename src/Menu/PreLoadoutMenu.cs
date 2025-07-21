@@ -34,7 +34,6 @@ public class PreLoadoutMenu : IMainMenu {
 		if (Confirm2 == true) Time2 += Global.spf * 2;
 	}
 	public void update() {
-		TimeUpdate();
 		Helpers.menuUpDown(ref selectY, 0, 5);
 
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
@@ -45,24 +44,30 @@ public class PreLoadoutMenu : IMainMenu {
 				Menu.change(new SelectZeroWeaponMenu(this, false));
 			}
 			if (selectY == 2) {
-				Menu.change(new SelectVileWeaponMenu(this, false));
-			}
-			if (selectY == 3) {
-				Menu.change(new SelectAxlWeaponMenu(this, false));
-			}
-			if (selectY == 4) {
-				Menu.change(new SelectSigmaWeaponMenu(this, false));
-			}
-			if (selectY == (int)CharIds.PunchyZero) {
 				Menu.change(new SelectPunchyZeroWeaponMenu(this, false));
 			}
-		} 
-		if (Time2 >= 1) {
-			Menu.change(prevMenu);
-			prevMenu.Time = 0;
-			prevMenu.Time2 = 1;
-			prevMenu.Confirm = false;
-			prevMenu.Confirm2 = false;
+			if (selectY == 3) {
+				Menu.change(new SelectVileWeaponMenu(this, false));
+			}
+			if (selectY == 4) {
+				Menu.change(new SelectAxlWeaponMenu(this, false));
+			}
+			if (selectY == 5) {
+				Menu.change(new SelectSigmaWeaponMenu(this, false));
+			}
+		}
+		if (Options.main.blackFade) {
+			TimeUpdate();
+			if (Time2 >= 1) {
+				Menu.change(prevMenu);
+				prevMenu.Time = 0;
+				prevMenu.Time2 = 1;
+				prevMenu.Confirm = false;
+				prevMenu.Confirm2 = false;
+			}
+		} else {
+			if (Global.input.isPressedMenu(Control.MenuBack))
+				Menu.change(prevMenu);
 		}
 	}
 
@@ -80,13 +85,15 @@ public class PreLoadoutMenu : IMainMenu {
 
 		Fonts.drawText(FontType.DarkBlue, "X Loadout", startX, optionPos[0], selected: selectY == 0);
 		Fonts.drawText(FontType.DarkBlue, "Zero Loadout", startX, optionPos[1], selected: selectY == 1);
-		Fonts.drawText(FontType.DarkBlue, "Vile Loadout", startX, optionPos[2], selected: selectY == 2);
-		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[3], selected: selectY == 3);
-		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[4], selected: selectY == 4);
-		Fonts.drawText(FontType.DarkBlue, "KZero Loadout", startX, optionPos[5], selected: selectY == 5);
+		Fonts.drawText(FontType.DarkBlue, "K.Zero Loadout", startX, optionPos[2], selected: selectY == 2);
+		Fonts.drawText(FontType.DarkBlue, "Vile Loadout", startX, optionPos[3], selected: selectY == 3);
+		Fonts.drawText(FontType.DarkBlue, "Axl Loadout", startX, optionPos[4], selected: selectY == 4);
+		Fonts.drawText(FontType.DarkBlue, "Sigma Loadout", startX, optionPos[5], selected: selectY == 5);
 
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 200, Alignment.Center);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0,0, Time2);
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}
 	}
 }

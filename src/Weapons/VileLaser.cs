@@ -40,7 +40,7 @@ public class VileLaser : Weapon {
 			ammousage = 24;
 			damage = "6";
 			hitcooldown = "0.5";
-			Flinch = "26";
+			flinch = "26";
 			effect = "Insane Hitbox.";
 		} else if (vileLaserType == VileLaserType.NecroBurst) {
 			index = (int)WeaponIds.NecroBurst;
@@ -52,7 +52,7 @@ public class VileLaser : Weapon {
 			ammousage = 32;
 			damage = "6";
 			hitcooldown = "0.5";
-			Flinch = "26";
+			flinch = "26";
 			effect = "No DMG inside Ride.";
 		} else if (vileLaserType == VileLaserType.StraightNightmare) {
 			index = (int)WeaponIds.StraightNightmare;
@@ -244,9 +244,8 @@ public class RisingSpecterProj : Projectile {
 	}
 }
 
-public class NecroBurstAttack : CharState {
+public class NecroBurstAttack : VileState {
 	bool shot = false;
-	Vile vile = null!;
 
 	public NecroBurstAttack(bool grounded) : base(grounded ? "idle_shoot" : "cannon_air") {
 	}
@@ -277,11 +276,6 @@ public class NecroBurstAttack : CharState {
 			);
 			vile.playSound("necroburst", sendRpc: true);
 		}
-	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
 

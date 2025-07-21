@@ -46,8 +46,8 @@ public class RocketPunch : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "3";
 			hitcooldown = "0.5";
-			Flinch = "13";
-			FlinchCD = "1";
+			flinch = "13";
+			flinchCD = "1";
 			effect = "Won't destroy on hit.";
 		} else if (rocketPunchType == RocketPunchType.SpoiledBrat) {
 			fireRate = 12;
@@ -60,8 +60,8 @@ public class RocketPunch : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "2";
 			hitcooldown = "0.1";
-			Flinch = "13";
-			FlinchCD = "1";
+			flinch = "13";
+			flinchCD = "1";
 			effect = "Destroys on hit.";
 		}
 		if (rocketPunchType == RocketPunchType.InfinityGig) {
@@ -75,8 +75,8 @@ public class RocketPunch : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "3";
 			hitcooldown = "0.5";
-			Flinch = "13";
-			FlinchCD = "1";
+			flinch = "13";
+			flinchCD = "1";
 			effect = "Homing,Travels further.";
 		}
 	}
@@ -255,11 +255,10 @@ public class RocketPunchProj : Projectile {
 	}
 }
 
-public class RocketPunchAttack : CharState {
+public class RocketPunchAttack : VileState {
 	bool shot = false;
 	RocketPunchProj? proj;
 	float specialPressTime;
-	Vile vile = null!;
 
 	public RocketPunchAttack(string transitionSprite = "") : base("rocket_punch", "", "", transitionSprite) {
 	}
@@ -333,6 +332,5 @@ public class RocketPunchAttack : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }

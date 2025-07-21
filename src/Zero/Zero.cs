@@ -55,6 +55,11 @@ public class Zero : Character {
 	public float hadangekiCooldown;
 	public float genmureiCooldown;
 	public int airRisingUses;
+	public float tauntCooldown;
+	public int fSplasherUses;
+	public float fSplasherCooldown;
+	public int quakeBlazerBounces;
+	public float kuuenzanCooldown;
 
 	// Hypermode stuff.
 	public float donutTimer;
@@ -102,11 +107,29 @@ public class Zero : Character {
 
 	// State overdrive.
 	public override CharState getAirJumpState() => new Jump() { sprite = "kuuenbu" };
+	public override CharState getFallState() {
+		if (airRisingUses > 0) {
+			return new FallSaber();
+		}
+		return new Fall();
+	}
+
+	public override CharState getTauntState() {
+		if (isAwakened && tauntCooldown <= 0) {
+			return new AwakenedTaunt();
+		}
+		return new ZeroTaunt();
+	}
 
 	public override void preUpdate() {
 		base.preUpdate();
-		if (grounded && charState is not ZeroUppercut) {
-			airRisingUses = 0;
+		if (grounded || charState is WallSlide) {
+			if (charState is not ZeroUppercut) 
+				airRisingUses = 0;		
+			if (charState is not FSplasherState) 
+				fSplasherUses = 0;
+			if (charState is not ZeroDownthrust) 
+				quakeBlazerBounces = 0;	
 		}
 	}
 
@@ -145,6 +168,9 @@ public class Zero : Character {
 		Helpers.decrementFrames(ref genmureiCooldown);
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref tauntCooldown);
+		Helpers.decrementFrames(ref fSplasherCooldown);
+		Helpers.decrementFrames(ref kuuenzanCooldown);
 		airSpecial.update();
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
@@ -559,7 +585,7 @@ public class Zero : Character {
 		// Air attack.
 		if (specialPressed) {
 			if (airSpecial.type == 0 && charState is not ZeroRollingSlashtate) {
-				if (Options.main.swapAirAttacks == false) {
+				if (Options.main.swapAirAttacks == false && kuuenzanCooldown <= 0) {
 					changeState(new ZeroRollingSlashtate(), true);					
 				} else {
 					changeState(new ZeroAirSlashState(), true);
@@ -577,7 +603,7 @@ public class Zero : Character {
 			} else {
 				if (Options.main.swapAirAttacks == false) {
 					changeState(new ZeroAirSlashState(), true);					
-				} else {
+				} else if (kuuenzanCooldown <= 0) {
 					changeState(new ZeroRollingSlashtate(), true);
 				}
 			}
@@ -596,7 +622,7 @@ public class Zero : Character {
 	// This is to prevent accidental combo activation between attacks.
 
 	// This is to prevent accidental combo activation between attacks.
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		// Save old state.
 		CharState oldState = charState;
 		// Base function call.
@@ -737,7 +763,7 @@ public class Zero : Character {
 			"zero_attack_dash" => MeleeIds.DashSlash,
 			"zero_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
-			"zero_attack_air" => MeleeIds.AirSlash,
+			"zero_attack_air" or "zero_attack_air_ground" => MeleeIds.AirSlash,
 			"zero_attack_air2" => MeleeIds.RollingSlash,
 			"zero_hyoroga_attack"  => MeleeIds.Hyoroga,
 			// Ground Speiclas
@@ -757,7 +783,7 @@ public class Zero : Character {
 			"zero_ladder_attack" => MeleeIds.LadderSlash,
 			"zero_wall_slide_attack" => MeleeIds.WallSlash,
 			"zero_block" => MeleeIds.Gokumonken,
-			"zero_projswing" => MeleeIds.Hadangeki,
+			"zero_projswing" or "zero_projswing_air" => MeleeIds.Hadangeki,
 			_ => MeleeIds.None
 		});
 	}
@@ -933,7 +959,29 @@ public class Zero : Character {
 			chargeEffect.update(getChargeLevel(), chargeType);
 		}
 	}
-	
+	public override void landingCode(bool useSound = true) {
+		dashedInAir = 0;
+		if (useSound) {
+			playAltSound("land", sendRpc: true, altParams: "larmor");
+		}
+		if (grounded && (
+			player.input.isHeld(Control.Left, player) ||
+			player.input.isHeld(Control.Right, player)
+		)) {
+			changeState(getRunState(true));
+			return;
+		}
+		CharState idleState = getIdleState();
+		idleState.transitionSprite = "land";
+		idleState.transShootSprite = "land_shoot";
+		if (airRisingUses > 0) {
+			idleState.transitionSprite = "land_saber";
+		}
+		if (idleState.transitionSprite != "") {
+			idleState.sprite = idleState.transitionSprite;
+		}
+		changeState(idleState, true);
+	}
 	// Shader and display.
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
@@ -962,8 +1010,11 @@ public class Zero : Character {
 				case 2:
 					palette = Player.ZeroBlueC;
 					break;
-				case >=3:
+				case 3:
 					palette = Player.ZeroPinkC;
+					break;
+				case 4:
+					palette = Player.ZeroGreenC;
 					break;
 			}
 		}

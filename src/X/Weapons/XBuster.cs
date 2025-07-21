@@ -9,6 +9,7 @@ public class XBuster : Weapon {
 	public bool isUnpoBuster;
 
 	public XBuster() : base() {
+		displayName = "X-Buster";
 		index = (int)WeaponIds.Buster;
 		killFeedIndex = 0;
 		weaponBarBaseIndex = 0;
@@ -20,10 +21,10 @@ public class XBuster : Weapon {
 		drawAmmo = false;
 		drawCooldown = false;
 		//effect = "Mega Buster Mark 17";
-		hitcooldown = "0/0/0/1";
+		hitcooldown = "0/0/0/60";
 		damage = "1/2/3/4";
-		Flinch = "0/0/13/26";
-		FlinchCD = "0";
+		flinch = "0/0/13/26";
+		flinchCD = "0";
 	}
 
 	public void setUnpoBuster(MegamanX mmx) {
@@ -154,7 +155,7 @@ public class XBuster : Weapon {
 			else if (mmx.armArmor == ArmorId.Giga) {
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			} else {
-				shootLightBuster4(player, pos, xDir);
+				shootLightBuster4(mmx, pos, xDir);
 			}
 		}
 		if (shootSound != "") {
@@ -163,8 +164,8 @@ public class XBuster : Weapon {
 	}
 
 	public static void createX3SpreadShot(Character character, int xDir) {
-		Player player = character.player;		
-		MegamanX mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 		new BusterX3Proj2(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0, mmx,
 			player, player.getNextActorNetId(), rpc: true
@@ -183,28 +184,30 @@ public class XBuster : Weapon {
 		);
 	}
 
-	public void shootLightBuster4(Player player, Point pos, int xDir) {
+	public void shootLightBuster4(MegamanX mmx, Point pos, int xDir) {
+		Player player = mmx.player;
 		new Anim(pos.clone(), "buster4_muzzle_flash", xDir, null, true);
 		//Create the buster effect
 		int xOff = xDir * -5;
 		player.setNextActorNetId(player.getNextActorNetId());
 		// Create first line instantly.
-		createBuster4Line(pos.x + xOff, pos.y, xDir, player, 0f);
+		createBuster4Line(pos.x + xOff, pos.y, xDir, mmx, 0f);
 		// Create 2nd with a delay.
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
-			createBuster4Line(pos.x + xOff, pos.y, xDir, player, 10);
+			createBuster4Line(pos.x + xOff, pos.y, xDir, mmx, 10);
 		}, 2.8f / 60f));
 		// Use smooth spawn on the 3rd.
 		Global.level.delayedActions.Add(new DelayedAction(delegate {
-			createBuster4Line(pos.x + xOff, pos.y, xDir, player, 5, true);
+			createBuster4Line(pos.x + xOff, pos.y, xDir, mmx, 5, true);
 		}, 5.8f / 60f));
 	}
 	
 	public void createBuster4Line(
-		float x, float y, int xDir, Player player,
+		float x, float y, int xDir, MegamanX mmx,
 		float offsetTime, bool smoothStart = false
 	) {
-		MegamanX mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		Player player = mmx.player;
+
 		new Buster4Proj(
 			new Point(x + xDir, y), xDir, mmx,
 			player, 0, offsetTime,

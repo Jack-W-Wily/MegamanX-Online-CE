@@ -78,7 +78,7 @@ public class VileBall : Weapon {
 			ammousage = vileAmmoUsage;
 			damage = "3";
 			hitcooldown = "0.5";
-			Flinch = "6";
+			flinch = "6";
 			effect = "Splits,no destroy on hit.";
 		}
 	}
@@ -86,21 +86,23 @@ public class VileBall : Weapon {
 	public override float getAmmoUsage(int chargeLevel) {
 		return vileAmmoUsage;
 	}
-
+	public static bool isGrenadeType(Vile vile) {
+		if (vile.grenadeWeapon.type == (int)VileBallType.PeaceOutRoller) return true;		
+		if (vile.grenadeWeapon.type == (int)VileBallType.SpreadShot) return true;		
+		return (vile.grenadeWeapon.type == (int)VileBallType.ExplosiveRound);
+	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
-		if (vile.player.vileAmmo < 8) return;
+		if (vile.energy.ammo < 8) return;
 		if (vile.grenadeWeapon.type == (int)VileBallType.None) return;
-		if (vile.grenadeWeapon.type != (int)VileBallType.NoneNapalm && vile.grenadeWeapon.type != (int)VileBallType.NoneFlamethrower) {
-			if (vile.tryUseVileAmmo(vileAmmoUsage)) {
-				vile.setVileShootTime(this);
-				vile.changeState(new AirBombAttack(true), true);
-			}
+		if (isGrenadeType(vile) && vile.tryUseVileAmmo(vileAmmoUsage)) {
+			vile.setVileShootTime(this);
+			vile.changeState(new AirBombAttack(true), true);
 		} else if (vile.grenadeWeapon.type == (int)VileBallType.NoneFlamethrower) {
 			if (vile.flamethrowerWeapon.type != (int)VileFlamethrowerType.None)
 				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
 					vile.changeState(new FlamethrowerState(), true);
-				}			
+				}
 		} else if (vile.grenadeWeapon.type == (int)VileBallType.NoneNapalm) {
 			if (vile.napalmWeapon.type > -1)
 				if (vile.tryUseVileAmmo(vileAmmoUsage)) {
@@ -224,7 +226,8 @@ public class PeaceOutRollerProj : Projectile {
 		projId = (int)ProjIds.PeaceOutRoller;
 		destroyOnHit = false;
 		useGravity = true;
-
+		xScale = 0.75f;
+		yScale = 0.75f;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
@@ -240,14 +243,6 @@ public class PeaceOutRollerProj : Projectile {
 		if (!ownedByLocalPlayer) return;
 		split();
 	}
-
-	public override void onHitDamagable(IDamagable damagable) {
-		if (ownedByLocalPlayer) {
-			split();
-		}
-		base.onHitDamagable(damagable);
-	}
-
 	public void split() {
 		if (!ownedByLocalPlayer) return;
 		if (!splitOnce) splitOnce = true;
@@ -278,11 +273,12 @@ public class PeaceOutRollerSplitProj : Projectile {
 		destroyOnHit = false;
 		useGravity = false;
 		this.type = type;
+		xScale = 0.75f;
+		yScale = 0.75f;
 		if (type == 0) {
-			setupWallCrawl(new Point(250 , 250));
-		}
-		else if (type == 1) {
-			setupWallCrawl(new Point(-250 , -250));
+			setupWallCrawl(new Point(250, 250));
+		} else if (type == 1) {
+			setupWallCrawl(new Point(-250, -250));
 		}
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
@@ -299,10 +295,10 @@ public class PeaceOutRollerSplitProj : Projectile {
 	}
 }
 
-public class AirBombAttack : CharState {
+public class AirBombAttack : VileState {
 	int bombNum;
 	bool isNapalm;
-	Vile vile = null!;
+
 	public AirBombAttack(bool isNapalm, string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
 		this.isNapalm = isNapalm;
 		useDashJumpSpeed = true;
@@ -362,7 +358,7 @@ public class AirBombAttack : CharState {
 	public void ExplosiveRoundProj() {
 		var inputDir = player.input.getInputDir(player);
 		if (inputDir.x == 0) inputDir.x = character.xDir;
-		if (!vile.tryUseVileAmmo(8)) {
+		if (!vile.tryUseVileAmmo(4)) {
 			character.changeState(character.getFallState(), true);
 			return;
 		}
@@ -377,7 +373,6 @@ public class AirBombAttack : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
-		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {
@@ -392,10 +387,6 @@ public class AirBombAttack : CharState {
 				vile.napalmWeapon.shootCooldown = 60;
 			}
 		}
-	}
-	public override bool canEnter(Character character) {
-		if (player.vileAmmo < 8) return false;
-		return base.canEnter(character);
 	}
 }
 

@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class Weapon {
 	public static Weapon baseNetWeapon = new();
-	public string[] shootSounds = { "", "", "", ""};
+	public string[] shootSounds = ["", "", "", ""];
 	public float ammo;
 	public float maxAmmo;
 	public float fireRate;
@@ -36,7 +36,6 @@ public class Weapon {
 	// Ammo display vars.
 	public bool allowSmallBar = true;
 	public float ammoDisplayScale = 1;
-	public float ammoDisplayScaleSmall = 2;
 
 	// Ammo recharge vars.
 	public float weaponHealAmount = 0;
@@ -54,11 +53,11 @@ public class Weapon {
 	public bool drawRoundedDown = false;
 	public bool drawGrayOnLowAmmo = false;
 	public string damage = "";
-	public string hitcooldown= "";
+	public string hitcooldown = "";
 	public double ammousage;
 	public string effect = "";
-	public string Flinch = "";
-	public string FlinchCD = "";
+	public string flinch = "";
+	public string flinchCD = "";
 	public bool hasCustomChargeAnim;
 	// Axl Custom Setting Reload
 	public float rechargeAmmoCustomSettingAxl;
@@ -73,8 +72,8 @@ public class Weapon {
 		effect = "";
 		damage = "0";
 		hitcooldown = "0";
-		Flinch = "0";
-		FlinchCD = "0";
+		flinch = "0";
+		flinchCD = "0";
 		ammousage = getAmmoUsage(0);
 	}
 

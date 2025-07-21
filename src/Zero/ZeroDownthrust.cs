@@ -23,7 +23,7 @@ public class HyouretsuzanWeapon : Weapon {
 		description = new string[] { "A dive attack that can freeze enemies." };
 		damage = "4";
 		hitcooldown = "0.5";
-		Flinch = "12";
+		flinch = "12";
 		effect = "Freeze Time: 2 seconds.";
 	}
 
@@ -50,7 +50,7 @@ public class RakukojinWeapon : Weapon {
 		description = new string[] { "Drop with a metal blade that deals high damage."};
 		damage = "3";
 		hitcooldown = "0.5";
-		Flinch = "12";
+		flinch = "12";
 		effect = "Bonus Damage via Fall Time.";
 	}
 }
@@ -69,16 +69,13 @@ public class DanchienWeapon : Weapon {
 		description = new string[] { "A dive attack that can burn enemies."};
 		damage = "2";
 		hitcooldown = "0.5";
-		Flinch = "0";
+		flinch = "0";
 		effect = "Burn DOT: 1 Second.Bounce on enemy by jumping.";
 	}
 }
 
-public class ZeroDownthrust : CharState {
+public class ZeroDownthrust : ZeroState {
 	public ZeroDownthrustType type;
-	public int quakeBlazerBounces;
-	public Zero zero = null!;
-
 	public ZeroDownthrust(
 		ZeroDownthrustType type
 	) : base(
@@ -151,14 +148,14 @@ public class ZeroDownthrust : CharState {
 
 		character.playSound("circleBlazeExplosion", sendRpc: true);
 		new DanchienExplosionProj(
-			character.pos.addxy(10 * character.xDir, -10), character.xDir, 
+			character.pos.addxy(10 * character.xDir, -10), character.xDir,
 			zero, player, player.getNextActorNetId(), rpc: true
 		);
 
 		if (!hitGround) {
-			if (player.input.isHeld(Control.Jump, player) && quakeBlazerBounces < 1) {
-				character.vel.y = Physics.JumpSpeed;
-				quakeBlazerBounces++;
+			if (player.input.isHeld(Control.Jump, player) && zero.quakeBlazerBounces < 1) {
+				character.vel.y = -character.getJumpPower();
+				zero.quakeBlazerBounces++;
 			}
 			character.changeState(character.getFallState(), true);
 		}
@@ -169,7 +166,9 @@ public class ZeroDownthrust : CharState {
 		if (character.vel.y < 0) {
 			character.vel.y = 0;
 		}
-		zero = character as Zero ?? throw new NullReferenceException();
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
 	}
 }
 

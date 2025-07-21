@@ -24,6 +24,9 @@ public class BusterZero : Character {
 		charId = CharIds.BusterZero;
 		altSoundId = AltSoundIds.X3;
 	}
+	public override CharState getTauntState() {
+		return new BZeroTaunt();
+	}
 	public override void preUpdate() {
 		base.preUpdate();
 		if (!ownedByLocalPlayer) {
@@ -48,7 +51,7 @@ public class BusterZero : Character {
 		}
 		if (stockedSaber || stockedBusterLv > 0) {
 			stockedTime += Global.spf;
-			if (stockedTime >= 61f/60f) {
+			if (stockedTime >= 61f / 60f) {
 				stockedTime = 0;
 				playSound("stockedSaber");
 			}
@@ -361,19 +364,25 @@ public class BusterZero : Character {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add(Helpers.boolArrayToByte([
 			isBlackZero,
+			stockedSaber
 		]));
+		customData.Add((byte)stockedBusterLv);
 		return customData;
 	}
+
 	public override void updateCustomActorNetData(byte[] data) {
 		// Update base arguments.
 		base.updateCustomActorNetData(data);
 		data = data[data[0]..];
 		bool[] flags = Helpers.byteToBoolArray(data[0]);
 		isBlackZero = flags[0];
+		stockedSaber = flags[1];
+		stockedBusterLv = data[1];
 	}
 
 	public float aiAttackCooldown;

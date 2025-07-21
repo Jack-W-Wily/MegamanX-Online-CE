@@ -862,7 +862,7 @@ public class Damager {
 					maverick.changeState(newState, true);
 				}
 			} else {
-				newState = null!;
+				newState = null;
 			}
 			// Superarmor.
 			if (maverick.state.superArmor) {

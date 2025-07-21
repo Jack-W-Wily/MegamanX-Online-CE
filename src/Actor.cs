@@ -138,6 +138,7 @@ public partial class Actor : GameObject {
 	private float? lastAngle;
 	private bool? lastVisible;
 	public float lastNetUpdate;
+	public int lastNetFrame;
 
 	public NetActorCreateId netActorCreateId;
 	public Player? netOwner;
@@ -979,6 +980,11 @@ public partial class Actor : GameObject {
 		if (this is Projectile proj) {
 			return proj.owner?.isDefenderFavored == true;
 		}
+		if (this is Character character) {
+			if (character.charState is DodgeRoll && Global.level.server?.customMatchSettings?.AxlFTADodgeroll == true) {
+				return character.player?.isDefenderFavored == false;
+			}
+		}
 		return false;
 	}
 
@@ -1013,7 +1019,7 @@ public partial class Actor : GameObject {
 	}
 
 	public void netUpdate() {
-		if (netId == null) return;
+			if (netId == null) return;
 		if (destroyPosSet) {
 			destroyPosTime += Global.spf;
 			incPos(vel.times(Global.spf));
@@ -1036,7 +1042,8 @@ public partial class Actor : GameObject {
 				return;
 			}
 
-			float frameSmooth = Global.tickRate;
+			float frameSmooth = Global.frameCount - lastNetFrame + 1;
+			if (frameSmooth < 1) { frameSmooth = 1; }
 
 			if (frameSmooth > 1 && interplorateNetPos) {
 				if (targetNetPos != null) {
@@ -1083,6 +1090,7 @@ public partial class Actor : GameObject {
 				}
 			}
 
+			
 			int spriteIndex = -1;
 			if (Global.spriteIndexByName.ContainsKey(sprite.name)) {
 				spriteIndex = Global.spriteIndexByName[sprite.name];
@@ -1106,7 +1114,7 @@ public partial class Actor : GameObject {
 			if (netYDir != null && yDir != netYDir) {
 				yDir = (int)netYDir;
 			}
-			if (netAngle != null && netAngle != lastAngle) {
+			if (netAngle != null && netAngle != byteAngle) {
 				byteAngle = netAngle.Value;
 			}
 		}
@@ -1828,5 +1836,9 @@ public partial class Actor : GameObject {
 			}
 		}
 		return closeActors.ToArray();
+	}
+
+	public string getActorTypeName() {
+		return GetType().ToString().RemovePrefix("MMXOnline.");
 	}
 }

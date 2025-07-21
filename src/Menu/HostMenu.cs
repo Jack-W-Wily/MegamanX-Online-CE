@@ -34,13 +34,11 @@ public class HostMenu : IMainMenu {
 	public List<MenuOption> menuOptions;
 	public int selectArrowPosY;
 	public static int startX = 20;
-	public static int startY = 40;
+	public static int startY = 34;
 	public static int lineH = 10;
-
 	public MainMenu previous;
 	public bool listenForKey = false;
 	public Point mapPos = new Point(178, 43);
-
 	public string serverName;
 	public bool isOffline;
 	public bool isLAN;
@@ -463,25 +461,57 @@ public class HostMenu : IMainMenu {
 				"Random Map"
 			)
 		);
-		if (isTraining) {
+		if (selectedLevel.twoDisplayNames) {
 			menuOptions.Add(
 				new MenuOption(startX, startY,
 					() => {
+						if (currentMapSizePool.Count == 0) {
+							return;
+						}
 						if (Global.input.isPressedMenu(Control.MenuLeft)) {
-							useLoadout = false;
+							mapIndex--;
+							if (mapIndex < 0) mapIndex = currentMapSizePool.Count - 1;
+							onMapChange();
 						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
-							useLoadout = true;
+							mapIndex++;
+							if (mapIndex >= currentMapSizePool.Count) mapIndex = 0;
+							onMapChange();
+						} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
+							mapIndex = Helpers.randomRange(0, currentMapSizePool.Count - 1);
+							onMapChange();
 						}
 					},
 					(Point pos, int index) => {
-						Fonts.drawText(
-							FontType.Blue, "Use loadout: " + Helpers.boolYesNo(useLoadout),
-							pos.x, pos.y, selected: index == selectArrowPosY
-						);
-					}
+						if (selectedLevel.twoDisplayNames) {
+							Fonts.drawText(
+								FontType.Blue, isMapSelected ? selectedLevel.displayName2 : "[Select]",
+								pos.x, pos.y, selected: index == selectArrowPosY
+							);
+						}
+					},
+					"Random Map"
 				)
 			);
 		}
+		if (isTraining) {
+				menuOptions.Add(
+					new MenuOption(startX, startY,
+						() => {
+							if (Global.input.isPressedMenu(Control.MenuLeft)) {
+								useLoadout = false;
+							} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+								useLoadout = true;
+							}
+						},
+						(Point pos, int index) => {
+							Fonts.drawText(
+								FontType.Blue, "Use loadout: " + Helpers.boolYesNo(useLoadout),
+								pos.x, pos.y, selected: index == selectArrowPosY
+							);
+						}
+					)
+				);
+			}
 		// Mode
 		if (!isTraining) {
 			menuOptions.Add(
@@ -873,7 +903,6 @@ public class HostMenu : IMainMenu {
 		return "match" + Helpers.randomRange(1, 999).ToString();
 	}
 	public void update() {
-		TimeUpdate();
 		if (Global.leaveMatchSignal != null) return;
 
 		if (inGame) {
@@ -927,13 +956,21 @@ public class HostMenu : IMainMenu {
 				Global.serverClient = null;
 				Menu.change(previous);
 			} */
-			if (Time2 >= 1 && !inGame) {
-				Menu.change(previous);
-				Global.serverClient = null;
-				previous.Time = 0;
-				previous.Time2 = 1;
-				previous.Confirm = false;
-				previous.Confirm2 = false;
+			if (Options.main.blackFade) {
+				TimeUpdate();
+				if (Time2 >= 1 && !inGame) {
+					Menu.change(previous);
+					Global.serverClient = null;
+					previous.Time = 0;
+					previous.Time2 = 1;
+					previous.Confirm = false;
+					previous.Confirm2 = false;
+				}
+			} else {
+				if (Global.input.isPressedMenu(Control.MenuBack) && !inGame) {
+					Menu.change(previous);
+					Global.serverClient = null;
+				}
 			}
 			/*
 			else if (Global.input.isPressedMenu(Control.MenuEnter) && inGame)
@@ -1401,7 +1438,7 @@ public class HostMenu : IMainMenu {
 		msg = "[OK]: Next, [BACK]: Back" + extraMsg;
 		Fonts.drawTextEX(
 			FontType.Grey, msg + "\nLeft/Right: Change setting",
-			Global.screenW * 0.5f, 178, Alignment.Center
+			Global.screenW * 0.5f, 182, Alignment.Center
 		);
 
 		if (errorMessage != null) {
@@ -1418,17 +1455,25 @@ public class HostMenu : IMainMenu {
 				Global.screenW * 0.5f, 20 + top, alignment: Alignment.Center
 			);
 		}
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
-		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);		
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}	
 
 	}
 	public void TimeUpdate() {
-		if (Confirm == false) Time -= Global.spf * 2;
-		if (Time <= 0) {
-			Confirm = true;
-			Time = 0;
+		if (!inGame) {
+			if (Confirm == false) Time -= Global.spf * 2;
+			if (Time <= 0) {
+				Confirm = true;
+				Time = 0;
+			}
+			if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+			if (Confirm2 == true) Time2 += Global.spf * 2;
 		}
-		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
-		if (Confirm2 == true) Time2 += Global.spf * 2;
+		if (inGame) {
+			Time = 0;
+			Time2 = 0;
+		}
 	}
 }

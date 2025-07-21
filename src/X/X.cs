@@ -109,6 +109,11 @@ public class MegamanX : Character {
 	public float stingPaletteTime;
 	public float chargePalleteTime;
 
+	// RaySplasher
+	public float raySplasherCooldown;
+	public float raySplasherCooldown2;
+	public int raySplasherFrameIndex;
+
 	// X3 Helmet.
 	public bool isHealingWithChip;
 	public decimal lastChipBaseHP;
@@ -161,6 +166,9 @@ public class MegamanX : Character {
 		legArmor = (ArmorId)player.legArmorNum;
 		helmetArmor = (ArmorId)player.helmetArmorNum;
 	}
+	public override CharState getTauntState() {
+		return new XTaunt();
+	}
 
 	// Updates at the start of the frame.
 	public override void preUpdate() {
@@ -171,8 +179,7 @@ public class MegamanX : Character {
 		if (barrierActiveTime > 0) {
 			if (!barrierAnim.isAnimOver()) {
 				barrierAnim.update();
-			}
-			else {
+			} else {
 				barrierAnimRed.update();
 				barrierAnimBlue.update();
 			}
@@ -239,7 +246,7 @@ public class MegamanX : Character {
 			player.delaySubtank();
 		}
 
-		if (hyperHelmetArmor == ArmorId.Max && health > 0) {
+		if (hyperHelmetArmor == ArmorId.Max && alive) {
 			if (health >= lastChipBaseHP) {
 				lastChipBaseHP = health;
 			}
@@ -340,14 +347,20 @@ public class MegamanX : Character {
 	}
 
 	public override bool attackCtrl() {
-		if (stockedSaber && player.input.isBPressed(player)) {
+		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
+			itemTracer.shootCooldown == 0
+		) {
+			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
+			itemTracer.shootCooldown = itemTracer.fireRate;
+		}
+		if (stockedSaber && player.input.isPressed(Control.Special1, player)) {
 			changeState(new XMaxWaveSaberState(), true);
 			return true;
 		}
 		if (player.input.isBPressed(player) && !hasAnyArmor &&
 			stingActiveTime <= 0
 		) {
-			if (specialButtonMode == 1 && specialSaberCooldown <= 0) {
+			if (specialButtonMode == 1 && specialSaberCooldown <= 0 && !hasLockingProj()) {
 				changeState(new X6SaberState(grounded), true);
 				specialSaberCooldown = 60;
 				return true;
@@ -355,12 +368,6 @@ public class MegamanX : Character {
 				shoot(0, specialBuster, false);
 				return true;
 			}
-		}
-		if (player.input.isBPressed(player) && helmetArmor == ArmorId.Giga &&
-			itemTracer.shootCooldown == 0
-		) {
-			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
-			itemTracer.shootCooldown = itemTracer.fireRate;
 		}
 		if (gigaAttackSpecialOption()) {
 			return true;
@@ -478,7 +485,7 @@ public class MegamanX : Character {
 			stockedSaber = true;
 		}
 		// Changes to shoot animation and gets sound.
-		if (chargeLevel < 3 || !weapon.hasCustomChargeAnim) {
+		if (!useCrossShotAnim && (chargeLevel < 3 || !weapon.hasCustomChargeAnim)) {
 			setShootAnim();
 			shootAnimTime = DefaultShootAnimTime;
 		}
@@ -784,13 +791,23 @@ public class MegamanX : Character {
 		bool damaged = base.canBeDamaged(damagerAlliance, damagerPlayerId, projId);
 
 		// Bommerang can go thru invisibility check
+		if (player.alliance != damagerAlliance && projId != null && Damager.isBoomerang(projId)) {
+			return damaged;
+		}
 		if (stingActiveTime > 0) {
-			if (player.alliance != damagerAlliance && projId != null && Damager.isBoomerang(projId)) {
-				return damaged;
-			}
 			return false;
 		}
 		return damaged;
+	}
+	public override bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
+		bool invul = base.isInvulnerable(ignoreRideArmorHide, factorHyperMode);
+		if (stingActiveTime > 0) {
+			return !factorHyperMode;
+		}
+		return invul;
+	}
+	public override bool isStealthy(int alliance) {
+		return player.alliance != alliance && stingActiveTime > 0;
 	}
 
 	public bool hasHadoukenEquipped() {
@@ -822,7 +839,8 @@ public class MegamanX : Character {
 			chargedSpinningBlade?.destroyed == false ||
 			chargedFrostShield?.destroyed == false ||
 			chargedTornadoFang?.destroyed == false ||
-			strikeChainProj?.destroyed == false
+			strikeChainProj?.destroyed == false ||
+			shootingRaySplasher != null
 		);
 	}
 
@@ -831,7 +849,8 @@ public class MegamanX : Character {
 			chargedFrostShield?.destroyed == false ||
 			chargedTornadoFang?.destroyed == false ||
 			chargedSpinningBlade?.destroyed == false ||
-			linkedTriadThunder?.destroyed == false
+			linkedTriadThunder?.destroyed == false ||
+			shootingRaySplasher != null
 		);
 	}
 
@@ -936,7 +955,7 @@ public class MegamanX : Character {
 		base.onFlinchOrStun(newState);
 	}
 
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		bool hasChanged = base.changeState(newState, forceChange);
 		if (!hasChanged || !ownedByLocalPlayer) {
 			return hasChanged;
@@ -1207,13 +1226,13 @@ public class MegamanX : Character {
 		return chargePalletes;
 	}
 
-	public int getArmorByte() {
+	public ushort getArmorByte() {
 		int armorByte = (byte)chestArmor;
 		armorByte += (byte)armArmor << 4;
 		armorByte += (byte)legArmor << 8;
 		armorByte += (byte)helmetArmor << 12;
 
-		return armorByte;
+		return (ushort)armorByte;
 	}
 
 	public void setArmorByte(int armorByte) {
@@ -1393,8 +1412,7 @@ public class MegamanX : Character {
 		base.aiDodge(target);
 	}
 
-	public override void aiUpdate() {
+	public override void aiUpdate(Actor? target) {
 		//Buying UAX and Golden Armor goes here
-		base.aiUpdate();
 	}
 }

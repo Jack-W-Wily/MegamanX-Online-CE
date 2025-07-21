@@ -30,6 +30,7 @@ public class Options {
 	public bool DisableL2Shortcut = true;
 	public float networkTimeoutSeconds = 3;
 	public bool autoCreateDocFolderPromptShown = false;
+	public bool blackFade = true;
 
 	public int getNetworkTimeoutMs() {
 		networkTimeoutSeconds = Helpers.clamp(networkTimeoutSeconds, 1, 5);

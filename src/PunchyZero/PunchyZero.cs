@@ -45,6 +45,7 @@ public class PunchyZero : Character {
 	public float parryCooldown;
 	public float hadangekiCooldown;
 	public float genmureiCooldown;
+	public float tauntCooldown;
 
 	// Hypermode stuff.
 	public float donutTimer = 0;
@@ -78,6 +79,12 @@ public class PunchyZero : Character {
 			return new Jump() { sprite = "kuuenbu" };
 		}
 		return new Jump();
+	}
+	public override CharState getTauntState() {
+		if (isAwakened && tauntCooldown <= 0) {
+			return new PAwakenedTaunt();
+		}
+		return new PZeroTaunt();
 	}
 
 	public override void update() {
@@ -114,7 +121,9 @@ public class PunchyZero : Character {
 		Helpers.decrementFrames(ref dashAttackCooldown);
 		Helpers.decrementFrames(ref diveKickCooldown);
 		Helpers.decrementFrames(ref uppercutCooldown);
+		Helpers.decrementFrames(ref genmureiCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref tauntCooldown);
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
 		base.update();
@@ -401,7 +410,7 @@ public class PunchyZero : Character {
 	}
 
 
-	public override bool changeState(CharState newState, bool forceChange = false) {
+	public override bool changeState(CharState newState, bool forceChange = true) {
 		// Save old state.
 		CharState oldState = charState;
 		// Base function call.
@@ -539,8 +548,11 @@ public class PunchyZero : Character {
 				case 2:
 					palette = Player.ZeroBlueC;
 					break;
-				case >=3:
+				case 3:
 					palette = Player.ZeroPinkC;
+					break;
+				case 4:
+					palette = Player.ZeroGreenC;
 					break;
 			}
 		}
@@ -825,25 +837,7 @@ public class PunchyZero : Character {
 					changeState(new PZeroSpinKick(), true);
 					break;
 				case 3 when grounded && gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0):
-					if (gigaAttack is RekkohaWeapon) {
-						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new PunchyZeroRekkohaState(gigaAttack), true);
-					} else if (gigaAttack is RakuhouhaWeapon) {
-						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
-					}
-					else if (gigaAttack is Messenkou) {
-						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new PunchyZeroCFlasherState(gigaAttack), true);
-					}
-					else if (gigaAttack is ShinMessenkou) {
-						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new PunchyZeroShinMessenkouState(gigaAttack), true);
-					}
-					else if (gigaAttack is DarkHoldWeapon) {
-						gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-						changeState(new PunchyZeroDarkHoldShootState(gigaAttack), true);
-					}
+					gigaAttack.shoot(this, []);
 					break;
 				case 4 when grounded && isFacingTarget:
 					changeState(new PZeroYoudantotsu(), true);
@@ -867,29 +861,8 @@ public class PunchyZero : Character {
 					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
 					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
 				) {
-					if (gigaAttack.shootCooldown <= 0 && grounded) {
-						switch (gigaAttack) {
-							case RekkohaWeapon when gigaAttack.ammo >= 28:
-								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new PunchyZeroRekkohaState(gigaAttack), true);
-								break;
-							case Messenkou when gigaAttack.ammo >= 7:
-								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new PunchyZeroCFlasherState(gigaAttack), true);
-								break;
-							case RakuhouhaWeapon when gigaAttack.ammo >= 14:
-								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new PunchyZeroRakuhouhaState(gigaAttack), true);
-								break;
-							case DarkHoldWeapon when gigaAttack.ammo >= 14 && isViral:
-								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new PunchyZeroDarkHoldShootState(gigaAttack), true);
-								break;
-							case ShinMessenkou when gigaAttack.ammo >= 14 && isAwakened:
-								gigaAttack.addAmmo(-gigaAttack.getAmmoUsage(0), player);
-								changeState(new PunchyZeroShinMessenkouState(gigaAttack), true);
-								break;
-						}
+					if (gigaAttack.shootCooldown <= 0 && grounded && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
+						gigaAttack.shoot(this, []);
 					} else if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded) {
 					turnToInput(player.input, player);
 					changeState(new PZeroParry(), true);

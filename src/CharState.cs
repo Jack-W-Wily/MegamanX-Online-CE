@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace MMXOnline;
 
@@ -371,9 +372,12 @@ public class WarpIn : CharState {
 	public bool landOnce;
 	public bool decloaked;
 	public bool addInvulnFrames;
+	public bool refillHP;
 	public bool sigma2Once;
-	public WarpIn(bool addInvulnFrames = true) : base("warp_in") {
+
+	public WarpIn(bool addInvulnFrames = true, bool refillHP = false) : base("warp_in") {
 		this.addInvulnFrames = addInvulnFrames;
+		this.refillHP = refillHP;
 		invincible = true;
 	}
 
@@ -414,7 +418,11 @@ public class WarpIn : CharState {
 				character.grounded = true;
 				character.pos.y = destY;
 				character.pos.x = destX;
-				character.changeToIdleOrFall();
+				if (refillHP && !player.warpedInOnce) {
+					character.changeState(new WarpIdle(player.warpedInOnce));
+				} else {
+					character.changeToIdleOrFall();
+				}
 			}
 			return;
 		}
@@ -488,7 +496,69 @@ public class WarpIn : CharState {
 		if (addInvulnFrames && character.ownedByLocalPlayer) {
 			character.invulnTime = (player.warpedInOnce || Global.level.joinedLate) ? 2 : 0;
 		}
+		if (refillHP && character.ownedByLocalPlayer && newState is not WarpIdle) {
+			character.spawnHealthToAdd = MathInt.Ceiling(character.maxHealth);
+		}
 		player.warpedInOnce = true;
+	}
+}
+
+public class WarpIdle : CharState {
+	public bool firstSpawn;
+	public bool fullHP;
+	public bool fullAlt;
+	float healTime = -4;
+
+	public WarpIdle(bool firstSpawn = false) : base("win") {
+		invincible = true;
+		this.firstSpawn = firstSpawn;
+	}
+
+	public override void update() {
+		base.update();
+		refillNormal();
+
+		if ((character.isAnimOver() || character.sprite.loopCount >= 1) && fullHP && fullAlt) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+
+	public void refillNormal() {
+		fullAlt = true;
+		healTime++;
+		if (fullHP || healTime < 3) {
+			return;
+		}
+		// Health.
+		if (character.health < character.maxHealth) {
+			character.health = Helpers.clampMax(character.health + 1, character.maxHealth);
+		} else {
+			fullHP = true;
+		}
+		if (Global.level.mainPlayer.character == character) {
+			character.playSound("heal", forcePlay: true);
+		}
+		healTime = 0;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.useGravity = false;
+		specialId = SpecialStateIds.WarpIdle;
+		character.invulnTime = firstSpawn ? 5 : 0;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.visible = true;
+		character.useGravity = true;
+		character.splashable = true;
+		specialId = SpecialStateIds.None;
+		if (character.ownedByLocalPlayer) {
+			character.invulnTime = firstSpawn ? 1 : 0;
+		}
 	}
 }
 
@@ -556,7 +626,7 @@ public class Idle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if ((character is RagingChargeX || player.health < 4)) {
+		if (character is RagingChargeX || character.health < 4 && character.spawnHealthToAdd <= 0) {
 			if (Global.sprites.ContainsKey(character.getSprite("weak"))) {
 				defaultSprite = "weak";
 				if (!inTransition()) {
@@ -581,9 +651,7 @@ public class Idle : CharState {
 
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
+				character.changeState(character.getTauntState());
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					string loseSprite = "lose";
@@ -595,7 +663,10 @@ public class Idle : CharState {
 }
 
 public class Run : CharState {
-	public Run() : base("run", "run_shoot", "attack") {
+	public bool skipIntro;
+
+	public Run(bool skipIntro = false) : base("run", "run_shoot", "attack") {
+		this.skipIntro = skipIntro;
 		accuracy = 5;
 		exitOnAirborne = true;
 		attackCtrl = true;
@@ -620,6 +691,14 @@ public class Run : CharState {
 			character.move(move);
 		} else {
 			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (skipIntro) {
+			character.frameIndex = 1;
+			stateFrames = 5;
 		}
 	}
 }
@@ -653,9 +732,7 @@ public class Crouch : CharState {
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
+				character.changeState(character.getTauntState());
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					character.changeSpriteFromName("lose", true);
@@ -688,9 +765,7 @@ public class SwordBlock : CharState {
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				if (!character.sprite.name.Contains("_win")) {
-					character.changeSpriteFromName("win", true);
-				}
+				character.changeState(character.getTauntState());
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					character.changeSpriteFromName("lose", true);
@@ -757,7 +832,6 @@ public class Jump : CharState {
 public class Fall : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
-
 	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
@@ -1313,70 +1387,12 @@ public class LadderEnd : CharState {
 
 public class Taunt : CharState {
 	float tauntTime = 1;
-	Anim? zeroching;
 	public Taunt() : base("win") {
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		if (player.charNum == 0) tauntTime = 0.75f;
-		if (player.charNum == 3) tauntTime = 0.75f;
-	}
-
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-		zeroching?.destroySelf();
-	}
-
 	public override void update() {
 		base.update();
-
-		if (player.charNum == 2) {
-			if (character.isAnimOver()) {
-				character.changeToIdleOrFall();
-			}
-		} else if (stateTime >= tauntTime) {
+		if (stateTime >= tauntTime) {
 			character.changeToIdleOrFall();
-		}
-		if (player.charNum == (int)CharIds.Zero || player.charNum == (int)CharIds.PunchyZero) {
-			character.changeSprite("zero_taunt", true);
-			if (character.isAnimOver()) {
-				character.changeToIdleOrFall();
-			} 
-		}
-		if (character.sprite.name == "bzero_win" && character.frameIndex == 1 && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir, -25f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-		if ((character.sprite.name == "zero_win" || character.sprite.name == "zero_taunt") && character.frameIndex == 6 && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir * -7, -28f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-		if (character.sprite.name == "mmx_win" && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
-			zeroching = new Anim(
-				character.pos.addxy(character.xDir*4, -22f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
-		}
-		if (character.sprite.name == "axl_win" && !once) {
-			once = true;
-			character.playSound("ching", sendRpc: true);
 		}
 	}
 }
@@ -1414,6 +1430,7 @@ public class Die : CharState {
 		character.xPushVel = 0;
 		character.vel.x = 0;
 		character.vel.y = 0;
+		character.stopCharge();
 		base.update();
 		if (!character.ownedByLocalPlayer) {
 			return;
@@ -1616,6 +1633,18 @@ public class GenericGrabbedState : CharState {
 		}
 		character.useGravity = true;
 		character.setzIndex(savedZIndex);
+	}
+}
+
+public class ATransTransition : CharState {
+	public ATransTransition() : base("win") {
+		airMove = true;
+		normalCtrl = false;
+		attackCtrl = false;
+	}
+
+	public override bool canExit(Character character, CharState newState) {
+		return false;
 	}
 }
 

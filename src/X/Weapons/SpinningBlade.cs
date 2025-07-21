@@ -9,6 +9,7 @@ public class SpinningBlade : Weapon {
 	public static SpinningBlade netWeapon = new();
 
 	public SpinningBlade() : base() {
+		displayName = "Spinning Blade";
 		shootSounds = new string[] { "", "", "", "spinningBladeCharged" };
 		fireRate = 75;
 		switchCooldown = 45;
@@ -20,9 +21,9 @@ public class SpinningBlade : Weapon {
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 		damage = "2/2";
 		effect = "Goes back after some time on screen.";
-		hitcooldown = "0/0.5";
-		Flinch = "0/26";
-		FlinchCD = "0/1";
+		hitcooldown = "0/30";
+		flinch = "0/26";
+		flinchCD = "0/1";
 		maxAmmo = 16;
 		ammo = maxAmmo;
 	}
@@ -134,7 +135,7 @@ public class SpinningBladeProj : Projectile {
 }
 
 public class SpinningBladeProjCharged : Projectile {
-	public MegamanX mmx = null!;
+	public MegamanX? mmx = null;
 	public float xDist;
 	const float maxXDist = 90;
 	public float spinAngle;
@@ -153,7 +154,7 @@ public class SpinningBladeProjCharged : Projectile {
 		projId = (int)ProjIds.SpinningBladeCharged;
 		shouldShieldBlock = false;
 		destroyOnHit = false;
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		mmx = player.character as MegamanX;
 		shouldVortexSuck = false;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

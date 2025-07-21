@@ -16,6 +16,7 @@ public class BaseSigma : Character {
 	public long framesSinceLastAttack = 1000;
 	public bool isTrueAI;
 	public bool tempAiSummoner;
+
 	public SigmaLoadout loadout;
 	public MaverickAIBehavior currentMaverickCommand;
 	public bool summonerAttackModeActive;
@@ -23,10 +24,11 @@ public class BaseSigma : Character {
 	public BaseSigma(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null
+		bool isWarpIn = true, SigmaLoadout? sigmaLoadout = null,
+		bool isAtrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn
+		netId, ownedByLocalPlayer, isWarpIn, isAtrans
 	) {
 		charId = CharIds.Sigma;
 		// Special Sigma-only colider.
@@ -47,7 +49,7 @@ public class BaseSigma : Character {
 			if (player.maverick1v1 != null) {
 				intialCharState = new WarpOut(true);
 			} else if (isWarpIn) {
-				intialCharState = new WarpIn();
+				intialCharState = new WarpIn(true, true);
 			} else {
 				intialCharState = getIdleState();
 			}
@@ -392,22 +394,6 @@ public class BaseSigma : Character {
 		}
 		Helpers.decrementTime(ref noBlockTime);
 
-		if (player.sigmaAmmo >= player.sigmaMaxAmmo) {
-			weaponHealAmount = 0;
-		}
-		if (weaponHealAmount > 0 && player.health > 0) {
-			weaponHealTime += Global.spf;
-			if (weaponHealTime > 0.05) {
-				weaponHealTime = 0;
-				weaponHealAmount--;
-				player.sigmaAmmo = Helpers.clampMax(player.sigmaAmmo + 1, player.sigmaMaxAmmo);
-				if (this is CmdSigma) {
-					playSound("heal", forcePlay: true);
-				} else {
-					playSound("healX3", forcePlay: true);
-				}
-			}
-		}
 		if (player.maverick1v1 != null && player.readyTextOver &&
 			!player.maverick1v1Spawned && player.respawnTime <= 0 && player.weapons.Count > 0
 		) {
@@ -551,6 +537,13 @@ public class BaseSigma : Character {
 		// We cant expect true AI to do resource management.
 		if (isTrueAI) {
 			return 0;
+		}
+		// ATrans puppeter price.
+		if (isATrans) {
+			return mw.trueControlMode switch {
+				MaverickMode.Striker => 0,
+				_ => 5
+			};
 		}
 		// Regular prices for humans.
 		return mw.trueControlMode switch {
@@ -721,10 +714,12 @@ public class BaseSigma : Character {
 				commandMode = (int)MaverickMode.Summoner;
 			}
 			// Get weapons.
-			retWeapons = [
-				SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick1, sigmaLoadout.commandMode),
-				SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick2, sigmaLoadout.commandMode)
-			];
+			if (!oldATrans) {
+				retWeapons = [
+					SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick1, sigmaLoadout.commandMode),
+					SigmaLoadout.getWeaponById(player, sigmaLoadout.maverick2, sigmaLoadout.commandMode)
+				];
+			}
 			// Push the generic Sigma slot.
 			int sigmaWeaponSlot = 1;
 			// Always put the AI and enemies slot in the center.

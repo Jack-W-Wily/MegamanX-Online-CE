@@ -11,11 +11,10 @@ public class HexaInvoluteWeapon : Weapon {
 	}
 }
 
-public class HexaInvoluteState : CharState {
+public class HexaInvoluteState : VileState {
 	HexaInvoluteProj proj;
 	bool startGrounded;
 	float ammoTime;
-	Vile vile = null!;
 
 	public HexaInvoluteState() : base("super") {
 		superArmor = true;
@@ -40,18 +39,17 @@ public class HexaInvoluteState : CharState {
 			Helpers.decrementTime(ref ammoTime);
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
-				player.vileAmmo--;
+				vile.addAmmo(-1);
 			}
 		}
 
-		if (player.vileAmmo <= 0 || (player.input.isBPressed(player) && stateTime > 1)) {
+		if (vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateTime > 1)) {
 			character.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		if (character.grounded) {
 			startGrounded = true;
 		}

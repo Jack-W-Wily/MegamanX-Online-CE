@@ -334,8 +334,7 @@ public class VileMK2StunShotProj : Projectile {
 	}
 }
 
-public class MissileAttack : CharState {
-	public Vile vile = null!;
+public class MissileAttack : VileState {
 	public MissileAttack(bool grounded) : base(getSprite(grounded)) {
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -358,10 +357,9 @@ public class MissileAttack : CharState {
 	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		bool isMK2 = vile.isVileMK2;
-		Point? headPosNullable = vile.getVileMK2StunShotPos();
-		if (headPosNullable == null) return;
 		Point shootVel = vile.getVileShootVel(true);
 		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		Point? headPosNullable = vile.getVileMK2StunShotPos() ?? shootPos;
 		int xDir = vile.xDir;
 		if (vile.getShootXDir() == -1) {
 			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
@@ -400,7 +398,6 @@ public class MissileAttack : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		shootLogic(vile);
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;

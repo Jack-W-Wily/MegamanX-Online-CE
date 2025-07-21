@@ -1,12 +1,27 @@
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using SFML.Graphics;
 
 namespace MMXOnline;
 
-public class BusterZeroMelee : CharState {
-	bool fired;
+public class BusterZeroState : CharState {
 	public BusterZero zero = null!;
+
+	public BusterZeroState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite, transitionSprite, transShootSprite
+	) {
+	}
+	
+	public override void onEnter(CharState oldState) {
+		zero = character as BusterZero ?? throw new NullReferenceException();
+	}
+}
+
+public class BusterZeroMelee : BusterZeroState {
+	bool fired;
 
 	public BusterZeroMelee() : base("projswing") {
 		landSprite = "projswing";
@@ -19,7 +34,7 @@ public class BusterZeroMelee : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex >= 3 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 			character.playSound("zerosaberx3", sendRpc: true);
 		}
@@ -30,7 +45,6 @@ public class BusterZeroMelee : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			character.changeSpriteFromName(sprite, true);
@@ -44,9 +58,8 @@ public class BusterZeroMelee : CharState {
 }
 
 
-public class BusterZeroMeleeWall : CharState {
+public class BusterZeroMeleeWall : BusterZeroState {
 	bool fired;
-	public BusterZero zero = null!;
 	public int wallDir;
 	public Collider wallCollider;
 
@@ -68,11 +81,6 @@ public class BusterZeroMeleeWall : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as BusterZero ?? throw new NullReferenceException();
-	}
-
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		useGravity = true;
@@ -80,14 +88,13 @@ public class BusterZeroMeleeWall : CharState {
 	}
 }
 
-public class BusterZeroDoubleBuster : CharState {
+public class BusterZeroDoubleBuster : BusterZeroState {
 	public bool fired1;
 	public bool fired2;
 	public bool isSecond;
 	public bool isPinkCharge;
 	public bool shootPressedAgain;
 	public int startStockLevel;
-	BusterZero zero = null!;
 
 	public BusterZeroDoubleBuster(bool isSecond, int startstockLevel) : base("doublebuster") {
 		this.isSecond = isSecond;
@@ -143,7 +150,6 @@ public class BusterZeroDoubleBuster : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero ?? throw new NullReferenceException();
 		// For the starting buster;
 		if (startStockLevel is 1 or 3) {
 			isPinkCharge = true;
@@ -195,9 +201,8 @@ public class BusterZeroDoubleBuster : CharState {
 	}
 }
 
-public class BusterZeroHadangeki : CharState {
+public class BusterZeroHadangeki : BusterZeroState {
 	bool fired;
-	public BusterZero zero = null!;
 
 	public BusterZeroHadangeki() : base("projswing") {
 		landSprite = "projswing";
@@ -227,7 +232,6 @@ public class BusterZeroHadangeki : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero ?? throw new NullReferenceException();
 		if (!character.grounded || character.vel.y < 0) {
 			sprite = "projswing_air";
 			defaultSprite = sprite;
@@ -242,9 +246,8 @@ public class BusterZeroHadangeki : CharState {
 	}
 }
 
-public class BusterZeroHadangekiWall : CharState {
+public class BusterZeroHadangekiWall : BusterZeroState {
 	bool fired;
-	public BusterZero zero = null!;
 	public int wallDir;
 	public Collider wallCollider;
 
@@ -273,11 +276,6 @@ public class BusterZeroHadangekiWall : CharState {
 		}
 	}
 
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-		zero = character as BusterZero ?? throw new NullReferenceException();
-	}
-
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		useGravity = true;
@@ -285,10 +283,9 @@ public class BusterZeroHadangekiWall : CharState {
 	}
 }
 
-public class HyperBusterZeroStart : CharState {
+public class HyperBusterZeroStart : BusterZeroState {
 	public float radius = 200;
 	public float time;
-	BusterZero zero = null!;
 	Anim? LightX3;
 
 	public HyperBusterZeroStart() : base("hyper_start") {
@@ -317,19 +314,14 @@ public class HyperBusterZeroStart : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero = character as BusterZero ?? throw new NullReferenceException();
 		character.useGravity = false;
 		character.vel = new Point();
-		if (zero == null) {
-			throw new NullReferenceException();
-		}
 		LightX3 = new Anim(
 				character.pos.addxy(50 * character.xDir, 0f),
 				"LightX3", -character.xDir,
 				player.getNextActorNetId(),
-				destroyOnEnd: false, sendRpc: true
+				destroyOnEnd: false, sendRpc: true, fadeIn: true
 			);
-		LightX3.fadeIn = true;
 		character.player.currency -= Player.zBusterZeroHyperCost;
 		character.playSound("blackzeroentry", forcePlay: false, sendRpc: true);
 	}
@@ -351,3 +343,25 @@ public class HyperBusterZeroStart : CharState {
 		);
 	}
 }
+public class BZeroTaunt : CharState {
+	public BZeroTaunt() : base("win") {
+
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver() && !Global.level.gameMode.playerWon(player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex == 1 && !once) {
+			once = true;
+			character.playSound("ching", sendRpc: true);
+			new Anim(
+				character.pos.addxy(character.xDir, -25f),
+				"zero_ching", -character.xDir,
+				player.getNextActorNetId(),
+				destroyOnEnd: true, sendRpc: true
+			);
+		}
+	}
+}
+

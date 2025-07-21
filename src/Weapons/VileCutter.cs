@@ -82,8 +82,7 @@ public class VileCutter : Weapon {
 	}
 }
 
-public class CutterAttackState : CharState {
-	Vile vile = null!;
+public class CutterAttackState : VileState {
 	public CutterAttackState(bool grounded) : base(getSprite(grounded)) {
 		useDashJumpSpeed = true;
 		airMove = true;
@@ -135,7 +134,6 @@ public class CutterAttackState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = player.character as Vile ?? throw new NullReferenceException();
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
 		}
@@ -270,7 +268,7 @@ public class VileQuickHomesick : Projectile {
 				pickup.changePos(character.getCenterPos());
 			}
 			destroySelf();
-			character.player.vileAmmo = Helpers.clampMax(character.player.vileAmmo + 8, character.player.vileMaxAmmo);
+			character.addAmmo(8);
 		}
 	}
 	public override void onDestroy() {

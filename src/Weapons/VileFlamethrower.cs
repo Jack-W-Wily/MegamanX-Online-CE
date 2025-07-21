@@ -25,7 +25,7 @@ public abstract class VileFlamethrower : Weapon {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.energy.ammo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -73,7 +73,7 @@ public class WildHorseKick : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.energy.ammo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -106,7 +106,7 @@ public class SeaDragonRage : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.energy.ammo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
@@ -138,19 +138,18 @@ public class DragonsWrath : VileFlamethrower {
 	}
 
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (shootCooldown == 0 && vile.player.vileAmmo > 0) {
+		if (shootCooldown == 0 && vile.energy.ammo > 0) {
 			vile.setVileShootTime(this);
 			vile.changeState(new FlamethrowerState(), true);
 		}
 	}
 }
 
-public class FlamethrowerState : CharState {
+public class FlamethrowerState : VileState {
 	bool isGrounded;
 	public float shootTime;
 	public Point shootPOI = new Point(-1, -1);
 	public Point groundShotPOI = new Point(12, -11);
-	Vile vile = null!;
 
 	public FlamethrowerState() : base("flamethrower") {
 		useGravity = false;
@@ -202,8 +201,9 @@ public class FlamethrowerState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as Vile ?? throw new NullReferenceException();
 		character.stopMovingWeak();
+		character.useGravity = false;
+		character.vel = new Point();
 		if (character.grounded && character.vel.y >= 0) {
 			character.changeSpriteFromName("crouch_flamethrower", true);
 			isGrounded = true;
