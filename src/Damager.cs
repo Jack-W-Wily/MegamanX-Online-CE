@@ -698,18 +698,23 @@ public class Damager {
 
 				character?.changeState(new ForceGrabbed(owner.character));
 			}
+			
+			if (projId == (int)ProjIds.BlockableLaunch && !character.isBlocking()) {
+
+				character?.changeState(new LaunchedState(owner.character));
+			}
 
 			
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
-					if (hitFromBehind(character, damagingActor, owner, projId)) {
-						damage--;
+				if (hitFromBehind(character, damagingActor, owner, projId)) {
+					damage--;
 
-						if (damage < 1) {
-							damage = 0;
-							character.playSound("m10ding");
-						}
+					if (damage < 1) {
+						damage = 0;
+						character.playSound("m10ding");
 					}
 				}
+			}
 			//Damage above 0
 			if (damage > 0) {
 				//bool if the character is frozen

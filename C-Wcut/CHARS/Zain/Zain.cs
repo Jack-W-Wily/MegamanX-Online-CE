@@ -146,10 +146,10 @@ public override bool normalCtrl() {
 			&& !player.input.isHeld(Control.Up,player)
 			) {
 			if (unpoAbsorbedProj != null) {
-				changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
+				changeState(new ZainUPParryProjState(unpoAbsorbedProj, true, false), true);
 				unpoAbsorbedProj = null;		
 			} else {
-				changeState(new XUPParryStartState(), true);
+				changeState(new ZainUPParryStartState(), true);
 			}
 		}
 
@@ -199,49 +199,48 @@ public override bool normalCtrl() {
 		
 		if (  sprite.name.Contains("rising"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.BlockableLaunch, player, 2f, 0, 10f, null, isShield: true, isDeflectShield: true);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.BlockableLaunch,
+			player, 2f, 0, 10f, null, isShield: true, isDeflectShield: true,addToLevel: true);
 		}
 		if (  sprite.name.Contains("spinslash"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.ZSaberRollingSlash, player,
 				1, 10, 5f, isDeflectShield: true,
-			//	isJuggleProjectile: true,
 				isZSaberClang : true
-			);
+			,addToLevel: true);
 		}
 		if (  sprite.name.Contains("projswing_air"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 4f, 30, 15f, isZSaberClang : true);
+			 ProjIds.ZSaber3, player, 4f, 30, 15f, isZSaberClang : true,addToLevel: true);
 		}
 		if (  sprite.name.Contains("jab"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.UPPunch, player, 2f, 10, 15f, isZSaberClang : true);
+			 ProjIds.UPPunch, player, 2f, 10, 15f, isZSaberClang : true,addToLevel: true);
 		}
-		if (  sprite.name.Contains("parry_start"))
-		{
+		if (sprite.name.Contains("parry_start")) {
 			return new GenericMeleeProj(new SilkShot(), centerPoint,
-			 ProjIds.ForceGrabState, player, 1f, 0, 15f, isZSaberClang : true);
+			 ProjIds.ForceGrabState, player, 1f, 0, 15f, isZSaberClang: true
+			 ,addToLevel: true);
 		}
 
-		if (  sprite.name.Contains("stabgrab") && !sprite.name.Contains("end"))
-		{
+		if (sprite.name.Contains("stabgrab") && !sprite.name.Contains("end")) {
 			return new GenericMeleeProj(new SilkShot(), centerPoint,
-			 ProjIds.ForceGrabState, player, 2f, 0, 15f, isZSaberClang : true);
+			 ProjIds.ForceGrabState, player, 2f, 0, 15f, isZSaberClang: true
+			 ,addToLevel: true);
 		}
 
-		if (  sprite.name.Contains("slash") && !sprite.name.Contains("uppercut"))
-		{
+		if (sprite.name.Contains("slash") && !sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber2, player, 3f, 20, 15f, isZSaberClang : true);
+			 ProjIds.ZSaber2, player, 3f, 20, 15f, isZSaberClang: true
+			 ,addToLevel: true);
 		}
 		if (  sprite.name.Contains("uppercut"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang : true
-			 //, isJuggleProjectile : true
-			 );
+			,addToLevel: true);
 		}
 
 		if (  sprite.name.Contains("grab")  
@@ -249,51 +248,51 @@ public override bool normalCtrl() {
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang : true
-			 //, isJuggleProjectile : true
-			 );
+			 ,addToLevel: true);
+			 
 		}
 
-		if (  sprite.name.Contains("grab")  && sprite.name.Contains("2"))
-		{
+		if (sprite.name.Contains("grab") && sprite.name.Contains("2")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f, isZSaberClang : true);
+			 ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f, isZSaberClang: true
+			 ,addToLevel: true);
 		}
 
 		if (  sprite.name.Contains("groundstab"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.ZSaber3, player, 3f, 20, 15f, isZSaberClang : true
-			 //, isJuggleProjectile : true
-			 );
+			,addToLevel: true);
 		}
 
 
 		if (  sprite.name.Contains("stabgrab_end"))
 		{
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.HeavyPush, player, 4f, 0, 15f, isZSaberClang: true);
-			 //, isJuggleProjectile : true
+			 ProjIds.HeavyPush, player, 4f, 0, 15f, isZSaberClang: true
+			 , addToLevel: true);
 		}
 
-		if (  sprite.name.Contains("air_dunk"))
-		{
+		if (sprite.name.Contains("air_dunk")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound , player, 2f, 20, 15f, isZSaberClang : true);
+			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, isZSaberClang: true
+			 ,addToLevel: true);
 		}
 
 
-		if (  sprite.name.Contains("projswing") && !sprite.name.Contains("air"))
-		{
+		if (sprite.name.Contains("projswing") && !sprite.name.Contains("air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound , player, 5f, 20, 15f, isZSaberClang : true);
+			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, isZSaberClang: true
+			 ,addToLevel: true);
 		}
-		if (  sprite.name.Contains("parry"))
-		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f);
+		if (sprite.name.Contains("parry")) {
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f
+			,addToLevel: true);
 		}
 		if (  sprite.name.Contains("thrust"))
 		{
-			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.SpreadShot, player, 2f, 0, 15f);
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.SpreadShot, player, 2f, 0, 15f
+			,addToLevel: true);
 		}
 		return null;
 	}
