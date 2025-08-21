@@ -785,7 +785,7 @@ public class ForceGrabbed : GenericGrabbedState {
 
 	public override void update() {
 		trySnapToGrabPoint(true);
-		if (grabber.sprite.name.Contains("gbd_b")) {
+		if (!grabber.sprite.name.Contains("gbd_b")) {
 			if (grabber.sprite.name.Contains("idle") ||
 			grabber.sprite.name.Contains("crouch") ||
 			grabber.sprite.name.Contains("run") ||
