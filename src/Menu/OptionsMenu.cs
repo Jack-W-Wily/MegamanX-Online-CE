@@ -26,12 +26,13 @@ public class OptionsMenu : IMainMenu {
 
 	public bool oldFullscreen;
 	public uint oldWindowScale;
-	public int oldMaxFPS;
+	public int oldFpsMode;
 	public bool oldDisableShaders;
 	public bool oldEnablePostprocessing;
 	public bool oldUseOptimizedAssets;
 	private int oldParticleQuality;
 	public bool oldIntegerFullscreen;
+	public bool oldFastShaders;
 	public bool oldVsync;
 
 	public FontType optionFontText = FontType.Blue;
@@ -40,6 +41,7 @@ public class OptionsMenu : IMainMenu {
 	public OptionsMenu(IMainMenu mainMenu, bool inGame, int? charNum, int selectY) {
 		previous = mainMenu;
 		this.inGame = inGame;
+		//GsU: What is this stupid thing
 		if (selectY == 1) {
 			isGameplay = true;
 		}
@@ -48,10 +50,11 @@ public class OptionsMenu : IMainMenu {
 		}
 
 		oldIntegerFullscreen = Options.main.integerFullscreen;
+		oldFastShaders = Options.main.fastShaders;
 		oldFullscreen = Options.main.fullScreen;
 		oldWindowScale = Options.main.windowScale;
+		oldFpsMode = Options.main.fpsMode;
 		oldDisableShaders = Options.main.disableShaders;
-		oldMaxFPS = Options.main.maxFPS;
 		oldEnablePostprocessing = Options.main.enablePostProcessing;
 		oldUseOptimizedAssets = Options.main.useOptimizedAssets;
 		oldParticleQuality = Options.main.particleQuality;
@@ -149,24 +152,26 @@ public class OptionsMenu : IMainMenu {
 				new MenuOption(
 					30, startY,
 					() => {
-						if (inGame) return;
-						if (Global.input.isHeldMenu(Control.MenuLeft)) {
-							Options.main.maxFPS = 30;
-						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
-							Options.main.maxFPS = Global.fpsCap;
-						}
+						Helpers.menuLeftRightInc(ref Options.main.fpsMode, 0, 2);
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
 							optionFontText, "Max FPS:",
 							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
+						string fpsDraw = Options.main.fpsMode switch {
+							0 => "60",
+							1 => "120",
+							2 => "240",
+							_ => "ERROR"
+						};
 						Fonts.drawText(
-							optionFontValue, Options.main.maxFPS.ToString(),
+							optionFontValue, fpsDraw,
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
-					"Controls the max framerate the game can run.\nLower values are more choppy but use less GPU."
+					"Controls the max framerate the game can run.\n" +
+					"Higher framerates can use more CPU. (Default: 60)"
 				),
 				// VSYNC
 				new MenuOption(
@@ -188,6 +193,7 @@ public class OptionsMenu : IMainMenu {
 					"Set to Yes to enable vsync.\nMakes movement/scrolling smoother, but adds input lag."
 				),
 				// Use optimized sprites
+				/*
 				new MenuOption(
 					30, startY,
 					() => {
@@ -206,6 +212,7 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Set to Yes to use optimized assets.\nThis can result in better performance."
 				),
+				*/
 				// Full screen integer
 				new MenuOption(
 					30, startY,
@@ -224,6 +231,28 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Rounds down fullscreen pixels to the nearest integer.\n" +
 					"Reduces distortion when going fullscreen."
+				),
+				// Shaders
+				new MenuOption(40, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.fastShaders = false;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.fastShaders = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontValue, "FAST SHADERS:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.fastShaders),
+							pos.x + 200, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Uses a faster shader system for better performance,\n" +
+					"disables special effects like team mode outlines."
 				),
 				// Small Bars
 				new MenuOption(
@@ -843,6 +872,60 @@ public class OptionsMenu : IMainMenu {
 					"Allows to perform Nova Strike by pressing SPC,\n" +
 					"but you lose the ability to switch to Nova Strike."
 				),
+				// Should Nova on side walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.novaStrikeWall);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "N.Strike on a Side Wall:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeWall),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Disables performing Nova Strike if a side wall is close by."
+				),
+				// Should Nova on ceiling walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.novaStrikeCeiling);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "N.Strike on Ceiling:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeCeiling),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Disables performing Nova Strike if a Ceiling is close by."
+				),
+				// Should Nova on floor walls.
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.novaStrikeFloor);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "N.Strike on Floor:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.novaStrikeFloor),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Disables performing Nova Strike if a Floor is close by."
+				),
 				/*
 				new MenuOption(
 					30, startY,
@@ -1455,10 +1538,9 @@ public class OptionsMenu : IMainMenu {
 	public static void setPresetQuality(int graphicsPreset) {
 		if (graphicsPreset >= 3) return;
 		Options.main.graphicsPreset = graphicsPreset;
-		Options.main.fontType = 0; //(graphicsPreset == 0 ? 0 : 1);
 		Options.main.particleQuality = graphicsPreset;
 		Options.main.enablePostProcessing = (graphicsPreset > 0);
-		Options.main.disableShaders = (graphicsPreset == 0);
+		Options.main.fastShaders = graphicsPreset == 0;
 		Options.main.useOptimizedAssets = (graphicsPreset <= 1);
 		Options.main.enableMapSprites = (graphicsPreset > 0);
 		Options.main.saveToFile();
@@ -1593,10 +1675,14 @@ public class OptionsMenu : IMainMenu {
 			if (oldWindowScale != Options.main.windowScale) {
 				Global.changeWindowSize(Options.main.windowScale);
 			}
-
+			if (oldFpsMode != Options.main.fpsMode) {
+				Options.main.updateFpsMode();
+				oldFpsMode = Options.main.fpsMode;
+			}
 			if (oldFullscreen != Options.main.fullScreen ||
+				oldFastShaders != Options.main.fastShaders ||
 				//oldWindowScale != Options.main.windowScale ||
-				oldMaxFPS != Options.main.maxFPS ||
+				//oldMaxFPS != Options.main.maxFPS ||
 				oldDisableShaders != Options.main.disableShaders ||
 				oldEnablePostprocessing != Options.main.enablePostProcessing ||
 				oldUseOptimizedAssets != Options.main.useOptimizedAssets ||

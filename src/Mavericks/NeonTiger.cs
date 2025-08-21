@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class NeonTiger : Maverick {
@@ -8,12 +9,19 @@ public class NeonTiger : Maverick {
 	public const float wallPounceSpeed = 325;
 	public int shootNum;
 	public bool isDashing;
-	public NeonTiger(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(NeonTClawState), new MaverickStateCooldown(false, true, 0.33f));
-		//stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.33f));
-		// stateCooldowns.Add(typeof(NeonTDashState), new MaverickStateCooldown(false, true, 0.5f));
-
+	public int shootTimes;
+	public float dashAICooldown;
+	public NeonTiger(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(NeonTClawState), new(20, true) },
+			//{ typeof(MShoot), new(20, true) },
+			//{ typeof(NeonTDashClawState), new(30, true) }
+		};
 		weapon = getWeapon();
 
 		canClimbWall = true;
@@ -28,17 +36,19 @@ public class NeonTiger : Maverick {
 			createActorRpc(player.id);
 		}
 		gameMavs = GameMavs.X3;
+		height = 38;
 	}
 
 	public override void update() {
 		base.update();
-
+		Helpers.decrementFrames(ref dashAICooldown);
+		subtractTargetDistance = 60;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isHeld(Control.Special1, player)) {
 					changeState(new NeonTShootState());
 				} else if (input.isPressed(Control.Dash, player)) {
-						changeState(new NeonTDashState());
+					changeState(new NeonTDashState());
 				} else if (input.isHeld(Control.Shoot, player)) {
 					changeState(new NeonTClawState(false));
 				}
@@ -64,24 +74,38 @@ public class NeonTiger : Maverick {
 		return 200f;
 	}
 
-	public override float getDashSpeed() {
-		return 1f;
-	}
-
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new NeonTClawState(false),
+			new NeonTShootState(),
+			new NeonTDashClawState()
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new NeonTClawState(false),
-				new NeonTShootState(),
-				new NeonTDashState(),
-		};
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [];
+		if (state is MFall or MJump) {
+			aiStates.Add(new NeonTAirClawState());
+		}
+		if (enemyDist >= 70 && shootTimes < 4) {
+			aiStates.Add(new NeonTShootState());
+		}
+		if (enemyDist <= 40) {
+			aiStates.Add(new NeonTClawState(isSecond: false));
+			aiStates.Add(new NeonTDashClawState());
+			shootTimes = 0;
+		}
+		if (dashAICooldown <= 0 && shootTimes >= 4) {
+			dashAICooldown = 90;
+			aiStates.Add(new NeonTDashState());
+		}
+		
+		return aiStates.ToArray();
 	}
-
-	
 
 	// Melee IDs for attacks.
 	public enum MeleeIds {
@@ -142,7 +166,7 @@ public class NeonTRaySplasherProj : Projectile {
 		Point pos, int xDir, int type,
 		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "neont_projectile", netId, player	
+		pos, xDir, owner, "neont_projectile", netId, player
 	) {
 		weapon = NeonTiger.getWeapon();
 		damager.damage = 2;
@@ -152,10 +176,10 @@ public class NeonTRaySplasherProj : Projectile {
 		maxTime = 0.8f;
 		fadeSprite = "raysplasher_fade";
 		fadeOnAutoDestroy = true;
-		int randomType0F = randomType0[Helpers.randomRange(0,2)];
-		int randomType1F = randomType1[Helpers.randomRange(0,2)];
-		int randomType2F = randomType2[Helpers.randomRange(0,2)];
-		if (type == 0) vel = new Point(250 * xDir, randomType0F);	
+		int randomType0F = randomType0[Helpers.randomRange(0, 2)];
+		int randomType1F = randomType1[Helpers.randomRange(0, 2)];
+		int randomType2F = randomType2[Helpers.randomRange(0, 2)];
+		if (type == 0) vel = new Point(250 * xDir, randomType0F);
 		if (type == 1) vel = new Point(250 * xDir, randomType1F);
 		if (type == 2) vel = new Point(250 * xDir, randomType2F);
 
@@ -170,16 +194,27 @@ public class NeonTRaySplasherProj : Projectile {
 		);
 	}
 }
-public class NeonTShootState : MaverickState {
-	public bool once2;
+public class NeonTMState : MaverickState {
 	public NeonTiger ShiningTigerd = null!;
+	public NeonTMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
+	}
+}
+public class NeonTShootState : NeonTMState {
+	public bool once2;
 	public NeonTShootState() : base("shoot") {
 		
 	}
 	public override void update() {
 		base.update();
-		bool upHeld = player.input.isHeld(Control.Up, player);
-		bool downHeld = player.input.isHeld(Control.Down, player);
 		Point? shootPos = maverick.getFirstPOI();
 		if (shootPos != null) {
 			if (stateTime > 4f/60f && !once2) {
@@ -187,20 +222,33 @@ public class NeonTShootState : MaverickState {
 				new Anim(shootPos.Value, "neont_projectile_start", maverick.xDir,
 				player.getNextActorNetId(), true, sendRpc: true);
 			}
-			if (!once && stateTime > 16f/60f) {
-				once = true;
-				maverick.playSound("neontRaySplasher", sendRpc: true);
-				if (downHeld) {
-					SplasherProj(2);
-				} else if (upHeld) {
-					SplasherProj(1);
-				} else {
-					SplasherProj(0);
+			if (!isAI) {
+				if (!once && stateTime > 16f / 60f) {
+					once = true;
+					maverick.playSound("neontRaySplasher", sendRpc: true);
+					shotProj();
 				}
+			}
+			if (isAI && ShiningTigerd.shootTimes < 4 && stateTime > 16f / 60f) {
+				shotProj();
+				maverick.playSound("neontRaySplasher", sendRpc: true);
+				maverick.changeState(new NeonTShootState(), true);
+				ShiningTigerd.shootTimes++;
 			}
 		}
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleOrFall();
+		}
+	}
+	public void shotProj() {
+		bool upHeld = player.input.isHeld(Control.Up, player);
+		bool downHeld = player.input.isHeld(Control.Down, player);
+		if (downHeld) {
+			SplasherProj(2);
+		} else if (upHeld) {
+			SplasherProj(1);
+		} else {
+			SplasherProj(0);
 		}
 	}
 	public void SplasherProj(int type) {
@@ -212,16 +260,11 @@ public class NeonTShootState : MaverickState {
 			);
 		}
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
-	}
 
 }
-public class NeonTWallShootState : MaverickState {
+public class NeonTWallShootState : NeonTMState {
 	MaverickState prevState;
 	public bool once2;
-	public NeonTiger ShiningTigerd = null!;
 	public NeonTWallShootState(MaverickState prevState) : base("wall_shoot") {
 		useGravity = false;
 		this.prevState = prevState;
@@ -263,13 +306,9 @@ public class NeonTWallShootState : MaverickState {
 			);
 		}
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
-	}
 }
 
-public class NeonTWallClawState : MaverickState {
+public class NeonTWallClawState : NeonTMState {
 	MaverickState prevState;
 	public NeonTWallClawState(MaverickState prevState) : base("wall_slash") {
 		useGravity = false;
@@ -285,7 +324,7 @@ public class NeonTWallClawState : MaverickState {
 	}
 }
 
-public class NeonTClawState : MaverickState {
+public class NeonTClawState : NeonTMState {
 	bool isSecond;
 	bool shootPressed;
 	public NeonTClawState(bool isSecond) : base(isSecond ? "slash2" : "slash") {
@@ -313,18 +352,19 @@ public class NeonTClawState : MaverickState {
 	}
 }
 
-public class NeonTAirClawState : MaverickState {
+public class NeonTAirClawState : NeonTMState {
 	bool wasPounce;
 	bool wasWallPounce;
-	public NeonTiger ShiningTigerd = null!;
 	public NeonTAirClawState() : base("jump_slash") {
 		exitOnAnimEnd = true;
 		enterSound = "neontSlash";
+		exitOnLanding = true;
+		canStopJump = true;
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
-		airCode(canMove: !wasPounce);
 		if (wasPounce) {
 			maverick.move(new Point(maverick.xDir * (wasWallPounce ? NeonTiger.wallPounceSpeed : NeonTiger.pounceSpeed), 0));
 		}
@@ -332,15 +372,16 @@ public class NeonTAirClawState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
 		if (oldState is NeonTPounceState || ShiningTigerd.isDashing) {
 			wasPounce = true;
+			canStopJump = false;
+			airMove = false;
 			wasWallPounce = (oldState as NeonTPounceState)?.isWallPounce ?? false;
 		}
 	}
 }
 
-public class NeonTDashClawState : MaverickState {
+public class NeonTDashClawState : NeonTMState {
 	float velX;
 	public NeonTDashClawState() : base("dash_slash") {
 		exitOnAnimEnd = true;
@@ -359,20 +400,21 @@ public class NeonTDashClawState : MaverickState {
 	}
 }
 
-public class NeonTDashState : MaverickState {
+public class NeonTDashState : NeonTMState {
 	float dustTime;
-	public NeonTiger ShiningTigerd = null!;
 	public NeonTDashState() : base("dash") {
 		enterSound = "dashX3";
 		normalCtrl = true;
 		attackCtrl = true;
-		aiAttackCtrl = true;
 		canBeCanceled = false;
 	}
 
 	public override void update() {
 		base.update();
-
+		float enemyDist = 300;
+		if (maverick.target != null) {
+			enemyDist = MathF.Abs(maverick.target.pos.x - maverick.pos.x);
+		}
 		Helpers.decrementTime(ref dustTime);
 		if (dustTime == 0) {
 			new Anim(maverick.pos.addxy(-maverick.xDir * 27, 0), "dust", maverick.xDir, player.getNextActorNetId(), true, sendRpc: true);
@@ -397,23 +439,17 @@ public class NeonTDashState : MaverickState {
 			maverick.changeState(new MIdle());
 			return;
 		}
-
 		maverick.move(move);
-
-		if (input.isPressed(Control.Shoot, player) || isAI) {
+		if (input.isPressed(Control.Shoot, player) || (isAI && enemyDist <= 30)) {
 			maverick.changeState(new NeonTDashClawState());
-		} else if (isHoldStateOver(0.1f, 0.6f, 0.4f, Control.Dash)) {
+		} else if (isHoldStateOver(0.1f, 0.6f, 50f / 60f, Control.Dash)) {
 			maverick.changeToIdleOrFall();
 		}
 	}
 
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ShiningTigerd = maverick as NeonTiger ?? throw new NullReferenceException();
-	}
 }
 
-public class NeonTPounceState : MaverickState {
+public class NeonTPounceState : NeonTMState {
 	public bool isWallPounce;
 	public NeonTPounceState() : base("fall") {
 		enterSound = "jump";

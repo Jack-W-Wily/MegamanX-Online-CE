@@ -513,7 +513,7 @@ public partial class Level {
 				if (levelData.name != "giantdam" || enableGiantDamPropellers()) {
 					var moveZone = new MoveZone(
 						instanceName, points,
-						(float)instance.properties.moveX, (float)instance.properties.moveY
+						(float)instance.properties.moveX / 60f, (float)instance.properties.moveY / 60f
 					);
 					addGameObject(moveZone);
 				}
@@ -998,20 +998,21 @@ public partial class Level {
 				int targetCharNum = hostPlayer.currentCharNum.Value;
 				LoadoutData currentLoadout = player.loadout;
 				if (player.atransLoadout != null) {
-					player.loadout = player.atransLoadout;
+					currentLoadout = player.atransLoadout;
 				}
 				player.spawnCharAtPoint(
-					targetCharNum, player.getCharSpawnData(targetCharNum),
+					targetCharNum, player.getCharSpawnData(targetCharNum, false, currentLoadout),
 					new Point(hostPlayer.charXPos, hostPlayer.charYPos),
 					hostPlayer.charXDir, (ushort)hostPlayer.charNetId, false
 				);
-				if (hostPlayer.charRollingShieldNetId != null) {
-					new RollingShieldProjCharged(
+				if (hostPlayer.charRollingShieldNetId != null && player.character is MegamanX mmx) {
+					mmx.chargedRollingShieldProj = new RollingShieldProjCharged(
 						player.character.pos,
-						player.character.xDir, player.character, player, hostPlayer.charRollingShieldNetId.Value
+						player.character.xDir,
+						player.character, player,
+						hostPlayer.charRollingShieldNetId.Value
 					);
 				}
-				player.loadout = currentLoadout;
 			} else {
 				player.atransLoadout = null;
 			}
@@ -1258,12 +1259,12 @@ public partial class Level {
 		}
 
 		if (enableGiantDamPropellers()) {
-			if (Global.frameCount % 30 == 0) new Anim(new Point(1728, 576 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.frameCount % 20 == 0) new Anim(new Point(1728, 600 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.frameCount % 40 == 0) new Anim(new Point(1728, 625 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.frameCount % 30 == 15) new Anim(new Point(1728, 650 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.frameCount % 20 == 10) new Anim(new Point(1728, 675 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
-			else if (Global.frameCount % 40 == 20) new Anim(new Point(1728, 690 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
+			if (Global.flFrameCount % 30 == 0) new Anim(new Point(1728, 576 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
+			else if (Global.flFrameCount % 20 == 0) new Anim(new Point(1728, 600 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
+			else if (Global.flFrameCount % 40 == 0) new Anim(new Point(1728, 625 + 20), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
+			else if (Global.flFrameCount % 30 == 15) new Anim(new Point(1728, 650 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
+			else if (Global.flFrameCount % 20 == 10) new Anim(new Point(1728, 675 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
+			else if (Global.flFrameCount % 40 == 20) new Anim(new Point(1728, 690 + 10), "bubbles", 1, null, false) { vel = new Point(-100, 0), ttl = 4 };
 		}
 
 		foreach (string key in recentClipCount.Keys.ToList()) {
@@ -1301,13 +1302,14 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
-			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount;
-				go.speedMul = slowAmount;
+			if (!isTimeSlowed(go, out float slowAmount)) {
+				slowAmount = 1;
 			}
+			Global.speedMul = slowAmount * Global.gameSpeed;
+			go.speedMul = slowAmount * Global.gameSpeed;
 			go.preUpdate();
 			go.statePreUpdate();
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 		}
 
 		// Preupdate RPCs.
@@ -1324,10 +1326,11 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
-			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount;
-				go.speedMul = slowAmount;
+			if (!isTimeSlowed(go, out float slowAmount)) {
+				slowAmount = 1;
 			}
+			Global.speedMul = slowAmount * Global.gameSpeed;
+			go.speedMul = slowAmount * Global.gameSpeed;
 			go.update();
 			go.stateUpdate();
 			if (isNon1v1Elimination() &&
@@ -1351,12 +1354,12 @@ public partial class Level {
 							actor.playSound("hit");
 							actor.addRenderEffect(RenderEffectType.Hit, 3, 6);
 							damagable.applyDamage(2, null, null, null, null);
-							damagable.projectileCooldown["sigmavirus"] = 1;
+							damagable.projectileCooldown["sigmavirus"] = 60;
 						}
 					}
 				}
 			}
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 		}
 
 		// Normal update RPCs.
@@ -1431,20 +1434,20 @@ public partial class Level {
 						currentGrid[i], currentGrid[j]
 					);
 					if (iDatas.Count > 0) {
-						Global.speedMul = currentGrid[i].speedMul;
+						Global.speedMul = currentGrid[i].speedMul * Global.gameSpeed;
 						iDatas = organizeTriggers(iDatas);
 						foreach (CollideData collideDataI in iDatas) {
 							currentGrid[i].registerCollision(collideDataI);
 						}
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 					if (jDatas.Count > 0) {
-						Global.speedMul = currentGrid[j].speedMul;
+						Global.speedMul = currentGrid[j].speedMul * Global.gameSpeed;
 						jDatas = organizeTriggers(jDatas);
 						foreach (CollideData collideDataJ in jDatas) {
 							currentGrid[j].registerCollision(collideDataJ);
 						}
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 				}
 				// Continue if we get destroyed.
@@ -1472,18 +1475,18 @@ public partial class Level {
 						actor, geometry
 					);
 					if (iData != null) {
-						Global.speedMul = currentGrid[i].speedMul;
+						Global.speedMul = currentGrid[i].speedMul * Global.gameSpeed;
 						currentGrid[i].registerCollision(iData);
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 					if (jData != null) {
 						Global.speedMul = wallObj.speedMul;
 						wallObj.registerCollision(jData);
-						Global.speedMul = 1;
+						Global.speedMul = Global.gameSpeed;
 					}
 				}
 			}
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
 		}
 
 		// Collision RPCs.
@@ -1514,14 +1517,17 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
-			if (isTimeSlowed(go, out float slowAmount)) {
-				Global.speedMul = slowAmount;
-				go.speedMul = slowAmount;
+			if (!isTimeSlowed(go, out float slowAmount)) {
+				slowAmount = 1;
 			}
+			Global.speedMul = slowAmount * Global.gameSpeed;
+			go.speedMul = slowAmount * Global.gameSpeed;
 			go.postUpdate();
 			go.statePostUpdate();
-			Global.speedMul = 1;
+			Global.speedMul = Global.gameSpeed;
+			go.speedMul = Global.gameSpeed;
 			go.netUpdate();
+			go.speedMul = slowAmount * Global.gameSpeed;
 		}
 
 		if (camPlayer.character != null) {
@@ -1529,9 +1535,9 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
 
-				float extraPos = 0;//MathF.Floor(MathF.Abs(followActor.deltaPos.x));
+				float extraPos = MathF.Floor(MathF.Abs(followActor.moveDelta.x));
 				if (extraPos >= 4) {
-					extraPos = extraPos * 16 * MathF.Sign(followActor.deltaPos.x);
+					extraPos = extraPos * 16 * MathF.Sign(followActor.moveDelta.x);
 					if (lastCameraXDelta == 0 ||
 						extraPos > 0 && extraPos * 100 > lastCameraXDelta ||
 						extraPos < 0 && extraPos * 100 < lastCameraXDelta
@@ -2750,7 +2756,7 @@ public partial class Level {
 	public void clearOldActors() {
 		Dictionary<ushort, Actor> destroyedActorsByIdClone = new(destroyedActorsById);
 		foreach ((ushort actorId, Actor actor) in destroyedActorsByIdClone) {
-			long framesDestroyed = frameCount - actor.destroyedOnFrame;
+			long framesDestroyed = Global.floorFrameCount - actor.destroyedOnFrame;
 			if (framesDestroyed >= 240) {
 				destroyedActorsById.Remove(actorId);
 			}

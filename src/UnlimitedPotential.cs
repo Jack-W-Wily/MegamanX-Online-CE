@@ -13,9 +13,9 @@ public class XUPParryStartState : CharState {
 	public override void update() {
 		base.update();
 
-		if (stateTime < 0.1f) {
+		//if (stateTime < 0.1f) {
 			character.turnToInput(player.input, player);
-		}
+		//}
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -25,11 +25,11 @@ public class XUPParryStartState : CharState {
 	public void counterAttack(Player? damagingPlayer, Actor? damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
 		Projectile? absorbedProj = null;
-		
+		/*
 		if (player.weapon is XBuster { isUnpoBuster: true }) {
 			player.weapon.ammo = player.weapon.maxAmmo;
-		}
-		
+		}*/
+		mmx.addPercentAmmo(100);
 		if (damagingActor is Projectile proj) {
 			if (proj.owningActor != null) {
 				counterAttackTarget = proj.owningActor;
@@ -47,7 +47,7 @@ public class XUPParryStartState : CharState {
 				character.playSound("upParryAbsorb", sendRpc: true);
 				if (!player.input.isWeaponLeftOrRightHeld(player)) {
 					mmx.absorbedProj = absorbedProj;
-					//character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
+					character.player.weapons.Add(new AbsorbWeapon(absorbedProj));
 				} else {
 					shootProj = true;
 					absorbThenShoot = true;
@@ -70,7 +70,6 @@ public class XUPParryStartState : CharState {
 				chr.changeState(new ParriedState(), true);
 			}
 		}
-		mmx.addPercentAmmo(100);
 		character.playSound("upParry", sendRpc: true);
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}
@@ -427,7 +426,7 @@ public class UPGrabbed : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.stopCharge();
 		savedZIndex = character.zIndex;
 		character.setzIndex(grabber.zIndex - 100);
@@ -545,18 +544,18 @@ public class XReviveStart : CharState {
 				dialogWaitTime = 0;
 				if (dialogIndex < 4) {
 					dialogWaitTime = 0.03f;
-					if (Global.frameCount % 5 == 0) Global.playSound("text");
+					if (Global.flFrameCount % 5 == 0) Global.playSound("text");
 				} else if (dialogIndex == 4) {
 					dialogWaitTime = 0.4f;
 				} else {
-					if (Global.frameCount % 5 == 0) Global.playSound("text");
+					if (Global.flFrameCount % 5 == 0) Global.playSound("text");
 				}
 			} else {
 				dialogWaitTime = 0.03f;
 				if (dialogIndex == dialogLine3Content.Length) {
 					dialogWaitTime = 0.4f;
 				} else {
-					if (Global.frameCount % 5 == 0) Global.playSound("text");
+					if (Global.flFrameCount % 5 == 0) Global.playSound("text");
 				}
 			}
 
@@ -592,10 +591,6 @@ public class XReviveStart : CharState {
 			"drlight", -character.xDir, player.getNextActorNetId(), false, sendRpc: true
 		);
 		drLightAnim.blink = true;
-		int busterIndex = player.weapons.FindIndex(w => w is XBuster);
-		if (busterIndex >= 0) {
-			player.changeWeaponSlot(busterIndex);
-		}
 		mmx = character as RagingChargeX;
 	}
 
@@ -620,8 +615,8 @@ public class XRevive : CharState {
 		base.update();
 		if (!once && character.frameIndex >= 1 && sprite == "revive") {
 			character.playSound("ching", sendRpc: true);
-			player.health = 1;
-			character.addHealth(player.maxHealth);
+			character.health = 1;
+			character.addHealth(character.maxHealth);
 			once = true;
 			var flash = new Anim(
 				character.pos.addxy(0, -33), "up_flash",

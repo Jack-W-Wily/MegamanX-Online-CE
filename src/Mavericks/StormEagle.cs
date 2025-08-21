@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -6,16 +7,21 @@ public class StormEagle : Maverick {
 	public static Weapon netWeapon = new Weapon(WeaponIds.StormEGeneric, 99);
 	public StormEDiveWeapon diveWeapon;
 
-	public StormEagle(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public StormEagle(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(StormEAirShootState), new(120, true, true) },
+			{ typeof(MShoot), new(120, false, false) },
+			{ typeof(StormEEggState), new(90, true) },
+			{ typeof(StormEGustState), new(45, true) },
+			{ typeof(StormEDiveState), new(60) }
+		};
+
 		diveWeapon = new StormEDiveWeapon();
-
-		stateCooldowns.Add(typeof(StormEAirShootState), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
-		stateCooldowns.Add(typeof(StormEEggState), new MaverickStateCooldown(false, true, 1.5f));
-		stateCooldowns.Add(typeof(StormEGustState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(StormEDiveState), new MaverickStateCooldown(false, false, 1f));
-
 		weapon = new Weapon(WeaponIds.StormEGeneric, 99);
 
 		awardWeaponId = WeaponIds.StormTornado;
@@ -32,6 +38,7 @@ public class StormEagle : Maverick {
 		flyBarIndexes = (44, 38);
 		maxFlyBar = 960;
 		flyBar = 960;
+		height = 44;
 	}
 
 	public override void update() {
@@ -79,33 +86,40 @@ public class StormEagle : Maverick {
 		return new MShoot((Point pos, int xDir) => {
 			new TornadoProj(pos, xDir, true, this, player, player.getNextActorNetId(), rpc: true);
 		}, "tornado");
+
+	}
+
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(),
+			new StormEEggState(true),
+			new StormEGustState(isStriker: true),
+			new StormEJumpAI(false),
+			//new StormEJumpAI(true)
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(),
-				new StormEEggState(true),
-				new StormEGustState(),
-		};
-	}
-
-	public override MaverickState getRandomAttackState() {
-		if (grounded) {
-			var attacks = new MaverickState[]
-			{
-					getShootState(),
-					new StormEEggState(true),
-					new StormEGustState(),
-			};
-			return attacks.GetRandomItem();
-		} else {
-			var attacks = new MaverickState[]
-			{
-					new StormEEggState(false),
-			};
-			return attacks.GetRandomItem();
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = target.pos.distanceTo(pos);
 		}
+		List<MaverickState> aiStates = [
+			new StormEEggState(grounded)
+		];
+		if (enemyDist > 50) {
+			aiStates.Add(getShootState());
+		}
+		if (grounded && enemyDist <= 80) {
+			aiStates.Add(new StormEGustState());
+		}
+		if (grounded && enemyDist <= 100) {
+			aiStates.Add(new StormEJumpAI(false));
+		}
+		if (!grounded && enemyDist <= 100) {
+			aiStates.Add(new StormEDiveState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -343,7 +357,21 @@ public class StormEGustProj : Projectile {
 #endregion
 
 #region states
-public class StormEDiveState : MaverickState {
+public class SEagleMState : MaverickState {
+	public StormEagle StormEagleed = null!;
+	public SEagleMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		StormEagleed = maverick as StormEagle ?? throw new NullReferenceException();
+	}
+}
+public class StormEDiveState : SEagleMState {
 	Point diveVel;
 	bool reverse;
 	float incAmount;
@@ -417,22 +445,14 @@ public class StormEDiveState : MaverickState {
 	}
 }
 
-public class StormEGustState : MaverickState {
+public class StormEGustState : SEagleMState {
 	float soundTime = 0.5f;
 	float gustTime;
-	public StormEagle StormEagleed = null!;
-	public StormEGustState() : base("flap") {
+	public bool isStriker;
+	public StormEGustState(bool isStriker = false) : base("flap")
+	{
+		this.isStriker = isStriker;
 		aiAttackCtrl = true;
-	}
-
-	public override bool canEnter(Maverick maverick) {
-		return base.canEnter(maverick);
-	}
-
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		StormEagleed = maverick as StormEagle ?? throw new NullReferenceException();		
-		maverick.stopMoving();
 	}
 
 	public override void update() {
@@ -455,33 +475,23 @@ public class StormEGustState : MaverickState {
 				player.getNextActorNetId(), rpc: true
 			);
 		}
-
-		if (isAI) {
-			if (stateTime > 4) {
-				maverick.changeState(new MIdle());
-			}
-		} else {
+		if (isStriker) {
+			maverick.maxStrikerTime = 180;
+		} else  {
 			if (!input.isHeld(Control.Dash, player)) {
-				maverick.changeState(new MIdle());
+				maverick.changeToIdleFallOrFly();
 			}
 		}
 	}
 }
 
-public class StormEEggState : MaverickState {
+public class StormEEggState : SEagleMState {
 	bool isGrounded;
-	public StormEagle StormEagleed = null!;
 	public StormEEggState(bool isGrounded) : base(isGrounded ? "air_eggshoot" : "air_eggshoot") {
 		this.isGrounded = isGrounded;
 	}
-
-	public override bool canEnter(Maverick maverick) {
-		return base.canEnter(maverick);
-	}
-
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		StormEagleed = maverick as StormEagle ?? throw new NullReferenceException();		
 		if (!isGrounded) {
 			maverick.stopMoving();
 			maverick.useGravity = false;
@@ -506,9 +516,8 @@ public class StormEEggState : MaverickState {
 	}
 }
 
-public class StormEAirShootState : MaverickState {
+public class StormEAirShootState : SEagleMState {
 	bool shotOnce;
-	public StormEagle StormEagleed = null!;
 
 	public StormEAirShootState() : base("air_shoot") {
 	}
@@ -526,7 +535,9 @@ public class StormEAirShootState : MaverickState {
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}
-
+		if (maverick.isAI && maverick.controlMode == MaverickModeId.Striker) {
+			maverick.changeToIdleOrFall();
+		}
 		if (maverick.isAnimOver()) {
 			maverick.changeState(new MFly());
 		}
@@ -535,12 +546,32 @@ public class StormEAirShootState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
-		StormEagleed = maverick as StormEagle ?? throw new NullReferenceException();
-
-	}
-
-	public override void onExit(MaverickState newState) {
-		base.onExit(newState);
 	}
 }
+
+public class StormEJumpAI : SEagleMState {
+	public bool isTornado;
+	public StormEJumpAI(bool isTornado) : base("jump", "jump_start") {
+		this.isTornado = isTornado;
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 24 / 60f && !isTornado) {
+			maverick.changeState(new StormEDiveState());
+		}
+		if (isTornado && stateTime > 18 / 60f) {
+			maverick.changeState(new StormEAirShootState());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		if (isTornado) {
+			maverick.vel.y = -maverick.getJumpPower() * 0.75f;
+		} else 
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
+	}
+}
+
 #endregion

@@ -627,15 +627,15 @@ public class RPCPlayerToggle : RPC {
 			(player?.character as MegamanX)?.strikeChainProj?.reverse(null);
 		} else if (toggleId == RPCToggleType.StrikeChainChargedReversed) {
 			(player?.character as MegamanX)?.strikeChainChargedProj?.reverseDir();
-		} */ else if (toggleId == RPCToggleType.StockCharge) {
+		}  else if (toggleId == RPCToggleType.StockCharge) {
 			if (player?.character is MegamanX mmx) {
-				mmx.stockedBuster = true;
+				mmx.stockedBusterLv = true;
 			}
 		} else if (toggleId == RPCToggleType.UnstockCharge) {
 			if (player?.character is MegamanX mmx) {
-				mmx.stockedBuster = false;
+				mmx.stockedBusterLv = false;
 			}
-		} else if (toggleId == RPCToggleType.StartBarrier) {
+		} */ else if (toggleId == RPCToggleType.StartBarrier) {
 			if (player.character is MegamanX mmx) {
 				mmx.barrierActiveTime = 90;
 			}
@@ -1262,15 +1262,20 @@ public class RPCAxlDisguise : RPC {
 			JsonConvert.DeserializeObject<RPCAxlDisguiseJson>(json) ?? throw new NullReferenceException()
 		);
 		var player = Global.level.getPlayerById(axlDisguiseData.playerId);
-		if (player == null) {
+		if (player.character == null) {
 			return;
 		}
 		if (axlDisguiseData.charNum == -1) {
-			player.revertToAxl(axlDisguiseData.dnaNetId);
+			if (player.character == null) {
+				player.atransLoadout = null;
+			} else {
+				player.revertAtransMain(axlDisguiseData.dnaNetId);
+			}
 		} else if (axlDisguiseData.charNum == -2) {
-			player.revertToAxlDeath();
+			player.revertAtransDeath();
 		} else {
-			player.transformAxlNet(axlDisguiseData);
+			player.character = player.startAtransNet(player.character, axlDisguiseData);
+			player.atransLoadout = axlDisguiseData.loadout;
 		}
 	}
 }

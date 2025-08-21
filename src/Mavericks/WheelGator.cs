@@ -17,12 +17,15 @@ public class WheelGator : Maverick {
 	//public ShaderWrapper eatenShader;
 
 	public WheelGator(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(WheelGShootState), new MaverickStateCooldown(false, false, 1.25f));
-		stateCooldowns.Add(typeof(WheelGSpinState), new MaverickStateCooldown(false, false, 2f));
+		stateCooldowns = new() {
+			{ typeof(WheelGShootState), new MaverickStateCooldown(75) },
+			{ typeof(WheelGSpinState), new MaverickStateCooldown(2 * 60) }
+		};
 
 		weapon = getWeapon();
 		upBiteWeapon = getUpBiteWeapon(player);
@@ -43,6 +46,7 @@ public class WheelGator : Maverick {
 		armorClass = ArmorClass.Heavy;
 		canStomp = true;
 		gameMavs = GameMavs.X2;
+		height = 40;
 	}
 
 	public override void update() {
@@ -145,24 +149,32 @@ public class WheelGator : Maverick {
 		}
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new WheelGBiteState(),
-				new WheelGShootState(),
-				new WheelGSpinState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new WheelGBiteState(),
+			new WheelGShootState(),
+			new WheelGSpinState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				new WheelGBiteState(),
-				new WheelGShootState(),
-				new WheelGUpBiteState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		float enemyDistY = 30;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyDistY = MathF.Abs(target.pos.y - pos.y);
+		}
+		List<MaverickState> aiStates = [
+			new WheelGShootState(),
+			new WheelGSpinState()
+		];
+		if (enemyDist <= 20) {
+			aiStates.Add(new WheelGBiteState());
+		}
+		if (enemyDistY >= 15 && enemyDist <= 15) {
+			aiStates.Add(new WheelGUpBiteState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public override List<byte> getCustomActorNetData() {
@@ -290,16 +302,25 @@ public class WheelGSpinWheelProj : Projectile {
 		base.onHitDamagable(damagable);
 	}
 }
-
-public class WheelGShootState : MaverickState {
-	int state;
-	bool shotOnce;
+public class WheelGMState : MaverickState {
 	public WheelGator WheelAlligates = null!;
-	public WheelGShootState() : base("wheelthrow_start") {
+	public WheelGMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
+	}
+}
+
+public class WheelGShootState : WheelGMState {
+	int state;
+	bool shotOnce;
+	public WheelGShootState() : base("wheelthrow_start") {
 	}
 	public override void update() {
 		base.update();
@@ -439,10 +460,9 @@ public class WheelGSpitProj : Projectile {
 	}
 }
 
-public class WheelGSpitState : MaverickState {
+public class WheelGSpitState : WheelGMState {
 	bool shotOnce;
 	float damageEaten;
-	public WheelGator WheelAlligates = null!;
 	public int UPorDown;
 	public WheelGSpitState(float damageEaten) : base("eat_spit") {
 		this.damageEaten = damageEaten;
@@ -496,7 +516,6 @@ public class WheelGSpitState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
 		maverick.frameSpeed = 1;
 		maverick.frameIndex = 0;
 	}
@@ -550,12 +569,11 @@ public class WheelGSpinState : MaverickState {
 	}
 }
 
-public class WheelGUpBiteState : MaverickState {
+public class WheelGUpBiteState : WheelGMState {
 	public Character? victim;
 	int state;
 	int shootFramesHeld;
 	bool shootReleased;
-	public WheelGator WheelAlligates = null!;
 	public WheelGUpBiteState() : base("grab_start", "jump_start") {
 	}
 
@@ -600,10 +618,6 @@ public class WheelGUpBiteState : MaverickState {
 			return true;
 		}
 		return false;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		WheelAlligates = maverick as WheelGator ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(MaverickState newState) {

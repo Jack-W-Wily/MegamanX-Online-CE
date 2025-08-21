@@ -124,7 +124,7 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (character.sprite.frameIndex >= comboFrame) {
+		if (character.sprite.frameIndex >= comboFrame && !character.grounded) {
 			attackCtrl = true;
 		}
 	}

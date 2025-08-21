@@ -29,7 +29,7 @@ public class ViralSigmaIdle : CharState {
 
 	public override void update() {
 		stateTime += Global.spf;
-		character.stopMoving();
+		character.stopMovingS();
 
 		var inputDir = player.input.getInputDir(player);
 		var moveAmount = inputDir.times(125);
@@ -492,25 +492,25 @@ public class ViralSigmaRevive : CharState {
 			}
 		} else if (state == 2) {
 			if (stateTime > 0f) {
-				player.health = 1;
-				character.addHealth(player.maxHealth);
+				character.health = 1;
+				character.addHealth(character.maxHealth);
 				state = 3;
 			}
 		} else if (state == 3) {
-			if (Global.debug && player.input.isBPressed(player)) {
-				player.health = player.maxHealth;
+			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+				character.health = character.maxHealth;
 			}
 
-			if (player.health >= player.maxHealth) {
-				player.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Tank));
-				player.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Hopper));
-				player.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Bird));
+			if (character.health >= character.maxHealth) {
+				character.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Tank));
+				character.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Hopper));
+				character.weapons.Add(new MechaniloidWeapon(player, MechaniloidType.Bird));
 				character.frameSpeed = 1;
 
 				character.invulnTime = 0.5f;
 				character.useGravity = false;
 				character.angle = 0;
-				character.stopMoving();
+				character.stopMovingS();
 				character.grounded = false;
 				character.canBeGrounded = false;
 

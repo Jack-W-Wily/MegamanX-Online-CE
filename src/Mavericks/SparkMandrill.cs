@@ -12,12 +12,14 @@ public class SparkMandrill : Maverick {
 	public SparkMandrill(
 		Player player, Point pos, Point destPos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
-	) : base(player, pos, destPos, xDir, netId, ownedByLocalPlayer
-) {
-
-		stateCooldowns.Add(typeof(SparkMPunchState), new MaverickStateCooldown(true, true, 1f));
-		stateCooldowns.Add(typeof(SparkMDashPunchState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(true, true, 2f));
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(SparkMPunchState), new(60, true, true) },
+			{ typeof(SparkMDashPunchState), new(45, false, true) },
+			{ typeof(MShoot), new(2 * 60, true, true) }
+		};
 		spriteToCollider["dash_punch"] = getDashCollider();
 
 		weapon = new Weapon(WeaponIds.SparkMGeneric, 94);
@@ -48,7 +50,7 @@ public class SparkMandrill : Maverick {
 		base.update();
 
 		//rechargeAmmo(8);
-
+		subtractTargetDistance = 70;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (specialPressed()) {
@@ -84,22 +86,27 @@ public class SparkMandrill : Maverick {
 		}, "sparkmSparkX1");
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new SparkMPunchState(),
-				getShootState(),
-				new SparkMDashPunchState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(),
+			new SparkMPunchState(),
+			new SparkMDashPunchState()
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(),
-				new SparkMDashPunchState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new SparkMDashPunchState(),
+			getShootState(),
+		];
+		if (enemyDist <= 60) {
+			aiStates.Add(new SparkMPunchState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -289,7 +296,7 @@ public class SparkMClimbState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.changePos(new Point(maverick.pos.x, hitPoint.y + maverick.height));
 	}
 

@@ -8,10 +8,17 @@ namespace MMXOnline;
 public class MorphMoth : Maverick {
 	public static Weapon getWeapon() { return new Weapon(WeaponIds.MorphMGeneric, 146); }
 
-	public MorphMoth(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer, overrideState: isHatch ? new MorphMHatchState() : null) {
-		stateCooldowns.Add(typeof(MorphMShoot), new MaverickStateCooldown(true, false, 0.5f));
-		stateCooldowns.Add(typeof(MorphMShootAir), new MaverickStateCooldown(true, false, 0.5f));
+	public MorphMoth(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool isHatch, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer,
+		overrideState: isHatch ? new MorphMHatchState() : null
+	) {
+		stateCooldowns = new() {
+			{ typeof(MorphMShoot), new(30, false, true) },
+			{ typeof(MorphMShootAir), new(30, false, true) }
+		};
 
 		weapon = getWeapon();
 		spriteToCollider["sweep"] = getDashCollider();
@@ -58,9 +65,18 @@ public class MorphMoth : Maverick {
 				}
 			} else if (state is MFly) {
 				if (input.isPressed(Control.Dash, player)) {
-					changeState(new MorphMSweepState());
+					changeState(new MorphMSweepState(isStriker: false));
 				} else if (input.isPressed(Control.Shoot, player)) {
 					changeState(new MorphMShootAir());
+				}
+			}
+		}
+		if (controlMode == MaverickModeId.Striker) {
+			if (player.input.isHeld(Control.Shoot, player)) {
+				var mmw = player.weapons.FirstOrDefault(w => w is MorphMothWeapon mmw) as MorphMothWeapon;
+				if (mmw != null) {
+					bool wasCocoon = ownerChar?.currentMaverick == this;
+					mmw.isMoth = false;
 				}
 			}
 		}
@@ -70,19 +86,38 @@ public class MorphMoth : Maverick {
 		return "morphm";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new List<MaverickState>
-		{
-				grounded ? new MorphMShoot() : new MorphMShootAir()
-			};
-		if (!grounded) {
-			attacks.Add(new MorphMSweepState());
-		}
-		return attacks.ToArray();
+	public override MaverickState[] strikerStates() {
+		return [
+			new MorphMShoot(),
+			new MorphMAIJump(1),
+			new MorphMAIJump(3),
+			new MorphMAIJump(2),
+			new MorphMAIJump(4),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+		];
+		if (grounded) {
+			aiStates.Add(new MorphMAIJump(1));
+			if (enemyDist <= 125) {
+				aiStates.Add(new MorphMShoot());
+			}
+		} else if (!grounded) {
+			aiStates.Add(new MorphMSweepState(isStriker: false));
+			if (enemyDist <= 30) {
+				aiStates.Add(new MorphMShootAir(3));
+			}
+			if (enemyDist > 140) {
+				aiStates.Add(new MorphMShootAir(2));
+			}
+		}
+		return aiStates.ToArray();
 	}
 }
 
@@ -196,7 +231,9 @@ public class MorphMShoot : MaverickState {
 
 public class MorphMShootAir : MaverickState {
 	bool shotOnce;
-	public MorphMShootAir() : base("shoot", "shoot_start") {
+	public int stateAI;
+	public MorphMShootAir(int stateAI = 1) : base("shoot", "shoot_start") {
+		this.stateAI = stateAI;
 	}
 
 	public override void update() {
@@ -207,11 +244,36 @@ public class MorphMShootAir : MaverickState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			morphMothBeam(shootPos.Value, false);
+			if (stateAI == 1) {
+				morphMothBeam(shootPos.Value, false);
+			}
+			if (stateAI == 2) {
+				maverick.playSound("morphmBeam", sendRpc: true);
+				new MorphMBeamProj(
+					maverick.weapon, shootPos.Value,
+					maverick.getCenterPos().addxy(160 * maverick.xDir, 50),
+					maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+			} else if (stateAI == 3) {
+				morphMothBeam(shootPos.Value, false);
+			} else if (stateAI == 4) {
+				new MorphMBeamProj(
+					maverick.weapon, shootPos.Value,
+					maverick.getCenterPos().addxy(160 * maverick.xDir, -50),
+					maverick.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+				maverick.playSound("morphmBeam", sendRpc: true);
+			}
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeState(new MFly());
+			maverick.changeToIdleFallOrFly();
+		}
+		if (isAI) {
+			maverick.vel.y = 0;
+			if (stateTime > 32f / 60f) {
+				maverick.changeToIdleFallOrFly();
+			}
 		}
 	}
 
@@ -256,7 +318,9 @@ public class MorphMPowderProj : Projectile {
 }
 
 public class MorphMSweepState : MaverickState {
-	public MorphMSweepState() : base("sweep", "sweep_start") {
+	public bool isStriker;
+	public MorphMSweepState(bool isStriker) : base("sweep", "sweep_start") {
+		this.isStriker = isStriker;
 	}
 	public MorphMoth Moth = null!;
 	float shootTime;
@@ -272,7 +336,7 @@ public class MorphMSweepState : MaverickState {
 		if (isAI || input.isHeld(Control.Shoot, player)) {
 			Helpers.decrementTime(ref maverick.ammo);
 			if (shootTime == 0) {
-				shootTime = 0.15f;
+				shootTime = isStriker ? 0.1f : 0.15f;
 				Point shootPos = maverick.getFirstPOIOrDefault().addRand(10, 5);
 				new MorphMPowderProj(
 					shootPos, maverick.xDir, Moth,
@@ -280,7 +344,10 @@ public class MorphMSweepState : MaverickState {
 				);
 			}
 		}
-
+		if (isStriker) {
+			maverick.move(new Point(20*maverick.xDir, -20));
+			if (stateTime > 60f / 60f) maverick.changeToIdleFallOrFly();
+		}
 		var inputDir = input.getInputDir(player);
 
 		if (inputDir.x != 0 && MathF.Sign(inputDir.x) != maverick.xDir) {
@@ -359,7 +426,31 @@ public class MorphMHatchState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
+	}
+}
+public class MorphMAIJump : MaverickState {
+	public int stateAI;
+	public MorphMAIJump(int stateAI) : base("jump", "jump_start") {
+		this.stateAI = stateAI;
+	}
+
+	public override void update() {
+		base.update();
+		if (stateAI == 1 && stateTime > 24f / 60f) {
+			maverick.changeState(new MorphMSweepState(isStriker: false));
+		} else if (stateAI == 2 && stateTime > 8f / 60f) {
+			maverick.changeState(new MorphMShootAir(2));			
+		} else if (stateAI == 3 && stateTime > 8f / 60f) {
+			maverick.changeState(new MorphMShootAir(3));			
+		} else if (stateAI == 4 && stateTime > 8f / 60f) {
+			maverick.changeState(new MorphMShootAir(4));			
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }

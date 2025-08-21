@@ -125,7 +125,7 @@ public class Projectile : Actor {
 	) : base(
 		sprite, pos, netId,
 		ownedByLocalPlayer ?? player?.ownedByLocalPlayer ?? owner?.ownedByLocalPlayer ??
-		(netId != null ? Global.level.getPlayerById(netId.Value).ownedByLocalPlayer : true),
+		(netId == null || Global.level.getPlayerById(netId.Value).ownedByLocalPlayer),
 		!addToLevel
 	) {
 		weapon = Weapon.baseNetWeapon;
@@ -134,7 +134,7 @@ public class Projectile : Actor {
 		damager = new Damager(ownerPlayer, 0, 0, 0);
 		owningActor = owner;
 		this.xDir = xDir;
-		if ((Global.level.gameMode.isTeamMode && Global.level.mainPlayer != ownerPlayer) &&
+		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != ownerPlayer &&
 			this is not NapalmPartProj or FlameBurnerProj
 		) {
 			RenderEffectType? allianceEffect = ownerPlayer.alliance switch {
@@ -622,7 +622,7 @@ public class Projectile : Actor {
 				if (hitPos != null && destroyOnHit) changePos(hitPos.Value);
 
 				bool weakness = false;
-				if (character != null && character.player.isX) {
+				if (character is MegamanX) {
 					int wi = character.player.weapon.weaknessIndex;
 					if (wi > 0 && wi == weapon.index) weakness = true;
 				}

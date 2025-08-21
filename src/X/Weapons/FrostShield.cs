@@ -71,10 +71,8 @@ public class FrostShieldProj : Projectile {
 		projId = (int)ProjIds.FrostShield;
 		destroyOnHit = true;
 		exhaust = new Anim(pos, "frostshield_exhaust", xDir, null, false);
-		if (Global.level.server?.customMatchSettings?.FrostShieldNerf == false) {
-			isShield = true;	
-		} else if (Global.level.server?.customMatchSettings?.FrostShieldNerf == true) {
-			isShield = false;
+		if (Global.level.server?.customMatchSettings?.frostShieldNerf == false) {
+			isShield = true;
 		}
 
 		if (rpc) {
@@ -180,10 +178,8 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldGround;
 		destroyOnHit = true;
-		if (Global.level.server?.customMatchSettings?.FrostShieldNerf == false) {
-			isShield = true;	
-		} else if (Global.level.server?.customMatchSettings?.FrostShieldNerf == true) {
-			isShield = false;
+		if (Global.level.server?.customMatchSettings?.frostShieldNerf == false) {
+			isShield = true;
 		}
 		playSound("frostShield");
 		if (rpc) {
@@ -226,9 +222,8 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 	}
 
 	public bool isInvincible(Player attacker, int? projId) {
-		if (projId == null) return true;
-		if (Global.level.server?.customMatchSettings?.FrostShieldNerf == true) {
-			return false;
+		if (projId == null) {
+			return true;
 		}
 		return !Damager.canDamageFrostShield(projId.Value);
 	}
@@ -260,9 +255,9 @@ public class FrostShieldProjCharged : Projectile {
 		destroyOnHit = false;
 		shouldVortexSuck = false;
 		character = player.character;
-		if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == false) {
+		if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == false) {
 			isShield = true;	
-		} else if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == true) {
+		} else if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == true) {
 			isShield = false;
 		}
 		if (rpc) {
@@ -340,9 +335,9 @@ public class FrostShieldProjChargedGround : Projectile {
 		shouldVortexSuck = false;
 		character = player.character;
 		useGravity = true;
-		if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == false) {
+		if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == false) {
 			isShield = true;	
-		} else if (Global.level.server?.customMatchSettings?.FrostShieldChargedNerf == true) {
+		} else if (Global.level.server?.customMatchSettings?.frostShieldChargedNerf == true) {
 			isShield = false;
 		}
 		vel = new Point(xDir * 150, -100);

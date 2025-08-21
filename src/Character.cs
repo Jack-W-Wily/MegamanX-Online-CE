@@ -24,6 +24,7 @@ public partial class Character : Actor, IDamagable {
 	public int spawnHealthToAdd;
 	public float spawnHealthAddTime;
 	public bool alive = true;
+	public int heartTanks;
 	public bool ShouldExplode;
 
 	public float aiAttackCooldown;
@@ -135,6 +136,8 @@ public partial class Character : Actor, IDamagable {
 	public float transformSmokeTime;
 	public int fakeAlliance;
 	public bool isATrans;
+	public DNACore? linkedDna;
+	public Character? linkedATransChar;
 	public bool oldATrans => (
 		isATrans &&
 		Global.level.server?.customMatchSettings?.oldATrans == true
@@ -303,7 +306,7 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 	public bool isControllingPuppet() {
-		return currentMaverick?.controlMode == MaverickMode.Puppeteer;
+		return currentMaverick?.controlMode == MaverickModeId.Puppeteer;
 	}
 	public Weapon? lastMaverickWeapon = null;
 
@@ -323,11 +326,12 @@ public partial class Character : Actor, IDamagable {
 	public Character(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, bool isATrans = false
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
 		null!, new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
 	) {
 		//hasStateMachine = true;
+		slideOnIce = true;
 		this.isATrans = isATrans;
 		this.player = player;
 		netOwner = player;
@@ -380,11 +384,10 @@ public partial class Character : Actor, IDamagable {
 
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
-		maxHealth = (decimal)player.getMaxHealth();
-		bonusHealth = (decimal)player.getMaxHealth();
-		health = 1;
-		if (player.disguise == null) {
-			healAmount = (float)maxHealth - 1;
+		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
+		maxHealth = getMaxHealth();
+		if (!ownedByLocalPlayer || !isWarpIn) {
+			health = maxHealth;
 		}
 	}
 
@@ -724,7 +727,7 @@ public partial class Character : Actor, IDamagable {
 		if (player.isPossessed()) return false;
 		if (dropFlagCooldown > 0) return false;
 		if (isInvulnerable()) return false;
-		if (player.isDisguisedAxl && !disguiseCoverBlown) return false;
+		if (isATrans && !disguiseCoverBlown) return false;
 		if (isNonDamageStatusImmune()) return false;
 		if (charState is Die || charState is VileRevive || charState is XReviveStart || charState is XRevive) return false;
 		if (isWarpOut()) return false;
@@ -887,7 +890,12 @@ public partial class Character : Actor, IDamagable {
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
 		debuffGfx();
-		if (!ownedByLocalPlayer) { return; }
+		// Other timers.
+		Helpers.decrementTime(ref limboRACheckCooldown);
+		Helpers.decrementTime(ref dropFlagCooldown);
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		// Local only starts here.
 		debuffCooldowns();
 		genericPuppetControl();
@@ -1244,7 +1252,7 @@ public partial class Character : Actor, IDamagable {
 		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) {
 			int alliance = player.alliance;
 			// If this is an enemy disguised Axl, change the alliance
-			if (player.alliance != Global.level.mainPlayer.alliance && player.isDisguisedAxl && !disguiseCoverBlown) {
+			if (player.alliance != Global.level.mainPlayer.alliance && isATrans && !disguiseCoverBlown) {
 				alliance = fakeAlliance;
 			}
 			RenderEffectType? allianceEffect = alliance switch {
@@ -1281,10 +1289,18 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (flag != null) {
-			if (MathF.Abs(xPushVel) > 75) xPushVel = 75 * MathF.Sign(xPushVel);
-			if (MathF.Abs(xSwingVel) > 75) xSwingVel = 75 * MathF.Sign(xSwingVel);
-			if (vel.y < -350) vel.y = -350;
-
+			if (MathF.Abs(xPushVel) > 1.25f) {
+				xPushVel = 1.25f * MathF.Sign(xPushVel);
+			}
+			if (MathF.Abs(xFlinchPushVel) > 1.25f) {
+				xPushVel = 1.25f * MathF.Sign(xPushVel);
+			}
+			if (MathF.Abs(xSwingVel) > 1.25f) {
+				xSwingVel = 1.25f * MathF.Sign(xSwingVel);
+			}
+			if (vel.y * gravityModifier < -350) {
+				vel.y = -350 * gravityModifier;
+			}
 			// Used to prevent holding dash before taking flag from activating which is bad player experience
 			if (!player.input.isHeld(Control.Dash, player)) {
 				dropFlagUnlocked = true;
@@ -1349,7 +1365,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (pos.y > Global.level.killY && !isWarpIn() && charState is not WarpOut) {
 			if (charState is WolfSigmaRevive wsr) {
-				stopMoving();
+				stopMovingS();
 				useGravity = false;
 				wsr.groundStart = true;
 			} else {
@@ -1422,7 +1438,7 @@ public partial class Character : Actor, IDamagable {
 		) {
 			Damager.applyDamage(
 				lastGravityWellDamager,
-				4, 30, Global.halfFlinch, this,
+				4, 120, Global.halfFlinch, this,
 				false, (int)WeaponIds.GravityWell, 45, this,
 				(int)ProjIds.GravityWellCharged
 			);
@@ -1440,7 +1456,7 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
-		if (player.isDisguisedAxl) {
+		if (isATrans) {
 			updateDisguisedAxl();
 		}
 
@@ -1865,7 +1881,7 @@ public partial class Character : Actor, IDamagable {
 			chargeSound.play();
 			int chargeType = 0;
 			if (!sprite.name.Contains("ra_hide")) {
-				int level = getChargeLevel();
+				int level = getDisplayChargeLevel();
 				var renderGfx = RenderEffectType.ChargeBlue;
 				renderGfx = level switch {
 					1 => RenderEffectType.ChargeBlue,
@@ -1877,7 +1893,7 @@ public partial class Character : Actor, IDamagable {
 				};
 				addRenderEffect(renderGfx, 3, 5);
 			}
-			chargeEffect.update(getChargeLevel(), chargeType);
+			chargeEffect.update(getDisplayChargeLevel(), chargeType);
 		}
 	}
 
@@ -2105,7 +2121,7 @@ public partial class Character : Actor, IDamagable {
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform;
 		}
-		if (currentMaverick != null && currentMaverick.controlMode == MaverickMode.TagTeam) {
+		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
 			return currentMaverick;
 		}
 		if (rideArmor != null) {
@@ -2229,6 +2245,10 @@ public partial class Character : Actor, IDamagable {
 		return Helpers.clampMax(chargeLevel, maxCharge);
 	}
 
+	public virtual int getDisplayChargeLevel() {
+		return getChargeLevel();
+	}
+
 	public virtual void changeToIdleOrFall(
 		string transitionSprite = "",
 		string transShootSprite = ""
@@ -2281,6 +2301,42 @@ public partial class Character : Actor, IDamagable {
 				changeState(getFallState(), true);
 			}
 		}
+	}
+
+
+	public virtual void atransStateChange(Character oldChar) {
+		CharState? newState = oldChar.charState switch {
+			Dash dash when canDash() => new Dash(dash.initialDashButton) { dashTime = dash.dashTime },
+			AirDash airDash when canDash() => (
+				new AirDash(airDash.initialDashButton) { dashTime = airDash.dashTime }
+			),
+			WallSlide wallSlide => (
+				new WallSlide(wallSlide.wallDir, wallSlide.wallCollider) {
+					stateFrames = wallSlide.stateFrames
+				}
+			),
+			Crouch when canCrouch() => new Crouch(),
+			Run => getRunState(true),
+			_ => null
+		};
+		if (newState != null) {
+			changeState(newState);
+			if (charState is WallSlide) {
+				frameIndex = sprite.totalFrameNum - 1;
+			}
+			if (charState is Dash dash && dash.dashTime >= 4) {
+				frameIndex = sprite.totalFrameNum - 1;
+			}
+			return;
+		}
+		if (!oldChar.grounded && oldChar.isDashing) {
+			isDashing = true;
+		}
+		if (!grounded && oldChar.charState.canStopJump && !oldChar.charState.stoppedJump) {
+			changeState(getJumpState());
+			return;
+		}
+		changeToIdleOrFall();
 	}
 
 	public virtual void landingCode(bool useSound = true) {
@@ -2404,7 +2460,7 @@ public partial class Character : Actor, IDamagable {
 		float? savedAlpha = null;
 		if (invulnTime > 0) {
 			savedAlpha = alpha;
-			if (Global.level.frameCount % 4 < 2) {
+			if (Global.flFrameCount % 4 < 2) {
 				alpha *= 0.15f;
 			} else {
 				alpha *= 0.85f;
@@ -2421,7 +2477,7 @@ public partial class Character : Actor, IDamagable {
 		if (isCrystalized) {
 			float yOff = 0;
 			if (sprite.name.Contains("ra_idle")) yOff = 12;
-			if (player.isSigma) yOff = -7;
+			if (this is BaseSigma) yOff = -7;
 			Global.sprites["crystalhunter_crystal"].draw(
 				0, pos.x + x, pos.y + y + yOff, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
@@ -2447,7 +2503,7 @@ public partial class Character : Actor, IDamagable {
 				}
 			}
 			// Special case: labeling the own player's disguised Axl
-			else if (player.isMainPlayer && player.isDisguisedAxl && 
+			else if (player.isMainPlayer && isATrans &&
 				Global.level.gameMode.isTeamMode && player.disguise != null
 			) {
 				overrideName = player.disguise.targetName;
@@ -2455,7 +2511,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			// Special case: labeling an enemy player's disguised Axl
 			else if (
-				!player.isMainPlayer && player.isDisguisedAxl &&
+				!player.isMainPlayer && isATrans &&
 				Global.level.gameMode.isTeamMode &&
 				player.alliance != Global.level.mainPlayer.alliance &&
 				player.disguise != null &&
@@ -2563,7 +2619,7 @@ public partial class Character : Actor, IDamagable {
 				);
 
 				int label = 125;
-				if (player.isAxl || player.isDisguisedAxl) {
+				if (this is Axl || isATrans) {
 					label = 123;
 				}
 				Global.sprites["hud_killfeed_weapon"].draw(
@@ -2572,7 +2628,7 @@ public partial class Character : Actor, IDamagable {
 				deductLabelY(labelCooldownOffY);
 			}
 		}
-		if (player.isKaiserSigma() && !player.isKaiserViralSigma()) {
+		if (this is KaiserSigma { isVirus: false }) {
 			renderDamageText(100);
 		} else {
 			renderDamageText(35);
@@ -2927,6 +2983,18 @@ public partial class Character : Actor, IDamagable {
 		deductLabelY(labelNameOffY);
 	}
 
+
+	public virtual int baselineMaxHealth() {
+		return 16;
+	}
+
+	public virtual int getMaxHealth() {
+		if (Global.level.is1v1()) {
+			return Player.getModifiedHealth(28);
+		}
+		return Player.getModifiedHealth(baselineMaxHealth() + (heartTanks * Player.getHeartTankModifier()));
+	}
+
 	public virtual bool canBeHealed(int healerAlliance) {
 		return player.alliance == healerAlliance && alive && health < maxHealth;
 	}
@@ -3123,7 +3191,7 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (damage > 0 && attacker != null) {
-			if (projId != (int)ProjIds.Burn && projId != (int)ProjIds.AcidBurstPoison) {
+			if (!Damager.isDot(projId)) {
 				player.delaySubtank();
 			}
 		}
@@ -3337,13 +3405,21 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 	}
+	
+	public void addHealth(int amount, bool fillSubtank = true) {
+		addHealth((decimal)amount, fillSubtank);
+	}
 
 	public void addHealth(float amount, bool fillSubtank = true) {
+		addHealth((decimal)amount, fillSubtank);
+	}
+
+	public void addHealth(decimal amount, bool fillSubtank = true) {
 		if (health >= maxHealth && fillSubtank) {
-			player.fillSubtank(amount);
+			player.fillSubtank((float)amount);
 		}
-		healAmount += amount;
-		onHealing((decimal)amount);
+		healAmount += (float)amount;
+		onHealing(amount);
 	}
 
 	public void fillHealthToMax() {
@@ -3389,6 +3465,19 @@ public partial class Character : Actor, IDamagable {
 		this.flag = flag;
 	}
 
+	/// <summary> Pushes the player in a direction, if pushed aganist a jump does disable the jump. </summary>
+	public void pushEffect(Point speed) {
+		if (MathF.Sign(vel.y) != MathF.Sign(speed.y) || MathF.Abs(speed.y * 60) > MathF.Abs(vel.y)) {
+			vel.y = speed.y * 60f;
+		}
+		if (MathF.Abs(speed.x) > MathF.Abs(xFlinchPushVel)) {
+			xFlinchPushVel = speed.x;
+		}
+		if (speed.y * gravityModifier < 0) {
+			charState.canStopJump = false;
+		}
+	}
+
 	public HitStop hitstops;
 
 	public void setHurt(int dir, int flinchFrames, bool spiked) {
@@ -3396,7 +3485,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (player.isSigma || isToughGuyHyperMode()) {
+		if (this is BaseSigma || isToughGuyHyperMode()) {
 			if (flinchFrames >= Global.superFlinch) {
 				flinchFrames = Global.halfFlinch;
 			} else {
@@ -3472,7 +3561,9 @@ public partial class Character : Actor, IDamagable {
 
 	public void crystalizeStart() {
 		isCrystalized = true;
-		if (globalCollider != null) globalCollider.isClimbable = true;
+		if (globalCollider != null) {
+			globalCollider.isClimbable = true;
+		}
 		new Anim(getCenterPos(), "crystalhunter_activate", 1, null, true);
 		playSound("crystalize");
 	}
@@ -3681,24 +3772,32 @@ public partial class Character : Actor, IDamagable {
 		// Tranform.
 		if (currentWeapon is UndisguiseWeapon && (shootPressed || altShootPressed)) {
 			undisguiseTime = 6;
-			changeState(new ATransTransition());
-			DNACore lastDNA = player.lastDNACore;
 			int lastDNAIndex = player.lastDNACoreIndex;
 			playSound("transform", sendRpc: true);
-			Character oldAxl = player.revertToAxl();
-			oldAxl.undisguiseTime = 6;
+
+			Character? newChar;
+			if (player.character == this) {
+				player.revertAtransMain();
+				newChar = player.character;
+			} else {
+				newChar = player.revertAtrans(this, linkedATransChar);
+			}
+			if (newChar == null) {
+				return;
+			}
+			newChar.undisguiseTime = 6;
 			// To keep DNA.
-			if (oldATrans && altShootPressed && player.currency >= 1) {
+			if (oldATrans && altShootPressed && player.currency >= 1 && linkedDna != null) {
 				player.currency -= 1;
-				lastDNA.hyperMode = DNACoreHyperMode.None;
+				linkedDna.hyperMode = DNACoreHyperMode.None;
 				// Turn ancient gun into regular axl bullet
-				if (lastDNA.weapons.Count > 0 &&
-					lastDNA.weapons[0] is AxlBullet ab &&
+				if (linkedDna.weapons.Count > 0 &&
+					linkedDna.weapons[0] is AxlBullet ab &&
 					ab.type == (int)AxlBulletWeaponType.AncientGun
 				) {
-					lastDNA.weapons[0] = player.getAxlBulletWeapon(0);
+					linkedDna.weapons[0] = player.getAxlBulletWeapon(0);
 				}
-				oldAxl.weapons.Insert(lastDNAIndex, lastDNA);
+				newChar.weapons.Insert(lastDNAIndex, linkedDna);
 			}
 			return;
 		}
@@ -3736,7 +3835,7 @@ public partial class Character : Actor, IDamagable {
 	public void shootAssassinShot(bool isAlt = false) {
 		if (getChargeLevel() >= 3 || isAlt) {
 			assassinTime = 33f;
-			player.revertToAxl();
+			player.revertAtransMain();
 			changeState(new AssassinateChar(), true);
 		} else {
 			stopCharge();
@@ -3746,7 +3845,9 @@ public partial class Character : Actor, IDamagable {
 	public bool disguiseCoverBlown;
 
 	public void addTransformAnim() {
-		transformAnim = new Anim(pos, "axl_transform", xDir, player.getNextActorNetId(), true, true);
+		transformAnim = new Anim(
+			pos, "axl_transform", xDir, player.getNextActorNetId(), true, true
+		);
 	}
 
 	public virtual void onFlinchOrStun(CharState state) { }
@@ -3760,7 +3861,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 
-	public virtual void chargeLogic(Action<int> shootFunct) {
+	public virtual void chargeLogic(Action<int>? shootFunct) {
 		// Charge shoot logic.
 		// We test if we are holding charge and not inside a vehicle.
 		if (chargeButtonHeld() && flag == null && rideChaser == null && rideArmor == null) {
@@ -3773,7 +3874,7 @@ public partial class Character : Actor, IDamagable {
 		// This to prevent from losing charge.
 		else if (canShootCharge()) {
 			int chargeLevel = getChargeLevel();
-			if (isCharging() && chargeLevel >= 1) {
+			if (isCharging() && chargeLevel >= 1 && shootFunct != null) {
 				shootFunct(chargeLevel);
 			}
 			stopCharge();
@@ -3811,7 +3912,20 @@ public partial class Character : Actor, IDamagable {
 		return sound;
 	}
 
-	public virtual void aiUpdate(Actor? target) { }
+	public virtual void aiUpdate(Actor? target) {
+		if (!player.isMainPlayer && player.character != null && !Global.level.is1v1()) {
+			if (heartTanks < UpgradeMenu.getMaxHeartTanks() &&
+				player.currency >= UpgradeMenu.getHeartTankCost()
+			) {
+				player.currency -= UpgradeMenu.getHeartTankCost();
+				player.heartTanks++;
+				heartTanks++;
+				decimal currentMaxHp = maxHealth;
+				maxHealth = getMaxHealth();
+				addHealth(MathInt.Ceiling(maxHealth - currentMaxHp));
+			}
+		}
+	}
 
 	public virtual void aiAttack(Actor? target) { }
 

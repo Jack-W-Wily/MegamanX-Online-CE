@@ -15,11 +15,12 @@ public class Doppma : BaseSigma {
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId,
 		bool ownedByLocalPlayer, bool isWarpIn = true,
-		SigmaLoadout? sigmaLoadout = null, bool isATrans = false
+		SigmaLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn,
-		sigmaLoadout, isATrans
+		loadout, heartTanks, isATrans
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
 		altSoundId = AltSoundIds.X3;
@@ -85,10 +86,10 @@ public class Doppma : BaseSigma {
 		if (player.weapon is not AssassinBulletChar) {
 			if (player.input.isAPressed(player)) {
 				attackPressed = true;
-				lastAttackFrame = Global.level.frameCount;
+				lastAttackFrame = Global.floorFrameCount;
 			}
 		}
-		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
+		framesSinceLastAttack = Global.floorFrameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		// Shoot button attacks.
@@ -224,7 +225,8 @@ public class Doppma : BaseSigma {
 				if (weapon is MaverickWeapon mw && mw.maverick != null) {
 					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
 				}
-			}	
+			}
 		}
+		base.aiUpdate(target);
 	}
 }

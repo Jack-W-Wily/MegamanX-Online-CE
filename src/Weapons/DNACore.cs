@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace MMXOnline;
 
@@ -9,6 +10,9 @@ public class UndisguiseWeapon : AxlWeapon {
 		index = (int)WeaponIds.Undisguise;
 		weaponSlotIndex = 50;
 		sprite = "axl_arm_pistol";
+		drawAmmo = false;
+		drawCooldown = false;
+
 		drawAmmo = false;
 		drawCooldown = false;
 	}
@@ -22,38 +26,44 @@ public enum DNACoreHyperMode {
 	WhiteAxl,
 	AwakenedZero,
 	NightmareZero,
+	UltimateArmor,
 }
 
 public class DNACore : AxlWeapon {
 	public int charNum;
 	public LoadoutData loadout;
-	public float maxHealth;
 	public string name;
 	public int alliance;
-	public int armorFlag;
-	public byte hyperArmorBools;
-	public bool frozenCastle;
-	public bool speedDevil;
-	public bool ultimateArmor;
-	public DNACoreHyperMode hyperMode;
-	public float rakuhouhaAmmo;
-	public List<Weapon> weapons = new List<Weapon>();
-	public bool usedOnce = false;
+	[JsonIgnore] public int hyperModeTimer;
+	[JsonIgnore] public byte hyperArmorBools;
+	[JsonIgnore] public DNACoreHyperMode hyperMode;
+	[JsonIgnore] public bool frozenCastle;
+	[JsonIgnore] public bool speedDevil;
+	[JsonIgnore] public bool ultimateArmor;
+	[JsonIgnore] public float altCharAmmo;
+	[JsonIgnore] public float hyperNovaAmmo;
+	[JsonIgnore] public int armorFlag;
+	[JsonIgnore] public float maxHealth;
+	[JsonIgnore] public List<Weapon> weapons = [];
+	[JsonIgnore] public bool usedOnce = false;
 
-	public DNACore(Character character) : base(0) {
+	public DNACore(Character character, Player player) : base(0) {
 		charNum = (int)character.charId;
-		loadout = character.player.atransLoadout ?? character.player.loadout;
+		loadout = (
+			character.player.atransLoadout?.clone(player.id) ?? character.player.loadout.clone(player.id)
+		);
 		maxHealth = (float)Math.Ceiling(character.maxHealth);
 		name = character.player.name;
 		alliance = character.player.alliance;
 
-		if (charNum == (int)CharIds.RagingChargeX) {
-			charNum = (int)CharIds.X;
-		}
 		if (character is MegamanX mmx) {
+			loadout.xLoadout = mmx.loadout.clone();
 			weapons = loadout.xLoadout.getWeaponsFromLoadout(character.player);
 			armorFlag = mmx.getArmorByte();
 			ultimateArmor = mmx.hasUltimateArmor;
+			if (mmx.hasUltimateArmor) {
+				hyperMode = DNACoreHyperMode.UltimateArmor;
+			}
 			hyperArmorBools = Helpers.boolArrayToByte([
 				mmx.hyperChestActive,
 				mmx.hyperArmActive,
@@ -62,7 +72,8 @@ public class DNACore : AxlWeapon {
 			]);
 		}
 		else if (character is Zero zero) {
-			rakuhouhaAmmo = zero.gigaAttack.ammo;
+			loadout.zeroLoadout = zero.loadout.clone();
+			altCharAmmo = zero.gigaAttack.ammo;
 			if (zero.hypermodeActive()) {
 				hyperMode = zero.hyperMode switch {
 					1 => DNACoreHyperMode.AwakenedZero,
@@ -72,7 +83,8 @@ public class DNACore : AxlWeapon {
 			}
 		}
 		else if (character is PunchyZero pzero) {
-			rakuhouhaAmmo = pzero.gigaAttack.ammo;
+			loadout.pzeroLoadout = pzero.loadout.clone();
+			altCharAmmo = pzero.gigaAttack.ammo;
 			if (pzero.isBlack || pzero.isAwakened || pzero.isViral) {
 				hyperMode = pzero.hyperMode switch {
 					1 => DNACoreHyperMode.AwakenedZero,
@@ -80,20 +92,28 @@ public class DNACore : AxlWeapon {
 					_ => DNACoreHyperMode.BlackZero
 				};
 			}
+		} else if (character is BusterZero bzero) {
+			if (bzero.isBlackZero) {
+				hyperMode = DNACoreHyperMode.BlackZero;
+			}
 		}
-		else if (character is Axl) {
+		else if (character is Axl axl) {
+			loadout.axlLoadout = axl.loadout.clone();
 			weapons = loadout.axlLoadout.getWeaponsFromLoadout();
 			if (weapons.Count > 0 && character.player.axlBulletType > 0) {
 				weapons[0] = character.player.getAxlBulletWeapon();
 			}
 		}
-		else if (character is CmdSigma sigma) {
-			sigma.ballWeapon.ammo = rakuhouhaAmmo;
-		}
-		else if (character is NeoSigma neoSigma) {
-			neoSigma.gigaAttack.ammo = rakuhouhaAmmo;
-		}
-		else if (character is Vile vile) {
+		else if (character is BaseSigma baseSigma) {
+			loadout.sigmaLoadout = baseSigma.loadout.clone();
+			loadout.sigmaLoadout.commandMode = (int)MaverickModeId.Puppeteer;
+			if (character is CmdSigma cmdSigma) {
+				cmdSigma.ballWeapon.ammo = altCharAmmo;
+			} else if (character is NeoSigma neoSigma) {
+				neoSigma.gigaAttack.ammo = altCharAmmo;
+			}
+		} else if (character is Vile vile) {
+			loadout.vileLoadout = vile.loadout.clone();;
 			frozenCastle = vile.hasFrozenCastle;
 			speedDevil = vile.hasSpeedDevil;
 		}
@@ -119,10 +139,12 @@ public class DNACore : AxlWeapon {
 			weaponSlotIndex = 65;
 		}
 		if (charNum == (int)CharIds.BusterZero || charNum == (int)CharIds.PunchyZero) {
-			weaponBarBaseIndex = 31;
+			weaponSlotIndex = 31;
 		}
+
 		sprite = "axl_arm_pistol";
 		drawAmmo = false;
+		drawCooldown = false;
 	}
 
 	public DNACore() : base(0) {
@@ -151,7 +173,7 @@ public class DNACore : AxlWeapon {
 			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform with flag");
 			return;
 		}
-		if (!oldATrans && (axl.isWhiteAxl() || axl.isStealthMode())) {
+		if (!oldATrans && (!Global.level.isHyperMatch() && (axl.isWhiteAxl() || axl.isStealthMode()))) {
 			Global.level.gameMode.setHUDErrorMessage(player, "Cannot transform as Hyper Axl");
 			return;
 		}
@@ -164,14 +186,13 @@ public class DNACore : AxlWeapon {
 		}
 
 		player.lastDNACore = this;
-		player.lastDNACoreIndex = player.weaponSlot;
+		player.lastDNACoreIndex = axl.weaponSlot;
 		player.savedDNACoreWeapons.Remove(this);
 		if (oldATrans) {
-			player.weapons.RemoveAt(player.weaponSlot);
+			axl.weapons.RemoveAt(player.weaponSlot);
 		}
-		player.preTransformedAxl = player.character;
-		Global.level.removeGameObject(player.preTransformedAxl);
-		player.transformAxl(this, player.getNextATransNetId());
+		player.preTransformedChar = player.character;
+		player.startAtransMain(this, player.getNextATransNetId());
 		player.character.playSound("transform", sendRpc: true);
 		player.character.undisguiseTime = 6;
 	}

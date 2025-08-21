@@ -18,7 +18,7 @@ public class Options {
 	public bool showSysReqPrompt = true;
 	public bool enableDeveloperConsole;
 	public bool disableChat;
-	public int maxFPS = 60;
+	public int fpsMode = 0;
 	public bool cheatWarningShown;
 	public bool disableDoubleDash;
 	public int preferredCharacter;
@@ -49,12 +49,13 @@ public class Options {
 		return disableShaders;
 	}
 	public int textQuality = 0;
-	public int fontType = 0; // 0 = bitmap only, 1 = bitmap + vector, 2 = vector only
+	//public int fontType = 0; // 0 = bitmap only, 1 = bitmap + vector, 2 = vector only
 	public bool enablePostProcessing = true;
 	public int particleQuality = 0;
 	public bool enableMapSprites = true;
 	public bool enableSmallBars;
 	public bool smallBarsEx;
+	public bool fastShaders;
 
 	public bool lowQualityParticles() { return particleQuality == 0; }
 
@@ -66,6 +67,9 @@ public class Options {
 	public int gridModeX;
 	public int hyperChargeSlot;
 	public bool novaStrikeSpecial;
+	public bool novaStrikeWall;
+	public bool novaStrikeCeiling;
+	public bool novaStrikeFloor;
 	public bool gigaCrushSpecial;
 	public XLoadout xLoadout = XLoadout.getDefault();
 
@@ -142,8 +146,8 @@ public class Options {
 				if (Global.debug) {
 					_main.axlAimMode = Global.overrideAimMode ?? _main.axlAimMode;
 					_main.fullScreen = Global.overrideFullscreen ?? _main.fullScreen;
-					_main.maxFPS = MathInt.Clamp(_main.maxFPS, 30, Global.fpsCap);
-					_main.fontType = Global.fontTypeOverride ?? _main.fontType;
+					//_main.maxFPS = MathInt.Clamp(_main.maxFPS, 30, Global.fpsCap);
+					//_main.fontType = Global.fontTypeOverride ?? _main.fontType;
 				}
 			}
 
@@ -173,15 +177,6 @@ public class Options {
 		if (!LANIPPrefix.EndsWith(".")) return false;
 		string fullIP = LANIPPrefix + "1";
 		return IPAddress.TryParse(fullIP, out _);
-	}
-
-	public string getSpecialAirAttack() {
-		return !swapAirAttacks ? "zero_attack_air2" : "zero_attack_air";
-	}
-
-	public string getAirAttack() {
-		if (Global.level?.mainPlayer?.isSigma == true) return "attack_air";
-		return swapAirAttacks ? "attack_air2" : "attack_air";
 	}
 
 	public bool useMouseAim {
@@ -218,5 +213,13 @@ public class Options {
 		} else {
 			return enableDeveloperConsole;
 		}
+	}
+	
+	public void updateFpsMode() {
+		Global.gameSpeed = fpsMode switch {
+			1 => 0.5f,
+			2 => 0.25f,
+			_ => 1
+		};
 	}
 }

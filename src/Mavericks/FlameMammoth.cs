@@ -6,12 +6,15 @@ public class FlameMammoth : Maverick {
 	public FlameMStompWeapon stompWeapon = new();
 
 	public FlameMammoth(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.5f));
-		stateCooldowns.Add(typeof(FlameMOilState), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(30, true) },
+			{ typeof(FlameMOilState), new(30, true) }
+		};
 
 		awardWeaponId = WeaponIds.FireWave;
 		weakWeaponId = WeaponIds.StormTornado;
@@ -31,6 +34,7 @@ public class FlameMammoth : Maverick {
 
 	public override void update() {
 		base.update();
+		subtractTargetDistance = 70;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (shootPressed()) {
@@ -58,28 +62,34 @@ public class FlameMammoth : Maverick {
 			);
 		}, "flamemShoot");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.5f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 3, 0.1f);
 		}
 		return shootState;
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				getShootState(true),
-				new FlameMOilState(),
-				new MJumpStart(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			getShootState(true),
+			new FlameMJumpStateAI(),
+			new FlameMOilState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[] {
-				getShootState(true),
-				new FlameMOilState(),
-				new MJumpStart(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = target.pos.distanceTo(pos);
+		}
+		List<MaverickState> aiStates = [
+			new FlameMOilState(),
+			getShootState(false)
+		];
+		if (grounded && enemyDist <= 30) {
+			aiStates.Add(new FlameMJumpStateAI());
+		}
+		return aiStates.ToArray();
 	}
+
 
 	// Melee IDs for attacks.
 	public enum MeleeIds {
@@ -418,9 +428,22 @@ public class FlameMStompShockwave : Projectile {
 #endregion
 
 #region states
+public class MammothMState : MaverickState {
+	public FlameMammoth BurninNoumander = null!;
+	public MammothMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class FlameMOilState : MaverickState {
-	public FlameMammoth BurninNoumander  = null!;
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		BurninNoumander = maverick as FlameMammoth ?? throw new NullReferenceException();
+	}
+}
+
+public class FlameMOilState : MammothMState {
 	public FlameMOilState() : base("shoot2") {
 	}
 
@@ -430,7 +453,6 @@ public class FlameMOilState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		BurninNoumander = maverick as FlameMammoth ?? throw new NullReferenceException();		
 		maverick.stopMoving();
 	}
 
@@ -446,12 +468,12 @@ public class FlameMOilState : MaverickState {
 		}
 
 		if (maverick.isAnimOver()) {
-			maverick.changeState(new MIdle());
+			maverick.changeToIdleOrFall();
 		}
 	}
 }
 
-public class FlameMJumpPressState : MaverickState {
+public class FlameMJumpPressState : MammothMState {
 	public FlameMJumpPressState() : base("fall") {
 	}
 
@@ -460,13 +482,34 @@ public class FlameMJumpPressState : MaverickState {
 		if (player == null) return;
 
 		if (maverick.grounded) {
-			landingCode();
+			if (maverick.isAI && maverick.controlMode == MaverickModeId.Striker) {
+				landingCode(false);
+			} else {
+				landingCode();				
+			}
 		}
 	}
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.vel = new Point(0, 300);
+	}
+}
+public class FlameMJumpStateAI : MammothMState {
+	public FlameMJumpStateAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+		if (stateTime >= 24f/60f) {
+			maverick.changeState(new FlameMJumpPressState());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }
 #endregion

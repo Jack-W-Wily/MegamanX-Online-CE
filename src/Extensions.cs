@@ -72,12 +72,12 @@ public static class Extensions {
 		return s.Substring(0, maxLength) + "...";
 	}
 
-	public static TValue GetValueOrDefault<TKey, TValue>(
+	/*public static TValue GetValueOrDefault<TKey, TValue>(
 		this IDictionary<TKey, TValue> dictionary,
 		TKey key) {
 		TValue value;
 		return dictionary.TryGetValue(key, out value) ? value : default;
-	}
+	}*/
 
 	public static TValue GetValueOrCreate<TKey, TValue>(
 		this IDictionary<TKey, TValue> dictionary,
@@ -120,7 +120,7 @@ public static class Extensions {
 	}
 
 	public static Actor actor(this IDamagable damagable) {
-		return damagable as Actor;
+		return damagable as Actor ?? throw new Exception("Damagable could not be converted into actor");
 	}
 
 	public static void SendStringMessage(this TcpClient client, string message, NetworkStream networkStream) {
@@ -223,7 +223,6 @@ public class ProtectedInt {
 	}
 }
 
-
 public class ProtectedFloat {
 	private float internalVal;
 	private float internalValMul;
@@ -278,5 +277,26 @@ public class ProtectedArrayInt {
 	public ProtectedArrayInt(int size) {
 		internalVal = new int[size];
 		internalValMul = new int[size];
+	}
+}
+
+public class ProtectedIntMap<TKey> : Dictionary<TKey, (int valMul, int val)> where TKey : notnull {
+	private readonly int mul = Helpers.randomRange(2, 8);
+
+	public new int this[TKey key] {
+		get {
+			(int valMul, int val) = base[key];
+			if (val * mul != valMul) {
+				throw new Exception("Error on modified protected value");
+			}
+			return val;
+		}
+		set {
+			base[key] = (value * mul, value);
+		}
+	}
+
+	public int quickVal(TKey key) {
+		return base[key].val;
 	}
 }

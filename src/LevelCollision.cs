@@ -281,7 +281,7 @@ public partial class Level {
 			var actorChar = actor as Character;
 			var goChar = gameObject as Character;
 
-			if (actorChar.isCrystalized || goChar.isCrystalized) return false;
+			if (actorChar.isCrystalized || goChar.isCrystalized) return true;
 			//if (actorChar.sprite.name.Contains("frozen") || goChar.sprite.name.Contains("frozen")) return false;
 			return true;
 		}
@@ -626,7 +626,7 @@ public partial class Level {
 			var goCollider = go.collider;
 
 			// Fix a one-off case where charge beam wouldn't lock onto Kaiser's head
-			if (isChargeBeam && go is Character chr && chr.player.isKaiserNonViralSigma()) {
+			if (isChargeBeam && go is KaiserSigma { isVirus: false }) {
 				goCollider = go.getAllColliders().FirstOrDefault(c => c.name == "head");
 				if (goCollider == null) continue;
 			}
@@ -665,11 +665,11 @@ public partial class Level {
 		return results;
 	}
 
-	public CollideData raycast(Point pos1, Point pos2, List<Type> classNames) {
+	public CollideData? raycast(Point pos1, Point pos2, List<Type> classNames) {
 		var hits = raycastAll(pos1, pos2, classNames);
 
 		float minDist = float.MaxValue;
-		CollideData best = null;
+		CollideData? best = null;
 		foreach (var collideData in hits) {
 			float? dist = collideData.hitData.hitPoint?.distanceTo(pos1);
 			if (dist == null) continue;
@@ -709,7 +709,7 @@ public partial class Level {
 				if (character.player.isDead) continue;
 				if (!includeAllies && character.player.alliance == alliance) continue;
 				if (character.player.alliance != alliance &&
-					character.player.isDisguisedAxl && gameMode.isTeamMode
+					character.isATrans && gameMode.isTeamMode
 				) {
 					if (!isRequesterAI) continue;
 					else if (!character.disguiseCoverBlown) continue;

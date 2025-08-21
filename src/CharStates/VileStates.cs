@@ -79,7 +79,7 @@ public class VileRevive : VileState {
 			radius -= Global.spf * 150;
 		}
 		if (character.frameIndex < 2) {
-			if (Global.frameCount % 4 < 2) {
+			if (Global.flFrameCount % 4 < 2) {
 				character.addRenderEffect(RenderEffectType.Flash);
 			} else {
 				character.removeRenderEffect(RenderEffectType.Flash);
@@ -89,8 +89,8 @@ public class VileRevive : VileState {
 		}
 		if (character.frameIndex == 7 && !once) {
 			character.playSound("ching");
-			player.health = 1;
-			character.addHealth(player.maxHealth);
+			character.health = 1;
+			character.addHealth(character.maxHealth);
 			once = true;
 		}
 		if (character.ownedByLocalPlayer) {

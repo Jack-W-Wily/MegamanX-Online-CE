@@ -8,7 +8,7 @@ namespace MMXOnline;
 
 public partial class Player {
 	public List<Weapon> weapons => character?.weapons ?? oldWeapons;
-	public List<Weapon> oldWeapons = new();
+	public List<Weapon> oldWeapons = [];
 
 	public int weaponSlot {
 		get => character?.weaponSlot ?? 0;
@@ -20,12 +20,6 @@ public partial class Player {
 	public Weapon? weapon => character?.currentWeapon;
 
 	public Weapon? lastHudWeapon = null;
-
-	public AxlWeapon? axlWeapon {
-		get {
-			return weapon as AxlWeapon;
-		}
-	}
 
 	public MaverickWeapon? maverickWeapon {
 		get { return weapon as MaverickWeapon; }
@@ -109,10 +103,8 @@ public partial class Player {
 		}
 
 		if (input.isPressed(Control.WeaponLeft, this)) {
-			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponLeft();
 		} else if (input.isPressed(Control.WeaponRight, this)) {
-			if (isDisguisedAxl && isZero && input.isHeld(Control.Down, this)) return;
 			weaponRight();
 		} else if (character != null && !Control.isNumberBound(realCharNum, Options.main.axlAimMode)) {
 			if (input.isPressed(Key.Num1, canControl) && weapons.Count >= 1) {
@@ -245,7 +237,7 @@ label:
 	public void configureWeapons(Character character) {
 		// Save weapons for cross-life maverick HP if not an Axl.
 		List<Weapon> weapons = character.weapons;
-		if (disguise == null) {
+		if (!character.isATrans) {
 			oldWeapons = character.weapons;
 		}
 		if (ownedByLocalPlayer && character is BaseSigma && weapons.Count == 3) {

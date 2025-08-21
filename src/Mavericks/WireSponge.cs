@@ -14,12 +14,19 @@ public class WireSponge : Maverick {
 	//public ShaderWrapper chargeShader;
 	public float chargeTime;
 
-	public WireSponge(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(WSpongeSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeLightningState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(WSpongeChainSpinState), new MaverickStateCooldown(false, true, 0.75f));
+	public WireSponge(Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(WSpongeSeedThrowState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeLightningState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeChainSpinState), new MaverickStateCooldown(45, true) },
+			{ typeof(WSpongeChargeState), new MaverickStateCooldown(isAI ? 60 : 0, true) }
+
+		};
 
 		weapon = getWeapon();
 		chainWeapon = getChainWeapon(player);
@@ -96,18 +103,30 @@ public class WireSponge : Maverick {
 		return "wsponge";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		var attacks = new MaverickState[]
-		{
-				new WSpongeChainSpinState(),
-				new WSpongeSeedThrowState(Control.Special1),
-				new WSpongeChargeState(),
-		};
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new WSpongeChainSpinState(),
+			new WSpongeSeedThrowStateAI(isStriker: true),
+			new WSpongeChargeState(),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [];
+		if (player.seeds.Count < 8 && enemyDist > 170) {
+			aiStates.Add(new WSpongeSeedThrowStateAI(isStriker: false));
+		}
+		if (enemyDist < 180) {
+			aiStates.Add(new WSpongeChainSpinState());
+		}
+		if (enemyDist < 150 && enemyDist > 30) {
+			aiStates.Add(new WSpongeChargeState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public override List<byte> getCustomActorNetData() {
@@ -597,7 +616,7 @@ public class WSpongeClingState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
-		maverick.stopMoving();
+		maverick.stopMovingS();
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -868,7 +887,7 @@ public class WSpongeUpChainHangState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -1043,20 +1062,28 @@ public class WSpongeSpike : Projectile, IDamagable {
 	}
 	public bool isPlayableDamagable() { return false; }
 }
+public class WSpongeMState : MaverickState {
+	public WireSponge WireHetimarl = null!;
+	public WSpongeMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class WSpongeSeedThrowState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
+	}
+}
+public class WSpongeSeedThrowState : WSpongeMState {
 	string shootControl;
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
-	public WireSponge WireHetimarl = null!;
 	public WSpongeSeedThrowState(string shootControl) : base("seedthrow") {
 		this.shootControl = shootControl;
 		consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.25f);
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -1112,13 +1139,12 @@ public class WSpongeSeedThrowState : MaverickState {
 	}
 }
 
-public class WSpongeHangSeedThrowState : MaverickState {
+public class WSpongeHangSeedThrowState : WSpongeMState {
 	WSpongeUpChainProj proj;
 	string shootControl;
 	int framesShootHeld;
 	bool frameStopHeld;
 	bool inputDirUpOnce;
-	public WireSponge WireHetimarl = null!;
 	public WSpongeHangSeedThrowState(WSpongeUpChainProj proj, string shootControl) : base("vine_up_seedthrow") {
 		this.proj = proj;
 		this.shootControl = shootControl;
@@ -1126,7 +1152,6 @@ public class WSpongeHangSeedThrowState : MaverickState {
 	}
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();
 		maverick.useGravity = false;
 	}
 
@@ -1185,12 +1210,10 @@ public class WSpongeHangSeedThrowState : MaverickState {
 	}
 }
 
-public class WSpongeChargeState : MaverickState {
+public class WSpongeChargeState : WSpongeMState {
 	int state = 0;
 	public const float maxChargeTime = 4;
 	SoundWrapper? chargeSound;
-	public WireSponge WireHetimarl = null!;
-
 	public WSpongeChargeState() : base("angry_start") {
 		superArmor = true;
 		aiAttackCtrl = true;
@@ -1226,7 +1249,6 @@ public class WSpongeChargeState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		WireHetimarl = maverick as WireSponge ?? throw new NullReferenceException();	
 		chargeSound = maverick.playSound("wspongeCharge", sendRpc: true);
 	}
 
@@ -1277,5 +1299,188 @@ public class WSpongeLightningState : MaverickState {
 		if (maverick.isAnimOver()) {
 			maverick.changeToIdleOrFall();
 		}
+	}
+}
+
+public class WSpongeSeedThrowStateAI : WSpongeMState {
+	public bool isStriker;
+	public WSpongeSeedThrowStateAI(bool isStriker) : base("seedthrow") {
+		this.isStriker = isStriker;
+	}
+
+	public override void update() {
+		base.update();
+		Point? shootPos = maverick.getFirstPOI();
+		if (!isStriker && shootPos != null && !once) {
+			once = true;
+			new WSpongeSeedProjAI(
+				shootPos.Value, maverick.xDir, 0,
+				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+			);
+			new WSpongeSeedProjAI(
+				shootPos.Value, maverick.xDir, 1,
+				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+			);
+			maverick.playSound("wspongeSeed", sendRpc: true);
+		}
+		if (isStriker && shootPos != null && !once) {
+			once = true;
+			new WSpongeSeedProjAIStriker(
+				shootPos.Value, maverick.xDir, 0,
+				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+			);
+			new WSpongeSeedProjAIStriker(
+				shootPos.Value, maverick.xDir, 1,
+				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+			);
+			new WSpongeSeedProjAIStriker(
+				shootPos.Value, maverick.xDir, 2,
+				WireHetimarl, player.getNextActorNetId(), sendRpc: true
+			);
+			maverick.playSound("wspongeSeed", sendRpc: true);
+		}
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+
+	}
+}
+public class WSpongeSeedProjAI : Projectile {
+	bool once;
+	public int type;
+	public WSpongeSeedProjAI(
+		Point pos, int xDir, int type,
+		Actor owner, ushort netProjId, bool sendRpc = false
+	) : base(
+		pos, xDir, owner, "wsponge_seed", netProjId
+	) {
+		weapon = WireSponge.getWeapon();
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = WSpongeSeedWeapon.netWeapon;
+		projId = (int)ProjIds.WSpongeSeedAI;
+		maxTime = 2f;
+		destroyOnHit = true;
+		useGravity = true;
+		if (collider != null) { collider.wallOnly = true; }
+		this.type = type;
+		if (type == 0) vel = new Point(Helpers.randomRange(150, 210) * owner.xDir, -Helpers.randomRange(250, 300));
+		else if (type == 1) vel = new Point(Helpers.randomRange(210, 250) * owner.xDir, -Helpers.randomRange(300, 350));
+		if (sendRpc) {
+			rpcCreate(pos, ownerPlayer, netProjId, xDir, (byte)type);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSeedProjAI(
+			args.pos, args.xDir, args.extraData[0],
+			args.owner, args.netId
+		);
+	}
+
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+		if (!ownedByLocalPlayer) return;
+		plantSeed(other);
+	}
+
+	public void plantSeed(CollideData other) {
+		if (!ownedByLocalPlayer) return;
+		if (once) return;
+
+		once = true;
+		int type = 0;
+		if (other == null) type = 0;
+		else if (other.isSideWallHit()) type = 1;
+		else if (other.isCeilingHit()) type = 2;
+
+		var triggers = Global.level.getTriggerList(this, 0, 0);
+
+		var seedSpike = new WSpongeSpike(
+			other?.getHitPointSafe() ?? getCenterPos(), -xDir,
+			type, this, owner, owner.getNextActorNetId(), rpc: true
+		);
+
+		if (triggers.Any(t => t.gameObject is WSpongeSpike)) {
+			seedSpike.incPos(new Point(Helpers.randomRange(-2, 2), 0));
+		}
+
+		owner.seeds.Add(seedSpike);
+		if (owner.seeds.Count > 8) {
+			owner.seeds[0].destroySelf();
+		}
+		destroySelf();
+	}
+}
+
+public class WSpongeSeedProjAIStriker : Projectile {
+	bool once;
+	public int type;
+	public WSpongeSeedProjAIStriker(
+		Point pos, int xDir, int type,
+		Actor owner, ushort netProjId, bool sendRpc = false
+	) : base(
+		pos, xDir, owner, "wsponge_seed", netProjId
+	) {
+		weapon = WireSponge.getWeapon();
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 1;
+		weapon = WSpongeSeedWeapon.netWeapon;
+		projId = (int)ProjIds.WSpongeSeedAI;
+		maxTime = 2f;
+		destroyOnHit = true;
+		useGravity = true;
+		if (collider != null) { collider.wallOnly = true; }
+		this.type = type;
+		if (type == 0) vel = new Point(Helpers.randomRange(50, 90), -Helpers.randomRange(270, 300));
+		else if (type == 1) vel = new Point(Helpers.randomRange(140, 180), -Helpers.randomRange(300, 350));
+		else if (type == 2) vel = new Point(Helpers.randomRange(230, 270), -Helpers.randomRange(300, 350));
+		if (sendRpc) {
+			rpcCreate(pos, ownerPlayer, netProjId, xDir, (byte)type);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new WSpongeSeedProjAIStriker(
+			args.pos, args.xDir, args.extraData[0],
+			args.owner, args.netId
+		);
+	}
+
+	public override void onHitWall(CollideData other) {
+		base.onHitWall(other);
+		if (!ownedByLocalPlayer) return;
+		plantSeed(other);
+	}
+
+	public void plantSeed(CollideData other) {
+		if (!ownedByLocalPlayer) return;
+		if (once) return;
+
+		once = true;
+		int type = 0;
+		if (other == null) type = 0;
+		else if (other.isSideWallHit()) type = 1;
+		else if (other.isCeilingHit()) type = 2;
+
+		var triggers = Global.level.getTriggerList(this, 0, 0);
+
+		var seedSpike = new WSpongeSpike(
+			other?.getHitPointSafe() ?? getCenterPos(), -xDir,
+			type, this, owner, owner.getNextActorNetId(), rpc: true
+		);
+
+		if (triggers.Any(t => t.gameObject is WSpongeSpike)) {
+			seedSpike.incPos(new Point(Helpers.randomRange(-2, 2), 0));
+		}
+
+		owner.seeds.Add(seedSpike);
+		if (owner.seeds.Count > 8) {
+			owner.seeds[0].destroySelf();
+		}
+		destroySelf();
 	}
 }

@@ -18,11 +18,12 @@ public class CmdSigma : BaseSigma {
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId,
 		bool ownedByLocalPlayer, bool isWarpIn = true,
-		SigmaLoadout? sigmaLoadout = null, bool isATrans = false
+		SigmaLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn,
-		sigmaLoadout, isATrans
+		loadout, heartTanks, isATrans
 	) {
 		sigmaSaberMaxCooldown = 1;
 		altSoundId = AltSoundIds.X1;
@@ -41,6 +42,8 @@ public class CmdSigma : BaseSigma {
 		Helpers.decrementTime(ref leapSlashCooldown);
 		Helpers.decrementFrames(ref sigmaAmmoRechargeCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		ballWeapon.update();
+		ballWeapon.charLinkedUpdate(this, true);
 		// Ammo reload.
 		if (sigmaAmmoRechargeCooldown == 0) {
 			Helpers.decrementFrames(ref sigmaAmmoRechargeTime);
@@ -74,10 +77,10 @@ public class CmdSigma : BaseSigma {
 		if (player.weapon is not AssassinBulletChar) {
 			if (player.input.isAPressed(player)) {
 				attackPressed = true;
-				lastAttackFrame = Global.level.frameCount;
+				lastAttackFrame = Global.floorFrameCount;
 			}
 		}
-		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
+		framesSinceLastAttack = Global.floorFrameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		if (charState is Dash dashState) {
@@ -176,10 +179,12 @@ public class CmdSigma : BaseSigma {
 
 	public override void addAmmo(float amount) {
 		weaponHealAmount += amount;
+		ballWeapon.addAmmoHeal(amount);
 	}
 
 	public override void addPercentAmmo(float amount) {
 		weaponHealAmount += amount * 0.32f;
+		ballWeapon.addAmmoPercentHeal(amount);
 	}
 
 	public override bool canAddAmmo() {
@@ -261,7 +266,8 @@ public class CmdSigma : BaseSigma {
 				if (weapon is MaverickWeapon mw && mw.maverick != null) {
 					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
 				}
-			}	
+			}
 		}
+		base.aiUpdate(target);
 	}
 }

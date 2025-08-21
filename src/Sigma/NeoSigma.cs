@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
@@ -13,11 +13,12 @@ public class NeoSigma : BaseSigma {
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId,
 		bool ownedByLocalPlayer, bool isWarpIn = true,
-		SigmaLoadout? sigmaLoadout = null, bool isATrans = false
+		SigmaLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn,
-		sigmaLoadout, isATrans
+		loadout, heartTanks, isATrans
 	) {
 		sigmaSaberMaxCooldown = 0.5f;
 		altSoundId = AltSoundIds.X2;
@@ -35,6 +36,8 @@ public class NeoSigma : BaseSigma {
 		Helpers.decrementTime(ref sigmaUpSlashCooldown);
 		Helpers.decrementTime(ref sigmaDownSlashCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		gigaAttack.update();
+		gigaAttack.charLinkedUpdate(this, true);
 		// For ladder and slide attacks.
 		if (isAttacking() && charState is WallSlide or LadderClimb) {
 			if (isAnimOver() && charState != null && charState is not SigmaClawState) {
@@ -59,10 +62,10 @@ public class NeoSigma : BaseSigma {
 		if (player.weapon is not AssassinBulletChar) {
 			if (player.input.isAPressed(player)) {
 				attackPressed = true;
-				lastAttackFrame = Global.level.frameCount;
+				lastAttackFrame = Global.floorFrameCount;
 			}
 		}
-		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
+		framesSinceLastAttack = Global.floorFrameCount - lastAttackFrame;
 		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
 
 		// Shoot button attacks.
@@ -184,11 +187,11 @@ public class NeoSigma : BaseSigma {
 	}
 
 	public override void addAmmo(float amount) {
-		weaponHealAmount += amount;
+		gigaAttack.addAmmoHeal(amount);
 	}
 
 	public override void addPercentAmmo(float amount) {
-		weaponHealAmount += amount * 0.32f;
+		gigaAttack.addAmmoPercentHeal(amount);
 	}
 
 	public override bool canAddAmmo() {
@@ -276,7 +279,8 @@ public class NeoSigma : BaseSigma {
 				if (weapon is MaverickWeapon mw && mw.maverick != null) {
 					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
 				}
-			}	
+			}
 		}
+		base.aiUpdate(target);
 	}
 }

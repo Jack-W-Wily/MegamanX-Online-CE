@@ -52,7 +52,7 @@ public class GravityWell : Weapon {
 		if (player.character is not MegamanX mmx) {
 			return false;
 		}
-		if (mmx.stockedBuster == true) {
+		if (mmx.stockedBusterLv >= 1) {
 			return base.canShoot(chargeLevel, player);
 		}
 		return base.canShoot(chargeLevel, player) && (mmx.linkedGravityWell == null || mmx.linkedGravityWell.destroyed);
@@ -405,7 +405,9 @@ public class GravityWellChargedState : CharState {
 		superArmor = true;
 		landSprite = "point_up";
 		airSprite = "point_up_air";
+		useDashJumpSpeed = true;
 	}
+
 	public override void update() {
 		base.update();
 		if (character.frameIndex >= 4 && !fired) {

@@ -325,7 +325,7 @@ public class GameMode {
 		if (!isOver) {
 			if (setupTime == 0 && Global.isHost) {
 				// Just in case packets were dropped, keep syncing "0" time
-				if (Global.frameCount % 30 == 0) {
+				if (Global.flFrameCount % 30 == 0) {
 					Global.serverClient?.rpc(RPC.syncSetupTime, 0, 0);
 				}
 			}
@@ -634,13 +634,21 @@ public class GameMode {
 					"x" + drawPlayer.currency.ToString(), 16, 140, Alignment.Left
 				);
 			}
-			if (drawPlayer.character is RagingChargeX mmx && mmx.shotCount > 0) {
+			if (drawPlayer.character is RagingChargeX mmx) {
+				/*
 				int x = 10, y = 156;
 				int count = mmx.shotCount;
 				if (count >= 1) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y);
 				if (count >= 2) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y);
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
+				*/
+				float decayCooldown = 1 - Helpers.progress(mmx.selfDamageCooldown, mmx.selfDamageMaxCooldown);
+				drawGigaWeaponCooldown(122, decayCooldown, (int)Global.halfScreenW / 17, 160);
+				if (mmx.parryCooldown > 0) {
+					float cooldown = 1 - Helpers.progress(mmx.parryCooldown, 30);
+					drawGigaWeaponCooldown(51, cooldown, (int)Global.halfScreenW / 17, 178);
+				}
 			}
 
 
@@ -727,7 +735,7 @@ public class GameMode {
 				float cooldown = 1 - Helpers.progress(axl2.dodgeRollCooldown, Axl.maxDodgeRollCooldown);
 				drawGigaWeaponCooldown(50, cooldown, y: 170);
 			}
-			if (drawPlayer.character is Axl && Global.level.server?.customMatchSettings?.AxlCustomReload == true) {
+			if (drawPlayer.character is Axl && Global.level.server?.customMatchSettings?.axlCustomReload == true) {
 				if (drawPlayer.weapon?.rechargeAmmoCustomSettingAxl > 0 ||
 					drawPlayer.weapon?.rechargeAmmoCustomSettingAxl2 > 0) {
 					Fonts.drawText(
@@ -842,7 +850,7 @@ public class GameMode {
 				FontType.BlueMenu, hudErrorMsg,
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer?.isKaiserViralSigma() == true) {
+		} else if (mainPlayer.character is KaiserSigma) {
 			string msg = "";
 			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[JUMP]: Relocate";
 			if (msg != "") {
@@ -896,7 +904,7 @@ public class GameMode {
 				Global.halfScreenW, 8, Alignment.Center
 			);
 		} else if (
-			level.mainPlayer.currentMaverick?.controlMode == MaverickMode.Puppeteer &&
+			level.mainPlayer.currentMaverick?.controlMode == MaverickModeId.Puppeteer &&
 			level.mainPlayer.weapon is MaverickWeapon mw
 		) {
 			if (level.mainPlayer.currentMaverick.isPuppeteerTooFar()) {
@@ -986,7 +994,10 @@ public class GameMode {
 		}
 	}
 
-	public void setHUDErrorMessage(Player player, string message, bool playSound = true, bool resetCooldown = false) {
+	public void setHUDErrorMessage(
+		Player player, string message,
+		bool playSound = true, bool resetCooldown = false
+	) {
 		if (player != level.mainPlayer) return;
 		if (resetCooldown) hudErrorMsgTime = 0;
 		if (hudErrorMsgTime == 0) {
@@ -996,6 +1007,10 @@ public class GameMode {
 				Global.playSound("error");
 			}
 		}
+	}
+
+	public void setDebugMessage(string message) {
+		setHUDErrorMessage(Global.level.mainPlayer, message, false, true);
 	}
 
 	public bool shouldDrawRadar() {
@@ -1009,15 +1024,15 @@ public class GameMode {
 			return true;
 		}
 		if (level.mainPlayer.currentMaverick != null) {
-			if (level.mainPlayer.currentMaverick.controlMode is MaverickMode.Puppeteer or MaverickMode.Summoner) {
+			if (level.mainPlayer.currentMaverick.controlMode is MaverickModeId.Puppeteer or MaverickModeId.Summoner) {
 				return level.mainPlayer.mavericks.Count > 0;
 			}
 		}
 		if (level.mainPlayer.currentMaverick != null) {
-			if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Puppeteer) {
+			if (level.mainPlayer.currentMaverick.controlMode == MaverickModeId.Puppeteer) {
 				return level.mainPlayer.character?.alive == true;
 			}
-			else if (level.mainPlayer.currentMaverick.controlMode == MaverickMode.Summoner) {
+			else if (level.mainPlayer.currentMaverick.controlMode == MaverickModeId.Summoner) {
 				return level.mainPlayer.mavericks.Count > 1;
 			}
 		}
@@ -1026,22 +1041,26 @@ public class GameMode {
 
 	void drawRadar() {
 		List<Point> revealedSpots = new List<Point>();
-		float revealedRadius;
-
-		if (level.mainPlayer.isX) {
-			revealedSpots.Add(new Point(level.camX + Global.viewScreenW / 2, level.camY + Global.viewScreenH / 2));
-			revealedRadius = Global.viewScreenW * 1.5f;
-		} else if (level.mainPlayer.isSigma) {
+		float revealedRadius = Global.viewScreenW * 0.5f;
+		
+		if (level.mainPlayer.mavericks.Count > 0) {
 			foreach (var maverick in level.mainPlayer.mavericks) {
-				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
+				if (maverick == level.mainPlayer.currentMaverick) {
+					continue;
+				}
 				revealedSpots.Add(maverick.pos);
 			}
 			revealedRadius = Global.viewScreenW * 0.5f;
-		} else {
+		} 
+		if (level.boundBlasterAltProjs.Count > 0) {
 			foreach (var bbAltProj in level.boundBlasterAltProjs) {
 				revealedSpots.Add(bbAltProj.pos);
 			}
 			revealedRadius = Global.viewScreenW;
+		}
+		if (level.mainPlayer.isX || level.mainPlayer.character is MegamanX) {
+			revealedSpots.Add(new Point(level.camX + Global.viewScreenW / 2, level.camY + Global.viewScreenH / 2));
+			revealedRadius = Global.viewScreenW * 1.5f;
 		}
 
 		//float borderThickness = 1;
@@ -1160,7 +1179,7 @@ public class GameMode {
 		sprite.Dispose();
 		sprite2.Dispose();
 
-		if (level.mainPlayer.isSigma) {
+		if (level.mainPlayer.mavericks.Count > 0) {
 			foreach (Maverick maverick in level.mainPlayer.mavericks) {
 				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
 				float xPos = maverick.pos.x * scaleW;
@@ -1897,8 +1916,6 @@ public class GameMode {
 	}
 
 	public void drawWeaponSwitchHUD(Player player) {
-		if (player.isZero && !player.isDisguisedAxl) return;
-
 		if (player.isSelectingRA()) {
 			drawRideArmorIcons();
 		}
@@ -2136,7 +2153,10 @@ public class GameMode {
 		}
 
 
-		if (weapon is BlastLauncher && level.mainPlayer.axlLoadout.blastLauncherAlt == 1 && level.mainPlayer.grenades.Count > 0) {
+		if (weapon is BlastLauncher &&
+			level.mainPlayer.character is Axl { loadout.blastLauncherAlt: 1 } &&
+			level.mainPlayer.grenades.Count > 0
+		) {
 			drawWeaponText(x, y, level.mainPlayer.grenades.Count.ToString());
 		}
 
@@ -2156,27 +2176,23 @@ public class GameMode {
 		MaverickWeapon? mw = weapon as MaverickWeapon;
 		if (mw != null) {
 			float maxHealth = level.mainPlayer.getMaverickMaxHp(mw.controlMode);
-			if (mw.controlMode == MaverickMode.Summoner) {
+			if (mw.controlMode == MaverickModeId.Summoner) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
 				drawWeaponSlotCooldown(x, y, mw.shootCooldown / MaverickWeapon.summonerCooldown);
-			} else if (mw.controlMode == MaverickMode.Puppeteer) {
+			} else if (mw.controlMode == MaverickModeId.Puppeteer) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
-			} else if (mw.controlMode == MaverickMode.Striker) {
+			} else if (mw.controlMode == MaverickModeId.Striker) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
-				if (level.mainPlayer.mavericks.Count > 0 && mw.maverick == null) {
-					mHealth = 0;
-				}
-
 				drawWeaponSlotAmmo(x, y, mHealth / mMaxHealth);
 				drawWeaponSlotCooldown(x, y, mw.cooldown / MaverickWeapon.strikerCooldown);
-			} else if (mw.controlMode == MaverickMode.TagTeam) {
+			} else if (mw.controlMode == MaverickModeId.TagTeam) {
 				float mHealth = mw.maverick?.health ?? mw.lastHealth;
 				float mMaxHealth = mw.maverick?.maxHealth ?? maxHealth;
 				if (!mw.summonedOnce) mHealth = 0;
@@ -2214,7 +2230,7 @@ public class GameMode {
 		if (weapon is SigmaMenuWeapon && level.mainPlayer.character is BaseSigma baseSigma) {
 			if (baseSigma.currentMaverickCommand == MaverickAIBehavior.Follow &&
 				level.mainPlayer.weapons.First(
-					wp => wp is MaverickWeapon mw && mw.controlMode is MaverickMode.Summoner or MaverickMode.Puppeteer
+					wp => wp is MaverickWeapon mw && mw.controlMode is MaverickModeId.Summoner or MaverickModeId.Puppeteer
 				) != null
 			) {
 				Helpers.drawWeaponSlotSymbol(x - 8, y - 8, "ª");
@@ -2239,6 +2255,9 @@ public class GameMode {
 				float alpha = Helpers.clamp01(1 - animProgress);
 				Global.sprites["hud_scrap"].drawToHUD(0, x - 6, y - yOff - 10, alpha);
 				//DrawWrappers.DrawText("+1", x - 6, y - yOff - 10, Alignment.Center, )
+				if (Global.level.isHyperMatch()) {
+					Fonts.drawText(FontType.RedishOrange, "+5", x - 4, y - yOff - 15, Alignment.Left);	
+				} else 
 				Fonts.drawText(FontType.RedishOrange, "+1", x - 4, y - yOff - 15, Alignment.Left);
 			}
 		}
@@ -2424,7 +2443,7 @@ public class GameMode {
 		}
 		if (dnaCore.charNum == (int)CharIds.Zero) {
 			if (dnaCore.hyperMode == DNACoreHyperMode.NightmareZero) {
-				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.rakuhouhaAmmo });
+				weapons.Add(new DarkHoldWeapon() { ammo = dnaCore.altCharAmmo });
 			} else {
 				weapons.Add(RakuhouhaWeapon.getWeaponFromIndex(dnaCore.loadout?.zeroLoadout.gigaAttack ?? 0));
 			}
@@ -2432,12 +2451,12 @@ public class GameMode {
 		if (dnaCore.charNum == (int)CharIds.Sigma) {
 			if (sigmaForm == 0) weapons.Add(new Weapon() {
 				weaponSlotIndex = 111,
-				ammo = dnaCore.rakuhouhaAmmo,
+				ammo = dnaCore.altCharAmmo,
 				maxAmmo = 20,
 			});
 			if (sigmaForm == 1) weapons.Add(new Weapon() {
 				weaponSlotIndex = 110,
-				ammo = dnaCore.rakuhouhaAmmo,
+				ammo = dnaCore.altCharAmmo,
 				maxAmmo = 28,
 			});
 		}
@@ -2448,7 +2467,7 @@ public class GameMode {
 			float slotY = sy;
 			Global.sprites["hud_weapon_icon"].drawToHUD(weapon.weaponSlotIndex, slotX, slotY);
 			float ammo = weapon.ammo;
-			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is Messenkou || weapon is DarkHoldWeapon) ammo = dnaCore.rakuhouhaAmmo;
+			if (weapon is RakuhouhaWeapon || weapon is RekkohaWeapon || weapon is Messenkou || weapon is DarkHoldWeapon) ammo = dnaCore.altCharAmmo;
 			if (weapon is not MechMenuWeapon) {
 				DrawWrappers.DrawRectWH(slotX - 8, slotY - 8, 16, 16 - MathF.Floor(16 * (ammo / weapon.maxAmmo)), true, new Color(0, 0, 0, 128), 1, ZIndex.HUD, false);
 			}
@@ -2859,22 +2878,20 @@ public class GameMode {
 	}
 
 	public FontType getCharFont(Player player) {
-		if (player.isDead && !isOver) {
-			return FontType.Grey;
-		} else if (player.eliminated()) {
+		//if (player.isDead && !isOver) {
+		//	return FontType.Grey;
+		//}
+		if (player.eliminated()) {
 			return FontType.DarkOrange;
-		} else if (player.isX) {
-			return FontType.Blue;
-		} else if (player.isZero) {
-			return FontType.Red;
-		} else if (player.isAxl) {
-			return FontType.Yellow;
-		} else if (player.isVile) {
-			return FontType.Pink;
-		} else if (player.isSigma) {
-			return FontType.Green;
 		}
-		return FontType.Grey;
+		return (CharIds)player.charNum switch {
+			CharIds.X => FontType.Blue,
+			CharIds.Zero => FontType.Red,
+			CharIds.Axl => FontType.Yellow,
+			CharIds.Vile => FontType.Pink,
+			CharIds.Sigma => FontType.Green,
+			_ => FontType.Grey
+		};
 	}
 
 	public string getCharIcon(Player player) {

@@ -203,7 +203,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 				}
 			}
 
-			if (Global.frameCount % 60 < 30) {
+			if (Global.flFrameCount % 60 < 30) {
 				Fonts.drawText(FontType.Blue, ">", rightArrowPos, yPos, selected: selCursorIndex == i);
 				Fonts.drawText(FontType.Blue, "<", leftArrowPos, yPos, selected: selCursorIndex == i);
 			}
@@ -411,7 +411,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			1 => "Frightening Forest's Strike",
 			4 => "Nobleman of The Skies",
 			3 => "Blazing Oil Tank", 
-			8 => "",
+			8 => "Guardian of The Underworld",
 			14 => "Little Forest Demon",
 			12 => "Fanged Heavy Tank",
 			10 => "Shredder of The Deep",
@@ -420,7 +420,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			15 => "Crimson Assassin",
 			9 => "Crystal Ball Magician",
 			13 => "Swift Runner of The Sands",
-			17 => "Sigma & Zero",
+			17 => "Shadow doppelganger",
 			25 => "Silver Snowman",
 			18 => "President of The Water Dragons",
 			24 => "Subterranean Barbarian",

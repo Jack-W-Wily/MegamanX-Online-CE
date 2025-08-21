@@ -14,12 +14,17 @@ public class BusterZero : Character {
 	public List<DZBusterProj> zeroLemonsOnField = new();
 	public ZBusterSaber meleeWeapon = new();
 	public int lastShootPressed;
+	public float aiAttackCooldown;
+	public float jumpTimeAI;
 
 	public BusterZero(
 		Player player, float x, float y, int xDir,
-		bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer,
+		isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.BusterZero;
 		altSoundId = AltSoundIds.X3;
@@ -38,7 +43,7 @@ public class BusterZero : Character {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		// For the shooting animation.
 		if (shootAnimTime > 0) {
-			shootAnimTime -= Global.speedMul;
+			shootAnimTime -= speedMul;
 			if (shootAnimTime <= 0) {
 				shootAnimTime = 0;
 				if (sprite.name == getSprite(charState.shootSpriteEx)) {
@@ -129,9 +134,9 @@ public class BusterZero : Character {
 		}
 		if (!isCharging()) {
 			if (shootPressed) {
-				lastShootPressed = Global.frameCount;
+				lastShootPressed = Global.floorFrameCount;
 			}
-			int framesSinceLastShootPressed = Global.frameCount - lastShootPressed;
+			int framesSinceLastShootPressed = Global.floorFrameCount - lastShootPressed;
 			if (shootPressed || framesSinceLastShootPressed < 6) {
 				if (stockedBusterLv >= 1) {
 					if (charState is WallSlide) {
@@ -227,8 +232,7 @@ public class BusterZero : Character {
 				shootAnimTime = 0;
 				changeState(new BusterZeroDoubleBuster(false, 3), true);
 			}
-		}
-		else if (chargeLevel >= 4) {
+		} else if (chargeLevel >= 4) {
 			if (charState is WallSlide) {
 				shoot(2);
 				stockedBusterLv = 2;
@@ -262,7 +266,7 @@ public class BusterZero : Character {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.DZMelee, player,
 				isBlackZero ? 4 : 3, Global.defFlinch, isReflectShield: true,
-				isZSaberClang : true, isZSaberEffect : true,
+				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -349,7 +353,7 @@ public class BusterZero : Character {
 					break;
 			}
 			if (stockedSaber || stockedBusterLv == 2) {
-					palette = Player.ZeroGreenC;
+				palette = Player.ZeroGreenC;
 			}
 			if (stockedBusterLv == 1) {
 				palette = Player.ZeroPinkC;
@@ -385,8 +389,8 @@ public class BusterZero : Character {
 		stockedBusterLv = data[1];
 	}
 
-	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
+		Helpers.decrementTime(ref jumpTimeAI);
 		if (charState.normalCtrl) {
 			player.press(Control.Shoot);
 		}
@@ -395,29 +399,36 @@ public class BusterZero : Character {
 			&& charState is not HyperBusterZeroStart and not WarpIn) {
 			changeState(new HyperBusterZeroStart(), true);
 		}
-		bool isTargetInAir = pos.y < target?.pos.y - 20;
-		bool isTargetClose = pos.x < target?.pos.x - 10;
+		float enemyDist = 300;
+		float enemyDistY = 30;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyDistY = MathF.Abs(target.pos.y - pos.y);
+		}
+		bool isTargetClose = enemyDist <= 40;
+		bool isTargetInAir = enemyDistY >= 20;
 		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		int ZBattack = Helpers.randomRange(0, 2);
-		if (isTargetInAir && vel.y >= 0) {
-			player.press(Control.Jump);
+		if (isTargetInAir) {
+			doJumpAI();
 		}
-		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0) {
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && target != null) {
 			switch (ZBattack) {
 				// Release full charge if we have it.
 				case >= 0 when canHitMaxCharge && isFacingTarget:
-					player.press(Control.Shoot);
+					turnToPos(target.getCenterPos());
+					player.release(Control.Shoot);
 					break;
 				// Saber swing when target is close.
 				case 0 when isTargetClose:
+					turnToPos(target.getCenterPos());
 					player.press(Control.Special1);
 					break;
 				// Another action if the enemy is on Do Jump and do SaberSwing.
 				case 1 when isTargetClose:
-					if (vel.y >= 0) {
-						player.press(Control.Jump);
-					}
+					turnToPos(target.getCenterPos());
+					if (isTargetInAir) doJumpAI();	
 					player.press(Control.Special1);
 					break;
 				// Press Shoot to lemon.
@@ -431,19 +442,32 @@ public class BusterZero : Character {
 	}
 
 	public override void aiDodge(Actor? target) {
+		base.aiDodge(target);
+		if (!charState.attackCtrl) {
+			return;
+		}
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
-			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance && charState.attackCtrl) {
-				if (!(proj.projId == (int)ProjIds.RollingShield || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.SwordBlock
-					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+			if (gameObject is Projectile proj &&
+				proj.damager.owner.alliance != player.alliance && charState.attackCtrl
+			) {
+				if (proj.projId != (int)ProjIds.RollingShield &&
+					proj.projId != (int)ProjIds.FrostShield &&
+					proj.projId != (int)ProjIds.SwordBlock &&
+					proj.projId != (int)ProjIds.FrostShieldAir &&
+					proj.projId != (int)ProjIds.FrostShieldChargedPlatform &&
+					proj.projId != (int)ProjIds.FrostShieldPlatform &&
+					zSaberCooldown <= 0
 				) {
-					if (zSaberCooldown <= 0) {
-						turnToInput(player.input, player);
-						changeState(new BusterZeroMelee(), true);
-						zSaberCooldown = 36;
-					}
+					if (target != null)
+					turnToPos(target.getCenterPos());
+					changeState(new BusterZeroMelee(), true);
 				}
 			}
 		}
-		base.aiDodge(target);
+	}
+	public void doJumpAI(float jumpTimeAI = 0.75f) {
+		if (jumpTimeAI > 0) {
+			player.press(Control.Jump);
+		}
 	}
 }

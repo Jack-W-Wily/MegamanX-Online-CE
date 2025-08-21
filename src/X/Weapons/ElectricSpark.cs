@@ -133,17 +133,20 @@ public class ElectricSparkProjChargedStart : Projectile {
 	public ElectricSparkProjChargedStart(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "electric_spark_charge_start", netId, player	
+		pos, xDir, owner, "electric_spark_charge_start", netId, player
 	) {
 		weapon = ElectricSpark.netWeapon;
 		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.ElectricSparkChargedStart;
 		destroyOnHit = false;
 		shouldShieldBlock = false;
-
+		damager.damage = 4;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 30;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+		projId = (int)ProjIds.ElectricSparkCharged;
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {
@@ -174,7 +177,7 @@ public class ElectricSparkProjCharged : Projectile {
 	public ElectricSparkProjCharged(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "electric_spark_charge_start", netId, player	
+		pos, xDir, owner, "electric_spark_charge", netId, player	
 	) {
 		weapon = ElectricSpark.netWeapon;
 		damager.damage = 4;

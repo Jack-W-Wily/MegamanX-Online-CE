@@ -366,7 +366,6 @@ public class WarpIn : CharState {
 	bool warpAnimOnce;
 
 	// Sigma-specific
-	public bool isSigma { get { return player.isSigma; } }
 	public int sigmaRounds;
 	public const float yOffset = 200;
 	public bool landOnce;
@@ -409,7 +408,7 @@ public class WarpIn : CharState {
 				cloakAnim2.setzIndex(character.zIndex - 1);
 			}
 
-			if (isSigma && player.isSigma2() && character.sprite.frameIndex >= 11 && !sigma2Once) {
+			if (character is NeoSigma && character.sprite.frameIndex >= 11 && !sigma2Once) {
 				sigma2Once = true;
 				character.playSound("sigma2start", sendRpc: true);
 			}
@@ -439,13 +438,13 @@ public class WarpIn : CharState {
 		float yInc = Global.spf * 450 * getSigmaRoundsMod(sigmaRounds);
 		warpAnim.incPos(new Point(0, yInc));
 
-		if ((isSigma || player.isVile) && !landOnce && warpAnim.pos.y >= destY - 1) {
+		if (character is BaseSigma or Vile && !landOnce && warpAnim.pos.y >= destY - 1) {
 			landOnce = true;
 			warpAnim.changePos(new Point(warpAnim.pos.x, destY - 1));
 		}
 
 		if (warpAnim.pos.y >= destY) {
-			if (!(isSigma || player.isVile) || sigmaRounds > 6) {
+			if (character is not BaseSigma and not Vile || sigmaRounds > 6) {
 				warpAnim.destroySelf();
 				warpAnim = null;
 			} else {
@@ -457,8 +456,7 @@ public class WarpIn : CharState {
 	}
 
 	float getSigmaRoundsMod(int aSigmaRounds) {
-		if (!(isSigma || player.isVile)) return 1;
-		return 2;
+		return character is BaseSigma ? 2 : 1;
 	}
 
 	float getSigmaYOffset(int aSigmaRounds) {
@@ -472,7 +470,7 @@ public class WarpIn : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.visible = false;
 		character.frameSpeed = 0;
@@ -526,7 +524,7 @@ public class WarpIdle : CharState {
 
 	public void refillNormal() {
 		fullAlt = true;
-		healTime++;
+		healTime += Global.gameSpeed;
 		if (fullHP || healTime < 3) {
 			return;
 		}
@@ -544,7 +542,7 @@ public class WarpIdle : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		specialId = SpecialStateIds.WarpIdle;
 		character.invulnTime = firstSpawn ? 5 : 0;
@@ -568,7 +566,6 @@ public class WarpOut : CharState {
 	public float startY;
 	public Anim? warpAnim;
 	public const float yOffset = 200;
-	public bool isSigma { get { return player.isSigma; } }
 	public bool is1v1MaverickStart;
 
 	public WarpOut(bool is1v1MaverickStart = false) : base("warp_beam") {
@@ -598,7 +595,7 @@ public class WarpOut : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.visible = false;
 		destY = character.pos.y - yOffset;
@@ -698,7 +695,9 @@ public class Run : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (skipIntro) {
-			character.frameIndex = 1;
+			if (character is CmdSigma) {
+				character.frameIndex = 1;
+			}
 			stateFrames = 5;
 		}
 	}
@@ -760,9 +759,11 @@ public class SwordBlock : CharState {
 			player.input.isHeld(Control.WeaponLeft, player) ||
 			player.input.isHeld(Control.WeaponRight, player)
 		);
-		if (!isHoldingGuard) {
+		if (!isHoldingGuard && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
+		} else if (player.isAI && stateTime >= 32f/60f) {
+			character.changeToIdleOrFall();
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
@@ -807,7 +808,7 @@ public class ZeroClang : CharState {
 }
 
 public class Jump : CharState {
-	public Jump() : base("jump", "jump_shoot", Options.main.getAirAttack()) {
+	public Jump() : base("jump", "jump_shoot", "attack_air") {
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
@@ -833,7 +834,7 @@ public class Jump : CharState {
 public class Fall : CharState {
 	public float limboVehicleCheckTime;
 	public Actor? limboVehicle;
-	public Fall() : base("fall", "fall_shoot", Options.main.getAirAttack(), "fall_start", "fall_start_shoot") {
+	public Fall() : base("fall", "fall_shoot", "attack_air", "fall_start", "fall_start_shoot") {
 		accuracy = 5;
 		exitOnLanding = true;
 		useDashJumpSpeed = true;
@@ -860,7 +861,7 @@ public class Fall : CharState {
 		if (limboVehicleCheckTime == 0 && character.limboRACheckCooldown == 0) {
 			this.limboVehicle = limboVehicle;
 			limboVehicleCheckTime = 1;
-			character.stopMoving();
+			character.stopMovingS();
 			character.useGravity = false;
 			if (limboVehicle is RideArmor ra) {
 				RPC.checkRAEnter.sendRpc(player.id, ra.netId, ra.neutralId, ra.raNum);
@@ -1279,7 +1280,7 @@ public class LadderClimb : CharState {
 		if (character.player == Global.level.mainPlayer) {
 			Global.level.lerpCamTime = 0.25f;
 		}
-		character.stopMoving();
+		character.stopMovingS();
 		character.useGravity = false;
 		character.dashedInAir = 0;
 	}
@@ -1339,6 +1340,13 @@ public class LadderClimb : CharState {
 				dropFromLadder();
 			}
 		}
+		if (character is Axl axl) {
+			if (axl.isAxlLadderShooting()) {
+				axl.changeSprite("axl_ladder_shoot", true);
+			} else if (character.sprite.name != "axl_ladder_end" && character.sprite.name != "axl_fall_start"){
+				axl.changeSprite("axl_ladder_climb", true);
+			}
+		}
 
 		if (character.grounded) {
 			character.changeToIdleOrFall();
@@ -1360,7 +1368,7 @@ public class LadderEnd : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
-		character.stopMoving();
+		character.stopMovingS();
 	}
 
 	public override void onExit(CharState? newState) {
@@ -1407,12 +1415,12 @@ public class Die : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
-		character.stopMoving();
+		character.stopMovingS();
 		character.stopCharge();
 		new Anim(character.pos.addxy(0, -12), "die_sparks", 1, null, true);
 
-		if (character.ownedByLocalPlayer && character.player.isDisguisedAxl) {
-			character.player.revertToAxlDeath();
+		if (character.ownedByLocalPlayer && character.isATrans) {
+			character.player.revertAtransDeath();
 			character.changeSpriteFromName("die", true);
 		}
 		player.lastDeathWasVileMK2 = false;
@@ -1443,8 +1451,8 @@ public class Die : CharState {
 				once = true;
 				character.visible = false;
 				player.explodeDieStart();
-				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickMode.TagTeam) {
-					foreach (var weapon in new List<Weapon>(player.weapons)) {
+				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
+					foreach (var weapon in new List<Weapon>(character.weapons)) {
 						if (weapon is MaverickWeapon mw && mw.maverick != null) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
 						}
@@ -1617,7 +1625,7 @@ public class GenericGrabbedState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMoving();
+		character.stopMovingS();
 		//character.stopCharge();
 		character.useGravity = false;
 		character.grounded = false;
@@ -1638,6 +1646,8 @@ public class GenericGrabbedState : CharState {
 }
 
 public class ATransTransition : CharState {
+	public bool allowChange = false;
+
 	public ATransTransition() : base("win") {
 		airMove = true;
 		normalCtrl = false;
@@ -1645,7 +1655,7 @@ public class ATransTransition : CharState {
 	}
 
 	public override bool canExit(Character character, CharState newState) {
-		return false;
+		return allowChange;
 	}
 }
 

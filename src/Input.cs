@@ -508,6 +508,7 @@ public class Input {
 	}
 
 	public bool allowInput(Player player, string inputName) {
+		/*
 		if (player != null && player.isVile && player.weapon is MechMenuWeapon mmw && mmw.isMenuOpened) {
 			if (inputName == Control.Up || inputName == Control.Down) {
 				return false;
@@ -517,7 +518,7 @@ public class Input {
 			if (inputName == Control.Up || inputName == Control.Down) {
 				return false;
 			}
-		}
+		}*/
 		return true;
 	}
 
@@ -547,7 +548,9 @@ public class Input {
 		}
 
 		if (player?.character != null && player.gridModeHeld) {
-			if (inputName == Control.Left || inputName == Control.Right || inputName == Control.Up || inputName == Control.Down) {
+			if (inputName == Control.Left || inputName == Control.Right ||
+				inputName == Control.Up || inputName == Control.Down
+			) {
 				return false;
 			}
 		}

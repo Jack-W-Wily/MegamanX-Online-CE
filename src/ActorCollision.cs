@@ -104,7 +104,7 @@ public partial class Actor {
 		}
 		bool hasNonAttackColider = false;
 		foreach (Collider allCollider in getAllColliders()) {
-			if (allCollider._shape.points.Count == 4) {
+			if (allCollider._shape.points.Count == 4 && allCollider._shape.isRect()) {
 				Color hitboxColor = new Color(50, 100, 255, 50);
 				Color outlineColor = new Color(0, 0, 255, 200);
 				if (allCollider.isAttack()) {
@@ -335,46 +335,77 @@ public partial class Actor {
 		}
 	}
 
-	public void move(
-		Point amount, bool useDeltaTime = true, bool pushIncline = true,
-		bool useIce = true, MoveClampMode clampMode = MoveClampMode.None
+	public void moveXY(
+		float x, float y, bool useDelta = true,
+		bool pushIncline = true, bool useIce = true
+	) {
+		if (x == 0 && y == 0) {
+			return;
+		}
+		Point amount = new Point(x, y);
+		amount *= useDelta ? speedMul : Global.gameSpeed;
+
+		moveSub(amount, pushIncline, useIce);
+	}
+
+	public void movePoint(
+		Point amount, bool useDeltaTime = true,
+		bool pushIncline = true, bool useIce = true
 	) {
 		if (amount == Point.zero) {
 			return;
 		}
-		var times = useDeltaTime ? Global.spf : 1;
+		amount *= useDeltaTime ? speedMul : Global.gameSpeed;
 
-		if (grounded && groundedIce && useIce && (
-			this is Character || this is Maverick || this is RideArmor
-		)) {
+		moveSub(amount, pushIncline, useIce);
+	}
+
+	public void move(
+		Point amount, bool useDeltaTime = true,
+		bool pushIncline = true, bool useIce = true
+	) {
+		if (amount == Point.zero) {
+			return;
+		}
+		amount *= useDeltaTime ? Global.spf : Global.gameSpeed;
+
+		moveSub(amount, pushIncline, useIce);
+	}
+
+	public void moveSub(Point amount, bool pushIncline = true, bool useIce = true) {
+		if (amount == Point.zero) {
+			return;
+		}
+		if (amount.y < 0) {
+			movedUpOnFrame = true;
+		}
+		// Add to Move Delta.
+		moveDelta += amount;
+		// Ice physics shenanigans.
+		if (grounded && groundedIce && useIce && slideOnIce) {
 			if (amount.x > 0) {
 				if (xIceVel < amount.x) {
-					xIceVel += amount.x * Global.spf * 5;
+					xIceVel += amount.x / 12f;
 				}
 			} else {
 				if (xIceVel > amount.x) {
-					xIceVel += amount.x * Global.spf * 5;
+					xIceVel += amount.x / 12f;
 				}
 			}
 			return;
 		}
-
-		Point moveAmount = amount.times(times);
-
 		//No collider: just move
 		if (physicsCollider == null) {
-			incPos(moveAmount);
+			incPos(amount);
 		}
 		// Regular collider: need to detect collision incrementally
 		// and stop moving past a collider if that's the case
 		else {
-			Point incAmount = amount * times;
-
-			Point? mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, incAmount, pushIncline);
+			Point? mtv = Global.level.getMtvDir(this, amount.x, amount.y, amount, pushIncline);
 			if (mtv != null && mtv?.magnitude > 10) {
-				mtv = Global.level.getMtvDir(this, incAmount.x, incAmount.y, null, false);
+				mtv = Global.level.getMtvDir(this, amount.x, amount.y, null, false);
 			}
-			incPos(incAmount);
+			incPos(amount);
 			if (mtv != null) {
 				incPos(mtv.Value.unitInc(0.01f));
 			}

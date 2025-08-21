@@ -15,7 +15,7 @@ public class HyperAxlStart : CharState {
 	public override void update() {
 		base.update();
 
-		foreach (var weapon in player.weapons) {
+		foreach (var weapon in character.weapons) {
 			for (int i = 0; i < 10; i++) weapon.rechargeAmmo(0.1f);
 		}
 
@@ -155,7 +155,7 @@ public class DodgeRoll : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (Global.level.server?.customMatchSettings != null)
-			 axl.dodgeRollCooldown = Global.level.server.customMatchSettings.AxlDodgerollCooldown;
+			 axl.dodgeRollCooldown = Global.level.server.customMatchSettings.axlDodgerollCooldown;
 		else axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
 	}
 

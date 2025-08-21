@@ -20,21 +20,22 @@ public class CustomMatchSettings {
 	[ProtoMember(12)] public int currencyGain;
 	[ProtoMember(13)] public int respawnTime;
 	[ProtoMember(14)] public bool pickupItems;
-	[ProtoMember(15)] public int SubtankGain;
-	[ProtoMember(16)] public int AssistTime;
-	[ProtoMember(16)] public bool Assistable;
-	[ProtoMember(17)] public int LargeHealthPickup;
-	[ProtoMember(18)] public int SmallHealthPickup;
-	[ProtoMember(19)] public int LargeAmmoPickup;
-	[ProtoMember(20)] public int SmallAmmoPickup;
-	[ProtoMember(21)] public int SubTankCost;
-	[ProtoMember(22)] public bool FrostShieldNerf;
-	[ProtoMember(23)] public bool FrostShieldChargedNerf;
-	[ProtoMember(24)] public bool AxlBackwardsDebuff;
-	[ProtoMember(25)] public float AxlDodgerollCooldown;
-	[ProtoMember(26)] public bool AxlCustomReload;
-	[ProtoMember(26)] public bool AxlFTADodgeroll;
+	[ProtoMember(15)] public int subtankGain;
+	[ProtoMember(16)] public int assistTime;
+	[ProtoMember(16)] public bool assistable;
+	[ProtoMember(17)] public int largeHealthPickup;
+	[ProtoMember(18)] public int smallHealthPickup;
+	[ProtoMember(19)] public int largeAmmoPickup;
+	[ProtoMember(20)] public int smallAmmoPickup;
+	[ProtoMember(21)] public int subTankCost;
+	[ProtoMember(22)] public bool frostShieldNerf;
+	[ProtoMember(23)] public bool frostShieldChargedNerf;
+	[ProtoMember(24)] public bool axlBackwardsDebuff;
+	[ProtoMember(25)] public float axlDodgerollCooldown;
+	[ProtoMember(26)] public bool axlCustomReload;
 	[ProtoMember(27)] public bool oldATrans;
+	[ProtoMember(28)] public bool flinchairDashReset;
+	[ProtoMember(29)] public bool ComboFlinch;
 
 
 	public CustomMatchSettings() {
@@ -57,20 +58,22 @@ public class CustomMatchSettings {
 			currencyGain = 1,
 			respawnTime = 5,
 			pickupItems = true,
-			SubtankGain = 3,
-			AssistTime = 2,
-			Assistable = true,
-			LargeHealthPickup = 8,
-			SmallHealthPickup = 4,
-			LargeAmmoPickup = 50,
-			SmallAmmoPickup = 25,
-			SubTankCost = 4,
-			FrostShieldNerf = false,
-			FrostShieldChargedNerf = false,
-			AxlBackwardsDebuff = true,
-			AxlDodgerollCooldown = 1.25f,
-			AxlCustomReload = false,
-			AxlFTADodgeroll = false,
+			subtankGain = 4,
+			assistTime = 2,
+			assistable = true,
+			largeHealthPickup = 8,
+			smallHealthPickup = 4,
+			largeAmmoPickup = 50,
+			smallAmmoPickup = 25,
+			subTankCost = 4,
+			frostShieldNerf = true,
+			frostShieldChargedNerf = false,
+			axlBackwardsDebuff = true,
+			axlDodgerollCooldown = 1.25f,
+			axlCustomReload = false,
+			oldATrans = false,
+			flinchairDashReset = false,
+			ComboFlinch = true,
 		};
 	}
 }
@@ -187,13 +190,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 		menuOptions.Add(
 			new MenuOption(startX, currentY += lineH,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SubTankCost, 0, 8, true);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.subTankCost, 0, 8, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Sub Tanks Cost: " +
-						savedMatchSettings.customMatchSettings.SubTankCost.ToString(),
+						savedMatchSettings.customMatchSettings.subTankCost.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY == 5
 					);
 				}
@@ -235,13 +238,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				new MenuOption(
 					startX, currentY += lineH,
 					() => {
-						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SubtankGain, 1, 4, true);
+						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.subtankGain, 1, 4, true);
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
 							FontType.Blue,
 							"Sub Tank Gain: " +
-							savedMatchSettings.customMatchSettings.SubtankGain.ToString(),
+							savedMatchSettings.customMatchSettings.subtankGain.ToString(),
 							pos.x, pos.y, selected: selectArrowPosY == 8
 						);
 					}
@@ -257,7 +260,7 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
-						"1v1 or Hypermode Match : " +
+						"Hypermode Match : " +
 						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.hyperModeMatch),
 						pos.x, pos.y, selected: selectArrowPosY == 9
 					);
@@ -368,13 +371,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 				new MenuOption(
 					startX2, currentY2 += lineH2,
 					() => {
-						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.AssistTime, 0, 5, true);
+						Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.assistTime, 0, 5, true);
 					},
 					(Point pos, int index) => {
 						Fonts.drawText(
 							FontType.Blue,
 							"Assist Time: " +
-							savedMatchSettings.customMatchSettings.AssistTime.ToString(),
+							savedMatchSettings.customMatchSettings.assistTime.ToString(),
 							pos.x, pos.y, selected: selectArrowPosY2 == 3
 						);
 					}
@@ -384,13 +387,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.Assistable);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.assistable);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Unassistable List: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.Assistable),
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.assistable),
 						pos.x, pos.y, selected: selectArrowPosY2 == 4
 					);
 				}
@@ -416,13 +419,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.LargeHealthPickup, 0, 32, true);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.largeHealthPickup, 0, 32, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Large Health Recovery: " +
-						savedMatchSettings.customMatchSettings.LargeHealthPickup.ToString(),
+						savedMatchSettings.customMatchSettings.largeHealthPickup.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY2 == 6
 					);
 				}
@@ -432,13 +435,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SmallHealthPickup, 0, 32, true);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.smallHealthPickup, 0, 32, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Small Health Recovery: " +
-						savedMatchSettings.customMatchSettings.SmallHealthPickup.ToString(),
+						savedMatchSettings.customMatchSettings.smallHealthPickup.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY2 == 7
 					);
 				}
@@ -448,13 +451,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.LargeAmmoPickup, 0, 100, true);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.largeAmmoPickup, 0, 100, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Large Ammo Recovery: " +
-						savedMatchSettings.customMatchSettings.LargeAmmoPickup.ToString(),
+						savedMatchSettings.customMatchSettings.largeAmmoPickup.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY2 == 8
 					);
 				}
@@ -464,13 +467,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX2, currentY2 += lineH2,
 				() => {
-					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.SmallAmmoPickup, 0, 100, true);
+					Helpers.menuLeftRightInc(ref savedMatchSettings.customMatchSettings.smallAmmoPickup, 0, 100, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Blue,
 						"Small Ammo Recovery: " +
-						savedMatchSettings.customMatchSettings.SmallAmmoPickup.ToString(),
+						savedMatchSettings.customMatchSettings.smallAmmoPickup.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY2 == 9
 					);
 				}
@@ -482,13 +485,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldNerf, true);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.frostShieldNerf, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
 						"Frost Shield Uncharged 'Shield' Nerf: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.FrostShieldNerf),
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.frostShieldNerf),
 						pos.x, pos.y, selected: selectArrowPosY3 == 0
 					);
 				}
@@ -498,13 +501,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.FrostShieldChargedNerf, true);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.frostShieldChargedNerf, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
 						"Frost Shield Charged 'Shield' Nerf: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.FrostShieldChargedNerf),
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.frostShieldChargedNerf),
 						pos.x, pos.y, selected: selectArrowPosY3 == 1
 					);
 				}
@@ -514,13 +517,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlBackwardsDebuff, true);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.axlBackwardsDebuff, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
 						"Axl Shooting Backwards Debuff: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlBackwardsDebuff),
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.axlBackwardsDebuff),
 						pos.x, pos.y, selected: selectArrowPosY3 == 2
 					);
 				}
@@ -530,13 +533,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightIncFloat(ref savedMatchSettings.customMatchSettings.AxlDodgerollCooldown, 1.25f, 3, true, true);
+					Helpers.menuLeftRightIncFloat(ref savedMatchSettings.customMatchSettings.axlDodgerollCooldown, 1.25f, 3, true, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
 						"Axl Dodge Roll Cooldown: " +
-						savedMatchSettings.customMatchSettings.AxlDodgerollCooldown.ToString(),
+						savedMatchSettings.customMatchSettings.axlDodgerollCooldown.ToString(),
 						pos.x, pos.y, selected: selectArrowPosY3 == 3
 					);
 				}
@@ -546,13 +549,13 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlFTADodgeroll, true);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.axlCustomReload, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
-						"Axl FTA Dodge Roll : " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlFTADodgeroll),
+						"Axl Weapons Capable to Reload: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.axlCustomReload),
 						pos.x, pos.y, selected: selectArrowPosY3 == 4
 					);
 				}
@@ -562,14 +565,46 @@ public class CustomMatchSettingsMenu : IMainMenu {
 			new MenuOption(
 				startX3, currentY3 += lineH3,
 				() => {
-					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.AxlCustomReload, true);
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.oldATrans, true);
 				},
 				(Point pos, int index) => {
 					Fonts.drawText(
 						FontType.Purple,
-						"Axl Weapons Capable to Reload: " +
-						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.AxlCustomReload),
+						"Axl Vanilla DNA: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.oldATrans),
 						pos.x, pos.y, selected: selectArrowPosY3 == 5
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.flinchairDashReset, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Flinch resets Air Dash: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.flinchairDashReset),
+						pos.x, pos.y, selected: selectArrowPosY3 == 6
+					);
+				}
+			)
+		);
+		menuOptions3.Add(
+			new MenuOption(
+				startX3, currentY3 += lineH3,
+				() => {
+					Helpers.menuLeftRightBool(ref savedMatchSettings.customMatchSettings.ComboFlinch, true);
+				},
+				(Point pos, int index) => {
+					Fonts.drawText(
+						FontType.Purple,
+						"Flinch stack: " +
+						Helpers.boolYesNo(savedMatchSettings.customMatchSettings.ComboFlinch),
+						pos.x, pos.y, selected: selectArrowPosY3 == 7
 					);
 				}
 			)

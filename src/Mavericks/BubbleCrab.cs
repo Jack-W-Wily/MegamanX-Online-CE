@@ -19,7 +19,9 @@ public class BubbleCrab : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		//stateCooldowns.Add(typeof(BCrabShieldStartState), new MaverickStateCooldown(false, true, 0.75f));
+		/*stateCooldowns = new() {
+			{ typeof(BCrabShieldStartState), new(45, true) }
+		};*/
 
 		weapon = getWeapon();
 
@@ -42,10 +44,12 @@ public class BubbleCrab : Maverick {
 
 		armorClass = ArmorClass.Light;
 		gameMavs = GameMavs.X2;
+		height = 28;
 	}
 
 	public override void update() {
 		base.update();
+		subtractTargetDistance = 30;
 
 		Helpers.decrementTime(ref clawSoundTime);
 		if (sprite.name.Contains("jump_attack")) {
@@ -132,17 +136,33 @@ public class BubbleCrab : Maverick {
 		return "bcrab";
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new BCrabShootState(),
-				getSpecialState(),
-				new BCrabClawState(),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			new BCrabShootState(),
+			new BCrabSummonState(),
+			new BCrabClawState()
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		if (shield == null) {
+			return [
+				new BCrabShieldStartState()
+			];
+		}
+		if (enemyDist <= 30) {
+			return [
+				new BCrabShootState(),
+				new BCrabClawState()
+			];
+		}
+		return [
+			new BCrabShootState(),
+		];
 	}
 
 	// Melee IDs for attacks.
@@ -245,18 +265,29 @@ public class BCrabBubbleSplashProj : Projectile {
 		}
 	}
 }
-
-public class BCrabShootState : MaverickState {
-	bool secondAnim;
-	float shootCooldown;
-	int num;
+public class BCrablosMState : MaverickState {
 	public BubbleCrab BubblyCrablos = null!;
-	public BCrabShootState() : base("ring_attack_start") {
+	public BCrablosMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
+
 	}
+}
+public class BCrabShootState : BCrablosMState {
+	bool secondAnim;
+	float shootCooldown;
+	int num;
+
+	public BCrabShootState() : base("ring_attack_start") {
+	}
+
 	public override void update() {
 		base.update();
 		if (BubblyCrablos == null) return;
@@ -297,8 +328,10 @@ public class BCrabShootState : MaverickState {
 	}
 }
 
-public class BCrabClawState : MaverickState {
+public class BCrabClawState : BCrablosMState {
 	public BCrabClawState() : base("jump_attack_start") {
+		canJump = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
@@ -306,7 +339,6 @@ public class BCrabClawState : MaverickState {
 		if (player == null) return;
 
 		maverick.turnToInput(input, player);
-		genericJumpCode();
 		if (!maverick.grounded) {
 			maverick.changeState(new BCrabClawJumpState());
 			return;
@@ -323,15 +355,16 @@ public class BCrabClawState : MaverickState {
 	}
 }
 
-public class BCrabClawJumpState : MaverickState {
+public class BCrabClawJumpState : BCrablosMState {
 	public BCrabClawJumpState() : base("jump_attack") {
+		airMove = true;
+		canStopJump = true;
 	}
 
 	public override void update() {
 		base.update();
 		if (player == null) return;
 
-		airCode();
 		if (maverick.grounded) {
 			maverick.changeState(new BCrabClawState());
 			return;
@@ -439,14 +472,9 @@ public class BCrabShieldProj : Projectile, IDamagable {
 	}
 }
 
-public class BCrabShieldStartState : MaverickState {
-	public BubbleCrab BubblyCrablos = null!;
+public class BCrabShieldStartState : BCrablosMState {
 	public BCrabShieldStartState() : base("shield_start") {
 		aiAttackCtrl = true;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
 	}
 	public override void update() {
 		base.update();
@@ -705,13 +733,8 @@ public class BCrabSummonCrabProj : Projectile, IDamagable {
 	}
 }
 
-public class BCrabSummonState : MaverickState {
-	public BubbleCrab BubblyCrablos = null!;
+public class BCrabSummonState : BCrablosMState {
 	public BCrabSummonState() : base("summon") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		BubblyCrablos = maverick as BubbleCrab ?? throw new NullReferenceException();
 	}
 	public override void update() {
 		base.update();

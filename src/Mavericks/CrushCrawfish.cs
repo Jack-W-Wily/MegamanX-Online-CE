@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 namespace MMXOnline;
 
 public class CrushCrawfish : Maverick {
@@ -6,11 +7,17 @@ public class CrushCrawfish : Maverick {
 	public static Weapon getMeleeWeapon(Player player) { return new Weapon(WeaponIds.CrushCGeneric, 155, new Damager(player, 1, 0, 0)); }
 
 	public Weapon meleeWeapon;
-	public CrushCrawfish(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(CrushCShootArmState), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(CrushCDashState), new MaverickStateCooldown(false, false, 0.5f));
+	public CrushCrawfish(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			{ typeof(CrushCShootArmState), new(45, true) },
+			{ typeof(CrushCDashState), new(30) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
@@ -25,10 +32,12 @@ public class CrushCrawfish : Maverick {
 			createActorRpc(player.id);
 		}
 		gameMavs = GameMavs.X3;
+		height = 32;
 	}
 
 	public override void update() {
 		base.update();
+		subtractTargetDistance = 50;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
@@ -47,17 +56,27 @@ public class CrushCrawfish : Maverick {
 		return "crushc";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new CrushCShootArmState(),
+			getShootState(true),
+			new CrushCDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new CrushCShootArmState(),
-				getShootState(true),
-				new CrushCDashState(),
-		};
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			getShootState(isAI: true),
+			new CrushCDashState()
+		];
+		if (enemyDist <= 110) {
+			aiStates.Add(new CrushCShootArmState());
+		}
+		return aiStates.ToArray();
 	}
 
 	public MaverickState getShootState(bool isAI) {
@@ -68,7 +87,7 @@ public class CrushCrawfish : Maverick {
 			);
 		}, "crushcShoot");
 		if (isAI) {
-			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.75f);
+			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.25f);
 		}
 		return mshoot;
 	}
@@ -230,16 +249,24 @@ public class CrushCArmProj : Projectile {
 		state = 1;
 	}
 }
-
-public class CrushCShootArmState : MaverickState {
-	CrushCArmProj? proj;
+public class CrawfishMState : MaverickState {
 	public CrushCrawfish ScissorsShrimper = null!;
-	public CrushCShootArmState() : base("attack_claw") {
-		superArmor = true;
+	public CrawfishMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
+	}
+}
+public class CrushCShootArmState : CrawfishMState {
+	CrushCArmProj? proj;
+	public CrushCShootArmState() : base("attack_claw") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -280,7 +307,7 @@ public class CrushCShootArmState : MaverickState {
 	}
 }
 
-public class CrushCDashState : MaverickState {
+public class CrushCDashState : CrawfishMState {
 	float dustTime;
 	float ftdWaitTime;
 	public CrushCDashState() : base("dash", "dash_start") {
@@ -334,18 +361,13 @@ public class CrushCDashState : MaverickState {
 	}
 }
 
-public class CrushCGrabState : MaverickState {
+public class CrushCGrabState : CrawfishMState {
 	Character victim;
 	float hurtTime;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public CrushCrawfish ScissorsShrimper = null!;
 	public CrushCGrabState(Character grabbedChar) : base("grab_attack") {
 		victim = grabbedChar;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ScissorsShrimper = maverick as CrushCrawfish ?? throw new NullReferenceException();
 	}
 	public override void update() {
 		base.update();

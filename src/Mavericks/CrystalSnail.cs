@@ -16,7 +16,9 @@ public class CrystalSnail : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(CSnailShootState), new MaverickStateCooldown(false, false, 0.75f));
+		stateCooldowns = new() {
+			{ typeof(CSnailShootState), new(45) }
+		};
 
 		spriteToCollider["shell"] = getShellCollider();
 		spriteToCollider["shell_spin"] = getShellCollider();
@@ -42,12 +44,13 @@ public class CrystalSnail : Maverick {
 
 		armorClass = ArmorClass.Light;
 		gameMavs = GameMavs.X2;
+		height = 32;
 	}
 
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
-
+		subtractTargetDistance = 70;
 		if (chargedCrystalHunter != null) {
 			if (chargedCrystalHunter.destroyed) {
 				chargedCrystalHunter = null;
@@ -102,25 +105,26 @@ public class CrystalSnail : Maverick {
 		return noShell ? 100 : 75;
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		MaverickState[] attacks;
-		if (noShell) {
-			attacks = new MaverickState[]
-			{
-					new CSnailShootState(),
-			};
-		} else {
-			attacks = new MaverickState[]
-			{
-					new CSnailShootState(),
-					new CSnailShellState(true),
-			};
-		}
-		return attacks;
+	public override MaverickState[] strikerStates() {
+		return [
+			new CSnailShootState(),
+			new CSnailShellState(true),
+			new CSnailShellState(false),
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		if (noShell) {
+			return [
+				new CSnailShootState(),
+			];
+		}
+		return [
+			new CSnailShootState(),
+			new CSnailShootState(),
+			new CSnailShellState(true),
+			new CSnailShellState(false),
+		];
 	}
 
 	public Collider getShellCollider() {
@@ -321,15 +325,23 @@ public class CSnailCrystalHunterProj : Projectile {
 		}
 	}
 }
-
-public class CSnailShootState : MaverickState {
-	bool shotOnce;
-	CrystalSnail CristarMymine = null!;
-	public CSnailShootState() : base("spit") {
+public class SnailMState : MaverickState {
+	public CrystalSnail CristarMymine = null!;
+	public SnailMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
 	}
+
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		CristarMymine = maverick as CrystalSnail ?? throw new NullReferenceException();
+	}
+}
+public class CSnailShootState : SnailMState {
+	bool shotOnce;
+	public CSnailShootState() : base("spit") {
 	}
 
 	public override void update() {
@@ -360,7 +372,7 @@ public class CSnailShootState : MaverickState {
 	}
 }
 
-public class CSnailShellState : MaverickState {
+public class CSnailShellState : SnailMState {
 	float jumpDist;
 	float maxJumpDist = 112;
 	float exhaustTime;
@@ -453,7 +465,7 @@ public class CSnailShellState : MaverickState {
 	}
 }
 
-public class CSnailShellSpinDashState : MaverickState {
+public class CSnailShellSpinDashState : SnailMState {
 	float spinDist;
 	float angleSpeed = 360;
 	float chargeDist;
@@ -547,7 +559,7 @@ public class CSnailShellSpinDashState : MaverickState {
 	}
 }
 
-public class CSnailShellSpinSlowState : MaverickState {
+public class CSnailShellSpinSlowState : SnailMState {
 	float spinDist;
 	float angleSpeed = 720;
 	Anim? shell;
@@ -618,11 +630,10 @@ public class CSnailShellSpinSlowState : MaverickState {
 	}
 }
 
-public class CSnailTimeStopState : MaverickState {
+public class CSnailTimeStopState : SnailMState {
 	bool shotOnce;
 	float spinCycles;
 	bool soundOnce;
-	CrystalSnail CristarMymine = null!;
 	public CSnailTimeStopState(float spinCycles) : base("timestop", "timestop_start") {
 		this.spinCycles = spinCycles;
 	}
@@ -661,7 +672,6 @@ public class CSnailTimeStopState : MaverickState {
 		base.onEnter(oldState);
 		maverick.stopMoving();
 		maverick.useGravity = false;
-		CristarMymine = maverick as CrystalSnail ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -670,13 +680,14 @@ public class CSnailTimeStopState : MaverickState {
 	}
 }
 
-public class CSnailWeaknessState : MaverickState {
+public class CSnailWeaknessState : SnailMState {
 	float hurtSpeed;
 	float soundTime;
-	CrystalSnail CristarMymine = null!;
+	public bool wasMagnetMine;
 	public CSnailWeaknessState(bool wasMagnetMine) : base(wasMagnetMine ? "weakness" : "hurt") {
 		aiAttackCtrl = true;
 		canBeCanceled = false;
+		this.wasMagnetMine = wasMagnetMine;
 		if (!wasMagnetMine) {
 			once = true;
 			stateTime = 1;
@@ -725,7 +736,6 @@ public class CSnailWeaknessState : MaverickState {
 		maverick.stopMoving();
 		maverick.useGravity = false;
 		hurtSpeed = 300;
-		CristarMymine = maverick as CrystalSnail ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(MaverickState newState) {
@@ -735,15 +745,10 @@ public class CSnailWeaknessState : MaverickState {
 	}
 }
 
-public class CSnailDashState : MaverickState {
-	CrystalSnail CristarMymine = null!;
+public class CSnailDashState : SnailMState {
 	public CSnailDashState() : base("dash") {
 		aiAttackCtrl = true;
 		canBeCanceled = false;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		CristarMymine = maverick as CrystalSnail ?? throw new NullReferenceException();
 	}
 
 

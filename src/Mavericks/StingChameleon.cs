@@ -14,15 +14,21 @@ public class StingChameleon : Maverick {
 	public float cloakTransitionTime;
 	public float uncloakTransitionTime;
 
-	public StingChameleon(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
+	public StingChameleon(
+		Player player, Point pos, Point destPos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
 		tongueWeapon = new StingCTongueWeapon();
-
-		stateCooldowns.Add(typeof(MShoot), new MaverickStateCooldown(false, true, 0.75f));
-		stateCooldowns.Add(typeof(StingCTongueState), new MaverickStateCooldown(false, true, 1));
-		stateCooldowns.Add(typeof(StingCClimbTongueState), new MaverickStateCooldown(false, true, 1));
-		stateCooldowns.Add(typeof(StingCHangState), new MaverickStateCooldown(false, false, 2f));
-		stateCooldowns.Add(typeof(StingCClingShootState), new MaverickStateCooldown(false, true, 0.5f));
+		stateCooldowns = new() {
+			{ typeof(MShoot), new(45, true) },
+			{ typeof(StingCTongueState), new(60, true) },
+			{ typeof(StingCClimbTongueState), new(60, true) },
+			{ typeof(StingCJumpAI), new(2 * 60) },
+			{ typeof(StingCHangState), new(2 * 60) },
+			{ typeof(StingCClingShootState), new(30) }
+		};
 
 		weapon = new Weapon(WeaponIds.StingCGeneric, 98);
 
@@ -45,6 +51,7 @@ public class StingChameleon : Maverick {
 		maxAmmo = 32;
 		grayAmmoLevel = 8;
 		barIndexes = (57, 46);
+		height = 32;
 	}
 
 	public bool isCloakTransition() {
@@ -55,6 +62,7 @@ public class StingChameleon : Maverick {
 		base.update();
 
 		Helpers.decrementTime(ref invisibleCooldown);
+		subtractTargetDistance = 90;
 
 		if (!isCloakTransition()) {
 			if (isInvisible) {
@@ -145,27 +153,35 @@ public class StingChameleon : Maverick {
 			new StingCStingProj(pos, xDir, 5, this, player, player.getNextActorNetId(), rpc: true);
 		}, "stingcSting");
 		if (isAI) {
-			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2, 0.5f);
+			shootState.consecutiveData = new MaverickStateConsecutiveData(0, 2);
 		}
 		return shootState;
 	}
 
-	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new StingCTongueState(0),
-				getShootState(true),
-		};
+	public override MaverickState[] strikerStates() {
+		return [
+			new StingCTongueState(0),
+			new StingCTongueState(1),
+			new StingCJumpAI(),
+			getShootState(true)
+		];
 	}
 
-	public override MaverickState getRandomAttackState() {
-		var attacks = new MaverickState[]
-		{
-				getShootState(true),
-				new StingCTongueState(0),
-			//new StingCHangState(),
-		};
-		return attacks.GetRandomItem();
+	public override MaverickState[] aiAttackStates() {
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			getShootState(isAI: false)
+		];
+		if (enemyDist <= 125) {
+			aiStates.Add(new StingCTongueState(0));
+		}
+		if (Helpers.randomRange(0, 5) == 1 && grounded) {
+			aiStates.Add(new StingCJumpAI());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -327,6 +343,20 @@ public class StingCSpikeProj : Projectile {
 #endregion
 
 #region states
+public class StingCMState : MaverickState {
+	public StingChameleon StingChameleao = null!;
+	public StingCMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
+	}
+}
 public class StingCClimb : MaverickState {
 	public StingCClimb() : base("climb") {
 		aiAttackCtrl = true;
@@ -335,7 +365,7 @@ public class StingCClimb : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 	}
 
@@ -347,7 +377,7 @@ public class StingCClimb : MaverickState {
 
 	public override void update() {
 		base.update();
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		if (inTransition()) {
 			return;
 		}
@@ -389,6 +419,23 @@ public class StingCClimb : MaverickState {
 		}
 	}
 }
+public class StingCJumpAI : MaverickState {
+	public StingCJumpAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		var hit = Global.level.raycast(maverick.pos, maverick.pos.addxy(0, -105), new List<Type>() { typeof(Wall) });
+		if (maverick.vel.y < 100 && hit?.gameObject is Wall wall && !wall.topWall) {
+			maverick.changeState(new StingCHangState(hit.getHitPointSafe().y));
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
+	}
+}
 
 public class StingCTongueState : MaverickState {
 	public StingCTongueState(int type) : base(type == 0 ? "tongue" : (type == 1 ? "tongue2" : "tongue3")) {
@@ -400,7 +447,7 @@ public class StingCTongueState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 	}
 
 	public override void update() {
@@ -440,16 +487,15 @@ public class StingCClimbTongueState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 		this.oldState = oldState;
 	}
 }
 
-public class StingCClingShootState : MaverickState {
+public class StingCClingShootState : StingCMState {
 	bool shotOnce;
 	public MaverickState? oldState;
-	public StingChameleon StingChameleao= null!;
 	public StingCClingShootState() : base("cling_shoot") {
 	}
 
@@ -485,19 +531,18 @@ public class StingCClingShootState : MaverickState {
 		base.onEnter(oldState);
 		maverick.useGravity = false;
 		this.oldState = oldState;
-		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
-
 	}
 }
 
-public class StingCHangState : MaverickState {
+public class StingCHangState : StingCMState {
 	int state;
 	float spikeTime;
 	float endTime;
-	float ceilingY;
-	public StingChameleon StingChameleao= null!;
-	public StingCHangState(float ceilingY) : base("hang") {
-		this.ceilingY = ceilingY;
+	float? _ceilingY;
+	float ceilingY => _ceilingY ?? 0;
+
+	public StingCHangState(float? ceilingY) : base("hang") {
+		_ceilingY = ceilingY;
 	}
 
 	public override bool canEnter(Maverick maverick) {
@@ -510,11 +555,16 @@ public class StingCHangState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		StingChameleao = maverick as StingChameleon ?? throw new NullReferenceException();
-		maverick.stopMoving();
+		maverick.stopMovingS();
 		maverick.useGravity = false;
 		maverick.changePos(getTargetPos(maverick));
 		maverick.frameSpeed = 0;
+
+		if (_ceilingY == null) {
+			_ceilingY = Global.level.raycast(
+				maverick.pos, maverick.pos.addxy(0, -105), [typeof(Wall)]
+			)?.getHitPointSafe().y;
+		}
 	}
 
 	private Point getTargetPos(Maverick maverick) {

@@ -45,7 +45,7 @@ public class UpgradeMenu : IMainMenu {
 	}
 	public static int getSubTankCost() {
 		if (Global.level.server?.customMatchSettings != null) {
-			return Global.level.server.customMatchSettings.SubTankCost;
+			return Global.level.server.customMatchSettings.subTankCost;
 		}
 		return 4;
 	}
@@ -73,7 +73,7 @@ public class UpgradeMenu : IMainMenu {
 		subtankTargets.Clear();
 		if (mainPlayer.isSigma && mainPlayer.character is BaseSigma sigma) {
 			if (mainPlayer.currentMaverick != null &&
-				mainPlayer.currentMaverick.controlMode == MaverickMode.TagTeam
+				mainPlayer.currentMaverick.controlMode == MaverickModeId.TagTeam
 			) {
 				var currentMaverickWeapon = mainPlayer.weapons.FirstOrDefault(
 					w => w is MaverickWeapon mw && mw.maverick == mainPlayer.currentMaverick
@@ -81,7 +81,7 @@ public class UpgradeMenu : IMainMenu {
 				if (currentMaverickWeapon != null) {
 					subtankTargets.Add(currentMaverickWeapon);
 				}
-			} else if (sigma.loadout.commandMode != (int)MaverickMode.Striker) {
+			} else if (sigma.loadout.commandMode != (int)MaverickModeId.Striker) {
 				subtankTargets = mainPlayer.weapons.FindAll(
 					w => (w is MaverickWeapon mw && mw.maverick != null) || w is SigmaMenuWeapon
 				).ToList();
@@ -128,17 +128,20 @@ public class UpgradeMenu : IMainMenu {
 					mainPlayer.currency -= getHeartTankCost();
 					mainPlayer.heartTanks++;
 					Global.playSound("hearthX1");
-					float currentMaxHp = mainPlayer.maxHealth;
-					float newHP = mainPlayer.getMaxHealth();
-					mainPlayer.maxHealth = newHP;
-					mainPlayer.character?.addHealth(newHP - currentMaxHp);
+					if (mainPlayer.character != null) {
+						Character chara = mainPlayer.character;
+						chara.heartTanks++;
+						decimal currentMaxHp = chara.maxHealth;
+						chara.maxHealth = chara.getMaxHealth();
+						chara.addHealth(MathInt.Ceiling(chara.maxHealth - currentMaxHp));
+					} else {
+						mainPlayer.maxHealth = mainPlayer.getMaxHealth();
+					}
 					/*
-					if (mainPlayer.isVile && mainPlayer.character?.vileStartRideArmor != null)
-					{
+					if (mainPlayer.character?.vileStartRideArmor != null) {
 						mainPlayer.character.vileStartRideArmor.addHealth(mainPlayer.getHeartTankModifier());
 					}
-					else if (mainPlayer.isSigma && mainPlayer.currentMaverick != null)
-					{
+					else if (mainPlayer?.currentMaverick != null) {
 						mainPlayer.currentMaverick.addHealth(mainPlayer.getHeartTankModifier(), false);
 						mainPlayer.currentMaverick.maxHealth += mainPlayer.getHeartTankModifier();
 					}
@@ -204,10 +207,10 @@ public class UpgradeMenu : IMainMenu {
 			);
 		}
 
-		if (Global.frameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
+		if (Global.flFrameCount % 60 < 30 && mainPlayer.realCharNum == 2) {
 			Fonts.drawText(FontType.DarkPurple, ">", Global.screenW - 14, Global.halfScreenH, Alignment.Center);
 			//Fonts.drawText(FontType.DarkPurple, "Armor", Global.screenW - 25, Global.halfScreenH + 15, Alignment.Center);
-		} else if (Global.frameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
+		} else if (Global.flFrameCount % 60 < 30 && mainPlayer.canUpgradeXArmor()) {
 			Fonts.drawText(FontType.DarkPurple, "<", 14, Global.halfScreenH, Alignment.Center);
 			//Fonts.drawText(FontType.DarkPurple, "X3", 12, Global.halfScreenH + 15, Alignment.Center);
 
@@ -240,7 +243,7 @@ public class UpgradeMenu : IMainMenu {
 				var subtank = mainPlayer.subtanks[i];
 				canUseSubtank = mainPlayer.canUseSubtank(subtank);
 				if (mainPlayer.currentMaverick != null &&
-					mainPlayer.currentMaverick.controlMode == MaverickMode.TagTeam
+					mainPlayer.currentMaverick.controlMode == MaverickModeId.TagTeam
 				) {
 					canUseSubtank = mainPlayer.currentMaverickWeapon.canUseSubtank(subtank);
 				}
@@ -276,7 +279,7 @@ public class UpgradeMenu : IMainMenu {
 					float targetXPos = 113;
 					if (subtankTargets.Count > 1) {
 						Global.sprites["hud_weapon_icon"].drawToHUD(currentTarget.weaponSlotIndex, optionPos.x + targetXPos, optionPos.y + 4);
-						if (Global.frameCount % 60 < 30) {
+						if (Global.flFrameCount % 60 < 30) {
 							Fonts.drawText(FontType.DarkPurple, "<", optionPos.x + targetXPos - 12, optionPos.y - 2, Alignment.Center);
 							Fonts.drawText(FontType.DarkPurple, ">", optionPos.x + targetXPos + 12, optionPos.y - 2, Alignment.Center);
 						}

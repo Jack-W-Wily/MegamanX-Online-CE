@@ -40,6 +40,7 @@ public class Vile : Character {
 
 	public VileAmmoWeapon energy = new();
 	public VileCannon cannonWeapon;
+	public VileLoadout loadout;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
@@ -54,10 +55,11 @@ public class Vile : Character {
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false,
-		bool isATrans = false
+		VileLoadout loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
 		player, x, y, xDir, isVisible,
-		netId, ownedByLocalPlayer, isWarpIn, isATrans
+		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Vile;
 		if (isWarpIn) {
@@ -72,22 +74,23 @@ public class Vile : Character {
 				vileForm = 1;
 			}
 		}
-		VileLoadout vileLoadout = player.loadout.vileLoadout;
+		loadout ??= player.loadout.vileLoadout.clone();
+		this.loadout = loadout;
 
-		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
-		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
-		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
-		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
-		flamethrowerWeapon = vileLoadout.flamethrower switch {
+		vulcanWeapon = new Vulcan((VulcanType)loadout.vulcan);
+		cannonWeapon = new VileCannon((VileCannonType)loadout.cannon);
+		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
+		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
+		napalmWeapon = new Napalm((NapalmType)loadout.napalm);
+		grenadeWeapon = new VileBall((VileBallType)loadout.ball);
+		cutterWeapon = new VileCutter((VileCutterType)loadout.cutter);
+		flamethrowerWeapon = loadout.flamethrower switch {
 			-1 => new NoneFlamethrower(),
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
 			_ => new WildHorseKick()
 		};
-		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
+		laserWeapon = new VileLaser((VileLaserType)loadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
@@ -133,6 +136,16 @@ public class Vile : Character {
 
 		getCannonSprite(out Point poiPos, out _);
 		return poiPos;
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		if (weapons.Count == 1 && currentWeapon == energy) {
+			energy.charLinkedUpdate(this, true);
+		}
 	}
 
 	public override void update() {
@@ -364,7 +377,7 @@ public class Vile : Character {
 		return player.input.isBHeld(player);
 	}
 	public override bool canCharge() {
-		return !isInvulnerableAttack() && charState is not Die && invulnTime == 0;
+		return !isInvulnerable(true) && charState is not Die && invulnTime == 0;
 	}
 	public override int getMaxChargeLevel() {
 		return isVileMK5 ? 4 : 3;
@@ -857,7 +870,7 @@ public class Vile : Character {
 	}
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
-		int Vattack = Helpers.randomRange(1, 9);
+		int Vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
@@ -888,12 +901,6 @@ public class Vile : Character {
 				case 7 when charState is Fall:
 					flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 					break;
-				case 8 when energy.ammo >= 24 && !player.isMainPlayer && isFacingTarget:
-					laserWeapon.vileShoot(WeaponIds.VileLaser, this);
-					break;
-				case 9 when isVileMK5 && energy.ammo >= 20 && !player.isMainPlayer:
-					changeState(new HexaInvoluteState(), true);
-					break;
 			}
 			aiAttackCooldown = 20;
 		}
@@ -901,12 +908,25 @@ public class Vile : Character {
 	}
 
 	public override void aiUpdate(Actor? target) {
+		base.aiUpdate(target);
 		if (!player.isMainPlayer) {
 			if (player.canReviveVile() && isVileMK1) {
 				player.reviveVile(false);
 			}
 			if (isVileMK2 && player.canReviveVile()) {
 				player.reviveVile(true);
+			}
+		}
+		if (!player.isMainPlayer) {
+			if (player.currency >= 3 && !player.frozenCastle) {
+				player.frozenCastle = true;
+				hasFrozenCastle = true;
+				player.currency -= Vile.frozenCastleCost;
+			}
+			if (player.currency >= 3 && !player.speedDevil) {
+				player.speedDevil = true;
+				hasSpeedDevil = true;
+				player.currency -= Vile.speedDevilCost;
 			}
 		}
 	}
@@ -924,5 +944,6 @@ public class VileAmmoWeapon : Weapon {
 
 		maxAmmo = 32;
 		ammo = maxAmmo;
+		drawCooldown = false;
 	}
 }

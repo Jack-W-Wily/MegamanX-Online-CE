@@ -435,7 +435,7 @@ public class KaiserSigmaVirusState : CharState {
 		base.update();
 
 		stateTime += Global.spf;
-		character.stopMoving();
+		character.stopMovingS();
 
 		if (!startAnimOver) {
 			character.xScale += Global.spf * 2.5f;
@@ -957,19 +957,19 @@ public class KaiserSigmaRevive : CharState {
 			}
 		} else if (state == 3) {
 			if (stateTime > 0.5f) {
-				player.health = 1;
-				character.addHealth(player.maxHealth);
+				character.health = 1;
+				character.addHealth(character.maxHealth);
 				state = 4;
 			}
 		} else if (state == 4) {
-			if (Global.debug && player.input.isBPressed(player)) {
-				player.health = player.maxHealth;
+			if (Global.debug && player.input.isPressed(Control.Special1, player)) {
+				character.health = character.maxHealth;
 			}
 
-			if (player.health >= player.maxHealth) {
+			if (character.health >= character.maxHealth) {
 				character.invulnTime = 0.5f;
 				character.useGravity = true;
-				character.stopMoving();
+				character.stopMovingS();
 				character.grounded = false;
 				character.canBeGrounded = false;
 

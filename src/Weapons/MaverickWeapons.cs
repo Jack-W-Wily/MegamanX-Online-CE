@@ -4,8 +4,8 @@ namespace MMXOnline;
 
 public class MaverickWeapon : Weapon {
 	public Player? player;
-	public MaverickMode controlMode;
-	public MaverickMode trueControlMode;
+	public MaverickModeId controlMode;
+	public MaverickModeId trueControlMode;
 
 	public bool isMenuOpened;
 	public float cooldown;
@@ -19,7 +19,7 @@ public class MaverickWeapon : Weapon {
 	public Maverick? maverick {
 		get {
 			if (_maverick != null && _maverick.destroyed) {
-				cooldown = _maverick.controlMode == MaverickMode.TagTeam ? tagTeamCooldown : strikerCooldown;
+				cooldown = _maverick.controlMode == MaverickModeId.TagTeam ? tagTeamCooldown : strikerCooldown;
 				lastHealth = _maverick.health;
 				if (_maverick.health <= 0) smd = null;
 				else smd = new SavedMaverickData(_maverick);
@@ -46,9 +46,12 @@ public class MaverickWeapon : Weapon {
 	public bool isMoth;
 
 	public MaverickWeapon(Player? player, int controlMode) {
-		this.controlMode = (MaverickMode)controlMode;
+		trueControlMode = (MaverickModeId)controlMode;
+		this.controlMode = trueControlMode;
 		lastHealth = player?.getMaverickMaxHp(this.controlMode) ?? 32;
 		this.player = player;
+
+		drawAmmo = false;
 	}
 
 	public override void update() {
@@ -61,7 +64,13 @@ public class MaverickWeapon : Weapon {
 				if (currencyGainCooldown >= currencyGainMaxCooldown) {
 					currencyGainCooldown = 0;
 					currencyHUDAnimTime = Global.spf;
-					player.currency++;
+					if (Global.level.isHyperMatch()) {
+						player.currency += 5 + Global.level.server.customMatchSettings.currencyGain;
+					} else if (Global.level?.server?.customMatchSettings != null) {
+						player.currency += Global.level.server.customMatchSettings.currencyGain;
+					} else {
+						player.currency++;
+					}
 				}
 			}
 		}
@@ -147,6 +156,7 @@ public class MaverickWeapon : Weapon {
 		if (maverick == null) {
 			throw new Exception("Error summoning maverick on maverick weapon " + this.GetType().ToString());
 		}
+		maverick.ownerChar = player.character;
 		maverick.controlMode = controlMode;
 		maverick.trueControlMode = trueControlMode;
 		maverick.rootWeapon = this;
@@ -158,8 +168,8 @@ public class MaverickWeapon : Weapon {
 		} else {
 			lastHealth = maverick.maxHealth;
 		}
-		smd?.applySavedMaverickData(maverick, controlMode == MaverickMode.Puppeteer);
-		if (controlMode == MaverickMode.Striker) {
+		smd?.applySavedMaverickData(maverick, controlMode == MaverickModeId.Puppeteer);
+		if (controlMode == MaverickModeId.Striker) {
 			maverick.ammo = maverick.maxAmmo;
 		}
 		summonedOnce = true;
@@ -171,11 +181,11 @@ public class MaverickWeapon : Weapon {
 	}
 
 	public bool canIssueOrders() {
-		return controlMode is MaverickMode.Summoner or MaverickMode.Puppeteer;
+		return controlMode is MaverickModeId.Summoner or MaverickModeId.Puppeteer;
 	}
 
 	public bool canIssueAttack() {
-		return controlMode is MaverickMode.Summoner;
+		return controlMode is MaverickModeId.Summoner;
 	}
 }
 

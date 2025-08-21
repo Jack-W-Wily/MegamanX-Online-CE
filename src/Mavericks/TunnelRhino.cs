@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -8,13 +9,16 @@ public class TunnelRhino : Maverick {
 
 	public Weapon meleeWeapon;
 	public TunnelRhino(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(TunnelRShootState), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(TunnelRShoot2State), new MaverickStateCooldown(true, false, 0.75f));
-		stateCooldowns.Add(typeof(TunnelRDashState), new MaverickStateCooldown(false, false, 1f));
+		stateCooldowns = new() {
+			{ typeof(TunnelRShootState), new(45, false, true) },
+			{ typeof(TunnelRShoot2State), new(45, false, true) },
+			{ typeof(TunnelRDashState), new(60) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
@@ -53,24 +57,43 @@ public class TunnelRhino : Maverick {
 	}
 
 	public override float getRunSpeed() {
-		return 75;
+		return Physics.WalkSpeed;
 	}
 
 	public override string getMaverickPrefix() {
 		return "tunnelr";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new TunnelRShootState(false),
+			new TunnelRShoot2State(),
+			new TunnelRDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new TunnelRShootState(false),
-				new TunnelRShoot2State(),
-				new TunnelRDashState(),
-		};
+		float enemyDist = 300;
+		int enemyxDir = 1;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+			enemyxDir = target.xDir * -1;
+		}
+		List<MaverickState> aiStates = [];
+		if (enemyDist > 30) {
+			aiStates.Add(new TunnelRShootState(false));
+			aiStates.Add(new TunnelRShoot2State());
+
+		}
+		if (enemyDist > 30) {
+			aiStates.Add(new TunnelRDashState());
+		}
+		if (enemyDist <= 30) {
+			xDir = -xDir;
+			aiStates.Add(new TunnelRDashState());
+			aiStates.Add(new TunnelRJumpAI());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -121,7 +144,7 @@ public class TunnelRTornadoFang : Projectile {
 	public TunnelRTornadoFang(
 		Point pos, int xDir, int type, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "tunnelr_proj_drillbig", netId, player	
+		pos, xDir, owner, "tunnelr_proj_drillbig", netId, player
 	) {
 		weapon = TunnelRhino.getWeapon();
 		damager.damage = 1;
@@ -195,19 +218,28 @@ public class TunnelRTornadoFang : Projectile {
 		}
 	}
 }
+public class TunnelRMState : MaverickState {
+	public TunnelRhino ScrewMasaider = null!;
+	public TunnelRMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class TunnelRShootState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
+	}
+}
+
+public class TunnelRShootState : TunnelRMState {
 	bool shotOnce;
 	bool isSecond;
-	public TunnelRhino ScrewMasaider = null!;
 	public TunnelRShootState(bool isSecond) : base("shoot1") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
 		canEnterSelf = true;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -267,19 +299,13 @@ public class TunnelRTornadoFangDiag : Projectile {
 }
 
 
-public class TunnelRShoot2State : MaverickState {
+public class TunnelRShoot2State : TunnelRMState {
 	bool shotOnce;
 	bool shotOnce2;
 	bool shotOnce3;
-	public TunnelRhino ScrewMasaider = null!;
 	public TunnelRShoot2State() : base("shoot3") {
 		exitOnAnimEnd = true;
 	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		ScrewMasaider = maverick as TunnelRhino ?? throw new NullReferenceException();
-	}
-
 	public override void update() {
 		base.update();
 
@@ -349,9 +375,25 @@ public class TunnelRDashState : MaverickState {
 
 		maverick.move(move);
 
-		if (isHoldStateOver(0.5f, 1.5f, 1f, Control.Dash)) {
+		if (isHoldStateOver(0.5f, 1.5f, 1.5f, Control.Dash)) {
 			maverick.changeToIdleOrFall();
 			return;
 		}
+	}
+}
+public class TunnelRJumpAI : MaverickState {
+	public TunnelRJumpAI() : base("jump", "jump_start") {
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 12f / 60f) {
+			maverick.changeState(new MFall());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }

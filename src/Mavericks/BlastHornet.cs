@@ -13,12 +13,18 @@ public class BlastHornet : Maverick {
 	//public float lockOnTime;
 	public Sprite wings;
 
-	public BlastHornet(Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false) :
-		base(player, pos, destPos, xDir, netId, ownedByLocalPlayer) {
-		stateCooldowns.Add(typeof(BHornetShootState), new MaverickStateCooldown(false, false, 2f));
-		stateCooldowns.Add(typeof(BHornetShootCursorState), new MaverickStateCooldown(false, false, 0.25f));
-		stateCooldowns.Add(typeof(BHornetShoot2State), new MaverickStateCooldown(false, false, 0f));
-		stateCooldowns.Add(typeof(BHornetStingState), new MaverickStateCooldown(false, false, 0.5f));
+	public BlastHornet(
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		player, pos, destPos, xDir, netId, ownedByLocalPlayer
+	) {
+		stateCooldowns = new() {
+			{ typeof(BHornetShootState), new(2 * 60) },
+			{ typeof(BHornetShootCursorState), new(15) },
+			{ typeof(BHornetStingState), new(30) },
+			//{ typeof(BHornetShoot2State), new(0) }
+		};
 
 		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 		wings = new Sprite("bhornet_wings");
@@ -45,6 +51,7 @@ public class BlastHornet : Maverick {
 		base.update();
 		wings.update();
 		if (!ownedByLocalPlayer) return;
+		subtractTargetDistance = 50;
 
 		if (cursor != null && cursor.destroyed) {
 			cursor = null;
@@ -88,19 +95,27 @@ public class BlastHornet : Maverick {
 		}
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new BHornetShootState(grounded),
+			new BHornetShoot2State(null, true),
+			new BHornetStingState(true),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		var states = new List<MaverickState>
-		{
-				new BHornetShootState(grounded),
-				new BHornetShoot2State(null),
-				new BHornetStingState(),
-			};
-
-		return states.ToArray();
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new BHornetShootState(grounded),
+			new BHornetShoot2State(null, true),
+		];
+		if (enemyDist <= 40) {
+			aiStates.Add(new BHornetStingState(true));
+		}
+		return aiStates.ToArray();
 	}
 
 	public Point? getWingPOI(out string tag) {
@@ -342,11 +357,26 @@ public class BHornetHomingBeeProj : Projectile, IDamagable {
 	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
 	public bool isPlayableDamagable() { return false; }
 }
+public class HornetMState : MaverickState {
+	public BlastHornet ExploseHorneck = null!;
+	public HornetMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
 
-public class BHornetShootState : MaverickState {
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
+
+	}
+}
+public class BHornetShootState : HornetMState {
 	bool shotOnce;
-	public BlastHornet ExploseHorneck  = null!;
+	public bool isGrounded;
 	public BHornetShootState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
+		this.isGrounded = isGrounded;
 	}
 
 	public override void update() {
@@ -384,10 +414,11 @@ public class BHornetShootState : MaverickState {
 	}
 }
 
-public class BHornetShootCursorState : MaverickState {
+public class BHornetShootCursorState : HornetMState {
 	bool shotOnce;
-	public BlastHornet ExploseHorneck  = null!;
+	public bool isGrounded;
 	public BHornetShootCursorState(bool isGrounded) : base(isGrounded ? "attack" : "fly_attack") {
+		this.isGrounded = isGrounded;
 	}
 
 	public override void update() {
@@ -427,7 +458,6 @@ public class BHornetShootCursorState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
 		if (wasFlying) maverick.useGravity = false;
 	}
 
@@ -538,19 +568,20 @@ public class BHornetCursorProj : Projectile {
 	}
 }
 
-public class BHornetShoot2State : MaverickState {
+public class BHornetShoot2State : HornetMState {
 	bool shotOnce;
 	Actor? target;
-	bool isAIRise;
-	public BlastHornet ExploseHorneck  = null!;
-	public BHornetShoot2State(Actor? target) : base("fly_wasp_spawn") {
+	bool aiRise;
+
+	public BHornetShoot2State(Actor? target, bool aiRise = false) : base("fly_wasp_spawn") {
 		this.target = target;
+		this.aiRise = aiRise;
 	}
 
 	public override void update() {
 		base.update();
 
-		if (isAIRise) {
+		if (aiRise) {
 			if (stateTime < 0.25f) {
 				maverick.useGravity = false;
 				maverick.grounded = false;
@@ -577,10 +608,8 @@ public class BHornetShoot2State : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ExploseHorneck = maverick as BlastHornet ?? throw new NullReferenceException();
-		if (wasFlying) maverick.useGravity = false;
-		if (maverick.grounded && isAI) {
-			isAIRise = true;
+		if (wasFlying) {
+			maverick.useGravity = false;
 		}
 	}
 
@@ -590,18 +619,20 @@ public class BHornetShoot2State : MaverickState {
 	}
 }
 
-public class BHornetStingState : MaverickState {
+public class BHornetStingState : HornetMState {
 	float moveTime;
 	Anim? stingAnim;
-	bool isAIRise;
-	public BHornetStingState() : base("fly_stinger_attack", "fly_stinger_start") {
+	bool aiRise;
+
+	public BHornetStingState(bool aiRise = false) : base("fly_stinger_attack", "fly_stinger_start") {
 		useGravity = false;
+		this.aiRise = aiRise;
 	}
 
 	public override void update() {
 		base.update();
 		if (inTransition()) {
-			if (isAIRise && maverick.frameIndex < 7) {
+			if (aiRise && maverick.frameIndex < 7) {
 				maverick.useGravity = false;
 				maverick.grounded = false;
 				maverick.move(new Point(0, -200));
@@ -653,8 +684,5 @@ public class BHornetStingState : MaverickState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.stopMoving();
-		if (maverick.grounded && isAI) {
-			isAIRise = true;
-		}
 	}
 }

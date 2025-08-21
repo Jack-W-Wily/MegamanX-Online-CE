@@ -433,6 +433,7 @@ class Program {
 		bool isPaused = false; //(Global.menu != null || Global.dialogBox != null);
 		if (!isPaused) {
 			Global.frameCount++;
+			Global.flFrameCount += Global.gameSpeed;
 			Global.time += Global.spf;
 			Global.calledPerFrame = 0;
 
@@ -559,52 +560,36 @@ class Program {
 
 		// Check for AI takeover
 		if (e.Code == Key.F12 && Global.level?.mainPlayer != null) {
-			if (Global.level.isTraining() && Global.serverClient == null) {
-				if (AI.trainingBehavior == AITrainingBehavior.Default) AI.trainingBehavior = AITrainingBehavior.Idle;
-				else if (AI.trainingBehavior == AITrainingBehavior.Idle) AI.trainingBehavior = AITrainingBehavior.Attack;
-				else if (AI.trainingBehavior == AITrainingBehavior.Attack) AI.trainingBehavior = AITrainingBehavior.Jump;
-				else if (AI.trainingBehavior == AITrainingBehavior.Jump) AI.trainingBehavior = AITrainingBehavior.Default;
+			if (!Global.level.mainPlayer.isAI) {
+				Global.level.mainPlayer.aiTakeover = true;
+				Global.level.mainPlayer.isAI = true;
+				Global.level.mainPlayer.character?.addAI();
 			} else {
-				if (Global.level.isTraining()) {
-					if (!Global.level.mainPlayer.isAI) {
-						AI.trainingBehavior = AITrainingBehavior.Attack;
-						Global.level.mainPlayer.aiTakeover = true;
-						Global.level.mainPlayer.isAI = true;
-						Global.level.mainPlayer.character?.addAI();
-					} else {
-						if (AI.trainingBehavior == AITrainingBehavior.Attack) {
-							AI.trainingBehavior = AITrainingBehavior.Jump;
-						} else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
-							AI.trainingBehavior = AITrainingBehavior.Default;
-						} else if (AI.trainingBehavior == AITrainingBehavior.Default) {
-							AI.trainingBehavior = AITrainingBehavior.Idle;
-							Global.level.mainPlayer.aiTakeover = false;
-							Global.level.mainPlayer.isAI = false;
-							if (Global.level.mainPlayer.character != null) Global.level.mainPlayer.character.ai = null;
-						}
-					}
-				} else {
-					if (!Global.level.mainPlayer.isAI) {
-						Global.level.mainPlayer.aiTakeover = true;
-						Global.level.mainPlayer.isAI = true;
-						Global.level.mainPlayer.character?.addAI();
-					} else {
-						if (Global.level.isTraining()) {
-							AI.trainingBehavior = AITrainingBehavior.Idle;
-						}
-						Global.level.mainPlayer.aiTakeover = false;
-						Global.level.mainPlayer.isAI = false;
-						if (Global.level.mainPlayer.character != null) Global.level.mainPlayer.character.ai = null;
-					}
+				Global.level.mainPlayer.aiTakeover = false;
+				Global.level.mainPlayer.isAI = false;
+				if (Global.level.mainPlayer.character != null) {
+					Global.level.mainPlayer.character.ai = null;
 				}
 			}
 		}
-		if (e.Code == Key.F12) {
+		if (e.Code == Key.F11 && Global.level?.isTraining() == true) {
+			if (AI.trainingBehavior == AITrainingBehavior.Default) {
+			AI.trainingBehavior = AITrainingBehavior.Idle;
+			} else if (AI.trainingBehavior == AITrainingBehavior.Idle) {
+				AI.trainingBehavior = AITrainingBehavior.Attack;
+			} else if (AI.trainingBehavior == AITrainingBehavior.Attack) {
+				AI.trainingBehavior = AITrainingBehavior.Jump;
+			} else if (AI.trainingBehavior == AITrainingBehavior.Jump) {
+				AI.trainingBehavior = AITrainingBehavior.Default;
+			}
+		}
+		if (e.Code == Key.F12 || e.Code == Key.F11) {
 			return;
 		}
-
-		ControlMenu controlMenu = Menu.mainMenu as ControlMenu;
-		if (controlMenu != null && controlMenu.listenForKey && controlMenu.bindFrames == 0) {
+		if (Menu.mainMenu is ControlMenu controlMenu &&
+			controlMenu.listenForKey &&
+			controlMenu.bindFrames == 0
+		) {
 			controlMenu.bind((int)e.Code);
 		}
 	}
@@ -1252,8 +1237,14 @@ class Program {
 		decimal deltaTime = 0;
 		decimal deltaTimeAlt = 0;
 		decimal lastAltUpdateTime = 0;
-		decimal fpsLimit = (TimeSpan.TicksPerSecond / 60m);
-		decimal fpsLimitAlt = (TimeSpan.TicksPerSecond / 240m);
+		// Set FPS cap.
+		Options.main.updateFpsMode();
+		Global.speedMul = Global.gameSpeed;
+		float lastGameSpeed = Global.gameSpeed;
+		decimal targetFps = 60m / (decimal)Global.gameSpeed;
+		decimal fpsLimit = TimeSpan.TicksPerSecond / targetFps;
+		decimal fpsLimitAlt = TimeSpan.TicksPerSecond / 240m;
+		// Other frame data.
 		long lastSecondFPS = 0;
 		int videoUpdatesThisSecond = 0;
 		int framesUpdatesThisSecond = 0;
@@ -1263,6 +1254,7 @@ class Program {
 		bool continueNextFrameStep = false;
 		bool f5Released = true;
 		bool f6Released = true;
+		bool f7Released = true;
 		// WARNING DISABLE THIS FOR NON-DEBUG BUILDS
 		bool frameStepEnabled = true;
 		var clearColor = Color.Black;
@@ -1299,11 +1291,41 @@ class Program {
 					} else {
 						f6Released = true;
 					}
+					// Framerate shenanigans.
+					if (Keyboard.IsKeyPressed(Key.F7)) {
+						if (f7Released) {
+							Options.main.fpsMode = Options.main.fpsMode switch {
+								0 => 1,
+								1 => 2,
+								_ => 0
+							};
+							Options.main.updateFpsMode();
+							f7Released = false;
+						}
+					} else {
+						f7Released = true;
+					}
 				}
 			}
 			if (!(deltaTime >= 1)) {
 				continue;
 			}
+			// In case we chage the target framerate.
+			// We should disable this on release builds... maybe.
+			if (lastGameSpeed != Global.gameSpeed) {
+				targetFps = 60m / (decimal)Global.gameSpeed;
+				fpsLimit = TimeSpan.TicksPerSecond / targetFps;
+				Global.speedMul = Global.gameSpeed;
+				if (Global.gameSpeed == 1) {
+					Global.flFrameCount = MathF.Ceiling(Global.flFrameCount);
+				} else {
+					Global.flFrameCount = (
+						MathF.Ceiling(Global.flFrameCount / Global.gameSpeed) * Global.gameSpeed					
+					);
+				}
+				lastGameSpeed = Global.gameSpeed;
+			}
+
 			long timeSecondsNow = (long)Math.Floor(timeSpam.TotalSeconds);
 			if (timeSecondsNow > lastSecondFPS) {
 				Global.currentFPS = videoUpdatesThisSecond;

@@ -12,13 +12,16 @@ public class GravityBeetle : Maverick {
 	public GBeetleGravityWellProj? well;
 
 	public GravityBeetle(
-		Player player, Point pos, Point destPos, int xDir, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+		Player player, Point pos, Point destPos, int xDir,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns.Add(typeof(GBeetleShoot), new MaverickStateCooldown(false, false, 1f));
-		stateCooldowns.Add(typeof(GBeetleGravityWellState), new MaverickStateCooldown(false, false, 1));
-		stateCooldowns.Add(typeof(GBeetleDashState), new MaverickStateCooldown(false, false, 1.5f));
+		stateCooldowns = new() {
+			{ typeof(GBeetleShoot), new(60) },
+			{ typeof(GBeetleGravityWellState), new(60) },
+			{ typeof(GBeetleDashState), new(90) }
+		};
 
 		weapon = getWeapon();
 		meleeWeapon = getMeleeWeapon(player);
@@ -36,6 +39,7 @@ public class GravityBeetle : Maverick {
 		armorClass = ArmorClass.Heavy;
 		canStomp = true;
 		gameMavs = GameMavs.X3;
+		height = 40;
 	}
 
 	public override void update() {
@@ -43,7 +47,7 @@ public class GravityBeetle : Maverick {
 		if (well?.destroyed == true) {
 			well = null;
 		}
-
+		subtractTargetDistance = 20;
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
@@ -66,17 +70,27 @@ public class GravityBeetle : Maverick {
 		return "gbeetle";
 	}
 
-	public override MaverickState getRandomAttackState() {
-		return aiAttackStates().GetRandomItem();
+	public override MaverickState[] strikerStates() {
+		return [
+			new GBeetleShoot(false),
+			new GBeetleGravityWellState(),
+			new GBeetleDashState(),
+		];
 	}
 
 	public override MaverickState[] aiAttackStates() {
-		return new MaverickState[]
-		{
-				new GBeetleShoot(false),
-				new GBeetleGravityWellState(),
-				new GBeetleDashState(),
-		};
+		float enemyDist = 300;
+		if (target != null) {
+			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		List<MaverickState> aiStates = [
+			new GBeetleShoot(false),
+			new GBeetleDashState()
+		];
+		if (enemyDist <= 80) {
+			aiStates.Add(new GBeetleGravityWellState());
+		}
+		return aiStates.ToArray();
 	}
 
 	// Melee IDs for attacks.
@@ -195,18 +209,27 @@ public class GBeetleBallProj : Projectile {
 	}
 }
 
-public class GBeetleShoot : MaverickState {
+public class BeetleMState : MaverickState {
+	public GravityBeetle GravityBeetbood = null!;
+	public BeetleMState(
+		string sprite, string transitionSprite = ""
+	) : base(
+		sprite, transitionSprite
+	) {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
+	}
+}
+public class GBeetleShoot : BeetleMState {
 	bool shotOnce;
 	bool isSecond;
-	public GravityBeetle GravityBeetbood = null!;
 	public GBeetleShoot(bool isSecond) :
 		base(isSecond ? "attackproj2" : "attackproj", isSecond ? "attackproj2_start" : "attackproj_start") {
 		this.isSecond = isSecond;
 		exitOnAnimEnd = true;
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -230,7 +253,7 @@ public class GBeetleShoot : MaverickState {
 	}
 }
 
-public class GBeetleDashState : MaverickState {
+public class GBeetleDashState : BeetleMState {
 	float soundTime;
 	float dustTime;
 	float partTime;
@@ -304,7 +327,7 @@ public class GBeetleDashState : MaverickState {
 	}
 }
 
-public class GBeetleLiftState : MaverickState {
+public class GBeetleLiftState : BeetleMState {
 	public Character grabbedChar;
 	float timeWaiting;
 	bool grabbedOnce;
@@ -331,7 +354,13 @@ public class GBeetleLiftState : MaverickState {
 		}
 	}
 }
-
+public class GravityBeetboodDeadLiftWeapon : Weapon {
+	public GravityBeetboodDeadLiftWeapon(Player player) {
+		index = (int)WeaponIds.GravityBeetle;
+		killFeedIndex = 97;
+		damager = new Damager(player, 4, Global.defFlinch, 0.5f);
+	}
+}
 public class BeetleGrabbedState : GenericGrabbedState {
 	public Character? grabbedChar;
 	public bool launched;
@@ -353,7 +382,7 @@ public class BeetleGrabbedState : GenericGrabbedState {
 				return;
 			}
 			if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null) {
-				GravityBeetbood?.meleeWeapon.applyDamage(character, false, grabber, (int)ProjIds.GBeetleLiftCrash);
+				new GravityBeetboodDeadLiftWeapon((grabber as Maverick)?.player ?? player).applyDamage(character, false, character, (int)ProjIds.GBeetleLiftCrash);
 				character.playSound("crashX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 			}
@@ -499,16 +528,11 @@ public class GBeetleGravityWellProj : Projectile {
 	}
 }
 
-public class GBeetleGravityWellState : MaverickState {
+public class GBeetleGravityWellState : BeetleMState {
 	int state = 0;
 	float partTime;
 	float chargeTime;
-	public GravityBeetle GravityBeetbood = null!;
 	public GBeetleGravityWellState() : base("blackhole_start") {
-	}
-	public override void onEnter(MaverickState oldState) {
-		base.onEnter(oldState);
-		GravityBeetbood = maverick as GravityBeetle ?? throw new NullReferenceException();
 	}
 
 	public override void update() {
@@ -535,7 +559,7 @@ public class GBeetleGravityWellState : MaverickState {
 					player.getNextActorNetId(), false, sendRpc: true) { ttl = partTime, vel = vel };
 			}
 
-			if (isHoldStateOver(1f, 3f, 2f, Control.Special1)) {
+			if (isHoldStateOver(1f, 3f, 3f, Control.Special1)) {
 				maverick.changeSpriteFromName("blackhole", true);
 				chargeTime = (int)stateTime;
 				state = 1;

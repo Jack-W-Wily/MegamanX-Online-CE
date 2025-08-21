@@ -623,6 +623,8 @@ public enum ProjIds {
 	Sigma2HopperDrill,
 	Sigma2ViralPossess,
 	WSpongeSeed,
+	WSpongeSeedAI,
+	WSpongeSeedAIStriker,
 	WSpongeSpike,
 	WSpongeChainSpin,
 	WSpongeChain,
@@ -671,6 +673,9 @@ public enum ProjIds {
 	FakeZeroSwordBeam,
 	FakeZeroGroundPunch,
 	BBuffaloIceProj,
+	BBuffaloIceProjAI,
+	BBuffaloIceProjAIStriker,
+
 	BBuffaloIceProjGround,
 	BBuffaloBeam,
 	BBuffaloDrag,
@@ -920,6 +925,7 @@ public enum ProjIds {
 
 	// Special damage types.
 	SelfDmg = 30000,
+	SelfTrueDmg,
 
 	// Enviroment effect shenanigans.
 	KillZone = 32000,

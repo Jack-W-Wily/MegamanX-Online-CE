@@ -1,4 +1,4 @@
-namespace MMXOnline;
+﻿namespace MMXOnline;
 
 public class IssueGlobalCommand : CharState {
 	public bool isAutoGuarding;
@@ -43,6 +43,7 @@ public class CallDownMaverick : CharState {
 		this.isNew = isNew;
 		this.isRecall = isRecall;
 		superArmor = true;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -50,8 +51,8 @@ public class CallDownMaverick : CharState {
 
 		frame++;
 
-		if (frame > 0 && frame < 10 && maverick.controlMode is MaverickMode.Striker or MaverickMode.Summoner) {
-			if (player.input.isAPressed(player) &&
+		if (frame > 0 && frame < 10 && maverick.controlMode is MaverickModeId.Striker or MaverickModeId.Summoner) {
+			/*if (player.input.isPressed(Control.Shoot, player) &&
 				maverick.startMoveControl == Control.Special1
 			) {
 				maverick.startMoveControl = Control.Dash;
@@ -60,7 +61,7 @@ public class CallDownMaverick : CharState {
 				maverick.startMoveControl == Control.Shoot
 			) {
 				maverick.startMoveControl = Control.Dash;
-			}
+			} */
 		}
 
 		if (character.isAnimOver()) {
@@ -97,9 +98,11 @@ public class SigmaBlock : CharState {
 		if (inputXDir != 0) {
 			character.xDir = inputXDir;
 		}
-		if (!isHoldingGuard || Global.level.gameMode.isOver) {
+		if ((!isHoldingGuard || Global.level.gameMode.isOver) && !player.isAI) {
 			character.changeToIdleOrFall();
 			return;
+		} else if (player.isAI && stateTime >= 32f/60f) {
+			character.changeToIdleOrFall();
 		}
 	}
 }
