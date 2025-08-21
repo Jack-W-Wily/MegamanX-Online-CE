@@ -395,7 +395,350 @@ public class ZainParryMeleeState : CharState {
 	}
 }
 
+
+
+
+public class ZainDashParryState : CharState {
+	public ZainDashParryState() : base("parry_start", "", "", "") {
+		superArmor = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (player.isZain){
+			character.move(new Point(character.xDir * 350, 0));
+		}
+
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			character.genericParryCooldown = 30;
+		}
+	}
+
+	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
+		Actor? counterAttackTarget = null;
+		if (damagingActor is GenericMeleeProj gmp) {
+			counterAttackTarget = gmp.owningActor;
+		}
+		if (counterAttackTarget == null) {
+			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
+		}
+
+		Projectile? proj = damagingActor as Projectile;
+		bool stunnableParry = proj != null && proj.canBeParried();
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 75 &&
+			counterAttackTarget is Character chr && stunnableParry
+		) {
+			if (player.isVile){
+			if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new ParriedState(), true);
+			}
+			if (player.isVile){
+		Point shootVel = new Point(1, -3);
 	
+		}
+			character.addHealth(1);
+			}
+
+			if (player.isZain){
+					if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new VileMK2Grabbed(character), true);
+				character.changeState(new ZainGrab(), true);
+			}
+			}
+
+		}
+		character.playSound("zeroParry", forcePlay: false, sendRpc: true);	
+
+		if (Helpers.randomRange(0,5) == 5){
+			character.addHealth(1);
+			character.changeState(new ParriedState(), true);
+		}
+		if (!player.isZain){
+		character.changeState(new Idle(), true);
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+
+	public bool canParry(Actor damagingActor) {
+		if (damagingActor is not Projectile) {
+			return false;
+		}
+		if (player.isVile)return character.frameIndex < 5;
+	//	if (player.isDragoon)return character.frameIndex < 5;
+		
+		return character.frameIndex == 0;
+	}
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.isX || player.isRMX) {
+		character.changeSpriteFromName("unpo_parry_start", true);
+		}
+
+			if (player.isZain){
+			character.changeSpriteFromName("parry_dash", true);
+			character.playSound("distortion_d");
+			character.playSound("GDash");
+		}
+
+
+		
+		}
+	
+}
+
+
+
+
+public class ZainShinGroundStab : CharState {
+
+	public float pushBackSpeed;
+
+	bool fired;
+	public ZainShinGroundStab(string transitionSprite = "")
+		: base("groundstab", "", "", transitionSprite) {
+		airMove = true;
+		superArmor = true;
+		enterSound = "dbzpunchwave_1";
+	}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+		if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("flashysnd_1", forcePlay: false, sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new ZainPillar(new ElectricSpark(), character.pos.addxy(-100 , 0), character.xDir, player, player.getNextActorNetId(), sendRpc: true);
+			new ZainPillar(new ElectricSpark(), character.pos.addxy(100 ,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+		}
+
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+}
+
+
+public class ZainParryShinStartState : CharState {
+	public ZainParryShinStartState() : base("super_parry", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stateTime < 0.1f) {
+			character.turnToInput(player.input, player);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
+		Actor? counterAttackTarget = null;
+		if (damagingActor is GenericMeleeProj gmp) {
+			counterAttackTarget = gmp.owningActor;
+		}
+		if (counterAttackTarget == null) {
+			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
+		}
+
+		Projectile? proj = damagingActor as Projectile;
+		bool stunnableParry = proj != null && proj.canBeParried();
+		if (counterAttackTarget != null && character.pos.distanceTo(counterAttackTarget.pos) < 999 &&
+			counterAttackTarget is Character chr && stunnableParry
+		) {
+			if (!chr.ownedByLocalPlayer) {
+				RPC.actorToggle.sendRpc(chr.netId, RPCActorToggleType.ChangeToParriedState);
+			} else {
+				chr.changeState(new ParriedState(), true);
+			}
+		}
+
+		character.playSound("zeroParry", sendRpc: true);
+		character.changeState(new ZainParryShinMeleeState(counterAttackTarget), true);
+		character.addHealth(5);
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		
+		//character.parryCooldown = character.maxParryCooldown;
+	}
+
+	public bool canParry(Actor damagingActor) {
+	
+		return character.frameIndex == 0;
+	}
+
+
+	
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+			character.playSound("distortion_d");
+		}
+}
+
+public class ZainParryShinMeleeState : CharState {
+	Actor? counterAttackTarget;
+	Point counterAttackPos;
+	public ZainParryShinMeleeState(Actor? counterAttackTarget) : base("uppercut_slash", "", "", "") {
+		invincible = true;
+		this.counterAttackTarget = counterAttackTarget;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (counterAttackTarget != null) {
+			character.turnToPos(counterAttackPos);
+			float dist = character.pos.distanceTo(counterAttackPos);
+			if (dist < 950) {
+				if (character.frameIndex >= 1 && !once) {
+					if (dist > 5) {
+						var destPos = Point.lerp(character.pos, counterAttackPos, Global.spf * 5);
+						character.changePos(destPos);
+					}
+				}
+			}
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			character.playSound("flashysnd_1", forcePlay: false, sendRpc: true);
+
+				new ZainSaberProj(
+					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
+					character.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+		if (counterAttackTarget != null) {
+			counterAttackPos = counterAttackTarget.pos.addxy(character.xDir * 30, 0);
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+}
+
+
+
+public class ZainShinProjSwingState : CharState {
+	bool fired;
+	bool grounded;
+	bool shootProj;
+	bool once;
+
+	bool once1;
+	public ZainShinProjSwingState(
+		bool grounded, bool shootProj
+	) : base(
+		grounded ? "super_slash" : "super_slash", "", "", ""
+	) {
+		this.grounded = grounded;
+		landSprite = "super_slash";
+		this.shootProj = shootProj;
+		if (shootProj) {
+			superArmor = true;
+		}
+		airMove = true;
+		useDashJumpSpeed = true;
+		bonusAttackCtrl = true;
+		superArmor = true;
+	}
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+		if (player.input.isHeld(Control.Special2, player) && character.frameIndex == 2) {
+				character.frameIndex = 2;
+		}
+
+		if (character.frameIndex >= 4 && !fired) {
+			fired = true;
+			character.playSound("dbzpunchwave_2", forcePlay: false, sendRpc: true);
+
+			if (shootProj) {
+				character.playSound("flashysnd_1", forcePlay: false, sendRpc: true);
+
+				new ZainSaberProj(
+					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
+					character.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+			}
+		}
+
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "super_slash";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+}
+
+
+
 
 public class ZainProjSwingState : CharState {
 	bool fired;
@@ -421,31 +764,31 @@ public class ZainProjSwingState : CharState {
 	}
 
 
-		public override void onEnter(CharState oldState) {
+	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (player.input.isHeld(Control.Up, player)){
-		  character.changeSpriteFromName("uppercut_slash", true);
+		if (player.input.isHeld(Control.Up, player)) {
+			character.changeSpriteFromName("uppercut_slash", true);
 		}
 	}
 
 	public override void update() {
 		base.update();
 
-		
+
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
 			character.playSound("dbzpunchwave_2", forcePlay: false, sendRpc: true);
-			
+
 			if (shootProj) {
 				character.playSound("flashysnd_1", forcePlay: false, sendRpc: true);
-			
+
 				new ZainSaberProj(
 					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
 					character.xDir, player, player.getNextActorNetId(), rpc: true
 				);
 			}
 		}
-		
+
 		if (character.isAnimOver()) {
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
@@ -618,32 +961,30 @@ public class ZainGrab : CharState {
 public class ZainGroundStab : CharState {
 
 
-	
+
 	public float pushBackSpeed;
 
 
 	bool fired;
 	public ZainGroundStab(string transitionSprite = "")
-		: base("groundstab", "", "", transitionSprite)
-	{
-	airMove = true;
-	superArmor = true;
-	enterSound = "dbzpunchwave_1";
+		: base("groundstab", "", "", transitionSprite) {
+		airMove = true;
+		superArmor = true;
+		enterSound = "dbzpunchwave_1";
 	}
 
-	public override void update()
-	{
-	
+	public override void update() {
+
 		base.update();
 
 
-			if (character.frameIndex >= 3 && !fired) {
+		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			character.shakeCamera(sendRpc: true);
 			character.playSound("crash", forcePlay: false, sendRpc: true);
 		}
 
-	
+
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -666,35 +1007,35 @@ public class ZainGroundStab : CharState {
 
 
 }
+
+
+
+
 	
 
 public class ZainGrabStab : CharState {
 
-
-	
 	public float pushBackSpeed;
 
 
 	bool fired;
 	public ZainGrabStab(string transitionSprite = "")
-		: base("stabgrab", "", "", transitionSprite)
-	{
-	airMove = true;
-	superArmor = true;
-}
+		: base("stabgrab", "", "", transitionSprite) {
+		airMove = true;
+		superArmor = true;
+	}
 
-	public override void update()
-	{
-	
+	public override void update() {
+
 		base.update();
 
 
-			if (character.frameIndex >= 3 && !fired) {
+		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			character.playSound("dbzpunchwave_1", forcePlay: false, sendRpc: true);
 		}
 
-	
+
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -719,6 +1060,52 @@ public class ZainGrabStab : CharState {
 		if (!character.grounded) {
 			character.stopMovingWeak();
 			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+public class ZainJab : CharState {
+
+
+	bool fired;
+	public ZainJab(string transitionSprite = "")
+		: base("jab", "", "", transitionSprite)
+	{
+	airMove = true;
+	superArmor = true;
+}
+
+	public override void update()
+	{
+	
+		base.update();
+
+
+			if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("dbzpunchwave_3", forcePlay: false, sendRpc: true);
+		}
+
+	
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMovingWeak();
 		}		
 	}
 
@@ -727,7 +1114,6 @@ public class ZainGrabStab : CharState {
 		character.useGravity = true;
     }
 }
-
 
 
 
@@ -925,5 +1311,99 @@ public class ZainGrabSlash : CharState {
     }
 }
 
+
+
+
+
+public class ZainBossJumpStart : CharState {
+	public ZainBossJumpStart() : base("jump") {
+		enterSound = "vileJump";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isAnimOver()) {
+			character.vel.y = -character.getJumpPower() * 0.75f;
+			character.changeState(new ZainBossJump(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+public class ZainBossJump : CharState {
+
+	bool dropDown;
+	public ZainBossJump() : base("projswing_air") {
+		enterSound = "swordswipeGG";
+		superArmor = true;
+		canSpecialCancel = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded && stateTime > 0.05f) {
+			character.changeState(new ZainBossJumpLand(), true);
+		}
+
+		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
+			character.vel.y = 0;
+		}
+		if (!player.isAI && !character.player.input.isAHeld(player) && !dropDown) {
+			dropDown = true;
+			character.vel.y = 0;
+			character.frameIndex = 8;
+		}
+		if (player.isAI && stateTime == Helpers.randomRange(0,2) && !dropDown) {
+			dropDown = true;
+			character.vel.y = 0;
+			character.frameIndex = 8;
+		}
+		character.move(new Point(character.xDir * 300, 0));
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+
+public class ZainBossJumpLand : CharState {
+
+
+	public ZainBossJumpLand() : base("projswing") {
+		enterSound = "crash";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.shakeCamera(sendRpc: true);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
 
 

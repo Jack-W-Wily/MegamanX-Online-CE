@@ -21,6 +21,7 @@ public class BusterProj : Projectile {
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+		
 	}
 
 	public static Projectile rpcInvoke(ProjParameters args) {

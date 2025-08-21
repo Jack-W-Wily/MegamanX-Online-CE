@@ -49,6 +49,7 @@ public class Vava1GrabState : CharState {
 
 	public Vava1GrabState(Character? victim) : base("grab") {
 		this.victim = victim;
+		specialId = SpecialStateIds.AxlRoll;
 		grabTime = Vava1Grabbed.maxGrabTime;
 	}
 
@@ -82,7 +83,7 @@ public class Vava1GrabState : CharState {
 
 		if (player.input.isPressed(Control.Up, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
-			character.changeSpriteFromName("grab_up", true);
+			character.changeSpriteFromName("deadlift", true);
 		}
 
 		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
@@ -106,18 +107,7 @@ public class Vava1GrabState : CharState {
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 			}
 		}
-		
-		if (character.sprite.name.Contains("up") && character.frameIndex == 1) {
-			if (leechTime > 0.3f) {
-				leechTime = 0;
-				var damager = new Damager(player, 3, 25, 0);
-					new Anim(victim.pos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, character.ownedByLocalPlayer);
-				character.playSound("explosionX3", sendRpc: true);
-				character.shakeCamera(sendRpc: true);
-				victim.shakeCamera(sendRpc: true);
-				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.Ryuenjin);
-			}
-		}
+	
 
 		if (character.sprite.name.Contains("violentcrusher_grab") && character.frameIndex == 1) {
 			if (leechTime > 0.3f) {
@@ -144,8 +134,7 @@ public class Vava1GrabState : CharState {
 		if (regenTime > 0.4f) {
 			regenTime = 0;
 			character.addHealth(0.5f);
-			var damager = new Damager(player, 1, 0, 0.1f);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+			//damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 		}
 
 

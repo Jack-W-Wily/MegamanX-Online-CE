@@ -750,6 +750,84 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.HexaInvolute:
 				proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), pos, xDir, player, netProjByte);
 				break;
+
+			
+
+			// Dynamo WCUT RPC
+			case (int)ProjIds.DynamoBoomerangProj:
+				proj = new DynamoBoomerangProj(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.DynamoAirBuster:
+				proj = new DynamoAirBuster(new XBuster(), pos, xDir, player, 0, netProjByte);
+				break;
+			case (int)ProjIds.DynamoAirBuster2:
+				proj = new DynamoAirBuster(new XBuster(), pos, xDir, player, 1, netProjByte);
+				break;
+			case (int)ProjIds.DynamoCross:
+				proj = new DynamoCrossProj(new ShotgunIce(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.DarkHoldD:
+				proj = new DarkHoldDProj(new DarkHoldWeapon(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.DynamoBeam:
+				proj = new DynamoBeam(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.ZainPillar:
+				proj = new ZainPillar(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
+			
+			//Iris WCUT RPC
+			case (int)ProjIds.IrisFireBallProj:
+				proj = new IrisFireBallProj(new IrisCrystal(), pos, xDir, 0, false, player, netProjByte);
+				break;
+
+			case (int)ProjIds.IrisSlashProj:
+			proj = new IrisSlashProj(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.IrisStabProj:
+			proj = new IrisStabProj(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
+			
+				case (int)ProjIds.IrisCannon:
+			proj = new IrisCannon(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
+
+				//AXl WCUT RPC
+			case (int)ProjIds.AxlFlashKickProj:
+				proj = new AxlFlashKickProj(new StormTornado(), pos, xDir, player, netProjByte);
+				break;
+
+
+			// X weapons WCUT RPC
+			// Dragoon WCUT RPC
+			case (int)ProjIds.DragoonSpark:
+				proj = new DragoonSpark(new FireWave(), pos, xDir, player, netProjByte);
+				break;
+				
+			case (int)ProjIds.DoubleCycloneCharged:
+				proj = new DoubleCycloneCharged(
+					new DoubleCyclone(),
+					pos, xDir, player, netProjByte
+				);
+				break;
+			case (int)ProjIds.AimingLaserBlade:
+				proj = new AimingLaserBlade(new AimingLaser(), pos, xDir, player, netProjByte);
+				break;
+			
+			case (int)ProjIds.RayClaw:
+				proj = new RayClaw(new RaySplasher(), pos, xDir, player, netProjByte);
+				break;
+
+				case (int)ProjIds.DesmumeProj1:
+				proj = new DesmumeProj1(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.DesmumeProj2:
+				proj = new DesmumeProj2(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.DesmumeProj3:
+				proj = new DesmumeProj3(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				break;
+
 			default:
 				proj = null;
 				break;

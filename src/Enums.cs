@@ -50,7 +50,6 @@ public enum TCat {
 public enum WeaponIds {
 	// DO NOT change the order of these X weapons
 	Buster,
-	// X1 Weapons.
 	HomingTorpedo,
 	ChameleonSting,
 	RollingShield,
@@ -59,7 +58,6 @@ public enum WeaponIds {
 	ElectricSpark,
 	BoomerangCutter,
 	ShotgunIce,
-	// X2 Weapons.
 	CrystalHunter,
 	BubbleSplash,
 	SilkShot,
@@ -68,7 +66,6 @@ public enum WeaponIds {
 	StrikeChain,
 	MagnetMine,
 	SpeedBurner,
-	// X3 Weapons.
 	AcidBurst,
 	ParasiticBomb,
 	TriadThunder,
@@ -77,10 +74,19 @@ public enum WeaponIds {
 	GravityWell,
 	FrostShield,
 	TornadoFang,
+
+	LightningWeb,
+	FrostTower,
+	SoulBody,
+	RisingFire,
+	GroundHunter,
+	AimingLaser,
+	DoubleCyclone,
+	TwinSlasher,
 	// Other stuff whose order does not matter.
+	XSaber,
 	GigaCrush,
 	ItemTracer,
-	XSaber,
 	HyperCharge,
 	Hadouken,
 	Shoryuken,
@@ -299,7 +305,9 @@ public enum WeaponIds {
 
 	// Wcut STuff
 
+	IrisCrystal,
 
+	
 	// Zain
 
 	ZainParry,
@@ -754,6 +762,8 @@ public enum ProjIds {
 
 	BlockingProjID,
 
+	SigmaViralSlash,
+
 	GenericWCUTGrabProjID,
 
 	ForceGrabState,
@@ -784,7 +794,9 @@ public enum ProjIds {
 
 	ZainSaberProj,
 
-	
+	ZainPillar,
+
+
 	// X another
 	SiceSlide,
 
@@ -792,7 +804,7 @@ public enum ProjIds {
 
 	GBDKick,
 	ShieldBoomerang,
-	ShieldBoomerang2,
+	ShotgunIce2,
 	ChainrodProj,
 
 
@@ -863,8 +875,11 @@ public enum ProjIds {
 	TwinSlasherCharged7,
 	TwinSlasherCharged8,
 
-	// Wily Cut Axl.
+	DoubleCyclone,
+	DoubleCycloneCharged,
 
+	// Wily Cut Axl.
+	BlueBullet,
 	AxlMeleeBullet,
 	AxlFlashKickProj,
 	AxlBulletWC,
@@ -884,8 +899,21 @@ public enum ProjIds {
 	IrisStabProj,
 	IrisCannon,
 
+	IrisLaserProjDiagonal,
+	IrisLaserProjFoward,
+
+	IrisLaserProjUp,
+	VirusSlash,
 	// Random non-projectiles.
 	AxlDiscardedWeapon,
+
+	DragoonSpark,
+
+	HighmaxHomingProj,
+	HighmaxStunShot,
+	DesmumeProj1,
+	DesmumeProj2,
+	DesmumeProj3,
 
 	// EnemyRPCs (PROJIDS)
 	HGM2RPC,
@@ -900,3 +928,220 @@ public enum ProjIds {
 	// Do not add things bellow this.
 	SelfDestruct = 32700,
 }
+
+
+
+public enum SlotIndex {
+	//X1
+	Buster,
+	HTorpedo,
+	CSting,
+	RShield,
+	FWave,
+	STornado,
+	ESpark,
+	BCutter,
+	SIce,
+	Hadouken,
+	//X2
+	CHunter,
+	BSplash,
+	SShot,
+	SWheel,
+	SSlicer,
+	SChain,
+	MMine,
+	SBurner,
+	GigaCrush,
+	Shoryuken,
+	//X3
+	ABurst,
+	PBomb,
+	TThunder,
+	SBlade,
+	RSplasher,
+	GWell,
+	FShield,
+	TFang,
+	HyperCharge,
+	//X4
+	LWeb,
+	FTower,
+	SBody,
+	RFire,
+	GHunter,
+	ALaser,
+	DCyclone,
+	TSlasher,
+	NovaStrike,
+	//X5
+	DHold,
+	//extra weapons
+	ZSaber = 56,
+	//Rides
+	BBear = 66,
+	Kangroo,
+	Hawk,
+	Frog,
+	Goliath,
+	DBear,
+	//Mav X1
+	CP,
+	SMandrill,
+	AArmardillo,
+	LOctopus,
+	BKwagata,
+	SChameleon,
+	SEagle,
+	FMammoth,
+	Doggo,
+	//Mav X2
+	WSponge,
+	WGator,
+	Carlos,
+	FStag,
+	MMConcoon,
+	MCentiped,
+	Dav,
+	OOOStrich,
+	Claudio,
+	//Mav X3
+	BBuffalo,
+	TSeahorse,
+	TRino,
+	VCatfish,
+	CCrawfish,
+	NTiger,
+	GBeetle,
+	Bhornet,
+	DrCatus,
+	//moth form
+	MMMoth,
+	//sigma
+	Sigma,
+	WSigmaHead,
+	WSHand,
+	//Sigma Virus
+	MechaniloidBird,
+	MechaniloidDino,
+	MechaniloidFish,
+	MechaniloidDrill,
+	//DrDoppler Body
+	DrDoppler,
+	//Axl
+	Abullet,
+	BLauncher,
+	RGun,
+	IGattling,
+	BArrow,
+	FBurner,
+	PGun,
+	SMagnum,
+	BBlaster,
+	DrDShock = 121,
+	DrDVaccine,
+	CPIceStatue
+}
+
+
+
+//weapon bar index
+public enum WeaponBarIndex {
+	//X1
+	HomingTorpedo,
+	ChameleonSting,
+	RollingShield,
+	FireWave,
+	StormTornado,
+	ElectricSpark,
+	BoomerangCutter,
+	ShotgunIce,
+	//X2
+	CrystalHunter,
+	BubbleSplash,
+	SilkShot,
+	SpinWheel,
+	SonicSlicer,
+	StrikeChain,
+	MagnetMine,
+	SpeedBurner,
+	GigaCrush,
+	//X3
+	AcidBurst,
+	ParasiticBomb,
+	TriadThunder,
+	SpinningBlade,
+	RaySplasher,
+	GravityWell,
+	FrostShield,
+	TornadoFang,
+	HyperCharge,
+	ZSaber,
+	//X4
+	LightningWeb,
+	FrostTower,
+	SoulBody,
+	RisingFire,
+	GroundHunter,
+	AimingLaser,
+	DoubleCyclone,
+	TwinSlasher,
+	NovaStrike,
+	//X5
+	DarkHold,
+	//AxlWC
+	AxlBullet = 64,
+	BlastLauncher,
+	RayGun,
+	IceGattling,
+	BlackArrow,
+	FlameBurner,
+	PlasmaGun,
+	SpiralMagnum,
+	BoundBlaster,
+	//Others
+	VileAmmo,
+	MaverickAmmo,
+	MaverickAmmoOff,
+	WeaponAmmo,
+	WeaponAmmoOff,
+	SuperBar,
+	SuperBarOff,
+	ZainCounter,
+
+	LastIndex
+}
+
+public enum CharHpBarIndex{
+	X,
+	XAnother,
+	ZeroX1,
+	ZeroX2,
+	ZeroX6,
+	Vile,
+	AxlWC,
+	AxlX8,
+	Sigma,
+	Doppler,
+	GBD,
+	Dynamo,
+	Dragoon,
+	Zain,
+	BlackZero,
+	WhiteAxl,
+	BoostMode,
+	SoulBody,
+	Iris
+}
+
+public enum VehicleHpBarIndex {
+	BlackBear,
+	Frog,
+	Kangroo,
+	Hawk,
+	Goliath,
+	DevilBear,
+	RideChaser
+}
+
+

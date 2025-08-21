@@ -20,6 +20,7 @@ public class BubbleSplash : Weapon {
 		weaponBarBaseIndex = 10;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 10;
+		type = index;
 		killFeedIndex = 21;
 		weaknessIndex = (int)WeaponIds.SpinWheel;
 		switchCooldown = 15;
@@ -29,6 +30,7 @@ public class BubbleSplash : Weapon {
 		effect = "Charged: Grants Jump Boost.";
 		maxAmmo = 28;
 		ammo = maxAmmo;
+		type = index;
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

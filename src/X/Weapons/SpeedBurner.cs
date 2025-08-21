@@ -19,6 +19,7 @@ public class SpeedBurner : Weapon {
 		killFeedIndex = 27;
 		weaknessIndex = (int)WeaponIds.BubbleSplash;
 		damage = "2/4";
+		type = index;
 		effect = "Fire DOT: 1. Charged Grants Super Armor. Self Damage\non contact of a wall. Burn won't give assists.";
 		hitcooldown = "0";
 		flinch = "0/26";

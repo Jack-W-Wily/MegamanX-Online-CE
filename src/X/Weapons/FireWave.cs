@@ -11,6 +11,7 @@ public class FireWave : Weapon {
 		index = (int)WeaponIds.FireWave;
 		killFeedIndex = 4;
 		weaponBarBaseIndex = 4;
+		type = index;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 4;
 		weaknessIndex = (int)WeaponIds.StormTornado;

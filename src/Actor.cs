@@ -289,6 +289,40 @@ public partial class Actor : GameObject {
 		Global.serverClient?.rpc(RPC.createActor, bytes.ToArray());
 	}
 
+	
+	public virtual void rpcCreateActor(
+		ProjIds projId, Point pos, Player player, ushort? netProjId,
+		int xDir, params byte[] extraData
+	) {
+		if (netProjId == null) {
+			throw new Exception($"Attempt to create RPC of projectile type {this.GetType().ToString()} with null ID");
+		}
+		byte[] projIdBytes = BitConverter.GetBytes((ushort)projId);
+		byte[] xBytes = BitConverter.GetBytes(pos.x);
+		byte[] yBytes = BitConverter.GetBytes(pos.y);
+		byte[] netProjIdByte = BitConverter.GetBytes(netProjId.Value);
+		// Create bools of data.
+		byte dataInf = Helpers.boolArrayToByte(new bool[] {
+			false,
+			false,
+			extraData != null && extraData.Length > 0
+		});
+		// Create byte list.
+		List<byte> bytes = new List<byte>() {
+			dataInf, (byte)player.id,
+			projIdBytes[0], projIdBytes[1],
+			xBytes[0], xBytes[1], xBytes[2], xBytes[3],
+			yBytes[0], yBytes[1], yBytes[2], yBytes[3],
+			netProjIdByte[0], netProjIdByte[1],
+			0
+		};
+		if (extraData != null && extraData.Length > 0) {
+			bytes.AddRange(extraData);
+		}
+		Global.serverClient?.rpc(RPC.createProj, bytes.ToArray());
+	}
+
+
 	public void changeSpriteIfDifferent(string spriteName, bool resetFrame) {
 		if (sprite.name == spriteName) return;
 		changeSprite(spriteName, resetFrame);
@@ -392,6 +426,11 @@ public partial class Actor : GameObject {
 		// If vile mk2 and mk5 sounds were not found, use the vile ones
 		if (matchingVoice == null && (spriteName.StartsWith("vilemk2_") || spriteName.StartsWith("vilemk5_"))) {
 			spriteName = spriteName.Replace("vilemk2_", "vile_").Replace("vilemk5_", "vile_");
+			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
+		}
+
+		if (matchingVoice == null && (spriteName.StartsWith("sigma1alt_") || spriteName.StartsWith("sigma1alt_"))) {
+			spriteName = spriteName.Replace("sigma1alt_", "sigma_").Replace("sigma1alt_", "sigma_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
 
@@ -1470,13 +1509,15 @@ public partial class Actor : GameObject {
 	public SoundWrapper createSoundWrapper(SoundBufferWrapper soundBuffer) {
 		if (this is Character chara) {
 			string charName = chara switch {
-				MegamanX or RagingChargeX => "mmx",
+				MegamanX or RagingChargeX or RockmanX => "mmx",
 				Zero => "zero",
 				PunchyZero => "pzero",
 				BusterZero => "dzero",
-				Vile => "vile",
-				VAVA1 => "vava",
-				Axl => "axl",
+				Vile or VAVA1 => "vile",
+				Dynamo => "dynamo",
+				Iris => "iris",
+				Zain => "zain",
+				Axl or AxlWC=> "axl",
 				CmdSigma => "sigma",
 				NeoSigma => "neosigma",
 				Doppma => "doppma",

@@ -10,6 +10,7 @@ public class HomingTorpedo : Weapon {
 		displayName = "Homing Torpedo";
 		index = (int)WeaponIds.HomingTorpedo;
 		killFeedIndex = 1;
+		type = index;
 		weaponBarBaseIndex = 1;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 1;

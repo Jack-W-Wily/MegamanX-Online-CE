@@ -11,6 +11,7 @@ public class HyperCharge : Weapon {
 		index = (int)WeaponIds.HyperCharge;
 		killFeedIndex = 48;
 		weaponBarBaseIndex = 32;
+		type = index;
 		weaponBarIndex = 31;
 		weaponSlotIndex = 36;
 		//shootSounds = new string[] { "buster3X3", "buster3X3", "buster3X3", "buster3X3" };

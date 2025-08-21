@@ -10,6 +10,7 @@ public class ShoryukenWeapon : Weapon {
 		weaponBarBaseIndex = 32;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 32;
+		type = index;
 	}
 }
 

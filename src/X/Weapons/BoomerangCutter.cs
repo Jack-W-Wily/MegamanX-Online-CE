@@ -20,6 +20,7 @@ public class BoomerangCutter : Weapon {
 		effect = "Charged: Doesn't destroy on hit.\nCharged won't give assists.";
 		hitcooldown = "0/0.5";
 		flinch = "0/26";
+		type = index;
 	}
 	public override void shoot(Character character, int[] args) {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();

@@ -159,6 +159,34 @@ public class VAVAKamae : CharState {
 
 
 
+public class VKamaeHotIcecle : CharState {
+
+
+	public VKamaeHotIcecle() : base("hoticecle") {
+		wiffCancel = true;
+		enterSound = "genocideCutter1";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
 
 
 public class VKamaeUnblockableStart : CharState {
@@ -185,8 +213,12 @@ public class VKamaeUnblockableStart : CharState {
 }
 
 public class VUnblockable : CharState {
+
+	bool dropDown;
 	public VUnblockable() : base("kamae_unblockable") {
 		enterSound = "swordswipeGG";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -199,7 +231,16 @@ public class VUnblockable : CharState {
 		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
 			character.vel.y = 0;
 		}
-
+		if (!player.isAI && !character.player.input.isAHeld(player) && !dropDown) {
+			dropDown = true;
+			character.vel.y = 0;
+			character.frameIndex = 8;
+		}
+		if (player.isAI && stateTime == Helpers.randomRange(0,2) && !dropDown) {
+			dropDown = true;
+			character.vel.y = 0;
+			character.frameIndex = 8;
+		}
 		character.move(new Point(character.xDir * 300, 0));
 	}
 
@@ -212,32 +253,6 @@ public class VUnblockable : CharState {
 	}
 }
 
-
-
-
-public class VKamaeHotIcecle : CharState {
-
-
-	public VKamaeHotIcecle() : base("hoticecle") {
-		wiffCancel = true;
-		enterSound = "genocideCutter1";
-	}
-
-	public override void update() {
-		base.update();
-		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
-		}
-	}
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-
-	}
-
-}
 
 
 
@@ -274,6 +289,7 @@ public class VKamaeDash : CharState {
 	public VKamaeDash() : base("kamae_dash") {
 		immuneToWind = true;
 		enterSound = "GDash";
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {
@@ -320,6 +336,7 @@ public class VKamaeBDash : CharState {
 	public VKamaeBDash() : base("kamae_backdash") {
 		immuneToWind = true;
 		enterSound = "GDash";
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {
@@ -366,9 +383,9 @@ public class VKote : CharState {
 
 
 	public VKote() : base("kamae_kote") {
-		superArmor = true;
 		immuneToWind = true;
 		enterSound = "distortion_d";
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {

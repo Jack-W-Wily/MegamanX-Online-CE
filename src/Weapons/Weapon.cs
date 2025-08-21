@@ -65,6 +65,7 @@ public class Weapon {
 	public float rechargeAmmoCooldown;
 	public float altRechargeAmmoCooldown;
 
+
 	public Weapon() {
 		ammo = 32;
 		maxAmmo = 32;
@@ -178,6 +179,15 @@ public class Weapon {
 				new GravityWell(),
 				new FrostShield(),
 				new TornadoFang(),
+				new LightningWeb(),
+				new FrostTower(),
+				new SoulBody(),
+				new RisingFire(),
+				new GroundHunter(),
+				new AimingLaser(),
+				new DoubleCyclone(),
+				new TwinSlasher(),
+				new ZXSaber(),
 			};
 	}
 
@@ -334,6 +344,7 @@ public class Weapon {
 		if (player.character is MegamanX mmx && mmx.hyperArmArmor == ArmorId.Max && amount < 0) amount *= 0.5f;
 		ammo += amount;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
+		onAmmoChange(amount);
 	}
 
 	public virtual bool noAmmo() {
@@ -403,12 +414,17 @@ public class Weapon {
 		}
 	}
 
+	public virtual void onAmmoChange(float amount) {
+	}
+
+
 	public void addAmmoHeal(float ammoAdd) {
 		if (ammoAdd < 0 || ammo >= maxAmmo) {
 			return;
 		}
 		weaponHealAmount += MathF.Ceiling(ammoAdd * ammoGainMultiplier);
 		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
+		onAmmoChange(weaponHealAmount);
 	}
 
 	public void addAmmoPercentHeal(float ammoAdd) {
@@ -417,6 +433,7 @@ public class Weapon {
 		}
 		weaponHealAmount += MathF.Ceiling(maxAmmo * ammoAdd * ammoGainMultiplier / 100f);
 		weaponHealAmount = Helpers.clampMax(weaponHealAmount, maxAmmo);
+		onAmmoChange(weaponHealAmount);
 	}
 
 	public static void gigaAttackSoundLogic(

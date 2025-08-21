@@ -9,7 +9,7 @@ namespace MMXOnline;
 
 
 
-public class VAVA1 : Character {
+public class VAVA1 : Vile {
 
 
 	public float aiAttackCooldown;
@@ -47,6 +47,8 @@ public class VAVA1 : Character {
 
 	public float calldownMechCooldown;
 
+	public float CannonCD;
+
 	
 
 	public VileCannonWC cannonWeapon;
@@ -78,7 +80,8 @@ public class VAVA1 : Character {
 
 		charId = CharIds.VAVA1;
 
-
+		ShouldExplode = true;
+	
 		if (charState is WarpIn) player.superAmmo = 0;
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
@@ -109,11 +112,11 @@ public class VAVA1 : Character {
 			changeState(new BlockWCUT());
 
 		}
-		if (player.input.isPressed(Control.Special2, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-		}
+	//	if (player.input.isPressed(Control.Special2, player)
+	//	&& player.currency > 4
+	//	) {
+	//		player.currency -= 5;
+	//	}
 
 		return base.normalCtrl();
 	}
@@ -150,9 +153,6 @@ public class VAVA1 : Character {
 		return base.spcCancel();
 	}
 
-	public bool AirCheckExplosiveRound = false;
-	public bool AirCheckGreenEyedLamp = false;
-
 
 
 		public bool Supers() {
@@ -175,26 +175,35 @@ public class VAVA1 : Character {
 
 	public bool SpecialMoves() {
 		
-		if (player.input.checkHadoken(player, xDir, Control.Shoot) 
+		if (player.input.isHeld(Control.Down, player)
+		&& player.input.isLeftOrRightHeld(player)
+		&& player.input.isAPressed(player) 
 		){
 			changeState(new VAVAKamae(), true);	
 			return true;
 		}
 
-		if (player.input.checkHadoken(player, xDir, Control.Special1) && !grounded
-		&& !AirCheckGreenEyedLamp){
+		if (player.input.isBPressed(player) && player.input.isHeld(Control.Down, player)
+		&& player.input.isLeftOrRightHeld(player)
+		&& !grounded
+		&& player.vileAmmo > 15){
 			changeState(new GreenEyedLampState(), true);	
-			AirCheckGreenEyedLamp = true;
+			player.vileAmmo -= 15;
 			return true;
 		}
 
-		if (player.input.checkShoryuken(player, xDir, Control.R2)){
+		if (player.input.isHeld(Control.Down, player)
+		&& player.input.isLeftOrRightHeld(player)
+		&& player.input.isR2Pressed(player) 
+		&& sprite.name.Contains("dash")
+		&& !sprite.name.Contains("end")
+		){
 			changeState(new Vava1GizmoDash(), true);	
 			return true;
 		}
 
-		if (player.vileAmmo >= 15 &&
-			player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Dash, player)) {
+		if (player.vileAmmo >= 15 && canDash() &&
+			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
 			changeState(new VileDashChargeState());
 			player.vileAmmo -= 15;
 			return true;
@@ -209,27 +218,38 @@ public class VAVA1 : Character {
 		
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
 		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
-		&& charState is not VAVAKamae
-		) {
+		&& charState is not VAVAKamae) {
 			if (player.input.isAPressed(player)) {
 				if (grounded) {
-					if (player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 8) {
-							changeState(new GoGetterRightAttack(), true);
-						}
-					} else {
-							if (!player.input.isHeld(Control.Down, player)) {
-							changeState(new VAVAJab1(), true);
-							} else {
-							changeState(new VAVAUpperCutPunch(), true);	
-							}
-						}
-				} else {
-					if (player.input.isHeld(Control.Down, player)) {
+					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
 						if (player.vileAmmo >= 14) {
 						changeState(new InfinityGigAttack(), true);
+						}			
+					}
+					if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
+						if (player.vileAmmo >= 14) {
+						changeState(new SpoiledBratPunch(), true);
 						}
-						
+					}
+					
+					if (player.input.isLeftOrRightHeld(player)) {
+						if (!player.input.isHeld(Control.Down, player)) {
+							if (player.vileAmmo >= 8) {
+								changeState(new GoGetterRightAttack(), true);
+							}
+						}
+					} else {
+						if (!player.input.isHeld(Control.Down, player)) {
+							changeState(new VAVAJab1(), true);
+						} else {
+							changeState(new VAVAUpperCutPunch(), true);
+						}
+					}
+				} else {
+					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
+						if (player.vileAmmo >= 14) {
+						changeState(new InfinityGigAttack(), true);
+						}			
 					} else {
 						if (player.vileAmmo >= 4) {
 							changeState(new SpoiledBratPunch(), true);
@@ -242,14 +262,29 @@ public class VAVA1 : Character {
 
 		if (player.input.isBPressed(player)) {
 			if (grounded) {
+				if (player.input.isHeld(Control.Up, player)) {
+					changeState(new WildHorseKickState(), true);
+				} else if (player.input.isHeld(Control.Down, player)) {
+					
+				} else {
+					if (player.input.isLeftOrRightHeld(player)) {
+					} else {
+					}
+					
+				}
 				
 			} else {
-				if (!AirCheckExplosiveRound && charState is not GreenEyedLampState){
-				changeState(new ExplosiveRoundState(), true);
-				AirCheckExplosiveRound = true;
+				if (player.input.isHeld(Control.Down, player)) {
+					if (player.vileAmmo > 8 && charState is not GreenEyedLampState)
+					changeState(new SeaDragonRageState(), true);
+				}else {
+					if (player.vileAmmo > 10 && charState is not GreenEyedLampState) {
+					changeState(new ExplosiveRoundState(), true);
+					player.vileAmmo -= 10;
+					}
 				}
 			}
-			}
+		}
 
 		if (player.input.isL2Held(player)) {
 			if (player.input.isAPressed(player)) {
@@ -272,7 +307,10 @@ public class VAVA1 : Character {
 					downPressedTimes = 0;
 					player.vileAmmo -= 15;
 				} else {
-					shoot(0);
+					if (CannonCD == 0) {
+						shoot(0);
+						CannonCD = 0.35f;
+					}
 				}
 			}
 		}	
@@ -283,15 +321,7 @@ public class VAVA1 : Character {
 	}
 
 
-	public bool SetAirChecks() {
-		if (grounded) {
-			AirCheckGreenEyedLamp = false;
-			AirCheckExplosiveRound = false;
-			return true;
-		}
-		return false;
-	} 
-
+	
 
 	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
@@ -333,14 +363,15 @@ public class VAVA1 : Character {
 	
 	public override void update() {
 		base.update();
-		
+
 		if (overDriveTimer > 0) {
 			OverDrive = true;
 		} else {
 			OverDrive = false;
 		}
-
-
+		if (isVileMK5) {
+			phase2 = true;
+		}
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref CrimsonphantomCD);
@@ -348,10 +379,11 @@ public class VAVA1 : Character {
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref CannonCD);
 
 
 
-		if (player.isAI && health < 5 && !phase2 && !isWarpIn()) {
+		if (player.isAI && health < 5 && !phase2 && !isWarpIn() && isBossVile) {
 			changeState(new VAVAPhase2Start(false), true);
 			stopMoving();
 			bonusHealth = 40;
@@ -454,7 +486,7 @@ public class VAVA1 : Character {
 		}
 		RideArmorAttacks();
 		RideLinkMK5();
-		SetAirChecks();
+
 		Supers();
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
 			return;
@@ -543,6 +575,8 @@ public class VAVA1 : Character {
 		Kote,
 
 		GizmoGrab,
+
+		DeadLiftEX,
 	}
 
 
@@ -550,6 +584,7 @@ public class VAVA1 : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"vava_block"  => MeleeIds.Blocking,
+			"vava_deadlift"  => MeleeIds.DeadLiftEX,
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vava_jab_1" => MeleeIds.Jab,
 			"vava_jab_2" => MeleeIds.Jab2,
@@ -626,6 +661,13 @@ public class VAVA1 : Character {
 			(int)MeleeIds.KamaeUnB => new Vava1GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.DeadLiftEX => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
+				2, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
@@ -750,15 +792,17 @@ public class VAVA1 : Character {
 
 
 	// Shoots stuff. VAVA(WCUT)
-	public void shoot(int chargeLevel) {
+	public override void shoot(int chargeLevel) {
 
 
 		if (chargeLevel == 0) {
 			stopCharge();
-			cannonWeapon.type = (int)VileCannonType.FrontRunner;
-			cannonWeapon.vavaShoot(0, this);
+			if (player.vileAmmo > 9) {
+				changeState(new Vava1Stunshot(false, false), true);
+				player.vileAmmo -= 10;
+			}
 		} else if (chargeLevel == 1) {
-			cannonWeapon.type = (int)VileCannonType.FatBoy;
+			cannonWeapon.type = (int)VileCannonType.FrontRunner;
 			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel == 2) {
@@ -1069,11 +1113,7 @@ public class VAVA1 : Character {
 			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
 
 			float auraAlpha = 0.75f;
-			if (player.isVile) {
-				auraAlpha = 0.4f;
-			}
-
-
+			
 			// Draw aura.
 			Global.sprites[sprite.name].draw(
 				sprite.frameIndex,
@@ -1100,19 +1140,29 @@ public class VAVA1 : Character {
 	}
 
 
+	
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
+
 		customData.Add(Helpers.boolArrayToByte([
-			OverDrive,
+			hasFrozenCastle,
+			hasSpeedDevil,
+			OverDrive
 		]));
+
 		return customData;
 	}
+
 	public override void updateCustomActorNetData(byte[] data) {
 		// Update base arguments.
 		base.updateCustomActorNetData(data);
 		data = data[data[0]..];
-		bool[] flags = Helpers.byteToBoolArray(data[0]);
-		OverDrive = flags[0];
+
+		// Per-character data.
+		bool[] boolData = Helpers.byteToBoolArray(data[0]);
+		hasFrozenCastle = boolData[0];
+		hasSpeedDevil = boolData[1];
+		OverDrive = boolData[2];
 	}
 
 
@@ -1133,6 +1183,8 @@ public class VAVA1 : Character {
 
 	public bool AIStart;
 
+	public bool isBossVile;
+
 	public override void aiAttack(Actor? target) {
 		int Vattack = Helpers.randomRange(1, 7);
 		Helpers.decrementFrames(ref AIHellBarrageCD);
@@ -1140,39 +1192,52 @@ public class VAVA1 : Character {
 		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
 		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
-
-
-		if (!AIStart  && charState.attackCtrl ) {
-			changeState(new VB1(), true);
+		if (Global.level.is1v1()) {
+			isBossVile = true;
+		}
+		if (isBossVile) {
+			player.superAmmo = player.superMaxAmmo;
+		} else {
 			AIStart = true;
+		}
+
+		if (!AIStart && charState.attackCtrl) {
+			if (isBossVile) {
+				changeState(new VB1(), true);
+				AIStart = true;
+			}
+			
 		} else {
 
 			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
-				if (charState is Dash or AirDash && isFacingTarget) {
+				if (charState is Dash or AirDash && isFacingTarget && isBossVile) {
 					charState.isGrabbing = true;
 					charState.superArmor = true; // yes Cry Gsu I'm adding the annoying SuperArmor
 					changeSpriteFromName("dash_grab", true);
 				}
 
 
-
-
 				if (isTargetClose && grounded) {
 					switch (Vattack) {
-						case 1 when isFacingTarget:
+						case 1 when isFacingTarget && player.superAmmo >= player.superMaxAmmo:
 							changeState(new VavaBurensen1());
+							player.superAmmo -= 32;
 							break;
 						case 2 when isFacingTarget:
 							changeState(new SpoiledBratPunch());
 							break;
 						case 3 when isFacingTarget:
-							changeState(new InfinityGigAttackBossVer());
+							if (isBossVile) {
+								changeState(new InfinityGigAttackBossVer());
+							} else {
+								changeState(new VAVAUpperCutPunch());
+							}
 							break;
 						case 4 when isFacingTarget:
 							if (phase2) {
-									changeState(new RagingDemonStart());
+								changeState(new RagingDemonStart());
 							} else {
 								changeState(new Vava1GrabStartState());
 							}
@@ -1192,16 +1257,28 @@ public class VAVA1 : Character {
 				if (!grounded) {
 					switch (Vattack) {
 						case 1 when isFacingTarget:
-							changeState(new ExplosiveRoundState());
+							if (!isBossVile) {
+								changeState(new ExplosiveRoundState());
+							} else {
+								changeState(new ExplosiveRoundStateBoss());
+							}
 							break;
 						case 2 when isFacingTarget:
 							changeState(new SpoiledBratPunch());
 							break;
 						case 3 when isFacingTarget:
-							changeState(new InfinityGigAttackBossVer());
+							if (isBossVile) {
+								changeState(new InfinityGigAttackBossVer());
+							} else {
+								changeState(new InfinityGigAttack());
+							}
 							break;
 						case 4 when isFacingTarget:
-							changeState(new SpreadShotKnee());
+							if (isBossVile) {
+								changeState(new SpreadShotKnee());
+							} else {
+								changeState(new SeaDragonRageState());
+							}
 							break;
 						case 5 when isFacingTarget:
 							changeState(new PeaceOutRollerAttack());
@@ -1210,7 +1287,7 @@ public class VAVA1 : Character {
 							changeState(new VKamaeUnblockableStart());
 							break;
 						case 7 when isFacingTarget:
-							changeState(new ExplosiveRoundStateBoss());
+							changeState(new GreenEyedLampState());
 							break;
 					}
 				}
@@ -1218,13 +1295,21 @@ public class VAVA1 : Character {
 				if (!isTargetClose && grounded && isWishinRangedMoves) {
 					switch (Vattack) {
 						case 1 when isFacingTarget:
-							changeState(new ShoulderCannon(grounded));
+							if (isBossVile) {
+								changeState(new ShoulderCannon(grounded));
+							} else {
+								shoot(0);
+							}
 							break;
 						case 2 when isFacingTarget:
 							changeState(new SpoiledBratPunch());
 							break;
 						case 3 when isFacingTarget:
-							changeState(new InfinityGigAttackBossVer());
+							if (isBossVile) {
+								changeState(new InfinityGigAttackBossVer());
+							} else {
+								changeState(new InfinityGigAttack());
+							}
 							break;
 						case 4 when isFacingTarget:
 							changeState(new VKamaeUnblockableStart());
@@ -1236,7 +1321,11 @@ public class VAVA1 : Character {
 							changeState(new VileDashChargeState());
 							break;
 						case 7 when isFacingTarget:
-							changeState(new PopcornHell(grounded));
+							if (isBossVile) {
+								changeState(new PopcornHell(grounded));
+							} else {
+								shoot(1);
+							}
 							break;
 					}
 				}

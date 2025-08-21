@@ -24,6 +24,9 @@ public partial class Character : Actor, IDamagable {
 	public int spawnHealthToAdd;
 	public float spawnHealthAddTime;
 	public bool alive = true;
+	public bool ShouldExplode;
+
+	public float aiAttackCooldown;
 
 	public decimal bonusHealth = 0;
 
@@ -87,6 +90,8 @@ public partial class Character : Actor, IDamagable {
 	public bool isCrystalized;
 	public bool insideCharacter;
 	public float invulnTime = 0;
+
+	public float iframesTime = 0;
 
 		public float counterCooldown;
 
@@ -232,6 +237,61 @@ public partial class Character : Actor, IDamagable {
 
 	// Ctrl data
 	public int altCtrlsLength = 1;
+
+
+	// Made it so That X and XMID share stuff
+	// Weapon-specific.
+	public RollingShieldProjCharged? chargedRollingShieldProj;
+	public List<BubbleSplashProjCharged> chargedBubbles = new();
+	public StrikeChainProj? strikeChainProj;
+	public StrikeChainProjCharged? strikeChainChargedProj;
+	//public StrikeChainSemiCharged? strikeChainSemiChargedProj;
+	public GravityWellProjCharged? chargedGravityWell;
+	public SpinningBladeProjCharged? chargedSpinningBlade;
+	public FrostShieldProjCharged? chargedFrostShield;
+	public TornadoFangProjCharged? chargedTornadoFang;
+	public GravityWellProj? linkedGravityWell;
+	public TriadThunderProj? linkedTriadThunder;
+	public BeeSwarm? chargedParasiticBomb;
+	public List<MagnetMineProj> magnetMines = new();
+	public List<RaySplasherTurret> rayTurrets = new();
+	public RaySplasher? shootingRaySplasher = new();
+
+	//Force Armor Stuff
+	public int forceStocks;
+	public float[] forceStocksChargeTimes = new float[4];
+	public float uaStockChargeTime;
+
+	//X4 Weapons variables
+	public SoulBodyHologram? sBodyHologram;
+
+	public SoulBodyHologram2? sBodyHologram2;
+	public SoulBodyClone? sBodyClone;
+
+
+
+
+
+	public List<Character> aLaserTargets = new();
+	public AimingLaserCursor? aLaserCursor;
+	public AimingLaserHud? aLaserHud;
+	public AimingLaserProj? aLaserProj;
+	public List<AimingLaserProj?> aLasers = new();
+	public AimingLaserChargedProj? aLaserChargedProj;
+
+	//Aiming Laser stuff
+	public bool isTargetByALaser;
+	public List<Character> aLaserAttackers = new();
+	public Anim? aLaserTargetAnim;
+
+
+
+	// Chamaleon Sting.
+	public float stingActiveTime;
+	public int stingPaletteIndex;
+	public float stingPaletteTime;
+
+
 
 	// Puppet data.
 	public Maverick? currentMaverick {
@@ -917,8 +977,23 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+
+	
+	public bool hasBusterProj() {
+		return
+			chargedSpinningBlade != null ||
+			chargedFrostShield != null ||
+			chargedTornadoFang != null ||
+			strikeChainProj != null ||
+			strikeChainChargedProj != null ||
+			aLaserProj != null ||
+			aLaserChargedProj != null ||
+			aLasers.Count >= 1;
+	}
+	
 	public void debuffCooldowns() {
 		Helpers.decrementFrames(ref undisguiseTime);
+		Helpers.decrementFrames(ref iframesTime);
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
 
@@ -1030,16 +1105,20 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+
+	public float BurstCooldown;
 	public override void update() {
 
-		
-				// For Overdrive to work (WCUT)
+
+		// For Overdrive to work (WCUT)
 		if (overDriveTimer > 0) {
-		OverDrive = true;
+			OverDrive = true;
 		} else {
 			OverDrive = false;
 		}
 		Helpers.decrementTime(ref overDriveTimer);
+		Helpers.decrementTime(ref BurstCooldown);
+		Helpers.decrementFrames(ref aiAttackCooldown);
 
 
 		//Damage Systems (WCUT)
@@ -1063,12 +1142,13 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Wcut Burst System
 
-		if (isInDamageSprite() && 
+		if (isInDamageSprite() &&
 		(player.input.isHeld(Control.WeaponLeft, player)
 		&& player.input.isHeld(Control.WeaponRight, player)
 		|| player.input.isPressed(Control.L2, player))
 		&& player.input.isHeld(Control.Up, player)
-		&& player.currency > 0) {
+		&& player.currency > 0 && BurstCooldown == 0) {
+			BurstCooldown = 10;
 			player.currency -= 1;
 			changeState(new Idle(), true);
 			invulnTime = 1.5f;
@@ -1128,6 +1208,29 @@ public partial class Character : Actor, IDamagable {
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
+		
+
+		//Aiming Laser Hud
+		if (player.weapon is AimingLaser al && !hasBusterProj() && ownedByLocalPlayer) {
+			if (aLaserCursor == null && player.health > 0) {
+				new AimingLaserCursor(
+					al, getShootPos(), getShootXDir(),
+					player, player.getNextActorNetId()
+				);
+			}
+
+			if (aLaserHud == null && player.health > 0) {
+				for (int i = 0; i < 11; i++) {
+					new AimingLaserHud(
+						getShootPos(), getShootXDir(),
+						player.getNextActorNetId(), player, i
+					);
+				}
+			}
+		}
+
+
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
 
 		if (charState is not InRideChaser) {
@@ -1900,6 +2003,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool isInvulnerable(bool ignoreRideArmorHide = false, bool factorHyperMode = false) {
 		if (isWarpIn()) return true;
 		if (invulnTime > 0) return true;
+		if (iframesTime > 0) return true;
 		if (charState.specialId == SpecialStateIds.WarpIdle) return true;
 		if (!ignoreRideArmorHide) {
 			if (ownedByLocalPlayer && charState is InRideArmor { isHiding: true }) {
@@ -3249,8 +3353,13 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void onHealing(decimal amount) { }
 
+
+	public virtual void onAmmoChange(float amount) {
+	}
+
 	public virtual void addAmmo(float amount) {
 		currentWeapon?.addAmmoHeal(amount);
+		onAmmoChange(amount);
 	}
 
 	public virtual void addPercentAmmo(float amount) {

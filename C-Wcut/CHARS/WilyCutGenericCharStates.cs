@@ -221,7 +221,7 @@ public class GlobalParryState : CharState {
 			return false;
 		}
 		if (player.isVile)return character.frameIndex < 5;
-	//	if (player.isDragoon)return character.frameIndex < 5;
+		if (player.isDragoon)return character.frameIndex < 5;
 		
 		return character.frameIndex == 0;
 	}
@@ -235,7 +235,7 @@ public class GlobalParryState : CharState {
 			if (player.isZain){
 			character.changeSpriteFromName("parry_dash", true);
 			character.playSound("distortion_d");
-			character.playSound("zainDash");
+			character.playSound("GDash");
 		}
 
 
@@ -607,6 +607,9 @@ public class WcutGenericDodgeF : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		if (!character.sprite.name.Contains("dodge_f")) {
+			character.changeSpriteFromName("dash", false);
+		}
 		character.useGravity = true;
 	}
 
@@ -782,16 +785,26 @@ public class ForceGrabbed : GenericGrabbedState {
 
 	public override void update() {
 		trySnapToGrabPoint(true);
-		if (grabber.sprite.name.Contains("idle") ||
-		grabber.sprite.name.Contains("crouch") ||
-		grabber.sprite.name.Contains("run") ||
-		grabber.sprite.name.Contains("fall") ||
-		grabber.sprite.name.Contains("jump") ||
+		if (grabber.sprite.name.Contains("gbd_b")) {
+			if (grabber.sprite.name.Contains("idle") ||
+			grabber.sprite.name.Contains("crouch") ||
+			grabber.sprite.name.Contains("run") ||
+			grabber.sprite.name.Contains("fall") ||
+			grabber.sprite.name.Contains("jump") ||
+			grabber.sprite.name.Contains("hurt") ||
+			grabber.sprite.name.Contains("grabbed")
+
+			) {
+				character.changeToIdleOrFall();
+			}
+		} else {
+			if (
 		grabber.sprite.name.Contains("hurt") ||
 		grabber.sprite.name.Contains("grabbed")
-	
+		
 		) {
 			character.changeToIdleOrFall();
+		}
 		}
 	}
 }

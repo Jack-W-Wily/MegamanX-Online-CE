@@ -366,6 +366,26 @@ public class Damager {
 				owner.superAmmo += 1;
 				}
 			}
+			
+			if (owner.character is Sigma1 sig1 && sig1.health > 0) {
+			
+				if (sig1.charState.canSpecialCancel) {
+					sig1.charState.spcCancel = true;
+				}
+				if (owner.superAmmo != owner.superMaxAmmo && sig1.charState is not HellGaze){
+				owner.superAmmo += 1;
+				}
+			}
+
+			if (owner.character is Iris or RockmanX or Dynamo or Dragoon) {
+
+				if (owner.character.charState.canSpecialCancel) {
+					owner.character.charState.spcCancel = true;
+				}
+				if (owner.superAmmo != owner.superMaxAmmo) {
+					owner.superAmmo += 1;
+				}
+			}
 
 			switch (projId) {
 				//burn [to the ground] section
@@ -481,11 +501,17 @@ public class Damager {
 				case (int)ProjIds.MechFrogStompShockwave:
 				case (int)ProjIds.FlameMStompShockwave:
 				case (int)ProjIds.TBreakerProj:
-					if (character.grounded && character.ownedByLocalPlayer) {
+					if (character.ownedByLocalPlayer) {
 						character.changeState(new KnockedDown(character.pos.x < damagingActor?.pos.x ? -1 : 1), true);
 					}
 					break;
 				case (int)ProjIds.MechFrogGroundPound:
+					if (!character.grounded) {
+						character.vel.y += 300;
+						spiked = true;
+					}
+					break;
+				case (int)ProjIds.DynamoDropSlash:
 					if (!character.grounded) {
 						character.vel.y += 300;
 						spiked = true;
@@ -499,6 +525,9 @@ public class Damager {
 					character.addDarkHoldTime(DarkHoldState.totalStunTime, owner);
 					break;
 				case (int)ProjIds.MagnaCTail:
+					character.addVirusTime(owner, 4f);
+					break;
+				case (int)ProjIds.SigmaViralSlash:
 					character.addVirusTime(owner, 4f);
 					break;
 				case (int)ProjIds.MechPunch:
@@ -640,7 +669,44 @@ public class Damager {
 
 
 			// For Grabs to work (WCUT)
-		
+
+
+			if (projId == (int)ProjIds.ForceGrabState) {
+				if (owner.character.charState is ZainGrabStab) {
+					owner.character.changeState(new ZainGrabStabEnd());
+				}
+				if (owner.character.charState is ZainParryStartState) {
+					owner.character.changeState(new ZainGrabSlash());
+				}
+				if (owner.character.charState is ZainParryStartState) {
+					owner.character.changeState(new ZainGrabSlash());
+				}
+				if (owner.character.charState is ZainUPParryStartState) {
+					owner.character.changeState(new ZainGrab());
+				}
+				if (owner.character.charState is ZainDashParryState) {
+					owner.character.changeState(new ZainGrab());
+				}
+
+				if (owner.character.charState is IrisGrabStart) {
+					owner.character.changeState(new IrisGrabEX());
+					(owner.character as Iris).GrabVictim = character;
+				}
+				if (owner.character.charState is ZeroGrabStart) {
+					owner.character.changeState(new ZeroGrabEX());
+				}	
+				
+
+			}
+
+				if (owner?.character is Dragoon) {
+				if (projId == (int)ProjIds.ForceGrabState) {
+					character.changeState(new DragoonGrab());
+					owner.character?.changeState(new Vava1GrabState(character));
+				}
+				}
+
+
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 				if (owner?.character is RockmanX) {
 					character.changeState(new RMXGrabbed(owner.character));
@@ -665,32 +731,46 @@ public class Damager {
 			}
 
 
-			if (owner?.character is VAVA1) {
-				switch (projId) {
-				case (int)ProjIds.GenericWCUTGrabProjID:
-				owner.character.changeState(new Vava1GrabState(character), true);
-				character.changeState(new Vava1Grabbed(owner.character), true);
-				break;
-				case (int)ProjIds.RagingDemon:
+			if (projId == (int)ProjIds.HeavyPush) {
+				character.changeState(new PushedOver2(owner.character.xDir), true);
+			}
+
+			if (projId == (int)ProjIds.RagingDemon) {
 				owner.character.changeState(new RagingDemonSuccess(character), true);
 				character.changeState(new Vava1Grabbed(owner.character), true);
-				break;
-				case (int)ProjIds.BurensenStart:
-				owner.character.changeState(new VavaBurensen2(character), true);
-				character.changeState(new PushedOver2(owner.character.xDir), true);
-				break;
-				case (int)ProjIds.BurensenStomp:
-				character.changeState(new VileStomped(owner.character), true);
-				break;
-				case (int)ProjIds.BurensenEND:
+			}
+			
+			
+
+
+			if (owner?.character is VAVA1) {
+				switch (projId) {
+					case (int)ProjIds.GenericWCUTGrabProjID:
+						owner.character.changeState(new Vava1GrabState(character), true);
+						character.changeState(new Vava1Grabbed(owner.character), true);
+						break;
+					case (int)ProjIds.RagingDemon:
+						owner.character.changeState(new RagingDemonSuccess(character), true);
+						character.changeState(new Vava1Grabbed(owner.character), true);
+						break;
+					case (int)ProjIds.BurensenStart:
+						owner.character.changeState(new VavaBurensen2(character), true);
+						character.changeState(new PushedOver2(owner.character.xDir), true);
+						break;
+					case (int)ProjIds.BurensenStomp:
+						character.changeState(new VileStomped(owner.character), true);
+						break;
+					case (int)ProjIds.Ryuenjin:
+						character.shakeCamera(sendRpc: true);
+						character.changeState(new DropDown(character.pos.x < character.pos.x ? -1 : 1), true);
+						break;
+				}
+			}
+
+			if (projId == (int)ProjIds.BurensenEND && !character.isBlocking()) {
 				character.shakeCamera(sendRpc: true);
 				character.changeState(new LaunchedFowardState(), true);
-				break;
-				case (int)ProjIds.Ryuenjin:
-				character.shakeCamera(sendRpc: true);
-				character.changeState(new DropDown(character.pos.x < character.pos.x ? -1 : 1), true);
-				break;
-				}
+				
 			}
 
 
@@ -701,7 +781,7 @@ public class Damager {
 			
 			if (projId == (int)ProjIds.BlockableLaunch && !character.isBlocking()) {
 
-				character?.changeState(new LaunchedState(owner.character));
+				character.changeState(new LaunchedState(owner.character));
 			}
 
 			
@@ -885,9 +965,9 @@ public class Damager {
 			if (!weakness) {
 				// Flinch reduction.
 				if (flinch > 0) {
-					if (maverick.controlMode != MaverickMode.TagTeam) {
-						flinch = 0;
-					}
+					//if (maverick.controlMode != MaverickMode.TagTeam) {
+						//flinch = 0;
+					//}
 					// Large mavericks
 					if (maverick.armorClass == Maverick.ArmorClass.Heavy) {
 						if (flinch <= Global.miniFlinch) {
@@ -1013,6 +1093,37 @@ public class Damager {
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
 			return true;
 		}
+
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			charState is ZainParryStartState parryState3
+			&& parryState3.canParry(damagingActor) &&
+			!isDot(projId)
+		) {
+			parryState3.counterAttack(owner, damagingActor, finalDamage);
+			return true;
+		}
+
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			charState is ZainParryShinStartState parryState5
+			&& parryState5.canParry(damagingActor) &&
+			!isDot(projId)
+		) {
+			parryState5.counterAttack(owner, damagingActor, finalDamage);
+			return true;
+		}
+
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			charState is ZainUPParryStartState parryState4
+			&& parryState4.canParry(damagingActor) &&
+			!isDot(projId)
+		) {
+			parryState4.counterAttack(owner, damagingActor, finalDamage);
+			return true;
+		}
+
 		if ((damage > 0 || finalDamage > 0) && preCharacter != null &&
 			preCharacter.ownedByLocalPlayer &&
 			preCharacter.charState.specialId == SpecialStateIds.PZeroParry &&

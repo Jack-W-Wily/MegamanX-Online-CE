@@ -11,6 +11,7 @@ public class ElectricSpark : Weapon {
 		index = (int)WeaponIds.ElectricSpark;
 		killFeedIndex = 6;
 		weaponBarBaseIndex = 6;
+		type = index;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 6;
 		weaknessIndex = (int)WeaponIds.ShotgunIce;

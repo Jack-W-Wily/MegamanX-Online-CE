@@ -17,6 +17,7 @@ public class TornadoFang : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 24;
 		killFeedIndex = 47;
+		type = index;
 		weaknessIndex = (int)WeaponIds.AcidBurst;
 		damage = "1/1";
 		effect = "Inflicts Slowdown. Doesn't destroy on hit.\nUncharged won't give assists.";

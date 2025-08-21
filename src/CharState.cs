@@ -509,7 +509,7 @@ public class WarpIdle : CharState {
 	public bool fullAlt;
 	float healTime = -4;
 
-	public WarpIdle(bool firstSpawn = false) : base("win") {
+	public WarpIdle(bool firstSpawn = false) : base("idle") {
 		invincible = true;
 		this.firstSpawn = firstSpawn;
 	}
@@ -651,7 +651,8 @@ public class Idle : CharState {
 
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				character.changeState(character.getTauntState());
+				string winSprite = "win";
+				character.changeSpriteFromName(winSprite, true);
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					string loseSprite = "lose";
@@ -1435,7 +1436,7 @@ public class Die : CharState {
 		if (!character.ownedByLocalPlayer) {
 			return;
 		}
-		if (character is Vile or BaseSigma) {
+		if (character is Vile or BaseSigma || character.ShouldExplode) {
 			if (stateTime >= 1 && !once) {
 				player.respawnTime = player.getRespawnTime(); 
 				player.randomTip = Tips.getRandomTip(player.charNum);

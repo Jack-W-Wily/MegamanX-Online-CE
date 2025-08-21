@@ -37,6 +37,8 @@ public partial class Level {
 	public List<CrystalHunterCharged> chargedCrystalHunters = new List<CrystalHunterCharged>();
 	public List<HitStop> HitStops = new List<HitStop>();
 	public List<DarkHoldProj> darkHoldProjs = new List<DarkHoldProj>();
+
+	public List<DarkHoldDProj> darkHoldDProjs = new List<DarkHoldDProj>();
 	public List<GravityWellProj> unchargedGravityWells = new List<GravityWellProj>();
 	public List<BackloggedSpawns> backloggedSpawns = new List<BackloggedSpawns>();
 	public List<DelayedAction> delayedActions = new List<DelayedAction>();

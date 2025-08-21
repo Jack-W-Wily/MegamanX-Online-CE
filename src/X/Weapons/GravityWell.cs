@@ -9,6 +9,7 @@ public class GravityWell : Weapon {
 		displayName = "Gravity Well";
 		shootSounds = new string[] { "busterX3", "busterX3", "busterX3", "warpIn" };
 		fireRate = 30;
+		type = index;
 		index = (int)WeaponIds.GravityWell;
 		weaponBarBaseIndex = 22;
 		weaponBarIndex = weaponBarBaseIndex;

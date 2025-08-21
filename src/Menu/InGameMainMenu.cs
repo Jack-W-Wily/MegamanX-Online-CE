@@ -49,12 +49,12 @@ public class InGameMainMenu : IMainMenu {
 				}
 			} else if (selectY == 1) {
 				if (isSelArmorDisabled()) return;
-				if (Global.level.mainPlayer.realCharNum == 0 || Global.level.mainPlayer.realCharNum == 2) {
+				if (Global.level.mainPlayer.realCharNum == 0 || Global.level.mainPlayer.isVile) {
 					if (UpgradeMenu.onUpgradeMenu && !Global.level.server.disableHtSt) {
 						Menu.change(new UpgradeMenu(this));
 					} else if (Global.level.mainPlayer.realCharNum == 0) {
 						Menu.change(new UpgradeArmorMenuEX(this));
-					} else if (Global.level.mainPlayer.realCharNum == 2) {
+					} else if (Global.level.mainPlayer.isVile) {
 						Menu.change(new SelectVileArmorMenu(this));
 					}
 				} else {

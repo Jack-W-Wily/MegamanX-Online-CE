@@ -82,6 +82,15 @@ public class Options {
 	public bool lockInAirCannon = true;
 	public VileLoadout vileLoadout = new VileLoadout();
 
+	
+	//wcaxl
+	public bool lockMoveOnShoot;
+	public bool autoCharge;
+	public bool blockInput;
+	public bool hoverWhileDown;
+	public bool axlDirLock;
+	public AxlWCLoadout axlWCLoadout = AxlWCLoadout.createDefault();
+
 	// Axl
 	public int gridModeAxl;
 	public bool aimAnalog = false;

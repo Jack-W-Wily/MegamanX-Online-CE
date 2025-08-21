@@ -13,6 +13,7 @@ public class HyperNovaStrike : Weapon {
 		switchCooldown = 15;
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = 42;
+		type = index;
 		weaponBarIndex = 36;
 		weaponSlotIndex = 95;
 		killFeedIndex = 104;

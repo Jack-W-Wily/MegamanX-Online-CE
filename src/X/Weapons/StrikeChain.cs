@@ -17,6 +17,7 @@ public class StrikeChain : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 14;
 		killFeedIndex = 20 + (index - 9);
+		type = index;
 		weaknessIndex = (int)WeaponIds.SonicSlicer;
 		switchCooldown = 20;
 		damage = "2/4";

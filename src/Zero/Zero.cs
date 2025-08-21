@@ -1094,6 +1094,7 @@ public class Zero : Character {
 			isGenmuZero,
 			isBlack,
 			isViral,
+			OverDrive,
 		]));
 		if (hypermodeBlink > 0) {
 			customData.Add(hypermodeBlink);
@@ -1113,6 +1114,7 @@ public class Zero : Character {
 		awakenedPhase = (flags[2] ? 2 : (flags[1] ? 1 : 0));
 		isBlack = flags[3];
 		isViral = flags[4];
+		OverDrive = flags[5];
 
 		if (flags[0]) {
 			hypermodeBlink = data[2];

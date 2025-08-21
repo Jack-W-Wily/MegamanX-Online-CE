@@ -97,6 +97,38 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.TornadoFangCharged, TornadoFangProjCharged.rpcInvoke },
 		{ (int)ProjIds.XSaberProj, XSaberProj.rpcInvoke },
 
+		// X4 Stuff Projs
+				
+		{ (int)ProjIds.LightningWebProj, LightningWebProj.rpcInvoke },
+		{ (int)ProjIds.LightningWeb, LightningWebProjWeb.rpcInvoke },
+		{ (int)ProjIds.LightningWebChargedProj, LightningWebProjCharged.rpcInvoke },
+		{ (int)ProjIds.LightningWebCharged, LightningWebProjWebCharged.rpcInvoke },
+		{ (int)ProjIds.FrostTower, FrostTowerProj.rpcInvoke },
+		{ (int)ProjIds.FrostTowerCharged, FrostTowerProjCharged.rpcInvoke },
+		{ (int)ProjIds.SoulBodyHologram, SoulBodyHologram.rpcInvoke },
+		{ (int)ProjIds.SoulBodyHologram2, SoulBodyHologram.rpcInvoke },
+		{ (int)ProjIds.SoulBodyX5, SoulBodyX5.rpcInvoke },
+		{ (int)ProjIds.RisingFire, RisingFireProj.rpcInvoke },
+		{ (int)ProjIds.RisingFireChargedStart, RisingFireProjChargedStart.rpcInvoke },
+		{ (int)ProjIds.RisingFireCharged, RisingFireProjCharged.rpcInvoke },
+		{ (int)ProjIds.RisingFireUnderwater, RisingFireWaterProj.rpcInvoke },
+		{ (int)ProjIds.RisingFireUnderwaterCharged, RisingFireWaterProjCharged.rpcInvoke },
+		{ (int)ProjIds.GroundHunter, GroundHunterProj.rpcInvoke },
+		{ (int)ProjIds.GroundHunterCharged, GroundHunterChargedProj.rpcInvoke },
+		{ (int)ProjIds.GroundHunterSmall, GroundHunterSmallProj.rpcInvoke },
+		{ (int)ProjIds.AimingLaser, AimingLaserProj.rpcInvoke },
+		{ (int)ProjIds.AimingLaserCharged, AimingLaserChargedProj.rpcInvoke },
+		{ (int)ProjIds.AimingLaserMissle, PeacockMissle.rpcInvoke },
+		
+		{ (int)ProjIds.DoubleCyclone, DoubleCycloneProj.rpcInvoke },
+		{ (int)ProjIds.TwinSlasher, TwinSlasherProj.rpcInvoke },
+		{ (int)ProjIds.TwinSlasher2, TwinSlasherProj.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged, TwinSlasherProjCharged.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged2, TwinSlasherProjCharged.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged3, TwinSlasherProjCharged.rpcInvoke },
+		{ (int)ProjIds.TwinSlasherCharged4, TwinSlasherProjCharged.rpcInvoke },
+		
+
 		//EXTRA
 		{ (int)ProjIds.UPParryMelee, UPParryMeleeProj.rpcInvoke },
 		{ (int)ProjIds.UPParryProj, UPParryRangedProj.rpcInvoke },
@@ -259,6 +291,20 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.BBuffaloBeam, BBuffaloBeamProj.rpcInvoke },
 		{ (int)ProjIds.BBuffaloCrash, BBuffaloCrashProj.rpcInvoke },
 
+			// Wily Cut Axl.
+		{ (int)ProjIds.AxlDiscardedWeapon, AxlDiscrardedWeapon.rpcInvoke},
+		{ (int)ProjIds.BlastLauncherWC, BlastLauncherWCProj.rpcInvoke},
+		{ (int)ProjIds.GreenSpinnerWC, GreenSpinnerWCProj.rpcInvoke},
+		{ (int)ProjIds.RayGunWC, RayGunWCProj.rpcInvoke},
+		{ (int)ProjIds.IceGattlingWC, IceGattlingWCProj.rpcInvoke},
+		{ (int)ProjIds.IceGattlingAltWC, IceGattlingAltWCProj.rpcInvoke},
+		{ (int)ProjIds.SpiralMagnumWC, SpiralMagnumWCProj.rpcInvoke},
+		{ (int)ProjIds.FormicAcidWC, FormidAcidProj.rpcInvoke},
+		{ (int)ProjIds.AxlBulletWC, AxlBulletWCProj.rpcInvoke},
+		{ (int)ProjIds.CopyShotWC, CopyShotWCProj.rpcInvoke},
+		{ (int)ProjIds.BlueBullet, BlueBulletProj.rpcInvoke},
+		{ (int)ProjIds.AxlMeleeBullet, AxlMeleeBullet.rpcInvoke},
+
 		// Axl
 		{ (int)ProjIds.BlackArrowGround, BlackArrowGrounded.rpcInvoke },
 		{ (int)ProjIds.AssassinBulletEX, AssassinationProj.rpcInvoke },
@@ -274,6 +320,19 @@ public partial class RPCCreateProj : RPC {
 
 		{ (int)ProjIds.OrochinagiProj, OrochinagiChargedProj.rpcInvoke },
 		{ (int)ProjIds.YamiBaraiProj, YamiBaraiProj.rpcInvoke },
+
+		// Iris
+		{ (int)ProjIds.IrisLaserProjDiagonal, IrisLaserProjDiagonal.rpcInvoke },
+		{ (int)ProjIds.IrisLaserProjFoward, IrisLaserProjFoward.rpcInvoke },
+		{ (int)ProjIds.IrisLaserProjUp, IrisLaserProjUp.rpcInvoke },
+		{ (int)ProjIds.IrisCrystal, NewIrisCrystal.rpcInvoke },
+		// dynamo
+		{ (int)ProjIds.DynamoIceDagger, DynamoKnifeProj.rpcInvoke },
+
+		// Highmax
+		{ (int)ProjIds.HighmaxHomingProj, HighmaxHomingProj.rpcInvoke },
+		{ (int)ProjIds.HighmaxStunShot, HighmaxStunShot.rpcInvoke },
+	
 	};
 
 }

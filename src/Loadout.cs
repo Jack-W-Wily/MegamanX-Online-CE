@@ -27,9 +27,9 @@ public class XLoadout {
 	}
 
 	public void validate() {
-		if (weapon1 < 0 || weapon1 > 24) weapon1 = 0;
-		if (weapon2 < 0 || weapon2 > 24) weapon2 = 0;
-		if (weapon3 < 0 || weapon3 > 24) weapon3 = 0;
+		if (weapon1 < 0 || weapon1 > 36) weapon1 = 0;
+		if (weapon2 < 0 || weapon2 > 36) weapon2 = 0;
+		if (weapon3 < 0 || weapon3 > 36) weapon3 = 0;
 
 		if ((weapon1 == weapon2 && weapon1 >= 0) ||
 			(weapon1 == weapon3 && weapon2 >= 0) ||
@@ -419,6 +419,7 @@ public class LoadoutData {
 	[ProtoMember(5)] public AxlLoadout axlLoadout = new();
 	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new();
 	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
+	[ProtoMember(8)] public AxlWCLoadout axlWCLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
 		return new LoadoutData() {

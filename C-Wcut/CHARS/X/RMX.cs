@@ -39,19 +39,20 @@ public class RockmanX : MegamanX {
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isL2Held(player) && grounded){
+		if (player.input.isL2Held(player) &&
+			!isAttacking() && grounded &&
+			charState is not BlockWCUT
+		) {
 			changeState(new BlockWCUT());
-		
+			return true;
 		}
 		// This is Where hypermode actiavtion happens
 			if (player.input.isPressed(Control.Special2, player)
 			&& player.currency > 4
 			) {
 				player.currency -= 5;
-				
-				/* 
-				changeState() you'll be using this for every custom action your character does
-				*/
+			overDriveTimer = 12;
+			
 			}
 
 		return base.normalCtrl();

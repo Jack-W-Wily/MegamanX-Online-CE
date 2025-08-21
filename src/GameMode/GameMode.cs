@@ -642,6 +642,29 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 			}
+
+
+			// Zain display
+			if (drawPlayer.character is Zain zain) {
+				int yStart = 159;
+				int xStart = 26;	
+				Global.sprites["hud_zaincounter"].drawToHUD(0, 14, 158);
+				Fonts.drawText(FontType.Grey,
+				"x" + zain.ZainCounters, 28, 155, Alignment.Left);
+				yStart -= 26;
+				if (zain.ZainCounters >= 8) return;
+				Global.sprites["hud_bars_wp_base"].drawToHUD((int)WeaponBarIndex.ZainCounter, xStart, yStart);
+				yStart -= 18;
+				for (var i = 0; i < MathF.Ceiling(zain.player.vileMaxAmmo ); i++) {
+					if (i < Math.Ceiling(zain.player.vileAmmo)) {
+					Global.sprites["hud_bars_generic"].drawToHUD(12, xStart, yStart);
+					} else {
+						Global.sprites["hud_bars_generic"].drawToHUD(1, xStart, yStart);
+					}
+					yStart -= 2;
+					}
+					Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
+			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
 				if (zero.isViral) {
@@ -2577,15 +2600,15 @@ public class GameMode {
 
 	public virtual void drawScoreboard() {
 		int padding = 16;
-		int top = 16;
+		int top = 12;
 		int col1x = padding;
 		int col2x = (int)Math.Floor(Global.screenW * 0.33);
 		int col3x = (int)Math.Floor(Global.screenW * 0.475);
 		int col4x = (int)Math.Floor(Global.screenW * 0.65);
 		int col5x = (int)Math.Floor(Global.screenW * 0.85);
 		int lineY = padding + 20;
-		var labelTextY = lineY + 2;
-		int line2Y = lineY + 12;
+		var labelTextY = lineY + 3;
+		int line2Y = lineY + 15;
 		int topPlayerY = line2Y + 2;
 		DrawWrappers.DrawTextureHUD(Global.textures["pausemenu"], 0, 0);
 
@@ -2596,10 +2619,10 @@ public class GameMode {
 			_ => Global.level.server.gameMode
 		};
 		Fonts.drawText(FontType.BlueMenu, modeText, padding, top);
-		drawMapName(padding, top + 10);
+		drawMapName(padding, top + 12);
 		if (Global.serverClient != null) {
 			Fonts.drawText(
-				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 245, top + 10
+				FontType.BlueMenu, "Match: " + Global.level.server.name, padding + 100, top
 			);
 			drawNetcodeData();
 		}
@@ -2629,7 +2652,7 @@ public class GameMode {
 
 			if (Global.serverClient != null && player.serverPlayer.isHost) {
 				Fonts.drawText(
-					FontType.Yellow, "H", col1x - 8, 1 + topPlayerY + i * rowH
+					FontType.Yellow, "H", col1x - 8, 3 + topPlayerY + i * rowH
 				);
 			} else if (Global.serverClient != null && player.serverPlayer.isBot) {
 				Fonts.drawText(
@@ -2647,9 +2670,43 @@ public class GameMode {
 			if (Global.serverClient != null) {
 				Fonts.drawText(FontType.Blue, player.getDisplayPing(), col5x, topPlayerY + (i) * rowH, Alignment.Left);
 			}
-			if (player.charNum == (int)CharIds.PunchyZero || player.charNum == (int)CharIds.BusterZero) {
-				Global.sprites[getCharIcon(player)].drawToHUD(1, col2x + 4, topPlayerY + i * rowH);
-			} else Global.sprites[getCharIcon(player)].drawToHUD(player.realCharNum, col2x + 4, topPlayerY + i * rowH);
+			int frameIndex = 0;
+		if (player.charNum == (int)CharIds.RockmanX) {
+			frameIndex = (int)CharHpBarIndex.XAnother;
+		}if (player.charNum == (int)CharIds.PunchyZero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.BusterZero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX2;
+		}if (player.charNum == (int)CharIds.Zero) {
+			frameIndex = (int)CharHpBarIndex.ZeroX1;
+		}if (player.charNum == (int)CharIds.Vile) {
+			frameIndex = (int)CharHpBarIndex.Vile;
+		}if (player.charNum == (int)CharIds.AxlWC) {
+			frameIndex = (int)CharHpBarIndex.AxlWC;
+		}if (player.charNum == (int)CharIds.Axl) {
+			frameIndex = (int)CharHpBarIndex.AxlX8;
+		}if (player.charNum == (int)CharIds.Sigma) {
+			frameIndex = (int)CharHpBarIndex.Sigma;
+		}if (player.charNum == (int)CharIds.Sigma && 
+			Options.main.sigmaLoadout.sigmaForm == 3){
+			frameIndex = (int)CharHpBarIndex.Doppler;
+		}if (player.charNum == (int)CharIds.GBD) {
+			frameIndex = (int)CharHpBarIndex.GBD;
+		}if (player.charNum == (int)CharIds.Dynamo) {
+			frameIndex = (int)CharHpBarIndex.Dynamo;
+		}if (player.charNum == (int)CharIds.Dragoon) {
+			frameIndex = (int)CharHpBarIndex.Dragoon;
+		}if (player.charNum == (int)CharIds.Zain) {
+			frameIndex = (int)CharHpBarIndex.Zain;
+		}if(player.character is Zero zero && zero.isBlack){
+			frameIndex = (int)CharHpBarIndex.BlackZero;
+		}if(player.character is AxlWC awc && awc.isWhite){
+			frameIndex = (int)CharHpBarIndex.WhiteAxl;
+		}if (player.charNum == (int)CharIds.Iris) {
+			frameIndex = (int)CharHpBarIndex.Iris;
+		}
+
+			Global.sprites[getCharIcon(player)].drawToHUD(frameIndex, col2x + 4, topPlayerY + i * rowH);
 		}
 		//drawSpectators();
 	}

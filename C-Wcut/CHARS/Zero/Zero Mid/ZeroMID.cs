@@ -77,23 +77,19 @@ public class ZeroMID : Zero {
 	) {
 		charId = CharIds.ZeroMID;
 		// Loadout stuff.
-		ZeroLoadout zeroLoadout = player.loadout.zeroLoadout;
+		
+		groundSpecial = new RaijingekiWeapon();
+		airSpecial = KuuenzanWeapon.getWeaponFromIndex(0);
+		uppercutA = RyuenjinWeapon.getWeaponFromIndex(2);
+		uppercutS = RyuenjinWeapon.getWeaponFromIndex(0);
+		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(1);
+		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(0);
 
-		groundSpecial = RaijingekiWeapon.getWeaponFromIndex(zeroLoadout.groundSpecial);
-		airSpecial = KuuenzanWeapon.getWeaponFromIndex(zeroLoadout.airSpecial);
-		uppercutA = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutA);
-		uppercutS = RyuenjinWeapon.getWeaponFromIndex(zeroLoadout.uppercutS);
-		downThrustA = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustA);
-		downThrustS = HyouretsuzanWeapon.getWeaponFromIndex(zeroLoadout.downThrustS);
-
-		gigaAttackSelected = zeroLoadout.gigaAttack;
-		gigaAttack = zeroLoadout.gigaAttack switch {
-			1 => new Messenkou(),
-			2 => new RekkohaWeapon(),
-			_ => new RakuhouhaWeapon(),
-		};
-
-		hyperMode = zeroLoadout.hyperMode;
+		gigaAttackSelected =0;
+		gigaAttack = new RakuhouhaWeapon();
+		
+		hyperMode = 0;
+		
 		altCtrlsLength = 2;
 		altSoundId = AltSoundIds.X3;
 	}
@@ -107,9 +103,16 @@ public class ZeroMID : Zero {
 			airRisingUses = 0;
 		}
 	}
+	
+	public int Hypermode() {
+		if (player.input.isHeld(Control.Up, player)) {
+			return 1;
+		}
+		return 0;
+	}
 
 	public override void update() {
-	
+		hyperMode = Hypermode();
 		// Hypermode effects.
 		if (isAwakened) {
 			updateAwakenedAura();
@@ -253,7 +256,7 @@ public class ZeroMID : Zero {
 		int currencyUse = 0;
 
 		// Cancel non-invincible states.
-		if (!charState.attackCtrl && !charState.invincible) {
+		if (!charState.normalCtrl) {
 			changeToIdleOrFall();
 		}
 		// Shoot anim and vars.
@@ -387,7 +390,7 @@ public class ZeroMID : Zero {
 	// Non-attacks like guard and hypermode activation.
 	public override bool normalCtrl() {
 		// Hypermode activation.
-		int cost = Player.zeroHyperCost;
+		int cost = 5;
 		if (isAwakened) {
 			cost = 4;
 		}
@@ -417,7 +420,7 @@ public class ZeroMID : Zero {
 			hyperOvertimeActive = true;
 			Global.level.gameMode.setHUDErrorMessage(player, "Overtime mode active");
 		}
-		else if (hyperProgress >= 1 && player.currency >= Player.zeroHyperCost) {
+		else if (hyperProgress >= 1 && player.currency >= 5) {
 			hyperProgress = 0;
 			changeState(new HyperZeroStart(), true);
 			return true;
@@ -428,7 +431,7 @@ public class ZeroMID : Zero {
 		if (changedState) {
 			return true;
 		}
-		// Guard! (You can thank Axl for this mess)
+		// Guard!
 		if (
 				player.input.isL2Held(player)
 			)
@@ -437,7 +440,7 @@ public class ZeroMID : Zero {
 			changeState(new BlockWCUT());
 			return true;
 		} 
-		
+
 		return false;
 	}
 
@@ -448,15 +451,20 @@ public class ZeroMID : Zero {
 			return false;
 		}
 
-
-		if (grounded && player.superAmmo == player.superMaxAmmo && 
-		downPressedTimes >= 2 && player.input.isR2Held(player)) {
-					changeState(new GenmureiState(), true);
-				downPressedTimes = 0;
-				player.superAmmo = 0;
-					return true;
+		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
+			changeState(new ZeroGrabStart(), forceChange: true);
 		}
-		
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
+		if (grounded && player.superAmmo == player.superMaxAmmo &&
+		downPressedTimes >= 2 && player.input.isR2Held(player)) {
+			changeState(new GenmureiState(), true);
+			downPressedTimes = 0;
+			gigaAttack.ammo -= 32;
+			return true;
+		}
+
 
 
 		if (isAwakened && swingPressTime > 0 && hadangekiCooldown == 0) {
@@ -479,11 +487,15 @@ public class ZeroMID : Zero {
 				return true;
 			}
 		}
-		if (grounded && vel.y >= 0) {
-			return groundAttacks();
-		} else {
-			return airAttacks();
+		if (!player.input.isL2Held(player)) {
+			if (grounded && vel.y >= 0) {
+				return groundAttacks();
+			} else {
+				return airAttacks();
+			}
+
 		}
+		return base.attackCtrl();
 	}
 
 
@@ -561,7 +573,11 @@ public class ZeroMID : Zero {
 		}
 		// Use special if pressed first.
 		if (specialPressed && specialPressTime > shootPressTime) {
+			if (!OverDrive){
 			groundSpecial.attack(this);
+			} else {
+			groundSpecial.attack2(this);
+			}
 		}
 		// Regular slashes.
 		if (shootPressed) {
@@ -591,6 +607,7 @@ public class ZeroMID : Zero {
 		)) {
 			changeState(new ZeroUppercut(RisingType.RisingFang, isUnderwater()), true);
 			dashedInAir++;
+			airRisingUses++;
 			return true;
 		}
 		if (yDir == 1 && (shootPressed || specialPressed)) {
@@ -771,11 +788,18 @@ public class ZeroMID : Zero {
 		WallSlash,
 		Gokumonken,
 		Hadangeki,
+
+		Grab,
+		GrabEX,
+		GrabEnd,
 		AwakenedAura
 	}
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
+			"zarzo_grab_start" => MeleeIds.Grab,
+			"zarzo_grab_ex" => MeleeIds.GrabEX,
+			"zarzo_grab_ex_end" => MeleeIds.GrabEnd,
 			// Ground
 			"zarzo_attack" => MeleeIds.HuSlash,
 			"zarzo_attack2" => MeleeIds.HaSlash,
@@ -812,6 +836,22 @@ public class ZeroMID : Zero {
 
 	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		return id switch {
+
+			(int)MeleeIds.Grab => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 0, 0, 40, isReflectShield: true,
+				isZSaberEffect2: false, isZSaberClang: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.GrabEX => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 1, 0, 5, isReflectShield: true,
+				isZSaberEffect2: false, isZSaberClang: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.GrabEnd => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.HeavyPush, player, 5, 30, 15, isReflectShield: true,
+				isZSaberEffect2: false, isZSaberClang: false,
+				addToLevel: addToLevel
+			),
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber1, player, 1, Global.miniFlinch, 15, isReflectShield: true,
@@ -852,10 +892,10 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
-				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player,
-				1, 0, 5, isDeflectShield: true,
+				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
+				1, 10, 5, isDeflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
 				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, Global.superFlinch, 15,
@@ -867,7 +907,7 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.RaijingekiWeak => new GenericMeleeProj(
-				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.Raijingeki2, player, 1, Global.defFlinch, 4,
+				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.ElectricShock, player, 1, 0, 4,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Dairettsui => new GenericMeleeProj(
@@ -884,13 +924,13 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
-				DenjinWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 1, 0, 6,
-				addToLevel: addToLevel
+				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, 30, 6,
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 2, 0, 30,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 30,
 				isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			// Down specials
 			(int)MeleeIds.Hyouretsuzan => new GenericMeleeProj(
@@ -1135,6 +1175,7 @@ public class ZeroMID : Zero {
 		base.render(x, y);
 	}
 
+	
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 		customData.Add((byte)MathF.Floor(gigaAttack.ammo));
@@ -1165,6 +1206,7 @@ public class ZeroMID : Zero {
 		awakenedPhase = (flags[2] ? 2 : (flags[1] ? 1 : 0));
 		isBlack = flags[3];
 		isViral = flags[4];
+		OverDrive = flags[5];
 
 		if (flags[0]) {
 			hypermodeBlink = data[2];

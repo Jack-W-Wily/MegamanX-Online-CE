@@ -244,6 +244,8 @@ public class RisingSpecterProj : Projectile {
 	}
 }
 
+
+
 public class NecroBurstAttack : VileState {
 	bool shot = false;
 

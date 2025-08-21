@@ -14,7 +14,9 @@ public class RMXGenericMeleeProj : Projectile {
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
 		Actor? owningActor = null, bool isShield = false, bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = false, float? hitCooldownSeconds = null,
-		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false
+		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false,
+		bool isJuggleProjectile = false, bool isPushProjectile = false,
+		bool ShouldClang = false
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
 	) {
@@ -45,8 +47,12 @@ public class RMXGenericMeleeProj : Projectile {
 		this.isZSaberEffect2 = isZSaberEffect2;
 		this.isZSaberEffect2B = isZSaberEffect2B;
 		this.isZSaberClang = isZSaberClang;
+		this.isJuggleProjectile = isJuggleProjectile;
+		this.isPushProjectile = isPushProjectile;
+		this.ShouldClang = ShouldClang;
 		isMelee = true;
 	}
+
 
 	public override void update() {
 		base.update();

@@ -47,7 +47,7 @@ public class Hurt : CharState {
 				character.changeSpriteFromName("hurt2", true);
 			}
 		}
-		if (!spiked) {
+		if (!spiked && !character.grounded) {
 			float flichLimitusTime = flinchTime <= 30 ? flinchTime : 30;
 
 			character.vel.y = (-0.125f * (flichLimitusTime - 1)) * 60f;

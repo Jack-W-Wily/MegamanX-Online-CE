@@ -216,7 +216,7 @@ public class BaseSigma : Character {
 			}
 		} else if (
 			player.mavericks.Count > 0 &&
-			grounded && player.input.isHeld(Control.Up, player) &&
+			player.input.isHeld(Control.Up, player) &&
 			canIssueOrders && charState is not IssueGlobalCommand
 		) {
 			if (player.input.isCommandButtonPressed(player)) {

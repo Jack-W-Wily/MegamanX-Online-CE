@@ -47,9 +47,23 @@ public enum CharIds {
 	ZeroMID,
 	ZeroEND,
 	ShigumaX1,
-
+	AxlWC,
+	Dynamo,
+	Iris,
 	Zain,
-				
+	Dragoon,
+	Doppler,
+	HighMax,
+	GBD,
+	BossKuwanger,
+	BossPenguin,
+	BossMammoth,
+	BossMandril,
+	BossOctopus,
+	BossSigma,
+	BossClaudio,
+	
+	SoulBodyClone,
 
 }
 
@@ -65,8 +79,8 @@ public class CharSelection {
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
 
 	public static CharSelection[] selections => [
-		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
-		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_x", 0),
+		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0),
 		new CharSelection("Kaiser Knuckle", 5, 1, 0, "menu_kzero", 5) {
 		},
 		new CharSelection("Buster Zero", 6, 1, 0, "menu_bzero", 0) {
@@ -83,25 +97,27 @@ public class CharSelection {
 
 
 	public static CharSelection[] selectionsVavaUnlocked => [
-		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
-		new CharSelection("Zero (Vanilla)", (int)CharIds.Zero, 1, 0, "menu_szero", 0),
-		new CharSelection("Zero (WCUT)", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
-		new CharSelection("Vile", 2, 1, 0, "menu_vvile", 0),
-		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
-		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "zain_idle", 0),
-		new CharSelection("Sigma", 4, 1, 0, "menu_ssigma", sigmaIndex),
-		new CharSelection("Axl", 3, 1, 0, "menu_aaxl", 0){
-			offset = new Point(1, 45)
-		},
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
+		new CharSelection("Axl", (int)CharIds.AxlWC, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
+		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
+		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
+		new CharSelection("Iris", (int)CharIds.Iris, 1, 0, "smenu_iris", 0){offset = new Point(0, 20)},
+		new CharSelection("Dynamo", (int)CharIds.Dynamo, 1, 0, "smenu_dynamo", 0){offset = new Point(0, 20)},
+		new CharSelection("Sigma", (int)CharIds.Sigma, 1, 0, "smenu_sigma", 0){offset = new Point(0, 20)},
+		new CharSelection("Dragoon", (int)CharIds.Dragoon, 1, 0, "smenu_dragoon", 0){offset = new Point(0, 20)},
+		new CharSelection("High Max", (int)CharIds.HighMax, 1, 0, "smenu_highmax", 0){offset = new Point(0, 20)},
+		new CharSelection("Green Biker Dude", (int)CharIds.GBD, 1, 0, "smenu_gbd", 0){offset = new Point(0, 20)},
+
 		// Make sure to add your char here
 		new CharSelection("Kurumitos", // Display name in the menu
 		(int)CharIds.Kurumitos, // Char ID , you may notice that the ones above have numbers here 
 		// 							but adding it as  (int)Char.Ids."your character" is more effective
 		1,    // Mapped Char Armor (this is exclusive to make it so X's 1v1 Armors Work)
 		0,               // Mapped Char Maverick (This is for sigma's 1v1 mavericks)
-		"kr_idle",       // Sprite name to show in the menu, for this example I choose the idle
+		"smenu_kr",       // Sprite name to show in the menu, for this example I choose the idle
 		 0               // Frame that the sprite will be stuck in
-		 ),				 // Make sure to end the whole thing with a "," ion the end
+		 ){offset = new Point(0, 20)},              // Make sure to end the whole thing with a "," ion the end
 		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 	];
@@ -208,10 +224,10 @@ public class SelectCharacterMenu : IMainMenu {
 		this.isTeamMode = isTeamMode;
 		this.isHost = isHost;
 
-		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selections;
+		charSelections = is1v1 ? CharSelection.selectionsVavaUnlocked : CharSelection.selectionsVavaUnlocked;
 
 		if (!is1v1 && Options.main.C7E1FBE2E00 == 123) {
-		charSelections = is1v1 ? CharSelection.selections1v1 : CharSelection.selectionsVavaUnlocked;
+		charSelections = is1v1 ? CharSelection.selectionsVavaUnlocked : CharSelection.selectionsVavaUnlocked;
 		}
 		playerData.charNum = isInGame ? Global.level.mainPlayer.newCharNum : Options.main.preferredCharacter;
 

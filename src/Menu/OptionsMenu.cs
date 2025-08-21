@@ -1218,7 +1218,138 @@ public class OptionsMenu : IMainMenu {
 					"indicating Dodge Roll cooldown."
 				),
 			};
-		} else if (charNum == 4) {
+		} else if (charNum == (int)CharIds.AxlWC) {
+			menuOptions = new List<MenuOption>() {
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.lockMoveOnShoot = true;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.lockMoveOnShoot = false;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Move while shooting:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(!Options.main.lockMoveOnShoot),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If no, you wont move while shooting."
+				),
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.axlDirLock);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Lock shoot direction:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.axlDirLock),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If enabled Axl will keep direction while holding shoot.\n(Directional Only)"
+				),
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.autoCharge = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.autoCharge = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Auto charge Copy Shot:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.autoCharge),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If yes, you wont need to hold SPECIAL\n" + 
+					"to charge copy shot."
+				),
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.blockInput = true;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.blockInput = false;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Block input:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.blockInput ? "BLOCK KEY" : "DOWN"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Choose block input. If 'down' you will block\n" +
+					"using DOWN else, you will block using BLOCK key."
+				),
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.hoverWhileDown = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.hoverWhileDown = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Allow DOWN + Hover:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.hoverWhileDown),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If yes, you can hover if you are holding DOWN."
+				),
+				// Axl Use Mouse Aim
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isPressedMenu(Control.MenuLeft)) {
+							Options.main.axlAimMode = 0;
+						} else if (Global.input.isPressedMenu(Control.MenuRight)) {
+							Options.main.axlAimMode = 2;
+						}
+					},
+					(Point pos, int index) => {
+						string aimMode = "Directional";
+						if (Options.main.axlAimMode == 1) aimMode = "Directional";
+						else if (Options.main.axlAimMode == 2) aimMode = "Cursor";
+						Fonts.drawText(
+							optionFontText, "Aim mode:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, aimMode,
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Change Axl's aim controls to either use\nARROW KEYS (Directional) or mouse aim (Cursor)."
+				),
+			};
+			} 	else if (charNum == 4) {
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,

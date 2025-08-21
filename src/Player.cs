@@ -111,10 +111,10 @@ public partial class Player {
 	public bool lastDeathWasVileMK2;
 	public bool lastDeathWasVileV;
 	public bool lastDeathWasSigmaHyper;
-	public const int zeroHyperCost = 10;
-	public const int zBusterZeroHyperCost = 8;
+	public const int zeroHyperCost = 5;
+	public const int zBusterZeroHyperCost = 5;
 	public const int AxlHyperCost = 10;
-	public const int reviveVileCost = 5;
+	public const int reviveVileCost = 1;
 	public const int reviveSigmaCost = 10;
 	public const int reviveXCost = 10;
 	public const int goldenArmorCost = 5;
@@ -131,13 +131,26 @@ public partial class Player {
 
 	public bool isX { get { return charNum == (int)CharIds.X; } }
 	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
-	public bool isVile { get { return charNum == (int)CharIds.Vile; } }
-	public bool isAxl { get { return charNum == (int)CharIds.Axl; } }
+	public bool isVile { get { return charNum == (int)CharIds.Vile || charNum == (int)CharIds.VAVA1 ; } }
+	public bool isAxl { get { return charNum == (int)CharIds.Axl || charNum == (int)CharIds.AxlWC; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
 	public bool isRMX { get { return charNum == (int)CharIds.RockmanX; } }
 	public bool isZMID { get { return charNum == (int)CharIds.ZeroMID; } }
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
+
+	public bool isDynamo { get { return charNum == (int)CharIds.Dynamo; } }
+
+	public bool isIris { get { return charNum == (int)CharIds.Iris; } }
+
+	public bool isDragoon { get { return charNum == (int)CharIds.Dragoon; } }
+
+	public bool isKR { get { return charNum == (int)CharIds.Kurumitos; } }
+
+	public bool isHighMax { get { return charNum == (int)CharIds.HighMax; } }
+
+	public bool isGBD { get { return charNum == (int)CharIds.GBD; } }
+	
 
 
 
@@ -250,6 +263,12 @@ public partial class Player {
 		{ (int)CharIds.RockmanX, new() },
 		{ (int)CharIds.ZeroMID, new() },
 		{ (int)CharIds.Kurumitos, new() },
+		{ (int)CharIds.Iris, new() },
+		{ (int)CharIds.Dynamo, new() },
+		{ (int)CharIds.Dragoon, new() },
+		{ (int)CharIds.AxlWC, new() },
+		{ (int)CharIds.HighMax, new() },
+		{ (int)CharIds.GBD, new() },
 	};
 
 	// Heart tanks
@@ -268,6 +287,12 @@ public partial class Player {
 		{ (int)CharIds.RockmanX, new() },
 		{ (int)CharIds.ZeroMID, new() },
 		{ (int)CharIds.Zain, new() },
+		{ (int)CharIds.Iris, new() },
+		{ (int)CharIds.Dynamo, new() },
+		{ (int)CharIds.Dragoon, new() },
+		{ (int)CharIds.AxlWC, new() },
+		{ (int)CharIds.HighMax, new() },
+		{ (int)CharIds.GBD, new() },
 	};
 
 	// Getter functions.
@@ -447,9 +472,12 @@ public partial class Player {
 	
 	public List<ShaderWrapper> omegaAuraShaderRed;
 
+	public List<ShaderWrapper> omegaAuraShaderPurple;
+
 	public void intitalizeShaders() {
 		omegaAuraShader = new() { Helpers.cloneShaderSafe("omega") };
 		omegaAuraShaderRed = new() { Helpers.cloneShaderSafe("omegaRed") };
+		omegaAuraShaderPurple = new() { Helpers.cloneShaderSafe("omegaPurple") };
 	}
 
 	// Maverick shaders.
@@ -461,6 +489,9 @@ public partial class Player {
 	// Projectile shaders.
 	public ShaderWrapper timeSlowShader = Helpers.cloneShaderSafe("timeslow");
 	public ShaderWrapper darkHoldScreenShader = Helpers.cloneShaderSafe("darkHoldScreen");
+
+	public ShaderWrapper darkHoldDScreenShader = Helpers.cloneShaderSafe("sougenmuTrail");
+	
 	// Charge Lv
 	public static ShaderWrapper ZeroPinkC = Helpers.cloneGenericPaletteShader("zeroPinkCharge");
 	public static ShaderWrapper ZeroGreenC = Helpers.cloneGenericPaletteShader("zeroGreenCharge");
@@ -504,6 +535,8 @@ public partial class Player {
 	public List<ChillPIceStatueProj> iceStatues = new List<ChillPIceStatueProj>();
 	public List<WSpongeSpike> seeds = new List<WSpongeSpike>();
 	public List<Actor> mechaniloids = new List<Actor>();
+	public SoulBodyClone? sClone;
+
 
 	public ExplodeDieEffect? explodeDieEffect;
 	public bool suicided;
@@ -722,12 +755,20 @@ public partial class Player {
 			return getModifiedHealth(28);
 		}
 		int bonus = 0;
-		if (isSigma || isZMID) {
+		if (isSigma || isZMID || isKR)  {
 			bonus = 12;
 		}
-		if (isRMX ) {
+		if (isRMX || isDynamo || isDragoon) {
 			bonus = 10;
 		}
+		if (isZain || isHighMax) {
+			bonus = 15;
+		}
+		if (isIris || isGBD) {
+			bonus = 6;
+		}
+
+
 
 		return MathF.Ceiling(
 			getModifiedHealth(20 + bonus) + (heartTanks * getHeartTankModifier())
@@ -1142,8 +1183,25 @@ public partial class Player {
 		assassinHitPos = null;
 
 		Character newChar;
-		// X
-		if (charNum == (int)CharIds.X) {
+		// Bosses
+
+		if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI ){
+	
+			newChar = new BossClaudio(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI ){
+	
+			newChar = new Zain(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+
+		} 
+		
+		// Players
+		else if (charNum == (int)CharIds.X) {
 			XLoadout xLoadout = new() {
 				weapon1 = extraData[0],
 				weapon2 = extraData[1],
@@ -1201,17 +1259,17 @@ public partial class Player {
 			loadout.sigmaLoadout.commandMode = extraData[3];
 
 			if (sigmaForm == 2) {
-				newChar = new Doppma(
+				newChar = new Sigma1(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			} else if (sigmaForm == 1) {
-				newChar = new NeoSigma(
+				newChar = new Sigma1(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			} else {
-				newChar = new CmdSigma(
+				newChar = new Sigma1(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
@@ -1280,10 +1338,47 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
-		// Error out if invalid id.
-		else {
-			throw new Exception("Error: Non-valid char ID: " + charNum);
+		 else if (charNum == (int)CharIds.Iris) {
+			
+			newChar = new Iris(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
 		}
+		 else if (charNum == (int)CharIds.Dynamo) {
+			
+			newChar = new Dynamo(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.AxlWC) {
+			newChar = new AxlWC(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.Dragoon) {
+			newChar = new Dragoon(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+			);
+		}  else if (charNum == (int)CharIds.HighMax) {
+			
+			newChar = new HighMax(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (charNum == (int)CharIds.GBD) {
+			
+			newChar = new GBD(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+			// Error out if invalid id.
+			else {
+			throw new Exception("Error: Non-valid char ID: " + charNum);
+			}
+		
 		// Do this once char has spawned and is not null.
 		if (isMainChar) {
 			configureWeapons(newChar);
@@ -1537,6 +1632,28 @@ public partial class Player {
 				true, data.dnaNetId, false, isWarpIn: false
 			);
 		} 
+		 else if (data.charNum == (int)CharIds.Iris) {
+			retChar = new Iris(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		} 
+		else if (data.charNum == (int)CharIds.Dynamo) {
+			retChar = new Dynamo(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		} else if (data.charNum == (int)CharIds.Dragoon) {
+			retChar = new Dragoon(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}  else if (data.charNum == (int)CharIds.AxlWC) {
+			retChar = new AxlWC(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, data.dnaNetId, false, isWarpIn: false
+			);
+		}
 		
 		
 		
@@ -1734,6 +1851,38 @@ public partial class Player {
 				true, dnaNetId, true, isWarpIn: false
 			);
 		}
+		else if (charNum == (int)CharIds.Iris) {
+			retChar = new Iris(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
+		else if (charNum == (int)CharIds.Dynamo) {
+			retChar = new Dynamo(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.Dragoon) {
+			retChar = new Dragoon(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.AxlWC) {
+			retChar = new AxlWC(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.HighMax) {
+			retChar = new HighMax(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		} else if (charNum == (int)CharIds.GBD) {
+			retChar = new GBD(
+				this, character.pos.x, character.pos.y, character.xDir,
+				true, dnaNetId, true, isWarpIn: false
+			);
+		}
 		
 		
 		
@@ -1767,6 +1916,11 @@ public partial class Player {
 		if (charNum == (int)CharIds.VAVA1
 		|| charNum == (int)CharIds.Kurumitos
 		|| charNum == (int)CharIds.Zain
+		|| charNum == (int)CharIds.Iris
+		|| charNum == (int)CharIds.Dynamo
+		|| charNum == (int)CharIds.Dragoon
+		|| charNum == (int)CharIds.HighMax
+		|| charNum == (int)CharIds.GBD
 		) {
 			retChar.weapons.Add(new SigmaMenuWeapon());
 		}
@@ -2191,7 +2345,7 @@ public partial class Player {
 	public bool canReviveVile() {
 		if (Global.level.isElimination() ||
 			!lastDeathCanRevive ||
-			newCharNum != (int)CharIds.Vile ||
+			!isVile ||
 			currency < reviveVileCost
 		) {
 			return false;
@@ -2386,9 +2540,9 @@ public partial class Player {
 	}
 
 	public void explodeDieStart() {
-		if (character == null) {
-			return;
-		}
+	//	if (character == null) {
+	//		return;
+	//	}
 		explodeDieEffect = ExplodeDieEffect.createFromActor(this, character, 20, 1.5f, false, doExplosion: false);
 		Global.level.addEffect(explodeDieEffect);
 	}
@@ -2480,6 +2634,7 @@ public partial class Player {
 		if (currentMaverick != null && currentMaverick.controlMode == MaverickMode.TagTeam) {
 			destroyCharacter(true);
 		} else {
+			bonusHealth = 0;
 			character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		}
 		foreach (var maverick in mavericks) {

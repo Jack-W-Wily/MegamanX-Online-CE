@@ -21,6 +21,7 @@ public class TriadThunder : Weapon {
 		effect = "Charged: Grants Super Armor.\nUncharged won't give assists.";
 		hitcooldown = "30";
 		flinch = "6/26";
+		type = index;
 		flinchCD = "2.25/0";
 		maxAmmo = 10;
 		ammo = maxAmmo;

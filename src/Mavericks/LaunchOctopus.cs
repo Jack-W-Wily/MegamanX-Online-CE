@@ -300,6 +300,7 @@ public class LaunchOWhirlpoolProj : Projectile {
 		}
 	}
 }
+
 public class TorpedoProjChargedOcto : Projectile, IDamagable {
 	public Actor? target;
 	public float smokeTime = 0;

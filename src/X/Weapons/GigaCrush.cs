@@ -10,6 +10,7 @@ public class GigaCrush : Weapon {
 		shootSounds = new string[] { "gigaCrushX2", "gigaCrushX2", "gigaCrushX2", "gigaCrushX2" };
 		fireRate = 60;
 		switchCooldown = 15;
+		type = index;
 		ammo = 0;
 		maxAmmo = 28;
 		allowSmallBar = false;

@@ -12,6 +12,7 @@ public class ChameleonSting : Weapon {
 		index = (int)WeaponIds.ChameleonSting;
 		killFeedIndex = 2;
 		weaponBarBaseIndex = 2;
+		type = index;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 2;
 		weaknessIndex = (int)WeaponIds.BoomerangCutter;

@@ -16,6 +16,7 @@ public class RaySplasher : Weapon {
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 21;
+		type = index;
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
 		damage = "1/1";
@@ -125,6 +126,43 @@ public class RaySplasherProj : Projectile {
 			forceNetUpdateNextFrame = true;
 		}
 	}
+}
+
+
+public class RayClaw : Projectile {
+	public RayClaw(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId,
+		float damage = 2, int flinch = 26, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 2, player, "raysplasher_claw", flinch, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		reflectable = false;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		setIndestructableProperties();
+		isJuggleProjectile = true;
+		isShield = true;
+		isReflectShield = true;
+		maxTime = 0.3f;
+		projId = (int)ProjIds.RayClaw;
+		isMelee = true;
+		if (player.character != null) {
+			owningActor = player.character;
+		}
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void postUpdate() {
+		base.postUpdate();
+		if (owner?.character != null) {
+			incPos(owner.character.deltaPos);
+		}
+	}
+
+
 }
 
 public class RaySplasherTurret : Actor, IDamagable {

@@ -9,10 +9,10 @@ public class Zain : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
 		charId = CharIds.Zain;
+		ShouldExplode = true;
 		spriteFrameToSounds["zain_run/3"] = "ridewalk";
 		spriteFrameToSounds["zain_run/0"] = "ridewalk";
 		spriteFrameToSounds["zain_land/1"] = "ridewalk";
-	
 	}
 
 	private float CounterTimer;
@@ -21,33 +21,74 @@ public class Zain : Character {
 
 	private float SlashCooldown;
 
-	
+
 
 	public float ZainCounters;
 
+	public override void landingCode(bool useSound = true) {
+		base.landingCode(useSound);
+		shakeCamera(sendRpc: true);
+		playSound("crash", sendRpc: true);
+		
+	}
 
-public override bool normalCtrl() {
-	
-		if (player.input.isHeld(Control.Up, player) &&
+	public override bool normalCtrl() {
+
+		if (player.input.isL2Held(player) &&
 			!isAttacking() && grounded &&
-			charState is not SwordBlock
+			charState is not BlockWCUT
 		) {
-			changeState(new SwordBlock());
+			changeState(new BlockWCUT());
 			return true;
 		}
 		return base.normalCtrl();
 	}
 
+	public override bool attackCtrl() {
+		if (player.input.isHeld(Control.Down, player) && sprite.name.Contains("spinslash")) {
 
-	public override void update(){
+		}
+		if (player.input.isBPressed(player) && charState is not Dash) {
+
+			if (grounded) {
+				changeState(new ZainJab(), true);
+			} else {
+				changeState(new ZainAirDunk(), true);
+			}
+		}
+
+		if (player.input.isAPressed(player)) {
+			changeState(new ZainProjSwingState(grounded, shootProj: false), forceChange: true);
+		}
+
+		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
+			changeState(new ZainGrabStab(), forceChange: true);
+		}
+
+		return base.attackCtrl();
+	}
+
+
+
+	public override void update() {
 		base.update();
 
+
+		if (ZainCounters == 0) player.superAmmo = 0;
+		if (ZainCounters == 1) player.superAmmo = 4;
+		if (ZainCounters == 2) player.superAmmo = 8;
+		if (ZainCounters == 3) player.superAmmo = 12;
+		if (ZainCounters == 4) player.superAmmo = 18;
+		if (ZainCounters == 5) player.superAmmo = 20;
+		if (ZainCounters == 6) player.superAmmo = 24;
+		if (ZainCounters == 7) player.superAmmo = 28;
+		if (ZainCounters == 8) player.superAmmo = 32;
 
 		//Cooldowns
 		//Helpers.decrementTime(ref CounterTimer);
 		Helpers.decrementTime(ref CounterCooldown);
 		Helpers.decrementTime(ref SlashCooldown);
-		if (ZainCounters > 8 ) ZainCounters = 8;
+		if (ZainCounters > 8) ZainCounters = 8;
 		if (ZainCounters <= 0) {
 			ZainCounters = 0;
 			counterCooldown = 1;
@@ -58,122 +99,86 @@ public override bool normalCtrl() {
 		//			addMusicSource("RequiemNitanchouDiesIrae", getCenterPos(), true); 
 		///		}
 		//} 
-		if (charState.attackCtrl){
-			if ((charState is Dash || charState is AirDash) 
-			&& (player.input.isPressed(Control.Shoot, player))){
-			slideVel = xDir * getDashSpeed();			
-			}
-		}
-		if (charState.attackCtrl){
-			if ((charState is AirDash) 
-			&& (player.input.isPressed(Control.Shoot, player)
-			|| player.input.isPressed(Control.Special1, player))){
-			slideVel = xDir * getDashSpeed();			
-			}
-		}
-		if (player.input.isHeld(Control.Down,player)
-		&& charState is Dash or AirDash or Fall or Jump &&
-		!sprite.name.Contains("spinslash")){
-		changeSpriteFromName("spinslash", true);
-		}
-		if (player.input.isHeld(Control.Special1,player)
-		&& (charState.attackCtrl || charState.bonusAttackCtrl) && charState is not Dash and not AirDash &&
-		!sprite.name.Contains("jab")){
 
-		if (grounded){
-		changeSpriteFromName("jab", true);
-		} else{
-		changeState(new ZainAirDunk(), true);
-		}
-
-		}
-
-
-		if (player.input.isHeld(Control.Special1,player)
+		if (player.input.isBHeld(player)
 		&& (charState.attackCtrl || charState.bonusAttackCtrl) &&
-		player.input.isHeld(Control.Dash,player) &&
+		player.input.isHeld(Control.Dash, player) &&
 		ZainCounters > 1
-		){
-		changeState(new GlobalParryState(), true);
+		) {
+			changeState(new ZainDashParryState(), true);
 			ZainCounters -= 2;
 		}
 
-
-
-
-		if (sprite.name.Contains("jab") && isAnimOver()){
-		changeToIdleOrFall();
-		}
-		if (charState.attackCtrl  &&
-		player.input.isPressed(Control.Shoot, player))
-		{		
-       		changeState(new ZainProjSwingState(grounded, shootProj: false), forceChange: true);
-		}
-		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 0 &&
-		player.input.isPressed(Control.WeaponRight, player))
-		{	
+		if ((charState.attackCtrl || charState.bonusAttackCtrl) && ZainCounters > 0 &&
+		player.input.isR2Pressed(player)) {
 			changeState(new ZainKokuSlash(grounded, shootProj: false), forceChange: true);
 			ZainCounters -= 1;
-        }
-		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 3 &&
-		player.input.isPressed(Control.Special2, player))
-		{	
-			changeState(new ZainProjSwingState(grounded, shootProj: true), forceChange: true);
+		}
+		if ((charState.attackCtrl || charState.bonusAttackCtrl) && ZainCounters > 3 &&
+		player.input.isPressed(Control.Special2, player)) {
+
+			if (player.input.isHeld(Control.Down, player)) {
+				changeState(new ZainShinGroundStab(), true);
+			} else if (player.input.isHeld(Control.Up, player)) {
+				changeState(new ZainParryShinStartState(), true);
+			} else {
+				changeState(new ZainShinProjSwingState(grounded, shootProj: true), forceChange: true);
+
+			}
 			ZainCounters -= 4;
 		}
 
 
 
 		bool hadokenCheck2 = player.input.checkHadoken(player, xDir, Control.Special1);
-		
 
-		if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 1 &&
-		hadokenCheck2)
-		{	
-			changeState(new ZainGrabStab(), forceChange: true);
-			ZainCounters -= 2;
+
+		//	if ((charState.attackCtrl || charState.bonusAttackCtrl)  && ZainCounters > 1 &&
+		//	hadokenCheck2)
+		//	{	
+
+		//		ZainCounters -= 2;
+		//	}
+
+		if ((charState.attackCtrl || charState.bonusAttackCtrl)
+		 && player.input.isPressed(Control.WeaponLeft, player)
+		 && player.input.isHeld(Control.Up, player)) {
+			changeState(new ZainParryStartState(), true);
 		}
 
-		if ((charState.attackCtrl || charState.bonusAttackCtrl) 
-		 &&	 player.input.isPressed(Control.WeaponLeft, player) 
-		 && player.input.isHeld(Control.Up,player))
-			{ 
-			changeState(new ZainParryStartState(), true);
-			}
-		
-		 if  (player.input.isPressed(Control.WeaponLeft,player)
-			&&  (charState.attackCtrl || charState.bonusAttackCtrl) 
-			&& !player.input.isHeld(Control.Up,player)
-			) {
+		if (player.input.isPressed(Control.WeaponLeft, player)
+		   && (charState.attackCtrl || charState.bonusAttackCtrl)
+		   && !player.input.isHeld(Control.Up, player)
+		   ) {
 			if (unpoAbsorbedProj != null) {
 				changeState(new ZainUPParryProjState(unpoAbsorbedProj, true, false), true);
-				unpoAbsorbedProj = null;		
+				unpoAbsorbedProj = null;
 			} else {
 				changeState(new ZainUPParryStartState(), true);
 			}
 		}
 
-		 if (player.input.isPressed(Control.Special1,player) && genericParryCooldown == 0 &&
-			  (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
-			) {
+		if (player.input.isPressed(Control.Special1, player) && genericParryCooldown == 0 &&
+			 (charState is Idle || charState is Run || charState is Fall || charState is Jump || charState is XUPPunchState || charState is XUPGrabState)
+		   ) {
 			if (unpoAbsorbedProj != null) {
 				changeState(new XUPParryProjState(unpoAbsorbedProj, true, false), true);
-				unpoAbsorbedProj = null;	
+				unpoAbsorbedProj = null;
 			}
-			}
-		
+		}
+
 		if (ZainCounters >= 8) return;
 
 		player.vileAmmo += Global.spf * 15;
 		if (player.vileAmmo > player.vileMaxAmmo) {
 			player.vileAmmo = 0;
 			ZainCounters += 1;
-			}
+		}
 	}
 
 
 	public override bool isToughGuyHyperMode() {
-		return true;
+		return isAttacking();
 	}
 
 	public override void addAmmo(float amount) {
@@ -188,111 +193,112 @@ public override bool normalCtrl() {
 
 
 
-// This can run on both owners and non-owners. So data used must be in sync
+	// This can run on both owners and non-owners. So data used must be in sync
 	public override Projectile getProjFromHitbox(Collider collider, Point centerPoint) {
-		
+
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true
 			);
 		}
-		
-		if (  sprite.name.Contains("rising"))
-		{
+
+		if (sprite.name.Contains("rising")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.BlockableLaunch,
-			player, 2f, 0, 10f, null, isShield: true, isDeflectShield: true,addToLevel: true);
+			player, 2f, 0, 10f, null, isShield: true, isDeflectShield: true, addToLevel: true);
 		}
-		if (  sprite.name.Contains("spinslash"))
-		{
+		if (sprite.name.Contains("spinslash")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.ZSaberRollingSlash, player,
 				1, 10, 5f, isDeflectShield: true,
-				isZSaberClang : true
-			,addToLevel: true);
+				isZSaberClang: true
+			, addToLevel: true);
 		}
-		if (  sprite.name.Contains("projswing_air"))
-		{
+		if (sprite.name.Contains("super_slash")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 4f, 30, 15f, isZSaberClang : true,addToLevel: true);
+			 ProjIds.ZSaber3, player, 4f, 60, 15f, isZSaberClang: true, addToLevel: true);
 		}
-		if (  sprite.name.Contains("jab"))
-		{
+		if (sprite.name.Contains("projswing_air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.UPPunch, player, 2f, 10, 15f, isZSaberClang : true,addToLevel: true);
+			 ProjIds.ZSaber3, player, 4f, 30, 15f, isZSaberClang: true, addToLevel: true);
+		}
+		if (sprite.name.Contains("jab")) {
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.UPPunch, player, 2f, 10, 15f, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("parry_start")) {
 			return new GenericMeleeProj(new SilkShot(), centerPoint,
 			 ProjIds.ForceGrabState, player, 1f, 0, 15f, isZSaberClang: true
-			 ,addToLevel: true);
+			 , addToLevel: true);
+		}
+
+		if (sprite.name.Contains("parry_dash")) {
+			return new GenericMeleeProj(new SilkShot(), centerPoint,
+			 ProjIds.ForceGrabState, player, 1f, 0, 15f, isZSaberClang: true
+			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("stabgrab") && !sprite.name.Contains("end")) {
 			return new GenericMeleeProj(new SilkShot(), centerPoint,
-			 ProjIds.ForceGrabState, player, 2f, 0, 15f, isZSaberClang: true
-			 ,addToLevel: true);
+			 ProjIds.ForceGrabState, player, 2f, 0, 15f, isZSaberClang: false
+			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("slash") && !sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.ZSaber2, player, 3f, 20, 15f, isZSaberClang: true
-			 ,addToLevel: true);
+			 , addToLevel: true);
 		}
-		if (  sprite.name.Contains("uppercut"))
-		{
+		if (sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang : true
-			,addToLevel: true);
+			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang: true
+			, addToLevel: true);
 		}
 
-		if (  sprite.name.Contains("grab")  
-		&& !sprite.name.Contains("2") && !sprite.name.Contains("stab"))
-		{
+		if (sprite.name.Contains("grab")
+		&& !sprite.name.Contains("2") && !sprite.name.Contains("stab")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang : true
-			 ,addToLevel: true);
-			 
+			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang: false
+			 , addToLevel: true);
+
 		}
 
 		if (sprite.name.Contains("grab") && sprite.name.Contains("2")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f, isZSaberClang: true
-			 ,addToLevel: true);
+			 , addToLevel: true);
 		}
 
-		if (  sprite.name.Contains("groundstab"))
-		{
+		if (sprite.name.Contains("groundstab")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 3f, 20, 15f, isZSaberClang : true
-			,addToLevel: true);
+			 ProjIds.ZSaber3, player, 3f, 20, 15f, isZSaberClang: true
+			, addToLevel: true);
 		}
 
 
-		if (  sprite.name.Contains("stabgrab_end"))
-		{
+		if (sprite.name.Contains("stabgrab_end")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.HeavyPush, player, 4f, 0, 15f, isZSaberClang: true
+			 ProjIds.HeavyPush, player, 4f, 30, 15f, isZSaberClang: true
 			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("air_dunk")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, isZSaberClang: true
-			 ,addToLevel: true);
+			 , addToLevel: true);
 		}
 
 
 		if (sprite.name.Contains("projswing") && !sprite.name.Contains("air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
 			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, isZSaberClang: true
-			 ,addToLevel: true);
+			 , addToLevel: true);
 		}
 		if (sprite.name.Contains("parry")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f
-			,addToLevel: true);
+			, addToLevel: true);
 		}
-		if (  sprite.name.Contains("thrust"))
-		{
+		if (sprite.name.Contains("thrust")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.SpreadShot, player, 2f, 0, 15f
-			,addToLevel: true);
+			, addToLevel: true);
 		}
 		return null;
 	}
@@ -307,11 +313,141 @@ public override bool normalCtrl() {
 	}
 
 	public override string getSprite(string spriteName) {
-	//	if ((Options.main.enableSkins == true)
-	//		&& Global.sprites.ContainsKey("zainalt_" + spriteName)){		
-	//		return "zainalt_" + spriteName;
-	//		}
-			return "zain_" + spriteName;
+		//	if ((Options.main.enableSkins == true)
+		//		&& Global.sprites.ContainsKey("zainalt_" + spriteName)){		
+		//		return "zainalt_" + spriteName;
+		//		}
+		return "zain_" + spriteName;
 	}
+	
+
+	
+	public float AIHellBarrageCD;
+
+	public bool AIStart;
+
+	public bool isBoss;
+
+	public override void aiAttack(Actor? target) {
+		int Vattack = Helpers.randomRange(1, 7);
+		Helpers.decrementFrames(ref AIHellBarrageCD);
+		bool isTargetInAir = pos.y > target?.pos.y - 20;
+		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
+		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (Global.level.is1v1()) {
+			isBoss = true;
+		}
+		if (isBoss) {
+			player.superAmmo = player.superMaxAmmo;
+		}
+
+		
+
+			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+
+				if (isTargetClose && grounded) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+					
+						changeState(new ZainJab());					
+							break;
+						case 2 when isFacingTarget && ZainCounters > 0:
+						changeState(new ZainKokuSlash(grounded, false));	
+						ZainCounters -= 1;	
+							break;
+						case 3 when isFacingTarget && ZainCounters > 0:
+						changeState(new ZainKokuSlash(grounded, false));	
+						player.press(Control.Up);
+						ZainCounters -= 1;	
+							break;
+						case 4 when isFacingTarget && ZainCounters > 0:
+						changeState(new ZainKokuSlash(grounded, false));	
+						player.press(Control.Down);
+						ZainCounters -= 1;		
+							break;
+						case 5 when isFacingTarget:
+							changeState(new ZainGrabStab());	
+							break;
+						case 6 when isFacingTarget:
+							changeState(new ZainProjSwingState(grounded, false));	
+							break;
+						case 7 when isFacingTarget:
+							changeState(new ZainGroundStab());	
+							break;
+					}
+				}
+
+				
+
+				if (!isTargetClose && grounded && isWishinRangedMoves) {
+					switch (Vattack) {
+						case 1 when isFacingTarget && ZainCounters >= 2:
+						changeState(new ZainDashParryState());
+						ZainCounters -= 2;			
+							break;
+						case 2 when isFacingTarget:
+							changeState(new ZainBossJumpStart());	
+							break;
+						case 3 when isFacingTarget:
+							changeState(new ClaudioBossDash());	
+							break;
+						case 4 when isFacingTarget:
+							changeState(new ZainBossJump());	
+							break;
+						case 5 when isFacingTarget && ZainCounters >= 4:
+							changeState(new ZainParryShinStartState(), true);
+							ZainCounters -= 4;
+							addHealth(5);
+							break;
+						case 6 when isFacingTarget && ZainCounters >= 4:
+							changeState(new ZainShinGroundStab(), true);
+							ZainCounters -= 4;
+							break;
+						case 7 when isFacingTarget && ZainCounters >= 4:
+							changeState(new ZainShinProjSwingState(grounded, shootProj: true), forceChange: true);
+							ZainCounters -= 4;
+							break;
+					}
+				}
+
+				aiAttackCooldown = Helpers.randomRange(0, 30);
+			}
+
+			
+	
+		base.aiAttack(target);
+	}
+
+	
+	public float aiBlocktime;
+
+	public float aiDodgeCD;
+	public override void aiDodge(Actor? target) {
+		Helpers.decrementFrames(ref aiBlocktime);
+		Helpers.decrementFrames(ref aiDodgeCD);
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance &&
+			(charState.attackCtrl || charState is ShoulderCannon or PopcornHell)) {
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (grounded) {
+						if (aiDodgeCD == 0 && !isDashing) {
+							
+								aiDodgeCD = Helpers.randomRange(100, 220);
+							
+						}
+					} 
+				}
+			}
+		}
+	
+		base.aiDodge(target);
+	}
+	
 }
 

@@ -180,10 +180,6 @@ public class Vile : Character {
 				}
 			}
 		}
-		if (player.currency > 3 && player.input.isHeld(Control.Down, player) &&
-		player.input.isHeld(Control.Taunt, player) && !isVileMK2) {
-			changeState(new VileRevive(false));
-		}
 		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
 			vulcanLingerTime += Global.spf;
 			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
@@ -223,25 +219,28 @@ public class Vile : Character {
 		chargeLogic(shoot);
 	}
 	public override bool attackCtrl() {
-		bool specialPressed = player.input.isPressed(Control.Special1, player);
-		bool shootHeld = player.input.isHeld(Control.Shoot, player);
 
-		bool WeaponRightHeld = (
-			player.input.isHeld(Control.WeaponRight, player) && 
-			(!isATrans || !player.input.isHeld(Control.Up, player))
-		);
+		if (this is not VAVA1) {
+			bool specialPressed = player.input.isPressed(Control.Special1, player);
+			bool shootHeld = player.input.isHeld(Control.Shoot, player);
 
-		if (specialPressed) {
-			dashGrabSpecial();
-			normalAttacks();
-			airDownAttacks();
-		}
-		if (shootHeld && cannonWeapon.type > -1) {
-			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 
-				cannonWeapon.vileShoot(0, this);
-		}
-		if (WeaponRightHeld && vulcanWeapon.type > -3) {
-			vulcanWeapon.vileShoot(0, this);
+			bool WeaponRightHeld = (
+				player.input.isHeld(Control.WeaponRight, player) &&
+				(!isATrans || !player.input.isHeld(Control.Up, player))
+			);
+
+			if (specialPressed) {
+				dashGrabSpecial();
+				normalAttacks();
+				airDownAttacks();
+			}
+			if (shootHeld && cannonWeapon.type > -1) {
+				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
+					cannonWeapon.vileShoot(0, this);
+			}
+			if (WeaponRightHeld && vulcanWeapon.type > -3) {
+				vulcanWeapon.vileShoot(0, this);
+			}
 		}
 		return base.attackCtrl();
 	}
@@ -352,7 +351,7 @@ public class Vile : Character {
 		}
 		return base.normalCtrl();
 	}
-	public void shoot(int chargeLevel) {
+	public virtual void shoot(int chargeLevel) {
 		if (chargeLevel >= 3) {
 			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 		}
@@ -838,7 +837,8 @@ public class Vile : Character {
 
 		customData.Add(Helpers.boolArrayToByte([
 			hasFrozenCastle,
-			hasSpeedDevil
+			hasSpeedDevil,
+			OverDrive
 		]));
 
 		return customData;
@@ -853,6 +853,7 @@ public class Vile : Character {
 		bool[] boolData = Helpers.byteToBoolArray(data[0]);
 		hasFrozenCastle = boolData[0];
 		hasSpeedDevil = boolData[1];
+		OverDrive = boolData[2];
 	}
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
@@ -861,7 +862,7 @@ public class Vile : Character {
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
 			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
-			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0) {
+			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0 && this is not VAVA1) {
 			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
 				player.press(Control.Special1);
 			}

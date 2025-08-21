@@ -41,6 +41,9 @@ public class Velguarder : Maverick {
 					changeState(new VelGPounceStartState());
 				}
 			} else if (state is MJump || state is MFall) {
+				if (input.isPressed(Control.Dash, player)) {
+					changeState(new VelGPounceStartState());
+				}
 			}
 		}
 	}

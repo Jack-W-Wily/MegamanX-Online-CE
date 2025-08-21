@@ -865,7 +865,7 @@ public class HostMenu : IMainMenu {
 		// Medium maps.
 		"factory_md", "airport_md", "maverickfactory_md", "desertbase_md", "weathercontrol_md",
 		// Small maps.
-		 "training",
+		 "training", "training_ce",
 		"centralcomputer_1v1", "zerovirus_1v1", "sigma4_1v1", "dopplerlab_1v1", "sigma1_1v1",
 		"airport_1v1", "factory_1v1", "hunterbase_1v1", "forest_1v1", "highway", "highway2",
 		"bossroom", "powerplant", "factory", "gallery", "tower", "mountain", "ocean", "forest",
@@ -900,7 +900,7 @@ public class HostMenu : IMainMenu {
 	}
 
 	public string getRandomServerName() {
-		return "match" + Helpers.randomRange(1, 999).ToString();
+		return "WC-Match" + Helpers.randomRange(1, 999).ToString();
 	}
 	public void update() {
 		if (Global.leaveMatchSignal != null) return;

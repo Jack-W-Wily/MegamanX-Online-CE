@@ -18,6 +18,7 @@ public class SpinningBlade : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 20;
 		killFeedIndex = 43;
+		type = index;
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 		damage = "2/2";
 		effect = "Goes back after some time on screen.";

@@ -194,7 +194,12 @@ public class ZeroDownthrustLand : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
+
+		if (player.input.isBPressed(player)) {
+			character.changeState(new Raijingeki(true), true);
+		}
 	}
+
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);

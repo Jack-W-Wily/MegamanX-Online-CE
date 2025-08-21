@@ -9,8 +9,27 @@ public class ZXSaber : Weapon {
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
 		killFeedIndex = 66;
+		type = index;
+	}
+
+
+	public override void shoot(Character character, int[] args) {
+		int chargeLevel = args[0];
+		Point pos = character.getShootPos();
+		int xDir = character.getShootXDir();
+		Player player = character.player;
+		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
+
+		if (chargeLevel >= 3) {
+			character.changeState(new XMaxWaveSaberState(), true);
+		} else {
+			character.changeState(new X6SaberState(character.grounded), true);
+		}
 	}
 }
+
+
+
 
 public class XSaberProj : Projectile {
 	public XSaberProj(

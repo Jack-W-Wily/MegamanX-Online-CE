@@ -133,12 +133,13 @@ public class VileCannonWC : Weapon {
 	}
 }
 
-public class Vava1FrontRunner : CharState {
+
+public class Vava1Stunshot : CharState {
 	bool isGizmo;
 	private VAVA1 vile = null!;
-	public Vava1FrontRunner(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
+	public Vava1Stunshot(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
 		useDashJumpSpeed = true;
-		this.isGizmo = isGizmo;
+		this.isGizmo = false;
 	}
 
 	public static string getSprite(bool isGizmo, bool grounded) {
@@ -193,6 +194,111 @@ public class Vava1FrontRunner : CharState {
 			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
 		}
 		if (vile.cannonWeapon.type == (int)VileCannonType.FrontRunner) {
+			new StunShotProj(
+					shootPos, vile.xDir, MathF.Round(shootVel.byteAngle), vile, 
+					vile.player, vile.player.getNextActorNetId(), rpc: true
+				);
+		}
+		else if (vile.cannonWeapon.type == (int)VileCannonType.FatBoy) {
+			new StunShotProj(
+					shootPos, vile.xDir, MathF.Round(shootVel.byteAngle), vile, 
+					vile.player, vile.player.getNextActorNetId(), rpc: true
+				);
+		}
+		else if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) {
+			new StunShotProj(
+					shootPos, vile.xDir, MathF.Round(shootVel.byteAngle), vile, 
+					vile.player, vile.player.getNextActorNetId(), rpc: true
+				);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as VAVA1 ?? throw new NullReferenceException();
+		shootLogic(vile);
+		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+			exitOnAirborne = true;
+		} else {
+			exitOnAirborne = false;
+			character.useGravity = false;
+			character.stopMoving();
+		}
+		
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		vile.isShootingLongshotGizmo = false;
+		character.useGravity = true;
+		if (isGizmo) {
+			vile.gizmoCooldown = 0.5f;
+		}
+	}
+}
+
+
+
+public class Vava1FrontRunner : CharState {
+	bool isGizmo;
+	private VAVA1 vile = null!;
+	public Vava1FrontRunner(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
+		useDashJumpSpeed = true;
+		this.isGizmo = false;
+	}
+
+	public static string getSprite(bool isGizmo, bool grounded) {
+		if (isGizmo) {
+			return grounded ? "idle_gizmo" : "cannon_gizmo_air";
+		}
+		return grounded ? "idle_shoot" : "cannon_air";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (vile.isShootingLongshotGizmo) {
+			if (vile.cannonWeapon.shootCooldown == 0) {
+				vile.cannonWeapon.vavaShoot(0, vile);
+			}
+			if (player.vileAmmo <= 0) {
+				vile.isShootingLongshotGizmo = false;
+			}
+			return;
+		}
+		//groundCodeWithMove();
+
+		if (character.sprite.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public static void shootLogic(VAVA1 vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
+			return;
+		}
+		Point shootVel = vile.getVileShootVel(true);
+
+		var player = vile.player;
+		vile.playSound("frontrunner", sendRpc: true);
+
+		string muzzleSprite = "cannon_muzzle";
+		if (vile.cannonWeapon.type == (int)VileCannonType.FatBoy) muzzleSprite += "_fb";
+		if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_fb";
+
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.sprite.name.EndsWith("_grab")) {
+			shootPos = vile.getFirstPOIOrDefault("s");
+		}
+
+		var muzzle = new Anim(
+			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
+		);
+		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+		if (vile.cannonWeapon.type == (int)VileCannonType.FrontRunner) {
 			new VileCannonProj(
 				shootPos, vile.xDir, 0, MathF.Round(shootVel.byteAngle), "vile_mk2_proj",
 				vile, player, player.getNextActorNetId(), rpc: true
@@ -206,7 +312,7 @@ public class Vava1FrontRunner : CharState {
 		}
 		else if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) {
 			new VileCannonProj(
-				shootPos, vile.xDir, 2, MathF.Round(shootVel.byteAngle), "vile_mk2_lg_proj",
+				shootPos, vile.xDir, 2, MathF.Round(shootVel.byteAngle), "vile_mk2_fb_proj",
 				vile, player, player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -365,6 +471,7 @@ public class VavaGizmoGrabState : CharState {
 	public VavaGizmoGrabState(Character? victim) : base("gizmo_grab_success") {
 		this.victim = victim;
 		grabTime = VileMK2Grabbed.maxGrabTime;
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {

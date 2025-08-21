@@ -47,6 +47,7 @@ public class KurumaGrabState : CharState {
 	public KurumaGrabState(Character? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = KurumaGrabbed.maxGrabTime;
+		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {

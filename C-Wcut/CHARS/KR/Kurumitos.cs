@@ -53,7 +53,7 @@ public class Kurumitos : Character {
 		) : base( // Make sure it looks exactly like this
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
 
-
+		ShouldExplode = true;
 		charId = CharIds.Kurumitos; // This is the char ID, you can rename it later
 
 
@@ -463,7 +463,7 @@ public static CharSelection[] selections => [
 
 			(int)MeleeIds.StandingKick => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
-				 2, Global.halfFlinch,20, isReflectShield: true,
+				 2, Global.halfFlinch,5, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
@@ -472,14 +472,14 @@ public static CharSelection[] selections => [
 
 			(int)MeleeIds.Dokugami => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MagnetMine, player,
-				 2, Global.halfFlinch,10, isReflectShield: true,
+				 2, Global.defFlinch,10, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Tsuyomi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GravityWell, player,
-				 2, Global.halfFlinch,10, isReflectShield: true,
+				 2, Global.defFlinch,10, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
@@ -493,19 +493,19 @@ public static CharSelection[] selections => [
 
 			(int)MeleeIds.ShikiOniaki => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
-				 2, Global.halfFlinch, isReflectShield: true,
+				 2, Global.defFlinch, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ShikiYamiBarai => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
-				 1, Global.halfFlinch,10, isReflectShield: true,
+				 1, Global.defFlinch,10, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Orochinagi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
-				 2, Global.halfFlinch,10, isReflectShield: true,
+				 2, Global.defFlinch,10, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),

@@ -36,6 +36,15 @@ public class Projectile : Actor {
 	public bool isZSaberEffect;
 	public bool isZSaberEffect2;
 	public bool isZSaberEffect2B;
+
+	// Wcut Stuff
+
+	public bool isJuggleProjectile;
+	public bool destroyOnDMG;
+	public bool isPushProjectile;
+	public bool ShouldClang;
+
+	
 	//Clang for Zero (or could be in all characters in general)
 	public bool isZSaberClang;
 	public bool shouldVortexSuck = true;
@@ -175,6 +184,10 @@ public class Projectile : Actor {
 			}
 		}
 		*/
+
+		if (destroyOnDMG && owner.character != null && owner.character.isInDamageSprite()) {
+			destroySelf(fadeSprite, fadeSound, doRpcEvenIfNotOwned: true);
+		}
 
 		if (locallyControlled) {
 			if (time > maxTime ||
@@ -692,6 +705,28 @@ public class Projectile : Actor {
 	// it needs to be in the Damager class as a "on<PROJ>Damage() method"
 	// Also, this runs on every hit regardless of hit cooldown, so if hit cooldown must be factored, use onDamage
 	public virtual void onHitDamagable(IDamagable damagable) {
+
+
+		if (isJuggleProjectile && damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			if (chr.isPushImmune()) return;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 0 * modifier, -300));
+		}
+
+		if (isPushProjectile){
+
+		if (damagable is Character character) {
+			if (character.isPushImmune()) { return; }
+			character.pushedByTornadoInFrame = true;
+			character.move(new Point(500 * 0.9f * xDir * 1 * 0.25f, 0));
+	
+		}
+	
+		}
+
+		
 		if (destroyOnHit) {
 			damagedOnce = true;
 			if (isNetcodeDamageOwner(damagable.actor())) {

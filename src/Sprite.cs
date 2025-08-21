@@ -497,6 +497,40 @@ public class Sprite {
 					},
 					time = 0.25f
 				});
+				if (Global.shaderWrappers.ContainsKey("trailRed")) shaderList.Add(Global.shaderWrappers["trailRed"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail() {
+					action = (float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					},
+					time = 0.25f
+				});
+				if (Global.shaderWrappers.ContainsKey("sougenmuTrail")) shaderList.Add(Global.shaderWrappers["sougenmuTrail"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail() {
+					action = (float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					},
+					time = 0.25f
+				});
 			}
 			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
 				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {

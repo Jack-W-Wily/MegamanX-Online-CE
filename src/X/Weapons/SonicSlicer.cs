@@ -16,6 +16,7 @@ public class SonicSlicer : Weapon {
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 13;
 		killFeedIndex = 24;
+		type = index;
 		weaknessIndex = (int)WeaponIds.CrystalHunter;
 		damage = "2/4";
 		effect = "U: Bounces on Wall. Breaks W.Sponge Shield.\nC: Decreases vertical speed drastically.";

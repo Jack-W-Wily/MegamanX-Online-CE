@@ -65,7 +65,7 @@ public class KurumitosOrochinagiCharge : CharState {
 
 
 	public KurumitosOrochinagiCharge() : base("orochinagi_charge") {
-
+		invincible = true;
 	}
 
 	public override void update() {
@@ -134,7 +134,7 @@ public class KurumitosOrochinagiCharged : CharState {
 	bool fired;
 
 	public Kurumitos kr = null!; // sometimes you want your character to have
-								// features tied to conditions in your charstates so you'll need this
+								 // features tied to conditions in your charstates so you'll need this
 
 	public KurumitosOrochinagiCharged() : base("orochinagi_fire") {
 		landSprite = "orochinagi_fire";
@@ -143,6 +143,7 @@ public class KurumitosOrochinagiCharged : CharState {
 		airMove = true;
 		canJump = true;
 		canStopJump = true;
+		invincible = true;
 	}
 
 	public override void update() {
