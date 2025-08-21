@@ -111,6 +111,7 @@ public partial class Character : Actor, IDamagable {
 	public const float maxLastAttackerTime = 5;
 
 	public float igFreezeProgress;
+	public float igFreezeRecoveryCooldown;
 	public float freezeInvulnTime;
 	public float stunInvulnTime;
 	public float crystalizeInvulnTime;
@@ -219,6 +220,7 @@ public partial class Character : Actor, IDamagable {
 
 	// Ice
 	public float slowdownTime;
+
 	// Parasite.
 	public Damager? parasiteDamager;
 	public ParasiteAnim? parasiteAnim;
@@ -237,6 +239,11 @@ public partial class Character : Actor, IDamagable {
 	// Buffs.
 	public float vaccineTime;
 	public float vaccineHurtCooldown;
+
+	// Combat status.
+	public float inCombatCooldown;
+	public float inCombatTime;
+	public float outOfCombatTime;
 
 	// Ctrl data
 	public int altCtrlsLength = 1;
@@ -313,8 +320,11 @@ public partial class Character : Actor, IDamagable {
 	// Etc.
 	public int camOffsetX;
 	public int secondBarOffset;
+	public bool isQuickAssassinate;
+	public bool disguiseCoverBlown;
 
 	public AltSoundIds altSoundId = AltSoundIds.None;
+
 	public enum AltSoundIds {
 		None,
 		X1,
@@ -524,7 +534,6 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	float igFreezeRecoveryCooldown = 0;
 	public void addIgFreezeProgress(float amount, int freezeTime = 120) {
 		if (freezeInvulnTime > 0) return;
 		if (frozenTime > 0) return;
@@ -1007,6 +1016,17 @@ public partial class Character : Actor, IDamagable {
 
 		if (Global.level.mainPlayer.readyTextOver) {
 			Helpers.decrementTime(ref invulnTime);
+		}
+
+		if (inCombatCooldown > 0) {
+			inCombatCooldown -= Global.gameSpeed;
+			inCombatTime += Global.gameSpeed;
+			if (inCombatCooldown <= 0) {
+				inCombatCooldown = 0;
+				inCombatTime = 0;
+			}
+		} else {
+			outOfCombatTime += Global.gameSpeed;
 		}
 
 		if (vaccineTime > 0) {
@@ -3044,7 +3064,18 @@ public partial class Character : Actor, IDamagable {
 		return true;
 	}
 
-	public virtual void applyDamage(float fDamage, Player? attacker, Actor? actor, int? weaponIndex, int? projId) {
+	public void enterCombat() {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		inCombatCooldown = 120;
+		outOfCombatTime = 0;
+	}
+
+	public virtual void applyDamage(
+		float fDamage, Player? attacker,
+		Actor? actor, int? weaponIndex, int? projId
+	) {
 		if (!ownedByLocalPlayer) return;
 		decimal damage = decimal.Parse(fDamage.ToString());
 		decimal originalDamage = damage;
@@ -3193,6 +3224,13 @@ public partial class Character : Actor, IDamagable {
 		if (damage > 0 && attacker != null) {
 			if (!Damager.isDot(projId)) {
 				player.delaySubtank();
+				enterCombat();
+			}
+			if (actor is Projectile proj && proj.owningActor != null) {
+
+			}
+			else if (player.character != null) {
+
 			}
 		}
 		if (originalHP > 0 && (originalDamage > 0 || damage > 0)) {
@@ -3841,8 +3879,6 @@ public partial class Character : Actor, IDamagable {
 			stopCharge();
 		}
 	}
-	public bool isQuickAssassinate;
-	public bool disguiseCoverBlown;
 
 	public void addTransformAnim() {
 		transformAnim = new Anim(

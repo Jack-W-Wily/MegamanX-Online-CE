@@ -639,6 +639,7 @@ public class XRevive : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.visible = true;
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		rcx = character as RagingChargeX ?? throw new NullReferenceException();
 	}
@@ -668,7 +669,7 @@ public class XReviveAnim : Anim {
 	public override void render(float x, float y) {
 		base.render(x, y);
 		DrawWrappers.DrawCircle(
-			pos.x + x, pos.y + y, startRadius * (1 - (time / ttl.Value)),
+			pos.x + x, pos.y + y, startRadius * (1 - (time / ttl ?? 1)),
 			false, Color.White, 5, zIndex + 1, true, Color.White
 		);
 	}

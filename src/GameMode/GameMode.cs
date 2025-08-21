@@ -643,7 +643,10 @@ public class GameMode {
 				if (count >= 3) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x, y + 11);
 				if (count >= 4) Global.sprites["hud_killfeed_weapon"].drawToHUD(180, x + 13, y + 11);
 				*/
-				float decayCooldown = 1 - Helpers.progress(mmx.selfDamageCooldown, mmx.selfDamageMaxCooldown);
+				float decayCooldown = Helpers.progress(
+					mmx.selfDamageCooldown,
+					mmx.selfDamageMaxCooldown
+				);
 				drawGigaWeaponCooldown(122, decayCooldown, (int)Global.halfScreenW / 17, 160);
 				if (mmx.parryCooldown > 0) {
 					float cooldown = 1 - Helpers.progress(mmx.parryCooldown, 30);
@@ -2550,7 +2553,7 @@ public class GameMode {
 
 		float startY = Global.screenH - 12;
 		float height = 15;
-		Vile vile = level.mainPlayer?.character as Vile;
+		Vile? vile = level.mainPlayer?.character as Vile;
 		bool isMK2 = vile?.isVileMK2 == true;
 		bool isMK5 = vile?.isVileMK5 == true;
 		bool isMK2Or5 = isMK2 || isMK5;

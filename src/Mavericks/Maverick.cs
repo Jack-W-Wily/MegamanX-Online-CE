@@ -931,7 +931,7 @@ public class Maverick : Actor, IDamagable {
 		}
 
 		if (ownedByLocalPlayer && damage > 0 && owner != null) {
-			netOwner.delaySubtank();
+			netOwner?.delaySubtank();
 			addDamageTextHelper(owner, damage, maxHealth, true);
 		}
 
@@ -941,8 +941,8 @@ public class Maverick : Actor, IDamagable {
 				changeState(new MDie(damage == Damager.envKillDamage));
 				int? assisterProjId = null;
 				int? assisterWeaponId = null;
-				Player killer = null;
-				Player assister = null;
+				Player? killer = null;
+				Player? assister = null;
 				getKillerAndAssister(player, ref killer, ref assister, ref weaponIndex, ref assisterProjId, ref assisterWeaponId);
 				creditMaverickKill(killer, assister, weaponIndex);
 			}

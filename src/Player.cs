@@ -20,6 +20,17 @@ public partial class Player {
 			-1, GameMode.neutralAlliance, "NULL", null, 0
 		)
 	);
+	public static Player errorPlayer = new Player(
+		"Error", 255, -1,
+		new PlayerCharData() { charNum = -1 },
+		false, false, GameMode.neutralAlliance,
+		new Input(false),
+		new ServerPlayer(
+			"Error", 255, false,
+			-1, GameMode.neutralAlliance, "NULL", null, 0
+		)
+	);
+	
 	
 	public SpawnPoint? firstSpawn;
 	public Input input;
@@ -512,11 +523,11 @@ public partial class Player {
 
 
 	// Character specific data populated on RPC request
-	public ushort? charNetId;
-	public ushort? charRollingShieldNetId;
-	public float charXPos;
-	public float charYPos;
-	public int charXDir;
+	//public ushort? charNetId;
+	//public ushort? charRollingShieldNetId;
+	//public float charXPos;
+	//public float charYPos;
+	//public int charXDir;
 	public Dictionary<int, int> charNumToKills = new Dictionary<int, int>() {
 	};
 
@@ -546,7 +557,6 @@ public partial class Player {
 	public ExplodeDieEffect? explodeDieEffect;
 	public bool suicided;
 
-	ushort savedArmorFlag;
 	public bool[] headArmorsPurchased = new bool[] { false, false, false };
 	public bool[] bodyArmorsPurchased = new bool[] { false, false, false };
 	public bool[] armArmorsPurchased = new bool[] { false, false, false };
@@ -1305,15 +1315,15 @@ public partial class Player {
 			);
 		}
 		// Kaiser Sigma (Hypermode)
-		else if (charNum == (int)CharIds.KaiserSigma) {
+		else if (spawnCharNum == (int)CharIds.KaiserSigma) {
 			newChar = new KaiserSigma(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
-				isWarpIn: isWarpIn
+				isRevive: true, isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
 		// Raging Charge X.
-		else if (charNum == (int)CharIds.RagingChargeX) {
+		else if (spawnCharNum == (int)CharIds.RagingChargeX) {
 			newChar = new RagingChargeX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
@@ -1885,13 +1895,14 @@ public partial class Player {
 		} else if  (spawnCharNum == (int)CharIds.KaiserSigma) {
 			retChar = new KaiserSigma(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
-				false, charNetId, ownedByLocalPlayer, isRevive: false,
+				true, dnaNetId, ownedByLocalPlayer,
+				isRevive: false, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.RagingChargeX) {
 			retChar = new RagingChargeX(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
-				true, charNetId, ownedByLocalPlayer, isWarpIn: false,
+				true, dnaNetId, true, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (charNum == (int)CharIds.Kurumitos) {
@@ -1963,6 +1974,7 @@ public partial class Player {
 			else if (isVileMK2) vile.vileForm = 1;
 		}
 		retChar.addTransformAnim();
+		retChar.linkedDna = dnaCore;
 
 		if (spawnCharNum == (int)CharIds.Zero) {
 			retChar.weapons.Add(new ZSaber());
@@ -2099,6 +2111,8 @@ public partial class Player {
 			sigma.ballWeapon.ammo = dnaCore.altCharAmmo;
 		} else if (retChar is NeoSigma neoSigma) {
 			neoSigma.gigaAttack.ammo = dnaCore.altCharAmmo;
+		} else if (retChar is RagingChargeX rcx) {
+			rcx.ragingBuster.ammo = dnaCore.altCharAmmo;
 		}
 		if (oldATrans) {
 			dnaCore.ultimateArmor = false;
@@ -2137,6 +2151,9 @@ public partial class Player {
 		if (oldChar == null) {
 			return null;
 		}
+		if (newChar?.netId == null) {
+			throw new Exception("Cannot use ATrans on objects without netID");
+		}
 		// Flag to enable vanilla A-Trans behaviour.
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
@@ -2155,6 +2172,8 @@ public partial class Player {
 					oldChar.linkedDna.altCharAmmo = sigma.ballWeapon.ammo;
 				} else if (oldChar is NeoSigma neoSigma) {
 					oldChar.linkedDna.altCharAmmo = neoSigma.gigaAttack.ammo;
+				} else if (oldChar is RagingChargeX rcx) {
+					oldChar.linkedDna.altCharAmmo = rcx.ragingBuster.ammo;
 				}
 			}
 		}
@@ -2234,6 +2253,9 @@ public partial class Player {
 		atransLoadout = null;
 		if (character == null) {
 			return;
+		}
+		if (character.netId == null) {
+			throw new Exception("Cannot use ATrans on objects without netID");
 		}
 		if (ownedByLocalPlayer) {
 			string json = JsonConvert.SerializeObject(
@@ -2357,7 +2379,7 @@ public partial class Player {
 				return false;
 			}
 			if (character != null && currentMaverick == null) {
-				InRideArmor inRideArmor = character.charState as InRideArmor;
+				InRideArmor? inRideArmor = character.charState as InRideArmor;
 				if (inRideArmor != null &&
 					(inRideArmor.frozenTime > 0 || inRideArmor.stunTime > 0 || inRideArmor.crystalizeTime > 0)
 				) {

@@ -961,16 +961,18 @@ public class RPCJoinLateRequest : RPC {
 
 		Global.level.addPlayer(serverPlayer, true);
 
+		/*
 		foreach (var player in Global.level.players) {
 			player.charNetId = null;
 			if (player.character != null) {
-				player.charNetId = player.character.netId;
+				//player.charNetId = player.character.netId;
 				player.charXPos = player.character.pos.x;
 				player.charYPos = player.character.pos.y;
 				player.charXDir = player.character.xDir;
-				player.charRollingShieldNetId = (player?.character as MegamanX)?.chargedRollingShieldProj?.netId;
+				//player.charRollingShieldNetId = player.character.chargedRollingShieldProj?.netId;
 			}
 		}
+		*/
 
 		var controlPoints = new List<ControlPointResponseModel>();
 		foreach (var cp in Global.level.controlPoints) {
@@ -1028,7 +1030,7 @@ public class RPCJoinLateResponse : RPC {
 	}
 
 	public override void invoke(params byte[] arguments) {
-		JoinLateResponseModel joinLateResponseModel = null;
+		JoinLateResponseModel? joinLateResponseModel = null;
 		try {
 			joinLateResponseModel = Helpers.deserialize<JoinLateResponseModel>(arguments);
 		} catch {
@@ -1165,7 +1167,10 @@ public class RPCSendKillFeedEntry : RPC {
 
 	public override void invoke(string message) {
 		var response = JsonConvert.DeserializeObject<RPCKillFeedEntryResponse>(message);
-		Player player = null;
+		if (response == null) {
+			return;
+		}
+		Player? player = null;
 		if (response.playerId != null) {
 			player = Global.level.getPlayerById(response.playerId.Value);
 		}

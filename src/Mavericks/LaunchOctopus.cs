@@ -336,7 +336,7 @@ public class TorpedoProjChargedOcto : Projectile, IDamagable {
 		customAngleRendering = true;
 		this.angle = this.xDir == -1 ? 180 : 0;
 		if (angle != null) {
-			this.angle = angle + (this.xDir == -1 ? 180 : 0);
+			this.angle = angle.Value + (this.xDir == -1 ? 180 : 0);
 		}
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -370,7 +370,7 @@ public class TorpedoProjChargedOcto : Projectile, IDamagable {
 					var dTo = pos.directionTo(target.getCenterPos()).normalize();
 					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 					destAngle = Helpers.to360(destAngle);
-					if (angle != null) angle = Helpers.lerpAngle((float)angle, destAngle, Global.spf * 3);
+					angle = Helpers.lerpAngle(angle, destAngle, Global.spf * 3);
 				}
 			}
 			if (time >= 0.15) {
@@ -378,10 +378,8 @@ public class TorpedoProjChargedOcto : Projectile, IDamagable {
 			} else if (time < 0.15) {
 				//this.vel.x += this.xDir * Global.spf * 300;
 			}
-			if (angle != null) {
-				vel.x = Helpers.cosd((float)angle) * maxSpeed;
-				vel.y = Helpers.sind((float)angle) * maxSpeed;
-			}
+			vel.x = Helpers.cosd(angle) * maxSpeed;
+			vel.y = Helpers.sind(angle) * maxSpeed;
 		}
 		smokeTime += Global.spf;
 		if (smokeTime > 0.2) {
@@ -398,20 +396,20 @@ public class TorpedoProjChargedOcto : Projectile, IDamagable {
 		if (angle < 90) {
 			xDir = 1;
 			yDir = -1;
-			normAngle = (float)angle;
+			normAngle = angle;
 		}
 		if (angle >= 90 && angle < 180) {
 			xDir = -1;
 			yDir = -1;
-			normAngle = 180 - (float)angle;
+			normAngle = 180 - angle;
 		} else if (angle >= 180 && angle < 270) {
 			xDir = -1;
 			yDir = 1;
-			normAngle = (float)angle - 180;
+			normAngle = angle - 180;
 		} else if (angle >= 270 && angle < 360) {
 			xDir = 1;
 			yDir = 1;
-			normAngle = 360 - (float)angle;
+			normAngle = 360 - angle;
 		}
 
 		if (normAngle < 18) frameIndex = 0;
@@ -606,8 +604,7 @@ public class LaunchOWhirlpoolState : OctopusMState {
 	public override void update() {
 		base.update();
 		if (LauncherOctopuld == null) return;
-
-		if (!maverick.tryMove(new Point(0, 100 * initYDir), out CollideData hit)) {
+		if (!maverick.tryMove(new Point(0, 100 * initYDir), out _)) {
 			if (initYDir == 1) {
 				maverick.unstickFromGround();
 			}
