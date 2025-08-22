@@ -326,7 +326,7 @@ public class CrimsonPhantomState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 	}
 
@@ -388,7 +388,7 @@ public class InfinityGigAttackBossVer : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -458,7 +458,7 @@ public class CrimsonPhantomState2 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 	}
 

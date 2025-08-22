@@ -15,6 +15,9 @@ public class HighMax : Character {
 
 	
 	public float IdlePunchCooldown;
+	public float shootCooldown;
+
+	public float ZetsubouCooldown;
 	public float CrouchPunchCooldown;
 
 	public override bool canDash() {
@@ -24,47 +27,95 @@ public class HighMax : Character {
 	public override bool canWallClimb() {
 		return false;
 	}
+	
+	public override bool isTrueStatusImmune() {
+		return overDriveTimer > 0;
+	}
 
 	public override bool normalCtrl() {
 		if (!grounded && charState.stateTime > 0.005f &&
-		player.input.isPressed(Control.Jump, player) && dashedInAir == 0 
+		player.input.isPressed(Control.Jump, player) && dashedInAir == 0
 		) {
 			dashedInAir++;
 			changeState(new HighMaxHover(), true);
 			return true;
 		}
-	
+
 		return base.normalCtrl();
 	}
 
 
 	public override bool attackCtrl() {
+		bool cmdPressed = player.input.isPressed(Control.Special2, player);
+		bool WRPressed = player.input.isPressed(Control.WeaponRight, player);
+		bool WLPressed = player.input.isPressed(Control.WeaponLeft, player);
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool dashPressed = player.input.isPressed(Control.Dash, player);
-		if (shootPressed && !player.input.isHeld(Control.Down,player)) {
-			if (IdlePunchCooldown == 0) {
-			
-					changeState(new HighMaxIdlePunch1(), true);
-					IdlePunchCooldown = 0.8f;
+		if (shootPressed && !player.input.isHeld(Control.Down,player) 
+		 && !player.input.isHeld(Control.Up,player)) {
+		
+					changeState(new HighMaxIdlePunch1(), true);		
 					return true;
 				
 			
-			}
 		}
 		if (shootPressed && player.input.isHeld(Control.Down,player)) {
-			if (CrouchPunchCooldown == 0) {
-			
+		
 					changeState(new HighMaxCrouchPunch1(), true);
-					CrouchPunchCooldown = 0.8f;
+
+					return true;
+				
+
+	
+		}
+		
+		if (shootPressed && player.input.isHeld(Control.Up,player)) {
+		if (IdlePunchCooldown == 0) {
+			
+					changeState(new HighMaxMegaPunch(), true);
+					IdlePunchCooldown = 1f;
 					return true;
 				
 	
 			}
 		}
+		
+		if (specialPressed) {
+			if (ZetsubouCooldown == 0) {
+
+				changeState(new DesmumeState(), true);
+				ZetsubouCooldown = 2f;
+				return true;
+
+
+			}
+		}
+
+
+		if (cmdPressed && player.superAmmo == player.superMaxAmmo) {
+				changeState(new DesmumeSpam(), true);
+				player.superAmmo = 0;
+				return true;
+		}
+		
+		if (WRPressed) {
+			if (shootCooldown == 0) {
+
+				changeState(new HighmaxShoot1(), true);
+				shootCooldown = 1f;
+			}
+				return true;
+		}
+
+		if (WLPressed) {
+			changeState(new HighmaxShoot2(), true);
+			return true;
+		}
+
 		if (dashPressed) {
-					changeState(new HighMaxChargePunch(), true);		
-					return true;
+			changeState(new HighMaxChargePunch(), true);
+			return true;
 		}
 		return base.attackCtrl();
 	}
@@ -80,6 +131,16 @@ public class HighMax : Character {
 		//
 		//			}
 		///	} 
+		/// 
+
+		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
+		&& player.currency > 4
+		) {
+			player.currency -= 5;
+			overDriveTimer = 12;
+			playSound("ching");
+
+		}
 
 		if (!ownedByLocalPlayer) {
 			return;
@@ -95,6 +156,9 @@ public class HighMax : Character {
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
+		Helpers.decrementTime(ref shootCooldown);
+		Helpers.decrementTime(ref ZetsubouCooldown);
+
 	}
 
 
@@ -188,29 +252,54 @@ public class HighMax : Character {
 	public override string getSprite(string spriteName) {
 		return "highmax_" + spriteName;
 	}
+	
+
+	public override void render(float x, float y) {
+
+		if (overDriveTimer > 0) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} else {
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+		}
+
+		if (player.isMainPlayer && overDriveTimer > 0) {
+			float healthPct = Helpers.clamp01((12 - overDriveTimer) / 12);
+			float sy = -27;
+			float sx = 20;
+			if (xDir == -1) sx = 90 - 20;
+			drawFuelMeter(healthPct, sx, sy);
+		}
+		base.render(x, y);
+	}
+
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, isZSaberClang : false, addToLevel: true
+				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, isZSaberClang: false, addToLevel: true
 			);
 		}
-		 if (  sprite.name.Contains("idle_punch"))
-		{
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("idle_punch")) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 20, isZSaberClang: true, addToLevel: true);
 		}
-		 if (  sprite.name.Contains("land"))
-		{
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f , isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("land")) {
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
-		 if (  sprite.name.Contains("crouch_punch"))
-		{
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0 , isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("crouch_punch")) {
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.UPPunch, player, 3f, 20, isZSaberClang: true, addToLevel: true);
 		}
-		 if ( sprite.name.Contains("dash_punch"))
-		{
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 2f, 0, 4f, null, isShield: true, isDeflectShield: true, isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("slam_grab")) {
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 3f, 30, isZSaberClang: true, addToLevel: true);
+		}
+		if (sprite.name.EndsWith("dash_punch")) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 2f, 0, 4f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
+		}
+		if (sprite.name.EndsWith("dash_punch_charge")) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 1f, 0, 20f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
+		}
+		if (sprite.name.EndsWith("foward_punch")) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 20f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
 		}
 		return proj;
 	}

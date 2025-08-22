@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -441,7 +441,6 @@ public class Sprite {
 				if (Global.shaderWrappers.ContainsKey("boomerkTrail")) {
 					ShaderWrapper boomerkTrail = Global.shaderWrappers["boomerkTrail"];
 					boomerkTrail.SetUniform("paletteTexture", Global.textures["boomerkTrailPalette"]);
-					
 					shaderList.Add(boomerkTrail);
 				}
 
@@ -470,7 +469,7 @@ public class Sprite {
 				lastTwoBkTrailDraws.Clear();
 			}
 
-			if (renderEffects.Contains(RenderEffectType.Trail) || name is "vava_crimson_phantom") {
+			if (renderEffects.Contains(RenderEffectType.Trail)) {
 				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 					var trail = lastFiveTrailDraws[i];
 					trail.action.Invoke(trail.time);
@@ -479,40 +478,6 @@ public class Sprite {
 
 				var shaderList = new List<ShaderWrapper>();
 				if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail() {
-					action = (float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					},
-					time = 0.25f
-				});
-				if (Global.shaderWrappers.ContainsKey("trailRed")) shaderList.Add(Global.shaderWrappers["trailRed"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail() {
-					action = (float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					},
-					time = 0.25f
-				});
-				if (Global.shaderWrappers.ContainsKey("sougenmuTrail")) shaderList.Add(Global.shaderWrappers["sougenmuTrail"]);
 
 				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
 				lastFiveTrailDraws.Add(new Trail(
@@ -1038,8 +1003,6 @@ public class AnimData {
 				shader?.SetUniform("alpha", 0.5f - (MathF.Sin(Global.level.time * 5) * 0.25f));
 			} else if (renderEffects.Contains(RenderEffectType.ChargeGreen)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeGreen");
-			} else if (renderEffects.Contains(RenderEffectType.StockedChargeLv2)) {
-				shader = Global.shaderWrappers.GetValueOrDefault("stockedchargelv2");
 			} else if (renderEffects.Contains(RenderEffectType.ChargeOrange)) {
 				shader = Global.shaderWrappers.GetValueOrDefault("chargeOrange");
 			} else if (renderEffects.Contains(RenderEffectType.ChargePink)) {

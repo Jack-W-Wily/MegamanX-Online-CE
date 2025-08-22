@@ -154,7 +154,7 @@ public class RMXDoubleKickShoot : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -230,7 +230,7 @@ public class RMXPunch : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -295,7 +295,7 @@ public class RMXPunch2 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}

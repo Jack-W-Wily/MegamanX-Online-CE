@@ -86,7 +86,7 @@ public class DragoonPunchState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}		
 	}
@@ -142,7 +142,7 @@ public class DragoonPunchState2 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}		
 	}
@@ -199,7 +199,7 @@ public class DragoonGrab : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}		
 	}
@@ -255,7 +255,7 @@ public class DragoonKickState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}		
 	}
@@ -529,7 +529,7 @@ public class DragoonRising : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.dashedInAir = 0;
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 		if (!character.grounded) {
 			character.frameIndex = 2;
@@ -767,13 +767,13 @@ public class DragoonDiveKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	    character.stopMovingWeak();
+	    character.stopMoving();
 		character.useGravity = false;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.stopMovingWeak();
+		character.stopMoving();
 	}
 }

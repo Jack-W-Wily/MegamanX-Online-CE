@@ -50,7 +50,7 @@ public class DragonsWrathState : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (character.grounded && character.vel.y >= 0) {
@@ -105,7 +105,7 @@ public class SeaDragonRageState : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (character.grounded && character.vel.y >= 0) {
@@ -162,7 +162,7 @@ public class WildHorseKickState : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 		character.vel = new Point();
 		if (character.grounded && character.vel.y >= 0) {

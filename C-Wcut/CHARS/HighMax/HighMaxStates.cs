@@ -5,17 +5,11 @@ namespace MMXOnline;
 
 public class HighMaxHover : CharState {
 	float hoverTime;
-	float desmumecooldown = 0;
-	float supercooldown = 0;
-    bool once;
-	bool first = false;
-	bool seccond = false;
-	bool third = false;
-	bool fourth = false;
+	
 	public HighMaxHover() : base("hover", "hover", "hover", "hover") {
 		exitOnLanding = true;
 		airMove = true;
-		attackCtrl = false;
+		attackCtrl = true;
 		normalCtrl = true;
 	}
 
@@ -44,144 +38,6 @@ public class HighMaxHover : CharState {
 
 	public override void update() {
 		base.update();
-				var poi = character.getFirstPOI();
-				
-		accuracy = 0;
-		Point prevPos = character.pos;
-			Point shootVel = AimPoint();
-
-		if (character.pos.x != prevPos.x) {
-			accuracy = 5;
-		}
-		Helpers.decrementTime(ref desmumecooldown);
-		Helpers.decrementTime(ref supercooldown);
-
-		if (player.input.isPressed(Control.WeaponRight, player) && player.currency > 5 && !once){
-		player.currency -= 5;
-		character.changeSpriteFromName("ultimate", true);
-		once = true;
-		character.invulnTime = 5f;
-		}
-
-			if (character.sprite.name.Contains("ultimate") && poi != null){
-			if (Helpers.randomRange(0, 2) == 0 && supercooldown == 0) {
-				supercooldown = 0.3f;
-				character.playSound("boundBlaster");
-				new HighmaxHomingProj(
-				poi.Value, 1, character,
-				player, player.getNextActorNetId(), 0, rpc: true
-				);
-				}
-				if (Helpers.randomRange(0,2) == 1 && supercooldown == 0){
-				supercooldown = 0.3f;
-				character.playSound("buster4");
-				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-				}
-				if (Helpers.randomRange(0,2) == 2 && supercooldown == 0){
-				supercooldown = 0.3f;
-				character.playSound("boundBlaster");
-				new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);
-				}
-			}
-
-		if (player.input.isPressed(Control.Shoot, player) && character.sprite.name.Contains("hover")){
-		character.changeSpriteFromName("shoot1", true);
-		once =    false;
-		}
-		if (player.input.isPressed(Control.WeaponLeft, player)  && character.sprite.name.Contains("hover")){
-		character.changeSpriteFromName("shoot2", true);
-		once =    false;
-		}
-		if (player.input.isPressed(Control.Special1, player)  && character.sprite.name.Contains("hover") && desmumecooldown == 0){
-		character.changeSpriteFromName("desmume", true);
-		desmumecooldown = 1.5f;
-		once = true;
-		character.playSound("buster4");
-		}
-
-		if (character.isAnimOver())
-			{
-				character.changeState(new Idle(), true);
-			}
-		if (character.sprite.name.Contains("desmume") && poi != null && !first){
-		Projectile proj;
-		first = true;
-		proj = new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-		}	
-		if (character.sprite.name.Contains("shoot1") && poi != null){
-			
-			if (!first && character.sprite.frameIndex > 2){
-			new HighmaxHomingProj(
-				poi.Value, 1, character,
-				player, player.getNextActorNetId(), 0, rpc: true
-				);
-			first = true;
-			character.playSound("boundBlaster");
-			}
-			if (!seccond && character.sprite.frameIndex > 4){
-			new HighmaxHomingProj(
-				poi.Value, 1, character,
-				player, player.getNextActorNetId(), 0, rpc: true
-				);
-			seccond = true;
-			character.playSound("boundBlaster");
-			}
-			if (!third && character.sprite.frameIndex > 6){
-			new HighmaxHomingProj(
-				poi.Value, 1, character,
-				player, player.getNextActorNetId(), 0, rpc: true
-				);
-			third = true;
-			character.playSound("boundBlaster");
-			}
-			if (!fourth && character.sprite.frameIndex > 8){
-			new HighmaxHomingProj(
-				poi.Value, 1, character,
-				player, player.getNextActorNetId(), 0, rpc: true
-				);
-			fourth = true;
-			character.playSound("boundBlaster");
-			}
-		}
-			if (character.sprite.name.Contains("shoot2") && poi != null){
-			
-			if (!first && character.sprite.frameIndex > 2){
-			new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);
-				first = true;
-			character.playSound("boundBlaster");
-			}
-			if (!seccond && character.sprite.frameIndex > 4){
-			new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);seccond = true;
-			character.playSound("boundBlaster");
-			}
-			if (!third && character.sprite.frameIndex > 6){
-			new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);third = true;
-			character.playSound("boundBlaster");
-			}
-			if (!fourth && character.sprite.frameIndex > 8){
-			new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);
-				fourth = true;
-			character.playSound("boundBlaster");
-			}
-		}
-
-
-
 
 		if ( character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
 		&& !player.input.isHeld(Control.Down, player)) {
@@ -230,53 +86,209 @@ public class HighMaxHover : CharState {
 
 
 
-public class HighMaxIdlePunch1 : CharState {
+
+public class HighmaxShoot1 : CharState {
 
 
 	private float specialPressTime;
-	
+
 	public float pushBackSpeed;
 
-	public HighMaxIdlePunch1(string transitionSprite = "")
-		: base("idle_punch1", "", "", transitionSprite)
-	{
-	
+	public HighmaxShoot1(string transitionSprite = "")
+		: base("shoot1", "", "", transitionSprite) {
+
 	}
 
-	public override void update()
-	{
-		
-		if (!character.grounded && pushBackSpeed > 0) {
-			character.useGravity = false;
-			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
-			pushBackSpeed -= 7.5f;
-		} else {
-			if (!character.grounded) {
-				character.move(new Point(-30 * character.xDir, 0));
+	public Point AimPoint() {
+		Point vel = new Point(1, 0);
+
+
+		if (player.input.isHeld(Control.Shoot, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
 			}
-			character.useGravity = true;
+		}
+		if (player.input.isHeld(Control.Special1, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, 0.75f);
+			} else {
+				vel = new Point(1, 3);
+			}
 		}
 
-		base.update();
-		Helpers.decrementTime(ref specialPressTime);
-		if (stateTime > 0.5f) {
-			character.changeToIdleOrFall();
+		return vel;
+	}
+
+	bool first = false;
+	bool seccond = false;
+	bool third = false;
+	bool fourth = false;
+
+	public override void update() {
+
+		var poi = character.getFirstPOI();
+		accuracy = 0;
+		Point prevPos = character.pos;
+		Point shootVel = AimPoint();
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
 		}
-		if ( player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Shoot, player))
-		{
-			character.changeState(new HighMaxCrouchPunch1());
+
+		if (poi != null) {
+			if (!first && character.sprite.frameIndex > 2) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				first = true;
+				character.playSound("boundBlaster");
+			}
+			if (!seccond && character.sprite.frameIndex > 4) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				seccond = true;
+				character.playSound("boundBlaster");
+			}
+			if (!third && character.sprite.frameIndex > 6) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				third = true;
+				character.playSound("boundBlaster");
+			}
+			if (!fourth && character.sprite.frameIndex > 8) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				fourth = true;
+				character.playSound("boundBlaster");
+			}
 		}
+
 		if (character.isAnimOver()) {
-			return;
+			if (character.grounded) {
+				character.changeState(new Idle());
+			} else {
+				character.changeState(new HighMaxHover());
+			}
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	if (!character.grounded) {
-			character.stopMovingWeak();
-			pushBackSpeed = 100;
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+
+public class HighmaxShoot2 : CharState {
+	
+	public float pushBackSpeed;
+
+	public HighmaxShoot2(string transitionSprite = "")
+		: base("shoot2", "", "", transitionSprite)
+	{
+	
+	}
+
+		public Point AimPoint() {
+	Point vel = new Point(1, 0);
+		
+
+	if (player.input.isHeld(Control.Shoot, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
+			}
+		}  
+		if (player.input.isHeld(Control.Special1, player) ) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, 0.75f);
+			} else {
+				vel = new Point(1, 3);
+			}
+		} 
+
+		return vel;
+	}
+
+	bool first = false;
+	bool seccond = false;
+	bool third = false;
+	bool fourth = false;
+
+	public override void update() {
+
+		var poi = character.getFirstPOI();	
+		accuracy = 0;
+		Point prevPos = character.pos;
+			Point shootVel = AimPoint();
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
 		}
+		if (poi != null) {
+			if (!first && character.sprite.frameIndex > 2) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				first = true;
+				character.playSound("boundBlaster");
+			}
+			if (!seccond && character.sprite.frameIndex > 4) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				seccond = true;
+				character.playSound("boundBlaster");
+			}
+			if (!third && character.sprite.frameIndex > 6) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				third = true;
+				character.playSound("boundBlaster");
+			}
+			if (!fourth && character.sprite.frameIndex > 8) {
+				new HighmaxHomingProj(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				fourth = true;
+				character.playSound("boundBlaster");
+			}
+		}
+		if (character.isAnimOver()) {
+			if (character.grounded) {
+				character.changeState(new Idle());
+			} else {
+				character.changeState(new HighMaxHover());
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
 	}
 
 	public override void onExit(CharState newState) {
@@ -287,15 +299,298 @@ public class HighMaxIdlePunch1 : CharState {
 
 
 
-public class HighMaxCrouchPunch1 : CharState {
+
+
+public class DesmumeSpam : CharState {
 
 
 	private float specialPressTime;
 	
 	public float pushBackSpeed;
 
+	public DesmumeSpam(string transitionSprite = "")
+		: base("ultimate", "", "", transitionSprite)
+	{
+	
+	}
+
+		public Point AimPoint() {
+	Point vel = new Point(1, 0);
+		
+
+	if (player.input.isHeld(Control.Shoot, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
+			}
+		}  
+		if (player.input.isHeld(Control.Special1, player) ) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, 0.75f);
+			} else {
+				vel = new Point(1, 3);
+			}
+		} 
+
+		return vel;
+	}
+
+
+		float supercooldown = 0;
+
+	public override void update() {
+
+		var poi = character.getFirstPOI();
+		accuracy = 0;
+		Point prevPos = character.pos;
+		Point shootVel = AimPoint();
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
+		}
+
+				Helpers.decrementTime(ref supercooldown);
+
+		if (character.sprite.name.Contains("ultimate") && poi != null) {
+			if (Helpers.randomRange(0, 2) == 0 && supercooldown == 0) {
+				supercooldown = 0.3f;
+				character.playSound("boundBlaster");
+				new HighmaxHomingProj(
+				poi.Value, 1, character,
+				player, player.getNextActorNetId(), 0, rpc: true
+				);
+			}
+			if (Helpers.randomRange(0, 2) == 1 && supercooldown == 0) {
+				supercooldown = 0.3f;
+				character.playSound("buster4");
+				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			}
+			if (Helpers.randomRange(0, 2) == 2 && supercooldown == 0) {
+				supercooldown = 0.3f;
+				character.playSound("boundBlaster");
+				new HighmaxStunShot(
+						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
+						character.player, character.player.getNextActorNetId(), rpc: true
+					);
+			}
+		}
+
+		if (character.isAnimOver()) {
+			if (character.grounded) {
+				character.changeState(new Idle());
+			} else {
+				character.changeState(new HighMaxHover());
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+public class DesmumeState : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public DesmumeState(string transitionSprite = "")
+		: base("desmume", "", "", transitionSprite)
+	{
+		superArmor = true;
+	}
+
+		public Point AimPoint() {
+	Point vel = new Point(1, 0);
+		
+
+	if (player.input.isHeld(Control.Shoot, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
+			}
+		}  
+		if (player.input.isHeld(Control.Special1, player) ) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, 0.75f);
+			} else {
+				vel = new Point(1, 3);
+			}
+		} 
+
+		return vel;
+	}
+
+
+	bool first = false;
+
+	public override void update() {
+
+		var poi = character.getFirstPOI();	
+		accuracy = 0;
+		Point prevPos = character.pos;
+			Point shootVel = AimPoint();
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
+		}
+		
+			if (character.sprite.name.Contains("desmume") && poi != null && !first){
+		Projectile proj;
+		first = true;
+		proj = new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+		}	
+
+		if (character.isAnimOver()) {
+			if (character.grounded) {
+				character.changeState(new Idle());
+			} else {
+				character.changeState(new HighMaxHover());
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+
+public class HighMaxIdlePunch1 : CharState {
+
+
+	private float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public HighMaxIdlePunch1(string transitionSprite = "")
+		: base("idle_punch1", "", "", transitionSprite) {
+
+	}
+
+	public override void update() {
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Shoot, player)) {
+			character.changeState(new HighMaxCrouchPunch1());
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+public class HighMaxCrouchPunch1 : CharState {
+
+
+	private float specialPressTime;
+
+	public float pushBackSpeed;
+
 	public HighMaxCrouchPunch1(string transitionSprite = "")
-		: base("crouch_punch", "", "", transitionSprite)
+		: base("crouch_punch", "", "", transitionSprite) {
+
+	}
+
+	public override void update() {
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+public class HighMaxMegaPunch : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public HighMaxMegaPunch(string transitionSprite = "")
+		: base("foward_punch", "", "", transitionSprite)
 	{
 	
 	}
@@ -328,7 +623,7 @@ public class HighMaxCrouchPunch1 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -344,7 +639,7 @@ public class HighMaxCrouchPunch1 : CharState {
 public class HighMaxChargePunch : CharState {
 	float hoverTime;
 
-    bool once;
+	bool once;
 
 	public HighMaxChargePunch() : base("dash_punch_charge", "dash_punch_charge", "dash_punch_charge", "dash_punch_charge") {
 		exitOnLanding = false;
@@ -362,16 +657,16 @@ public class HighMaxChargePunch : CharState {
 		if (character.pos.x != prevPos.x) {
 			accuracy = 5;
 		}
-		
-		if (character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
+
+		if (character.vel.y < 0 && !player.input.isHeld(Control.Up, player)
 		&& !player.input.isHeld(Control.Down, player)) {
 			character.vel.y += Global.speedMul * character.getGravity();
 			if (character.vel.y > 0) character.vel.y = 0;
 		}
-		if (player.input.isHeld(Control.Up, player)){
+		if (player.input.isHeld(Control.Up, player)) {
 			character.vel.y = -character.getJumpPower() * 0.2f;
 		}
-		if (player.input.isHeld(Control.Down, player)){
+		if (player.input.isHeld(Control.Down, player)) {
 			character.vel.y = +character.getJumpPower() * 0.2f;
 		}
 
@@ -380,10 +675,14 @@ public class HighMaxChargePunch : CharState {
 		}
 
 		hoverTime += Global.spf;
-	if ((hoverTime > 5) || hoverTime > 0.5f &&
-			!character.player.input.isHeld(Control.Dash, character.player)
-		) {
-			character.changeState(new HighMaxSuperPunchState(), true);
+		if ((hoverTime > 5) || hoverTime > 0.5f &&
+				!character.player.input.isHeld(Control.Dash, character.player)
+			) {
+			if (player.input.isHeld(Control.Up, player)) {
+				character.changeState(new HighMaxSlamDownState(), true);
+			} else {
+				character.changeState(new HighMaxSuperPunchState(), true);
+			}
 		}
 	}
 
@@ -391,8 +690,8 @@ public class HighMaxChargePunch : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	character.useGravity = false;
-	character.vel = new Point();
+		character.useGravity = false;
+		character.vel = new Point();
 
 	}
 
@@ -422,16 +721,16 @@ public class HighMaxSuperPunchState : CharState {
 		if (stateTime < 0.7f){
 		character.move(new Point(character.xDir * 350, 0));
 		}
-		CollideData collideData = Global.level.checkCollisionActorOnce(character, character.xDir, 0);
+			CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
-		if (!once)	{
-			character.playSound("crash", forcePlay: false, sendRpc: true);
-			once = true;
-			var poi = character.getFirstPOI();
-			character.playSound("buster4");
-			new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-				
-		}
+			if (!once) {
+				character.playSound("crash", forcePlay: false, sendRpc: true);
+				once = true;
+				var poi = character.getFirstPOI();
+				character.playSound("buster4");
+				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+
+			}
 			character.shakeCamera(sendRpc: true);
 			if (stateTime > 1f) {
 			character.changeState(new Idle(), true);
@@ -461,6 +760,67 @@ public class HighMaxSuperPunchState : CharState {
 		if (proj != null && !proj.destroyed) proj.destroySelf();
 	}
 }
+
+
+
+public class HighMaxSlamDownState : CharState {
+	Anim? proj;
+	bool once;
+	public HighMaxSlamDownState() : base("slam_grab", "", "", "") {
+		superArmor = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isUnderwater() && proj != null) {
+			proj.destroySelf();
+			proj = null;
+		}
+		if (stateTime < 0.7f){
+		character.move(new Point(character.xDir * 0, 350));
+		}
+		if (character.grounded) {
+			if (!once) {
+				character.playSound("crash", forcePlay: false, sendRpc: true);
+				once = true;
+				var poi = character.getFirstPOI();
+				character.playSound("buster4");
+				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+
+			}
+			character.shakeCamera(sendRpc: true);
+			if (stateTime > 1f) {
+			character.changeState(new Idle(), true);
+			return;
+			}
+		} 
+		if (stateTime > 1f) {
+			character.changeState(new Idle(), true);
+			return;
+		}
+
+		if (proj != null) {
+			proj.changePos(character.pos.addxy(0, -15));
+			proj.xDir = character.xDir;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		if (proj != null && !proj.destroyed) proj.destroySelf();
+	}
+}
+
+
 
 public class DesmumeProj1 : Projectile {
 	public DesmumeProj1(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :

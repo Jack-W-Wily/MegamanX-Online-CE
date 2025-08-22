@@ -58,7 +58,7 @@ public class IrisCrystalBashState : CharState {
 
 		character.playSound("dynamoslash", sendRpc: true);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
@@ -117,7 +117,7 @@ public class IrisCrystalRisingBash : CharState {
 
 		character.playSound("dynamoslash", sendRpc: true);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
@@ -170,7 +170,7 @@ public class IrisBash3 : CharState {
 		base.onEnter(oldState);
 		character.playSound("dynamoslash", sendRpc: true);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
@@ -223,7 +223,7 @@ public class IrisGrabStart : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
@@ -274,7 +274,7 @@ public class IrisGrabEX : CharState {
 		base.onEnter(oldState);
 		character.playSound("distortion_a", sendRpc: true);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
@@ -891,14 +891,14 @@ public class IrisDiveKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-	    character.stopMovingWeak();
+	    character.stopMoving();
 		character.useGravity = false;
 	}
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		character.stopMovingWeak();
+		character.stopMoving();
 	}
 }
 

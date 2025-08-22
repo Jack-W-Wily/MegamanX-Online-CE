@@ -209,7 +209,7 @@ public class GoGetterRightAttack : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -296,7 +296,7 @@ public class InfinityGigAttack : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -390,7 +390,7 @@ public class SpoiledBratPunch : CharState {
 		}
 		specialPressTime = 0.25f;
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}

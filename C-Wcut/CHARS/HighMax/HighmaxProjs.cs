@@ -19,13 +19,13 @@ public class HighmaxHomingProj : Projectile, IDamagable {
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		maxTime = 2f;
-		projId = (int)ProjIds.HighmaxHomingProj;
+		projId = (int)ProjIds.LaunchOTorpedo;
 		fadeOnAutoDestroy = true;
 		reflectableFBurner = true;
 		customAngleRendering = true;
 		this.angle = this.xDir == -1 ? 180 : 0;
 		if (angle != null) {
-			this.angle = angle + (this.xDir == -1 ? 180 : 0);
+			this.angle = angle.Value + (this.xDir == -1 ? 180 : 0);
 		}
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -131,6 +131,7 @@ public class HighmaxHomingProj : Projectile, IDamagable {
 		return false;
 	}
 }
+
 
 
 public class HighmaxStunShot : Projectile {

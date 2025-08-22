@@ -440,13 +440,12 @@ public class RockmanX : MegamanX {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
-
 	public List<ShaderWrapper> getChargeShaders() {
 		List<ShaderWrapper> chargePalletes = new();
 		ShaderWrapper? defaultChargePallete = null;
-		int chargeLevel = getChargeLevel();
+		int chargeLevel = getDisplayChargeLevel();
 		if (chargeLevel > 0) {
-			defaultChargePallete = getChargeLevel() switch {
+			defaultChargePallete = getDisplayChargeLevel() switch {
 				1 => Player.XBlueC,
 				2 => Player.XYellowC,
 				3 when hasFullHyperMaxArmor => Player.XGreenC,
@@ -455,14 +454,14 @@ public class RockmanX : MegamanX {
 			};
 			chargePalletes.Add(defaultChargePallete);
 		}
-		if (stockedMaxBuster) {
+		if (stockedMaxBusterLv >= 1) {
 			if (defaultChargePallete != Player.XOrangeC) {
 				chargePalletes.Add(Player.XOrangeC);
 			} else {
 				chargePalletes.Add(Player.XPinkC);
 			}
 		}
-		if (stockedBuster) {
+		if (stockedBusterLv >= 1) {
 			if (!chargePalletes.Contains(Player.XPinkC)) {
 				chargePalletes.Add(Player.XPinkC);
 			} else if (!chargePalletes.Contains(Player.XOrangeC)) {
@@ -477,7 +476,9 @@ public class RockmanX : MegamanX {
 			}
 		}
 		if (hyperChargeActive) {
-			if (!hasFullHyperMaxArmor && !stockedMaxBuster && !chargePalletes.Contains(Player.XOrangeC)) {
+			if (!hasFullHyperMaxArmor && stockedMaxBusterLv == 0 &&
+				!chargePalletes.Contains(Player.XOrangeC)
+			) {
 				chargePalletes.Add(Player.XOrangeC);
 			} else if (!stockedSaber && !chargePalletes.Contains(Player.XPinkC)) {
 				chargePalletes.Add(Player.XPinkC);
@@ -485,7 +486,6 @@ public class RockmanX : MegamanX {
 		}
 		return chargePalletes;
 	}
-
 
 
 

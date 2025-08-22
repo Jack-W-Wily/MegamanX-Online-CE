@@ -23,7 +23,7 @@ public class ZainSaberProj : Projectile {
 		useGravity = true;
 		collider.wallOnly = true;
 		destroyOnHit = false;
-
+		maxTime = 2;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

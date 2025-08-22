@@ -96,7 +96,7 @@ public class Damager {
 				weakness = false;
 			}
 
-			if (chr.player.isAxl && newFlinch > 0) {
+			if (chr is Axl && newFlinch > 0) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
 				} else if (newFlinch < Global.defFlinch) {
@@ -394,7 +394,7 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is Iris or RockmanX or Dynamo or Dragoon) {
+			if (owner.character is Iris or RockmanX or Dynamo or Dragoon or HighMax or Axl) {
 
 				if (owner.character.charState.canSpecialCancel) {
 					owner.character.charState.spcCancel = true;

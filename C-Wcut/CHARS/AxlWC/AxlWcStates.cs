@@ -60,7 +60,7 @@ public class HoverAxlWC : CharState {
 		base.update();
 		if (character.vel.y < 0) {
 			character.vel.y += Global.speedMul * character.getGravity();
-			if (character.vel.y > 0) character.vel.y = 0;
+			if (character.vel.y > 0) character.vel.y = 10;
 		}
 		if (character.gravityWellModifier > 1) {
 			character.vel.y += Global.level.gravity / 2f;
@@ -213,7 +213,7 @@ public class AxlFlashKick : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.vel.y = 0;
-		character.iframesTime = 6;
+		character.iframesTime = 8;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
@@ -264,7 +264,7 @@ public class TailShot : CharState {
 		base.update();
 		if (character.frameIndex <= 3) {
 			character.move(new Point(-80 * character.xDir, 0));
-			axl.iframesTime = 2;
+			axl.iframesTime = 8;
 		}
 		if (character.frameIndex >= 3 && !shot) {
 			shot = true;
@@ -348,7 +348,7 @@ public class AxlString2 : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 0) {
-			character.iframesTime = 2;
+			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3 && axl.grounded) {
 			float xInput = player.input.getXDir(player);
@@ -398,7 +398,7 @@ public class AxlString3 : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 0) {
-			character.iframesTime = 2;
+			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3 && axl.grounded) {
 			float xInput = player.input.getXDir(player);
@@ -448,7 +448,7 @@ public class AxlString4 : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 0 && axl.grounded) {
-			character.iframesTime = 2;
+			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3) {
 			float xInput = player.input.getXDir(player);
@@ -499,7 +499,7 @@ public class AxlString5 : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 3 && axl.grounded) {
-			character.iframesTime = 7;
+			character.iframesTime = 10;
 		}
 
 		if (character.frameIndex <= 4) {
@@ -549,7 +549,7 @@ public class EvasionBarrage : CharState {
 	public override void update() {
 		base.update();
 			if (character.frameIndex <= 0) {
-			character.iframesTime = 2;
+			character.iframesTime = 10;
 		}
 		if (pushBackSpeed > 0) {
 			character.vel.y = 0;
@@ -596,13 +596,13 @@ public class EvasionBarrage : CharState {
 			else if (character.vel.y > 0) {
 				character.vel.y *= 0.5f;
 			}
-			character.changeToLandingOrFall();
+			character.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.stopMovingWeak();
+		character.stopMoving();
 		pushBackSpeed = 180;
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
@@ -629,7 +629,7 @@ public class RisingBarrage : CharState {
 		base.update();
 		Point? gunpos = character.getFirstPOI();
 				if (character.frameIndex <= 0) {
-			character.iframesTime = 7;
+			character.iframesTime = 10;
 		}
 		if (character.sprite.frameIndex >= 2 && gunpos != null) {
 			character.move(new Point(character.xDir * 150, 0));
@@ -687,7 +687,7 @@ public class AxlRainDrop : CharState {
 
 	public override void update() {
 		if (character.frameIndex <= 0) {
-			character.iframesTime = 8;
+			character.iframesTime = 10;
 		}
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
@@ -742,7 +742,7 @@ public class AxlRainDrop : CharState {
 		base.onEnter(oldState);
 		axl = character as AxlWC ?? throw new NullReferenceException();
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -760,7 +760,7 @@ public class AxlSpinKick : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 0) {
-			character.iframesTime = 5;
+			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3 && character.grounded) {
 			float xInput = player.input.getXDir(player);
@@ -799,7 +799,7 @@ public class AxlSpinKick : CharState {
 		base.onEnter(oldState);
 		axl = character as AxlWC ?? throw new NullReferenceException();
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 	}
@@ -889,7 +889,7 @@ public class AxlRollBump : CharState {
 	public override void update() {
 		base.update();
 		if (character.frameIndex <= 0 && axl.grounded) {
-			character.iframesTime = 2;
+			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3) {
 			float xInput = player.input.getXDir(player);

@@ -396,6 +396,7 @@ public partial class Character : Actor, IDamagable {
 		lastGravityWellDamager = player;
 		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
 		maxHealth = getMaxHealth();
+		bonusHealth = getMaxHealth();
 		if (!ownedByLocalPlayer || !isWarpIn) {
 			health = maxHealth;
 		}
@@ -3012,7 +3013,22 @@ public partial class Character : Actor, IDamagable {
 		if (Global.level.is1v1()) {
 			return Player.getModifiedHealth(28);
 		}
-		return Player.getModifiedHealth(baselineMaxHealth() + (heartTanks * Player.getHeartTankModifier()));
+
+		int bonus = 0;
+		if (player.isSigma || player.isZMID || player.isKR)  {
+			bonus = 12;
+		}
+		if (player.isRMX || player.isDynamo || player.isDragoon) {
+			bonus = 10;
+		}
+		if (player.isZain || player.isHighMax) {
+			bonus = 15;
+		}
+		if (player.isIris || player.isGBD) {
+			bonus = 6;
+		}
+
+		return Player.getModifiedHealth(baselineMaxHealth() + bonus + (heartTanks * Player.getHeartTankModifier()));
 	}
 
 	public virtual bool canBeHealed(int healerAlliance) {

@@ -747,9 +747,9 @@ public partial class RPCCreateProj : RPC {
 			//case (int)ProjIds.DarkHold:
 			//	proj = new DarkHoldProj(new DarkHoldWeapon(), pos, xDir, player, netProjByte);
 			//	break;
-			case (int)ProjIds.HexaInvolute:
-				proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), pos, xDir, player, netProjByte);
-				break;
+			//case (int)ProjIds.HexaInvolute:
+			//	proj = new HexaInvoluteProj(new HexaInvoluteWeapon(), pos, xDir, player, netProjByte);
+			//	break;
 
 			
 
@@ -774,6 +774,10 @@ public partial class RPCCreateProj : RPC {
 				break;
 			case (int)ProjIds.ZainPillar:
 				proj = new ZainPillar(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
+
+			case (int)ProjIds.ZainSaberProj:
+				proj = new ZainSaberProj(new ZSaber(), pos, xDir, player, netProjByte);
 				break;
 			
 			//Iris WCUT RPC

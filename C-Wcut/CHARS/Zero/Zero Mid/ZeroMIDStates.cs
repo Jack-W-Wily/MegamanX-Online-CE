@@ -45,7 +45,7 @@ public class ZeroGrabStart : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
@@ -110,7 +110,7 @@ public class ZeroGrabEX : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		if (!character.grounded) {
-			character.stopMovingWeak();
+			character.stopMoving();
 			pushBackSpeed = 100;
 		}
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);

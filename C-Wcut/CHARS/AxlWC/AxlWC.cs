@@ -124,6 +124,12 @@ public class AxlWC : Character {
 	public override int getMaxChargeLevel() {
 		return 2;
 	}
+
+		public override bool canAirDash() {
+		return dashedInAir == 0 || overDriveTimer > 0;
+	}
+
+
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();
@@ -148,6 +154,39 @@ public class AxlWC : Character {
 	public override void update() {
 		bool wasGrounded = grounded;
 		base.update();
+		// Activate overdrive AXL
+		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
+		&& player.currency > 4
+		) {
+			player.currency -= 5;
+			overDriveTimer = 12;
+			playSound("ching");
+
+		}
+
+
+		if (charState is Dash or AirDash) {
+			if (player.input.isPressed(Control.Up, player)) {
+				vel.y = -100;
+			}
+			if (player.input.isPressed(Control.Down, player)) {
+				vel.y = 100;
+			}
+			turnToInput(player.input, player);
+		}
+
+		if (charState is WallSlide && player.input.isPressed(Control.Dash, player) &&
+		player.input.isHeld(Control.Up, player)) {
+			changeState(new UpDash(Control.Dash), true);
+		}
+		if (!isInDamageSprite()) {
+			if (player.input.isR2Pressed(player)
+			&& player.superAmmo >= 32) {
+				changeState(new AssassinateChar(), true);
+				player.superAmmo = 0;
+				invulnTime = 2;
+			}
+		}
 		if (charState is Die) {
 			if (chargeAnim != null) {
 				chargeAnim.destroySelf();
@@ -194,9 +233,9 @@ public class AxlWC : Character {
 				&& player.input.isPressed(Control.Jump, player)) {
 				changeState(new AxlFlashKick(), true);
 			}
-			if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
-				changeState(new EvasionBarrage(), true);
-			}
+		//	if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
+		//		changeState(new EvasionBarrage(), true);
+		//	}
 		}
 		// Weapon update.
 		foreach (AxlWeaponWC weapon in axlWeapons) {
@@ -212,7 +251,13 @@ public class AxlWC : Character {
 		if (!isInDamageSprite()) {
 			chargeLogic(chargeShoot);
 		}
-		weaponSwapLogic();
+		//weaponSwapLogic();
+		player.changeWeaponControls();
+		if (player.input.isWeaponLeftOrRightPressed(player)){
+			foreach (AxlWeaponWC weapon in axlWeapons) {
+			weapon.ammo = weapon.maxAmmo;
+			}
+		}
 	}
 
 	public override void postUpdate() {
@@ -256,9 +301,6 @@ public class AxlWC : Character {
 
 
 	public override bool changeState(CharState newState, bool forceChange = false) {
-		if (charState is Dash or AirDash) {
-			slideVel = xDir * getDashSpeed() * 0.3f;
-		}
 		return base.changeState(newState, forceChange);
 	}
 
@@ -453,10 +495,11 @@ public class AxlWC : Character {
 		}
 		// Hover.
 		if (!grounded && player.input.isPressed(Control.Jump, player)
-			&& getHoverConditions() && hoverTimes == 0 &&
+			&& getHoverConditions() && //hoverTimes == 0
+			
 			canJump() && flag == null
 		) {
-			hoverTimes++;
+			//hoverTimes++;
 			changeState(new HoverAxlWC(), true);
 			return true;
 		}
@@ -675,23 +718,6 @@ public class AxlWC : Character {
 	}
 
 
-	public void addDNACore(Character hitChar) {
-		if (!player.ownedByLocalPlayer) return;
-		if (!player.isAxl) return;
-		if (Global.level.is1v1()) return;
-
-		if (player.weapons.Count((Weapon weapon) => weapon is DNACore) < 4) {
-			var dnaCoreWeapon = new DNACore(hitChar);
-			dnaCoreWeapon.index = (int)WeaponIds.DNACore - player.weapons.Count;
-			if (player.isDisguisedAxl) {
-				player.oldWeapons.Add(dnaCoreWeapon);
-			} else {
-				player.weapons.Add(dnaCoreWeapon);
-			}
-			player.savedDNACoreWeapons.Add(dnaCoreWeapon);
-		}
-	}
-
 
 
 	public Point getAxlArmOrigin(AxlWeaponWC? weapon) {
@@ -827,10 +853,15 @@ public class AxlWC : Character {
 	}
 
 	public void configureWeapons() {
-		AxlWCLoadout axlLoadout = player.loadout.axlWCLoadout;
-		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon1]);
-		axlWeapons.Add(getAllMainWeapons()[axlLoadout.sideArm]);
-		axlWeapons.Add(getAllSpecialWeapons()[axlLoadout.weapon2]);
+		AxlLoadout axlLoadout = player.loadout.axlLoadout;
+		axlWeapons.Add(new AxlBulletWC());
+		axlWeapons.Add(new RayGunWC());
+		axlWeapons.Add(new BlastLauncherWC());
+		axlWeapons.Add(new SpiralMagnumWC());
+		axlWeapons.Add(new BoundBlasterWC());
+		axlWeapons.Add(new PlasmaGunWC());
+		axlWeapons.Add(new IceGattlingWC());
+		axlWeapons.Add(new FlameBurnerWC());
 		mainWeapon = axlWeapons[1];
 		weaponSlot = 1;
 		weapons = axlWeapons.Cast<Weapon>().ToList();

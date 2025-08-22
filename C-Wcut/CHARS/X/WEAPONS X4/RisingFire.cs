@@ -195,7 +195,7 @@ public class RisingFireChargedState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.dashedInAir = 0;
-		character.stopMovingWeak();
+		character.stopMoving();
 		character.useGravity = false;
 		if (!character.grounded) {
 			character.frameIndex = 2;

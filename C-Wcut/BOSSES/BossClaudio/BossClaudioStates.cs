@@ -90,38 +90,7 @@ public class ClaudioFWave : CharState {
 
 
 		character.playSound("flamemOilBurn", sendRpc: true);
-		new FlameMBigFireProj(
-			character.pos.addxy(20 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(30 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(40 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(60 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(80 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(100 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(120 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
-		new FlameMBigFireProj(
-			character.pos.addxy(140 * character.xDir, 0), character.xDir, character.angle ?? 0,
-			character, player, player.getNextActorNetId(), rpc: true
-		);
+		
 
 	}
 
@@ -248,25 +217,7 @@ public class ClaudioTrippleBuster : CharState {
 
 	
 		if (shootPos != null && character.frameIndex != lastShootFrame) {
-			if (shootNum == 0) {
-				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
-				new FakeZeroBusterProj3(
-					shootPos.Value, character.xDir, 0, character,
-					player, player.getNextActorNetId(), rpc: true
-				);	
-			} else if (shootNum == 1) {
-				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
-				new FakeZeroBusterProj3(
-					shootPos.Value, character.xDir, 1, character,
-					player, player.getNextActorNetId(), rpc: true
-				);	
-			} else if (shootNum == 2) {
-				character.playSound("buster4X2", forcePlay: false, sendRpc: true);
-				new FakeZeroSwordBeamProj(
-					shootPos.Value, character.xDir, character,
-					player, player.getNextActorNetId(), rpc: true
-				);	
-			}
+			
 			shootNum++;
 			lastShootFrame = character.frameIndex;
 		}
@@ -318,7 +269,7 @@ public class ClaudioGroundPunchState : CharState {
 	public void RockProjectile(int dist) {
 		new FakeZeroRockProj(
 			character.pos.addxy(dist, 0), character.xDir, character,
-			player, player.getNextActorNetId(), rpc: true
+			player.getNextActorNetId(), sendRpc: true
 		);
 
 	}

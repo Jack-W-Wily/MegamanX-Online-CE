@@ -254,53 +254,11 @@ public partial class Player {
 
 	public bool isMuted;
 
-	// Subtanks
-	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
-		{ -1, new() },
-		{ (int)CharIds.X, new() },
-		{ (int)CharIds.Zero, new() },
-		{ (int)CharIds.Vile, new() },
-		{ (int)CharIds.Axl, new() },
-		{ (int)CharIds.Sigma, new() },
-		{ (int)CharIds.PunchyZero, new() },
-		{ (int)CharIds.BusterZero, new() },
-		{ (int)CharIds.Rock, new() },
-		{ (int)CharIds.VAVA1, new() },
-		{ (int)CharIds.Zain, new() },
-		{ (int)CharIds.RockmanX, new() },
-		{ (int)CharIds.ZeroMID, new() },
-		{ (int)CharIds.Kurumitos, new() },
-		{ (int)CharIds.Iris, new() },
-		{ (int)CharIds.Dynamo, new() },
-		{ (int)CharIds.Dragoon, new() },
-		{ (int)CharIds.AxlWC, new() },
-		{ (int)CharIds.HighMax, new() },
-		{ (int)CharIds.GBD, new() },
-	};
+	
 
-	// Heart tanks
-	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
-		{ -1, new() },
-		{ (int)CharIds.X, new() },
-		{ (int)CharIds.Zero, new() },
-		{ (int)CharIds.Vile, new() },
-		{ (int)CharIds.Axl, new() },
-		{ (int)CharIds.Sigma, new() },
-		{ (int)CharIds.PunchyZero, new() },
-		{ (int)CharIds.BusterZero, new() },
-		{ (int)CharIds.Rock, new() },
-		{ (int)CharIds.Kurumitos, new() },
-		{ (int)CharIds.VAVA1, new() },
-		{ (int)CharIds.RockmanX, new() },
-		{ (int)CharIds.ZeroMID, new() },
-		{ (int)CharIds.Zain, new() },
-		{ (int)CharIds.Iris, new() },
-		{ (int)CharIds.Dynamo, new() },
-		{ (int)CharIds.Dragoon, new() },
-		{ (int)CharIds.AxlWC, new() },
-		{ (int)CharIds.HighMax, new() },
-		{ (int)CharIds.GBD, new() },
-	};
+		// Subtanks and heart tanks internal lists.
+	public Dictionary<int, List<SubTank>> subTanksMap = [];
+	private ProtectedIntMap<int> heartTanksMap = [];
 
 	// Getter functions.
 	public List<SubTank> subtanks {
@@ -320,11 +278,13 @@ public partial class Player {
 		set => heartTanksMap[charNum] = value;
 	}
 
+
 	// Currency
 	public const int maxCharCurrencyId = 42;
 	public static int curMul = Helpers.randomRange(2, 8);
 
 	public ProtectedIntMap<int> charCurrency = [];
+	
 	public int currency {
 		get {
 			if (Global.level.mainPlayer != this || Global.serverClient == null) {
@@ -721,6 +681,7 @@ public partial class Player {
 
 		is1v1Combatant = !isSpectator;
 	}
+
 
 	public static int getHeartTankModifier() {
 		return Global.level.server?.customMatchSettings?.heartTankHp ?? 1;
@@ -1201,22 +1162,25 @@ public partial class Player {
 
 		Character newChar;
 		// Bosses
+		
+		int htCount = getStartHeartTanksForChar();
 
-		if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI ){
-	
+		if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
+
 			newChar = new BossClaudio(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI ){
-	
+		} else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI) {
+
 			newChar = new Zain(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
 
-		} 
-		
+		}
+
+
 		// Players
 		else if (charNum == (int)CharIds.X) {
 			XLoadout xLoadout = new() {
@@ -1259,7 +1223,7 @@ public partial class Player {
 			AxlLoadout axlLoadout = loadout?.axlLoadout?.clone() ?? new();
 			axlLoadout.weapon2 = extraData[0];
 			axlLoadout.weapon3 = extraData[1];
-		//	axlLoadout.hyperMode = extraData[2];
+			//	axlLoadout.hyperMode = extraData[2];
 
 			if (isMainChar) {
 				loadout.axlLoadout = axlLoadout;
@@ -1352,28 +1316,25 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		} else if (charNum == (int)CharIds.ZeroMID) {
-			
+
 			newChar = new ZeroMID(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}
-		 else if (charNum == (int)CharIds.Zain) {
-			
+		} else if (charNum == (int)CharIds.Zain) {
+
 			newChar = new Zain(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}
-		 else if (charNum == (int)CharIds.Iris) {
-			
+		} else if (charNum == (int)CharIds.Iris) {
+
 			newChar = new Iris(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}
-		 else if (charNum == (int)CharIds.Dynamo) {
-			
+		} else if (charNum == (int)CharIds.Dynamo) {
+
 			newChar = new Dynamo(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1388,14 +1349,14 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
-		}  else if (charNum == (int)CharIds.HighMax) {
-			
+		} else if (charNum == (int)CharIds.HighMax) {
+
 			newChar = new HighMax(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
 		} else if (charNum == (int)CharIds.GBD) {
-			
+
 			newChar = new GBD(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
@@ -1404,7 +1365,7 @@ public partial class Player {
 			// Error out if invalid id.
 			else {
 			throw new Exception("Error: Non-valid char ID: " + charNum);
-			}
+		}
 		
 		// Do this once char has spawned and is not null.
 		if (isMainChar) {
@@ -1650,7 +1611,7 @@ public partial class Player {
 				retChar = new CmdSigma(
 					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 					true, data.dnaNetId, false, isWarpIn: false,
-					sigmaLoadout: sigmaLoadout, isATrans: true
+					loadout: sigmaLoadout, isATrans: true
 				);
 			}
 		} else if (data.charNum == (int)CharIds.Rock) {

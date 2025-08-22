@@ -102,10 +102,10 @@ public class AxlBulletWC : AxlWeaponWC {
 			axl.changeState(new OcelotSpin(), true);
 			return true;
 		}
-		if (specialPressed && ammo > 0) {
-			axl.changeState(new EvasionBarrage(), true);
-			return true;
-		}
+		//if (specialPressed && ammo > 0) {
+		//	axl.changeState(new EvasionBarrage(), true);
+		//	return true;
+		//}
 		return false;
 	}
 
