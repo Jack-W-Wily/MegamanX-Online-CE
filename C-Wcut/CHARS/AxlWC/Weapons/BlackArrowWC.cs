@@ -9,8 +9,8 @@ public class BlackArrowWC : AxlWeaponWC {
 		fireRate = 20;
 		altFireRate = 24;
 		index = (int)WeaponIds.BlackArrow;
-		weaponBarBaseIndex = (int)WeaponBarIndex.BlackArrow;
-		weaponSlotIndex = (int)SlotIndex.BArrow;
+		weaponBarBaseIndex = 33;
+		weaponSlotIndex = 53;
 		killFeedIndex = 68;
 		sprite = "axl_arm_blackarrow";
 		maxAmmo = 8;

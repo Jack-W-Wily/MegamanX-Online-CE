@@ -180,7 +180,7 @@ public class VKamaeHotIcecle : CharState {
 	}
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
-
+		specialId = SpecialStateIds.None;
 	}
 
 }
@@ -250,6 +250,7 @@ public class VUnblockable : CharState {
 
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
+		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -326,6 +327,7 @@ public class VKamaeDash : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.slideVel = character.xDir * character.getDashSpeed() * 0.9f;
+		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -374,6 +376,7 @@ public class VKamaeBDash : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.slideVel = character.xDir * character.getDashSpeed() * 0.9f;
+		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -415,7 +418,7 @@ public class VKote : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-
+		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -893,7 +896,7 @@ public class VAVADodge : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		
+		specialId = SpecialStateIds.None;
 	}
 
 	public override void update() {

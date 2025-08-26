@@ -16,7 +16,7 @@ public class AxlBulletWC : AxlWeaponWC {
 		index = (int)WeaponIds.AxlBullet;
 		weaponSlotIndex = (int)SlotIndex.Abullet;
 		killFeedIndex = 28;
-		weaponBarBaseIndex = (int)WeaponBarIndex.AxlBullet;
+		weaponBarBaseIndex = 28;
 		sprite = "axl_arm_pistol";
 		flashSprite = "x8_axl_bullet_flash";
 		chargedFlashSprite = "";

@@ -355,6 +355,10 @@ public class Damager {
 				character.addVirusTime(owner, damage);
 			}
 
+			if (owner.character is Iris { OverDrive: true }) {
+				character.addVirusTime(owner, 0.2f);
+			}
+
 			
 
 			if ((owner.character as PunchyZero)?.isViral == true) {
@@ -394,7 +398,7 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is Iris or RockmanX or Dynamo or Dragoon or HighMax or Axl) {
+			if (owner.character is Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
 
 				if (owner.character.charState.canSpecialCancel) {
 					owner.character.charState.spcCancel = true;
@@ -550,6 +554,9 @@ public class Damager {
 					break;
 				case (int)ProjIds.SigmaViralSlash:
 					character.addVirusTime(owner, 4f);
+					break;
+				case (int)ProjIds.SigmaSkull:
+					character.addVirusTime(owner, 2f);
 					break;
 				case (int)ProjIds.MechPunch:
 				case (int)ProjIds.MechDevilBearPunch:
@@ -750,7 +757,7 @@ public class Damager {
 			}
 
 
-			if (projId == (int)ProjIds.HeavyPush) {
+			if (projId == (int)ProjIds.HeavyPush && owner.character != null) {
 				character.changeState(new PushedOver2(owner.character.xDir), true);
 			}
 

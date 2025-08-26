@@ -156,9 +156,9 @@ public class VAVA1 : Vile {
 
 
 		public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= player.superMaxAmmo){
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 16){
 			changeState(new VavaBurensen1(), true);	
-			player.superAmmo = 0;
+			player.superAmmo -= 16;
 			playSound("chingX4");
 		}
 		return !sprite.name.Contains("hurt") ||
@@ -240,7 +240,9 @@ public class VAVA1 : Vile {
 						}
 					} else {
 						if (!player.input.isHeld(Control.Down, player)) {
-							changeState(new VAVAJab1(), true);
+							if (charState is not InfinityGigAttack or SpoiledBratPunch) {
+								changeState(new VAVAJab1(), true);
+							}
 						} else {
 							changeState(new VAVAUpperCutPunch(), true);
 						}
@@ -279,8 +281,15 @@ public class VAVA1 : Vile {
 					changeState(new SeaDragonRageState(), true);
 				}else {
 					if (player.vileAmmo > 10 && charState is not GreenEyedLampState) {
-					changeState(new ExplosiveRoundState(), true);
-					player.vileAmmo -= 10;
+						if (player.input.isHeld(Control.Up, player)) {
+							if (player.vileAmmo > 15){
+							changeState(new PeaceOutRollerAttack());
+							player.vileAmmo -= 15;
+							}
+						} else {
+							changeState(new ExplosiveRoundState(), true);
+							player.vileAmmo -= 10;
+						}
 					}
 				}
 			}
@@ -547,7 +556,7 @@ public class VAVA1 : Vile {
 
 
 	public override bool canDash() {
-		return true;
+		return flag == null;
 	}
 
 	public override string getSprite(string spriteName) {
@@ -1088,13 +1097,33 @@ public class VAVA1 : Vile {
 			omegaAura.time = 0;
 		}
 	}
+	
+	
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+		
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+		
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
 
 	public override void render(float x, float y) {
-		if (charState is CrimsonPhantomState) {
-			addRenderEffect(RenderEffectType.SpeedDevilTrail);
-		} else {
-			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
-		}
+		addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		if (currentFrame.POIs.Length > 0) {
 			Sprite? cannonSprite = getCannonSprite(out Point poiPos, out int zIndexDir);
 			cannonSprite?.draw(
@@ -1113,7 +1142,7 @@ public class VAVA1 : Vile {
 			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
 
 			float auraAlpha = 0.75f;
-			
+
 			// Draw aura.
 			Global.sprites[sprite.name].draw(
 				sprite.frameIndex,

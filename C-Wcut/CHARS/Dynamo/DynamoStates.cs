@@ -143,6 +143,7 @@ public class DynamoCrossProj : Projectile {
 		base(weapon, pos, xDir, 350, 2, player, "dynamo_cross_proj", 8, 0.3f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.DynamoCross;
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		maxTime = 1.5f;
 		this.vel.y = 0;
 		angle2 = 0;
@@ -1281,7 +1282,7 @@ public class DarkHoldDProj : Projectile {
 		setIndestructableProperties();
 		Global.level.darkHoldDProjs.Add(this);
 		if (Options.main.enablePostProcessing) {
-			screenShader = player.darkHoldDScreenShader;
+			screenShader = player.timeSlowShader;
 			updateShader();
 		}
 		if (rpc) {
@@ -1298,27 +1299,7 @@ public class DarkHoldDProj : Projectile {
 			foreach (var gameObject in Global.level.getGameObjectArray()) {
 				if (gameObject != this && gameObject is Actor actor && actor.locallyControlled && inRange(actor)) {
 					// For characters.
-					if (actor is Character chara && chara.darkHoldInvulnTime <= 0) {
-						if (timeInFrames > 30) {
-							continue;
-						}
-						if (chara.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) {
-							chara.addDarkHoldTime(150 - timeInFrames, damager.owner);
-							chara.darkHoldInvulnTime = (150 - timeInFrames) * 60f;
-						}
-						continue;
-					}
-					// For maverick and rides
-					if (actor is RideArmor or Maverick or Mechaniloid) {
-						if (actor.timeStopTime <= 0) {
-							continue;
-						}
-						IDamagable? damagable = actor as IDamagable;
-						if (damagable?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) == true) {
-							continue;
-						}
-						actor.timeStopTime = 160 - timeInFrames;
-					}
+				
 					// For projectiles
 					if (actor is Projectile && actor.timeStopTime <= 0) {
 						if (actor is BCrabSummonBubbleProj or BCrabSummonCrabProj &&

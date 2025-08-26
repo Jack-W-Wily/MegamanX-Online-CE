@@ -101,7 +101,15 @@ public class Sigma1 : BaseSigma {
 			if (player.input.isBPressed(player) &&
 				flag == null
 			) {
-				changeState(new SigmaWallDashStateWC(-1, true), true);
+				if (charState is LadderClimb) {
+					xDir = -xDir;
+				}
+				if (player.input.isHeld(Control.Down, player)) {
+						changeState(new SigmaWallDashStateWC(1, true), true);
+				} else {
+					changeState(new SigmaWallDashStateWC(-1, true), true);
+				}
+	
 				return true;
 			}
 		}
@@ -147,6 +155,7 @@ public class Sigma1 : BaseSigma {
 			if (player.input.isR2Pressed(player) && player.superAmmo > 15) {
 				player.superAmmo -= 16;
 				if (player.input.isHeld(Control.Up, player)) {
+					// Combo Complexo
 					changeState(new VirusSlash2(), true);
 				} else {
 					changeState(new HellGaze(), true);
@@ -183,11 +192,14 @@ public class Sigma1 : BaseSigma {
 		GenericSlash,
 		ViralSlash,
 		HellGaze,
+
+		Parry,
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
+			"sigma1alt_parry" => MeleeIds.Parry,
 			"sigma1alt_hellgaze" => MeleeIds.HellGaze,
 			"sigma1alt_slash_1" or "sigma1alt_slash_2" or "sigma1alt_slash_3" => MeleeIds.ViralSlash,
 			"sigma1alt_block" => MeleeIds.Guard,
@@ -220,7 +232,11 @@ public class Sigma1 : BaseSigma {
 				addToLevel: addToLevel
 			),
 			MeleeIds.ViralSlash => new GenericMeleeProj(
-				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaViralSlash, player, 3, 30, 5,
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaViralSlash, player, 2, 30, 5,
+				addToLevel: addToLevel
+			),
+			MeleeIds.Parry => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.HeavyPush, player, 6, 0, 5,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -254,70 +270,6 @@ public class Sigma1 : BaseSigma {
 		// Per-player data.
 		ballWeapon.ammo = data[0];
 	}
-
-	public override void aiAttack(Actor? target) {
-		bool isTargetInAir = pos.y < target?.pos.y - 20;
-		bool isTargetClose = pos.x < target?.pos.x - 10;
-		if (currentWeapon is MaverickWeapon mw &&
-			mw.maverick == null && canAffordMaverick(mw)
-		) {
-			buyMaverick(mw);
-			if (mw.maverick != null) {
-				changeState(new CallDownMaverick(mw.maverick, true, false), true);
-			}
-			mw.summon(player, pos.addxy(0, -112), pos, xDir);
-			player.changeToSigmaSlot();
-		}
-		if (charState is not LadderClimb) {
-			int Sattack = Helpers.randomRange(0, 5);
-			if (charState?.isGrabbedState == false && !player.isDead
-				&& !isInvulnerable() && !(charState is CallDownMaverick or SigmaSlashStateGround)
-				&& aiAttackCooldown <= 0) {
-				switch (Sattack) {
-					case 0 when isTargetClose:
-						changeState(new SigmaSlashStateGround(), true);
-						break;
-					case 1 when isTargetInAir:
-						changeState(new SigmaBallShoot(), true);
-						break;
-					case 2 when charState is Dash && grounded:
-						changeState(new SigmaWallDashState(xDir, true), true);
-						break;
-					case 3:
-						player.changeWeaponSlot(1);
-						break;
-					case 4:
-						player.changeWeaponSlot(2);
-						break;
-					case 5:
-						player.changeWeaponSlot(0);
-						break;
-				}
-				aiAttackCooldown = 18;
-			}
-		}
-		base.aiAttack(target);
-	}
-	public override void aiDodge(Actor? target) {
-		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
-			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
-				if (!(proj.projId == (int)ProjIds.SwordBlock)) {
-					changeState(new SigmaBlock(), true);
-				}
-			}
-		}
-		base.aiDodge(target);
-	}
-	public override void aiUpdate(Actor? target) {
-		if (charState is Die) {
-			foreach (Weapon weapon in weapons) {
-				if (weapon is MaverickWeapon mw && mw.maverick != null) {
-					mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
-				}
-			}
-		}
-	}
-
 
 
 
@@ -379,4 +331,131 @@ public class Sigma1 : BaseSigma {
 	}
 
 
+
+
+	public float AIHellBarrageCD;
+
+	public bool AIStart;
+
+	public bool isBoss;
+
+	public override void aiAttack(Actor? target) {
+		int Vattack = Helpers.randomRange(1, 7);
+		Helpers.decrementFrames(ref AIHellBarrageCD);
+		bool isTargetInAir = pos.y <= target?.pos.y - 20;
+		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
+		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
+		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
+		if (Global.level.is1v1()) {
+			isBoss = true;
+		}
+		if (isBoss) {
+			player.superAmmo = player.superMaxAmmo;
+		}
+
+		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+					&& aiAttackCooldown <= 0 && charState.attackCtrl ) {
+
+			if (isTargetClose  && grounded && !isTargetInAir) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+
+						player.changeWeaponSlot(0);
+						break;
+					case 2 when isFacingTarget :
+						changeState(new SigmaSlashStateGroundWC());
+						break;
+					case 3 when isFacingTarget :
+						changeState(new SigmaSlashStateGround2WC());
+						break;
+					case 4 when isFacingTarget :
+						changeState(new SigmaWallDashStateWC(-1, true), true);
+						break;
+					case 5 when isFacingTarget:
+						changeState(new BlockWCUT());
+						break;
+					case 6 when isFacingTarget:
+						changeState(new VirusSlash2());
+						break;
+					case 7 when isFacingTarget:
+						changeState(new HellGaze());
+						break;
+				}
+			}
+
+			
+
+
+
+			if (!isTargetClose && isWishinRangedMoves && grounded) {
+				switch (Vattack) {
+				case 1 when isFacingTarget:
+
+							player.changeWeaponSlot(0);
+						break;
+					case 2 when isFacingTarget:
+							changeState(new SigmaBallShootWC());
+						
+						break;
+					case 3 when isFacingTarget :
+							changeState(new SigmaWallDashStateWC(-1, true), true);
+						break;
+					case 4 when isFacingTarget :
+						changeState(new SigmaBallShootWCEnhanced());
+						break;
+					case 5 when isFacingTarget :
+						changeState(new ZainParryShinStartState(), true);
+						addHealth(10);
+						break;
+					case 6 when isFacingTarget :
+						changeState(new ZainParryShinStartState(), true);
+		
+						break;
+					case 7 when isFacingTarget :
+						changeState(new HellGazeEX(), true);
+		
+						break;
+				}
+			}
+
+			aiAttackCooldown = Helpers.randomRange(0, 20);
+		}
+
+
+
+		base.aiAttack(target);
+	}
+
+
+	public float aiBlocktime;
+
+	public float aiDodgeCD;
+	public override void aiDodge(Actor? target) {
+		Helpers.decrementFrames(ref aiBlocktime);
+		Helpers.decrementFrames(ref aiDodgeCD);
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance &&
+			(charState.attackCtrl || charState is HellGaze or PopcornHell)) {
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (grounded) {
+						if (aiDodgeCD == 0 && !isDashing) {
+							
+								changeState(new SigDodge(), true);
+							
+							aiDodgeCD = Helpers.randomRange(0, 30);
+
+						}
+					}
+				}
+			}
+		}
+
+		base.aiDodge(target);
+	}
+
 }
+

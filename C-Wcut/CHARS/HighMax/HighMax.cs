@@ -13,7 +13,7 @@ public class HighMax : Character {
 		charId = CharIds.HighMax;
 	}
 
-	
+
 	public float IdlePunchCooldown;
 	public float shootCooldown;
 
@@ -27,7 +27,7 @@ public class HighMax : Character {
 	public override bool canWallClimb() {
 		return false;
 	}
-	
+
 	public override bool isTrueStatusImmune() {
 		return overDriveTimer > 0;
 	}
@@ -36,7 +36,6 @@ public class HighMax : Character {
 		if (!grounded && charState.stateTime > 0.005f &&
 		player.input.isPressed(Control.Jump, player) && dashedInAir == 0
 		) {
-			dashedInAir++;
 			changeState(new HighMaxHover(), true);
 			return true;
 		}
@@ -44,6 +43,9 @@ public class HighMax : Character {
 		return base.normalCtrl();
 	}
 
+	public override bool canPickupFlag() {
+		return false;
+	}
 
 	public override bool attackCtrl() {
 		bool cmdPressed = player.input.isPressed(Control.Special2, player);
@@ -52,35 +54,35 @@ public class HighMax : Character {
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool dashPressed = player.input.isPressed(Control.Dash, player);
-		if (shootPressed && !player.input.isHeld(Control.Down,player) 
-		 && !player.input.isHeld(Control.Up,player)) {
-		
-					changeState(new HighMaxIdlePunch1(), true);		
-					return true;
-				
-			
-		}
-		if (shootPressed && player.input.isHeld(Control.Down,player)) {
-		
-					changeState(new HighMaxCrouchPunch1(), true);
+		if (shootPressed && !player.input.isHeld(Control.Down, player)
+		 && !player.input.isHeld(Control.Up, player)) {
 
-					return true;
-				
+			changeState(new HighMaxIdlePunch1(), true);
+			return true;
 
-	
+
 		}
-		
-		if (shootPressed && player.input.isHeld(Control.Up,player)) {
-		if (IdlePunchCooldown == 0) {
-			
-					changeState(new HighMaxMegaPunch(), true);
-					IdlePunchCooldown = 1f;
-					return true;
-				
-	
+		if (shootPressed && player.input.isHeld(Control.Down, player)) {
+
+			changeState(new HighMaxCrouchPunch1(), true);
+
+			return true;
+
+
+
+		}
+
+		if (shootPressed && player.input.isHeld(Control.Up, player)) {
+			if (IdlePunchCooldown == 0) {
+
+				changeState(new HighMaxMegaPunch(), true);
+				IdlePunchCooldown = 1f;
+				return true;
+
+
 			}
 		}
-		
+
 		if (specialPressed) {
 			if (ZetsubouCooldown == 0) {
 
@@ -94,18 +96,18 @@ public class HighMax : Character {
 
 
 		if (cmdPressed && player.superAmmo == player.superMaxAmmo) {
-				changeState(new DesmumeSpam(), true);
-				player.superAmmo = 0;
-				return true;
+			changeState(new DesmumeSpam(), true);
+			player.superAmmo = 0;
+			return true;
 		}
-		
+
 		if (WRPressed) {
 			if (shootCooldown == 0) {
 
 				changeState(new HighmaxShoot1(), true);
 				shootCooldown = 1f;
 			}
-				return true;
+			return true;
 		}
 
 		if (WLPressed) {
@@ -166,10 +168,10 @@ public class HighMax : Character {
 		base.landingCode(useSound);
 		shakeCamera(sendRpc: true);
 		playSound("crash", sendRpc: true);
-		
+
 	}
-	
-		public override bool isToughGuyHyperMode() {
+
+	public override bool isToughGuyHyperMode() {
 		return !isInDamageSprite();
 	}
 
@@ -252,14 +254,14 @@ public class HighMax : Character {
 	public override string getSprite(string spriteName) {
 		return "highmax_" + spriteName;
 	}
-	
+
 
 	public override void render(float x, float y) {
 
-		if (overDriveTimer > 0) {
-			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		if (overDriveTimer > 0 && visible) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrailNoDash);
 		} else {
-			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+			removeRenderEffect(RenderEffectType.SpeedDevilTrailNoDash);
 		}
 
 		if (player.isMainPlayer && overDriveTimer > 0) {
@@ -303,5 +305,30 @@ public class HighMax : Character {
 		}
 		return proj;
 	}
+	
+
+	
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
 }
 

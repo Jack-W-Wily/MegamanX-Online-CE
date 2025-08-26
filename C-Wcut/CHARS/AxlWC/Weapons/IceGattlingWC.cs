@@ -18,8 +18,8 @@ public class IceGattlingWC : AxlWeaponWC {
 		throwIndex = (int)ThrowID.IceGattling;
 		altFireRate = 24;
 		index = (int)WeaponIds.IceGattling;
-		weaponBarBaseIndex = (int)WeaponBarIndex.IceGattling;
-		weaponSlotIndex = (int)SlotIndex.IGattling;
+		weaponBarBaseIndex = 37;
+		weaponSlotIndex = 57;
 		killFeedIndex = 72;
 
 		sprite = "axl_arm_icegattling";

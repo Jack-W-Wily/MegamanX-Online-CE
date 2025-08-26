@@ -1136,9 +1136,14 @@ public partial class Character : Actor, IDamagable {
 
 
 	public float BurstCooldown;
+
+	public int SkinSlot = 0; 
+
 	public override void update() {
 
-
+		if (charState is WarpIn) {
+			SkinSlot = Options.main.SkinSlot;
+		}
 		// For Overdrive to work (WCUT)
 		if (overDriveTimer > 0) {
 			OverDrive = true;
@@ -1237,7 +1242,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
-		
+
 
 		//Aiming Laser Hud
 		if (player.weapon is AimingLaser al && !hasBusterProj() && ownedByLocalPlayer) {
@@ -1627,36 +1632,38 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Ground normal states.
 		if (grounded) {
-			if (player.input.isPressed(Control.Left, player) && player.input.checkDoubleTap(Control.Left)) {
-				slideVel = xDir * getDashSpeed();			
-			}
-			if (player.input.isPressed(Control.Right, player) && player.input.checkDoubleTap(Control.Right)) {
-				slideVel = xDir * getDashSpeed();
+			if (flag == null) {
+				if (player.input.isPressed(Control.Left, player) && player.input.checkDoubleTap(Control.Left)) {
+					slideVel = xDir * getDashSpeed();
+				}
+				if (player.input.isPressed(Control.Right, player) && player.input.checkDoubleTap(Control.Right)) {
+					slideVel = xDir * getDashSpeed();
+				}
 			}
 			if (player.input.isPressed(Control.Jump, player) && canJump()) {
-				vel.y = -getJumpPower();
-				isDashing = (
-					isDashing || player.dashPressed(out string dashControl) && canDash()
-				);
-				if (isDashing) {
-					dashedInAir++;
+					vel.y = -getJumpPower();
+					isDashing = (
+						isDashing || player.dashPressed(out string dashControl) && canDash()
+					);
+					if (isDashing) {
+						dashedInAir++;
+					}
+					changeState(getJumpState());
+					return true;
+				} else if (player.dashPressed(out string dashControl) && canDash()) {
+					changeState(new Dash(dashControl), true);
+					return true;
+				} else if (
+					rideArmorPlatform != null &&
+					player.input.isPressed(Control.Jump, player) &&
+					player.input.isHeld(Control.Up, player) &&
+					canEjectFromRideArmor()
+				  ) {
+					getOffMK5Platform();
+					changeState(getJumpState());
+					vel.y = -getJumpPower();
+					return true;
 				}
-				changeState(getJumpState());
-				return true;
-			} else if (player.dashPressed(out string dashControl) && canDash()) {
-				changeState(new Dash(dashControl), true);
-				return true;
-			} else if (
-				rideArmorPlatform != null &&
-				player.input.isPressed(Control.Jump, player) &&
-				player.input.isHeld(Control.Up, player) &&
-				canEjectFromRideArmor()
-			  ) {
-				getOffMK5Platform();
-				changeState(getJumpState());
-				vel.y = -getJumpPower();
-				return true;
-			}
 			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
 				changeState(new Crouch());
 				return true;
@@ -3011,6 +3018,12 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual int getMaxHealth() {
 		if (Global.level.is1v1()) {
+			if (player.isAI && player.isSigma){
+			return Player.getModifiedHealth(60);
+			}
+			if (player.isAI && player.isZain){
+			return Player.getModifiedHealth(40);
+			}
 			return Player.getModifiedHealth(28);
 		}
 
@@ -3018,13 +3031,13 @@ public partial class Character : Actor, IDamagable {
 		if (player.isSigma || player.isZMID || player.isKR)  {
 			bonus = 12;
 		}
-		if (player.isRMX || player.isDynamo || player.isDragoon) {
+		if (player.isX || player.isDynamo || player.isDragoon) {
 			bonus = 10;
 		}
 		if (player.isZain || player.isHighMax) {
 			bonus = 15;
 		}
-		if (player.isIris || player.isGBD) {
+		if (player.isIris || player.isGBD || player.isAxl) {
 			bonus = 6;
 		}
 

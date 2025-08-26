@@ -555,7 +555,7 @@ public class VavaBurensen2 : CharState {
 				character.addHealth(0.13f);
 				character.shakeCamera(sendRpc: true);
 				victim.changeState(new VileStomped(character));
-				var damager = new Damager(player, 0.5f, 0, 0);
+				var damager = new Damager(player, 0.5f, 0, 3);
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.UPPunch);
 			}
 

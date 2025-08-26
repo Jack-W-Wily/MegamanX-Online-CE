@@ -433,6 +433,27 @@ public class OptionsMenu : IMainMenu {
 					"Choose a default character the game will\npre-select for you."
 				),
 
+
+				// SkinSlot
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightInc(ref Options.main.SkinSlot, 0, 2);
+					},
+					(Point pos, int index) => {
+						// ToDo: Implement "Buster" option for hypercharge like HDM.
+						Fonts.drawText(
+							optionFontText, "Character Alt Costume:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.SkinSlot + 1).ToString(),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Character Alt Costume."
+				),
+				
 				// Disable double-tap dash
 				new MenuOption(
 					30, startY,
@@ -1091,8 +1112,10 @@ public class OptionsMenu : IMainMenu {
 					"If No, Front Runner and Fat Boy cannons will not\nroot Vile in the air when shot."
 				),
 			};
-		} else if (charNum == 3) {
-			menuOptions = new List<MenuOption>() {
+		} 
+		
+		else if (charNum == 3) {
+		/*	menuOptions = new List<MenuOption>() {
 				// Axl Use Mouse Aim
 				new MenuOption(
 					30, startY,
@@ -1302,6 +1325,7 @@ public class OptionsMenu : IMainMenu {
 				),
 			};
 		} else if (charNum == (int)CharIds.AxlWC) {
+		*/
 			menuOptions = new List<MenuOption>() {
 				new MenuOption(
 					30, startY,

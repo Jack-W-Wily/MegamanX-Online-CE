@@ -166,10 +166,10 @@ public class AxlWC : Character {
 
 
 		if (charState is Dash or AirDash) {
-			if (player.input.isPressed(Control.Up, player)) {
+			if (player.input.isHeld(Control.Up, player)) {
 				vel.y = -100;
 			}
-			if (player.input.isPressed(Control.Down, player)) {
+			if (player.input.isHeld(Control.Down, player)) {
 				vel.y = 100;
 			}
 			turnToInput(player.input, player);
@@ -318,6 +318,10 @@ public class AxlWC : Character {
 			armAngle += Math.Sign(targetAngle - armAngle) * 16;
 		} else {
 			armAngle = targetAngle;
+		}
+
+		if (player.input.isHeld(Control.AxlAimBackwards, player)) {
+			armAngle += Math.Sign(targetAngle - armAngle) * 180;
 		}
 	}
 
@@ -504,16 +508,11 @@ public class AxlWC : Character {
 			return true;
 		}
 		// Block.
-		if (Options.main.blockInput && grounded && player.input.isHeld(Control.AxlAimBackwards, player) &&
-			charState is not AxlBlock2 and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
+	
+		if (grounded && player.input.isL2Held(player)&&
+			charState is not BlockWCUT and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
 		) {
-			changeState(new AxlBlock2(), true);
-			return true;
-		}
-		if (!Options.main.blockInput && grounded && player.input.isHeld(Control.Down, player) &&
-			charState is not AxlBlock and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
-		) {
-			changeState(new AxlBlock(), true);
+			changeState(new BlockWCUT(), true);
 			return true;
 		}
 		return base.normalCtrl();
@@ -854,8 +853,8 @@ public class AxlWC : Character {
 
 	public void configureWeapons() {
 		AxlLoadout axlLoadout = player.loadout.axlLoadout;
-		axlWeapons.Add(new AxlBulletWC());
 		axlWeapons.Add(new RayGunWC());
+		axlWeapons.Add(new AxlBulletWC());
 		axlWeapons.Add(new BlastLauncherWC());
 		axlWeapons.Add(new SpiralMagnumWC());
 		axlWeapons.Add(new BoundBlasterWC());
@@ -895,6 +894,10 @@ public class AxlWC : Character {
 		var shaders = new List<ShaderWrapper>();
 		ShaderWrapper? palette = null;
 
+
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
 		int paletteNum = 0;
 		if (isWhite) { paletteNum = 1; }
 		palette = player.axlPaletteShader;
@@ -951,6 +954,15 @@ public class AxlWC : Character {
 
 	public override void render(float x, float y) {
 		base.render(x, y);
+
+		if (overDriveTimer > 0 && visible) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrailNoDash);
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} else {
+			removeRenderEffect(RenderEffectType.SpeedDevilTrailNoDash);
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} 
+
 		if (!shouldRender(x, y) || !shouldDraw() || !visible) {
 			return;
 		}
@@ -1034,6 +1046,7 @@ public class AxlWC : Character {
 		customData.Add(Helpers.boolArrayToByte([
 			shouldDrawArm(),
 			isWhite,
+			OverDrive,
 		]));
 		return customData;
 	}
@@ -1052,6 +1065,7 @@ public class AxlWC : Character {
 		bool[] flags = Helpers.byteToBoolArray(data[4]);
 		shouldDrawArmNet = flags[0];
 		isWhite = flags[1];
+		OverDrive = flags[2];
 	}
 }
 public enum ThrowID {

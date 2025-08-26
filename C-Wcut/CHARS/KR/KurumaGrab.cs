@@ -98,7 +98,7 @@ public class KurumaGrabState : CharState {
 		if (character.sprite.name.Contains("attack") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 1, 0, 0);
+				var damager = new Damager(player, 1, 0, 2);
 
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 			}
@@ -107,7 +107,7 @@ public class KurumaGrabState : CharState {
 		if (character.sprite.name.Contains("up") && character.frameIndex == 1) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 25, 0);
+				var damager = new Damager(player, 3, 25, 2);
 					new Anim(victim.pos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, character.ownedByLocalPlayer);
 				character.playSound("explosionX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
@@ -119,7 +119,7 @@ public class KurumaGrabState : CharState {
 		if (character.sprite.name.Contains("down") && character.frameIndex == 1) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 0, 0);
+				var damager = new Damager(player, 3, 0, 2);
 				damager.applyDamage(victim, false, new FireWave(), character,
 				(int)ProjIds.MechFrogStompShockwave);
 				new MechFrogStompShockwave(new FireWave(),
@@ -133,7 +133,7 @@ public class KurumaGrabState : CharState {
 		if (character.sprite.name.Contains("foward") && character.frameIndex == 1) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 20, 0);
+				var damager = new Damager(player, 3, 20, 2);
 				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.UPPunch);
 			}
 		}
@@ -176,12 +176,13 @@ public class KurumaGrabState : CharState {
 		if (newState is not VileMK2GrabState && victim != null &&
 
 		!character.sprite.name.Contains("up") &&
-		 !character.sprite.name.Contains("down")&&
-		 !character.sprite.name.Contains("foward")	) {
+		 !character.sprite.name.Contains("down") &&
+		 !character.sprite.name.Contains("foward")) {
 			victim.grabInvulnTime = 2;
 			victim.stunInvulnTime = 1;
 			victim?.releaseGrab(character, true);
 		}
+		specialId = SpecialStateIds.None;
 	}
 }
 

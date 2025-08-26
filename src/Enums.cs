@@ -768,6 +768,7 @@ public enum ProjIds {
 	BlockingProjID,
 
 	SigmaViralSlash,
+	SigmaSkull,
 
 	GenericWCUTGrabProjID,
 

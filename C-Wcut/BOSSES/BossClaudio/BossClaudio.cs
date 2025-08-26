@@ -332,31 +332,12 @@ public class BossClaudio : Character {
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
 
-		if (OverDrive) {
-			palette = player.zeroPaletteShader;
-			palette?.SetUniform("palette", 1);
-			palette?.SetUniform("paletteTexture", Global.textures["hyperBusterZeroPalette"]);
-		}
 
-		if (Global.isOnFrameCycle(4)) {
-			switch (getChargeLevel()) {
-				case 1:
-					palette = Player.ZeroBlueC;
-					break;
-				case 2:
-					palette = Player.ZeroBlueC;
-					break;
-				case 3:
-					palette = Player.ZeroPinkC;
-					break;
-				case 4:
-					palette = Player.ZeroGreenC;
-					break;
-			}
-			if (OverDrive) {
-				palette = Player.XOrangeC;
-			}
+		
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
 		}
+		
 		if (palette != null) {
 			shaders.Add(palette);
 		}
@@ -387,7 +368,56 @@ public class BossClaudio : Character {
 
 
 
+
+		
+	(float twitch, float grow, int time) omegaAura = new(0.015f, 0, 0);
+
+	void updateOmegaAura() {
+		omegaAura.twitch -= 0.05f;
+		if (omegaAura.twitch < 0.05)
+			omegaAura.twitch = 0.15f;
+
+		if (omegaAura.time >= 0 && omegaAura.time < 50)
+			omegaAura.grow += 0.0025f;
+		else if (omegaAura.time >= 55 && omegaAura.time < 105)
+			omegaAura.grow -= 0.0025f;
+
+		omegaAura.time++;
+		if (omegaAura.time > 110) {
+			omegaAura.time = 0;
+		}
+	}
+
+	public override void render(float x, float y) {
+		addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
+		if (visible && bonusHealth == 0) {
+			// Position to draw the sprite to.
+			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraAlpha = 0.75f;
+			
+			// Draw aura.
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex,
+				drawX, drawY,
+				xDir, yDir,
+				null, auraAlpha,
+				auraSize,
+				auraSize,
+				zIndex - 1,
+				player.omegaAuraShader
+			);
+			updateOmegaAura();
+		}
+
+
 	
+		base.render(x, y);
+	}
+
 	public float AIHellBarrageCD;
 
 	public bool AIStart;
@@ -450,11 +480,7 @@ public class BossClaudio : Character {
 							changeState(new ClaudioTrippleBuster());	
 							break;
 						case 3 when isFacingTarget:
-						if (Helpers.randomRange(0, 3) == 3) {
 							changeState(new ClaudioFWave());
-						} else {
-							changeState(new ClaudioBossDash());	
-						}
 							break;
 						case 4 when isFacingTarget:
 							changeState(new ClaudioTrippleBuster());	
@@ -496,7 +522,7 @@ public class BossClaudio : Character {
 				) {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
-							
+							changeState(new ClaudioGuardState());	
 								aiDodgeCD = Helpers.randomRange(100, 220);
 							
 						}

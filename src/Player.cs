@@ -102,7 +102,7 @@ public partial class Player {
 	public RaycastHitData? assassinHitPos;
 
 	public bool canUpgradeXArmor() {
-		return (realCharNum == 0);
+		return  isX;
 	}
 
 	public float adjustedZoomRange { get { return zoomRange - 40; } }
@@ -136,12 +136,12 @@ public partial class Player {
 	public bool aiTakeover;
 	public MaverickAIBehavior currentMaverickCommand;
 
-	public bool isX { get { return charNum == (int)CharIds.X; } }
+	public bool isX { get { return charNum == (int)CharIds.X || charNum == (int)CharIds.RockmanX; } }
 	public bool isZero { get { return charNum == (int)CharIds.Zero; } }
 	public bool isVile { get { return charNum == (int)CharIds.Vile || charNum == (int)CharIds.VAVA1 ; } }
 	public bool isAxl { get { return charNum == (int)CharIds.Axl || charNum == (int)CharIds.AxlWC; } }
 	public bool isSigma { get { return charNum == (int)CharIds.Sigma; } }
-	public bool isRMX { get { return charNum == (int)CharIds.RockmanX; } }
+
 	public bool isZMID { get { return charNum == (int)CharIds.ZeroMID; } }
 
 	public bool isZain { get { return charNum == (int)CharIds.Zain; } }
@@ -426,7 +426,10 @@ public partial class Player {
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
 	public ShaderWrapper blackBusterZeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperBusterZeroPalette");
-	public ShaderWrapper nightmareZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
+	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteViralZero");
+
+	public ShaderWrapper viralZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
+	
 	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("paletteAwakenedZero");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
 	public ShaderWrapper viralSigmaShader = Helpers.cloneShaderSafe("viralsigma");
@@ -734,7 +737,7 @@ public partial class Player {
 		if (isSigma || isZMID || isKR)  {
 			bonus = 12;
 		}
-		if (isRMX || isDynamo || isDragoon) {
+		if (isX || isDynamo || isDragoon) {
 			bonus = 10;
 		}
 		if (isZain || isHighMax) {
@@ -763,7 +766,12 @@ public partial class Player {
 		loadout = LoadoutData.createFromOptions(id);
 		if (Global.level.is1v1() && isSigma) {
 			if (maverick1v1 != null) loadout.sigmaLoadout.commandMode = 3;
-			else loadout.sigmaLoadout.commandMode = 2;
+			else if (isAI) {
+				loadout.sigmaLoadout.commandMode = 0;
+				loadout.sigmaLoadout.maverick1 = 9;
+				loadout.sigmaLoadout.maverick2 = 9;
+			}
+			else syncLoadout();
 		}
 		syncLoadout();
 	}
@@ -1166,14 +1174,22 @@ public partial class Player {
 		int htCount = getStartHeartTanksForChar();
 
 		if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
-
+			charNum = (int)CharIds.Sigma;
 			newChar = new BossClaudio(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
 		} else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI) {
-
+			charNum = (int)CharIds.Zain;
 			newChar = new Zain(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+
+		}
+		else if (isAI && Global.level.levelData.name == "sigma4_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.Sigma;
+			newChar = new Sigma1(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);

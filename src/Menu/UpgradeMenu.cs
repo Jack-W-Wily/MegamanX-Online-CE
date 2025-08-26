@@ -95,25 +95,21 @@ public class UpgradeMenu : IMainMenu {
 		if (!subtankTargets.InRange(subtankTargetIndex)) subtankTargetIndex = 0;
 
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
-			if (mainPlayer.realCharNum == 0) {
-				if (mainPlayer.canUpgradeXArmor()) {
+			if (mainPlayer.isX) {
 					UpgradeArmorMenuEX.xGame = 1;
 					Menu.change(new UpgradeArmorMenuEX(prevMenu));
 					onUpgradeMenu = false;
 					return;
-				}
 			}
 		}
 
 		if (Global.input.isPressedMenu(Control.MenuRight)) {
-			if (mainPlayer.realCharNum == 0) {
-				if (mainPlayer.canUpgradeXArmor()) {
+			if (mainPlayer.isX) {
 					UpgradeArmorMenuEX.xGame = 1;
 					Menu.change(new UpgradeArmorMenuEX(prevMenu));
 					onUpgradeMenu = false;
 					return;
-				}
-			} else if (mainPlayer.realCharNum == 2) {
+			} else if (mainPlayer.isVile) {
 				Menu.change(new SelectVileArmorMenu(prevMenu));
 				onUpgradeMenu = false;
 				return;

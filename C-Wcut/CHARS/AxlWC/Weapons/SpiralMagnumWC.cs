@@ -11,8 +11,8 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 		altFireRate = 40;
 		index = (int)WeaponIds.SpiralMagnum;
 		throwIndex = (int)ThrowID.SpiralMagnum;
-		weaponBarBaseIndex = (int)WeaponBarIndex.SpiralMagnum;
-		weaponSlotIndex = (int)SlotIndex.SMagnum;
+		weaponBarBaseIndex = 34;
+		weaponSlotIndex = 54;
 		killFeedIndex = 69;
 
 		sprite = "axl_arm_spiralmagnum";
@@ -187,9 +187,9 @@ public class FormidAcidProj : Projectile {
 
 	public override void onDestroy() {
 		base.onDestroy();
-		if (!acidSplashOnce) {
-			acidSplashEffect(null, ProjIds.FormicAcidSmallWC);
-		}
+	//	if (!acidSplashOnce) {
+	//		acidSplashEffect(null, ProjIds.FormicAcidSmallWC);
+	//	}
 	}
 
 	public override void onHitWall(CollideData other) {

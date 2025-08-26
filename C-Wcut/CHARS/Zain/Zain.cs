@@ -1,3 +1,8 @@
+using System;
+using System.Collections.Generic;
+
+
+
 namespace MMXOnline;
 
 public class Zain : Character {
@@ -29,7 +34,7 @@ public class Zain : Character {
 		base.landingCode(useSound);
 		shakeCamera(sendRpc: true);
 		playSound("crash", sendRpc: true);
-		
+
 	}
 
 	public override bool normalCtrl() {
@@ -177,6 +182,29 @@ public class Zain : Character {
 	}
 
 
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
+
 	public override bool isToughGuyHyperMode() {
 		return isAttacking();
 	}
@@ -305,7 +333,7 @@ public class Zain : Character {
 
 
 	public override bool canDash() {
-		return true;
+		return flag == null;
 	}
 
 	public override bool canWallClimb() {
@@ -319,9 +347,9 @@ public class Zain : Character {
 		//		}
 		return "zain_" + spriteName;
 	}
-	
 
-	
+
+
 	public float AIHellBarrageCD;
 
 	public bool AIStart;
@@ -331,7 +359,7 @@ public class Zain : Character {
 	public override void aiAttack(Actor? target) {
 		int Vattack = Helpers.randomRange(1, 7);
 		Helpers.decrementFrames(ref AIHellBarrageCD);
-		bool isTargetInAir = pos.y > target?.pos.y - 20;
+		bool isTargetInAir = pos.y <= target?.pos.y - 20;
 		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
 		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
@@ -342,85 +370,117 @@ public class Zain : Character {
 			player.superAmmo = player.superMaxAmmo;
 		}
 
-		
 
-			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
-				if (isTargetClose && grounded) {
-					switch (Vattack) {
-						case 1 when isFacingTarget:
-					
-						changeState(new ZainJab());					
-							break;
-						case 2 when isFacingTarget && ZainCounters > 0:
-						changeState(new ZainKokuSlash(grounded, false));	
-						ZainCounters -= 1;	
-							break;
-						case 3 when isFacingTarget && ZainCounters > 0:
-						changeState(new ZainKokuSlash(grounded, false));	
+		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+					&& aiAttackCooldown <= 0 && charState.attackCtrl ) {
+
+			if (isTargetClose  && grounded && !isTargetInAir) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+
+						changeState(new ZainJab());
+						break;
+					case 2 when isFacingTarget && ZainCounters > 0:
+						changeState(new ZainKokuSlash(grounded, false));
+						ZainCounters -= 1;
+						break;
+					case 3 when isFacingTarget && ZainCounters > 0:
+						changeState(new ZainKokuRising(grounded, false));
 						player.press(Control.Up);
-						ZainCounters -= 1;	
-							break;
-						case 4 when isFacingTarget && ZainCounters > 0:
-						changeState(new ZainKokuSlash(grounded, false));	
+						ZainCounters -= 1;
+						break;
+					case 4 when isFacingTarget && ZainCounters > 0:
+						changeState(new ZainKokuStab(grounded, false));
 						player.press(Control.Down);
-						ZainCounters -= 1;		
-							break;
-						case 5 when isFacingTarget:
-							changeState(new ZainGrabStab());	
-							break;
-						case 6 when isFacingTarget:
-							changeState(new ZainProjSwingState(grounded, false));	
-							break;
-						case 7 when isFacingTarget:
-							changeState(new ZainGroundStab());	
-							break;
-					}
+						ZainCounters -= 1;
+						break;
+					case 5 when isFacingTarget:
+						changeState(new ZainGrabStab());
+						break;
+					case 6 when isFacingTarget:
+						changeState(new ZainProjSwingState(grounded, false));
+						break;
+					case 7 when isFacingTarget:
+						changeState(new ZainGroundStab());
+						break;
 				}
-
-				
-
-				if (!isTargetClose && grounded && isWishinRangedMoves) {
-					switch (Vattack) {
-						case 1 when isFacingTarget && ZainCounters >= 2:
-						changeState(new ZainDashParryState());
-						ZainCounters -= 2;			
-							break;
-						case 2 when isFacingTarget:
-							changeState(new ZainBossJumpStart());	
-							break;
-						case 3 when isFacingTarget:
-							changeState(new ClaudioBossDash());	
-							break;
-						case 4 when isFacingTarget:
-							changeState(new ZainBossJump());	
-							break;
-						case 5 when isFacingTarget && ZainCounters >= 4:
-							changeState(new ZainParryShinStartState(), true);
-							ZainCounters -= 4;
-							addHealth(5);
-							break;
-						case 6 when isFacingTarget && ZainCounters >= 4:
-							changeState(new ZainShinGroundStab(), true);
-							ZainCounters -= 4;
-							break;
-						case 7 when isFacingTarget && ZainCounters >= 4:
-							changeState(new ZainShinProjSwingState(grounded, shootProj: true), forceChange: true);
-							ZainCounters -= 4;
-							break;
-					}
-				}
-
-				aiAttackCooldown = Helpers.randomRange(0, 30);
 			}
 
-			
-	
+			if (isTargetClose  && !grounded || isTargetInAir && isTargetClose) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+
+							changeState(new ZainKokuRising(grounded, false));
+						break;
+					case 2 when isFacingTarget && ZainCounters > 0:
+							changeState(new ZainKokuRising(grounded, false));
+						ZainCounters -= 1;
+						break;
+					case 3 when isFacingTarget && ZainCounters > 0:
+							changeState(new ZainKokuRising(grounded, false));
+						player.press(Control.Up);
+						ZainCounters -= 1;
+						break;
+					case 4 when isFacingTarget && ZainCounters > 0:
+							changeState(new ZainKokuRising(grounded, false));
+						player.press(Control.Down);
+						ZainCounters -= 1;
+						break;
+					case 5 when isFacingTarget:
+							changeState(new ZainKokuRising(grounded, false));
+						break;
+					case 6 when isFacingTarget:
+							changeState(new ZainKokuRising(grounded, false));
+						break;
+					case 7 when isFacingTarget:
+							changeState(new ZainKokuRising(grounded, false));
+						break;
+				}
+			}
+
+
+
+			if (!isTargetClose && isWishinRangedMoves && grounded) {
+				switch (Vattack) {
+					case 1 when isFacingTarget && ZainCounters >= 2:
+						changeState(new ZainDashParryState());
+		if (bonusHealth > 0)	ZainCounters -= 2;
+						break;
+					case 2 when isFacingTarget:
+						changeState(new ZainBossJumpStart());
+						break;
+					case 3 when isFacingTarget:
+						changeState(new ClaudioBossDash());
+						break;
+					case 4 when isFacingTarget:
+						changeState(new ZainBossJump());
+						break;
+					case 5 when isFacingTarget && ZainCounters >= 4:
+						changeState(new ZainParryShinStartState(), true);
+			if (bonusHealth > 0)	ZainCounters -= 4;
+						addHealth(10);
+						break;
+					case 6 when isFacingTarget && ZainCounters >= 4:
+						changeState(new ZainShinGroundStab(), true);
+		if (bonusHealth > 0)	ZainCounters -= 4;
+						break;
+					case 7 when isFacingTarget && ZainCounters >= 4:
+						changeState(new ZainShinProjSwingState(grounded, shootProj: true), forceChange: true);
+		if (bonusHealth > 0)	ZainCounters -= 4;
+						break;
+				}
+			}
+
+			aiAttackCooldown = Helpers.randomRange(0, 20);
+		}
+
+
+
 		base.aiAttack(target);
 	}
 
-	
+
 	public float aiBlocktime;
 
 	public float aiDodgeCD;
@@ -437,17 +497,23 @@ public class Zain : Character {
 				) {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
-							
-								aiDodgeCD = Helpers.randomRange(100, 220);
-							
+							if (Helpers.randomRange(0, 2) == 1){
+								changeState(new ZainUPParryStartState(), true);
+							} else if (Helpers.randomRange(0, 2) == 2) {
+								changeState(new ZainParryStartState(), true);
+							} else {
+								changeState(new ZainParryShinStartState(), true);
+							}
+							aiDodgeCD = Helpers.randomRange(0, 30);
+
 						}
-					} 
+					}
 				}
 			}
 		}
-	
+
 		base.aiDodge(target);
 	}
-	
+
 }
 

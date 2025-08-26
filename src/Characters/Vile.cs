@@ -748,7 +748,7 @@ public class Vile : Character {
 	}
 
 	public override void render(float x, float y) {
-		if (hasSpeedDevil) {
+		if (hasSpeedDevil && visible) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
 			removeRenderEffect(RenderEffectType.SpeedDevilTrail);

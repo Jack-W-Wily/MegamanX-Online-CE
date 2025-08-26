@@ -13,7 +13,7 @@ public class GBD : Character {
 		charId = CharIds.GBD;
 	}
 
-	
+
 	public float IdlePunchCooldown;
 	public float CrouchPunchCooldown;
 
@@ -28,10 +28,10 @@ public class GBD : Character {
 	}
 
 	public override bool normalCtrl() {
-		if ((charState is Dash || charState is AirDash)){
-			slideVel = xDir * getDashSpeed() *  0.5f;			
-			}
-	
+		if ((charState is Dash || charState is AirDash)) {
+			slideVel = xDir * getDashSpeed() * 0.5f;
+		}
+
 		return base.normalCtrl();
 	}
 
@@ -47,32 +47,32 @@ public class GBD : Character {
 			if (IdlePunchCooldown == 0) {
 
 				changeSpriteFromName("pipe_slash_3", true);
-					IdlePunchCooldown = 0.2f;
-					return true;
-				
-			
+				IdlePunchCooldown = 0.2f;
+				return true;
+
+
 			}
 		}
-		if (shootPressed && player.input.isHeld(Control.Up,player) ) {
+		if (shootPressed && player.input.isHeld(Control.Up, player)) {
 			if (IdlePunchCooldown == 0) {
 
 				changeSpriteFromName("pipe_slash", true);
-					IdlePunchCooldown = 0.2f;
-					return true;
-				
-			
+				IdlePunchCooldown = 0.2f;
+				return true;
+
+
 			}
 		}
 		if (shootPressed && player.input.isHeld(Control.Down, player)) {
-				changeSpriteFromName("pipe_slash_2", true);		
+			changeSpriteFromName("pipe_slash_2", true);
 			return true;
 		}
-		
+
 		if (specialPressed && player.input.isHeld(Control.Down, player)) {
-				changeSpriteFromName("kick", true);		
+			changeSpriteFromName("kick", true);
 			return true;
 		}
-		
+
 		if (shootPressed && player.input.isL2Held(player)) {
 			changeSpriteFromName("grab_start", true);
 			return true;
@@ -89,16 +89,16 @@ public class GBD : Character {
 			changeSpriteFromName("gun", true);
 			CrouchPunchCooldown = 0.5f;
 			playSound("mk2stunshot", sendRpc: true);
-			new VileMK2StunShotProj(
-				getShootPos(), xDir, MathF.Round(shootVel.byteAngle), this,
-				player, player.getNextActorNetId(), rpc: true
+			playSound("buster2", sendRpc: true);
+			new ZBuster2Proj(
+				getShootPos(), xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 
 
 		}
 
 
-	
+
 		return base.attackCtrl();
 	}
 
@@ -180,10 +180,10 @@ public class GBD : Character {
 		base.landingCode(useSound);
 		shakeCamera(sendRpc: true);
 		playSound("crash", sendRpc: true);
-		
+
 	}
-	
-		public override bool isToughGuyHyperMode() {
+
+	public override bool isToughGuyHyperMode() {
 		return !isInDamageSprite();
 	}
 
@@ -271,35 +271,56 @@ public class GBD : Character {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, isZSaberClang : false, addToLevel: true
+				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, isZSaberClang: false, addToLevel: true
 			);
 		}
-		 if (  sprite.name.Contains("pipe_slash_3"))
-		{
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("pipe_slash_3")) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, isZSaberClang: true, addToLevel: true);
 		}
-		 if (  sprite.name.Contains("land"))
-		{
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f , isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("land")) {
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
-		 if (  sprite.name.Contains("kick"))
-		{
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f , isZSaberClang : true, addToLevel: true);
+		if (sprite.name.Contains("kick")) {
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
-		 if (sprite.name.Contains("grab")) {
+		if (sprite.name.Contains("grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.ForceGrabState, player, 2f, 0, 5f, isZSaberClang: false, addToLevel: true);
 		}
-		 if (sprite.name.Contains("pipe_slash_2")) {
+		if (sprite.name.Contains("pipe_slash_2")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, isZSaberClang: true, addToLevel: true);
 		}
-		 if ( sprite.name.EndsWith("pipe_slash"))
-		{
+		if (sprite.name.EndsWith("pipe_slash")) {
 			if (isDashing) {
-				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 4f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);	
-			} 
+				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 4f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
+			}
 			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
 		}
 		return proj;
 	}
+	
+
+	
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
 }
 

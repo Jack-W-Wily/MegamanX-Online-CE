@@ -90,6 +90,7 @@ public class ClaudioFWave : CharState {
 
 
 		character.playSound("flamemOilBurn", sendRpc: true);
+		new FireWaveProjChargedStart(character.pos, character.xDir, character, player, player.getNextActorNetId(), true);
 		
 
 	}
@@ -106,7 +107,41 @@ public class ClaudioShingetsurin : CharState {
 	public override void update() {
 		base.update();
 		if (character.isAnimOver()) {
-			character.changeToIdleOrFall();
+			if (character.bonusHealth > 0) {
+				character.changeToIdleOrFall();
+			} else {
+			character.changeState(new ClaudioShingetsurin2(), true);
+			}
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		new ShingetsurinProj(
+			character.getShootPos(), character.xDir,
+			0f, character, player, player.getNextActorNetId(), rpc: true
+		);
+		character.playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+public class ClaudioShingetsurin2 : CharState {
+
+
+	public ClaudioShingetsurin2() : base("shoot") {
+
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeState(new ClaudioChargedSlash(), true);
 		}
 	}
 	public override void onEnter(CharState oldState) {
@@ -138,7 +173,7 @@ public class ClaudioDashPrepare : CharState {
 		if (character.isAnimOver()) {
 			character.changeState(new ClaudioBossDash(), true);
 		}
-		
+
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -163,12 +198,19 @@ public class ClaudioChargedSlash : CharState {
 		if (character.isAnimOver()) {
 			character.changeState(new Idle());
 		}
-		
+
 		if (character.frameIndex >= 4 && !once) {
 			once = true;
 			character.playSound("crash");
 			new Anim(character.pos, "claudio_charge_slash_ef", character.xDir, null, true);
+				if (character.bonusHealth == 0) {
+								new FakeZeroSwordBeamProj(
+			character.pos.addxy(0,-30), character.xDir, character,
+			player.getNextActorNetId(), sendRpc: true
+			);	
 		}
+		}
+	
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -217,6 +259,31 @@ public class ClaudioTrippleBuster : CharState {
 
 	
 		if (shootPos != null && character.frameIndex != lastShootFrame) {
+			if (shootNum == 0) {
+				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
+				new FakeZeroBusterProj3(
+					shootPos.Value, character.xDir, 0, character,
+					 player.getNextActorNetId(), sendRpc: true
+				);
+			} else if (shootNum == 1) {
+				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
+				new FakeZeroBusterProj3(
+					shootPos.Value, character.xDir, 1, character,
+					 player.getNextActorNetId(), sendRpc: true
+				);
+			} else if (shootNum == 2) {
+				character.playSound("buster4X2", forcePlay: false, sendRpc: true);
+							new FakeZeroSwordBeamProj(
+			shootPos.Value, character.xDir, character,
+			player.getNextActorNetId(), sendRpc: true
+			);	
+		
+			}
+			shootNum++;
+			lastShootFrame = character.frameIndex;
+		}
+		
+		if (shootPos != null && character.frameIndex != lastShootFrame) {
 			
 			shootNum++;
 			lastShootFrame = character.frameIndex;
@@ -243,9 +310,16 @@ public class ClaudioGroundPunchState : CharState {
 
 	public override void update() {
 		base.update();
-
+		
 		if (character.frameIndex == 3 && !once) {
 			character.playSound("crashX2", forcePlay: false, sendRpc: true);
+			float x = character.pos.x;
+			float y = character.pos.y;
+			if (character.bonusHealth == 0) {
+				new TriadThunderProjCharged(new Point(x, y), -1, 0, character, player, player.getNextActorNetId(), rpc: true);
+				new TriadThunderProjCharged(new Point(x, y), 1, 0, character, player, player.getNextActorNetId(), rpc: true);
+				new TriadThunderQuake(new Point(x, y), 1, character, player, player.getNextActorNetId(), rpc: true);
+			}
 			character.shakeCamera(sendRpc: true);
 			once = true;
 			RockProjectile(15);

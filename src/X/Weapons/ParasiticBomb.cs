@@ -12,9 +12,10 @@ public class ParasiticBomb : Weapon {
 		displayName = "Parasitic Bomb";
 		shootSounds = new string[] { "", "", "", "" };
 		fireRate = 60;
+		index = (int)WeaponIds.ParasiticBomb;
 		type = index;
 		switchCooldown = 45;
-		index = (int)WeaponIds.ParasiticBomb;
+		
 		weaponBarBaseIndex = 18;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 18;

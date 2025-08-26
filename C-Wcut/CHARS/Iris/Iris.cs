@@ -1,3 +1,9 @@
+
+using System;
+using System.Collections.Generic;
+
+
+
 namespace MMXOnline;
 
 public class Iris : Character {
@@ -79,6 +85,16 @@ public class Iris : Character {
 		base.update();
 
 
+			// Activate overdrive AXL
+		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
+		&& player.currency > 4
+		) {
+			player.currency -= 5;
+			overDriveTimer = 12;
+			playSound("ching");
+
+		}
+		
 		// Perifericos
 		if (!isInDamageSprite()) {
 
@@ -162,7 +178,7 @@ public class Iris : Character {
 		
 
 	public override bool canDash() {
-		return true;
+		return flag == null;
 	}
 
 	public override bool canWallClimb() {
@@ -215,6 +231,33 @@ public class Iris : Character {
 
 		return proj;
 	}
+
+
+
+
+	
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
 }
 
 

@@ -228,7 +228,7 @@ public class GlobalParryState : CharState {
 
 		public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (player.isX || player.isRMX) {
+		if (player.isX || player.isX) {
 		character.changeSpriteFromName("unpo_parry_start", true);
 		}
 
@@ -617,6 +617,7 @@ public class WcutGenericDodgeF : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.slideVel = character.xDir * character.getDashSpeed() * 0.9f;
+		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -687,6 +688,7 @@ public class WcutGenericDodgeU : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -724,6 +726,7 @@ public class WcutGenericDodgeB : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.slideVel = character.xDir * -character.getDashSpeed() * 0.9f;
+		specialId = SpecialStateIds.None;
 	}
 }
 

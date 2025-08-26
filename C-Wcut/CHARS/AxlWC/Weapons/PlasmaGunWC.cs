@@ -9,8 +9,8 @@ public class PlasmaGunWC : AxlWeaponWC {
 		fireRate = 14;
 		altFireRate = 2;
 		index = (int)WeaponIds.PlasmaGun;
-		weaponBarBaseIndex = (int)WeaponBarIndex.PlasmaGun;
-		weaponSlotIndex = (int)SlotIndex.PGun;
+		weaponBarBaseIndex = 36;
+		weaponSlotIndex = 56;
 		killFeedIndex = 71;
 		sprite = "axl_arm_plasmagun";
 		maxSwapCooldown = 60;

@@ -533,7 +533,7 @@ public class ZeroMID : Zero {
 	public bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
-		if (yDir == 1 && specialPressed) {
+		if (yDir == 1 && specialPressed && downPressedTimes >= 2) {
 			if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
 				gigaAttack.shoot(this, []);
 				return true;
@@ -541,6 +541,13 @@ public class ZeroMID : Zero {
 			if (!shootPressed) {
 				return true;
 			}
+		}
+		if (yDir == 1 && specialPressed && downPressedTimes <= 2) {
+			if (yDir == 1 && specialPressed && gigaAttack.ammo >= 8) {
+				changeState(new MessenkouState(new Messenkou()), true);
+				gigaAttack.ammo -= 8;
+			}
+			
 		}
 		// Uppercuts.
 		if (yDir == -1 && charState is not ZeroUppercut) {
@@ -809,7 +816,7 @@ public class ZeroMID : Zero {
 			"zarzo_attack_dash" => MeleeIds.DashSlash,
 			"zarzo_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
-			"zarzo_attack_air" => MeleeIds.AirSlash,
+			"zarzo_attack_air" or "zarzo_attack_air_ground" => MeleeIds.AirSlash,
 			"zarzo_attack_air2" => MeleeIds.RollingSlash,
 			"zarzo_hyoroga_attack"  => MeleeIds.Hyoroga,
 			// Ground Speiclas

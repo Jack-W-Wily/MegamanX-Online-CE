@@ -121,6 +121,8 @@ public class Options {
 
 	// WCUT STUFF
 
+
+	public int SkinSlot;
 	public int C7E1FBE2E00;
 
 	public bool C7E1FBE2E01;

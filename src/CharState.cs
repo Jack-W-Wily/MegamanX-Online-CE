@@ -1499,7 +1499,7 @@ public class Die : CharState {
 				int randX = Helpers.randomRange(-radius, radius);
 				int randY = Helpers.randomRange(-radius, radius);
 				var randomPos = character.getCenterPos().addxy(randX, randY);
-				if (character is Vile vile && vile.isVileMK2 || character is Doppma or KaiserSigma) {
+				if (character is Vile vile && vile.isVileMK2 || character is Doppma or KaiserSigma or BossClaudio or Zain ) {
 					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);	
 					character.playSound("explosionX3", sendRpc: true);
 				}
@@ -1507,7 +1507,8 @@ public class Die : CharState {
 					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);	
 					character.playSound("explosionX2", sendRpc: true);
 				} 
-				if (character is Vile vile1 && (vile1.isVileMK1 || vile1.isVileMK5) || character is CmdSigma or WolfSigma) {
+				if (character is Vile vile1 && (vile1.isVileMK1 || vile1.isVileMK5) || 
+				character is CmdSigma or WolfSigma or HighMax or Dynamo or Sigma1) {
 					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);	
 					character.playSound("explosion", sendRpc: true);	
 				}

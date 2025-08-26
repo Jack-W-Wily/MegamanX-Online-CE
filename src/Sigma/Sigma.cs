@@ -739,10 +739,50 @@ public class BaseSigma : Character {
 					).ToList()[player.maverick1v1.Value + 1]
 				];
 			} else if (!Global.level.isHyper1v1()) {
-				int sigmaForm = sigmaLoadout.sigmaForm;
-				retWeapons = Weapon.getAllSigmaWeapons(
-					player, sigmaForm, sigmaLoadout.sigmaForm
-				).Select(w => w.clone()).ToList();
+			// Get command mode.
+			int commandMode = sigmaLoadout.commandMode;
+			// Always force AI into summoner.
+			if (isTrueAI || player.isAI) {
+				commandMode = (int)MaverickModeId.Summoner;
+			}
+			// Get weapons.
+			if (!oldATrans) {
+				retWeapons = [
+					SigmaLoadout.getWeaponById(player, 8, sigmaLoadout.commandMode),
+				];
+			}
+			// Push the generic Sigma slot.
+			int sigmaWeaponSlot = 1;
+			// Always put the AI and enemies slot in the center.
+			if (Global.level.mainPlayer == player) {
+				sigmaWeaponSlot = Helpers.clamp(Options.main.sigmaWeaponSlot, 0, 2);
+			}
+			retWeapons.Insert(sigmaWeaponSlot, new SigmaMenuWeapon());
+			weaponSlot = sigmaWeaponSlot;
+		}
+		// Preserve HP on death so can summon for free until they die.
+		if (!isATrans &&
+			player.oldWeapons != null &&
+			sigmaLoadout.commandMode != (int)MaverickModeId.Striker &&
+			player.previousLoadout?.sigmaLoadout.commandMode == sigmaLoadout.commandMode
+		) {
+			foreach (var weapon in retWeapons) {
+				if (weapon is not MaverickWeapon mw) {
+					continue;
+				}
+				if (player.oldWeapons.FirstOrDefault(
+						w => w is MaverickWeapon && w.GetType() == weapon.GetType()
+					) is not MaverickWeapon matchingOldWeapon
+				) {
+					continue;
+				}
+				if (matchingOldWeapon.lastHealth > 0 && matchingOldWeapon.summonedOnce) {
+					mw.summonedOnce = true;
+					mw.lastHealth = matchingOldWeapon.lastHealth;
+					mw.isMoth = matchingOldWeapon.isMoth;
+				}
+			}
+		
 			}
 		}
 		// Regular loadout.

@@ -13,10 +13,11 @@ public class RaySplasher : Weapon {
 		shootSounds = ["raySplasher", "raySplasher", "raySplasher", "warpIn"];
 		fireRate = 80;
 		index = (int)WeaponIds.RaySplasher;
+		type = index;
 		weaponBarBaseIndex = 21;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 21;
-		type = index;
+		
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
 		damage = "1/1";

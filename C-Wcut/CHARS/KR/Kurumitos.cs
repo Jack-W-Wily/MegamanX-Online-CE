@@ -123,46 +123,6 @@ public static CharSelection[] selections => [
 		// With this done your character is selectable on The Character Select Menu
 
 
-		With all of that out of the way, to make sure you Locate the Player.cs File and find this section
-		and Add your character's ID to them as well
-
-		// Subtanks
-	private Dictionary<int, List<SubTank>> charSubTanks = new Dictionary<int, List<SubTank>>() {
-		{ (int)CharIds.X, new List<SubTank>() },
-		{ (int)CharIds.Zero, new List<SubTank>() },
-		{ (int)CharIds.Vile, new List<SubTank>() },
-		{ (int)CharIds.Axl, new List<SubTank>() },
-		{ (int)CharIds.Sigma, new List<SubTank>() },
-		{ (int)CharIds.PunchyZero, new List<SubTank>() },
-		{ (int)CharIds.BusterZero, new List<SubTank>() },
-		{ (int)CharIds.Rock, new List<SubTank>() },
-		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		{ (int)CharIds.Kurumitos, new List<SubTank>() },
-		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-												this is to make it so your character is compatible with
-															the SubTank section in the Upgrade Menu
-	};
-
-	// Heart tanks
-	private Dictionary<int, ProtectedInt> charHeartTanks = new Dictionary<int, ProtectedInt>(){
-		{ (int)CharIds.X, new() },
-		{ (int)CharIds.Zero, new() },
-		{ (int)CharIds.Vile, new() },
-		{ (int)CharIds.Axl, new() },
-		{ (int)CharIds.Sigma, new() },
-		{ (int)CharIds.PunchyZero, new() },
-		{ (int)CharIds.BusterZero, new() },
-		{ (int)CharIds.Rock, new() },
-		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-		{ (int)CharIds.Kurumitos, new() },  
-		// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-										this is to make it so your character is compatible with
-											the Heart Tank section in the Upgrade Menu
-	};
-
-
 
 	with this Done, you're gonna locate the "public Character? spawnCharAtPoint(" section
 	and add him in the else if Chain
@@ -225,7 +185,8 @@ public static CharSelection[] selections => [
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isL2Held(player) && grounded){
+		if (player.input.isL2Held(player) && grounded
+		&& charState is not BlockWCUT){
 			changeState(new BlockWCUT());
 		
 		}
@@ -337,6 +298,7 @@ public static CharSelection[] selections => [
 
 
 		}
+
 		if (OverDrive) {
 			stockedTime += Global.spf;
 			if (stockedTime >= 61f / 60f) {
@@ -371,7 +333,7 @@ public static CharSelection[] selections => [
 	
 
 	public override bool canDash() {
-		return true;
+		return flag == null;
 	}
 
 	public override bool canWallClimb() {
@@ -390,7 +352,7 @@ public static CharSelection[] selections => [
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public enum MeleeIds {
 		None = -1,
-
+		
 		Blocking, // you add more and more and finish with "," always for each move you add
 		StandingKick,
 		AirDunk,
@@ -592,14 +554,14 @@ public static CharSelection[] selections => [
 
 	public override void increaseCharge() {
 		float factor = 1;
-		if (OverDrive) factor = 1.5f; // this means during OverDrive he gets a chargespeed buff
+		if (OverDrive) factor = 2; // this means during OverDrive he gets a chargespeed buff
 		chargeTime += Global.speedMul * factor;
 	}
 
 	public override float getRunSpeed() {
 		float runSpeed = 90;
 		if (OverDrive) { // this means during OverDrive he gets a speed buff
-			runSpeed *= 1.15f;
+			runSpeed *= 1.5f;
 		}
 		return runSpeed * getRunDebuffs();
 	}
@@ -641,6 +603,10 @@ public static CharSelection[] selections => [
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
 
+
+		if (SkinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
 		if (OverDrive) {
 			palette = player.zeroPaletteShader;
 			palette?.SetUniform("palette", 1);

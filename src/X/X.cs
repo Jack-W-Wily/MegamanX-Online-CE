@@ -361,7 +361,7 @@ public class MegamanX : Character {
 		) {
 			if (specialButtonMode == 1 && specialSaberCooldown <= 0 && !hasLockingProj()) {
 				changeState(new X6SaberState(grounded), true);
-				specialSaberCooldown = 60;
+				//specialSaberCooldown = 60;
 				return true;
 			} else if (specialButtonMode == 0 && specialBuster.shootCooldown <= 0 && !isCharging()) {
 				shoot(0, specialBuster, false);

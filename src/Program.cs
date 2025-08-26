@@ -956,6 +956,55 @@ class Program {
 		Sprite.xSaberBitmap[1] = Global.textures["MaxSaberFront"];
 
 		Sprite.axlArmBitmap = Global.textures["axlArm"];
+
+
+
+
+
+		// Rockman X sprite compability
+		// Light
+		Sprite.rxArmorBootsBitmap[0] = Global.textures["RMX_Basics_L_Boots"];
+		Sprite.rxArmorBodyBitmap[0] = Global.textures["RMX_Basics_L_Chest"];
+		Sprite.rxArmorHelmetBitmap[0] = Global.textures["RMX_Basics_L_Helm"];
+		Sprite.rxArmorArmBitmap[0] = Global.textures["RMX_Basics_L_Buster"];
+		Sprite.rxArmorBootsBitmap2[0] = Global.textures["RMX_Moves1_L_Boots"];
+		Sprite.rxArmorBodyBitmap2[0] = Global.textures["RMX_Moves1_L_Chest"];
+		Sprite.rxArmorHelmetBitmap2[0] = Global.textures["RMX_Moves1_L_Helm"];
+		Sprite.rxArmorArmBitmap2[0] = Global.textures["RMX_Moves1_L_Buster"];
+
+		// Giga
+		Sprite.rxArmorBootsBitmap[1] = Global.textures["RMX_Basics_Max_Boots"];
+		Sprite.rxArmorBodyBitmap[1] = Global.textures["RMX_Basics_Max_Chest"];
+		Sprite.rxArmorHelmetBitmap[1] = Global.textures["RMX_Basics_Max_Helm"];
+		Sprite.rxArmorArmBitmap[1] = Global.textures["RMX_Basics_Max_Buster"];
+		Sprite.rxArmorBootsBitmap2[1] = Global.textures["RMX_Moves1_Max_Boots"];
+		Sprite.rxArmorBodyBitmap2[1] = Global.textures["RMX_Moves1_Max_Chest"];
+		Sprite.rxArmorHelmetBitmap2[1] = Global.textures["RMX_Moves1_Max_Helm"];
+		Sprite.rxArmorArmBitmap2[1] = Global.textures["RMX_Moves1_Max_Buster"];
+
+		// Max
+		Sprite.rxArmorBootsBitmap[2] = Global.textures["RMX_Basics_Max_Boots"];
+		Sprite.rxArmorBodyBitmap[2] = Global.textures["RMX_Basics_Max_Chest"];
+		Sprite.rxArmorHelmetBitmap[2] = Global.textures["RMX_Basics_Max_Helm"];
+		Sprite.rxArmorArmBitmap[2] = Global.textures["RMX_Basics_Max_Buster"];
+		Sprite.rxArmorBootsBitmap2[2] = Global.textures["RMX_Moves1_Max_Boots"];
+		Sprite.rxArmorBodyBitmap2[2] = Global.textures["RMX_Moves1_Max_Chest"];
+		Sprite.rxArmorHelmetBitmap2[2] = Global.textures["RMX_Moves1_Max_Helm"];
+		Sprite.rxArmorArmBitmap2[2] = Global.textures["RMX_Moves1_Max_Buster"];
+
+
+		// UAX
+		Sprite.rxArmorBootsBitmap[3] = Global.textures["RMX_Basics_Ultimate"];
+		Sprite.rxArmorBodyBitmap[3] = Global.textures["RMX_Basics_Ultimate"];
+		Sprite.rxArmorHelmetBitmap[3] = Global.textures["RMX_Basics_Ultimate"];
+		Sprite.rxArmorArmBitmap[3] = Global.textures["RMX_Basics_Ultimate"];
+		Sprite.rxArmorBootsBitmap2[3] = Global.textures["RMX_Moves1"];
+		Sprite.rxArmorBodyBitmap2[3] = Global.textures["RMX_Moves1"];
+		Sprite.rxArmorHelmetBitmap2[3] = Global.textures["RMX_Moves1"];
+		Sprite.rxArmorArmBitmap2[3] = Global.textures["RMX_Moves1"];
+		
+
+
 	}
 
 	static string loadSpritesSub(string[] spriteFilePaths) {

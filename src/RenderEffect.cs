@@ -16,6 +16,7 @@ public enum RenderEffectType {
 	//StockedSaber,
 	BoomerangKTrail,
 	SpeedDevilTrail,
+	SpeedDevilTrailNoDash,
 	StealthModeBlue,
 	StealthModeRed,
 	Shake,

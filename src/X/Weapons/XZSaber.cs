@@ -40,6 +40,7 @@ public class XSaberProj : Projectile {
 		weapon = ZXSaber.netWeapon;
 		damager.damage = 4;
 		damager.hitCooldown = 30;
+		damager.flinch = 30;
 		vel = new Point(300 * xDir, 0);
 		reflectable = true;
 		projId = (int)ProjIds.XSaberProj;
@@ -69,6 +70,7 @@ public class XMaxWaveSaberState : CharState {
 		useDashJumpSpeed = true;
 		canStopJump = true;
 		canJump = true;
+		superArmor = true;
 	}
 
 	public override void update() {

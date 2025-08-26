@@ -158,6 +158,12 @@ public class RockmanX : MegamanX {
 		}
 
 
+		if (helmetArmor == ArmorId.Light) {
+			if (charState is Jump && player.input.isHeld(Control.Down, player)) {
+				changeSpriteFromName("headbutt", false);
+			}
+		}
+
 
 
 		if (player.input.isWeaponLeftOrRightPressed(player)) {
@@ -185,7 +191,7 @@ public class RockmanX : MegamanX {
 	
 
 	public override bool canDash() {
-		return true;
+		return flag == null;
 	}
 
 	public override bool canWallClimb() {
@@ -234,23 +240,22 @@ public class RockmanX : MegamanX {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"rmx_block"   => MeleeIds.Blocking, 
-			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
-			"mmx_shoryuken" => MeleeIds.Shoryuken,
+			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"rmx_shoryuken" => MeleeIds.Shoryuken,
 			"rmx_punch_1" => MeleeIds.Punch1,
 			"rmx_grab_start" => MeleeIds.Grab,
 			"rmx_punch_2" => MeleeIds.Punch2,
-			"mmx_beam_saber" or "mmx_beam_saber_air" => MeleeIds.MaxZSaber,
-			"mmx_beam_saber2" => MeleeIds.ZSaber,
+			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
+			"rmx_beam_saber2" => MeleeIds.ZSaber,
 			"rmx_double_kick" when frameIndex < 5 => MeleeIds.DoubleKick,
 			"rmx_double_kick" when frameIndex > 5 => MeleeIds.DoubleKick2,
-			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
-			"mmx_nova_strike" or "mmx_nova_strike_down" or "mmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
+			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
-			"mmx_jump" or "mmx_jump_shoot" or "mmx_wall_kick" or "mmx_wall_kick_shoot"
+			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
-			"mmx_up_dash" or "mmx_up_dash_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbuttEX,
+			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 
 			_ => MeleeIds.None

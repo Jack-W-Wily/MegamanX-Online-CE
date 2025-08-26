@@ -312,7 +312,7 @@ public class Vava1FrontRunner : CharState {
 		}
 		else if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) {
 			new VileCannonProj(
-				shootPos, vile.xDir, 2, MathF.Round(shootVel.byteAngle), "vile_mk2_fb_proj",
+				shootPos, vile.xDir, 2, MathF.Round(shootVel.byteAngle), "vile_mk2_lg_proj",
 				vile, player, player.getNextActorNetId(), rpc: true
 			);
 		}

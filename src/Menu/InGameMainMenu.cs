@@ -67,10 +67,10 @@ public class InGameMainMenu : IMainMenu {
 				}
 			} else if (selectY == 1) {
 				if (isSelArmorDisabled()) return;
-				if (Global.level.mainPlayer.realCharNum == 0 || Global.level.mainPlayer.isVile) {
+				if (Global.level.mainPlayer.isX || Global.level.mainPlayer.isVile) {
 					if (UpgradeMenu.onUpgradeMenu && !Global.level.server.disableHtSt) {
 						Menu.change(new UpgradeMenu(this));
-					} else if (Global.level.mainPlayer.realCharNum == 0) {
+					} else if (Global.level.mainPlayer.isX) {
 						Menu.change(new UpgradeArmorMenuEX(this));
 					} else if (Global.level.mainPlayer.isVile) {
 						Menu.change(new SelectVileArmorMenu(this));
@@ -107,14 +107,11 @@ public class InGameMainMenu : IMainMenu {
 
 	public bool isSelArmorDisabled() {
 		if (Global.level.is1v1()) return true;
-		if (mainPlayer.realCharNum == 2) return false;
+		if (mainPlayer.isVile) return false;
+		if (mainPlayer.isX) return false;
 		if (Global.level.server.disableHtSt) {
-			if (mainPlayer.realCharNum != 0) return Global.level.server.disableHtSt;
-			if (mainPlayer.canUpgradeXArmor()) {
-				return false;
-			} else {
-				return Global.level.server.disableHtSt;
-			}
+			return Global.level.server.disableHtSt;
+		
 		}
 		return false;
 	}

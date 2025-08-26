@@ -100,7 +100,7 @@ public class PunchyZero : Character {
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("themeOfZeroMMZ_OldGsU", getCenterPos(), true);
+					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
@@ -537,6 +537,7 @@ public class PunchyZero : Character {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
+		
 		if (isBlack) {
 			palette = player.zeroPaletteShader;
 			palette?.SetUniform("palette", 1);

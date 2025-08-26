@@ -1999,6 +1999,11 @@ public partial class Level {
 					ppShaders.Add(dhp.screenShader);
 				}
 			}
+			foreach (var dhp2 in level.darkHoldDProjs) {
+				if (dhp2.screenShader != null) {
+					ppShaders.Add(dhp2.screenShader);
+				}
+			}
 
 			Global.window.SetView(Global.view);
 

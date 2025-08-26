@@ -14,6 +14,18 @@ public class Sprite {
 	public Collider[] hitboxes;
 	public Collider[][] frameHitboxes;
 
+
+	public static Texture[] rxArmorBootsBitmap = new Texture[4];
+	public static Texture[] rxArmorBodyBitmap = new Texture[4];
+	public static Texture[] rxArmorHelmetBitmap = new Texture[4];
+	public static Texture[] rxArmorArmBitmap = new Texture[4];
+
+	public static Texture[] rxArmorBootsBitmap2 = new Texture[4];
+	public static Texture[] rxArmorBodyBitmap2 = new Texture[4];
+	public static Texture[] rxArmorHelmetBitmap2 = new Texture[4];
+	public static Texture[] rxArmorArmBitmap2 = new Texture[4];
+
+
 	public static Texture[] xArmorBootsBitmap = new Texture[4];
 	public static Texture[] xArmorBodyBitmap = new Texture[4];
 	public static Texture[] xArmorHelmetBitmap = new Texture[4];
@@ -167,6 +179,8 @@ public class Sprite {
 		bool hyperBusterReady = false;
 		bool isUPX = false;
 		bool isUltX = false;
+		bool DrawVileHat = false;
+		
 		Character? character = actor as Character;
 		if (character != null) {
 			if (character is MegamanX mmx) {
@@ -186,6 +200,7 @@ public class Sprite {
 			}
 			isUPX = character is RagingChargeX;
 			isUltX = character is MegamanX { hasUltimateArmor: true };
+			DrawVileHat = character is VAVA1 && character.SkinSlot == 2;
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;
@@ -328,6 +343,98 @@ public class Sprite {
 				isCompositeSprite = true;
 			}
 		}
+
+
+		if (armors != null && animData.RXSprite) {
+			bool isShootSprite = needsX3BusterCorrection();
+			/*
+			if (isShootSprite) {
+				if (name.Contains("mmx_wall_slide_shoot")) {
+					flippedExtraW = 5;
+					extraW = flippedExtraW;
+					extraXOff = -flippedExtraW * flipX;
+				} else {
+					extraW = 5;
+				}
+			} */
+			if (armors[2] == 2) {
+				//extraYOff = 0;
+				//extraY = 2;
+			}
+			var x3ArmShaders = new List<ShaderWrapper>(shaders);
+			if (hyperBusterReady) {
+				if (Global.isOnFrameCycle(5)) {
+					if (Global.shaderWrappers.ContainsKey("hit")) {
+						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
+					}
+				}
+			}
+
+			compositeBitmaps.Add(bitmap);
+			if (armors[2] > 0) {
+				compositeBitmaps.Add(rxArmorHelmetBitmap[armors[2] - 1]);
+			}
+			if (armors[0] > 0) {
+				compositeBitmaps.Add(rxArmorBootsBitmap[armors[0] - 1]);
+			}
+			if (armors[1] > 0) {
+				compositeBitmaps.Add(rxArmorBodyBitmap[armors[1] - 1]);
+			}
+			if (armors[3] > 0) {
+				compositeBitmaps.Add(rxArmorArmBitmap[armors[3] - 1]);
+			}
+			if (compositeBitmaps.Count > 1) {
+				isCompositeSprite = true;
+			}
+
+
+
+		}
+
+		if (armors != null && animData.RXSprite2) {
+			bool isShootSprite = needsX3BusterCorrection();
+			/*
+			if (isShootSprite) {
+				if (name.Contains("mmx_wall_slide_shoot")) {
+					flippedExtraW = 5;
+					extraW = flippedExtraW;
+					extraXOff = -flippedExtraW * flipX;
+				} else {
+					extraW = 5;
+				}
+			} */
+			if (armors[2] == 2) {
+				//extraYOff = 0;
+				//extraY = 2;
+			}
+			var x3ArmShaders = new List<ShaderWrapper>(shaders);
+			if (hyperBusterReady) {
+				if (Global.isOnFrameCycle(5)) {
+					if (Global.shaderWrappers.ContainsKey("hit")) {
+						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
+					}
+				}
+			}
+
+			compositeBitmaps.Add(bitmap);
+			if (armors[2] > 0) {
+				compositeBitmaps.Add(rxArmorHelmetBitmap2[armors[2] - 1]);
+			}
+			if (armors[0] > 0) {
+				compositeBitmaps.Add(rxArmorBootsBitmap2[armors[0] - 1]);
+			}
+			if (armors[1] > 0) {
+				compositeBitmaps.Add(rxArmorBodyBitmap2[armors[1] - 1]);
+			}
+			if (armors[3] > 0) {
+				compositeBitmaps.Add(rxArmorArmBitmap2[armors[3] - 1]);
+			}
+			if (compositeBitmaps.Count > 1) {
+				isCompositeSprite = true;
+			}
+		}
+
+
 		if (armors != null && drawXSaber && animData.isXSprite) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
@@ -421,8 +528,8 @@ public class Sprite {
 					);
 				}
 			}
-		
-			if (name is "boomerk_dash" or "boomerk_bald_dash" && (animTime > 0 || frameIndex > 0)) {
+
+			if (name is "boomerk_dash" or "boomerk_bald_dash" or "sigma1alt_roll" && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
 					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
 					if (trail != null) {
@@ -528,6 +635,38 @@ public class Sprite {
 					}
 				));
 			}
+			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrailNoDash) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
+				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					Trail trail = character.lastFiveTrailDraws[i];
+					trail.action.Invoke(trail.time);
+
+					trail.time -= Global.spf;
+					if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
+				}
+
+				var shaderList = new List<ShaderWrapper>();
+
+				var speedDevilShader = character.player.speedDevilShader;
+				shaderList.Add(speedDevilShader);
+
+				if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
+
+				character.lastFiveTrailDraws.Add(new Trail(
+					0.125f,
+					(float time) => {
+						speedDevilShader?.SetUniform("alpha", time * 2);
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					}
+				));
+			}
 		}
 		if (!isCompositeSprite) {
 			DrawWrappers.DrawTexture(
@@ -583,6 +722,21 @@ public class Sprite {
 				cx - frameOffsetX * xDirArg,
 				cy - frameOffsetY * yDirArg,
 				xDirArg, yDirArg, 0, alpha, shaders, true
+			);
+		}
+
+		
+		if (animData.isVavaMk1SpriteBasics && DrawVileHat) {
+			var upShaders = new List<ShaderWrapper>(shaders);
+		
+			DrawWrappers.DrawTexture(
+				Global.textures["VavaMK1Basics_AltCostume1"],
+				currentFrame.rect.x1, currentFrame.rect.y1,
+				currentFrame.rect.w(), currentFrame.rect.h(),
+				x, y, zIndex,
+				cx - frameOffsetX * xDirArg,
+				cy - frameOffsetY * yDirArg,
+				xDirArg, yDirArg, angle, alpha, upShaders, true
 			);
 		}
 	}
@@ -744,7 +898,16 @@ public class AnimData {
 	public Texture bitmap;
 
 	public bool isXSprite;
+
+	public bool RXSprite;
+	public bool RXSprite2;
+	public bool RXSprite3;
 	public bool isAxlSprite;
+	
+
+	public bool isVavaMk1SpriteBasics;
+	public bool isVavaMk1SpriteMoves1;
+	public bool isVavaMk1SpriteMoves2;
 
 	public AnimData(string spriteJsonStr, string name, string customMapName) {
 		dynamic spriteJson = JsonConvert.DeserializeObject(spriteJsonStr) ?? throw new NullReferenceException();
@@ -787,8 +950,17 @@ public class AnimData {
 		if (textureName == "XDefault") {
 			isXSprite = true;
 		}
+
+		if (textureName == "RMX_Basics") {
+			RXSprite = true;
+		}
 		if (textureName == "axl") {
 			isAxlSprite = true;
+		}
+
+		// For Vile sprite skins
+		if (textureName == "VavaMK1Basics") {
+			isVavaMk1SpriteBasics = true;
 		}
 
 		JArray hitboxesJson = spriteJson["hitboxes"];
@@ -866,8 +1038,7 @@ public class AnimData {
 						Global.renderTextureQueue.Add(((uint)sprWidth, (uint)sprHeight));
 					}
 				}
-			}
-			else if (!Global.renderTextures.ContainsKey(encodeKey)) {
+			} else if (!Global.renderTextures.ContainsKey(encodeKey)) {
 				Global.renderTextures[encodeKey] = (
 					new RenderTexture((uint)sprWidth, (uint)sprHeight),
 					new RenderTexture((uint)sprWidth, (uint)sprHeight)

@@ -279,7 +279,7 @@ public override bool attackCtrl() {
 
 
 	public override bool canDash() {
-		return true;
+		return flag == null;
 	}
 
 	public override bool canWallClimb() {

@@ -105,7 +105,7 @@ public class RagingDemonSuccess : CharState {
 
 		
 				victim.changeState(new VileStomped(character));
-				var damager = new Damager(player, 1f, 0, 0);
+				var damager = new Damager(player, 1f, 0, 2);
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.UPPunch);
 		
 		if (character.isAnimOver()) {

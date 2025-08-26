@@ -311,7 +311,7 @@ public class DesmumeSpam : CharState {
 	public DesmumeSpam(string transitionSprite = "")
 		: base("ultimate", "", "", transitionSprite)
 	{
-	
+	superArmor = true;
 	}
 
 		public Point AimPoint() {
@@ -376,7 +376,7 @@ public class DesmumeSpam : CharState {
 			}
 		}
 
-		if (character.isAnimOver()) {
+		if (character.isAnimOver() || stateTime > 10) {
 			if (character.grounded) {
 				character.changeState(new Idle());
 			} else {
@@ -824,7 +824,7 @@ public class HighMaxSlamDownState : CharState {
 
 public class DesmumeProj1 : Projectile {
 	public DesmumeProj1(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, "highmax_punch_proj", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 1, player, "highmax_punch_proj", 20, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.DesmumeProj1;
 		this.vel = new Point(speed * xDir, -200);
 		useGravity = true;
@@ -859,7 +859,7 @@ public class DesmumeProj1 : Projectile {
 public class DesmumeProj2 : Projectile {
 	float flameCreateTime = 1;
 	public DesmumeProj2(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 1f, player, "highmax_punch_proj", 0, 1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 100, 1f, player, "highmax_punch_proj", 10, 1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 2;
 		projId = (int)ProjIds.DesmumeProj2;
 		useGravity = false;
@@ -903,7 +903,7 @@ public class DesmumeProj2 : Projectile {
 
 public class DesmumeProj3 : Projectile {
 	public DesmumeProj3(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "highmax_punch_proj", 0, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 2, player, "highmax_punch_proj", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 1f;
 		projId = (int)ProjIds.DesmumeProj3;
 		vel = new Point(0, -200);

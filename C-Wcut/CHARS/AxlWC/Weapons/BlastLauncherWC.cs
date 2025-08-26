@@ -8,8 +8,8 @@ public class BlastLauncherWC : AxlWeaponWC {
 	public BlastLauncherWC() {
 		shootSounds = [ "grenadeShoot", "rocketShoot" ];
 		index = (int)WeaponIds.BlastLauncher;
-		weaponBarBaseIndex = (int)WeaponBarIndex.BlastLauncher;
-		weaponSlotIndex = (int)SlotIndex.BLauncher;
+		weaponBarBaseIndex = 29;
+		weaponSlotIndex = 29;
 		killFeedIndex = 29;
 		fireRate = 28;
 		altFireRate = 14;

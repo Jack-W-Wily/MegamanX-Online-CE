@@ -8,8 +8,8 @@ public class BoundBlasterWC : AxlWeaponWC {
 		fireRate = 9;
 		altFireRate = 24;
 		index = (int)WeaponIds.BoundBlaster;
-		weaponBarBaseIndex = (int)WeaponBarIndex.BoundBlaster;
-		weaponSlotIndex = (int)SlotIndex.BBlaster;
+		weaponBarBaseIndex = 35;
+		weaponSlotIndex = 55;
 		killFeedIndex = 70;
 		throwIndex = (int)ThrowID.BoundBlaster;
 		sprite = "axl_arm_boundblaster";
