@@ -11,7 +11,7 @@ public class XLoadoutSetup {
 	public static List<Weapon> getLoadout(Player player, XLoadout xLoadout) {
 		List<Weapon> weapons = new();
 		// 1v1/Training loadout.
-		if (Global.level.isTraining() && !Global.level.server.useLoadout || Global.level.is1v1()) {
+		if (Global.level.isTraining() && !Global.level.server.useLoadout || Global.level.is1v1() && !Global.level.server.useLoadout) {
 			bool enableX1Weapons = player.xArmor1v1 == 1 || !Global.level.server.useLoadout;
 			bool enableX2Weapons = player.xArmor1v1 == 2 || !Global.level.server.useLoadout;
 			bool enableX3Weapons = player.xArmor1v1 == 3 || !Global.level.server.useLoadout;

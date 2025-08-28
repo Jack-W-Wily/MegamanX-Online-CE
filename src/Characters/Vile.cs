@@ -233,7 +233,7 @@ public class Vile : Character {
 	}
 	public override bool attackCtrl() {
 
-		if (this is not VAVA1) {
+		if (this is not VAVA1 and not MysteriousMaverick) {
 			bool specialPressed = player.input.isPressed(Control.Special1, player);
 			bool shootHeld = player.input.isHeld(Control.Shoot, player);
 
@@ -875,7 +875,9 @@ public class Vile : Character {
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
 			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
-			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0 && this is not VAVA1) {
+			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0 &&
+			this is not VAVA1
+			and not MysteriousMaverick) {
 			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
 				player.press(Control.Special1);
 			}

@@ -731,6 +731,7 @@ class Program {
 		var fontSprites = Helpers.getFiles(Global.assetPath + "assets/fonts", true, "png", "psd");
 		spritesheets.AddRange(menuImages);
 		spritesheets.AddRange(fontSprites);
+	
 
 		for (int i = 0; i < spritesheets.Count; i++) {
 			string path = spritesheets[i];
@@ -748,6 +749,7 @@ class Program {
 				Global.textures[mapName + ":" + spriteImageName] = texture;
 			}
 		}
+
 	}
 
 	static string getFileBlobMD5(Dictionary<string, string> fileNamesToContents) {
@@ -843,7 +845,7 @@ class Program {
 
 	static void loadSprites() {
 		string spritePath = "assets/sprites";
-
+	
 		string[] spriteFilePaths = Helpers.getFiles(Global.assetPath + spritePath, false, "json").ToArray();
 		if (spriteFilePaths.Length > 65536) {
 			throw new Exception(
@@ -851,6 +853,7 @@ class Program {
 			);
 		}
 
+		
 		int fileSplit = MathInt.Floor(spriteFilePaths.Count() / 6.0);
 		string[][] treadedFilePaths;
 		// Use multitread if loading 20 or more sprites.

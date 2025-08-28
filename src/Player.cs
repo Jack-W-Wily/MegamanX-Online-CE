@@ -1173,7 +1173,15 @@ public partial class Player {
 		
 		int htCount = getStartHeartTanksForChar();
 
-		if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
+		if (isAI && Global.level.levelData.name == "junkfactory_1v1" && charNum >= 0 && isAI) {
+				charNum = (int)CharIds.BossMMaverick;
+				newChar = new MysteriousMaverick(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+
+		else if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Sigma;
 			newChar = new BossClaudio(
 				this, pos.x, pos.y, xDir,
@@ -1186,8 +1194,7 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 
-		}
-		else if (isAI && Global.level.levelData.name == "sigma4_1v1" && charNum >= 0 && isAI) {
+		} else if (isAI && Global.level.levelData.name == "sigma4_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Sigma;
 			newChar = new Sigma1(
 				this, pos.x, pos.y, xDir,
@@ -1197,8 +1204,8 @@ public partial class Player {
 		}
 
 
-		// Players
-		else if (charNum == (int)CharIds.X) {
+		  // Players
+		  else if (charNum == (int)CharIds.X) {
 			XLoadout xLoadout = new() {
 				weapon1 = extraData[0],
 				weapon2 = extraData[1],
@@ -1216,16 +1223,16 @@ public partial class Player {
 				heartTanks: htCount
 			);
 		}
-		// Saber Zero.
-		else if (spawnCharNum == (int)CharIds.Zero) {
+		  // Saber Zero.
+		  else if (spawnCharNum == (int)CharIds.Zero) {
 			newChar = new Zero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				heartTanks: htCount
 			);
 		}
-		// Vile.
-		else if (spawnCharNum == (int)CharIds.Vile) {
+		  // Vile.
+		  else if (spawnCharNum == (int)CharIds.Vile) {
 			bool mk2VileOverride = Global.level.isHyperMatch();
 
 			newChar = new Vile(
@@ -1234,8 +1241,8 @@ public partial class Player {
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
-		// GM19 Axl.
-		else if (spawnCharNum == (int)CharIds.Axl) {
+		  // GM19 Axl.
+		  else if (spawnCharNum == (int)CharIds.Axl) {
 			AxlLoadout axlLoadout = loadout?.axlLoadout?.clone() ?? new();
 			axlLoadout.weapon2 = extraData[0];
 			axlLoadout.weapon3 = extraData[1];
@@ -1250,8 +1257,8 @@ public partial class Player {
 				loadout: axlLoadout, heartTanks: htCount
 			);
 		}
-		// Sigma.
-		else if (spawnCharNum == (int)CharIds.Sigma) {
+		  // Sigma.
+		  else if (spawnCharNum == (int)CharIds.Sigma) {
 			int sigmaForm = extraData[0];
 			loadout.sigmaLoadout.sigmaForm = extraData[0];
 			loadout.sigmaLoadout.maverick1 = extraData[1];
@@ -1278,32 +1285,32 @@ public partial class Player {
 				);
 			}
 		}
-		// Buster Zero.
-		else if (spawnCharNum == (int)CharIds.BusterZero) {
+		  // Buster Zero.
+		  else if (spawnCharNum == (int)CharIds.BusterZero) {
 			newChar = new BusterZero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
-		// Punchy Zero.
-		else if (spawnCharNum == (int)CharIds.PunchyZero) {
+		  // Punchy Zero.
+		  else if (spawnCharNum == (int)CharIds.PunchyZero) {
 			newChar = new PunchyZero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
-		// Kaiser Sigma (Hypermode)
-		else if (spawnCharNum == (int)CharIds.KaiserSigma) {
+		  // Kaiser Sigma (Hypermode)
+		  else if (spawnCharNum == (int)CharIds.KaiserSigma) {
 			newChar = new KaiserSigma(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isRevive: true, isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
-		// Raging Charge X.
-		else if (spawnCharNum == (int)CharIds.RagingChargeX) {
+		  // Raging Charge X.
+		  else if (spawnCharNum == (int)CharIds.RagingChargeX) {
 			newChar = new RagingChargeX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
@@ -1312,15 +1319,15 @@ public partial class Player {
 		}
 
 
-		// Kurumitos
-		else if (charNum == (int)CharIds.Kurumitos) {
+		  // Kurumitos
+		  else if (charNum == (int)CharIds.Kurumitos) {
 			newChar = new Kurumitos(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 			);
 		}
-		// Vile WCUT
-		else if (charNum == (int)CharIds.VAVA1) {
+		  // Vile WCUT
+		  else if (charNum == (int)CharIds.VAVA1) {
 			newChar = new VAVA1(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn

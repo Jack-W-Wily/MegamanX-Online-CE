@@ -617,6 +617,7 @@ public class LevelData {
 		{ "weathercontrol2", "MakenaiAiGaKittoAru" },
 		{ "sigmaruins", "SigmaRuins" },
 		{ "forest3", "StanUp" },
+		{ "junkfactory_1v1", "DayAfterDay_haji"},
 	};
 
 	public string getMusicKey(List<Player> players) {

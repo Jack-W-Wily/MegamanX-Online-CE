@@ -756,6 +756,28 @@ public class Damager {
 				}
 			}
 
+			// Mysterious Maverick's Instakill Inmmunities
+			if (projId == (int)ProjIds.AssassinBullet
+			||	projId == (int)ProjIds.AssassinBulletEX
+			||	projId == (int)ProjIds.Hadouken
+			||	projId == (int)ProjIds.Shoryuken
+			||	projId == (int)ProjIds.GigaCrush
+			||	projId == (int)ProjIds.Gemnu
+			||	projId == (int)ProjIds.AcidBurst
+			||	projId == (int)ProjIds.RaySplasher
+			||	projId == (int)ProjIds.TorpedoCharged
+			||	projId == (int)ProjIds.PopcornDemon
+			||	projId == (int)ProjIds.VileMissile
+			) {
+				if (character is MysteriousMaverick) {
+					damage = 0;
+					flinch = 0;
+					character.playSound("m10ding");
+					character.changeState(new Taunt());
+					owner.character.changeState(new ZeroClang(character.xDir), true);
+				}
+			}
+
 
 			if (projId == (int)ProjIds.HeavyPush && owner.character != null) {
 				character.changeState(new PushedOver2(owner.character.xDir), true);
@@ -776,8 +798,12 @@ public class Damager {
 						character.changeState(new Vava1Grabbed(owner.character), true);
 						break;
 					case (int)ProjIds.RagingDemon:
-						owner.character.changeState(new RagingDemonSuccess(character), true);
-						character.changeState(new Vava1Grabbed(owner.character), true);
+						if (character is not MysteriousMaverick) {
+							owner.character.changeState(new RagingDemonSuccess(character), true);
+							character.changeState(new Vava1Grabbed(owner.character), true);
+						} else {
+							owner.character.changeState(new ZeroClang(character.xDir), true);
+						}
 						break;
 					case (int)ProjIds.BurensenStart:
 						owner.character.changeState(new VavaBurensen2(character), true);
@@ -801,7 +827,9 @@ public class Damager {
 
 
 			if (projId == (int)ProjIds.ForceGrabState && !character.isBlocking()) {
-
+				if (owner.character is MysteriousMaverick) {
+					owner.character.addHealth(6);
+				}
 				character?.changeState(new ForceGrabbed(owner.character));
 			}
 			

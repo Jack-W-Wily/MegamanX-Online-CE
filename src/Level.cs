@@ -1886,7 +1886,7 @@ public partial class Level {
 		srt.Clear(Global.level?.levelData?.bgColor ?? new Color(0, 0, 0, 0));
 		srt.Display();
 
-		if (levelData.name == "powerplant2") {
+		if (levelData.name == "powerplant2" || levelData.name == "junkfactory_1v1" ) {
 			drawPowerplant2();
 		}
 

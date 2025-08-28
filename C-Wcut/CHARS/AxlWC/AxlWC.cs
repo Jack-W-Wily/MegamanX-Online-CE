@@ -544,7 +544,7 @@ public class AxlWC : Character {
 		if ((player.input.isHeld(Control.Shoot, player) || axlWeapon.autoFire) &&
 			shootCooldown <= 0 &&
 			axlWeapon.shootCooldown <= 0 &&
-			axlWeapon.ammo > 0
+			axlWeapon.ammo > 0 && charState is not BlockWCUT
 		) {
 			shootMain(axlWeapon);
 			return true;
@@ -552,7 +552,7 @@ public class AxlWC : Character {
 		if (player.input.isHeld(Control.Special1, player) &&
 			shootCooldown <= 0 && axlWeapon.shootCooldown <= 0 &&
 			axlWeapon is not AxlBulletWC &&
-			axlWeapon.ammo > 0
+			axlWeapon.ammo > 0 && charState is not BlockWCUT
 		) {
 			shootAlt(axlWeapon);
 			return true;
@@ -922,6 +922,7 @@ public class AxlWC : Character {
 			charState is not Hurt and
 			not AxlBlock and
 			not AxlBlock2 and
+			not BlockWCUT and
 			not Die and
 			not GenericStun and
 			not InRideArmor and

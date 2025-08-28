@@ -65,7 +65,7 @@ public enum CharIds {
 	BossOctopus,
 	BossSigma,
 	BossClaudio,
-	
+	BossMMaverick,
 	SoulBodyClone,
 
 }

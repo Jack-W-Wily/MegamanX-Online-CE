@@ -1454,6 +1454,45 @@ public class GameMode {
 		if (player.charNum == (int)CharIds.BusterZero) {
 			frameIndex = 1;
 		}
+
+		if (player.charNum == (int)CharIds.RockmanX) {
+			frameIndex = 0;
+		}
+		if (player.charNum == (int)CharIds.ZeroMID) {
+			if ((player.character as ZeroMID).isBlack) {
+				frameIndex = 14;
+			} else {
+				frameIndex = 1;
+			}
+		}
+		if (player.charNum == (int)CharIds.VAVA1) {
+			frameIndex = 2;
+		}
+		if (player.charNum == (int)CharIds.AxlWC) {
+			frameIndex = 3;
+		}
+		if (player.charNum == (int)CharIds.Dynamo) {
+			frameIndex = 11;
+		}
+		if (player.charNum == (int)CharIds.Iris) {
+			frameIndex = 18;
+		}
+		if (player.charNum == (int)CharIds.Zain) {
+			frameIndex = 13;
+		}
+		if (player.charNum == (int)CharIds.Dragoon) {
+			frameIndex = 12;
+		}
+		if (player.charNum == (int)CharIds.GBD) {
+			frameIndex = 10;
+		}
+		if (player.charNum == (int)CharIds.HighMax) {
+			frameIndex = 19;
+		}
+		if (player.charNum == (int)CharIds.BossMMaverick) {
+			frameIndex = 9;
+		}
+
 		if (player.isDisguisedAxl) frameIndex = 3;
 
 		float baseX = position.x;

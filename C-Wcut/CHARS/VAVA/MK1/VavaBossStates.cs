@@ -508,7 +508,7 @@ public class VavaBurensen2 : CharState {
 	float timeWaiting;
 	public VavaBurensen2(Character? victim) : base("burensen_2", "", "", "") {
 		this.victim = victim;
-		grabTime = 8;
+		grabTime = 30;
 	}
 
 	public override void update() {
@@ -527,7 +527,7 @@ public class VavaBurensen2 : CharState {
 		if (timein > 5 && !character.sprite.name.Contains("burensen_finish")) {
 				character.changeSpriteFromName("burensen_finish", true);
 				if (character.frameIndex < 5) {
-					victim.changeState(new VileStomped(character));
+					victim?.changeState(new VileStomped(character));
 				}
 			}
 
@@ -554,8 +554,8 @@ public class VavaBurensen2 : CharState {
 				leechTime = 0;
 				character.addHealth(0.13f);
 				character.shakeCamera(sendRpc: true);
-				victim.changeState(new VileStomped(character));
-				var damager = new Damager(player, 0.5f, 0, 3);
+				victim?.changeState(new VileStomped(character));
+				var damager = new Damager(player, 2f, 0, 3);
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.UPPunch);
 			}
 
@@ -576,5 +576,6 @@ public class VavaBurensen2 : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim?.releaseGrab(character);
+		victim?.changeToIdleOrFall();
 	}
 }

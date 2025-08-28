@@ -143,7 +143,7 @@ public class Zero : Character {
 			updateAwakenedAura();
 		}
 		// Hypermode music.
-		if (!Global.level.isHyper1v1()) {
+		if (!Global.level.isHyper1v1() && this is not ZeroMID) {
 			if (isBlack) {
 				if (musicSource == null) {
 					addMusicSource("themeOfZeroMMZ_OldGsU", getCenterPos(), true);

@@ -945,6 +945,7 @@ public class RideArmor : Actor, IDamagable {
 			return 80;
 		} else if (raNum == 1) {
 			if (isNeutral) return 70;
+			if (netOwner.isAI) return 150;
 			return 54;
 		} else {
 			if (isNeutral) return 80;
@@ -1953,21 +1954,31 @@ public class RAChainCharge : RideArmorState {
 		base.update();
 		if (!rideArmor.ownedByLocalPlayer) return;
 	if (player != null) {
-			if (!player.input.isAHeld(player)) {
-				rideArmor.changeState(new RAChainAttack(), true);
-				return;
-			}
+			if (player.isAI) {
+				if (!player.input.isAHeld(player)) {
+					rideArmor.changeState(new RAChainAttack(), true);
+					return;
+				}
 
-			if (player.input.isHeld(Control.Left, player)) {
-				rideArmor.xDir = -1;
-			} else if (player.input.isHeld(Control.Right, player)) {
-				rideArmor.xDir = 1;
-			}
+				if (player.input.isHeld(Control.Left, player)) {
+					rideArmor.xDir = -1;
+				} else if (player.input.isHeld(Control.Right, player)) {
+					rideArmor.xDir = 1;
+				}
 
-			if (player.dashPressed(out string dashControl)) {
-				bool isHiding = (character?.charState as InRideArmor)?.isHiding ?? false;
-				rideArmor.changeState(new RAChainChargeDash(dashControl, isHiding), true);
-				return;
+				if (player.dashPressed(out string dashControl)) {
+					bool isHiding = (character?.charState as InRideArmor)?.isHiding ?? false;
+					rideArmor.changeState(new RAChainChargeDash(dashControl, isHiding), true);
+					return;
+				}
+			} else {
+				if (stateTime > 0.5f) {
+					if (Helpers.randomRange(0, 1) == 0) {
+						rideArmor.changeState(new RAChainAttack(), true);
+					} else {
+						rideArmor.changeState(new RAChainChargeDash(Control.Dash, false), true);
+					}
+				}
 			}
 	}
 		rideArmor.chainSoundTime += Global.spf;
@@ -2016,12 +2027,18 @@ public class RAChainChargeDash : RideArmorState {
 		float modifier = (isSlow ? 0.5f : 0.75f);
 		rideArmor.move(new Point(rideArmor.xDir * rideArmor.getRunSpeed() * rideArmor.getDashSpeed() * modifier, 0));
 		if (player != null) {
-			if (!player.input.isHeld(dashControl, player)) {
-				rideArmor.changeState(new RAChainCharge(), true);
-				return;
-			} else if (!player.input.isAHeld(player)) {
-				rideArmor.changeState(new RAChainAttack(), true);
-				return;
+			if (!player.isAI) {
+				if (!player.input.isHeld(dashControl, player)) {
+					rideArmor.changeState(new RAChainCharge(), true);
+					return;
+				} else if (!player.input.isAHeld(player)) {
+					rideArmor.changeState(new RAChainAttack(), true);
+					return;
+				}
+			} else {
+				if (stateTime > 2) {
+					rideArmor.changeState(new RAChainCharge(), true);
+				}
 			}
 		}
 		if (stateTime > 0.1) {
