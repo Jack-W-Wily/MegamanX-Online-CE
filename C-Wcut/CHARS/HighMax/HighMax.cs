@@ -135,14 +135,7 @@ public class HighMax : Character {
 		///	} 
 		/// 
 
-		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-			overDriveTimer = 12;
-			playSound("ching");
-
-		}
+	
 
 		if (!ownedByLocalPlayer) {
 			return;
@@ -154,6 +147,9 @@ public class HighMax : Character {
 		) {
 			changeState(new BlockWCUT());
 
+		}
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
 		}
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
@@ -316,7 +312,7 @@ public class HighMax : Character {
 
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 

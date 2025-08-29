@@ -37,14 +37,7 @@ public class Sigma1 : BaseSigma {
 		base.update();
 
 
-		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-			overDriveTimer = 12;
-			playSound("ching");
-
-		}
+	
 
 		if (!ownedByLocalPlayer) {
 			return;
@@ -154,11 +147,19 @@ public class Sigma1 : BaseSigma {
 		if (grounded) {
 			if (player.input.isR2Pressed(player) && player.superAmmo > 15) {
 				player.superAmmo -= 16;
-				if (player.input.isHeld(Control.Up, player)) {
+				if (player.input.isHeld(Control.Down, player) && OverDrive) {
+					
+					changeState(new ZainParryShinStartState(), true);
+				}
+				else if (player.input.isHeld(Control.Up, player)) {
 					// Combo Complexo
 					changeState(new VirusSlash2(), true);
 				} else {
-					changeState(new HellGaze(), true);
+					if (OverDrive) {
+						changeState(new HellGazeEX(), true);
+					} else {
+						changeState(new HellGaze(), true);
+					}
 				}
 				return true;
 			}

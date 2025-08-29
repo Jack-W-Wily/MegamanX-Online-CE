@@ -154,15 +154,7 @@ public class AxlWC : Character {
 	public override void update() {
 		bool wasGrounded = grounded;
 		base.update();
-		// Activate overdrive AXL
-		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-			overDriveTimer = 12;
-			playSound("ching");
-
-		}
+	
 
 
 		if (charState is Dash or AirDash) {
@@ -895,7 +887,7 @@ public class AxlWC : Character {
 		ShaderWrapper? palette = null;
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 		int paletteNum = 0;

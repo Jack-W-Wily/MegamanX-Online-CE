@@ -1459,11 +1459,9 @@ public class GameMode {
 			frameIndex = 0;
 		}
 		if (player.charNum == (int)CharIds.ZeroMID) {
-			if ((player.character as ZeroMID).isBlack) {
-				frameIndex = 14;
-			} else {
+			
 				frameIndex = 1;
-			}
+			
 		}
 		if (player.charNum == (int)CharIds.VAVA1) {
 			frameIndex = 2;

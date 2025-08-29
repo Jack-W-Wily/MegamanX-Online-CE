@@ -107,6 +107,13 @@ public class CharState {
 		}
 	}
 
+	
+	public CollideData? checkCollisionNormal(float x, float y) {
+		return Global.level.checkTerrainCollisionOnce(
+			character, x, y, checkPlatforms: true
+		);
+	}
+
 	public virtual void onExit(CharState? newState) {
 		if (!useGravity) {
 			character.useGravity = true;
@@ -1499,7 +1506,12 @@ public class Die : CharState {
 				int randX = Helpers.randomRange(-radius, radius);
 				int randY = Helpers.randomRange(-radius, radius);
 				var randomPos = character.getCenterPos().addxy(randX, randY);
-				if (character is Vile vile && vile.isVileMK2 || character is Doppma or KaiserSigma or BossClaudio or Zain ) {
+				if (character is Vile vile && vile.isVileMK2 ||
+				character is Doppma or KaiserSigma or BossClaudio or Zain
+				or BossStag or Kurumitos
+				
+				
+				 ) {
 					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);	
 					character.playSound("explosionX3", sendRpc: true);
 				}

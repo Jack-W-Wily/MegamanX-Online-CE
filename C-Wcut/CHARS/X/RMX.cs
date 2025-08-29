@@ -46,14 +46,7 @@ public class RockmanX : MegamanX {
 			changeState(new BlockWCUT());
 			return true;
 		}
-		// This is Where hypermode actiavtion happens
-			if (player.input.isPressed(Control.Special2, player)
-			&& player.currency > 4
-			) {
-				player.currency -= 5;
-			overDriveTimer = 12;
-			
-			}
+	
 
 		return base.normalCtrl();
 	}
@@ -133,17 +126,19 @@ public class RockmanX : MegamanX {
 		base.update();
 	
 
-		if (overDriveTimer > 0) {
-		OverDrive = true;
-		} else {
-			OverDrive = false;
-		}
+	
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref DodgeCD);
 
 	
-
+		if (Global.level.levelData.name == "zero_vs_x_1v1") {
+			hasUltimateArmor = true;
+			if (bonusHealth == 0) {
+				overDriveTimer = 999;
+			}
+			
+		}
 
 		if (canSpecialCancel) {
 
@@ -370,7 +365,7 @@ public class RockmanX : MegamanX {
 
 	public override void increaseCharge() {
 		float factor = 1;
-		if (OverDrive) factor = 1.5f; // this means during OverDrive he gets a chargespeed buff
+		if (OverDrive) factor = 2.5f; // this means during OverDrive he gets a chargespeed buff
 		chargeTime += Global.speedMul * factor;
 	}
 

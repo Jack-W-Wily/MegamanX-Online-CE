@@ -89,7 +89,7 @@ public class HyperZeroStart : ZeroState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel = new Point();
-		character.player.currency -= 10;
+		character.player.currency -= 5;
 		if (zero.hyperMode == 2) {
 			zero.changeSpriteFromName("hyper_viral", true);
 			virusAnimName = "sigmavirushead";
@@ -114,7 +114,7 @@ public class HyperZeroStart : ZeroState {
 			character.invulnTime = 0.5f;
 		}
 		if (zero.isAwakened || zero.isBlack) {
-			zero.hyperModeTimer = Zero.maxBlackZeroTime + 30;
+			zero.hyperModeTimer = 99999;
 		}
 		virusEffectParts?.destroySelf();
 		bool playedHitSound = false;

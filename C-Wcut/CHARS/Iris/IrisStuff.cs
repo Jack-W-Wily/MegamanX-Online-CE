@@ -373,9 +373,8 @@ public class IrisSpawnBeam : CharState
 	{
 		base.update();
 		superArmor = true;
-		if (character.frameIndex == 3 && !fired && player.superAmmo > 15){
+		if (character.frameIndex == 3 && !fired){
 		fired = true;
-		player.superAmmo -= 16;
 		 TriadThunder weapon = new TriadThunder();
 			if ((character as Iris).irisCrystal != null) {
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);

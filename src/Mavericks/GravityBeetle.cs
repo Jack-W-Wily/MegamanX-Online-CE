@@ -145,6 +145,7 @@ public class GBeetleBallProj : Projectile {
 	) {
 		weapon = GravityBeetle.getWeapon();
 		damager.damage = 2;
+		damager.flinch = 20;
 		damager.hitCooldown = 30;
 		vel = new Point (moveSpeed * xDir, 0);
 		projId = (int)ProjIds.GBeetleBall;
@@ -258,6 +259,7 @@ public class GBeetleDashState : BeetleMState {
 	float dustTime;
 	float partTime;
 	public GBeetleDashState() : base("dash", "dash_start") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -333,6 +335,7 @@ public class GBeetleLiftState : BeetleMState {
 	bool grabbedOnce;
 	public GBeetleLiftState(Character grabbedChar) : base("dash_lift") {
 		this.grabbedChar = grabbedChar;
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -533,6 +536,7 @@ public class GBeetleGravityWellState : BeetleMState {
 	float partTime;
 	float chargeTime;
 	public GBeetleGravityWellState() : base("blackhole_start") {
+		superArmor = true;
 	}
 
 	public override void update() {

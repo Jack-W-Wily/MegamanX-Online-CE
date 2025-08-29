@@ -201,6 +201,15 @@ public partial class Player {
 		}
 	}
 
+	public int skinSlot {
+		get => (int)(character?.SkinSlot ?? 0);
+		set {
+			if (character != null) {
+				character.SkinSlot = value;
+			}
+		}
+	}
+
 	public bool isDead {
 		get {
 			if (currentMaverick != null) {
@@ -692,9 +701,9 @@ public partial class Player {
 
 	public float getMaverickMaxHp(MaverickModeId controlMode) {
 		if (!Global.level.is1v1() && controlMode == MaverickModeId.TagTeam) {
-			return getModifiedHealth(20) + (heartTanks * getHeartTankModifier());
+			return getModifiedHealth(32) + (heartTanks * getHeartTankModifier());
 		}
-		return MathF.Ceiling(getModifiedHealth(24));
+		return MathF.Ceiling(getModifiedHealth(34));
 	}
 
 	public bool hasAllItems() {
@@ -1180,10 +1189,35 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 		}
-
-		else if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
+		else if (isAI && Global.level.levelData.name == "zerovirus_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Sigma;
+			newChar = new ZeroMID(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		else if (isAI && Global.level.levelData.name == "highway_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.Vile;
+			newChar = new HighwayVAVA(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		else if (isAI && Global.level.levelData.name == "zero_vs_x_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.Sigma;
+			newChar = new RockmanX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossClaudio;
 			newChar = new BossClaudio(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (isAI && Global.level.levelData.name == "bossroom_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossClaudio;
+			newChar = new BossStag(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
@@ -2989,9 +3023,9 @@ public partial class Player {
 
 
 	public void UnlockVAVA() {
-		Options.main.C7E1FBE2E00 = 123;
+		Options.main.C7E1FBE2E00 = 888;
 		Global.level.gameMode.setHUDErrorMessage(
-				this, "Unlocked Character - VAVA!",
+				this, "Unlocked Character - Kurumitos!",
 				playSound: true, resetCooldown: true
 			);
 		Options.main.saveToFile();

@@ -241,6 +241,31 @@ public class ClaudioGuardState : CharState {
 
 
 
+public class BossGuard : CharState {
+	public BossGuard() : base("guard") {
+		invincible = true;
+
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stateTime > 2 || stateTime == Helpers.randomRange(0, 2)) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.sprite.name.Contains("guard")) {
+			character.changeSpriteFromName("block", true);
+		}
+	}
+}
+
+
+
 
 public class ClaudioTrippleBuster : CharState {
 	int shootNum;
@@ -257,7 +282,7 @@ public class ClaudioTrippleBuster : CharState {
 
 		Point? shootPos = character.getFirstPOI();
 
-	
+
 		if (shootPos != null && character.frameIndex != lastShootFrame) {
 			if (shootNum == 0) {
 				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
@@ -273,18 +298,18 @@ public class ClaudioTrippleBuster : CharState {
 				);
 			} else if (shootNum == 2) {
 				character.playSound("buster4X2", forcePlay: false, sendRpc: true);
-							new FakeZeroSwordBeamProj(
-			shootPos.Value, character.xDir, character,
-			player.getNextActorNetId(), sendRpc: true
-			);	
-		
+				new FakeZeroSwordBeamProj(
+shootPos.Value, character.xDir, character,
+player.getNextActorNetId(), sendRpc: true
+);
+
 			}
 			shootNum++;
 			lastShootFrame = character.frameIndex;
 		}
-		
+
 		if (shootPos != null && character.frameIndex != lastShootFrame) {
-			
+
 			shootNum++;
 			lastShootFrame = character.frameIndex;
 		}

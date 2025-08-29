@@ -190,16 +190,19 @@ public static CharSelection[] selections => [
 			changeState(new BlockWCUT());
 		
 		}
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
 		// This is Where hypermode actiavtion happens
-			if (player.input.isPressed(Control.Special2, player)
-			&& player.currency > 4
-			) {
-				player.currency -= 5;
-				changeState(new OverDriveStart(), true);
-				/* 
-				changeState() you'll be using this for every custom action your character does
-				*/
-			}
+		if (player.input.isPressed(Control.Special2, player)
+		&& player.currency > 4
+		) {
+			player.currency -= 5;
+			changeState(new OverDriveStart(), true);
+			/* 
+			changeState() you'll be using this for every custom action your character does
+			*/
+		}
 
 		return base.normalCtrl();
 	}
@@ -262,13 +265,8 @@ public static CharSelection[] selections => [
 		} else {
 			canSpecialCancel = false;
 		}
-		// For Overdrive to work
-		if (overDriveTimer > 0) {
-		OverDrive = true;
-		} else {
-			OverDrive = false;
-		}
-		Helpers.decrementTime(ref overDriveTimer);
+	
+		
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref ShikiYamiBaraiCD);
 		
@@ -604,7 +602,7 @@ public static CharSelection[] selections => [
 		ShaderWrapper? palette = null;
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 		if (OverDrive) {

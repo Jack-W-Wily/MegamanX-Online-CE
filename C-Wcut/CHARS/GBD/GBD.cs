@@ -53,6 +53,9 @@ public class GBD : Character {
 
 			}
 		}
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
 		if (shootPressed && player.input.isHeld(Control.Up, player)) {
 			if (IdlePunchCooldown == 0) {
 
@@ -169,6 +172,7 @@ public class GBD : Character {
 			changeState(new BlockWCUT());
 
 		}
+		
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
@@ -308,7 +312,7 @@ public class GBD : Character {
 
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 

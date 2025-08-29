@@ -321,6 +321,7 @@ public class WheelGShootState : WheelGMState {
 	int state;
 	bool shotOnce;
 	public WheelGShootState() : base("wheelthrow_start") {
+		superArmor = true;
 	}
 	public override void update() {
 		base.update();
@@ -525,6 +526,7 @@ public class WheelGSpinState : MaverickState {
 	int state = 0;
 	float soundTime;
 	public WheelGSpinState() : base("drill_start", "jump_start") {
+		superArmor = true;
 	}
 
 	public override void update() {
@@ -575,6 +577,7 @@ public class WheelGUpBiteState : WheelGMState {
 	int shootFramesHeld;
 	bool shootReleased;
 	public WheelGUpBiteState() : base("grab_start", "jump_start") {
+		superArmor = true;
 	}
 
 	public override void update() {

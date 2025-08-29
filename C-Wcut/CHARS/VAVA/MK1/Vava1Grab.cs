@@ -216,7 +216,7 @@ public class Vava1Grabbed : GenericGrabbedState {
 
 
 public class VileStomped : CharState {
-	public const float maxGrabTime = 4;
+	public const float maxGrabTime = 10;
 	public Character? grabber;
 	public long savedZIndex;
 	public VileStomped(Character? grabber) : base("knocked_down") {

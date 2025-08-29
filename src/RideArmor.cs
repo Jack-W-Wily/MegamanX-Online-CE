@@ -6,8 +6,8 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class RideArmor : Actor, IDamagable {
-	public float health = 32;
-	public float maxHealth = 32;
+	public float health = 50;
+	public float maxHealth = 50;
 	public float goliathHealth = 0;
 	public float healAmount = 0;
 	public float healTime = 0;
@@ -944,12 +944,12 @@ public class RideArmor : Actor, IDamagable {
 		} else if (raNum == 2) {
 			return 80;
 		} else if (raNum == 1) {
-			if (isNeutral) return 70;
+			if (isNeutral) return 60;
 			if (netOwner.isAI) return 150;
-			return 54;
+			return 74;
 		} else {
 			if (isNeutral) return 80;
-			return 60;
+			return 90;
 		}
 	}
 
@@ -1005,13 +1005,14 @@ public class RideArmor : Actor, IDamagable {
 		lastCrashSoundTime = Global.time;
 	}
 
+	public bool isVava1Ride => netOwner.character is VAVA1 or HighwayVAVA;
 	public string getRaTypeName() {
-		if (raNum == 1) {
+		if (raNum == 1 && !isVava1Ride) {
 			return "kangaroo";
-		} else if (raNum == 2) return "hawk";
-		else if (raNum == 3) return "frog";
-		else if (raNum == 4) return "goliath";
-		else if (raNum == 5) return "devilbear";
+		} else if (raNum == 2 && !isVava1Ride) return "hawk";
+		else if (raNum == 3 && !isVava1Ride) return "frog";
+		else if (raNum == 4 && !isVava1Ride) return "goliath";
+		else if (raNum == 5 && !isVava1Ride ) return "devilbear";
 		else {
 			if (!isNeutral) return "ridearmor";
 			else return "neutralra";

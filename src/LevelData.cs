@@ -600,10 +600,12 @@ public class LevelData {
 		// Alt music.
 		{ "dopplerlab_1v1", "fortressBoss_X3" },
 		{ "zerovirus_1v1", "XvsZeroV2_megasfc" },
+		{ "zero_vs_x_1v1", "XvsZeroV2_megasfc" },
 		{ "centralcomputer_1v1", "zero_X2" },
 		{ "sigma4_1v1", "commanderSigma" },
 
 		// Others.
+		{ "highway_1v1" , "fortressBoss_X1"},
 		{ "japetribute", "variableX" },
 		{ "nodetest", "credits_X1" },
 		{ "training", "training_vodaz" },
@@ -618,6 +620,7 @@ public class LevelData {
 		{ "sigmaruins", "SigmaRuins" },
 		{ "forest3", "StanUp" },
 		{ "junkfactory_1v1", "DayAfterDay_haji"},
+
 	};
 
 	public string getMusicKey(List<Player> players) {

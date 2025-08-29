@@ -112,16 +112,17 @@ public class ZeroMID : Zero {
 	}
 
 	public override void update() {
-		hyperMode = Hypermode();
+		
 		// Hypermode effects.
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
-		// Hypermode music.
-		if (!Global.level.isHyper1v1()) {
+		
+
+		if (!Global.level.is1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("zero_X1", getCenterPos(), true);
+					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
@@ -135,6 +136,27 @@ public class ZeroMID : Zero {
 				destroyMusicSource();
 			}
 		}
+
+
+		if (player.input.isHeld(Control.Down, player) && player.currency >= 5 &&
+		player.input.isPressed(Control.Taunt, player)) {
+			awakenedPhase = 1;
+			hyperModeTimer = 999;
+			player.currency -= 5;
+		}
+
+		if (Global.level.levelData.name == "zerovirus_1v1") {
+			awakenedPhase = 1;
+			gigaAttack = new ShinMessenkou();
+			hyperModeTimer = 999;
+			if (bonusHealth == 0) {
+				overDriveTimer = 999;
+			}
+			if (charState is Raijingeki) {
+				changeState(new ClaudioShingetsurin(), true);
+			}
+		}
+		
 		if (!ownedByLocalPlayer) {
 			base.update();
 			return;
@@ -250,45 +272,118 @@ public class ZeroMID : Zero {
 		return player.input.isAHeld(player);
 	}
 
+	
+	public int stockedBusterLv;
+	public bool stockedSaber;
+	public float stockedTime;
+
 	public override void shoot(int chargeLevel) {
-		if (gigaAttack.ammo <= 4 && freeBusterShots <= 0) { return; }
-		if (chargeLevel == 0) { return; }
-		int currencyUse = 0;
+		if (!isBlack) {
+			if (gigaAttack.ammo <= 4 && freeBusterShots <= 0) { return; }
+			if (chargeLevel == 0) { return; }
+			int currencyUse = 0;
 
-		// Cancel non-invincible states.
-		if (!charState.normalCtrl) {
-			changeToIdleOrFall();
-		}
-		// Shoot anim and vars.
-		setShootAnim();
-		Point shootPos = getShootPos();
-		int xDir = getShootXDir();
+			// Cancel non-invincible states.
+			if (!charState.normalCtrl) {
+				changeToIdleOrFall();
+			}
+			// Shoot anim and vars.
+			setShootAnim();
+			Point shootPos = getShootPos();
+			int xDir = getShootXDir();
 
-		// Shoot stuff.
-		if (chargeLevel == 1) {
-			currencyUse = 1;
-			playSound("buster2", sendRpc: true);
-			new ZBuster2Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
-			);
-		} else if (chargeLevel == 2) {
-			currencyUse = 1;
-			playSound("buster2X3", sendRpc: true);
-			new ZBuster3Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
-			);
-		} else if (chargeLevel == 3 || chargeLevel >= 4) {
-			currencyUse = 1;
-			playSound("buster3X3", sendRpc: true);
-			new ZBuster4Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
-			);
-		}
-		if (currencyUse > 0) {
-			if (freeBusterShots > 0) {
-				freeBusterShots--;
-			} else if (gigaAttack.ammo > 3) {
-				gigaAttack.ammo -= 4;
+			// Shoot stuff.
+			if (chargeLevel == 1) {
+				currencyUse = 1;
+				playSound("buster2", sendRpc: true);
+				new ZBuster2Proj(
+					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				);
+			} else if (chargeLevel == 2) {
+				currencyUse = 1;
+				playSound("buster2X3", sendRpc: true);
+				new ZBuster3Proj(
+					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				);
+			} else if (chargeLevel == 3 || chargeLevel >= 4) {
+				currencyUse = 1;
+				playSound("buster3X3", sendRpc: true);
+				new ZBuster4Proj(
+					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				);
+			}
+			if (currencyUse > 0) {
+				if (freeBusterShots > 0) {
+					freeBusterShots--;
+				} else if (gigaAttack.ammo > 3) {
+					gigaAttack.ammo -= 4;
+				}
+			}
+		} else {
+			
+			string shootSprite = getSprite(charState.shootSpriteEx);
+			if (!Global.sprites.ContainsKey(shootSprite)) {
+				if (grounded) { shootSprite = "zero_shoot"; } else { shootSprite = "zero_fall_shoot"; }
+			}
+			if (shootAnimTime == 0) {
+				changeSprite(shootSprite, false);
+			} else if (charState is Idle && !charState.inTransition()) {
+				frameIndex = 0;
+				frameTime = 0;
+			}
+			if (charState is LadderClimb) {
+				if (player.input.isHeld(Control.Left, player)) {
+					this.xDir = -1;
+				} else if (player.input.isHeld(Control.Right, player)) {
+					this.xDir = 1;
+				}
+			}
+			shootAnimTime = DefaultShootAnimTime;
+			Point shootPos = getShootPos();
+			int xDir = getShootXDir();
+
+			if (chargeLevel == 0) {
+				playSound("busterX3", sendRpc: true);
+				var lemon = new DZBusterProj(
+					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				);
+
+			} else if (chargeLevel == 1) {
+				playSound("buster2X3", sendRpc: true);
+				new DZBuster2Proj(
+					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				);
+
+			} else if (chargeLevel == 2) {
+				playSound("buster3X3", sendRpc: true);
+				new DZBuster3Proj(
+					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+				);
+
+			} else if (chargeLevel == 3) {
+				if (charState is WallSlide) {
+					shoot(2);
+					stockedBusterLv = 1;
+					
+					return;
+				} else {
+					shootAnimTime = 0;
+					changeState(new BusterZeroDoubleBuster(false, 3), true);
+				}
+			} else if (chargeLevel >= 4) {
+				if (charState is WallSlide) {
+					shoot(2);
+					stockedBusterLv = 2;
+					stockedSaber = true;
+
+					return;
+				} else {
+					shootAnimTime = 0;
+					changeState(new BusterZeroDoubleBuster(false, 4), true);
+				}
+			}
+			if (chargeLevel >= 1) {
+				stopCharge();
 			}
 		}
 	}
@@ -459,7 +554,11 @@ public class ZeroMID : Zero {
 		}
 		if (grounded && player.superAmmo == player.superMaxAmmo &&
 		downPressedTimes >= 2 && player.input.isR2Held(player)) {
-			changeState(new GenmureiState(), true);
+			if (isAwakened) {
+				changeState(new GenmureiState(), true);
+			} else {
+				changeState(new DarkHoldShootState(new DarkHoldWeapon()), true);
+			}
 			downPressedTimes = 0;
 			gigaAttack.ammo -= 32;
 			return true;

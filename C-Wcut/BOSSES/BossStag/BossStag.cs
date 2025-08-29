@@ -15,7 +15,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 
-public class BossClaudio : Character {
+public class BossStag : Character {
 
 	
 
@@ -25,8 +25,12 @@ public class BossClaudio : Character {
 
 	public bool canSpecialCancel = false;
 
-
-	public BossClaudio(
+	
+	public Weapon uppercutWeapon;
+	public Sprite antler;
+	public Sprite antlerDown;
+	public Sprite antlerSide;
+	public BossStag(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
@@ -39,12 +43,12 @@ public class BossClaudio : Character {
 
 
 		if (charState is WarpIn) player.superAmmo = 0;
-
-		spriteFrameToSounds["claudio_jump_start/2"] = "zerosaberx3";
-
-		spriteFrameToSounds["claudio_trippleslash/1"] = "saber1";
-		spriteFrameToSounds["claudio_trippleslash/8"] = "saber2";
-		spriteFrameToSounds["claudio_trippleslash/17"] = "saber3";
+		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));
+		antler = new Sprite("fstag_antler");
+		antlerDown = new Sprite("fstag_antler_down");
+		antlerSide = new Sprite("fstag_antler_side");
+		spriteFrameToSounds["fstag_run/2"] = "run";
+		spriteFrameToSounds["fstag_run/6"] = "run";
 	}
 
 
@@ -76,10 +80,25 @@ public class BossClaudio : Character {
 
 	public override void update() {
 		base.update();
-		if (charState is Dash or AirDash) {
-			charState.specialId = SpecialStateIds.AxlRoll;
+
+		if (isUnderwater()) {
+			antler.visible = false;
+			antlerDown.visible = false;
+			antlerSide.visible = false;
+		} else {
+			antler.visible = true;
+			antlerDown.visible = true;
+			antlerSide.visible = true;
 		}
+
+		antler.update();
+		antlerDown.update();
+		antlerSide.update();
+
 	
+		Helpers.decrementTime(ref overDriveTimer);
+		Helpers.decrementTime(ref ShikiYamiBaraiCD);
+		
 
 		// Charge and release charge logic.
 		chargeLogic(shoot);
@@ -120,7 +139,7 @@ public class BossClaudio : Character {
 	
 
 	public override bool canDash() {
-		return true;
+		return false;
 	}
 
 	public override bool canWallClimb() {
@@ -128,10 +147,8 @@ public class BossClaudio : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "claudio_" + spriteName;
-		// NOTE: your character needs at bare minimum
-		// _idle.json, _warp_in.json and _warp_beam.json in order to
-		// work or else the game will crash when he Spawns
+		return "fstag_" + spriteName;
+
 	}
 
 
@@ -161,11 +178,12 @@ public class BossClaudio : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"kr_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
-			"claudio_chargeslash"  => MeleeIds.DashSlash,
-			"claudio_trippleslash" => MeleeIds.TrippleSlash,
+			"fstag_orochinagi_end"  => MeleeIds.DashSlash,
+			"fstag_punch" => MeleeIds.TrippleSlash,
 			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
 			"claudio_dash" => MeleeIds.Rising,
-			"claudio_jump"  or  "claudio_rising" => MeleeIds.Rising,
+			"fstag_dash_grab" => MeleeIds.Grab,
+			"fstag_orochinagi_start"  or  "fstag_wall_dash" => MeleeIds.Rising,
 			
 
 			_ => MeleeIds.None
@@ -198,7 +216,12 @@ public class BossClaudio : Character {
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
 			),
 
-
+			(int)MeleeIds.Grab => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.ForceGrabState, player,
+				 3,0,10, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
 			(int)MeleeIds.TrippleSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 3,30,10, isReflectShield: false,
@@ -294,22 +317,6 @@ public class BossClaudio : Character {
 	public void shoot(int chargeLevel) {
 
 
-		if (chargeLevel == 0) {
-			changeState(new KurumitosShikiYamiBaraiLv1(), true);
-			stopCharge();
-		} else if (chargeLevel == 1) {
-			changeState(new KurumitosShikiYamiBaraiLv2(), true);
-			stopCharge();
-		} else if (chargeLevel == 2) {
-			changeState(new KurumitosShikiYamiBaraiLv2(), true);
-			stopCharge();
-		} else if (chargeLevel == 3) {
-			changeState(new KurumitosShikiYamiBaraiLv2(), true);
-			stopCharge();
-		} else if (chargeLevel >= 4) {
-			changeState(new KurumitosOrochinagi(), true);
-			stopCharge();
-		}
 		if (chargeLevel >= 1) {
 			stopCharge();
 		}
@@ -383,27 +390,7 @@ public class BossClaudio : Character {
 	public override void render(float x, float y) {
 		addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
-		if (visible && bonusHealth == 0) {
-			// Position to draw the sprite to.
-			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
-			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
-			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
-
-			float auraAlpha = 0.75f;
-			
-			// Draw aura.
-			Global.sprites[sprite.name].draw(
-				sprite.frameIndex,
-				drawX, drawY,
-				xDir, yDir,
-				null, auraAlpha,
-				auraSize,
-				auraSize,
-				zIndex - 1,
-				player.omegaAuraShader
-			);
-			updateOmegaAura();
-		}
+		
 
 
 	
@@ -435,62 +422,66 @@ public class BossClaudio : Character {
 			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
-				if (isTargetClose && grounded) {
+				if (isTargetClose ) {
 					switch (Vattack) {
 						case 1 when isFacingTarget:
-						changeState(new ClaudioTrppleSlash());					
+						changeState(new BFStagDashChargeState());					
 							break;
 						case 2 when isFacingTarget:
-							changeState(new ClaudioTrppleSlash());	
+							changeState(new BFStagGrabState(false));	
 							break;
 						case 3 when isFacingTarget:
-							changeState(new ClaudioChargedSlash());	
+							changeState(new BFStagGrabState(true));	
 							break;
 						case 4 when isFacingTarget:
-							changeState(new ClaudioTrppleSlash());	
+							changeState(new BFStagDashState(0.1f));	
 							break;
 						case 5 when isFacingTarget:
-							changeState(new ClaudioGroundPunchState());	
+							changeState(new BFStagOrochinagi());	
 							break;
 						case 6 when isFacingTarget:
-							changeState(new ClaudioDashPrepare());	
+							changeState(new BFStagShoot(false));	
 							break;
-						case 7 when isFacingTarget:
-							changeState(new ClaudioGroundPunchState());	
+						case 7 when isFacingTarget && bonusHealth == 0:
+							changeState(new BFStagOrochinagiCharge());	
+							addHealth(5);
 							break;
 					}
 				}
 
 				
 
-				if (!isTargetClose && grounded && isWishinRangedMoves) {
+				if (!isTargetClose && isWishinRangedMoves) {
 					switch (Vattack) {
 						case 1 when isFacingTarget:
-						changeState(new ClaudioShingetsurin());					
+						changeState(new BFStagGrabState(true));					
 							break;
 						case 2 when isFacingTarget:
-							changeState(new ClaudioTrippleBuster());	
+							changeState(new BFStagDashState(0.5f));	
 							break;
 						case 3 when isFacingTarget:
-							changeState(new ClaudioFWave());
+							changeState(new BFStagDashChargeState());
 							break;
 						case 4 when isFacingTarget:
-							changeState(new ClaudioTrippleBuster());	
+							changeState(new BFStagShoot(false));	
 							break;
 						case 5 when isFacingTarget:
 							changeState(new Taunt());
 							addHealth(5);
 							break;
 						case 6 when isFacingTarget:
-							changeState(new ClaudioDashPrepare());	
+							changeState(new BFStagShoot(true));	
 							break;
 						case 7 when isFacingTarget:
-							changeState(new ClaudioTrippleBuster());	
+							changeState(new BFStagDashState(0.8f));	
 							break;
 					}
 				}
-
+			if (bonusHealth > 0) {
+				aiAttackCooldown = Helpers.randomRange(20, 60);
+			} else {
 				aiAttackCooldown = Helpers.randomRange(0, 30);
+			}
 			}
 
 			
@@ -514,7 +505,7 @@ public class BossClaudio : Character {
 				) {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
-							changeState(new ClaudioGuardState());	
+							changeState(new BossGuard());	
 								aiDodgeCD = Helpers.randomRange(100, 220);
 							
 						}

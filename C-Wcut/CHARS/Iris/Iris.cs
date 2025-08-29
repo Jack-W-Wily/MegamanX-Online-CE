@@ -42,7 +42,9 @@ public class Iris : Character {
 			changeState(new BlockWCUT());
 			return true;
 		}
-
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
 		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
 			changeState(new IrisGrabStart(), forceChange: true);
 		}
@@ -83,17 +85,6 @@ public class Iris : Character {
 
 	public override void update() {
 		base.update();
-
-
-			// Activate overdrive AXL
-		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-			overDriveTimer = 12;
-			playSound("ching");
-
-		}
 		
 		// Perifericos
 		if (!isInDamageSprite()) {
@@ -244,7 +235,7 @@ public class Iris : Character {
 
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 

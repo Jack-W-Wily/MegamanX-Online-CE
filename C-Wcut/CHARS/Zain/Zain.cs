@@ -46,6 +46,9 @@ public class Zain : Character {
 			changeState(new BlockWCUT());
 			return true;
 		}
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
 		return base.normalCtrl();
 	}
 
@@ -190,7 +193,7 @@ public class Zain : Character {
 
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 

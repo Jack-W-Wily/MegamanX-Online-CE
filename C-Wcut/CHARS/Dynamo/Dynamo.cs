@@ -48,7 +48,9 @@ public class Dynamo : Character {
 			changeState(new BlockWCUT());
 			return true;
 		}
-
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);
+		}
 		if (player.input.isAPressed(player) &&
 		player.input.isL2Held(player)
 		) {
@@ -67,9 +69,10 @@ public class Dynamo : Character {
 		hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
 		shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
 
-		if (hadokenCheck && SlashCooldown == 0) {
+		if (hadokenCheck && SlashCooldown == 0 && upPressedTimes > 0) {
 			changeState(new DynamoBladeDash(), true);
-			SlashCooldown = 1.5f;
+			SlashCooldown = 0.5f;
+			upPressedTimes = 0;
 		}
 
 		return base.normalCtrl();
@@ -185,6 +188,18 @@ public class Dynamo : Character {
 	public override void update() {
 		base.update();
 
+
+		// Hypermode music.
+		if (OverDrive) {
+			if (musicSource == null) {
+				addMusicSource("dynamo", getCenterPos(), true);
+			}
+		} else if (musicSource != null) {
+			musicSource.stop();
+			musicSource = null;
+		}
+
+
 		if (charState is Dash &&
 		player.input.isHeld(Control.Down, player)
 		) {
@@ -203,6 +218,14 @@ public class Dynamo : Character {
 			playSound("dynamoting", forcePlay: false, sendRpc: true);
 			changeState(new Idle());
 			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
+
+			if (OverDrive) {
+				new DarkHoldProj(
+			pos.addxy(0, -20), xDir, this,
+			player, player.getNextActorNetId(), rpc: true
+		);
+				playSound("darkhold");
+			}
 		}
 
 
@@ -346,9 +369,9 @@ public class Dynamo : Character {
 		//	}
 		return "dynamo_" + spriteName;
 	}
-	
 
-	
+
+
 	// For Shaders stuff
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
@@ -357,7 +380,7 @@ public class Dynamo : Character {
 
 
 
-		if (SkinSlot == 1) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
 
@@ -369,6 +392,21 @@ public class Dynamo : Character {
 		}
 		shaders.AddRange(baseShaders);
 		return shaders;
+	}
+
+
+		public override void render(float x, float y) {
+		base.render(x, y);
+
+		if (overDriveTimer > 0 && visible) {
+			addRenderEffect(RenderEffectType.SpeedDevilTrailNoDash);
+			removeRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} else {
+			removeRenderEffect(RenderEffectType.SpeedDevilTrailNoDash);
+			addRenderEffect(RenderEffectType.SpeedDevilTrail);
+		} 
+
+		
 	}
 }
 

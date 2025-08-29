@@ -803,8 +803,11 @@ public class DynamoSlide : CharState {
 	public override void update() {
 		base.update();
 
-
-		character.move(new Point(character.xDir * 350, 0));
+		if (character.OverDrive) {
+			character.move(new Point(character.xDir * 350, 0));
+		} else {
+			character.move(new Point(character.xDir * 300, 0));
+		}
 
 	  if (stateTime > 0.4f) {
 			character.changeToIdleOrFall();
@@ -844,8 +847,11 @@ public class DynamoSlideKick : CharState {
 	public override void update() {
 		base.update();
 	
-		character.move(new Point(character.xDir * 350, 0));
-
+		if (character.OverDrive) {
+			character.move(new Point(character.xDir * 350, 0));
+		} else {
+			character.move(new Point(character.xDir * 300, 0));
+		}
 	  if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 			return;
@@ -927,16 +933,15 @@ public class DynamoGPChargeState : CharState {
 
 		pillarCount += Global.spf;
 		 if (!player.input.isAHeld(player) && stateTime > 0.2f) {
-			
-			if (stateTime < 0.5f )
-			{character.changeState(new DynamoGPState());}
-			if (stateTime > 0.5f && stateTime < 1f 
-			){character.changeState(new DynamoGPStateLV1());}
-			if (stateTime > 1f && stateTime < 2f )
-			{character.changeState(new DynamoGPStateLV2());}	
-			if (stateTime > 2f )
-			{character.changeState(new DynamoGPStateLV3());}
-		
+			if (!character.OverDrive) {
+				if (stateTime < 0.5f) { character.changeState(new DynamoGPState()); }
+				if (stateTime > 0.5f && stateTime < 1f
+				) { character.changeState(new DynamoGPStateLV1()); }
+				if (stateTime > 1f && stateTime < 2f) { character.changeState(new DynamoGPStateLV2()); }
+				if (stateTime > 2f) { character.changeState(new DynamoGPStateLV3()); }
+			} else {
+				character.changeState(new DynamoGPStateLV3());
+			}
 				
 	
 		}

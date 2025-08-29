@@ -40,7 +40,9 @@ public override bool normalCtrl() {
 			changeState(new BlockWCUT());
 			return true;
 		}
-
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
 		
 		
 		if (player.input.isHeld(Control.Up, player)&&

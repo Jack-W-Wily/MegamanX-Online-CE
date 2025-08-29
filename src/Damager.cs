@@ -379,7 +379,9 @@ public class Damager {
 			}
 
 			if (owner.character is VAVA1 vava1 && vava1.health > 0) {
-			
+				if (vava1.OverDrive) {
+					owner.character.addHealth(0.5f);
+				}
 				if (vava1.charState.canSpecialCancel) {
 					vava1.charState.spcCancel = true;
 				}
@@ -825,6 +827,13 @@ public class Damager {
 				
 			}
 
+			// For Boss Grabs
+			if (projId == (int)ProjIds.ForceGrabState) {
+				if (owner.character is BossStag) {
+					owner.character.changeState(new BFStagUppercutState(character));
+				}
+				character?.changeState(new ForceGrabbed(owner.character));
+			}
 
 			if (projId == (int)ProjIds.ForceGrabState && !character.isBlocking()) {
 				if (owner.character is MysteriousMaverick) {

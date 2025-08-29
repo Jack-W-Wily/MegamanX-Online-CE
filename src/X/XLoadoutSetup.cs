@@ -53,7 +53,19 @@ public class XLoadoutSetup {
 		}
 		// Regular Loadout.
 		else {
-			weapons = xLoadout.getWeaponsFromLoadout(player);
+			if (!player.isAI) {
+				weapons = xLoadout.getWeaponsFromLoadout(player);
+			} else {
+				weapons.Add(new XBuster());
+				weapons.Add(new DoubleCyclone());
+				weapons.Add(new SoulBody());
+				weapons.Add(new FrostTower());
+				weapons.Add(new RisingFire());
+				weapons.Add(new LightningWeb());
+				weapons.Add(new GroundHunter());
+				weapons.Add(new AimingLaser());
+				weapons.Add(new TwinSlasher());
+			}
 		}
 
 		return weapons;

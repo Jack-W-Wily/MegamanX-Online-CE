@@ -877,7 +877,12 @@ public class Vile : Character {
 			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
 			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0 &&
 			this is not VAVA1
-			and not MysteriousMaverick) {
+			and not MysteriousMaverick
+			and not HighwayVAVA
+			
+			
+			
+			) {
 			if (isVileMK2 && charState is Dash or AirDash && isFacingTarget) {
 				player.press(Control.Special1);
 			}

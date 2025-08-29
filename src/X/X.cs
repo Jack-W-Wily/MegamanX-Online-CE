@@ -1411,9 +1411,36 @@ public class MegamanX : Character {
 		}
 		base.aiAttack(target);
 	}
+
+	public float aiBlocktime;
+
+	public float aiDodgeCD;
 	public override void aiDodge(Actor? target) {
-		
+
 		base.aiDodge(target);
+
+
+		Helpers.decrementFrames(ref aiBlocktime);
+		Helpers.decrementFrames(ref aiDodgeCD);
+		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance &&
+			(charState.attackCtrl || charState is ShoulderCannon or PopcornHell)) {
+				//Projectile is not 
+				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
+					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
+					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
+				) {
+					if (grounded) {
+						if (aiDodgeCD == 0 && !isDashing) {
+							changeState(new BossGuard());
+							aiDodgeCD = Helpers.randomRange(100, 220);
+
+						}
+					}
+				}
+			}
+		}
+
 	}
 
 	public override void aiUpdate(Actor? target) {

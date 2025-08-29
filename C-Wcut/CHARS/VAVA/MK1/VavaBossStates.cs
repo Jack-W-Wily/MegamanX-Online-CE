@@ -504,11 +504,25 @@ public class VavaBurensen2 : CharState {
 
 	float timein = 0;
 
+
+
+	bool Dashed;
+
+	bool deadlifted;
+
+	bool dropkicked;
+
+	bool stomped;
+
+
+	bool fired;
+
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public VavaBurensen2(Character? victim) : base("burensen_2", "", "", "") {
+	public VavaBurensen2(Character? victim) : base("hyperdash_start", "", "", "") {
 		this.victim = victim;
 		grabTime = 30;
+		invincible = true;
 	}
 
 	public override void update() {
@@ -516,21 +530,44 @@ public class VavaBurensen2 : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 		timein += Global.spf;
-
-		if (timein > 2 && !character.sprite.name.Contains("burensen_3")
-		&& !character.sprite.name.Contains("burensen_finish")) {
+		if (timein > 0.2f && !Dashed
+		&& !character.sprite.name.Contains("hyperdash_start")) {
+			character.changeSpriteFromName("hyperdash_attack", true);
+			Dashed = true;
+		}
+			
+		if (timein > 0.6f && !deadlifted) {
+			character.changeSpriteFromName("deadlift", true);
+			deadlifted = true;
+		}
+		if (timein > 1f && !dropkicked) {
+			character.changeSpriteFromName("drop_kick", true);
+			dropkicked = true;
+		}
+			if (timein > 1.5f && !stomped) {
+			character.changeSpriteFromName("burensen_2", true);
+			stomped = true;
+		}
+	
+		if (timein > 2.3f && !character.sprite.name.Contains("burensen_3")
+		&& !character.sprite.name.Contains("cannon_execution")) {
 			character.changeSpriteFromName("burensen_3", true);
 		}
-		if (!character.sprite.name.Contains("burensen_finish")) {
-			victim.changeState(new VileStomped(character));
-		}
-		if (timein > 5 && !character.sprite.name.Contains("burensen_finish")) {
-				character.changeSpriteFromName("burensen_finish", true);
-				if (character.frameIndex < 5) {
-					victim?.changeState(new VileStomped(character));
-				}
+		
+		if (timein > 5 && !character.sprite.name.Contains("cannon_execution")) {
+			character.changeSpriteFromName("cannon_execution", true);
+			if (character.frameIndex < 5 && character.sprite.name.Contains("cannon_execution")) {
+				victim?.changeState(new VileStomped(character));
+			}
 			}
 
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+			}
 
 		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
 			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
@@ -542,7 +579,7 @@ public class VavaBurensen2 : CharState {
 				victimWasGrabbedSpriteOnce = true;
 			}
 		}
-
+		
 		if (character.sprite.name.Contains("burensen_2")) {
 			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
 			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
@@ -561,7 +598,32 @@ public class VavaBurensen2 : CharState {
 
 		}
 
-		if (character.sprite.name.Contains("burensen_finish") && character.isAnimOver()) {
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("deadlift") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
 			character.changeToIdleOrFall();
 			return;
 		}

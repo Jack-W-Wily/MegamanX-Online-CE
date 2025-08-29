@@ -1141,6 +1141,16 @@ public partial class Character : Actor, IDamagable {
 
 	public override void update() {
 
+
+		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
+		&& player.currency > 4
+		) {
+			player.currency -= 5;
+			overDriveTimer = 30;
+			playSound("ching");
+
+		}
+
 		if (charState is WarpIn) {
 			SkinSlot = Options.main.SkinSlot;
 		}
@@ -1150,6 +1160,10 @@ public partial class Character : Actor, IDamagable {
 		} else {
 			OverDrive = false;
 		}
+
+
+
+
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref BurstCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
@@ -3400,7 +3414,7 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player && killer != Player.stagePlayer) {
 				killer.addKill();
-				if (this.player.isAI && this is VAVA1 && Global.level.is1v1() && Options.main.C7E1FBE2E00 != 123) {
+				if (this.player.isAI && this is BossStag && Global.level.is1v1() && Options.main.C7E1FBE2E00 != 888 && killer.character.bonusHealth >= maxHealth) {
 						killer.UnlockVAVA();
 					}
 				if (Global.level.gameMode is TeamDeathMatch) {
