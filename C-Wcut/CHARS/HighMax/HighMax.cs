@@ -95,8 +95,18 @@ public class HighMax : Character {
 		}
 
 
-		if (cmdPressed && player.superAmmo == player.superMaxAmmo) {
+		if (cmdPressed && player.superAmmo == player.superMaxAmmo && player.input.isHeld(Control.Up,player)) {
 			changeState(new DesmumeSpam(), true);
+			player.superAmmo = 0;
+			return true;
+		}
+		if (cmdPressed && player.superAmmo == player.superMaxAmmo && player.input.isHeld(Control.Down,player)) {
+			changeState(new DesmumeSpam2(), true);
+			player.superAmmo = 0;
+			return true;
+		}
+		if (cmdPressed && player.superAmmo == player.superMaxAmmo && !player.input.isHeld(Control.Up, player) && !player.input.isHeld(Control.Down, player)) {
+			changeState(new HighMaxSuperPunchState(), true);
 			player.superAmmo = 0;
 			return true;
 		}
@@ -135,7 +145,7 @@ public class HighMax : Character {
 		///	} 
 		/// 
 
-	
+
 
 		if (!ownedByLocalPlayer) {
 			return;
@@ -149,16 +159,26 @@ public class HighMax : Character {
 
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
-			changeState(new WcutGenericDodgeF(), true);	
+			changeState(new WcutGenericDodgeF(), true);
 		}
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
 		Helpers.decrementTime(ref shootCooldown);
 		Helpers.decrementTime(ref ZetsubouCooldown);
+		Helpers.decrementTime(ref highmaxArmorCooldown);
 
+		if (charState is Hurt && charState.stateFrames == 0) {
+			highmaxDmgCount += 1;
+		}
+		if (highmaxDmgCount > 5) {
+			highmaxArmorCooldown = 2;
+			highmaxDmgCount = 0;
+		}
 	}
 
+	public int highmaxDmgCount = 0;
+	public float highmaxArmorCooldown;
 
 	public override void landingCode(bool useSound = true) {
 		base.landingCode(useSound);
@@ -168,7 +188,7 @@ public class HighMax : Character {
 	}
 
 	public override bool isToughGuyHyperMode() {
-		return !isInDamageSprite();
+		return highmaxArmorCooldown == 0;
 	}
 
 
@@ -176,6 +196,7 @@ public class HighMax : Character {
 		if (!ownedByLocalPlayer) {
 			return false;
 		}
+		
 		if (charState.exitOnLanding && grounded) {
 			landingCode();
 		}
@@ -296,8 +317,11 @@ public class HighMax : Character {
 		if (sprite.name.EndsWith("dash_punch_charge")) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 1f, 0, 20f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
 		}
-		if (sprite.name.EndsWith("foward_punch")) {
+		if (sprite.name.EndsWith("foward_punch") && charState is not HighMaxSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 20f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
+		}
+		if (sprite.name.EndsWith("foward_punch") && charState is HighMaxSuperPunchState) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 6f, 0, 20f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
 		}
 		return proj;
 	}

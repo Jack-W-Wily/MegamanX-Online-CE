@@ -940,7 +940,12 @@ public class DynamoGPChargeState : CharState {
 				if (stateTime > 1f && stateTime < 2f) { character.changeState(new DynamoGPStateLV2()); }
 				if (stateTime > 2f) { character.changeState(new DynamoGPStateLV3()); }
 			} else {
-				character.changeState(new DynamoGPStateLV3());
+				if (stateTime < 0.5f) { character.changeState(new DynamoGPStateLV1()); }
+				if (stateTime > 0.5f && stateTime < 1f
+				) { character.changeState(new DynamoGPStateLV2()); }
+				if (stateTime > 1f && stateTime < 2f) { character.changeState(new DynamoGPStateLV3()); }
+				if (stateTime > 2f) { character.changeState(new DynamoGPStateLV3()); }
+		
 			}
 				
 	

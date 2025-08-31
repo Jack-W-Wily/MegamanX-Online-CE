@@ -372,7 +372,6 @@ public partial class Global {
 
 			{ "fstag_fall", "fstag_enter" },
 			{ "fstag_jump", "fstag_exit" },
-			{ "fstag_die", "fstag_hurt" },
 
 			{ "morphm_fall", "morphm_enter" },
 			{ "morphm_jump", "morphm_exit" },

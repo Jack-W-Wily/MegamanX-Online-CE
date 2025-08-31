@@ -200,7 +200,7 @@ public class Sprite {
 			}
 			isUPX = character is RagingChargeX;
 			isUltX = character is MegamanX { hasUltimateArmor: true };
-			DrawVileHat = character is VAVA1 && character.SkinSlot == 2;
+			DrawVileHat = character is VavaHatSkin ;
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;
@@ -602,6 +602,120 @@ public class Sprite {
 					}
 				));
 			}
+			// for Zero Dash stuff
+			if (name.Contains("zarzo_")  && character != null) {
+				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					var trail = lastFiveTrailDraws[i];
+					if (character.isDashing) {
+						trail.action.Invoke(trail.time);
+					}
+					trail.time -= Global.spf;
+				}
+				var shaderList = new List<ShaderWrapper>();
+				if (Global.shaderWrappers.ContainsKey("trailRed")) shaderList.Add(Global.shaderWrappers["trailRed"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail(
+					0.25f,
+					(float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					}
+				));
+			}
+
+
+			if (name.Contains("zain_")  && character != null) {
+				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					var trail = lastFiveTrailDraws[i];
+					if (character.isDashing) {
+						trail.action.Invoke(trail.time);
+					}
+					trail.time -= Global.spf;
+				}
+				var shaderList = new List<ShaderWrapper>();
+				if (Global.shaderWrappers.ContainsKey("chargeYellow")) shaderList.Add(Global.shaderWrappers["chargeYellow"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail(
+					0.25f,
+					(float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					}
+				));
+			}
+
+			if (name.Contains("rmx")  && character != null) {
+				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					var trail = lastFiveTrailDraws[i];
+					if (character.isDashing) {
+						trail.action.Invoke(trail.time);
+					}
+					trail.time -= Global.spf;
+				}
+				var shaderList = new List<ShaderWrapper>();
+				if (Global.shaderWrappers.ContainsKey("trailBlue")) shaderList.Add(Global.shaderWrappers["trailBlue"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail(
+					0.25f,
+					(float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					}
+				));
+			}
+
+			if (name.Contains("iris")  && character != null) {
+				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+					var trail = lastFiveTrailDraws[i];
+					if (character.isDashing) {
+						trail.action.Invoke(trail.time);
+					}
+					trail.time -= Global.spf;
+				}
+				var shaderList = new List<ShaderWrapper>();
+				if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
+
+				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+				lastFiveTrailDraws.Add(new Trail(
+					0.25f,
+					(float time) => {
+						DrawWrappers.DrawTexture(
+							bitmap,
+							currentFrame.rect.x1, currentFrame.rect.y1,
+							currentFrame.rect.w(), currentFrame.rect.h(),
+							x, y, zIndex,
+							cx - frameOffsetX * xDirArg,
+							cy - frameOffsetY * yDirArg,
+							xDirArg, yDirArg, angle, alpha, shaderList, true
+						);
+					}
+				));
+			}
+			
 			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
 				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 					Trail trail = character.lastFiveTrailDraws[i];

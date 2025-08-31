@@ -45,6 +45,7 @@ public class BossClaudio : Character {
 		spriteFrameToSounds["claudio_trippleslash/1"] = "saber1";
 		spriteFrameToSounds["claudio_trippleslash/8"] = "saber2";
 		spriteFrameToSounds["claudio_trippleslash/17"] = "saber3";
+		isWCUTBoss = true;
 	}
 
 

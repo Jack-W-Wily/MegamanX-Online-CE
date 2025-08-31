@@ -11,8 +11,9 @@ public class FrostShield : Weapon {
 		shootSounds = ["frostShield", "frostShield", "frostShield", "frostShieldCharged"];
 		fireRate = 60;
 		switchCooldown = 45;
-		type = index;
 		index = (int)WeaponIds.FrostShield;
+		type = index;
+	
 		weaponBarBaseIndex = 23;
 		weaponBarIndex = weaponBarBaseIndex;
 		weaponSlotIndex = 23;

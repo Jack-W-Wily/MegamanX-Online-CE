@@ -835,14 +835,21 @@ public class ZainKokuSlash : CharState {
 		}
 		airMove = true;
 		useDashJumpSpeed = true;
-		bonusAttackCtrl = true;
+		
 	}
 
 
 		public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		 if (base.player.input.isHeld("up", base.player)){
-		    character.changeSpriteFromName("rising", true);
+
+
+		
+			bonusAttackCtrl = true;
+		
+
+		
+		 if (base.player.input.isHeld("up", base.player)) {
+			character.changeSpriteFromName("rising", true);
 			character.dashedInAir++;
 			float ySpeedMod = 1.5f;
 			character.vel.y = (0f - character.getJumpPower()) * ySpeedMod;

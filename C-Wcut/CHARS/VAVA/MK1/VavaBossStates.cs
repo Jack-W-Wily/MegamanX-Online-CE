@@ -556,9 +556,6 @@ public class VavaBurensen2 : CharState {
 		
 		if (timein > 5 && !character.sprite.name.Contains("cannon_execution")) {
 			character.changeSpriteFromName("cannon_execution", true);
-			if (character.frameIndex < 5 && character.sprite.name.Contains("cannon_execution")) {
-				victim?.changeState(new VileStomped(character));
-			}
 			}
 
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
@@ -591,9 +588,8 @@ public class VavaBurensen2 : CharState {
 				leechTime = 0;
 				character.addHealth(0.13f);
 				character.shakeCamera(sendRpc: true);
-				victim?.changeState(new VileStomped(character));
 				var damager = new Damager(player, 2f, 0, 3);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.UPPunch);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
 			}
 
 		}

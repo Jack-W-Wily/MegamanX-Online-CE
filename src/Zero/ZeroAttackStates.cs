@@ -246,21 +246,18 @@ public class ZeroDoubleBuster : ZeroState {
 			shootPressedAgain = true;
 		}
 
+		if (player.input.isAPressed(player) && character.frameIndex >= 7) {
+			character.changeState(new AwakenedZeroHadangeki(), true);
+		}
+
 		if (!fired1 && character.frameIndex == 3) {
 			fired1 = true;
-			if (!isPinkCharge) {
 				character.playSound("buster3X3", sendRpc: true);
 				new ZBuster4Proj(
 					character.getShootPos(),
 					character.getShootXDir(), zero, player, player.getNextActorNetId(), rpc: true
 				);
-			} else {
-				character.playSound("buster2X3", sendRpc: true);
-				new ZBuster2Proj(
-					character.getShootPos(), character.getShootXDir(),
-					zero, player, player.getNextActorNetId(), rpc: true
-				);
-			}
+			
 		}
 		if (!fired2 && character.frameIndex == 7) {
 			fired2 = true;

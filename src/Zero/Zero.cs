@@ -143,10 +143,10 @@ public class Zero : Character {
 			updateAwakenedAura();
 		}
 		// Hypermode music.
-		if (!Global.level.isHyper1v1() && this is not ZeroMID) {
+		if (!Global.level.isHyper1v1() ) {
 			if (isBlack) {
 				if (musicSource == null) {
-					addMusicSource("themeOfZeroMMZ_OldGsU", getCenterPos(), true);
+					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {
@@ -244,6 +244,8 @@ public class Zero : Character {
 		// Charge and release charge logic.
 		if (isAwakened) {
 			chargeLogic(shootDonuts);
+		} else if (isBlack) {
+			chargeLogic(shootb);
 		} else {
 			chargeLogic(shoot);
 		}
@@ -321,6 +323,82 @@ public class Zero : Character {
 				}
 			}
 		
+	}
+
+		
+	public int stockedBusterLv;
+	public bool stockedSaber;
+	public float stockedTime;
+
+
+	public virtual void shootb(int chargeLevel) {
+
+
+		string shootSprite = getSprite(charState.shootSpriteEx);
+		if (!Global.sprites.ContainsKey(shootSprite)) {
+			if (grounded) { shootSprite = "zero_shoot"; } else { shootSprite = "zero_fall_shoot"; }
+		}
+		if (shootAnimTime == 0) {
+			changeSprite(shootSprite, false);
+		} else if (charState is Idle && !charState.inTransition()) {
+			frameIndex = 0;
+			frameTime = 0;
+		}
+		if (charState is LadderClimb) {
+			if (player.input.isHeld(Control.Left, player)) {
+				this.xDir = -1;
+			} else if (player.input.isHeld(Control.Right, player)) {
+				this.xDir = 1;
+			}
+		}
+		shootAnimTime = DefaultShootAnimTime;
+		Point shootPos = getShootPos();
+		int xDir = getShootXDir();
+
+		if (chargeLevel == 0) {
+			playSound("busterX3", sendRpc: true);
+			var lemon = new DZBusterProj(
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+			);
+
+		} else if (chargeLevel == 1) {
+			playSound("buster2X3", sendRpc: true);
+			new DZBuster2Proj(
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+			);
+
+		} else if (chargeLevel == 2) {
+			playSound("buster3X3", sendRpc: true);
+			new DZBuster3Proj(
+				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+			);
+
+		} else if (chargeLevel == 3) {
+			if (charState is WallSlide) {
+				shoot(2);
+				stockedBusterLv = 1;
+
+				return;
+			} else {
+				shootAnimTime = 0;
+				changeState(new ZeroDoubleBuster(false, true), true);
+			}
+		} else if (chargeLevel >= 4) {
+			if (charState is WallSlide) {
+				shoot(2);
+				stockedBusterLv = 2;
+				stockedSaber = true;
+
+				return;
+			} else {
+				shootAnimTime = 0;
+				changeState(new ZeroDoubleBuster(false, false), true);
+			}
+		}
+		if (chargeLevel >= 1) {
+			stopCharge();
+		}
+
 	}
 
 	public void setShootAnim() {

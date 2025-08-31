@@ -620,6 +620,7 @@ public class LevelData {
 		{ "sigmaruins", "SigmaRuins" },
 		{ "forest3", "StanUp" },
 		{ "junkfactory_1v1", "DayAfterDay_haji"},
+		{ "stag_1v1", "VolcanosWrath" },
 
 	};
 

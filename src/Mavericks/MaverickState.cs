@@ -1059,7 +1059,7 @@ public class MHurt : MaverickState {
 				flinchYPos = maverick.pos.y;
 			}
 		}
-		if (maverick.sprite.name.EndsWith("hurt")) {
+		if (!maverick.sprite.name.EndsWith("hurt")) {
 			maverick.changeSpriteFromName("die", true);
 		}
 	}

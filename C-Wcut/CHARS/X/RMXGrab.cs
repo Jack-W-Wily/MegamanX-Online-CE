@@ -46,7 +46,7 @@ public class RMXGrabState : CharState {
 
 	public RMXGrabState(Character? victim) : base("grab") {
 		this.victim = victim;
-		grabTime = KurumaGrabbed.maxGrabTime;
+		grabTime = 1;
 	}
 
 	public override void update() {

@@ -368,6 +368,9 @@ public class Damager {
 
 			if (owner.character is ZeroMID zarzo && zarzo.health > 0) {
 				if (zarzo.OverDrive) {
+					if (zarzo.charState is not ZeroDoubleBuster and not
+					ZeroSlash1State and not ZeroSlash2State
+					)
 					zarzo.charState.attackCtrl = true;
 				}
 				if (zarzo.charState.canSpecialCancel) {
@@ -729,8 +732,8 @@ public class Damager {
 
 				if (owner?.character is Dragoon) {
 				if (projId == (int)ProjIds.ForceGrabState) {
-					character.changeState(new DragoonGrab());
-					owner.character?.changeState(new Vava1GrabState(character));
+					owner?.character.changeState(new DragoonGrab());
+					character?.changeState(new ForceGrabbed(owner.character));
 				}
 				}
 
@@ -758,23 +761,28 @@ public class Damager {
 				}
 			}
 
-			// Mysterious Maverick's Instakill Inmmunities
-			if (projId == (int)ProjIds.AssassinBullet
+			// Boss Instakill Inmmunities
+			if ((projId == (int)ProjIds.AssassinBullet
 			||	projId == (int)ProjIds.AssassinBulletEX
 			||	projId == (int)ProjIds.Hadouken
 			||	projId == (int)ProjIds.Shoryuken
 			||	projId == (int)ProjIds.GigaCrush
 			||	projId == (int)ProjIds.Gemnu
-			||	projId == (int)ProjIds.AcidBurst
 			||	projId == (int)ProjIds.RaySplasher
 			||	projId == (int)ProjIds.TorpedoCharged
 			||	projId == (int)ProjIds.PopcornDemon
 			||	projId == (int)ProjIds.VileMissile
+			||	projId == (int)ProjIds.RaySplasherChargedProj
+			||	projId == (int)ProjIds.AcidBurstPoison
+			||	projId == (int)ProjIds.Burn
+			
+			
+			) && character.isWCUTBoss
 			) {
-				if (character is MysteriousMaverick) {
 					damage = 0;
 					flinch = 0;
 					character.playSound("m10ding");
+				if (character is MysteriousMaverick) {
 					character.changeState(new Taunt());
 					owner.character.changeState(new ZeroClang(character.xDir), true);
 				}
@@ -1147,6 +1155,7 @@ public class Damager {
 			parryState.canParry() && !isDot(projId)
 		) {
 			parryState.counterAttack(owner, damagingActor, Math.Max(finalDamage * 2, 4));
+			victim.addDamageText("Parry!!", 1);
 			return true;
 		}
 		if (finalDamage > 0 && preCharacter != null &&
@@ -1156,6 +1165,7 @@ public class Damager {
 			!isDot(projId)
 		) {
 			parryState2.counterAttack(owner, damagingActor, finalDamage);
+			victim.addDamageText("Parry!!", 1);
 			return true;
 		}
 
@@ -1166,6 +1176,7 @@ public class Damager {
 			!isDot(projId)
 		) {
 			parryState3.counterAttack(owner, damagingActor, finalDamage);
+			victim.addDamageText("Parry!!", 1);
 			return true;
 		}
 
@@ -1176,6 +1187,7 @@ public class Damager {
 			!isDot(projId)
 		) {
 			parryState5.counterAttack(owner, damagingActor, finalDamage);
+			victim.addDamageText("Parry!!", 1);
 			return true;
 		}
 
@@ -1186,6 +1198,7 @@ public class Damager {
 			!isDot(projId)
 		) {
 			parryState4.counterAttack(owner, damagingActor, finalDamage);
+			victim.addDamageText("Parry!!", 1);
 			return true;
 		}
 
@@ -1196,6 +1209,7 @@ public class Damager {
 			zeroParryState.canParry(damagingActor, projId)
 		) {
 			zeroParryState.counterAttack(owner, damagingActor);
+			victim.addDamageText("Parry!!", 1);
 			return true;
 		}
 
@@ -1205,12 +1219,38 @@ public class Damager {
 			
 		) {
 			preCharacter.addHealth(1);
+			preCharacter.changeToIdleOrFall();
 			preCharacter.charState.invincible = true;
 			preCharacter.playSound("zeroParry");
 			victim.addDamageText("Parry!!", 1);
 			owner.character.changeState(new ZeroClang(preCharacter.xDir), true);
 			return true;
 		}
+
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			charState is ZainDashParryState parryState6
+			&& parryState6.canParry(damagingActor) &&
+			!isDot(projId)
+		) {
+			parryState6.counterAttack(owner, damagingActor, finalDamage);
+			victim.addDamageText("Parry!!", 1);
+			return true;
+		}
+
+
+		if (finalDamage > 0 && preCharacter != null &&
+			preCharacter.ownedByLocalPlayer &&
+			charState is GlobalParryState parryState7
+			&& parryState7.canParry(damagingActor) &&
+			!isDot(projId)
+		) {
+			parryState7.counterAttack(owner, damagingActor, finalDamage);
+			victim.addDamageText("Parry!!", 1);
+			return true;
+		}
+
+
 
 		damagable?.applyDamage(finalDamage, owner, damagingActor, weaponKillFeedIndex, projId);
 

@@ -470,8 +470,7 @@ public class VavaGizmoGrabState : CharState {
 
 	public VavaGizmoGrabState(Character? victim) : base("gizmo_grab_success") {
 		this.victim = victim;
-		grabTime = VileMK2Grabbed.maxGrabTime;
-		specialId = SpecialStateIds.AxlRoll;
+		grabTime = 1;
 	}
 
 	public override void update() {

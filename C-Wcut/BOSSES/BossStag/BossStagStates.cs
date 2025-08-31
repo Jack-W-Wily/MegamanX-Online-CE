@@ -257,7 +257,7 @@ public class BFStagUppercutState : BossStagMState {
 						character.xDir *= -1;
 					}
 				}
-			} else if (yDist > 224) {
+			} else if (yDist > 250) {
 				reverse();
 			}
 		} else if (state == 1) {

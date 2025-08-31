@@ -80,7 +80,7 @@ public class RaySplasherProj : Projectile {
 		pos, xDir, owner, "raysplasher_proj", netId, player
 	) {
 		weapon = RaySplasher.netWeapon;
-		damager.damage = 1;
+		damager.damage = 0.336f;
 		damager.hitCooldown = 6;
 		vel = new Point(600 * xDir, 0);
 		maxTime = 0.25f;
@@ -382,7 +382,7 @@ public class RaySplasherTurretProj : Projectile {
 		pos, xDir, owner, "raysplasher_proj", netId, player
 	) {
 		weapon = RaySplasher.netWeapon;
-		damager.damage = 1;
+		damager.damage = 0.5f;
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasherChargedProj;
 		frameIndex = spriteType;

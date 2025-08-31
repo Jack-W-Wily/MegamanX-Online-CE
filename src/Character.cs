@@ -174,6 +174,9 @@ public partial class Character : Actor, IDamagable {
 	public bool stockedBuster;
 
 
+	// For Wcut Bosses
+	public bool isWCUTBoss = false;
+
 	//>>>>>>>>>>>>>>>>>
 
 	// For Overdrive
@@ -1143,12 +1146,12 @@ public partial class Character : Actor, IDamagable {
 
 
 		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
-		&& player.currency > 4
+		&& player.currency > 4 && BurstCooldown == 0
 		) {
 			player.currency -= 5;
 			overDriveTimer = 30;
 			playSound("ching");
-
+			addDamageText("O V E R D R I V E", 0);
 		}
 
 		if (charState is WarpIn) {
@@ -1204,6 +1207,7 @@ public partial class Character : Actor, IDamagable {
 			pos.addxy(6 * xDir, 0f), xDir, player,
 			player.getNextActorNetId(), rpc: true);
 			playSound("crash", true);
+			addDamageText("B U R S T ! ! !", 1);
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -3035,10 +3039,10 @@ public partial class Character : Actor, IDamagable {
 			if (player.isAI && player.isSigma){
 			return Player.getModifiedHealth(60);
 			}
-			if (player.isAI && player.isZain){
-			return Player.getModifiedHealth(40);
+			if (player.isAI && !player.isSigma){
+			return Player.getModifiedHealth(50);
 			}
-			return Player.getModifiedHealth(28);
+			return Player.getModifiedHealth(20);
 		}
 
 		int bonus = 0;
@@ -3155,11 +3159,7 @@ public partial class Character : Actor, IDamagable {
 		}
 
 
-		// For Bonus Health
-		if (bonusHealth > 0) {
-			bonusHealth -= damage;
-			if (bonusHealth < 0) bonusHealth = 0;
-		} else {
+	
 
 			// For fractional damage shenanigans.
 			if (damage % 1 != 0) {
@@ -3250,7 +3250,13 @@ public partial class Character : Actor, IDamagable {
 			// If somehow the damage is negative.
 			// Heals are not really applied here.
 			if (damage < 0) { damage = 0; }
-			health -= damage;
+			// For Bonus Health
+			if (bonusHealth > 0) {
+			bonusHealth -= damage;
+			if (bonusHealth < 0) bonusHealth = 0;
+			} else {
+				health -= damage;
+			}
 			// Clamp to 0. We do not want to go into the negatives here.
 			if (health < 0) {
 				health = 0;
@@ -3392,7 +3398,7 @@ public partial class Character : Actor, IDamagable {
 					);
 				}
 			}
-		}
+		
 	}
 	
 	public void killPlayer(Player? killer, Player? assister, int? weaponIndex, int? projId) {
@@ -4121,6 +4127,7 @@ public partial class Character : Actor, IDamagable {
 		isStrikeChainState = boolData[4];
 		charState.immuneToWind = boolData[5];
 		charState.stunResistant = boolData[6];
+		OverDrive = boolData[7];
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);

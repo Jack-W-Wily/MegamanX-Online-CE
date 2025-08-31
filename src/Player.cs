@@ -1215,7 +1215,7 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (isAI && Global.level.levelData.name == "bossroom_1v1" && charNum >= 0 && isAI) {
+		} else if (isAI && Global.level.levelData.name == "stag_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.BossClaudio;
 			newChar = new BossStag(
 				this, pos.x, pos.y, xDir,
@@ -1362,10 +1362,22 @@ public partial class Player {
 		}
 		  // Vile WCUT
 		  else if (charNum == (int)CharIds.VAVA1) {
-			newChar = new VAVA1(
-				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
-			);
+			if (Options.main.SkinSlot == 1) {
+				newChar = new VavaGreySkin(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				);
+			} else if (Options.main.SkinSlot == 2) {
+				newChar = new VavaHatSkin(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				);	
+			} else {
+				newChar = new VAVA1(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				);
+			}
 		} else if (charNum == (int)CharIds.RockmanX) {
 
 			newChar = new RockmanX(

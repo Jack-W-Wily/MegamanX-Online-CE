@@ -305,10 +305,110 @@ public class DesmumeSpam : CharState {
 
 
 	private float specialPressTime;
-	
+
 	public float pushBackSpeed;
 
 	public DesmumeSpam(string transitionSprite = "")
+		: base("ultimate", "", "", transitionSprite) {
+		superArmor = true;
+	}
+
+	public Point AimPoint() {
+		Point vel = new Point(1, 0);
+
+
+		if (player.input.isHeld(Control.Shoot, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, -0.75f);
+			} else {
+				vel = new Point(1, -3);
+			}
+		}
+		if (player.input.isHeld(Control.Special1, player)) {
+			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+				vel = new Point(1, 0.75f);
+			} else {
+				vel = new Point(1, 3);
+			}
+		}
+
+		return vel;
+	}
+
+
+	float supercooldown = 0;
+
+	public override void update() {
+
+		var poi = character.getFirstPOI();
+		accuracy = 0;
+		Point prevPos = character.pos;
+		Point shootVel = AimPoint();
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
+		}
+
+		Helpers.decrementTime(ref supercooldown);
+
+		if (character.sprite.name.Contains("ultimate") && poi != null) {
+			if (Helpers.randomRange(0, 2) == 0 && supercooldown == 0) {
+				supercooldown = 0.3f;
+				character.playSound("boundBlaster");
+				new HighmaxHomingProj(
+				poi.Value, 1, character,
+				player, player.getNextActorNetId(), 0, rpc: true
+				);
+			}
+			if (Helpers.randomRange(0, 2) == 1 && supercooldown == 0) {
+				supercooldown = 0.3f;
+				character.playSound("buster4");
+				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			}
+			if (Helpers.randomRange(0, 2) == 2 && supercooldown == 0) {
+				supercooldown = 0.3f;
+				character.playSound("boundBlaster");
+				new HighmaxStunShot(
+						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
+						character.player, character.player.getNextActorNetId(), rpc: true
+					);
+			}
+		}
+
+
+		if (player.input.isPressed(Control.Jump, player)) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver() || stateTime > 10) {
+			if (character.grounded) {
+				character.changeState(new Idle());
+			} else {
+				character.changeState(new HighMaxHover());
+			}
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+public class DesmumeSpam2 : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public DesmumeSpam2(string transitionSprite = "")
 		: base("ultimate", "", "", transitionSprite)
 	{
 	superArmor = true;
@@ -353,29 +453,18 @@ public class DesmumeSpam : CharState {
 				Helpers.decrementTime(ref supercooldown);
 
 		if (character.sprite.name.Contains("ultimate") && poi != null) {
-			if (Helpers.randomRange(0, 2) == 0 && supercooldown == 0) {
-				supercooldown = 0.3f;
-				character.playSound("boundBlaster");
-				new HighmaxHomingProj(
-				poi.Value, 1, character,
-				player, player.getNextActorNetId(), 0, rpc: true
-				);
-			}
-			if (Helpers.randomRange(0, 2) == 1 && supercooldown == 0) {
+		
 				supercooldown = 0.3f;
 				character.playSound("buster4");
 				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-			}
-			if (Helpers.randomRange(0, 2) == 2 && supercooldown == 0) {
-				supercooldown = 0.3f;
-				character.playSound("boundBlaster");
-				new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);
-			}
+				new DesmumeProj1(new XBuster(), poi.Value, -character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			
 		}
 
+
+		if (player.input.isPressed(Control.Jump, player)) {
+			character.changeToIdleOrFall();
+		}
 		if (character.isAnimOver() || stateTime > 10) {
 			if (character.grounded) {
 				character.changeState(new Idle());
@@ -401,33 +490,32 @@ public class DesmumeState : CharState {
 
 
 	private float specialPressTime;
-	
+
 	public float pushBackSpeed;
 
 	public DesmumeState(string transitionSprite = "")
-		: base("desmume", "", "", transitionSprite)
-	{
+		: base("desmume", "", "", transitionSprite) {
 		superArmor = true;
 	}
 
-		public Point AimPoint() {
-	Point vel = new Point(1, 0);
-		
+	public Point AimPoint() {
+		Point vel = new Point(1, 0);
 
-	if (player.input.isHeld(Control.Shoot, player)) {
+
+		if (player.input.isHeld(Control.Shoot, player)) {
 			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 				vel = new Point(1, -0.75f);
 			} else {
 				vel = new Point(1, -3);
 			}
-		}  
-		if (player.input.isHeld(Control.Special1, player) ) {
+		}
+		if (player.input.isHeld(Control.Special1, player)) {
 			if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 				vel = new Point(1, 0.75f);
 			} else {
 				vel = new Point(1, 3);
 			}
-		} 
+		}
 
 		return vel;
 	}
@@ -437,20 +525,20 @@ public class DesmumeState : CharState {
 
 	public override void update() {
 
-		var poi = character.getFirstPOI();	
+		var poi = character.getFirstPOI();
 		accuracy = 0;
 		Point prevPos = character.pos;
-			Point shootVel = AimPoint();
+		Point shootVel = AimPoint();
 
 		if (character.pos.x != prevPos.x) {
 			accuracy = 5;
 		}
-		
-			if (character.sprite.name.Contains("desmume") && poi != null && !first){
-		Projectile proj;
-		first = true;
-		proj = new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-		}	
+
+		if (character.sprite.name.Contains("desmume") && poi != null && !first) {
+			Projectile proj;
+			first = true;
+			proj = new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+		}
 
 		if (character.isAnimOver()) {
 			if (character.grounded) {
@@ -469,7 +557,7 @@ public class DesmumeState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-    }
+	}
 }
 
 
@@ -636,6 +724,60 @@ public class HighMaxMegaPunch : CharState {
 
 
 
+public class HighMaxSuperPunch : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public HighMaxSuperPunch(string transitionSprite = "")
+		: base("foward_punch", "", "", transitionSprite)
+	{
+	
+	}
+
+	public override void update()
+	{
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
 public class HighMaxChargePunch : CharState {
 	float hoverTime;
 
@@ -709,6 +851,7 @@ public class HighMaxSuperPunchState : CharState {
 	public HighMaxSuperPunchState() : base("dash_punch", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;
+		invincible = true;
 	}
 
 	public override void update() {

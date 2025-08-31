@@ -49,6 +49,7 @@ public class BossStag : Character {
 		antlerSide = new Sprite("fstag_antler_side");
 		spriteFrameToSounds["fstag_run/2"] = "run";
 		spriteFrameToSounds["fstag_run/6"] = "run";
+		isWCUTBoss = true;
 	}
 
 
@@ -365,6 +366,11 @@ public class BossStag : Character {
 	}
 
 
+		public override float getJumpPower() {
+		float jumpModifier = 3;
+	
+		return jumpModifier + base.getJumpPower();
+	}
 
 
 
@@ -416,73 +422,78 @@ public class BossStag : Character {
 		if (isBoss) {
 			player.superAmmo = player.superMaxAmmo;
 		}
-
+		if (charState is Dash) {
+			changeState(new BFStagDashChargeState());
+		}
+		if (charState is AirDash) {
+			changeState(new BFStagWallDashState());
+		}
 		
 
 			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+					&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
-				if (isTargetClose ) {
-					switch (Vattack) {
-						case 1 when isFacingTarget:
-						changeState(new BFStagDashChargeState());					
-							break;
-						case 2 when isFacingTarget:
-							changeState(new BFStagGrabState(false));	
-							break;
-						case 3 when isFacingTarget:
-							changeState(new BFStagGrabState(true));	
-							break;
-						case 4 when isFacingTarget:
-							changeState(new BFStagDashState(0.1f));	
-							break;
-						case 5 when isFacingTarget:
-							changeState(new BFStagOrochinagi());	
-							break;
-						case 6 when isFacingTarget:
-							changeState(new BFStagShoot(false));	
-							break;
-						case 7 when isFacingTarget && bonusHealth == 0:
-							changeState(new BFStagOrochinagiCharge());	
-							addHealth(5);
-							break;
-					}
+			if (isTargetClose) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+						changeState(new BFStagDashChargeState());
+						break;
+					case 2 when isFacingTarget:
+						changeState(new BFStagGrabState(false));
+						break;
+					case 3 when isFacingTarget:
+						changeState(new BFStagGrabState(true));
+						break;
+					case 4 when isFacingTarget:
+						changeState(new BFStagDashState(0.1f));
+						break;
+					case 5 when isFacingTarget:
+						changeState(new BFStagOrochinagi());
+						break;
+					case 6 when isFacingTarget:
+						changeState(new BFStagShoot(false));
+						break;
+					case 7 when isFacingTarget && bonusHealth == 0:
+						changeState(new BFStagOrochinagiCharge());
+						addHealth(5);
+						break;
 				}
+			}
 
-				
 
-				if (!isTargetClose && isWishinRangedMoves) {
-					switch (Vattack) {
-						case 1 when isFacingTarget:
-						changeState(new BFStagGrabState(true));					
-							break;
-						case 2 when isFacingTarget:
-							changeState(new BFStagDashState(0.5f));	
-							break;
-						case 3 when isFacingTarget:
-							changeState(new BFStagDashChargeState());
-							break;
-						case 4 when isFacingTarget:
-							changeState(new BFStagShoot(false));	
-							break;
-						case 5 when isFacingTarget:
-							changeState(new Taunt());
-							addHealth(5);
-							break;
-						case 6 when isFacingTarget:
-							changeState(new BFStagShoot(true));	
-							break;
-						case 7 when isFacingTarget:
-							changeState(new BFStagDashState(0.8f));	
-							break;
-					}
+
+			if (!isTargetClose && isWishinRangedMoves) {
+				switch (Vattack) {
+					case 1 when isFacingTarget:
+						changeState(new BFStagGrabState(true));
+						break;
+					case 2 when isFacingTarget:
+						changeState(new BFStagDashState(0.5f));
+						break;
+					case 3 when isFacingTarget:
+						changeState(new BFStagDashChargeState());
+						break;
+					case 4 when isFacingTarget:
+						changeState(new BFStagShoot(false));
+						break;
+					case 5 when isFacingTarget:
+						changeState(new Taunt());
+						addHealth(5);
+						break;
+					case 6 when isFacingTarget:
+						changeState(new BFStagShoot(true));
+						break;
+					case 7 when isFacingTarget:
+						changeState(new BFStagDashState(0.8f));
+						break;
 				}
+			}
 			if (bonusHealth > 0) {
 				aiAttackCooldown = Helpers.randomRange(20, 60);
 			} else {
 				aiAttackCooldown = Helpers.randomRange(0, 30);
 			}
-			}
+		}
 
 			
 	

@@ -102,7 +102,7 @@ public class HighwayVAVA : Vile {
 		vileForm = 1;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
-
+		isWCUTBoss = true;
 	}
 
 

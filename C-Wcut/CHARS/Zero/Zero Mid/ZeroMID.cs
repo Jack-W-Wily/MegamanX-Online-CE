@@ -119,23 +119,7 @@ public class ZeroMID : Zero {
 		}
 		
 
-		if (!Global.level.is1v1()) {
-			if (isBlack) {
-				if (musicSource == null) {
-					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
-				}
-			} else if (isAwakened) {
-				if (musicSource == null) {
-					addMusicSource("XvsZeroV2_megasfc", getCenterPos(), true);
-				}
-			} else if (isViral && ownedByLocalPlayer) {
-				if (musicSource == null) {
-					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
-				}
-			} else {
-				destroyMusicSource();
-			}
-		}
+	
 
 
 		if (player.input.isHeld(Control.Down, player) && player.currency >= 5 &&
@@ -239,6 +223,8 @@ public class ZeroMID : Zero {
 		// Charge and release charge logic.
 		if (isAwakened) {
 			chargeLogic(shootDonuts);
+		} else if (isBlack) {
+			chargeLogic(shootb);
 		} else {
 			chargeLogic(shoot);
 		}
@@ -278,7 +264,7 @@ public class ZeroMID : Zero {
 	public float stockedTime;
 
 	public override void shoot(int chargeLevel) {
-		if (!isBlack) {
+	
 			if (gigaAttack.ammo <= 4 && freeBusterShots <= 0) { return; }
 			if (chargeLevel == 0) { return; }
 			int currencyUse = 0;
@@ -319,7 +305,11 @@ public class ZeroMID : Zero {
 					gigaAttack.ammo -= 4;
 				}
 			}
-		} else {
+		
+	}
+
+	public virtual void shootb(int chargeLevel) {
+		
 			
 			string shootSprite = getSprite(charState.shootSpriteEx);
 			if (!Global.sprites.ContainsKey(shootSprite)) {
@@ -368,7 +358,7 @@ public class ZeroMID : Zero {
 					return;
 				} else {
 					shootAnimTime = 0;
-					changeState(new BusterZeroDoubleBuster(false, 3), true);
+					changeState(new ZeroDoubleBuster(false, false), true);
 				}
 			} else if (chargeLevel >= 4) {
 				if (charState is WallSlide) {
@@ -379,13 +369,13 @@ public class ZeroMID : Zero {
 					return;
 				} else {
 					shootAnimTime = 0;
-					changeState(new BusterZeroDoubleBuster(false, 4), true);
+					changeState(new ZeroDoubleBuster(false, false), true);
 				}
 			}
 			if (chargeLevel >= 1) {
 				stopCharge();
 			}
-		}
+		
 	}
 
 	public void setShootAnim() {
@@ -1215,7 +1205,7 @@ public class ZeroMID : Zero {
 
 
 		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
-		if (visible && base.OverDrive) {
+		if (visible && OverDrive) {
 			// Position to draw the sprite to.
 			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
 			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;

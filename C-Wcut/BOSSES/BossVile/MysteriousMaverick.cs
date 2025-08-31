@@ -50,7 +50,7 @@ public class MysteriousMaverick : Vile {
 	public float CannonCD;
 
 	
-
+	
 	public VileCannonWC cannonWeapon;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
@@ -102,7 +102,7 @@ public class MysteriousMaverick : Vile {
 		vileForm = 1;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
-
+		isWCUTBoss = true;
 	}
 
 

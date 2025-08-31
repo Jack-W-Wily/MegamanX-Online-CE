@@ -290,7 +290,6 @@ public class VKamaeDash : CharState {
 	public VKamaeDash() : base("kamae_dash") {
 		immuneToWind = true;
 		enterSound = "GDash";
-		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {

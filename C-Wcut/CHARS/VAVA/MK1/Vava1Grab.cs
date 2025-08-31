@@ -49,7 +49,6 @@ public class Vava1GrabState : CharState {
 
 	public Vava1GrabState(Character? victim) : base("grab") {
 		this.victim = victim;
-		specialId = SpecialStateIds.AxlRoll;
 		grabTime = Vava1Grabbed.maxGrabTime;
 	}
 
@@ -189,7 +188,6 @@ public class Vava1GrabState : CharState {
 			victim.stunInvulnTime = 1;
 			victim?.releaseGrab(character, true);
 		}
-		specialId = SpecialStateIds.None;
 	}
 }
 
@@ -245,11 +243,7 @@ public class VileStomped : CharState {
 	public override void update() {
 		base.update();
 
-		grabTime -= player.mashValue();
-		if (grabTime <= 0) {
-			character.changeToIdleOrFall();
-		}
-
+		
 
 
 
