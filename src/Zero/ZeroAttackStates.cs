@@ -253,7 +253,7 @@ public class ZeroDoubleBuster : ZeroState {
 		if (!fired1 && character.frameIndex == 3) {
 			fired1 = true;
 				character.playSound("buster3X3", sendRpc: true);
-				new ZBuster4Proj(
+				new DZBuster3Proj(
 					character.getShootPos(),
 					character.getShootXDir(), zero, player, player.getNextActorNetId(), rpc: true
 				);
@@ -267,7 +267,7 @@ public class ZeroDoubleBuster : ZeroState {
 				//character.stockCharge(false);
 			}
 			character.playSound("buster3X3", sendRpc: true);
-			new ZBuster4Proj(
+			new DZBuster3Proj(
 				character.getShootPos(), character.getShootXDir(),
 				zero, player, player.getNextActorNetId(), rpc: true
 			);

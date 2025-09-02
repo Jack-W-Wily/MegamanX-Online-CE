@@ -15,7 +15,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 
-public class BossStag : Character {
+public class BossMammoth : Character {
 
 	
 
@@ -30,7 +30,7 @@ public class BossStag : Character {
 	public Sprite antler;
 	public Sprite antlerDown;
 	public Sprite antlerSide;
-	public BossStag(
+	public BossMammoth(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
@@ -44,10 +44,8 @@ public class BossStag : Character {
 
 		if (charState is WarpIn) player.superAmmo = 0;
 		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));
-		antler = new Sprite("fstag_antler");
-		antlerDown = new Sprite("fstag_antler_down");
-		antlerSide = new Sprite("fstag_antler_side");
-		spriteFrameToSounds["fstag_run/2"] = "run";
+	
+		spriteFrameToSounds["flamem_warp_in/2"] = "flamemOilBurn";
 		spriteFrameToSounds["fstag_run/6"] = "run";
 		isWCUTBoss = true;
 	}
@@ -82,19 +80,7 @@ public class BossStag : Character {
 	public override void update() {
 		base.update();
 
-		if (isUnderwater()) {
-			antler.visible = false;
-			antlerDown.visible = false;
-			antlerSide.visible = false;
-		} else {
-			antler.visible = true;
-			antlerDown.visible = true;
-			antlerSide.visible = true;
-		}
-
-		antler.update();
-		antlerDown.update();
-		antlerSide.update();
+		
 
 	
 		Helpers.decrementTime(ref overDriveTimer);
@@ -148,7 +134,7 @@ public class BossStag : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "fstag_" + spriteName;
+		return "flamem_" + spriteName;
 
 	}
 
@@ -179,11 +165,11 @@ public class BossStag : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"kr_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
-			"fstag_orochinagi_end"  => MeleeIds.DashSlash,
-			"fstag_punch" => MeleeIds.TrippleSlash,
-			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
-			"claudio_dash" => MeleeIds.Rising,
-			"fstag_dash_grab" => MeleeIds.Grab,
+			"flamem_dash" or "flamem_antiair" => MeleeIds.DashSlash,
+			"flamem_fall" => MeleeIds.TrippleSlash,
+			"flamem_inferno_release" => MeleeIds.TrippleBusterSlash,
+			"flamem_jump" => MeleeIds.Rising,
+			"flamem_grab" => MeleeIds.Grab,
 			"fstag_orochinagi_start"  or  "fstag_wall_dash" => MeleeIds.Rising,
 			
 
@@ -409,6 +395,18 @@ public class BossStag : Character {
 
 	public bool isBoss;
 
+
+	public override void landingCode(bool useSound = true) {
+		base.landingCode(useSound);
+		shakeCamera(sendRpc: true);
+		playSound("crash", sendRpc: true);
+		new FlameMStompShockwave(
+			pos, xDir,
+			this, player, player.getNextActorNetId(), rpc: true);
+			shakeCamera(sendRpc: true);
+
+	}
+
 	public override void aiAttack(Actor? target) {
 		int Vattack = Helpers.randomRange(1, 7);
 		Helpers.decrementFrames(ref AIHellBarrageCD);
@@ -422,73 +420,64 @@ public class BossStag : Character {
 		if (isBoss) {
 			player.superAmmo = player.superMaxAmmo;
 		}
-		if (charState is Dash) {
-			changeState(new BFStagDashChargeState());
-		}
-		if (charState is AirDash ) {
-			changeState(new BFStagWallDashState());
-		}
 
-			if (charState is WallKick) {
-			changeState(new BFStagWallDashState2());
-		}
-		
 
-			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-					&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+				&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
-			if (isTargetClose) {
+			if (grounded) {
 				switch (Vattack) {
 					case 1 when isFacingTarget:
-						changeState(new BFStagDashChargeState());
+						changeState(new BFlameMAntiAir());
 						break;
 					case 2 when isFacingTarget:
-						changeState(new BFStagGrabState(false));
+						changeState(new BFlameMGrabStart());
 						break;
 					case 3 when isFacingTarget:
-						changeState(new BFStagGrabState(true));
+						changeState(new BFlameMShootState());
 						break;
 					case 4 when isFacingTarget:
-						changeState(new BFStagDashState(0.1f));
+						changeState(new BFlameMOilState());
 						break;
 					case 5 when isFacingTarget:
-						changeState(new BFStagOrochinagi());
+						changeState(new BFlameMGrabStart());
+						slideVel = getDashSpeed() * 2;
 						break;
 					case 6 when isFacingTarget:
-						changeState(new BFStagShoot(false));
+						changeState(new BFlameMGrabStart());
+						slideVel = getDashSpeed();
 						break;
 					case 7 when isFacingTarget && bonusHealth == 0:
-						changeState(new BFStagOrochinagiCharge());
-						addHealth(5);
+						changeState(new BFlameMInfernoCharge());
+						
 						break;
 				}
 			}
 
 
 
-			if (!isTargetClose && isWishinRangedMoves) {
+			if (!grounded && isTargetClose) {
 				switch (Vattack) {
 					case 1 when isFacingTarget:
-						changeState(new BFStagGrabState(true));
+						changeState(new BFlameMJumpPressState());
 						break;
 					case 2 when isFacingTarget:
-						changeState(new BFStagDashState(0.5f));
+						changeState(new BFlameMJumpPressState());
 						break;
 					case 3 when isFacingTarget:
-						changeState(new BFStagDashChargeState());
+						changeState(new BFlameMJumpPressState());
 						break;
 					case 4 when isFacingTarget:
-						changeState(new BFStagShoot(false));
+						changeState(new BFlameMJumpPressState());
 						break;
 					case 5 when isFacingTarget:
-						changeState(new Taunt());
-						addHealth(5);
+						changeState(new BFlameMJumpPressState());
 						break;
 					case 6 when isFacingTarget:
-						changeState(new BFStagShoot(true));
+						changeState(new BFlameMJumpPressState());
 						break;
 					case 7 when isFacingTarget:
-						changeState(new BFStagDashState(0.8f));
+						changeState(new BFlameMJumpPressState());
 						break;
 				}
 			}
@@ -499,8 +488,8 @@ public class BossStag : Character {
 			}
 		}
 
-			
-	
+
+
 		base.aiAttack(target);
 	}
 

@@ -390,7 +390,7 @@ public class FlameMStompShockwave : Projectile {
 	public FlameMStompShockwave(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "flamem_proj_shockwave", netId, player	
+		pos, xDir, owner, "flamem_proj_shockwave", netId, player
 	) {
 		weapon = FlameMStompWeapon.netWeapon;
 		damager.hitCooldown = 60;
@@ -421,6 +421,22 @@ public class FlameMStompShockwave : Projectile {
 
 		if (isAnimOver()) {
 			destroySelf();
+		}
+	}
+
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is FlameMOilSpillProj oilSpill && oilSpill.ownedByLocalPlayer && frameIndex >= 4) {
+			playSound("flamemOilBurn", sendRpc: true);
+			new FlameMBigFireProj(
+				oilSpill.pos, oilSpill.xDir,
+				oilSpill.angle, this,
+				owner, owner.getNextActorNetId(), rpc: true
+			);
+			// oilSpill.time = 0;
+			oilSpill.destroySelf();
 		}
 	}
 }

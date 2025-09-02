@@ -250,7 +250,7 @@ public class BossGuard : CharState {
 	public override void update() {
 		base.update();
 
-		if (stateTime > 2 || stateTime == Helpers.randomRange(0, 2)) {
+		if (stateTime > 1 || stateTime == Helpers.randomRange(0, 2)) {
 			character.changeToIdleOrFall();
 		}
 	}

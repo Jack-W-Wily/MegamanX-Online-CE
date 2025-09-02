@@ -376,6 +376,7 @@ public class Damager {
 				if (zarzo.charState.canSpecialCancel) {
 					zarzo.charState.spcCancel = true;
 				}
+				zarzo.dashedInAir = 0;
 				if (owner.superAmmo != owner.superMaxAmmo) {
 					zarzo.gigaAttack.ammo += 1;
 				}
@@ -626,7 +627,7 @@ public class Damager {
 				if (flinchCooldown == 0) {
 					flinchCooldown = 60;
 				}
-				damage = MathF.Ceiling(damage * 1.5f);
+				//damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
 			else if (flinch > 0 && Global.customSettings?.ComboFlinch == false) {
@@ -839,6 +840,9 @@ public class Damager {
 			if (projId == (int)ProjIds.ForceGrabState) {
 				if (owner.character is BossStag) {
 					owner.character.changeState(new BFStagUppercutState(character));
+				}
+				if (owner.character is BossMammoth) {
+					owner.character.changeState(new BFlameMGrabFinisher());
 				}
 				character?.changeState(new ForceGrabbed(owner.character));
 			}

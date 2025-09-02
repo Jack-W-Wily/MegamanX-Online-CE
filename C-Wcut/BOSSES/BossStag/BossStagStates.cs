@@ -339,26 +339,52 @@ public class BFStagUppercutState : BossStagMState {
 
 public class BFStagWallDashState : BossStagMState {
 	public BFStagWallDashState() : base("wall_dash") {
-	enterSound = "jumpx2";
+		enterSound = "jumpx2";
+		exitOnLanding = true;
+		normalCtrl = true;
 	}
 
 	public override void update() {
 		base.update();
-		if (character.grounded) {
-			character.landingCode();
-			return;
-		}
+				
 
 		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
 			character.vel.y = 0;
 		}
 		character.move(new Point(character.xDir * 350, 0));
 	}
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		
+	}
 }
 
 
+public class BFStagWallDashState2 : BossStagMState {
+	public BFStagWallDashState2() : base("wall_dash") {
+		enterSound = "jumpx2";
+		exitOnLanding = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+				
+
+		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
+			character.vel.y = 0;
+		}
+		character.move(new Point(character.xDir * 450, -100));
+	}
 
 
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.xDir *= -1;
+	}
+}
 
 public class BFStagOrochinagiCharge : CharState {
 

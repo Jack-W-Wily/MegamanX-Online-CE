@@ -3035,11 +3035,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual int getMaxHealth() {
-		if (Global.level.is1v1()) {
-			if (player.isAI && player.isSigma){
+		if (Global.level.is1v1() && player.isAI) {
+			if ( player.isSigma){
 			return Player.getModifiedHealth(60);
 			}
-			if (player.isAI && !player.isSigma){
+			if ( !player.isSigma){
 			return Player.getModifiedHealth(50);
 			}
 			return Player.getModifiedHealth(20);
@@ -3250,17 +3250,20 @@ public partial class Character : Actor, IDamagable {
 			// If somehow the damage is negative.
 			// Heals are not really applied here.
 			if (damage < 0) { damage = 0; }
-			// For Bonus Health
-			if (bonusHealth > 0) {
+		// For Bonus Health
+		if (bonusHealth > 0) {
 			bonusHealth -= damage;
+			isNodamage = false;
 			if (bonusHealth < 0) bonusHealth = 0;
-			} else {
-				health -= damage;
+		} else {
+			health -= damage;
+			isNodamage = false; 
 			}
+			
 			// Clamp to 0. We do not want to go into the negatives here.
-			if (health < 0) {
-				health = 0;
-			}
+		if (health < 0) {
+			health = 0;
+		}
 
 		if (player.showTrainingDps && alive && originalDamage > 0) {
 			if (player.trainingDpsStartTime == 0) {
@@ -3400,7 +3403,8 @@ public partial class Character : Actor, IDamagable {
 			}
 		
 	}
-	
+
+	public bool isNodamage = true;
 	public void killPlayer(Player? killer, Player? assister, int? weaponIndex, int? projId) {
 		health = 0;
 		alive = false;
@@ -3420,9 +3424,9 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player && killer != Player.stagePlayer) {
 				killer.addKill();
-				if (this.player.isAI && this is BossStag && Global.level.is1v1() && Options.main.C7E1FBE2E00 != 888 && killer.character.bonusHealth >= maxHealth) {
-						killer.UnlockVAVA();
-					}
+				if (this.player.isAI && this is BossStag && Global.level.is1v1() && Options.main.C7E1FBE2E00 != 888 && killer.character.isNodamage) {
+					killer.UnlockVAVA();
+				}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
 						if (killer.alliance != player.alliance) {
@@ -3439,7 +3443,7 @@ public partial class Character : Actor, IDamagable {
 					otherPlayer.addKill();
 				}
 
-				
+
 			}
 
 			if (assister != null && assister != player && assister != Player.stagePlayer) {

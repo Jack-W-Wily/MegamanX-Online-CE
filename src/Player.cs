@@ -1221,7 +1221,16 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI) {
+		}else if (isAI && Global.level.levelData.name == "factory_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossClaudio;
+			newChar = new BossMammoth(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		}
+		
+		
+		 else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Zain;
 			newChar = new Zain(
 				this, pos.x, pos.y, xDir,
@@ -1371,7 +1380,7 @@ public partial class Player {
 				newChar = new VavaHatSkin(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
-				);	
+				);
 			} else {
 				newChar = new VAVA1(
 					this, pos.x, pos.y, xDir,

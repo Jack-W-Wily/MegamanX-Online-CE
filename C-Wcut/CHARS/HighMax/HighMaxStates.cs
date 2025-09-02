@@ -184,6 +184,7 @@ public class HighmaxShoot1 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
@@ -294,6 +295,7 @@ public class HighmaxShoot2 : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		character.stopMoving();
     }
 }
 
@@ -391,6 +393,7 @@ public class DesmumeSpam : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
@@ -452,7 +455,7 @@ public class DesmumeSpam2 : CharState {
 
 				Helpers.decrementTime(ref supercooldown);
 
-		if (character.sprite.name.Contains("ultimate") && poi != null) {
+		if (character.sprite.name.Contains("ultimate") && poi != null && supercooldown == 0) {
 		
 				supercooldown = 0.3f;
 				character.playSound("buster4");
@@ -477,6 +480,7 @@ public class DesmumeSpam2 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {
