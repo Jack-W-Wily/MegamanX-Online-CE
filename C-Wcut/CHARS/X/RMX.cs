@@ -25,7 +25,7 @@ public class RockmanX : MegamanX {
 	) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
 	) {
-
+		specialButtonMode = 0;	
 		charId = CharIds.RockmanX;
 
 		// For special conditions stuff
@@ -56,21 +56,7 @@ public class RockmanX : MegamanX {
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
 
-			if (player.superAmmo == player.superMaxAmmo && 
-		downPressedTimes >= 2 && player.input.isR2Pressed(player)) {
-					changeState(new GigaCrushCharState(), true);
-				downPressedTimes = 0;
-				player.superAmmo = 0;
-					return true;
-		}
 
-		if (player.input.checkShoryuken(player, xDir, Control.Shoot) &&
-		player.superAmmo == player.superMaxAmmo 
-		) {
-			changeState(new Shoryuken(isUnderwater()), true);
-				player.superAmmo = 0;
-		}
-		
 
 
 		if (player.input.isL2Held(player)
@@ -85,13 +71,13 @@ public class RockmanX : MegamanX {
 		
 				changeState(new WarpDodge(pos), true);
 			
-			DodgeCD = 0.43f;
+			DodgeCD = 1.2f;
 		}
 
 
 		
 		
-		if (player.input.isR2Pressed(player) &&
+		if (player.input.isBPressed(player) &&
 		player.input.isHeld(Control.Up, player) &&
 		player.input.isLeftOrRightHeld(player) &&
 		!player.input.checkShoryuken(player, xDir, Control.R2)
@@ -99,7 +85,7 @@ public class RockmanX : MegamanX {
 				changeState(new RMXDoubleKick(), true);
 		}
 
-		if (player.input.isR2Pressed(player) &&
+		if (player.input.isBPressed(player) &&
 		!player.input.isHeld(Control.Up, player) &&
 		!player.input.isLeftOrRightHeld(player) &&
 		!player.input.checkShoryuken(player, xDir, Control.R2)
@@ -107,7 +93,7 @@ public class RockmanX : MegamanX {
 			changeState(new RMXPunch(), true);
 		}
 
-		if (player.input.isR2Pressed(player) &&
+		if (player.input.isBPressed(player) &&
 		!player.input.isHeld(Control.Up, player) &&
 		player.input.isLeftOrRightHeld(player) &&
 		!player.input.checkShoryuken(player, xDir, Control.R2)
@@ -299,7 +285,7 @@ public class RockmanX : MegamanX {
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel
+				3, Global.defFlinch, 50, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shoryuken => new RMXGenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
@@ -330,25 +316,13 @@ public class RockmanX : MegamanX {
 
 
 	// Ammo section
-	public override void addAmmo(float amount) {
-		weaponHealAmount += amount;
-	}
-
-	public override void addPercentAmmo(float amount) {
-		weaponHealAmount += amount * 0.32f;
-	}
-
-	public override bool canAddAmmo() {
-		return (player.superAmmo < player.superMaxAmmo);
-	}
+	
 
 	public override bool canCharge() {
 		return !isInvulnerableAttack();
 	}
 
-	public override bool chargeButtonHeld() {
-		return player.input.isR2Held(player) || player.input.isAHeld(player)  || player.input.isBHeld(player);
-	}
+	
 
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {

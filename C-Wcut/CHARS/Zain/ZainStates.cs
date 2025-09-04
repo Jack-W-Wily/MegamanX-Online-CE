@@ -1259,6 +1259,7 @@ public class ZainGrabStabEnd : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		character.xDir *= -1;
     }
 }
 

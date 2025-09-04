@@ -920,7 +920,7 @@ public enum ProjIds {
 	DesmumeProj1,
 	DesmumeProj2,
 	DesmumeProj3,
-
+	DesmumeProj4,
 	// EnemyRPCs (PROJIDS)
 	HGM2RPC,
 

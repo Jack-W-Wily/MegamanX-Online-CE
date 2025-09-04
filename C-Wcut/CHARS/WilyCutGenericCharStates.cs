@@ -597,7 +597,7 @@ public class WcutGenericDodgeF : CharState {
 
 
 
-		if (stateTime > 0.2f) {
+		if (stateTime > 0.3f) {
 			character.changeToIdleOrFall();
 			return;
 		}

@@ -196,6 +196,7 @@ public class BoomerangProjCharged : Projectile {
 		shouldShieldBlock = false;
 		this.twin = twin;
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		canBeLocal = false;
 
 		if (lerpToPos != null) {

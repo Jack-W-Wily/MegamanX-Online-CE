@@ -9,6 +9,82 @@ namespace MMXOnline;
 
 
 
+public class ZainSpinningSlashCharge : CharState {
+	
+	public ZainSpinningSlashCharge() : base("spinslash", "") {
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		character.turnToInput(player.input, player);
+
+
+		if (!player.isAI && !player.input.isHeld(Control.Dash, player) && stateTime > 0.2f) {
+			character.changeState(new ZainSpinningSlash(stateTime));
+			}
+
+		if (player.isAI && stateTime > Helpers.randomRange(0.3f,2)) {
+			character.changeState(new ZainSpinningSlash(stateTime));
+		}
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+public class ZainSpinningSlash : CharState {
+	float trailTime;
+	float chargeTime;
+
+	Character? target;
+
+
+	public ZainSpinningSlash(float chargeTime) : base("spinslash", "") {
+		this.chargeTime = chargeTime;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+		character.move(new Point(character.xDir * 400, 0));
+
+		if (player.input.isPressed(Control.Dash, player) || stateTime > chargeTime) {
+			character.changeToIdleOrFall();
+		}
+		if (player.input.isPressed(Control.Jump, player) && character.grounded) {
+			character.vel.y = character.getJumpPower();
+		}
+		character.turnToInput(player.input, player);
+
+			CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			character.changeState(new Idle(), true);
+			
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
 public class ZainKokuStab : CharState {
 	bool fired;
 	bool grounded;

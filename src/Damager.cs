@@ -351,9 +351,9 @@ public class Damager {
 			if (character.ownedByLocalPlayer && character.isFlinchImmune()) {
 				flinch = 0;
 			}
-			if (owner.character is Zero { isViral: true }) {
-				character.addVirusTime(owner, damage);
-			}
+		//	if (owner.character is Zero { isViral: true }) {
+		///		character.addVirusTime(owner, damage);
+			//}
 
 			if (owner.character is Iris { OverDrive: true }) {
 				character.addVirusTime(owner, 0.2f);
@@ -724,6 +724,9 @@ public class Damager {
 					owner.character.changeState(new IrisGrabEX());
 					(owner.character as Iris).GrabVictim = character;
 				}
+				if (owner.character.charState is SigmaGrabStart) {
+					owner.character.changeState(new SigmaGrabEX());
+				}
 				if (owner.character.charState is ZeroGrabStart) {
 					owner.character.changeState(new ZeroGrabEX());
 				}	
@@ -783,10 +786,7 @@ public class Damager {
 					damage = 0;
 					flinch = 0;
 					character.playSound("m10ding");
-				if (character is MysteriousMaverick) {
-					character.changeState(new Taunt());
-					owner.character.changeState(new ZeroClang(character.xDir), true);
-				}
+			
 			}
 
 

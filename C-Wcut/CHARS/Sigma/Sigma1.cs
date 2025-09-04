@@ -129,6 +129,8 @@ public class Sigma1 : BaseSigma {
 				}
 				if (player.input.isHeld(Control.Down, player)) {
 					changeState(new SigmaSlashStateGround2WC(), true);
+				} else if (player.input.isHeld(Control.Up, player)) {
+					changeState(new SigmaGrabStart(), true);
 				} else {
 					changeState(new SigmaSlashStateGroundWC(), true);
 				}
@@ -195,6 +197,10 @@ public class Sigma1 : BaseSigma {
 		HellGaze,
 
 		Parry,
+
+		Grab,
+
+		Sigkick,
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
@@ -206,6 +212,8 @@ public class Sigma1 : BaseSigma {
 			"sigma1alt_block" => MeleeIds.Guard,
 			"sigma1alt_block_auto" => MeleeIds.AutoGuard,
 			"sigma1alt_ladder_attack" or "sigma1alt_wall_slide_attack" or "sigma1alt_attack" or "sigma1alt_attack_crouch" or "sigma1alt_attack_dash" => MeleeIds.GenericSlash,
+			"sigma1alt_grab_start" => MeleeIds.Grab,
+			"sigma1alt_grab" => MeleeIds.Sigkick,
 			_ => MeleeIds.None
 		});
 	}
@@ -238,6 +246,14 @@ public class Sigma1 : BaseSigma {
 			),
 			MeleeIds.Parry => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.HeavyPush, player, 6, 0, 5,
+				addToLevel: addToLevel
+			),
+			MeleeIds.Grab => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.ForceGrabState, player, 0, 0,
+				addToLevel: addToLevel
+			),
+			MeleeIds.Sigkick => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.BlockableLaunch, player, 4, 0,
 				addToLevel: addToLevel
 			),
 			_ => null

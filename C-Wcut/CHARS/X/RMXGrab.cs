@@ -115,10 +115,10 @@ public class RMXGrabState : CharState {
 		if (character.sprite.name.Contains("up") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				
+				var damager = new Damager(player, 2, 0, 0);
 			character.shakeCamera(sendRpc: true);
-				victim.shakeCamera(sendRpc: true);
-				victim.changeState(new PushedOver(victim.xDir), true);
+				victim?.shakeCamera(sendRpc: true);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
 			}
 		}
 
@@ -131,7 +131,6 @@ public class RMXGrabState : CharState {
 				new MechFrogStompShockwave(new FireWave(),
 				character.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
 				player.getNextActorNetId(), rpc: true);
-				victim.changeState(new LaunchedStateWeak(character), true);
 				victim.playSound("crash", true);
 			}
 		}
@@ -139,7 +138,8 @@ public class RMXGrabState : CharState {
 		if (character.sprite.name.Contains("foward") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				victim.changeState(new LaunchedFowardState(), true);
+				var damager = new Damager(player, 2, 0, 0);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
 			}
 		}
 

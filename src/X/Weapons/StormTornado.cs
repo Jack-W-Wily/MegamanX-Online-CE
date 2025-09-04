@@ -83,6 +83,7 @@ public class TornadoProj : Projectile {
 		spriteEnd = new Sprite("tornado_end");
 		vel.x = 0;
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		shouldShieldBlock = false;
 
 		if (rpc) {
@@ -186,6 +187,7 @@ public class TornadoProjCharged : Projectile {
 		}
 		//this.ground();
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		shouldShieldBlock = false;
 
 		if (rpc) {

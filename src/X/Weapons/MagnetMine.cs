@@ -194,6 +194,7 @@ public class MagnetMineProjCharged : Projectile {
 		vel = new Point(50 * xDir, 0);
 		maxTime = 4f;
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		shouldShieldBlock = false;
 		projId = (int)ProjIds.MagnetMineCharged;
 		startY = pos.y;

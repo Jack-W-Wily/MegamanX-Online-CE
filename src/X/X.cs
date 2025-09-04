@@ -364,7 +364,7 @@ public class MegamanX : Character {
 				//specialSaberCooldown = 60;
 				return true;
 			} else if (specialButtonMode == 0 && specialBuster.shootCooldown <= 0 && !isCharging()) {
-				shoot(0, specialBuster, false);
+				//shoot(0, specialBuster, false);
 				return true;
 			}
 		}
@@ -434,22 +434,24 @@ public class MegamanX : Character {
 		if (hasShoryukenEquipped()) {
 			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
-		if (inputCheckH && canUseFgMove() && grounded &&
-			player.hadoukenAmmo >= player.fgMoveMaxAmmo &&
-			hadoukenCooldownTime == 0
+		if (inputCheckH && canUseFgMove() && grounded && player.superAmmo >= player.superMaxAmmo
+		//	player.hadoukenAmmo >= player.fgMoveMaxAmmo &&
+		//	hadoukenCooldownTime == 0
 		) {
-			if (!player.hasAllItems()) player.currency -= 3;
-			player.hadoukenAmmo = 0;
+		//	if (!player.hasAllItems()) player.currency -= 3;
+		//	player.hadoukenAmmo = 0;
 			changeState(new Hadouken(), true);
+			player.superAmmo -= 32;
 			return true;
 		}
-		if (inputCheckS && canUseFgMove() && grounded &&
-			player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
-			shoryukenCooldownTime == 0
+		if (inputCheckS && canUseFgMove() && grounded && player.superAmmo >= player.superMaxAmmo
+		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
+		//	shoryukenCooldownTime == 0
 		) {
-			if (!player.hasAllItems()) player.currency -= 3;
-			player.shoryukenAmmo = 0;
+		//	if (!player.hasAllItems()) player.currency -= 3;
+		//	player.shoryukenAmmo = 0;
 			changeState(new Shoryuken(isUnderwater()), true);
+			player.superAmmo -= 32;
 			return true;
 		}
 		return false;
@@ -462,6 +464,7 @@ public class MegamanX : Character {
 
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
 		lastShootPressed = 100;
+		
 		// Check if can shoot.
 		if (!weapon.canShoot(chargeLevel, this) || weapon.shootCooldown > 0) {
 			return;
@@ -495,6 +498,7 @@ public class MegamanX : Character {
 			stopCharge();
 			return;
 		} else {
+			if (player.input.isBHeld(player)) weapon = new XBuster(); 
 			weapon.shoot(this, [chargeLevel, busterStock ? 1 : 0]);
 			if (isStockActive && stockedBusterLv > 0) {
 				stockedBusterLv--;

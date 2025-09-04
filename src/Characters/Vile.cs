@@ -32,6 +32,8 @@ public class Vile : Character {
 	public const float speedDevilRunSpeed = 110;
 	public const int frozenCastleCost = 3;
 	public const int speedDevilCost = 3;
+
+	
 	public bool lastFrameWeaponLeftHeld;
 	public bool lastFrameWeaponRightHeld;
 	public int cannonAimNum;

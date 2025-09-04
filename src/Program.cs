@@ -162,7 +162,7 @@ class Program {
 		loadText.Add("MMXOD " + Global.shortForkName + " " + Global.versionName + " " + Global.subVersionName);
 		loadText.Add("");
 		if (String.IsNullOrEmpty(Options.main.playerName)) {
-			loadText.Add("User: Dr. Cain");
+			loadText.Add("User: Dr. Wily");
 		} else {
 			loadText.Add("User: " + Options.main.playerName);
 		}

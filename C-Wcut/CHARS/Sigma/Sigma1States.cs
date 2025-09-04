@@ -453,18 +453,89 @@ public class SigDodge : CharState {
 
 
 
-public class VirusSlash1 : CharState {
-	bool fired = false;
-	
 
-	public VirusSlash1() : base("slash_1", "", "", "") {
-	superArmor = true;
+
+
+public class SigmaGrabStart : CharState {
+
+
+	private float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public SigmaGrabStart(string transitionSprite = "")
+		: base("grab_start", "", "", transitionSprite) {
+		airMove = true;
 	}
 
 	public override void update() {
-		base.update();
 
-		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+public class SigmaGrabEX : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public SigmaGrabEX(string transitionSprite = "")
+		: base("grab", "", "", transitionSprite)
+	{
+	airMove = true;
+	}
+
+	public override void update()
+	{
+	
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -472,12 +543,48 @@ public class VirusSlash1 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		
+		character.playSound("distortion_a", sendRpc: true);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
+		}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+
+public class VirusSlash1 : CharState {
+	bool fired = false;
+
+
+	public VirusSlash1() : base("slash_1", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
 		character.playSound("genmureix5", sendRpc: true);
 		float slideVel = character.xDir * character.getDashSpeed();
-		if (player.input.isHeld(Control.Dash,player)){
-			character.move(new Point( slideVel, 0));
-			
+		if (player.input.isHeld(Control.Dash, player)) {
+			character.move(new Point(slideVel, 0));
+
 		}
 	}
 
@@ -585,7 +692,7 @@ public class SigmaSkull : Projectile, IDamagable {
 	) : base(
 		pos, xDir, owner, "sigma_skull_proj", netId, player
 	) {
-		weapon = LaunchOctopus.netWeapon;
+		weapon = SigmaBallWeapon.netWeapon;
 		damager.damage = 1;
 		damager.flinch = Global.halfFlinch;
 		vel = new Point(150 * xDir, 0);
@@ -596,6 +703,7 @@ public class SigmaSkull : Projectile, IDamagable {
 		fadeOnAutoDestroy = true;
 		reflectableFBurner = true;
 		customAngleRendering = true;
+		destroyOnDMG = true;
 		this.angle = this.xDir == -1 ? 180 : 0;
 		if (angle != null) {
 			this.angle = angle.Value + (this.xDir == -1 ? 180 : 0);
@@ -606,7 +714,7 @@ public class SigmaSkull : Projectile, IDamagable {
 		canBeLocal = false;
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
-		return new TorpedoProjChargedOcto(
+		return new SigmaSkull(
 			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}

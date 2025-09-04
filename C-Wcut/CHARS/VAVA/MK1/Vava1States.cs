@@ -486,8 +486,7 @@ public class VileDashState : CharState {
 
 			CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
 		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
-			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
-			character.changeState(new VileDashStateEnd(), true);
+		character.changeState(new VileDashStateEnd(), true);
 			
 		}
 	}

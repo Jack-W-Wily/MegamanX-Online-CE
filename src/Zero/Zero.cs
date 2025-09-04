@@ -104,9 +104,11 @@ public class Zero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 
-		hyperMode = loadout.hyperMode;
+		hyperMode = 2;//loadout.hyperMode;
 		altCtrlsLength = 2;
 		altSoundId = AltSoundIds.X3;
+		
+		isBlack = player.blackZarzo;
 	}
 
 	// State overdrive.
@@ -139,14 +141,25 @@ public class Zero : Character {
 
 	public override void update() {
 		// Hypermode effects.
+
+		if (player.blackZarzo) {
+			isBlack = true;
+		} else {
+			isBlack = false;
+		}
+			if (charState is AirDash && isViral) {
+			changeState(new FSplasherState(), true);
+		}
+
+
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
 		// Hypermode music.
 		if (!Global.level.isHyper1v1() ) {
-			if (isBlack) {
+			if (isBlack && OverDrive) {
 				if (musicSource == null) {
-					addMusicSource("introStageZeroX5_megasfc", getCenterPos(), true);
+					addMusicSource("zero_X3", getCenterPos(), true);
 				}
 			} else if (isAwakened) {
 				if (musicSource == null) {

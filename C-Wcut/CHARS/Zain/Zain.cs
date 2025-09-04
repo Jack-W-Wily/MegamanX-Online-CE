@@ -53,6 +53,14 @@ public class Zain : Character {
 	}
 
 	public override bool attackCtrl() {
+
+		if ( canDash() &&
+			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
+			changeState(new ZainSpinningSlashCharge());	
+			return true;
+		}
+
+
 		if (player.input.isHeld(Control.Down, player) && sprite.name.Contains("spinslash")) {
 
 		}

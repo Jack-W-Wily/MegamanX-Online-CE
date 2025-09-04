@@ -203,7 +203,7 @@ public class RMXPunch : CharState {
 		}
 
 
-		if (player.input.isR2Pressed(player) && character.sprite.frameIndex >= 3) {
+		if (player.input.isBPressed(player) && character.sprite.frameIndex >= 3) {
 			character.changeState(new RMXPunch2(), true);
 		}
 

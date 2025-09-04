@@ -210,6 +210,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.Sigma3KaiserBeam, KaiserSigmaBeamProj.rpcInvoke },
 		{ (int)ProjIds.Sigma3KaiserMissile, KaiserSigmaMissileProj.rpcInvoke },
 		{ (int)ProjIds.Sigma3KaiserMine, KaiserSigmaMineProj.rpcInvoke },
+		{ (int)ProjIds.SigmaSkull, SigmaSkull.rpcInvoke },
 		
 		// Mavericks
 		{ (int)ProjIds.ChillPIceBlow, ShotgunIceProjCharged.rpcInvoke },

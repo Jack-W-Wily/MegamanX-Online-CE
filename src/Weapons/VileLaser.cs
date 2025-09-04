@@ -133,7 +133,7 @@ public class RisingSpecterState : CharState {
 
 		if (vile.tryUseVileAmmo(vile.laserWeapon.getAmmoUsage(0))) {
 			new RisingSpecterProj(
-				shootPos, vile.xDir, vile, vile.player, 
+				character.pos.addxy(10 * character.xDir, -35 ), vile.xDir, vile, vile.player, 
 				vile.player.getNextActorNetId(), rpc: true
 			);
 			vile.playSound("risingSpecter", sendRpc: true);
@@ -273,7 +273,7 @@ public class NecroBurstAttack : VileState {
 			Point shootPos = vile.setCannonAim(new Point(1, 0));
 			//character.vileAmmoRechargeCooldown = 3;
 			new NecroBurstProj(
-				shootPos, vile.xDir, vile, vile.player,
+				vile.pos.addxy(10 * vile.xDir, -35 ), vile.xDir, vile, vile.player,
 				vile.player.getNextActorNetId(), rpc: true
 			);
 			vile.playSound("necroburst", sendRpc: true);
@@ -410,7 +410,7 @@ public class StraightNightmareAttack : CharState {
 		if (vile.tryUseVileAmmo(vile.laserWeapon.getAmmoUsage(0))) {
 			Point shootPos = vile.setCannonAim(new Point(1, 0));
 			new StraightNightmareProj(
-				shootPos.addxy(-8 * vile.xDir, 0), vile.xDir, vile, 
+				vile.pos.addxy(10 * vile.xDir, -35 ).addxy(-8 * vile.xDir, 0), vile.xDir, vile, 
 				vile.player, vile.player.getNextActorNetId(), rpc: true
 			);
 		}

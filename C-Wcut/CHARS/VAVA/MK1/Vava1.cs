@@ -800,7 +800,7 @@ public class VAVA1 : Vile {
 
 	public override void increaseCharge() {
 		float factor = 1;
-		if (OverDrive) factor = 1.5f; // this means during OverDrive he gets a chargespeed buff
+		if (OverDrive) factor = 1.2f; // this means during OverDrive he gets a chargespeed buff
 		chargeTime += Global.speedMul * factor;
 	}
 
@@ -838,8 +838,13 @@ public class VAVA1 : Vile {
 			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel >= 4) {
-			cannonWeapon.type = (int)VileCannonType.FatBoy;
-			cannonWeapon.vavaShoot(0, this);
+				if (player.input.isHeld(Control.Down, player)) {
+				changeState(new NecroBurstAttack(grounded), true);
+			} else if (player.input.isHeld(Control.Up, player)) {
+				changeState(new RisingSpecterState(grounded), true);
+			} else if (player.input.isLeftOrRightHeld(player)) {
+				changeState(new StraightNightmareAttack(grounded), true);
+			}
 			stopCharge();
 		}
 		if (chargeLevel >= 1) {
@@ -1150,7 +1155,7 @@ public class VAVA1 : Vile {
 
 
 		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
-		if (visible && phase2) {
+		if (visible && (OverDrive || phase2) ) {
 			// Position to draw the sprite to.
 			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
 			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;

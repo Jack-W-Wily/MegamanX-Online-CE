@@ -166,6 +166,7 @@ public class FireWaveProjCharged : Projectile {
 		frameSpeed = 0;
 		this.parentTime = parentTime;
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		shouldShieldBlock = false;
 		this.timesReversed = timesReversed;
 		new Anim(this.pos.clone(), "fire_wave_charge_flash", 1, null, true);

@@ -381,6 +381,10 @@ public partial class Player {
 	public bool frozenCastle;
 	public bool speedDevil;
 
+
+	// For black zero
+	public bool blackZarzo;
+
 	public Disguise? disguise;
 	
 	// Not sure what this is useful for,

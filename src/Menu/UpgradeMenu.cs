@@ -113,6 +113,10 @@ public class UpgradeMenu : IMainMenu {
 				Menu.change(new SelectVileArmorMenu(prevMenu));
 				onUpgradeMenu = false;
 				return;
+			} else if (mainPlayer.isZMID) {
+				Menu.change(new UpgradeZeroMenu(prevMenu));
+				onUpgradeMenu = false;
+				return;
 			}
 		}
 

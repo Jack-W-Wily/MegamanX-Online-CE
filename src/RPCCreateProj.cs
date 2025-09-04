@@ -831,6 +831,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.DesmumeProj3:
 				proj = new DesmumeProj3(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.DesmumeProj4:
+				proj = new DesmumeProj4(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				break;
 
 			//case (int)ProjIds.HexaInvolute:
 			//	proj = new HexaInvoluteProj(, pos, xDir, player, netProjByte);

@@ -918,6 +918,14 @@ public partial class Character : Actor, IDamagable {
 		if (ai != null) {
 			ai.preUpdate();
 		}
+
+
+
+		player.hadoukenAmmo += Global.speedMul;
+		if (player.hadoukenAmmo > player.fgMoveMaxAmmo) player.hadoukenAmmo = player.fgMoveMaxAmmo;
+		player.shoryukenAmmo += Global.speedMul;
+		if (player.shoryukenAmmo > player.fgMoveMaxAmmo) player.shoryukenAmmo = player.fgMoveMaxAmmo;
+
 	}
 
 	public override void onCollision(CollideData other) {
@@ -1145,14 +1153,47 @@ public partial class Character : Actor, IDamagable {
 	public override void update() {
 
 
-		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Up, player)
-		&& player.currency > 4 && BurstCooldown == 0
+		if (player.input.isPressed(Control.Taunt, player)
+		&& player.input.isHeld(Control.Up, player)
+		&& !isInDamageSprite()
+		&& player.shoryukenAmmo >= player.fgMoveMaxAmmo
 		) {
-			player.currency -= 5;
-			overDriveTimer = 30;
+			player.shoryukenAmmo = 0;
+			if (bonusHealth > 0) {
+				overDriveTimer = 15;
+			} 
+			if (health <= 10 && bonusHealth == 0) {
+				overDriveTimer = 9999;
+			} 
+			
+			if (health > 10 && bonusHealth == 0) {
+				overDriveTimer = 30;
+			}
+			
 			playSound("ching");
 			addDamageText("O V E R D R I V E", 0);
+			invulnTime = 1f;
 		}
+
+
+		// Wcut Burst System
+
+		if (isInDamageSprite() &&
+		player.input.isPressed(Control.Taunt, player) 
+		&& player.currency > 0 && BurstCooldown == 0) {
+			BurstCooldown = 5;
+			player.currency -= 1;
+			changeState(new Idle(), true);
+			invulnTime = 1.5f;
+			new MechFrogStompShockwave(new XBuster(),
+			pos.addxy(6 * xDir, 0f), xDir, player,
+			player.getNextActorNetId(), rpc: true);
+			playSound("crash", true);
+			addDamageText("B U R S T ! ! !", 1);
+		}
+		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
 
 		if (charState is WarpIn) {
 			SkinSlot = Options.main.SkinSlot;
@@ -1160,6 +1201,7 @@ public partial class Character : Actor, IDamagable {
 		// For Overdrive to work (WCUT)
 		if (overDriveTimer > 0) {
 			OverDrive = true;
+			player.shoryukenAmmo = 0;
 		} else {
 			OverDrive = false;
 		}
@@ -1191,27 +1233,7 @@ public partial class Character : Actor, IDamagable {
 			DamageScaling += Global.spf * 2;
 			DamageScalingCD = 0.5f;
 		}
-		// Wcut Burst System
-
-		if (isInDamageSprite() &&
-		(player.input.isHeld(Control.WeaponLeft, player)
-		&& player.input.isHeld(Control.WeaponRight, player)
-		|| player.input.isPressed(Control.L2, player))
-		&& player.input.isHeld(Control.Up, player)
-		&& player.currency > 0 && BurstCooldown == 0) {
-			BurstCooldown = 10;
-			player.currency -= 1;
-			changeState(new Idle(), true);
-			invulnTime = 1.5f;
-			new MechFrogStompShockwave(new XBuster(),
-			pos.addxy(6 * xDir, 0f), xDir, player,
-			player.getNextActorNetId(), rpc: true);
-			playSound("crash", true);
-			addDamageText("B U R S T ! ! !", 1);
-		}
-		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
+		
 
 		Helpers.decrementFrames(ref genericGrabCooldown);
 		Helpers.decrementFrames(ref genericParryCooldown);
@@ -2835,6 +2857,12 @@ public partial class Character : Actor, IDamagable {
 				iconsToDraw.Add(2);
 				hasDrawn = true;
 			}
+			if (BurstCooldown > 0) {
+				drawStatusBar(BurstCooldown, gst.getTimerFalloff(), 5, new Color(255, 231, 123));
+				deductLabelY(5);
+				iconsToDraw.Add(2);
+				hasDrawn = true;
+			}
 			if (hasDrawn) {
 				for (int i = 0; i < iconsToDraw.Count; i++) {
 					Global.sprites["hud_status_icon"].draw(
@@ -4048,6 +4076,7 @@ public partial class Character : Actor, IDamagable {
 			isStrikeChainState,
 			charState.immuneToWind,
 			charState.stunResistant,
+			OverDrive,
 		]);
 
 		customData.Add(netHP);

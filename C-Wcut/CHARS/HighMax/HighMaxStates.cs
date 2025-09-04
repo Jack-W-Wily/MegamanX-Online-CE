@@ -457,7 +457,7 @@ public class DesmumeSpam2 : CharState {
 
 		if (character.sprite.name.Contains("ultimate") && poi != null && supercooldown == 0) {
 		
-				supercooldown = 0.3f;
+				supercooldown = 0.6f;
 				character.playSound("buster4");
 				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 				new DesmumeProj1(new XBuster(), poi.Value, -character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
@@ -796,7 +796,7 @@ public class HighMaxChargePunch : CharState {
 
 	public override void update() {
 		base.update();
-
+		character.turnToInput(player.input, player);
 		accuracy = 0;
 		Point prevPos = character.pos;
 
@@ -1034,11 +1034,14 @@ public class DesmumeProj2 : Projectile {
 
 	public override void update() {
 		base.update();
-	
 
+		if (ownedByLocalPlayer && owner.input.isPressed(Control.Special1, owner) && owner.input.isHeld(Control.Down, owner)) {
+			new DesmumeProj4(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
+			destroySelf();
+		}
 		var hit = Global.level.checkCollisionActorOnce(this, vel.x * Global.spf, 0, null);
 		if (hit?.gameObject is Wall && hit?.hitData?.normal != null && !(hit.hitData.normal.Value.isAngled()) 
-		|| owner.input.isPressed(Control.Special1, owner)) {
+		|| owner.input.isPressed(Control.Special1, owner) && owner.input.isHeld(Control.Up, owner)) {
 			if (ownedByLocalPlayer) {
 				new DesmumeProj3(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
 			}
@@ -1054,6 +1057,40 @@ public class DesmumeProj3 : Projectile {
 		maxTime = 1f;
 		projId = (int)ProjIds.DesmumeProj3;
 		vel = new Point(0, -200);
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+		if (isUnderwater()) {
+			destroySelf(disableRpc: true);
+		}
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (damagable is Character chr) {
+			float modifier = 1;
+			if (chr.isUnderwater()) modifier = 2;
+			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+			chr.move(new Point(xMoveVel * 50 * modifier, -300));
+		}
+	}
+
+}
+
+
+
+public class DesmumeProj4 : Projectile {
+	public DesmumeProj4(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
+		base(weapon, pos, xDir, 0, 2, player, "highmax_punch_proj", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		maxTime = 1f;
+		projId = (int)ProjIds.DesmumeProj4;
+		vel = new Point(0, 200);
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		if (rpc) {

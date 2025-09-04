@@ -4,6 +4,8 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public class ZeroMID : Zero {
+
+	public const int BlackZeroCost = 10;
 	// Hypermode stuff.
 	public bool isViral;
 	public int awakenedPhase;
@@ -77,7 +79,7 @@ public class ZeroMID : Zero {
 	) {
 		charId = CharIds.ZeroMID;
 		// Loadout stuff.
-		
+		isBlack = player.blackZarzo;
 		groundSpecial = new RaijingekiWeapon();
 		airSpecial = KuuenzanWeapon.getWeaponFromIndex(0);
 		uppercutA = RyuenjinWeapon.getWeaponFromIndex(2);
@@ -88,7 +90,7 @@ public class ZeroMID : Zero {
 		gigaAttackSelected =0;
 		gigaAttack = new RakuhouhaWeapon();
 		
-		hyperMode = 0;
+		hyperMode = 2;
 		
 		altCtrlsLength = 2;
 		altSoundId = AltSoundIds.X3;
@@ -117,13 +119,17 @@ public class ZeroMID : Zero {
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
-		
+	
+
+		if (player.blackZarzo) {
+			hyperProgress = 0;
+		}
 
 	
 
 
 		if (player.input.isHeld(Control.Down, player) && player.currency >= 5 &&
-		player.input.isPressed(Control.Taunt, player)) {
+		player.input.isPressed(Control.Taunt, player) && !player.blackZarzo) {
 			awakenedPhase = 1;
 			hyperModeTimer = 999;
 			player.currency -= 5;
@@ -255,7 +261,7 @@ public class ZeroMID : Zero {
 	}
 
 	public override bool chargeButtonHeld() {
-		return player.input.isAHeld(player);
+		return player.input.isAHeld(player) || player.input.isBHeld(player) || player.input.isR2Held(player);
 	}
 
 	
@@ -633,7 +639,11 @@ public class ZeroMID : Zero {
 		}
 		if (yDir == 1 && specialPressed && downPressedTimes <= 2) {
 			if (yDir == 1 && specialPressed && gigaAttack.ammo >= 8) {
-				changeState(new MessenkouState(new Messenkou()), true);
+				if (isAwakened) {
+					changeState(new ShinMessenkouState(new ShinMessenkou()), true);
+				} else {
+					changeState(new MessenkouState(new Messenkou()), true);
+				}
 				gigaAttack.ammo -= 8;
 			}
 			

@@ -95,6 +95,7 @@ public class TornadoFangProj : Projectile {
 		exhaust = new Anim(pos, "tunnelfang_exhaust", xDir, null, false);
 		exhaust.setzIndex(zIndex - 100);
 		destroyOnHit = false;
+		destroyOnDMG = true;
 		this.type = type;
 		if (type != 0) {
 			vel.x = 0;

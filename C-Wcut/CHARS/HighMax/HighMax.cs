@@ -300,13 +300,13 @@ public class HighMax : Character {
 			);
 		}
 		if (sprite.name.Contains("idle_punch")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 20, isZSaberClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.MechFrogGroundPound, player, 3f, 20, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("land")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("crouch_punch")) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.UPPunch, player, 3f, 20, isZSaberClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.UPPunch, player, 2f, 25, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("slam_grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 3f, 30, isZSaberClang: true, addToLevel: true);

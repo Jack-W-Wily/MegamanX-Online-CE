@@ -70,7 +70,7 @@ public class SpinWheelProj : Projectile {
 		projId = (int)ProjIds.SpinWheel;
 		maxTimeProj = startMaxTime;
 		maxTime = startMaxTime;
-
+		destroyOnDMG = true;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
