@@ -102,7 +102,9 @@ public class MysteriousMaverick : Vile {
 		vileForm = 1;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
-		isWCUTBoss = true;
+		if (player.isAI) {
+			isWCUTBoss = true;
+		}
 	}
 
 
@@ -1333,10 +1335,6 @@ public class MysteriousMaverick : Vile {
 						case 7 when isFacingTarget && linkedRideArmor != null:
 							changeState(new VileDashState(0.5f));
 							linkedRideArmor.explode(true);
-							new NecroBurstProj(
-							linkedRideArmor.pos, xDir, this, player,
-							player.getNextActorNetId(), rpc: true
-								);
 							linkedRideArmor.playSound("necroburst", sendRpc: true);
 							new GigaCrushProj(
 							linkedRideArmor.pos, xDir, 

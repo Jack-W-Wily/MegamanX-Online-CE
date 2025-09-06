@@ -151,11 +151,13 @@ public class AxlWC : Character {
 			chargeEffect.update(getChargeLevel(), 5);
 		}
 	}
+
+	public float reoloadTime;
 	public override void update() {
 		bool wasGrounded = grounded;
 		base.update();
-	
 
+		Helpers.decrementTime(ref reoloadTime);
 
 		if (charState is Dash or AirDash) {
 			if (player.input.isHeld(Control.Up, player)) {
@@ -225,9 +227,9 @@ public class AxlWC : Character {
 				&& player.input.isPressed(Control.Jump, player)) {
 				changeState(new AxlFlashKick(), true);
 			}
-		//	if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
-		//		changeState(new EvasionBarrage(), true);
-		//	}
+			//	if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
+			//		changeState(new EvasionBarrage(), true);
+			//	}
 		}
 		// Weapon update.
 		foreach (AxlWeaponWC weapon in axlWeapons) {
@@ -245,12 +247,14 @@ public class AxlWC : Character {
 		}
 		//weaponSwapLogic();
 		player.changeWeaponControls();
-		if (player.input.isWeaponLeftOrRightPressed(player)){
+		if (player.input.isWeaponLeftOrRightPressed(player) && reoloadTime == 0) {
 			foreach (AxlWeaponWC weapon in axlWeapons) {
-			weapon.ammo = weapon.maxAmmo;
+				weapon.ammo = weapon.maxAmmo;
 			}
+			reoloadTime = 2;
 		}
 	}
+
 
 	public override void postUpdate() {
 		base.postUpdate();

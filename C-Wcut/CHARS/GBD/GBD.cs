@@ -71,7 +71,7 @@ public class GBD : Character {
 			return true;
 		}
 
-		if (specialPressed && player.input.isHeld(Control.Down, player)) {
+		if (specialPressed && player.input.isHeld(Control.Up, player)) {
 			changeSpriteFromName("kick", true);
 			return true;
 		}
@@ -88,13 +88,12 @@ public class GBD : Character {
 
 
 		if (specialPressed && CrouchPunchCooldown == 0 && !player.input.isHeld(Control.Down, player)) {
-			Point shootVel = getShootVel(true);
 			changeSpriteFromName("gun", true);
 			CrouchPunchCooldown = 0.5f;
 			playSound("mk2stunshot", sendRpc: true);
 			playSound("buster2", sendRpc: true);
 			new ZBuster2Proj(
-				getShootPos(), xDir, this, player, player.getNextActorNetId(), rpc: true
+				pos.addxy(20 * xDir, -30), xDir, this, player, player.getNextActorNetId(), rpc: true
 			);
 
 
@@ -106,6 +105,13 @@ public class GBD : Character {
 	}
 
 
+	public override float getRunSpeed() {
+		float runSpeed = 120;
+		if (OverDrive) { // this means during OverDrive he gets a speed buff
+			runSpeed *= 1.5f;
+		}
+		return runSpeed * getRunDebuffs();
+	}
 
 
 	public Point getShootVel(bool aimable) {
@@ -151,10 +157,22 @@ public class GBD : Character {
 		return vel;
 	}
 
+
+	public float trailTime;
+
 	public override void update() {
 		base.update();
 
-
+		if (OverDrive && vel.x > 0 * xDir){
+			Helpers.decrementTime(ref trailTime);
+			if (trailTime <= 0) {
+			trailTime = 0.04f;
+			new FStagTrailProj(
+			 	pos, xDir,
+				this ,player, player.getNextActorNetId(), rpc: true
+			);
+			}
+		}
 		if ((sprite.name.Contains("pipe") || sprite.name.Contains("gun")
 		|| sprite.name.Contains("kick") || sprite.name.Contains("grab")
 		) && isAnimOver()) {
@@ -172,7 +190,7 @@ public class GBD : Character {
 			changeState(new BlockWCUT());
 
 		}
-		
+
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
@@ -285,7 +303,7 @@ public class GBD : Character {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("kick")) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 4f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.ForceGrabState, player, 2f, 0, 5f, isZSaberClang: false, addToLevel: true);

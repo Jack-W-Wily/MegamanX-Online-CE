@@ -290,6 +290,7 @@ public class HighmaxShoot2 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		character.stopMoving();
 	}
 
 	public override void onExit(CharState newState) {

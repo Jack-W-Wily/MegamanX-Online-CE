@@ -1662,7 +1662,9 @@ public class RPCCommandGrabPlayer : RPC {
 				}
 			} else {
 				if (grabberChar.ownedByLocalPlayer) {
-					grabberChar.changeState(new VileMK2GrabState(victimChar));
+					grabberChar.changeState(new VAVA2GrabState(victimChar));
+	
+				
 				}
 			}
 		} else if (hookScenario == CommandGrabScenario.UPGrab) {

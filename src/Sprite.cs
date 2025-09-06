@@ -179,7 +179,7 @@ public class Sprite {
 		bool hyperBusterReady = false;
 		bool isUPX = false;
 		bool isUltX = false;
-		bool DrawVileHat = false;
+	
 		
 		Character? character = actor as Character;
 		if (character != null) {
@@ -200,7 +200,7 @@ public class Sprite {
 			}
 			isUPX = character is RagingChargeX;
 			isUltX = character is MegamanX { hasUltimateArmor: true };
-			DrawVileHat = character is VavaHatSkin ;
+	
 		}
 
 		if (name == "mmx_unpo_grab" || name == "mmx_unpo_grab2") zIndex = ZIndex.MainPlayer;
@@ -840,11 +840,11 @@ public class Sprite {
 		}
 
 		
-		if (animData.isVavaMk1SpriteBasics && DrawVileHat) {
+		if (animData.isVavaMk1SpriteBasics && Options.main.SkinSlot == 0) {
 			var upShaders = new List<ShaderWrapper>(shaders);
 		
 			DrawWrappers.DrawTexture(
-				Global.textures["VavaMK1Basics_AltCostume1"],
+				Global.textures["GBD_alt"],
 				currentFrame.rect.x1, currentFrame.rect.y1,
 				currentFrame.rect.w(), currentFrame.rect.h(),
 				x, y, zIndex,
@@ -1073,7 +1073,7 @@ public class AnimData {
 		}
 
 		// For Vile sprite skins
-		if (textureName == "VavaMK1Basics") {
+		if (textureName == "GBD") {
 			isVavaMk1SpriteBasics = true;
 		}
 

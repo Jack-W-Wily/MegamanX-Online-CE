@@ -133,11 +133,15 @@ public class HexaInvoluteProj : Projectile {
 			beamDest[i] = pos;
 		}
 
+
+		var rect = new Rect(0, 0, 10, 10);
+		globalCollider = new Collider(rect.getPoints(), true, this, false, false, 0, new Point(0, 0));
+
 		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
-	
+
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new HexaInvoluteProj(
 			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
@@ -208,6 +212,7 @@ public class HexaInvoluteProj : Projectile {
 		foreach (HexaInvolutePart part in particles) {
 			Point partPos = part.getPos();
 			float partSize = part.getRadius();
+
 			Global.sprites["vilemk5_super_part"].draw(
 				0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1
 			);
@@ -289,3 +294,267 @@ public class HexaInvoluteProj : Projectile {
 		}
 	}
 }
+
+
+
+
+public class VavaVOverdriveStart : VileState {
+	public HexaInvoluteProj2? proj;
+	public bool startGrounded;
+	public float moveTime;
+	public float ammoTime;
+	public bool shot;
+
+	public VavaVOverdriveStart() : base("super") {
+		superArmor = true;
+		immuneToWind = true;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (startGrounded && moveTime <= 16) {
+			character.moveXY(0, -2);
+			moveTime += character.speedMul;
+		}
+
+		if (!shot && character.frameIndex >= 2) {
+			shot = true;
+			proj = new HexaInvoluteProj2(
+				character.getCenterPos(),
+				character.xDir, character, player.getNextActorNetId(),
+				sendRpc: true
+			);
+		}
+
+		if (proj != null) {
+			vile.usedAmmoLastFrame = true;
+			Helpers.decrementTime(ref ammoTime);
+			if (ammoTime == 0) {
+				ammoTime = 0.125f;
+				vile.addAmmo(-1);
+			}
+		}
+
+		if ( stateFrames >= 120) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character.grounded) {
+			startGrounded = true;
+		}
+		character.stopMovingS();
+		vile.vileHoverTime = vile.vileMaxHoverTime;
+		vile.useGravity = false;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		vile.useGravity = true;
+	}
+}
+
+public class HexaInvoluteProj2 : Projectile {
+	public Anim? muzzle;
+	public int hitboxNum = 10;
+	public float radius = 50;
+	public SoundWrapper? sound;
+	public float soundCooldown;
+	public List<HexaInvolutePart> particles = [];
+	public float partCooldown;
+	public Point[] beamDest = new Point[6];
+
+	public HexaInvoluteProj2(
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
+	) : base(
+		pos, xDir, owner, "empty", netId, altPlayer
+	) {
+		damager.damage = 0.1f;
+		damager.hitCooldown = 9;
+		projId = (int)ProjIds.HexaInvolute2;
+		zIndex = ZIndex.Backwall;
+		setIndestructableProperties();
+		sprite.hitboxes = popullateHitboxes();
+		for (int i = 0; i < beamDest.Length; i++) {
+			beamDest[i] = pos;
+		}
+
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new HexaInvoluteProj2(
+			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (isRunByLocalPlayer()) {
+			foreach (var go in getCloseActors(MathInt.Ceiling(radius + 20))) {
+				var chr = go as Character;
+				bool isHurtSelf = chr?.player == damager.owner;
+				if (go is not Actor actor) continue;
+				if (go is not IDamagable damagable) continue;
+				if (!isHurtSelf && !damagable.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) continue;
+
+				float dist = actor.getCenterPos().distanceTo(pos);
+
+				float overrideDamage = 0.1f;
+				int overrideFlinch = 0;
+				damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: overrideDamage, overrideFlinch: overrideFlinch);
+			}
+		}
+		if (owningActor != null) {
+			changePos(owningActor.getCenterPos());
+		}
+
+		for (int i = particles.Count - 1; i >= 0; i--) {
+			particles[i].time += Global.spf;
+			if (particles[i].time > particles[i].maxTime) {
+				particles.RemoveAt(i);
+			}
+		}
+
+		if (partCooldown == 0) {
+			partCooldown = 2;
+		}
+		Helpers.decrementFrames(ref soundCooldown);
+		Helpers.decrementFrames(ref partCooldown);
+		if (soundCooldown == 0) {
+			sound = owner.character?.playSound("hexaInvolute");
+			soundCooldown = 126;
+		}
+
+		byteAngle += speedMul * 0.6f * xDir;
+		updateBeams();
+
+		if (!owner.character.OverDrive) {
+			destroySelf();
+		}
+	}
+
+	public void updateBeams() {
+		float drawAngle = angle;
+
+		for (int i = 0; i < beamDest.Length; i++) {
+			float offset = i * 60;
+			Point dest = pos.addxy(
+				Helpers.cosd(drawAngle + offset) * radius, Helpers.sind(drawAngle + offset) * radius
+			);
+			var hitPoint = Global.level.raycast(pos, dest, Helpers.wallTypeList);
+			if (hitPoint != null) {
+				dest = hitPoint.getHitPointSafe();
+			}
+			beamDest[i] = dest;
+			updateHitboxes(i, dest - pos);
+
+			if (partCooldown == 0) {
+				if (!Options.main.lowQualityParticles()) {
+					particles.Add(new HexaInvolutePart(dest));
+				}
+			}
+		}
+		if (partCooldown == 0) {
+			if (!Options.main.lowQualityParticles()) {
+				particles.Add(new HexaInvolutePart(pos));
+			}
+		}
+	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+		for (int i = 0; i < beamDest.Length; i++) {
+			drawLine(pos, beamDest[i]);
+		}
+		foreach (HexaInvolutePart part in particles) {
+			Point partPos = part.getPos();
+			float partSize = part.getRadius();
+			Global.sprites["vilemk5_super_part2"].draw(
+				0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1
+			);
+		}
+	}
+
+	public Collider[] popullateHitboxes() {
+		Collider[] retCol = new Collider[(6 * hitboxNum) + 1];
+		for (int i = 0; i < retCol.Length; i++) {
+			retCol[i] = new Collider(
+				new Rect(0f, 0f, 16, 16).getPoints(),
+				false, this, false, false,
+				HitboxFlag.Hitbox, Point.zero
+			);
+		}
+		return retCol;
+	}
+
+
+	public void updateHitboxes(int num, Point dest) {
+		int start = num * hitboxNum;
+		int end = start + hitboxNum;
+		float xOff = dest.x / hitboxNum;
+		float yOff = dest.y / hitboxNum;
+		int j = 1;
+		for (int i = start; i < end; i++) {
+			Collider hitbox = sprite.hitboxes[i];
+			hitbox.offset.x = xOff * j;
+			hitbox.offset.y = yOff * j;
+			j++;
+		}
+	}
+
+	public List<Point> getNodes(Point origin, Point dest) {
+		List<Point> nodes = [];
+		int nodeCount = 8;
+		Point dirTo = origin.directionTo(dest).normalize();
+		float len = origin.distanceTo(dest);
+		Point lastNode = origin;
+		for (int i = 0; i <= nodeCount; i++) {
+			Point node = i == 0 ? lastNode : lastNode.add(dirTo.times(len / 8));
+			Point randNode = node;
+			if (i > 0 && i < nodeCount) randNode = node.addRand(10, 10);
+			nodes.Add(randNode);
+			lastNode = node;
+		}
+		return nodes;
+	}
+
+	public void drawLine(Point origin, Point dest) {
+		var	col1 = new Color(221, 78, 74);
+		var	col2 = new Color(255, 113, 61);
+		var	col3 = new Color(255, 245, 240);
+		float sin = MathF.Sin(Global.time * 30);
+		var nodes = getNodes(origin, dest);
+
+		for (int i = 1; i < nodes.Count; i++) {
+			Point startPos = nodes[i - 1];
+			Point endPos = nodes[i];
+			if (Options.main.lowQualityParticles()) {
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col3, 2 + sin, zIndex, true);
+			} else {
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col1, 4 + sin, zIndex, true);
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col2, 3 + sin, zIndex, true);
+				DrawWrappers.DrawLine(startPos.x, startPos.y, endPos.x, endPos.y, col3, 2 + sin, zIndex, true);
+			}
+		}
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		muzzle?.destroySelf();
+		if (sound != null && Global.sounds.Contains(sound)) {
+			sound.sound.Stop();
+			sound.sound.Dispose();
+			Global.sounds.Remove(sound);
+			sound = null;
+		}
+	}
+}
+

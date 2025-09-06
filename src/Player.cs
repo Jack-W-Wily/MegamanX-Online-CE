@@ -949,6 +949,13 @@ public partial class Player {
 				}
 			}
 
+				if (canReviveVile2()) {
+			if (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive) {
+					reviveVile2();
+				} 
+			}
+
+
 			if (canReviveVile()) {
 				if (input.isPressed(Control.Special1, this) || Global.shouldAiAutoRevive) {
 					reviveVile(false);
@@ -1376,12 +1383,12 @@ public partial class Player {
 		  // Vile WCUT
 		  else if (charNum == (int)CharIds.VAVA1) {
 			if (Options.main.SkinSlot == 1) {
-				newChar = new VavaGreySkin(
+				newChar = new VAVA2(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			} else if (Options.main.SkinSlot == 2) {
-				newChar = new VavaHatSkin(
+				newChar = new VAVAV(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
@@ -2520,6 +2527,21 @@ public partial class Player {
 		return 5;
 	}
 
+
+		public bool canReviveVile2() {
+		
+		if (character is not VAVA2 vile ){//|| vile.summonedGoliath) {
+			return false;
+		}
+			if (character?.charState is not Die) {
+			return false;
+		}
+		return true;
+	}
+
+
+
+
 	public bool canReviveVile() {
 		if (Global.level.isElimination() ||
 			!lastDeathCanRevive ||
@@ -2619,6 +2641,23 @@ public partial class Player {
 			currency >= reviveXCost
 		);
 	}
+
+
+	
+	public void reviveVile2() {
+
+		respawnTime = 0;
+
+		character.visible = true;
+		if (explodeDieEffect != null) {
+			explodeDieEffect.destroySelf();
+			explodeDieEffect = null;
+		}
+	
+		character.changeState(new VileResistDeath(), true);
+		
+	}
+
 
 	public void reviveVile(bool toMK5) {
 		currency -= reviveVileCost;

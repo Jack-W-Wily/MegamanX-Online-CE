@@ -1504,7 +1504,7 @@ public partial class Actor : GameObject {
 				Zero => "zero",
 				PunchyZero => "pzero",
 				BusterZero => "dzero",
-				Vile or VAVA1 => "vile",
+				Vile or VAVA1 or VAVA2 or VAVAV => "vile",
 				Dynamo => "dynamo",
 				Iris => "iris",
 				Zain => "zain",

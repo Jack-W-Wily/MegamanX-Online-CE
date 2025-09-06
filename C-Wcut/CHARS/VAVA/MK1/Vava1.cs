@@ -99,6 +99,9 @@ public class VAVA1 : Vile {
 		};
 		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+		spriteFrameToSounds["vile_run/4"] = "vileWalk";
+		spriteFrameToSounds["vile_run/8"] = "vileWalk";
+		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
 
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
@@ -156,9 +159,9 @@ public class VAVA1 : Vile {
 
 
 		public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 16){
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32){
 			changeState(new VavaBurensen1(), true);	
-			player.superAmmo -= 16;
+			player.superAmmo = 0;
 			playSound("chingX4");
 		}
 		return !sprite.name.Contains("hurt") ||
@@ -213,9 +216,12 @@ public class VAVA1 : Vile {
 	}
 
 	public override bool attackCtrl() {
+		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 
-			SpecialMoves();
-		
+		SpecialMoves();
+		if (WeaponRightHeld) {
+			vulcanWeapon.vileShoot(0, this);
+		}
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
 		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
 		&& charState is not VAVAKamae) {
@@ -226,13 +232,13 @@ public class VAVA1 : Vile {
 						changeState(new InfinityGigAttack(), true);
 						}			
 					}
-					if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
+					 else if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
 						if (player.vileAmmo >= 14) {
 						changeState(new SpoiledBratPunch(), true);
 						}
 					}
 					
-					if (player.input.isLeftOrRightHeld(player)) {
+				 	else if (player.input.isLeftOrRightHeld(player)) {
 						if (!player.input.isHeld(Control.Down, player)) {
 							if (player.vileAmmo >= 8) {
 								changeState(new GoGetterRightAttack(), true);
@@ -267,7 +273,7 @@ public class VAVA1 : Vile {
 				if (player.input.isHeld(Control.Up, player)) {
 					changeState(new WildHorseKickState(), true);
 				} else if (player.input.isHeld(Control.Down, player)) {
-					
+					changeState(new BumptyBoomGranadeLaunch(), true);
 				} else {
 					if (player.input.isLeftOrRightHeld(player)) {
 					} else {
@@ -283,7 +289,11 @@ public class VAVA1 : Vile {
 					if (player.vileAmmo > 10 && charState is not GreenEyedLampState) {
 						if (player.input.isHeld(Control.Up, player)) {
 							if (player.vileAmmo > 15){
-							changeState(new PeaceOutRollerAttack());
+								if (!player.input.isL2Held(player)) {
+									changeState(new PeaceOutRollerAttack());
+								} else {
+									changeState(new AirSplashHitGranadeLaunch(), true);	
+								}
 							player.vileAmmo -= 15;
 							}
 						} else {
@@ -929,7 +939,7 @@ public class VAVA1 : Vile {
 	}
 
 	public bool isVileMK5Linked() {
-		return isVileMK5 && linkedRideArmor?.character == this;
+		return false;
 	}
 
 	public bool canVileHover() {

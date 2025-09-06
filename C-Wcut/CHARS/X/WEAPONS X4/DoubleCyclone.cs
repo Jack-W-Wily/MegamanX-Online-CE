@@ -81,21 +81,7 @@ public class DoubleCycloneProj : Projectile {
 		maxTime = 1f;
 		projId = (int)ProjIds.DoubleCyclone;
 		destroyOnHit = false;
-		//fadeSprite = "explosion";
-		//fadeSound = "explosion";
-		/*try {
-			spinSound = new Sound(Global.soundBuffers["spinningBlade"].soundBuffer);
-			spinSound.Volume = 50f;
-		} catch {
-			// GM19:
-			// Sometimes code above throws for some users with
-			// "External component has thrown an exception." error,
-			// could investigate more on why
-			// Gacel Notes:
-			// WTF GM19?
-			// You know this is because you use it at object creation.
-			// I'm moving this to on onStart().
-		}*/
+		destroyOnDMG = true;
 		vel.y = (type == 0 ? -37 : 37);
 		if (type == 0) {
 			yScale = -1;

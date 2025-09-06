@@ -102,6 +102,7 @@ public class CharSelection {
 		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		new CharSelection("Axl", (int)CharIds.AxlWC, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
+	//	new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
 		new CharSelection("Iris", (int)CharIds.Iris, 1, 0, "smenu_iris", 0){offset = new Point(0, 20)},
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, 1, 0, "smenu_dynamo", 0){offset = new Point(0, 20)},

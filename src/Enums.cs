@@ -796,6 +796,19 @@ public enum ProjIds {
 	RagingDemon,
 	GizmoGrab,
 
+	VileGrab,
+	HexaInvolute2,
+	NapalmGrenade,
+
+	VAVA2GRAB,
+	VileStomp2,
+	VileStomp,
+	VileSuperKick,
+
+	VileAirRaidStart,
+	VileAirRaidPlusKnock,
+	BanzaiBeetleProj,
+
 	// Zain 
 
 	ZainSaberProj,

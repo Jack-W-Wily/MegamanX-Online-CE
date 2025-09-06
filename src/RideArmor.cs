@@ -292,7 +292,6 @@ public class RideArmor : Actor, IDamagable {
 		if (!isUnderwater()) {
 			isSwimming = false;
 		}
-
 		if (selfDestructTime > 0) {
 			int flashFrequency = 30;
 			if (selfDestructTime < 3) flashFrequency = 60;
@@ -308,12 +307,20 @@ public class RideArmor : Actor, IDamagable {
 
 			selfDestructTime += Global.spf;
 			if (selfDestructTime >= maxSelfDestructTime) {
-				explode();
+				explode(true);
 				return;
 			}
 		}
 
 		if (raNum == 2 && isUnderwater() && character != null && character.isUnderwater() && selfDestructTime == 0) {
+			if (hawkElec == null) {
+				hawkElec = new Anim(pos.addxy(0, -20), "hawk_elec", 1, null, false);
+			}
+			selfDestructTime = Global.spf;
+		}
+
+		if (character != null && character is VAVA1 && selfDestructTime == 0
+		&& character.player.input.isHeld(Control.Down, player) && character.player.input.isHeld(Control.Taunt, player)) {
 			if (hawkElec == null) {
 				hawkElec = new Anim(pos.addxy(0, -20), "hawk_elec", 1, null, false);
 			}
@@ -647,7 +654,7 @@ public class RideArmor : Actor, IDamagable {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		if (sprite.name.Contains("attack")) {
-			if (raNum == 0) return (int)MeleeIds.Punch;
+			if (raNum == 0 || sprite.name.Contains("ridearmor")) return (int)MeleeIds.Punch;
 			if (raNum == 1) return (int)MeleeIds.KPunch;
 			if (raNum == 4) return (int)MeleeIds.GPunch;
 			if (raNum == 5) return (int)MeleeIds.DPunch;
@@ -663,7 +670,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 		bool canDamage = deltaPos.y > 150 * Global.spf;
 		if (hitbox.name.Contains("stomp") && canDamage) {
-			if (raNum == 0) return (int)MeleeIds.Stomp;
+			if (raNum == 0 || sprite.name.Contains("ridearmor")) return (int)MeleeIds.Stomp;
 			if (raNum == 1) return (int)MeleeIds.KStomp;
 			if (raNum == 2) return (int)MeleeIds.HStomp;
 			if (raNum == 3) return (int)MeleeIds.FStomp;
@@ -809,8 +816,11 @@ public class RideArmor : Actor, IDamagable {
 			Player? assister = null;
 			getKillerAndAssister(player, ref killer, ref assister, ref weaponIndex, ref assisterProjId, ref assisterWeaponId);
 			creditKill(killer, assister, weaponIndex);
-
-			explode();
+			if (isVava1Ride) {
+				explode(true);
+			} else {
+				explode();
+			}
 		}
 	}
 
@@ -828,6 +838,8 @@ public class RideArmor : Actor, IDamagable {
 			destroySelf();
 		}
 	}
+
+	public NecroBurstProj ncp;
 
 	public void explodeAnim(Point centerPos, bool shrapnel = false) {
 		if (!ownedByLocalPlayer) return;
@@ -851,6 +863,12 @@ public class RideArmor : Actor, IDamagable {
 						centerPos, piecesSpriteName, 1, hasRaColorShader, this,
 						netOwner, netOwner.getNextActorNetId(), rpc: true);
 					piece.vel = shrapnelVels[i];
+					if (ncp != null) {
+					ncp =	new NecroBurstProj(
+							centerPos, xDir, this, netOwner,
+							netOwner.getNextActorNetId(), rpc: true
+								);
+					}
 				}
 				piece.frameIndex = i;
 				piece.frameSpeed = 0;
@@ -1662,13 +1680,13 @@ public class RAFall : RideArmorState {
 
 		if (hovering) {
 			if (!rideArmor.sprite.name.Contains("hover") && !rideArmor.sprite.name.Contains("attack")) {
-				rideArmor.changeSprite("hawk_hover", true);
+				rideArmor.changeSprite("ridearmor_hover", true);
 			}
 
 			rideArmor.vel.y = getHoverVelY(-106);
 		} else {
 			if (rideArmor.raNum == 3 && rideArmor.sprite.name.Contains("hover")) {
-				rideArmor.changeSprite("hawk_fall", true);
+				rideArmor.changeSprite("ridearmor_fall", true);
 			}
 		}
 	}
@@ -1701,13 +1719,13 @@ public class RAFall : RideArmorState {
 
 		if (hovering) {
 			if (!rideArmor.sprite.name.Contains("swim") && !rideArmor.sprite.name.Contains("attack")) {
-				rideArmor.changeSprite("frog_swim", true);
+				rideArmor.changeSprite("ridearmor_swim", true);
 			}
 			rideArmor.vel.x = 120 * character.xDir;
 			rideArmor.vel.y = -106;
 		} else {
 			if (rideArmor.raNum == 3 && rideArmor.sprite.name.Contains("swim") && swimTime == 0) {
-				rideArmor.changeSprite("frog_fall", true);
+				rideArmor.changeSprite("ridearmor_fall", true);
 			}
 			rideArmor.vel.x = 0;
 		}
@@ -1745,7 +1763,7 @@ public class RAFall : RideArmorState {
 }
 
 public class RAGroundPoundStart : RideArmorState {
-	public RAGroundPoundStart(string transitionSprite = "") : base("frog_groundpound_start") {
+	public RAGroundPoundStart(string transitionSprite = "") : base("ridearmor_groundpound_start") {
 	}
 
 	public override void update() {
@@ -1771,7 +1789,7 @@ public class RAGroundPoundStart : RideArmorState {
 }
 
 public class RAGroundPound : RideArmorState {
-	public RAGroundPound(string transitionSprite = "") : base("frog_groundpound") {
+	public RAGroundPound(string transitionSprite = "") : base("ridearmor_groundpound") {
 	}
 
 	public override void update() {
@@ -1790,7 +1808,7 @@ public class RAGroundPound : RideArmorState {
 }
 
 public class RAGroundPoundLand : RideArmorState {
-	public RAGroundPoundLand(string transitionSprite = "") : base("frog_groundpound_land") {
+	public RAGroundPoundLand(string transitionSprite = "") : base("ridearmor_groundpound_land") {
 		enterSound = "crash";
 	}
 

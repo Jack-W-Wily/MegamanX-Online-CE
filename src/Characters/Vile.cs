@@ -235,7 +235,8 @@ public class Vile : Character {
 	}
 	public override bool attackCtrl() {
 
-		if (this is not VAVA1 and not MysteriousMaverick) {
+		if (this is not VAVA1 and not MysteriousMaverick and not VAVA2
+		and not VAVAV) {
 			bool specialPressed = player.input.isPressed(Control.Special1, player);
 			bool shootHeld = player.input.isHeld(Control.Shoot, player);
 
@@ -879,8 +880,11 @@ public class Vile : Character {
 			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
 			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0 &&
 			this is not VAVA1
+			and not VAVA2
+			and not VAVAV
 			and not MysteriousMaverick
 			and not HighwayVAVA
+			
 			
 			
 			

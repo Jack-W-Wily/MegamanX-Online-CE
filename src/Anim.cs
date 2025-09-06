@@ -322,12 +322,29 @@ public class BubbleAnim : Anim {
 	}
 }
 
+
+
+public class DashDustAnim : Anim {
+	public DashDustAnim(Point pos, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
+		base(pos, "dust", 1, netId, false, sendRpc, ownedByLocalPlayer) {
+		vel.y = -100;
+	}
+
+	public override void update() {
+		base.update();
+		if (isAnimOver()) {
+			destroySelf();
+		}
+	}
+}
+
+
 public class ParasiteAnim : Anim {
 	float flashFrameTime;
 	float flashFramePeriod = 0.25f;
 	int flashFrameIndex;
 	Sprite secondAnim = new Sprite("parasitebomb_light");
-	
+
 	public ParasiteAnim(Point pos, string spriteName, ushort? netId = null, bool sendRpc = false, bool ownedByLocalPlayer = true) :
 		base(pos, spriteName, 1, netId, false, sendRpc, ownedByLocalPlayer) {
 	}

@@ -1148,6 +1148,10 @@ public partial class Character : Actor, IDamagable {
 
 	public float BurstCooldown;
 
+	public float GenericDodgeCD;
+
+	public float GenericParryCD;
+
 	public int SkinSlot = 0; 
 
 	public override void update() {
@@ -1169,7 +1173,9 @@ public partial class Character : Actor, IDamagable {
 			if (health > 10 && bonusHealth == 0) {
 				overDriveTimer = 30;
 			}
-			
+			if (this is VAVAV){
+				changeState(new VavaVOverdriveStart(), true);
+			}
 			playSound("ching");
 			addDamageText("O V E R D R I V E", 0);
 			invulnTime = 1f;
@@ -1211,6 +1217,8 @@ public partial class Character : Actor, IDamagable {
 
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref BurstCooldown);
+		Helpers.decrementTime(ref GenericDodgeCD);
+		Helpers.decrementTime(ref GenericParryCD);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 
 
@@ -3767,6 +3775,65 @@ public partial class Character : Actor, IDamagable {
 		parasiteDamager = null;
 	}
 
+
+	
+	// Banzai SECTION
+	public void addBanzai(Player attacker) {
+		if (!ownedByLocalPlayer) return;
+		if (charState.invincible || isInvulnerable()) return;
+		Damager damager = new Damager(attacker, 1, Global.superFlinch, 0);
+		parasiteTime = Global.spf;
+		parasiteDamager = damager;
+		parasiteAnim = new ParasiteAnim(getCenterPos(), "vileproj_banzai_2", player.getNextActorNetId(), true, true);
+	}
+
+	public void updateBanzai() {
+		if (parasiteTime <= 0) return;
+		slowdownTime = Math.Max(slowdownTime, 0.05f);
+
+		if (!(charState is BanzaiCarry) && parasiteTime > 1.5f) {
+			foreach (var otherPlayer in Global.level.players) {
+				if (otherPlayer.character == null) continue;
+				if (otherPlayer == player) continue;
+				if (otherPlayer == parasiteDamager?.owner) continue;
+				if (otherPlayer.character.isInvulnerable()) continue;
+				if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+				if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+				Character target = otherPlayer.character;
+				changeState(new BanzaiCarry(target, true));
+				break;
+			}
+		}
+
+		if (parasiteAnim != null) {
+			parasiteAnim.changePos(getParasitePos());
+		}
+
+		parasiteTime += Global.spf;
+	}
+
+
+	public void removeBanzai(bool ejected, bool carried) {
+		if (!ownedByLocalPlayer) return;
+		if (parasiteDamager == null) return;
+
+		parasiteAnim?.destroySelf();
+		if (ejected) {
+			new Anim(getCenterPos(), "vileproj_banzai_2", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer) {
+				vel = new Point(50 * xDir, -50),
+				useGravity = true
+			};
+		} else {
+			new Anim(getCenterPos(), "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, ownedByLocalPlayer);
+			playSound("explosion", sendRpc: true);
+			if (!carried) parasiteDamager.applyDamage(this, player.weapon is FrostShield, new VileMK2Grab(), this, (int)ProjIds.Tornado, overrideDamage: 1, overrideFlinch: Global.superFlinch);
+		}
+
+		parasiteTime = 0;
+		parasiteMashTime = 0;
+		parasiteDamager = null;
+	}
+
 	public void releaseGrab(Actor grabber, bool sendRpc = false) {
 		charState.releaseGrab();
 		if (!ownedByLocalPlayer) {
@@ -4076,7 +4143,6 @@ public partial class Character : Actor, IDamagable {
 			isStrikeChainState,
 			charState.immuneToWind,
 			charState.stunResistant,
-			OverDrive,
 		]);
 
 		customData.Add(netHP);
@@ -4124,6 +4190,7 @@ public partial class Character : Actor, IDamagable {
 			customData.Add((byte)MathF.Ceiling(vaccineTime * 30));
 			boolMask[6] = true;
 		}
+	
 		if (rideArmor?.netId != null && rideArmor.netId != 0 ||
 			rideChaser?.netId != null && rideChaser.netId != 0
 		) {
@@ -4134,6 +4201,7 @@ public partial class Character : Actor, IDamagable {
 			}
 			boolMask[7] = true;
 		}
+	  
 		// Add the final value of the bool mask.
 		customData[boolMaskPos] = Helpers.boolArrayToByte(boolMask);
 
@@ -4160,7 +4228,7 @@ public partial class Character : Actor, IDamagable {
 		isStrikeChainState = boolData[4];
 		charState.immuneToWind = boolData[5];
 		charState.stunResistant = boolData[6];
-		OverDrive = boolData[7];
+	
 
 		// Optional statuses.
 		bool[] boolMask = Helpers.byteToBoolArray(data[6]);

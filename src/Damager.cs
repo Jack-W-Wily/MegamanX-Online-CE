@@ -384,7 +384,7 @@ public class Damager {
 
 			if (owner.character is VAVA1 vava1 && vava1.health > 0) {
 				if (vava1.OverDrive) {
-					owner.character.addHealth(0.5f);
+					owner.character.addHealth(0.25f);
 				}
 				if (vava1.charState.canSpecialCancel) {
 					vava1.charState.spcCancel = true;
@@ -394,13 +394,32 @@ public class Damager {
 				}
 			}
 			
-			if (owner.character is Sigma1 sig1 && sig1.health > 0) {
+			if (owner.character is VAVA2 vava2 && vava2.health > 0) {
+				if (vava2.OverDrive) {
+					owner.character.addHealth(0.5f);
+				}
 			
+				if (owner.superAmmo != owner.superMaxAmmo){
+				owner.superAmmo += 1;
+				}
+			}
+
+			if (owner.character is VAVAV vavav && vavav.health > 0) {
+			
+				if (owner.superAmmo != owner.superMaxAmmo && projId !=(int)ProjIds.HexaInvolute
+				&& projId !=(int)ProjIds.HexaInvolute2
+				){
+				owner.superAmmo += 1;
+				}
+			}
+			
+			if (owner.character is Sigma1 sig1 && sig1.health > 0) {
+
 				if (sig1.charState.canSpecialCancel) {
 					sig1.charState.spcCancel = true;
 				}
-				if (owner.superAmmo != owner.superMaxAmmo && sig1.charState is not HellGaze){
-				owner.superAmmo += 1;
+				if (owner.superAmmo != owner.superMaxAmmo && sig1.charState is not HellGaze) {
+					owner.superAmmo += 1;
 				}
 			}
 
@@ -528,13 +547,13 @@ public class Damager {
 				case (int)ProjIds.MechFrogStompShockwave:
 				case (int)ProjIds.FlameMStompShockwave:
 				case (int)ProjIds.TBreakerProj:
-					if (character.grounded && character.ownedByLocalPlayer) {
+					//if (character.grounded && character.ownedByLocalPlayer) {
 						character.changeState(
 							new KnockedDown(
 								character.pos.x < damagingActor?.pos.x ? -1 : 1
 							), true
 						);
-					}
+				//	}
 					break;
 				case (int)ProjIds.MechFrogGroundPound:
 					if (!character.grounded) {
@@ -800,6 +819,84 @@ public class Damager {
 			}
 			
 			
+			if (owner.health > 0) {
+
+
+				// GBD stuff
+
+				if (projId == (int)ProjIds.GBDKick || projId == (int)ProjIds.SiceSlide) {
+
+					owner.character.isDashing = true;
+					owner.character.vel.y = -owner.character.getJumpPower();
+					owner.character.changeState(new WallKick(), true);
+				}
+				// ZeroFinal
+				if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart) {
+					owner.character.changeState(new ZeroFinalEnd(character), true);
+				}
+
+
+
+
+				// Hexa stuff
+				//	if (character.charState is HexaInvoluteState) {
+				//			character.addHealth(damage);	
+				//			victim.addDamageText("ABSORBED!", 1);		
+				//	}
+
+				if (projId == (int)ProjIds.HexaInvolute2 && owner.health > 0) {
+					owner.character.addHealth(0.1f);
+				}
+
+
+				// Vile stomp 
+				if (character.sprite.name.Contains("knocked_down")
+				 && projId == (int)ProjIds.VileStomp
+				 && !character.isStatusImmune()) {
+					owner.character.changeState(new VileStompState(character), true);
+					character.changeState(new VileStomped(owner.character), true);
+				}
+				if (projId == (int)ProjIds.VileStomp2
+				&& !character.isStatusImmune()) {
+					character.changeState(new VileStomped(owner.character), true);
+				}
+				// Vile Air Raid 
+				if (owner.isVile &&
+				(
+					projId == (int)ProjIds.VileAirRaidStart
+				|| projId == (int)ProjIds.VileAirRaidPlusKnock
+				)) {
+					owner.character.changeState(new VileAirRaid(character), true);
+				}
+
+
+				// ShunGokusatsu (Need to make a new Proj ID etc etc for this later)
+				if (owner.isDragoon &&
+				(
+					projId == (int)ProjIds.VileAirRaidStart
+				|| projId == (int)ProjIds.VileAirRaidPlusKnock
+				)) {
+					owner.character.changeState(new VileAirRaid(character), true);
+				}
+
+
+				// Axl Air Raid 
+				if (owner.ownedByLocalPlayer && owner.character is AxlWC &&
+					((ProjIds)projId) is ProjIds.VileAirRaidStart or ProjIds.VileAirRaidPlusKnock
+				) {
+					owner.character.changeState(new AxlAirRaid(character), true);
+				}
+				// Vile Blockable Grab
+				if (!character.sprite.name.Contains("block") &&
+				 projId == (int)ProjIds.VileGrab
+				 && !character.isStatusImmune()) {
+					character.changeState(new VileMK2Grabbed(owner.character), true);
+				}
+				if (owner.character.charState is VileAirRaid) {
+					damage = 1;
+				}
+			}
+
 
 
 			if (owner?.character is VAVA1) {
