@@ -110,7 +110,6 @@ public class SigmaElectricBallProj : Projectile {
 		weapon = SigmaElectricBallWeapon.netWeapon;
 		damager.damage = 3;
 		damager.hitCooldown = 12;
-		damager.flinch = Global.miniFlinch;
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;
 		maxTime = 0.5f;
@@ -236,6 +235,7 @@ public class SigmaElectricBall2StateEX : CharState {
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.clenaseDmgDebuffs();
 		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
 	}
 }
@@ -289,7 +289,6 @@ public class SigmaUpDownSlashState : CharState {
 	public SigmaUpDownSlashState(bool isUp) : base(isUp ? "upslash" : "downslash") {
 		this.isUp = isUp;
 		enterSound = "sigma2slash";
-		exitOnLanding = true;
 	}
 
 	public override void update() {

@@ -864,9 +864,9 @@ public class GameMode {
 				FontType.BlueMenu, hudErrorMsg,
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer.character is KaiserSigma) {
+		} else if (mainPlayer?.character is KaiserSigma) {
 			string msg = "";
-			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[JUMP]: Relocate";
+			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[DASH]: Relocate";
 			if (msg != "") {
 				Fonts.drawText(
 					FontType.BlueMenu, Helpers.controlText(msg),
@@ -1057,15 +1057,14 @@ public class GameMode {
 		List<Point> revealedSpots = new List<Point>();
 		float revealedRadius = Global.viewScreenW * 0.5f;
 		
-		if (level.mainPlayer.mavericks.Count > 0) {
-			foreach (var maverick in level.mainPlayer.mavericks) {
-				if (maverick == level.mainPlayer.currentMaverick) {
-					continue;
-				}
+		if (level.mainPlayer.character is BaseSigma) {
+			foreach (var maverick in level.mainPlayer.mavericks)
+			{
+				if (maverick == level.mainPlayer.currentMaverick && !level.mainPlayer.isAlivePuppeteer()) continue;
 				revealedSpots.Add(maverick.pos);
 			}
 			revealedRadius = Global.viewScreenW * 0.5f;
-		} 
+		}
 		if (level.boundBlasterAltProjs.Count > 0) {
 			foreach (var bbAltProj in level.boundBlasterAltProjs) {
 				revealedSpots.Add(bbAltProj.pos);
@@ -1397,7 +1396,10 @@ public class GameMode {
 		//Health
 		Point pos = getHUDHealthPosition(position, true);
 		int dir = 1;
-		if (position is HUDHealthPosition.Right or HUDHealthPosition.TopRight or HUDHealthPosition.BotRight) {
+		if (position is HUDHealthPosition.Right or
+			HUDHealthPosition.TopRight or
+			HUDHealthPosition.BotRight
+		) {
 			dir = -1;
 		}
 		renderHealth(player, pos, false, false);
@@ -1551,6 +1553,7 @@ public class GameMode {
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
 		baseY -= 16;
 		int barIndex = 0;
+		int sBarIndex = 4;
 
 		if (player?.character is RagingChargeX mmx) {
 			float hpPercent = MathF.Floor(player.health / player.maxHealth * 100f);
@@ -1558,30 +1561,46 @@ public class GameMode {
 			else if (hpPercent >= 50) barIndex = 3;
 			else if (hpPercent >= 25) barIndex = 4;
 			else barIndex = 5;
+			sBarIndex = 1;
 		}
 
-	for (var i = 0; i < MathF.Ceiling(maxHealth); i++) {
+		float modifier = Player.getHpMod();
+		if (modifier < 1) {
+			modifier = 1;
+		}
+		float maxHP = MathF.Ceiling(maxHealth / modifier);
+		float curHP = MathF.Floor(health / modifier);
+		float ceilCurHP = MathF.Ceiling(health / modifier);
+		float floatCurHP = health / modifier;
+		float fhpAlpha = floatCurHP - curHP;
+		float savings = 0;
+		float svCeil = 0;
+		float svFloat = 0;
+		float svAlpha = 0;
+		if (damageSavings >= 1) {
+			savings = curHP + MathF.Floor(damageSavings / modifier);
+			svCeil = ceilCurHP + MathF.Ceiling(damageSavings / modifier);
+			svFloat = curHP + damageSavings / modifier;
+			svAlpha = svFloat - savings;
+		}
+
+		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
 			// Draw HP
-			if (i < MathF.Ceiling(health)) {
-				Global.sprites["hud_bars_generic"].drawToHUD(barIndex, baseX, baseY);
-			} else if (i < MathInt.Ceiling(health) + damageSavings) {
-				Global.sprites["hud_bars_generic"].drawToHUD(3, baseX, baseY);
-			} else {
-				Global.sprites["hud_bars_generic"].drawToHUD(1, baseX, baseY);
+			if (i < curHP) {
+				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
 			}
-
-
-
-			if (twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
-				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
+			else if (i < savings) {
+				Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY);
 			}
-
-
-			// 2-layer health
-			if (twoLayerHealth > 0 && i < MathF.Ceiling(twoLayerHealth)) {
-				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
+			else {
+				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
+				if (i < ceilCurHP) {
+					Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY, fhpAlpha);
+				}
+				else if (i < svCeil) {
+					Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY, svAlpha);
+				}
 			}
-
 			baseY -= 2;
 		}
 		Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
@@ -2608,7 +2627,23 @@ public class GameMode {
 		bool isMK5 = vile?.isVileMK5 == true;
 		bool isMK2Or5 = isMK2 || isMK5;
 		int maxIndex = isMK2Or5 ? 5 : 4;
+		int selected = level.mainPlayer.selectedRAIndex;
 
+		// B, K, H, F
+		List<int> baseIcons = new List<int> { 0, 1, 2, 3 };
+		if (isMK2) baseIcons.Add(4); // G
+		if (isMK5) baseIcons.Add(5); // D
+
+		int count = baseIcons.Count;
+		int current = selected % count;
+		int previous = (current - 1 + count) % count;
+		int next = (current + 1) % count;
+
+		DrawWrappers.DrawTextureHUD(Global.textures["vileRidesHUD2"], Global.halfScreenW - 189, startY-26);
+		Global.sprites["hud_vile_rides"].drawToHUD(baseIcons[current], startX + 25, startY-6);
+		Global.sprites["hud_vile_rides_off"].drawToHUD(baseIcons[previous], startX + 9, startY-6);
+		Global.sprites["hud_vile_rides_off"].drawToHUD(baseIcons[next], startX + 41, startY-6);
+		/*
 		for (int i = 0; i < maxIndex; i++) {
 			float x = startX;
 			float y = startY - (i * height);
@@ -2632,6 +2667,7 @@ public class GameMode {
 				DrawWrappers.DrawRectWH(x - 7, y - 7, 14, 14, false, new Color(0, 224, 0), 1, ZIndex.HUD, false);
 			}
 		}
+		*/
 	}
 
 	public Color getPingColor(Player player) {

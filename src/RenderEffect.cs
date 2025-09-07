@@ -25,6 +25,7 @@ public enum RenderEffectType {
 	ChargePink,
 	ChargeYellow,
 	ChargeBlue,
+	ChargePurple
 
 	StockedChargeLv2,	
 

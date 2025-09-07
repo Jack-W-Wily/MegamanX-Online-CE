@@ -18,7 +18,7 @@ public class ElectricSpark : Weapon {
 		shootSounds = new string[] { "electricSpark", "electricSpark", "electricSpark", "electricSpark" };
 		fireRate = 30;
 		damage = "2/4";
-		effect =  "Can Split. Charged: Doesn't destroy on hit.";
+		effect =  "U:Splits on contact on enemies or walls.\nC:Projectile won't destroy on hit.";
 		hitcooldown = "0/0.5";
 		flinch = "6/26";
 		flinchCD = "1/0";
@@ -113,11 +113,11 @@ public class ElectricSparkProj : Projectile {
             normal2.multiply(150 * 3);
 
 			new ElectricSparkProj(
-				pos.clone(), xDir, this , damager.owner, 1,
+				pos, xDir, this , damager.owner, 1,
 				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x, (int)normal2.y), true
 			);
 			new ElectricSparkProj(
-				pos.clone(), xDir, this, damager.owner, 2,
+				pos, xDir, this, damager.owner, 2,
 				Global.level.mainPlayer.getNextActorNetId(), ((int)normal2.x * -1, (int)normal2.y * -1), rpc: true
 			);
 		}

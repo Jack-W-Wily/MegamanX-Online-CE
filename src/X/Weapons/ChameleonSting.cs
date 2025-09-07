@@ -19,7 +19,7 @@ public class ChameleonSting : Weapon {
 		shootSounds = ["csting", "csting", "csting", "stingCharge"];
 		fireRate = 45;
 		damage = "2";
-		effect = "Splits. \nFull Charge grants invulnerability.";
+		effect = "U:Splits. \nC:Grants invulnerability.";
 		hitcooldown = "0";
 	}
 

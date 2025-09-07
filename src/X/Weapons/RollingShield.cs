@@ -20,6 +20,7 @@ public class RollingShield : Weapon {
 		damage = "2/1";
 		type = index;
 		effect = "Mobile Shield That Deletes Projectiles.";
+		effect = "U:Mobile Shield That Deletes Projectiles.\nC:Immune to Stuns, DOT and Debuffs.";
 		hitcooldown = "0/20";	
 	}
 

@@ -290,7 +290,7 @@ public class GrenadeExplosionProj : Projectile {
 		Point dirTo = bombCenter.directionTo(victimCenter);
 		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-		character.pushEffect(new Point(0.4f, 0.3f) * dirTo * distFactor);
+		character.pushEffect(new Point(0.3f, 0.3f) * dirTo * distFactor);
 
 		if (character == attacker.character) {
 			float damage = damager.damage;
@@ -393,10 +393,6 @@ public class GreenSpinnerExplosionProj : Projectile {
 		}
 		bool directHit = this.directHit == character;
 		int directHitXDir = this.directHitXDir;
-		float ownAxlFactor = 1f;
-		if (character == attacker.character) {
-			ownAxlFactor = 1.5f;
-		}
 
 		var victimCenter = character.getCenterPos();
 		var bombCenter = pos;
@@ -406,11 +402,15 @@ public class GreenSpinnerExplosionProj : Projectile {
 		Point dirTo = bombCenter.directionTo(victimCenter);
 		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-		character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor * ownAxlFactor);
+		if (character == attacker.character) {
+			character.pushEffect(new Point(0.6f, 0.6f) * dirTo * distFactor);
+		} else {
+			character.pushEffect(new Point(0.3f, -0.25f) * dirTo * distFactor);
+		}
 
 		if (character == attacker.character) {
 			float damage = damager.damage;
-			if ((character as Axl)?.isWhiteAxl() != true) damage = 0;
+			if ((character as Axl)?.isWhiteAxl() == true) damage = 0;
 			return new DamagerMessage() {
 				damage = damage,
 				flinch = 0

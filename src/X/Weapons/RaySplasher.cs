@@ -21,7 +21,7 @@ public class RaySplasher : Weapon {
 		killFeedIndex = 44;
 		weaknessIndex = (int)WeaponIds.SpinningBlade;
 		damage = "1/1";
-		effect = "Charged: Grants Super Armor.";
+		effect = "C:Grants Flinch Immunity.";
 		hitcooldown = "5";
 		hasCustomChargeAnim = true;
 	}
@@ -44,6 +44,10 @@ public class RaySplasher : Weapon {
 			if (mmx.shootingRaySplasher != null) {
 				mmx.raySplasherCooldown += Global.speedMul;
 				if (mmx.raySplasherCooldown > 1) {
+					//Stop when invincible
+					if (mmx.charState.invincible) return;
+					if (mmx.invulnTime > 0) return;
+					if (!mmx.charState.attackCtrl) return;
 					if (mmx.raySplasherCooldown >= 4) {
 						addAmmo(-0.15f, mmx.player);
 						mmx.raySplasherCooldown = 1;
@@ -57,7 +61,7 @@ public class RaySplasher : Weapon {
 					mmx.shootAnimTime = 10;
 					mmx.raySplasherCooldown2 += Global.speedMul;
 				}
-				if (mmx.raySplasherCooldown2 >= 76) {
+				if (mmx.raySplasherCooldown2 >= 66) {
 					mmx.shootingRaySplasher = null;
 					mmx.raySplasherCooldown2 = 0;
 				}
@@ -420,7 +424,7 @@ public class RaySplasherChargedState : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.frameIndex >= 4 && !fired) {
+		if (character.frameIndex >= 5 && !fired) {
 			fired = true;
 			var turret = new RaySplasherTurret(
 				character.getShootPos(), player, character.xDir, 

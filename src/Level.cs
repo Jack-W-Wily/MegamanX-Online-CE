@@ -297,6 +297,7 @@ public partial class Level {
 
 		InGameMainMenu.selectY = 0;
 		UpgradeMenu.onUpgradeMenu = true;
+		UpgradeArmorMenu.xGame = 1;
 		UpgradeArmorMenuEX.xGame = 1;
 
 		Menu.exit();
@@ -424,7 +425,7 @@ public partial class Level {
 				Wall wall = new Wall(instanceName, points);
 
 				float moveX = instance?.properties?.moveX ?? 0;
-				wall.moveX = moveX;
+				wall.moveX = moveX / 60f;
 
 				if (instance?.properties?.slippery != null && instance.properties.slippery == true) {
 					wall.slippery = true;
@@ -1542,7 +1543,7 @@ public partial class Level {
 				Point camPos = camPlayer.character.getCamCenterPos();
 				Actor? followActor = camPlayer.character?.getFollowActor();
 
-				float extraPos = MathF.Floor(MathF.Abs(followActor.moveDelta.x));
+				float extraPos = 0; //MathF.Floor(MathF.Abs(followActor.moveDelta.x));
 				if (extraPos >= 4) {
 					extraPos = extraPos * 16 * MathF.Sign(followActor.moveDelta.x);
 					if (lastCameraXDelta == 0 ||

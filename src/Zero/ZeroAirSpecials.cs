@@ -24,7 +24,7 @@ public class KuuenzanWeapon : Weapon {
 		damage = "1";
 		hitcooldown = "0.125";
 		flinch = "0";
-		effect = "None.";
+		effect = "";
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
@@ -46,11 +46,11 @@ public class FSplasherWeapon : Weapon {
 		killFeedIndex = 109;
 		type = (int)AirSpecialType.FSplasher;
 		displayName = "Hisuishou";
-		description = new string[] { "A Mobile Aereal slightly faster Dash." };
+		description = new string[] { "A Mobile aerial slightly faster Dash." };
 		damage = "2";
 		hitcooldown = "0.5";
 		flinch = "0";
-		effect = "None.";
+		effect = "Can be canceled by other attacks.";
 	}
 
 	public override void attack(Character character) {
@@ -124,7 +124,9 @@ public class FSplasherState : ZeroState {
 		if (ProjVisible != null) {
 			ProjVisible.changePos(character.pos);
 		}
-		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, upSpeed);
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(
+			character, character.xDir, upSpeed
+		);
 		if (collideData != null) {
 			character.changeState(character.getFallState(), true);
 			return;
@@ -139,8 +141,8 @@ public class FSplasherState : ZeroState {
 
 		var move = new Point(0, 0);
 		move.x = character.getDashSpeed() * character.xDir * modifier;
-		move.y = upSpeed * 100;
-		character.move(move);
+		move.y = upSpeed * 1.65f;
+		character.movePoint(move);
 		if (stateTime > 0.1) {
 			stateTime = 0;
 		}

@@ -451,7 +451,9 @@ public partial class Player {
 	public ShaderWrapper acidShader = Helpers.cloneShaderSafe("acid");
 	public ShaderWrapper oilShader = Helpers.cloneShaderSafe("oil");
 	public ShaderWrapper igShader = Helpers.cloneShaderSafe("igIce");
+	public ShaderWrapper mvIgShader = Helpers.cloneShaderSafe("igIce");
 	public ShaderWrapper infectedShader = Helpers.cloneShaderSafe("infected");
+	public ShaderWrapper mvInfectedShader = Helpers.cloneShaderSafe("infected");
 	public ShaderWrapper frozenCastleShader = Helpers.cloneShaderSafe("frozenCastle");
 	public ShaderWrapper possessedShader = Helpers.cloneShaderSafe("possessed");
 	public ShaderWrapper vaccineShader = Helpers.cloneShaderSafe("vaccine");
@@ -705,28 +707,44 @@ public partial class Player {
 
 	public float getMaverickMaxHp(MaverickModeId controlMode) {
 		if (!Global.level.is1v1() && controlMode == MaverickModeId.TagTeam) {
-			return getModifiedHealth(32) + (heartTanks * getHeartTankModifier());
+			return MathF.Ceiling(
+				(getModifiedHealth(20) + heartTanks * getHeartTankModifier()) * getHpMod()
+			);
 		}
-		return MathF.Ceiling(getModifiedHealth(34));
+		return MathF.Ceiling(getModifiedHealth(24) * getHpMod());
 	}
 
 	public bool hasAllItems() {
 		return subtanks.Count >= UpgradeMenu.getMaxSubTanks() && heartTanks >= UpgradeMenu.getMaxHeartTanks();
 	}
 
-	public static float getBaseHealth() {
+	public static float getHpMod() {
 		if (Global.level.server.customMatchSettings != null) {
 			return Global.level.server.customMatchSettings.healthModifier;
+		}
+		return 1;
+	}
+
+	public static decimal getHpDMod() {
+		if (Global.level.server.customMatchSettings != null) {
+			return (decimal)Global.level.server.customMatchSettings.healthModifier;
+		}
+		return 1;
+	}
+
+	public static float getBaseHp() {
+		if (Global.level.server.customMatchSettings != null) {
+			return Global.level.server.customMatchSettings.baseHp;
 		}
 		return 16;
 	}
 
 	public static int getModifiedHealth(float health) {
 		if (Global.level.server.customMatchSettings != null) {
-			float retHp = getBaseHealth();
+			float retHp = getBaseHp();
 			float extraHP = health - 16;
 
-			float hpMulitiplier = MathF.Ceiling(getBaseHealth() / 16);
+			float hpMulitiplier = getBaseHp() / 16;
 			retHp += MathF.Ceiling(extraHP * hpMulitiplier);
 
 			if (retHp < 1) {
@@ -744,7 +762,7 @@ public partial class Player {
 	public float getMaxHealth() {
 		// 1v1 is the only mode without possible heart tanks/sub tanks
 		if (Global.level.is1v1()) {
-			return getModifiedHealth(28);
+			return MathF.Ceiling(getModifiedHealth(28) * getHpMod());
 		}
 		int bonus = 0;
 		if (isSigma || isZMID || isKR)  {
@@ -763,7 +781,7 @@ public partial class Player {
 
 
 		return MathF.Ceiling(
-			getModifiedHealth(20 + bonus) + (heartTanks * getHeartTankModifier())
+			(getModifiedHealth(16 + bonus) + heartTanks * getHeartTankModifier()) * getHpMod()
 		);
 	}
 
@@ -2198,16 +2216,16 @@ public partial class Player {
 
 	[return: NotNullIfNotNull(nameof(oldChar))]
 	public Character? revertAtrans(Character? oldChar, Character? newChar, ushort? backupNetId = null) {
-		if (oldChar == null) {
-			return null;
-		}
-		if (newChar?.netId == null) {
+		if (oldChar?.netId == null) {
 			throw new Exception("Cannot use ATrans on objects without netID");
 		}
 		// Flag to enable vanilla A-Trans behaviour.
 		bool oldATrans = Global.level.server?.customMatchSettings?.oldATrans == true;
 
 		if (ownedByLocalPlayer) {
+			if (newChar?.netId == null) {
+				throw new Exception("Error: Null newChar.netId on atrans tranform.");
+			}
 			string json = JsonConvert.SerializeObject(
 				new RPCAxlDisguiseJson(id, "", -1, loadout, newChar.netId.Value)
 			);
@@ -2233,11 +2251,12 @@ public partial class Player {
 				throw new Exception("Error: Missing NetID on Axl trasform RPC.");
 			}
 			newChar = new Axl(
-				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir, true, backupNetId, ownedByLocalPlayer, false
+				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+				true, backupNetId, ownedByLocalPlayer, false
 			);
 		}
 		else if (newChar == null) {
-			throw new Exception("Error: Null newChar on atrans tranform..");
+			throw new Exception("Error: Null newChar on ATrans tranform.");
 		}
 		else {
 			Global.level.addGameObject(newChar);
@@ -2304,7 +2323,7 @@ public partial class Player {
 		if (character == null) {
 			return;
 		}
-		if (character.netId == null) {
+		if (character?.netId == null) {
 			throw new Exception("Cannot use ATrans on objects without netID");
 		}
 		if (ownedByLocalPlayer) {
@@ -2470,7 +2489,10 @@ public partial class Player {
 		if (Global.level?.server?.customMatchSettings != null) {
 			fillSubtank(Global.level.server.customMatchSettings.subtankGain);
 		} else {
-			fillSubtank(4);
+			if (character is Zero or PunchyZero or BusterZero) fillSubtank(2);
+			if (character is Vile) fillSubtank(2);
+            if (character is Axl) fillSubtank(3);
+            if (character is MegamanX or BaseSigma) fillSubtank(4);
 		}
 		if (character is Zero zero && zero.isViral) {
 			zero.freeBusterShots++;

@@ -97,7 +97,7 @@ public class UpgradeMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuLeft)) {
 			if (mainPlayer.isX) {
 					UpgradeArmorMenuEX.xGame = 1;
-					Menu.change(new UpgradeArmorMenuEX(prevMenu));
+					Menu.change(new UpgradeArmorMenuEX(this));
 					onUpgradeMenu = false;
 					return;
 			}
@@ -106,7 +106,7 @@ public class UpgradeMenu : IMainMenu {
 		if (Global.input.isPressedMenu(Control.MenuRight)) {
 			if (mainPlayer.isX) {
 					UpgradeArmorMenuEX.xGame = 1;
-					Menu.change(new UpgradeArmorMenuEX(prevMenu));
+					Menu.change(new UpgradeArmorMenuEX(this));
 					onUpgradeMenu = false;
 					return;
 			} else if (mainPlayer.isVile) {
@@ -316,6 +316,10 @@ public class UpgradeMenu : IMainMenu {
 
 		//UpgradeArmorMenu.drawHyperArmorUpgrades(mainPlayer, 20);
 
+		Fonts.drawTextEX(
+			FontType.Grey, "[WeaponL]/[WeaponR]: Change Menu",
+			Global.halfScreenW, Global.screenH - 38, Alignment.Center
+		);
 		Fonts.drawTextEX(
 			FontType.Grey, "[MUP]/[MDOWN]: Select Item",
 			Global.halfScreenW, Global.screenH - 28, Alignment.Center

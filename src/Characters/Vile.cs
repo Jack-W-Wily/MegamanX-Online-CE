@@ -245,18 +245,20 @@ public class Vile : Character {
 				(!isATrans || !player.input.isHeld(Control.Up, player))
 			);
 
-			if (specialPressed) {
-				dashGrabSpecial();
-				normalAttacks();
-				airDownAttacks();
+		if (specialPressed) {
+			if (dashGrabSpecial() ||
+				airDownAttacks() ||
+				normalAttacks()
+			) {
+				return true;
 			}
-			if (shootHeld && cannonWeapon.type > -1) {
-				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
-					cannonWeapon.vileShoot(0, this);
-			}
-			if (WeaponRightHeld && vulcanWeapon.type > -3) {
-				vulcanWeapon.vileShoot(0, this);
-			}
+		}
+		if (shootHeld && cannonWeapon.type > -1) {
+			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 
+				cannonWeapon.vileShoot(0, this);
+		}
+		if (WeaponRightHeld && vulcanWeapon.type > -3) {
+			vulcanWeapon.vileShoot(0, this);
 		}
 		return base.attackCtrl();
 	}
@@ -823,12 +825,10 @@ public class Vile : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;
-
+		float dashSpeed = 3.45f;
 		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;
 		}
-	
 		return dashSpeed * getRunDebuffs();
 	}
 

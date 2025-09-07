@@ -70,7 +70,7 @@ public class DanchienWeapon : Weapon {
 		damage = "2";
 		hitcooldown = "0.5";
 		flinch = "0";
-		effect = "Burn DOT: 1 Second.Bounce on enemy by jumping.";
+		effect = "Burn DOT: 1 Second. Bounce on enemies by jumping.";
 	}
 }
 
@@ -117,7 +117,7 @@ public class ZeroDownthrust : ZeroState {
 			int xDir = player.input.getXDir(player);
 			if (xDir != 0) {
 				character.xDir = xDir;
-				character.move(new Point(100 * xDir, 0));
+				character.moveXY(1.65f * xDir, 0);
 			}
 		//	}
 		if (type == ZeroDownthrustType.Hyouretsuzan) {

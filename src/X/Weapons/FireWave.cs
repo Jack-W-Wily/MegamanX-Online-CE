@@ -20,7 +20,7 @@ public class FireWave : Weapon {
 		isStream = true;
 		switchCooldown = 15;
 		damage = "1/1";
-		effect = "Inflicts burn to enemies. DOT: 0.5/2 seconds.\nBurn won't give assists.";
+		effect = "Both:Inflicts burn to enemies.\nBurn won't give assists.\nDOT: 0.5/2 seconds.";
 		hitcooldown = "12/20";
 
 		ammoDisplayScale = 7;
@@ -169,7 +169,7 @@ public class FireWaveProjCharged : Projectile {
 		destroyOnDMG = true;
 		shouldShieldBlock = false;
 		this.timesReversed = timesReversed;
-		new Anim(this.pos.clone(), "fire_wave_charge_flash", 1, null, true);
+		new Anim(this.pos, "fire_wave_charge_flash", 1, null, true);
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

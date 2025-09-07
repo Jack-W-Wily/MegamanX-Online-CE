@@ -19,6 +19,7 @@ public class AcidBurst : Weapon {
 		damage = "1/1";
 		type = index;
 		effect = "DOT: 2+1/3+1. Reduces Enemy Defense. Acid DMG \nstops when cured or immersed in water. Doesn't Assists.";
+		effect = "Both:Reduces Enemy Defense. Poison stops when healed,\nvaccinated or immersed in water.\nPoison wont't give assists. DOT: 2+1/3+1 seconds. ";
 	}
 
 	public override void shoot(Character character, int[] args) {

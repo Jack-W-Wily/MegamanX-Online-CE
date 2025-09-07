@@ -129,17 +129,17 @@ public class LightDash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop) {
-			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+			character.moveXY(character.getDashSpeed() * 1.15f * dashDir, 0);
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.move(new Point(character.getRunSpeed() * inputXDir * 1.15f, 0));
+			character.moveXY(character.getRunSpeed() * inputXDir * 1.15f, 0);
 			character.changeState(character.getRunState(), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.move(new Point(character.getRunSpeed() * dashDir * 1.15f, 0));
+			character.moveXY(character.getRunSpeed() * dashDir * 1.15f, 0);
 		}
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
@@ -239,15 +239,15 @@ public class GigaAirDash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop || stop && dashHeld) {
-			character.move(new Point(character.getDashSpeed() * 1.15f * dashDir, 0));
+			character.moveXY(character.getDashSpeed() * 1.15f * dashDir, 0);
 		}
 		// Dash start and end while hold.
 		else if (!stop) {
-			character.move(new Point(character.getRunSpeed() * dashDir * 1.15f, 0));
+			character.moveXY(character.getDashSpeed() * dashDir * 1.15f, 0);
 		}
 		// Air move.
 		else if (inputXDir != 0) {
-			character.move(new Point(character.getDashSpeed() * inputXDir, 0));
+			character.moveXY(character.getDashSpeed() * inputXDir, 0);
 		}
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
@@ -305,12 +305,12 @@ public class UpDash : CharState {
 		int xDir = player.input.getXDir(player);
 		if (xDir != 0) {
 			character.xDir = xDir;
-			character.move(new Point(xDir * 60 * character.getRunDebuffs(), 0));
+			character.moveXY(xDir * character.getRunDebuffs(), 0);
 		}
 
 		if (!once) {
 			once = true;
-			character.vel = new Point(0, -character.getJumpPower() * 1.125f);
+			character.vel = new Point(0, -character.getJumpPower());
 			new Anim(
 				character.pos.addxy(0, -10), "dash_sparks_up",
 				character.xDir, player.getNextActorNetId(), true, sendRpc: true
@@ -320,7 +320,8 @@ public class UpDash : CharState {
 
 		dashTime += Global.spf;
 		float maxDashTime = 0.4f;
-		if (dashTime > maxDashTime || character.vel.y > -1) {
+		if (character.isUnderwater()) maxDashTime *= 1.5f;
+		if (dashTime > maxDashTime) {
 			changeToFall();
 			return;
 		}
@@ -328,9 +329,19 @@ public class UpDash : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.isDashing = true;
+		character.gravityModifier = 0.5f;
 		character.vel = new Point(0, -4);
 		character.dashedInAir++;
 		character.frameSpeed = 1;
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.gravityModifier = 1;
+	}
+	public override bool canEnter(Character character) {
+		if (character.grounded) return false;
+		return base.canEnter(character);
 	}
 
 	public void changeToFall() {
@@ -338,6 +349,8 @@ public class UpDash : CharState {
 			character.vel.y *= 0.4f;
 			if (character.vel.y > -1) { character.vel.y = -1; }
 		}
+		character.gravityModifier = 1;
+		character.isDashing = true;
 		bool animOver = character.isAnimOver();
 		string fullSpriteName = character.sprite.name;
 		string spriteName = character.sprite.name.RemovePrefix("mmx_");

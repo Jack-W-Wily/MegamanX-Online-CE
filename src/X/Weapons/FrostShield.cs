@@ -24,6 +24,7 @@ public class FrostShield : Weapon {
 		flinch = "0/26-26";
 		maxAmmo = 16;
 		ammo = maxAmmo;
+		effect = "Both:Only Fire type weapons can damage it.\nBlocks projectiles, Clangs Zero, Leaves spikes.\nC:Tackle or Shoot it.";
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {

@@ -20,6 +20,7 @@ public class SpinWheel : Weapon {
 		damage = "1/1*8";
 		type = index;
 		effect = "Inflicts Slowdown. Doesn't destroy on hit.\nUncharged won't give assists.";
+		effect = "U:Inflicts Slowdown on contact. Bounces on walls.\nProjectile won't destroy on hit nor give assists.";
 		hitcooldown = "12/0";
 		flinch = "0/26";
 		maxAmmo = 16;

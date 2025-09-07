@@ -211,9 +211,9 @@ public class VileCannonProj : Projectile {
 	}
 }
 
-public class CannonAttack : VileState {
+public class CannonAttack : CharState {
 	bool isGizmo;
-
+	public Vile vile = null!;
 	public CannonAttack(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
 		useDashJumpSpeed = true;
 		this.isGizmo = isGizmo;
@@ -292,6 +292,7 @@ public class CannonAttack : VileState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
 		shootLogic(vile);
 		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
 			exitOnAirborne = true;

@@ -21,7 +21,7 @@ public class SpinningBlade : Weapon {
 		type = index;
 		weaknessIndex = (int)WeaponIds.TriadThunder;
 		damage = "2/2";
-		effect = "Goes back after some time on screen.";
+		effect = "U:Goes back after some time on screen.\nC:Projectile won't destroy on hit.";
 		hitcooldown = "0/30";
 		flinch = "0/26";
 		flinchCD = "0/1";

@@ -181,7 +181,7 @@ public class SpiralMagnumProj : Projectile {
 			maxDist = player.adjustedZoomRange;
 			dist = jumpDist;
 			damager.damage += MathF.Round(6 * (axl?.zoomCharge ?? 0));
-			if (axl?.hasScopedTarget() != true) {
+			if (axl?.hasScopedTarget() != true && target == null) { // i have so many questions
 				damager.damage = 0;
 			}
 		}
@@ -564,7 +564,6 @@ public class SniperMissileExplosionProj : Projectile {
 			return null;
 		}
 		bool directHit = this.directHit == character;
-
 		Point victimCenter = character.getCenterPos();
 		Point bombCenter = pos;
 		if (directHit) {
@@ -573,7 +572,11 @@ public class SniperMissileExplosionProj : Projectile {
 		Point dirTo = bombCenter.directionTo(victimCenter);
 		float distFactor = Helpers.clamp01(1 - (bombCenter.distanceTo(victimCenter) / 60f));
 
-		character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor);
+		if (character == attacker.character) {
+			character.pushEffect(new Point(0.6f, 0.4f) * dirTo * distFactor);
+		} else {
+			character.pushEffect(new Point(0.3f, -0.3f) * dirTo * distFactor);
+		}
 
 		if (character == attacker.character) {
 			float damage = damager.damage;

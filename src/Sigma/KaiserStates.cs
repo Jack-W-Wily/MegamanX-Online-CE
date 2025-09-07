@@ -11,7 +11,7 @@ public class KaiserSigmaBaseState : CharState {
 	public KaiserSigma kaiserSigma = null!;
 
 	public KaiserSigmaBaseState(string sprite) : base(sprite) {
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -148,7 +148,7 @@ public class KaiserSigmaBaseState : CharState {
 public class KaiserSigmaIdleState : KaiserSigmaBaseState {
 	public KaiserSigmaIdleState() : base("idle") {
 		canShootBallistics = true;
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -200,7 +200,7 @@ public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 	public bool once2, once3;
 	public KaiserSigmaWalkState() : base("run") {
 		canShootBallistics = false;
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -259,7 +259,7 @@ public class KaiserSigmaWalkState : KaiserSigmaBaseState {
 public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 	public KaiserSigmaJumpState() : base("fall") {
 		canShootBallistics = true;
-		immuneToWind = true;
+		pushImmune = true;
 		useGravity = true;
 	}
 
@@ -301,7 +301,7 @@ public class KaiserSigmaJumpState : KaiserSigmaBaseState {
 
 public class KaiserSigmaTauntState : KaiserSigmaBaseState {
 	public KaiserSigmaTauntState() : base("taunt") {
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -315,7 +315,7 @@ public class KaiserSigmaTauntState : KaiserSigmaBaseState {
 
 public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 	public KaiserSigmaHoverState() : base("hover") {
-		immuneToWind = true;
+		pushImmune = true;
 		showExhaust = true;
 		canShootBallistics = true;
 		useGravity = false;
@@ -369,7 +369,7 @@ public class KaiserSigmaHoverState : KaiserSigmaBaseState {
 public class KaiserSigmaFallState : KaiserSigmaBaseState {
 	public float velY;
 	public KaiserSigmaFallState() : base("fall") {
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public override void update() {
@@ -416,7 +416,7 @@ public class KaiserSigmaVirusState : CharState {
 	public KaiserSigma kaiserSigma = null!;
 
 	public KaiserSigmaVirusState() : base("virus") {
-		immuneToWind = true;
+		pushImmune = true;
 	}
 
 	public void lerpBack(Point destPos, bool isRelocating) {
@@ -493,7 +493,7 @@ public class KaiserSigmaVirusState : CharState {
 		clampViralSigmaPos();
 
 		bool canSpawnAtPos = KaiserSigma.canKaiserSpawn(kaiserSigma, out var spawnPoint);
-		if (player.input.isAPressed(player) || player.input.isPressed(Control.Jump, player)) {
+		if (player.input.isPressed(Control.Shoot, player) || player.input.isPressed(Control.Dash, player)) {
 			if (canSpawnAtPos) {
 				lerpBack(spawnPoint, true);
 				return;
@@ -556,7 +556,7 @@ public class KaiserSigmaBeamState : KaiserSigmaBaseState {
 	SoundWrapper? chargeSound;
 	SoundWrapper? beamSound;
 	public KaiserSigmaBeamState(bool isDown) : base(isDown ? "shoot" : "shoot2") {
-		immuneToWind = true;
+		pushImmune = true;
 		canShootBallistics = true;
 		this.isDown = isDown;
 	}
@@ -876,20 +876,20 @@ public class KaiserSigmaMineProj : Projectile, IDamagable {
 		if (!firstHit && type == 0) {
 			firstHit = true;
 			vel.x *= -1;
-			vel.y = -speed;
-			vel = vel.normalize().times(speed);
+			vel.y = -100;
+			vel = vel.normalize().times(100);
 			didHit = true;
 		} else if (other.isSideWallHit()) {
 			vel.x *= -1;
-			vel = vel.normalize().times(speed);
+			vel = vel.normalize().times(100);
 			didHit = true;
 		} else if (other.isCeilingHit() || other.isGroundHit()) {
 			vel.y *= -1;
-			vel = vel.normalize().times(speed);
+			vel = vel.normalize().times(100);
 			didHit = true;
 		}
 		if (didHit) {
-			//playSound("gbeetleProjBounce", sendRpc: true);
+			playSound("gbeetleProjBounce", sendRpc: true);
 			hitWallCooldown = 0.1f;
 		}
 	}
