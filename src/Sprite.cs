@@ -347,15 +347,19 @@ public class Sprite {
 
 			compositeBitmaps.Add(bitmap);
 			if (armors[2] > 0) {
+				compositeBitmaps.Add(rxArmorHelmetBitmap[armors[2] - 1]);
 				compositeBitmaps.Add(xArmorHelmetBitmap[armors[2] - 1]);
 			}
 			if (armors[0] > 0) {
+				compositeBitmaps.Add(rxArmorBootsBitmap[armors[0] - 1]);
 				compositeBitmaps.Add(xArmorBootsBitmap[armors[0] - 1]);
 			}
 			if (armors[1] > 0) {
+				compositeBitmaps.Add(rxArmorBodyBitmap[armors[1] - 1]);
 				compositeBitmaps.Add(xArmorBodyBitmap[armors[1] - 1]);
 			}
 			if (armors[3] > 0) {
+				compositeBitmaps.Add(rxArmorArmBitmap[armors[3] - 1]);
 				compositeBitmaps.Add(xArmorArmBitmap[armors[3] - 1]);
 			}
 			if (compositeBitmaps.Count > 1) {
@@ -534,247 +538,250 @@ public class Sprite {
 					}
 				));
 			}
+
 			// for Zero Dash stuff
-			if (name.Contains("zarzo_")  && character != null) {
-				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					var trail = lastFiveTrailDraws[i];
-					if (character.isDashing) {
+			if (actor is Character chara) {
+				if (name.Contains("zarzo_") && chara != null) {
+					for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						var trail = lastFiveTrailDraws[i];
+						if (chara.isDashing) {
+							trail.action.Invoke(trail.time);
+						}
+						trail.time -= Global.spf;
+					}
+					var shaderList = new List<ShaderWrapper>();
+					if (Global.shaderWrappers.ContainsKey("trailRed")) shaderList.Add(Global.shaderWrappers["trailRed"]);
+
+					if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+					lastFiveTrailDraws.Add(new Trail(
+						0.25f,
+						(float time) => {
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
+				}
+
+
+				if (name.Contains("zain_") && chara != null) {
+					for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						var trail = lastFiveTrailDraws[i];
+						if (chara.isDashing) {
+							trail.action.Invoke(trail.time);
+						}
+						trail.time -= Global.spf;
+					}
+					var shaderList = new List<ShaderWrapper>();
+					if (Global.shaderWrappers.ContainsKey("chargeYellow")) shaderList.Add(Global.shaderWrappers["chargeYellow"]);
+
+					if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+					lastFiveTrailDraws.Add(new Trail(
+						0.25f,
+						(float time) => {
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
+				}
+
+				if (name.Contains("rmx") && chara != null) {
+					for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						var trail = lastFiveTrailDraws[i];
+						if (chara.isDashing) {
+							trail.action.Invoke(trail.time);
+						}
+						trail.time -= Global.spf;
+					}
+					var shaderList = new List<ShaderWrapper>();
+					if (Global.shaderWrappers.ContainsKey("trailBlue")) shaderList.Add(Global.shaderWrappers["trailBlue"]);
+
+					if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+					lastFiveTrailDraws.Add(new Trail(
+						0.25f,
+						(float time) => {
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
+				}
+
+				if (name.Contains("iris") && chara != null) {
+					for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						var trail = lastFiveTrailDraws[i];
+						if (chara.isDashing) {
+							trail.action.Invoke(trail.time);
+						}
+						trail.time -= Global.spf;
+					}
+					var shaderList = new List<ShaderWrapper>();
+					if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
+
+					if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
+					lastFiveTrailDraws.Add(new Trail(
+						0.25f,
+						(float time) => {
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
+				}
+
+				if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && chara != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
+					for (int i = chara.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						Trail trail = chara.lastFiveTrailDraws[i];
+						if (chara.isDashing) {
+							trail.action.Invoke(trail.time);
+						}
+						trail.time -= Global.spf;
+						if (trail.time <= 0) chara.lastFiveTrailDraws.RemoveAt(i);
+					}
+
+					var shaderList = new List<ShaderWrapper>();
+
+					var speedDevilShader = chara.player.speedDevilShader;
+					shaderList.Add(speedDevilShader);
+
+					if (chara.lastFiveTrailDraws.Count > 1) chara.lastFiveTrailDraws.PopFirst();
+
+					chara.lastFiveTrailDraws.Add(new Trail(
+						0.125f,
+						(float time) => {
+							speedDevilShader?.SetUniform("alpha", time * 2);
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
+				}
+				if (renderEffects.Contains(RenderEffectType.SpeedDevilTrailNoDash) && chara != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
+					for (int i = chara.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						Trail trail = chara.lastFiveTrailDraws[i];
 						trail.action.Invoke(trail.time);
+
+						trail.time -= Global.spf;
+						if (trail.time <= 0) chara.lastFiveTrailDraws.RemoveAt(i);
 					}
-					trail.time -= Global.spf;
+
+					var shaderList = new List<ShaderWrapper>();
+
+					var speedDevilShader = chara.player.speedDevilShader;
+					shaderList.Add(speedDevilShader);
+
+					if (chara.lastFiveTrailDraws.Count > 1) {
+						chara.lastFiveTrailDraws.PopFirst();
+					}
+					chara.lastFiveTrailDraws.Add(new Trail(
+						0.125f,
+						(float time) => {
+							speedDevilShader?.SetUniform("alpha", time * 2);
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
 				}
-				var shaderList = new List<ShaderWrapper>();
-				if (Global.shaderWrappers.ContainsKey("trailRed")) shaderList.Add(Global.shaderWrappers["trailRed"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail(
-					0.25f,
-					(float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
-			}
-
-
-			if (name.Contains("zain_")  && character != null) {
-				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					var trail = lastFiveTrailDraws[i];
-					if (character.isDashing) {
+				if (renderEffects.Contains(RenderEffectType.SpeedDevilTrailNoDash) && chara != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
+					for (int i = chara.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
+						Trail trail = chara.lastFiveTrailDraws[i];
 						trail.action.Invoke(trail.time);
+
+						trail.time -= Global.spf;
+						if (trail.time <= 0) chara.lastFiveTrailDraws.RemoveAt(i);
 					}
-					trail.time -= Global.spf;
+
+					var shaderList = new List<ShaderWrapper>();
+
+					var speedDevilShader = chara.player.speedDevilShader;
+					shaderList.Add(speedDevilShader);
+
+					if (chara.lastFiveTrailDraws.Count > 1) {
+						chara.lastFiveTrailDraws.PopFirst();
+					}
+					chara.lastFiveTrailDraws.Add(new Trail(
+						0.125f,
+						(float time) => {
+							speedDevilShader?.SetUniform("alpha", time * 2);
+							DrawWrappers.DrawTexture(
+								bitmap,
+								currentFrame.rect.x1, currentFrame.rect.y1,
+								currentFrame.rect.w(), currentFrame.rect.h(),
+								x, y, zIndex,
+								cx - frameOffsetX * xDirArg,
+								cy - frameOffsetY * yDirArg,
+								xDirArg, yDirArg, angle, alpha, shaderList, true
+							);
+						}
+					));
 				}
-				var shaderList = new List<ShaderWrapper>();
-				if (Global.shaderWrappers.ContainsKey("chargeYellow")) shaderList.Add(Global.shaderWrappers["chargeYellow"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail(
-					0.25f,
-					(float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
-			}
-
-			if (name.Contains("rmx")  && character != null) {
-				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					var trail = lastFiveTrailDraws[i];
-					if (character.isDashing) {
-						trail.action.Invoke(trail.time);
-					}
-					trail.time -= Global.spf;
-				}
-				var shaderList = new List<ShaderWrapper>();
-				if (Global.shaderWrappers.ContainsKey("trailBlue")) shaderList.Add(Global.shaderWrappers["trailBlue"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail(
-					0.25f,
-					(float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
-			}
-
-			if (name.Contains("iris")  && character != null) {
-				for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					var trail = lastFiveTrailDraws[i];
-					if (character.isDashing) {
-						trail.action.Invoke(trail.time);
-					}
-					trail.time -= Global.spf;
-				}
-				var shaderList = new List<ShaderWrapper>();
-				if (Global.shaderWrappers.ContainsKey("trail")) shaderList.Add(Global.shaderWrappers["trail"]);
-
-				if (lastFiveTrailDraws.Count > 5) lastFiveTrailDraws.PopFirst();
-				lastFiveTrailDraws.Add(new Trail(
-					0.25f,
-					(float time) => {
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
-			}
-			
-			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrail) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
-				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					Trail trail = character.lastFiveTrailDraws[i];
-					if (character.isDashing) {
-						trail.action.Invoke(trail.time);
-					}
-					trail.time -= Global.spf;
-					if (trail.time <= 0) chara.lastFiveTrailDraws.RemoveAt(i);
-				}
-
-				var shaderList = new List<ShaderWrapper>();
-
-				var speedDevilShader = character.player.speedDevilShader;
-				shaderList.Add(speedDevilShader);
-
-				if (character.lastFiveTrailDraws.Count > 1) character.lastFiveTrailDraws.PopFirst();
-
-				character.lastFiveTrailDraws.Add(new Trail(
-					0.125f,
-					(float time) => {
-						speedDevilShader?.SetUniform("alpha", time * 2);
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
-			}
-			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrailNoDash) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
-				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					Trail trail = character.lastFiveTrailDraws[i];
-					trail.action.Invoke(trail.time);
-
-					trail.time -= Global.spf;
-					if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
-				}
-
-				var shaderList = new List<ShaderWrapper>();
-
-				var speedDevilShader = chara.player.speedDevilShader;
-				shaderList.Add(speedDevilShader);
-
-				if (chara.lastFiveTrailDraws.Count > 1) {
-					chara.lastFiveTrailDraws.PopFirst();
-				}
-				chara.lastFiveTrailDraws.Add(new Trail(
-					0.125f,
-					(float time) => {
-						speedDevilShader?.SetUniform("alpha", time * 2);
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
-			}
-			if (renderEffects.Contains(RenderEffectType.SpeedDevilTrailNoDash) && character != null && Global.shaderWrappers.ContainsKey("speedDevilTrail")) {
-				for (int i = character.lastFiveTrailDraws.Count - 1; i >= 0; i--) {
-					Trail trail = character.lastFiveTrailDraws[i];
-					trail.action.Invoke(trail.time);
-
-					trail.time -= Global.spf;
-					if (trail.time <= 0) character.lastFiveTrailDraws.RemoveAt(i);
-				}
-
-				var shaderList = new List<ShaderWrapper>();
-
-				var speedDevilShader = chara.player.speedDevilShader;
-				shaderList.Add(speedDevilShader);
-
-				if (chara.lastFiveTrailDraws.Count > 1) {
-					chara.lastFiveTrailDraws.PopFirst();
-				}
-				chara.lastFiveTrailDraws.Add(new Trail(
-					0.125f,
-					(float time) => {
-						speedDevilShader?.SetUniform("alpha", time * 2);
-						DrawWrappers.DrawTexture(
-							bitmap,
-							currentFrame.rect.x1, currentFrame.rect.y1,
-							currentFrame.rect.w(), currentFrame.rect.h(),
-							x, y, zIndex,
-							cx - frameOffsetX * xDirArg,
-							cy - frameOffsetY * yDirArg,
-							xDirArg, yDirArg, angle, alpha, shaderList, true
-						);
-					}
-				));
 			}
 		}
 		if (!isCompositeSprite) {
-			DrawWrappers.DrawTexture(
-				bitmap,
-				currentFrame.rect.x1,
-				currentFrame.rect.y1 - extraYOff,
-				currentFrame.rect.w(),
-				currentFrame.rect.h() + extraY,
-				x, y, zIndex,
-				cx - frameOffsetX * xDirArg,
-				cy - (frameOffsetY - extraYOff) * yDirArg,
-				xDirArg, yDirArg,
-				angle, alpha, shaders, true
-			);
-		} else {
-			DrawWrappers.DrawCompositeTexture(
-				compositeBitmaps.ToArray(),
-				currentFrame.rect.x1 - flippedExtraW,
-				currentFrame.rect.y1 - extraYOff,
-				currentFrame.rect.w() + extraW,
-				currentFrame.rect.h() + extraY,
-				x, y, zIndex,
-				cx - (frameOffsetX - extraXOff) * xDirArg,
-				cy - (frameOffsetY - extraYOff) * yDirArg,
-				xDirArg, yDirArg,
-				angle, alpha, shaders, true
-			);
-		}
+				DrawWrappers.DrawTexture(
+					bitmap,
+					currentFrame.rect.x1,
+					currentFrame.rect.y1 - extraYOff,
+					currentFrame.rect.w(),
+					currentFrame.rect.h() + extraY,
+					x, y, zIndex,
+					cx - frameOffsetX * xDirArg,
+					cy - (frameOffsetY - extraYOff) * yDirArg,
+					xDirArg, yDirArg,
+					angle, alpha, shaders, true
+				);
+			} else {
+				DrawWrappers.DrawCompositeTexture(
+					compositeBitmaps.ToArray(),
+					currentFrame.rect.x1 - flippedExtraW,
+					currentFrame.rect.y1 - extraYOff,
+					currentFrame.rect.w() + extraW,
+					currentFrame.rect.h() + extraY,
+					x, y, zIndex,
+					cx - (frameOffsetX - extraXOff) * xDirArg,
+					cy - (frameOffsetY - extraYOff) * yDirArg,
+					xDirArg, yDirArg,
+					angle, alpha, shaders, true
+				);
+			}
 		// Old X armor draw for fast shaders.
 		if (armors != null && animData.isXSprite && (Options.main.fastShaders || Options.main.disableShaders)) {
 			// TODO: Add old armor code here.
@@ -811,17 +818,9 @@ public class Sprite {
 
 		
 		if (animData.isVavaMk1SpriteBasics && Options.main.SkinSlot == 0) {
-			var upShaders = new List<ShaderWrapper>(shaders);
-		
-			DrawWrappers.DrawTexture(
-				Global.textures["GBD_alt"],
-				currentFrame.rect.x1, currentFrame.rect.y1,
-				currentFrame.rect.w(), currentFrame.rect.h(),
-				x, y, zIndex,
-				cx - frameOffsetX * xDirArg,
-				cy - frameOffsetY * yDirArg,
-				xDirArg, yDirArg, angle, alpha, upShaders, true
-			);
+			bitmap = Global.textures["GBD_alt"];
+			extraYOff = 3;
+			extraY = 3;
 		}
 	}
 

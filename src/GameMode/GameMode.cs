@@ -1586,18 +1586,17 @@ public class GameMode {
 
 		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
 			// Draw HP
-			if (i < curHP) {
+			if (twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
+				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
+			} else if (i < curHP) {
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
-			}
-			else if (i < savings) {
+			} else if (i < savings) {
 				Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY);
-			}
-			else {
+			} else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 				if (i < ceilCurHP) {
 					Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY, fhpAlpha);
-				}
-				else if (i < svCeil) {
+				} else if (i < svCeil) {
 					Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY, svAlpha);
 				}
 			}

@@ -436,7 +436,8 @@ public class HexaInvoluteProj2 : Projectile {
 		byteAngle += speedMul * 0.6f * xDir;
 		updateBeams();
 
-		if (!owner.character.OverDrive) {
+		if (!owner.character.OverDrive || owner.character == null || owner.character.charState is Die &&
+		owner.character.charState.stateTime > 2) {
 			destroySelf();
 		}
 	}

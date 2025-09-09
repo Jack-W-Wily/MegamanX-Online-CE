@@ -100,7 +100,6 @@ public class BlockWCUT : CharState {
 		exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
-		stunResistant = true;
 		immuneToWind = true;
 		blockTime = maxBlockTime;
 	}

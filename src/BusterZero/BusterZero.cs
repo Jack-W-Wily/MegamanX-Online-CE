@@ -305,7 +305,10 @@ public class BusterZero : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f;
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
 		if (isBlackZero) {
 			dashSpeed *= 1.15f;
 		}

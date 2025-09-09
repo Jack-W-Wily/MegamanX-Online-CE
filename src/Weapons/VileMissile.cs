@@ -356,10 +356,11 @@ public class MissileAttack : VileState {
 
 	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
-		bool isMK2 = vile.isVileMK2;
+		bool isMK2 = vile.isVileMK2 || vile.sprite.name.Contains("mk2");
 		Point shootVel = vile.getVileShootVel(true);
 		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
 		Point? headPosNullable = vile.getVileMK2StunShotPos() ?? shootPos;
+		
 		int xDir = vile.xDir;
 		if (vile.getShootXDir() == -1) {
 			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);

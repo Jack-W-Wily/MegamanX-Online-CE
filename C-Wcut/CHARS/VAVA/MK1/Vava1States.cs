@@ -177,6 +177,10 @@ public class VKamaeHotIcecle : CharState {
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		if (character.sprite.name.Contains("mk2")) {
+			character.vel.y = -character.getJumpPower() * 1.25f;
+			
+		}
 	}
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
@@ -219,6 +223,7 @@ public class VUnblockable : CharState {
 		enterSound = "swordswipeGG";
 		specialId = SpecialStateIds.AxlRoll;
 		canSpecialCancel = true;
+		normalCtrl = true;
 	}
 
 	public override void update() {
@@ -227,11 +232,8 @@ public class VUnblockable : CharState {
 		if (character.grounded && stateTime > 0.05f) {
 			character.changeState(new VUnblockableLand(), true);
 		}
-
-		if (Global.level.checkTerrainCollisionOnce(character, 0, -1) != null && character.vel.y < 0) {
-			character.vel.y = 0;
-		}
-		if (!player.isAI && !character.player.input.isAHeld(player) && !dropDown) {
+		if (!character.grounded) {
+		if (!player.isAI && !character.player.input.isAHeld(player) && !dropDown && character.frameIndex < 8) {
 			dropDown = true;
 			character.vel.y = 0;
 			character.frameIndex = 8;
@@ -241,7 +243,9 @@ public class VUnblockable : CharState {
 			character.vel.y = 0;
 			character.frameIndex = 8;
 		}
-		character.move(new Point(character.xDir * 300, 0));
+		
+			character.move(new Point(character.xDir * 300, 0));
+		}
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -368,6 +372,7 @@ public class VKamaeBDash : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+
 
 	}
 

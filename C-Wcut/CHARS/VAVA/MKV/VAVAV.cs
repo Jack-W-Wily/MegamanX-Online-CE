@@ -33,7 +33,7 @@ public class VAVAV : Vile {
 
 	public int ResitDeathTimes = 0;
 
-	public HexaInvoluteProj? hexa;
+	public HexaInvoluteProj2? hexa;
 	public float selfDamageCooldown;
 
 	public bool isVileMK1 { get { return vileForm == 0; } }
@@ -123,7 +123,7 @@ public class VAVAV : Vile {
 		poiPos = getCenterPos();
 		zIndexDir = 0;
 
-		string vilePrefix = "vile_";
+		string vilePrefix = "vava_";
 		//	if (isVileMK2) vilePrefix = "vilemk2_";
 		//	if (isVileMK5) vilePrefix = "vilemk5_";
 		string cannonSprite = vilePrefix + "cannon";
@@ -145,7 +145,7 @@ public class VAVAV : Vile {
 		return null;
 	}
 
-	public Point setCannonAim(Point shootDir) {
+	public override Point setCannonAim(Point shootDir) {
 		float shootY = -shootDir.y;
 		float shootX = MathF.Abs(shootDir.x);
 		float ratio = shootY / shootX;
@@ -159,7 +159,7 @@ public class VAVAV : Vile {
 		Point? nullablePos = cannonSprite?.animData.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
 		if (nullablePos == null) {
 		}
-		Point cannonSpritePOI = nullablePos ?? Point.zero;
+		Point cannonSpritePOI = nullablePos ?? pos.addxy(20 * xDir, -35);
 
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}
@@ -287,8 +287,8 @@ public class VAVAV : Vile {
 		}
 
 
-		if (shoryukenA || charState is GoGetterRightAttack && player.input.isHeld(Control.Down, player)
-		&& player.input.isPressed(Control.Shoot, player)) {
+		if ( player.input.isL2Held( player)
+		&& player.input.isAPressed(player) && !isInDamageSprite()) {
 			changeState(new VileChainGrabState(), true);
 		}
 
@@ -1226,7 +1226,10 @@ public class VAVAV : Vile {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
 
 		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;

@@ -6,7 +6,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class XUPParryStartState : CharState {
-	public RagingChargeX mmx = null!;
+	public Character mmx = null!;
 	public XUPParryStartState() : base("unpo_parry_start") {
 	}
 
@@ -80,12 +80,12 @@ public class XUPParryStartState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		mmx = player.character as Character ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		mmx.parryCooldown = mmx.maxParryCooldown;
+	//	mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 
@@ -145,7 +145,7 @@ public class UPParryMeleeProj : Projectile {
 public class XUPParryMeleeState : CharState {
 	Actor counterAttackTarget;
 	float damage;
-	public RagingChargeX mmx = null!;
+	public Character mmx = null!;
 	public XUPParryMeleeState(Actor counterAttackTarget, float damage) : base("unpo_parry_attack") {
 		invincible = true;
 		this.counterAttackTarget = counterAttackTarget;
@@ -180,13 +180,13 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		mmx = player.character as Character ?? throw new NullReferenceException();
 		//character.frameIndex = 2;
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		mmx.parryCooldown = mmx.maxParryCooldown;
+	//	mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 
@@ -235,7 +235,7 @@ public class XUPParryProjState : CharState {
 	Anim? absorbAnim;
 	bool shootProj;
 	bool absorbThenShoot;
-	public RagingChargeX mmx = null!;
+	public Character mmx = null!;
 	public XUPParryProjState(Projectile otherProj, bool shootProj, bool absorbThenShoot) : base("unpo_parry_attack") {
 		this.otherProj = otherProj;
 		this.shootProj = shootProj;
@@ -282,7 +282,7 @@ public class XUPParryProjState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		mmx = player.character as Character ?? throw new NullReferenceException();
 		if (!shootProj || absorbThenShoot) {
 			absorbAnim = new Anim(
 				otherProj.pos, otherProj.sprite.name, otherProj.xDir, 
@@ -295,7 +295,7 @@ public class XUPParryProjState : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
-		mmx.parryCooldown = mmx.maxParryCooldown;
+		//mmx.parryCooldown = mmx.maxParryCooldown;
 	}
 }
 

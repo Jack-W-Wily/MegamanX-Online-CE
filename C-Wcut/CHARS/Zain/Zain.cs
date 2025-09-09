@@ -184,15 +184,33 @@ public class Zain : Character {
 		}
 
 		if (ZainCounters >= 8) return;
-
-		player.vileAmmo += Global.spf * 15;
+		if (OverDrive) {
+			player.vileAmmo += Global.spf * 20;
+		} else {
+			player.vileAmmo += Global.spf * 10;	
+		}
 		if (player.vileAmmo > player.vileMaxAmmo) {
 			player.vileAmmo = 0;
 			ZainCounters += 1;
 		}
 	}
 
-
+	
+	public override List<byte> getCustomActorNetData() {
+		List<byte> customData = base.getCustomActorNetData();
+		customData.Add(Helpers.boolArrayToByte([
+			OverDrive,
+		]));
+		return customData;
+	}
+	public override void updateCustomActorNetData(byte[] data) {
+		// Update base arguments.
+		base.updateCustomActorNetData(data);
+		data = data[data[0]..];
+		bool[] flags = Helpers.byteToBoolArray(data[0]);
+		OverDrive = flags[0];
+	}
+	
 	// For Shaders stuff
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
@@ -201,7 +219,7 @@ public class Zain : Character {
 
 
 
-		if (player.skinSlot == 1) {
+		if (OverDrive) {
 			palette = player.nightmareZeroShader;
 		}
 

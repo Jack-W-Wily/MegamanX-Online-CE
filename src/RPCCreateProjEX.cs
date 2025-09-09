@@ -167,7 +167,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.StraightNightmare, StraightNightmareProj.rpcInvoke },
 		{ (int)ProjIds.RisingSpecter, RisingSpecterProj.rpcInvoke },
 		{ (int)ProjIds.NecroBurst, NecroBurstProj.rpcInvoke },
-		{ (int)ProjIds.NecroBurstShrapnel, RAShrapnelProj.rpcInvoke },
+		//{ (int)ProjIds.NecroBurstShrapnel, RAShrapnelProj.rpcInvoke },
 		{ (int)ProjIds.Vulcan, VulcanCherryBlast.rpcInvoke },
 		{ (int)ProjIds.DistanceNeedler, VulcanDistanceNeedler.rpcInvoke },
 		{ (int)ProjIds.BuckshotDance, VulcanBuckshotDance.rpcInvoke },
@@ -321,8 +321,24 @@ public partial class RPCCreateProj : RPC {
 
 
 		// WCut Chars RPCEX
+
 		// VAVA
 		{ (int)ProjIds.TridentLine, VileCannonProj.rpcInvoke },
+		{ (int)ProjIds.LockDownMissileStart, LockDownMissileStart.rpcInvoke },
+		{ (int)ProjIds.LockDownMissileWall, LockDownMissileWall.rpcInvoke },
+		{ (int)VAVA2ProjIds.FreezeCrackerV, FreezeCrackerVProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.FreezeCrackerVPiece, FreezeCrackerVPieceProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.ThunderBolt, ThunderBoltProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.ThunderBoltSplit, ThunderBoltSplitProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.JunkShield, JunkShieldProj.rpcInvoke},
+		{ (int)VAVA2ProjIds.JunkShield2, JunkShieldProj2.rpcInvoke},
+		{ (int)VAVA2ProjIds.NoiseCrushV, NoiseCrushVProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.NoiseCrushVCharged, NoiseCrushVChargedProj.rpcInvoke },		
+		{ (int)VAVA2ProjIds.WildCoil, WildCoilProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.WildCoilCharged, WildCoilChargedProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.HardKnuckleV, HardKnuckleVProj.rpcInvoke },
+		{ (int)VAVA2ProjIds.SlashClawV, ArrowSlashProj.rpcInvoke },
+
 	
 		// Kurumitos
 

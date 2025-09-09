@@ -100,7 +100,13 @@ public class VAVA2 : Vile {
 		spriteFrameToSounds["vilemk5_run/4"] = "vileMk5Walk";
 		spriteFrameToSounds["vilemk5_run/7"] = "vileMk5Walk";
 		spriteFrameToSounds["vilemk5_slashrun/3"] = "vileMk5Walk";
-		
+
+
+		spriteFrameToSounds["vilemk2_kamae_dash/1"] = "swordswipeGG";
+		spriteFrameToSounds["vilemk2_kamae_backdash/1"] = "swordswipeGG";
+		spriteFrameToSounds["vilemk2_kamae_kote/1"] = "swordswipeGG";
+		spriteFrameToSounds["vilemk2_kamae_unblockable/8"] = "swordswipeGG";
+
 		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
 
 
@@ -123,7 +129,7 @@ public class VAVA2 : Vile {
 		poiPos = getCenterPos();
 		zIndexDir = 0;
 
-		string vilePrefix = "vile_";
+		string vilePrefix = "vava_";
 		//	if (isVileMK2) vilePrefix = "vilemk2_";
 		//	if (isVileMK5) vilePrefix = "vilemk5_";
 		string cannonSprite = vilePrefix + "cannon";
@@ -145,7 +151,7 @@ public class VAVA2 : Vile {
 		return null;
 	}
 
-	public Point setCannonAim(Point shootDir) {
+	public override Point setCannonAim(Point shootDir) {
 		float shootY = -shootDir.y;
 		float shootX = MathF.Abs(shootDir.x);
 		float ratio = shootY / shootX;
@@ -159,7 +165,7 @@ public class VAVA2 : Vile {
 		Point? nullablePos = cannonSprite?.animData.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
 		if (nullablePos == null) {
 		}
-		Point cannonSpritePOI = nullablePos ?? Point.zero;
+		Point cannonSpritePOI = nullablePos ?? pos.addxy(20 * xDir, -35);
 
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}
@@ -170,12 +176,36 @@ public class VAVA2 : Vile {
 	public float spawnTime = 0;
 
 	public int radius = 26;
+
+	public float LockDownCD;
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) {
 			return;
 		}
 
+		if (charState is VKamaeUnblockableStart) {
+			changeState(new SlashClawVState(), true);
+		}
+
+
+		Helpers.decrementTime(ref LockDownCD);
+		if (player.input.isR2Pressed(player) && LockDownCD == 0
+		&& charState is not VKamaeBDash or VAVAKamae or VKamaeDash or VKote
+		) {
+		
+		playSound("mk2stunshot", sendRpc: true);
+				new Anim(pos.addxy(0, -35), "dust", 1, player.getNextActorNetId(), true, true);
+			if (charState is not InRideArmor) {
+				new LockDownMissileStart(new VileMK2Grab(), pos.addxy(0, -35), xDir, player, player.getNextActorNetId(), true);
+				new LockDownMissileStart(new VileMK2Grab(), pos.addxy(0, -35), -xDir, player, player.getNextActorNetId(), true);
+			} else {
+				new LockDownMissileStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
+				new LockDownMissileStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
+			
+			}
+				LockDownCD = 2;
+		}
 
 		if (ResitDeathTimes > 0) {
 
@@ -225,7 +255,7 @@ public class VAVA2 : Vile {
 		}
 
 
-		
+
 		if (!isInDamageSprite()) {
 			chargeLogic(shoot);
 		}
@@ -281,8 +311,15 @@ public class VAVA2 : Vile {
 		}
 
 
-		if (shoryukenA || charState is GoGetterRightAttack && player.input.isHeld(Control.Down, player)
-		&& player.input.isPressed(Control.Shoot, player)) {
+			if (player.input.isBPressed(player) && charState is VKamaeHotIcecle) {
+		
+			changeState(new AirFireNadeLaunch(), true);
+			player.vileAmmo -= 8;
+		}
+
+
+		if (player.input.isL2Held(player)
+		&& player.input.isAPressed(player) && !isInDamageSprite()) {
 			changeState(new VileChainGrabState(), true);
 		}
 
@@ -299,7 +336,7 @@ public class VAVA2 : Vile {
 
 
 		if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
-				  player.input.isPressed(Control.Taunt, player) 
+				  player.input.isPressed(Control.Taunt, player)
 			) {
 			changeState(new GlobalParryState(), true);
 		}
@@ -314,7 +351,7 @@ public class VAVA2 : Vile {
 		&& player.input.isPressed(Control.Taunt, player)) {
 			linkedRideArmor.explode(shrapnel: true);
 			shakeCamera(sendRpc: true);
-			
+
 			playSound("necroburst", sendRpc: true);
 		}
 		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -472,7 +509,7 @@ public class VAVA2 : Vile {
 		}
 
 		if (shootHeld) {
-			if (grabCooldown == 0 && VileMode == 1) {
+			if (grabCooldown == 0 ) {
 				dashGrabSpecial();
 			}
 		}
@@ -498,7 +535,7 @@ public class VAVA2 : Vile {
 		bool LeftorRightHeld = player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player);
 		bool UpHeld = player.input.isHeld(Control.Up, player);
 		bool DownHeld = player.input.isHeld(Control.Down, player);
-		if (VileMode == 1 && charState is not AirDash &&
+		if (VileMode == 0 && charState is not AirDash &&
 		charState is not Dash) {
 			if (DownHeld) {
 				if (player.vileAmmo > 4)
@@ -524,11 +561,11 @@ public class VAVA2 : Vile {
 			return true;
 		}
 
-		if (VileMode == 0) {
-			if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f) {
-
-				cannonWeapon.vileShoot(0, this);
-			}
+		if (VileMode == 1) {
+		
+				changeState(new VAVAKamae(), true);
+		
+			
 		}
 
 		return false;
@@ -550,7 +587,7 @@ public class VAVA2 : Vile {
 
 			if (HeldDown && AirSplashHitCD == 0 && VileMode == 0) {
 				AirSplashHitCD = 0.5f;
-				changeState(new PeaceOutRollerAttack(), true);
+				changeState(new VavaWindCoil(), true);
 				player.vileAmmo -= 8;
 			}
 			if (HeldDown && AirSplashHitCD == 0 && VileMode == 1) {
@@ -591,11 +628,14 @@ public class VAVA2 : Vile {
 		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
 		&& VileMode == 1 && (grounded || charState is AirDash)) {
 
-			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
+			changeState(new HardKnuckleVState(), true);
+				new HardKnuckleVProj(this, pos.addxy(0,-30), xDir, player.getNextActorNetId(), true, player);
+			playSound("super_adaptor_punch", sendRpc: true);
+	
 		}
-		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
-		&& VileMode == 0 && (grounded || charState is AirDash)) {
+		if (VileMode == 0 && (grounded || charState is AirDash)) {
 			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+			missileWeapon.shootCooldown = 0;
 		}
 
 		return false;
@@ -673,19 +713,45 @@ public class VAVA2 : Vile {
 		}
 		return base.normalCtrl();
 	}
-	public void shoot(int chargeLevel) {
+	public override void shoot(int chargeLevel) {
 		if (chargeLevel == 1) {
+			cannonWeapon.type = (int)VileCannonType.FrontRunner;
+			cannonWeapon.vileShoot(0, this);
 			player.vileAmmo -= 10;
 		}
 		if (chargeLevel == 2) {
+			int input = player.input.getYDir(player);
+				new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
+				playSound("buster2", sendRpc: true);
+		
 			player.vileAmmo -= 15;
 		}
 
 		if (chargeLevel == 3) {
-			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+			if (player.input.isHeld(Control.Down, player)) {
+				for (int i = 0; i < 3; i++) {
+					new JunkShieldMagnet(
+				getCenterPos(), xDir, this,
+				player.getNextActorNetId(), i * 85
+				);
+				}
+			} else if (player.input.isLeftOrRightHeld(player)) {
+				playSound("noise_crush_charged");
+				new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(6 * -xDir, 0), xDir, 0, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(12 * -xDir, 0), xDir, 1, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(18 * -xDir, 0), xDir, 2, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(24 * -xDir, 0), xDir, 3, player.getNextActorNetId(), true);
+
+			} else {
+					new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
+				playSound("thunder_bolt", sendRpc: true);
+				player.vileAmmo -= 15;
+				}
+			
 		}
 		if (chargeLevel == 4 && (isVileMK5 || isVavaV)) {
-			changeState(new HexaInvoluteState(), true);
+			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 		}
 	}
 	public override bool chargeButtonHeld() {
@@ -1022,17 +1088,20 @@ public class VAVA2 : Vile {
 		}
 
 
-		if (sprite.name.Contains("punch")) {
+		if (sprite.name.Contains("punch") ||sprite.name.Contains("kamae") && sprite.name.Contains("dash") ) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
 				1f, 25, 15f, isDeflectShield: true, ShouldClang: true
 			, addToLevel : true);
 		}
+
+	
+		
 		if (sprite.name.Contains("kick") && !sprite.name.Contains("kick_3") && !sprite.name.Contains("super")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
 				1, 25, 15f, isDeflectShield: true, ShouldClang: true
-			, addToLevel : true);
+			, addToLevel: true);
 		}
 		if (sprite.name.EndsWith("superkick_up")
 		) {
@@ -1063,18 +1132,39 @@ public class VAVA2 : Vile {
 				0.5f, 0, 10f, isDeflectShield: true, ShouldClang: true
 			, addToLevel : true);
 		}
+		
+			if (sprite.name.Contains("kote")) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
+				2f, 0, 10f, isDeflectShield: true, ShouldClang: true
+			, addToLevel : true);
+		}
+
+		if (sprite.name.Contains("hoticecle")) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.Hyouretsuzan2, player,
+				2f, 0, 10f, isDeflectShield: true, ShouldClang: true
+			, addToLevel : true);
+		}
 
 		if (sprite.name.Contains("kick_3")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileAirRaidPlusKnock, player,
 				2, 0, 15f, isDeflectShield: true
-			, addToLevel : true);
+			, addToLevel: true);
 		}
 		
 			if (sprite.name.Contains("hyperdash_end")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.HeavyPush, player,
 				2, 0, 15f, isDeflectShield: true
+			, addToLevel : true);
+		}
+
+			if (sprite.name.Contains("kamae_unblockable")) {
+			return new GenericMeleeProj(
+				new VileMK2Grab(), centerPoint, ProjIds.HeavyPush, player,
+				3, 30, 15f, isDeflectShield: true
 			, addToLevel : true);
 		}
 
@@ -1218,7 +1308,10 @@ public class VAVA2 : Vile {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f * 60f;
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
 
 		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;

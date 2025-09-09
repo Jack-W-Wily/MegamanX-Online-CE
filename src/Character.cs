@@ -193,7 +193,8 @@ public partial class Character : Actor, IDamagable {
 	//StateCooldown System (wcut)
 	public float genericGrabCooldown;
 	public float genericParryCooldown;
-	public Projectile? AbsorbedProj;
+
+	public Projectile? absorbedProj;
 
 	public float ComboTimer;
 	public float ignoreStateCooldownTime;
@@ -402,10 +403,12 @@ public partial class Character : Actor, IDamagable {
 		lastGravityWellDamager = player;
 		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
 		maxHealth = getMaxHealth();
-		bonusHealth = getMaxHealth();
-		if (!ownedByLocalPlayer || !isWarpIn) {
+
+
+
 		if (ownedByLocalPlayer && (!isWarpIn || player.warpedInOnce)) {
 			health = maxHealth;
+			bonusHealth =  maxHealth;
 		}
 	}
 
@@ -787,7 +790,8 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual float getDashSpeed() {
-		return 3.45f * getRunDebuffs();
+		float dashSpeed = Physics.WalkSpeed * 2;
+		return dashSpeed * getRunDebuffs();
 	}
 
 	public virtual float getDashOrRunSpeed() {
@@ -1486,8 +1490,8 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (slideVel != 0) {
-			slideVel = Helpers.toZero(slideVel, speedMul * 0.1f, Math.Sign(slideVel));
-			moveXY(slideVel, 0);
+			slideVel = Helpers.toZero(slideVel, Global.spf * 350, Math.Sign(slideVel));
+			move(new Point(slideVel, 0), true);
 		}
 		base.update();
 
@@ -1786,7 +1790,10 @@ public partial class Character : Actor, IDamagable {
 			Point moveSpeed = new Point();
 			if (canMove()) { moveSpeed.x = getDashOrRunSpeed() * xDpadDir; }
 			if (canTurn()) { xDir = xDpadDir; }
-			if (moveSpeed.x != 0) { movePoint(moveSpeed); }
+		
+				if (moveSpeed.x != 0) { move(moveSpeed); }
+			
+
 		}
 	}
 
@@ -3052,7 +3059,16 @@ public partial class Character : Actor, IDamagable {
 
 
 	public virtual int baselineMaxHealth() {
-		return 16;
+		if (player.isHighMax) return 36; 
+		if (player.isSigma) return 34; 
+		if (player.isZain) return 34; 
+		if (player.isZMID) return 32;
+		if (player.isVile) {
+			if (this is VAVAV) return 20; 
+			if (this is VAVA2) return 22; 
+			return 24; 
+		} 
+		return 28;
 	}
 
 	public virtual int getMaxHealth() {
@@ -3065,6 +3081,8 @@ public partial class Character : Actor, IDamagable {
 			}
 			return Player.getModifiedHealth(20);
 		}
+
+
 		return MathInt.Ceiling(
 			(Player.getModifiedHealth(baselineMaxHealth()) +
 				heartTanks * Player.getHeartTankModifier()
@@ -3869,8 +3887,14 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool canAffordRideArmor() {
-		if (Global.level.is1v1()) {
+		if (Global.level.is1v1() ) {
 			return health > Math.Floor(maxHealth / 2);
+		}
+		if (this is VAVAV) {
+			return bonusHealth >= maxHealth;
+		}
+		if (this is VAVA2) {
+			return player.currency >= 3;
 		}
 		return player.currency >= Vile.callNewMechCost;
 	}
@@ -3878,6 +3902,15 @@ public partial class Character : Actor, IDamagable {
 	public void buyRideArmor() {
 		if (Global.level.is1v1()) {
 			health -= Math.Floor(maxHealth / 2);
+			return;
+		}
+		if (this is VAVAV) {
+			bonusHealth -= maxHealth;
+			return;
+
+		}
+		if (this is VAVA2) {
+			player.currency -= 3;
 			return;
 		}
 		player.currency -= Vile.callNewMechCost * (player.selectedRAIndex >= 4 ? 2 : 1);

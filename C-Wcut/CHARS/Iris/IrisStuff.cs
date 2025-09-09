@@ -1111,7 +1111,9 @@ public class IrisCannon : Projectile {
 			if (owner.input.isPressed(Control.WeaponRight,owner) && ShootCD == 0 && owner.superAmmo > 0 
 			&& owner.character != null && !owner.character.isInDamageSprite()){
 				ShootCD = 0.1f;
-			owner.superAmmo -= 1;
+			if (!owner.character.OverDrive) {
+				owner.superAmmo -= 1;
+			}
 				playSound("shootX3lv", sendRpc: true);
 					new IrisFireBallProj(new IrisCrystal(), pos, xDir , shootNum,
 					 true, owner, owner.getNextActorNetId(), sendRpc: true);

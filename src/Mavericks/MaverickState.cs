@@ -787,7 +787,7 @@ public class MJumpCharge : MaverickState {
 		}
 		if (!soundPlayed && jumpFramesHeld >= maxJumpFrames) {
 			soundPlayed = true;
-			maverick.playSound("chargeJumpSMB2");
+		//	maverick.playSound("chargeJumpSMB2");
 		}
 	}
 

@@ -2281,21 +2281,21 @@ public partial class Level {
 				powerplant2DarkTime = 0;
 			}
 		} else if (powerplant2State == 1) {
-			alpha = (byte)(powerplant2DarkTime * 255);
+			alpha = (byte)(powerplant2DarkTime * 245);
 			powerplant2DarkTime += Global.spf * 2;
 			if (powerplant2DarkTime >= 1) {
 				powerplant2State = 2;
 				powerplant2DarkTime = 0;
 			}
 		} else if (powerplant2State == 2) {
-			alpha = 255;
+			alpha = 245;
 			powerplant2DarkTime += Global.spf * 0.5f;
 			if (powerplant2DarkTime >= 1) {
 				powerplant2State = 3;
 				powerplant2DarkTime = 0;
 			}
 		} else if (powerplant2State == 3) {
-			alpha = (byte)((1 - powerplant2DarkTime) * 255);
+			alpha = (byte)((1 - powerplant2DarkTime) * 245);
 			powerplant2DarkTime += Global.spf * 2;
 			if (powerplant2DarkTime >= 1) {
 				powerplant2State = 0;

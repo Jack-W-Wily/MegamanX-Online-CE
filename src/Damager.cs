@@ -504,6 +504,10 @@ public class Damager {
 					character.addBurnTime(owner, new Sigma3FireWeapon(), 1f);
 					break;
 				//Freeze effects	
+					case (int)ProjIds.IceGattlingWC:
+					character.addIgFreezeProgress(1);
+					break;
+
 				case (int)ProjIds.IceGattling:
 					character.addIgFreezeProgress(1);
 					break;
@@ -518,6 +522,18 @@ public class Damager {
 					break;
 				case (int)ProjIds.Hyouretsuzan2:
 					character.addIgFreezeProgress(4);
+					flinch = 0;
+					break;
+				case (int)ProjIds.IceGattlingAltWC:
+					character.addIgFreezeProgress(4);
+					flinch = 0;
+					break;
+				case (int)VAVA2ProjIds.FreezeCrackerV:
+					character.addIgFreezeProgress(4);
+					flinch = 0;
+					break;
+				case (int)VAVA2ProjIds.FreezeCrackerVPiece:
+					character.addIgFreezeProgress(2);
 					flinch = 0;
 					break;
 				case (int)ProjIds.VelGIce:
@@ -1402,19 +1418,7 @@ public class Damager {
 			return true;
 		}
 
-		if ((damage > 0 || finalDamage > 0) && preCharacter != null &&
-			preCharacter.ownedByLocalPlayer &&
-			charState is RMXGrabStartState && preCharacter.frameIndex < 3 
-			
-		) {
-			preCharacter.addHealth(1);
-			preCharacter.changeToIdleOrFall();
-			preCharacter.charState.invincible = true;
-			preCharacter.playSound("zeroParry");
-			victim.addDamageText("Parry!!", 1);
-			owner.character.changeState(new ZeroClang(preCharacter.xDir), true);
-			return true;
-		}
+		
 
 		if (finalDamage > 0 && preCharacter != null &&
 			preCharacter.ownedByLocalPlayer &&

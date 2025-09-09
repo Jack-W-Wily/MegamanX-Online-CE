@@ -48,6 +48,10 @@ public enum NetActorCreateId {
 	BlastHornet,
 	DrDoppler,
 	RideChaser,
+
+	// For Classic Era WPS stuff
+	DWrapBigBubble,
+	
 }
 
 public class RPCCreateActor : RPC {

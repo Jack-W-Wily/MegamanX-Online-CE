@@ -53,6 +53,21 @@ public class Vile : Character {
 	public VileLaser laserWeapon;
 	public MechMenuWeapon rideMenuWeapon;
 
+	// For Classic Weapon Compatibility
+	public List<Actor> junkShieldProjs = new();
+	public LoopingSound? junkShieldSound;
+	public Projectile? sWheel;
+	public HardKnuckleVProj? HardKnuckleVProj;
+	public bool armless;
+	public ChargeEffect NoiseCrushVEffect;
+	public bool hasChargedNoiseCrushV = false;
+	public float NoiseCrushVAnimTime;
+	public LoopingSound? chargedNoiseCrushVSound;
+	public bool usedDoubleJump;
+	public bool boughtSuperAdaptorOnce;
+	public float timeSinceLastShoot;
+	public bool isSlideColliding;
+
 	public Vile(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
@@ -126,7 +141,9 @@ public class Vile : Character {
 		return null;
 	}
 
-	public Point setCannonAim(Point shootDir) {
+
+
+	public virtual Point setCannonAim(Point shootDir) {
 		float shootY = -shootDir.y;
 		float shootX = MathF.Abs(shootDir.x);
 		float ratio = shootY / shootX;
@@ -245,21 +262,22 @@ public class Vile : Character {
 				(!isATrans || !player.input.isHeld(Control.Up, player))
 			);
 
-		if (specialPressed) {
-			if (dashGrabSpecial() ||
-				airDownAttacks() ||
-				normalAttacks()
-			) {
-				return true;
+			if (specialPressed) {
+				if (dashGrabSpecial() ||
+					airDownAttacks() ||
+					normalAttacks()
+				) {
+					return true;
+				}
 			}
-		}
-		if (shootHeld && cannonWeapon.type > -1) {
-			if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f) 
-				cannonWeapon.vileShoot(0, this);
-		}
-		if (WeaponRightHeld && vulcanWeapon.type > -3) {
-			vulcanWeapon.vileShoot(0, this);
-		}
+			if (shootHeld && cannonWeapon.type > -1) {
+				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
+					cannonWeapon.vileShoot(0, this);
+			}
+			if (WeaponRightHeld && vulcanWeapon.type > -3) {
+				vulcanWeapon.vileShoot(0, this);
+			}
+			}
 		return base.attackCtrl();
 	}
 	public bool normalAttacks() {
@@ -752,7 +770,52 @@ public class Vile : Character {
 		return 50;
 	}
 
+
+
+
+		(float twitch, float grow, int time) omegaAura = new(0.015f, 0, 0);
+
+	void updateOmegaAura() {
+		omegaAura.twitch -= 0.05f;
+		if (omegaAura.twitch < 0.05)
+			omegaAura.twitch = 0.15f;
+
+		if (omegaAura.time >= 0 && omegaAura.time < 50)
+			omegaAura.grow += 0.0025f;
+		else if (omegaAura.time >= 55 && omegaAura.time < 105)
+			omegaAura.grow -= 0.0025f;
+
+		omegaAura.time++;
+		if (omegaAura.time > 110) {
+			omegaAura.time = 0;
+		}
+	}
+	
+
 	public override void render(float x, float y) {
+
+		if (visible && OverDrive  ) {
+			// Position to draw the sprite to.
+			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraAlpha = 0.75f;
+
+			// Draw aura.
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex,
+				drawX, drawY,
+				xDir, yDir,
+				null, auraAlpha,
+				auraSize,
+				auraSize,
+				zIndex - 1,
+				player.omegaAuraShader
+			);
+			updateOmegaAura();
+		}
+
 		if (hasSpeedDevil && visible) {
 			addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		} else {
@@ -825,7 +888,10 @@ public class Vile : Character {
 	}
 
 	public override float getDashSpeed() {
-		float dashSpeed = 3.45f;
+		if (flag != null || !isDashing) {
+			return getRunSpeed();
+		}
+		float dashSpeed = 210;
 		if (hasSpeedDevil) {
 			dashSpeed *= 1.1f;
 		}

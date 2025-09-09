@@ -519,7 +519,7 @@ public class HighwayVAVA : Vile {
 	}
 
 
-	public Point setCannonAim(Point shootDir) {
+	public override Point setCannonAim(Point shootDir) {
 		float shootY = -shootDir.y;
 		float shootX = MathF.Abs(shootDir.x);
 		float ratio = shootY / shootX;

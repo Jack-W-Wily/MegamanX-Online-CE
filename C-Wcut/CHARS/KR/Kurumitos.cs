@@ -76,7 +76,7 @@ public enum CharIds {
 	KaiserSigma,
 	RagingChargeX,
 	// Non-vanilla chars start here.
-	Rock = 10,
+	vile = 10,
 	// WCUT CHARS 
 	// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 	Kurumitos,   

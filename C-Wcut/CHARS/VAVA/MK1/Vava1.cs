@@ -545,7 +545,7 @@ public class VAVA1 : Vile {
 	}
 
 
-	public Point setCannonAim(Point shootDir) {
+	public override Point setCannonAim(Point shootDir) {
 		float shootY = -shootDir.y;
 		float shootX = MathF.Abs(shootDir.x);
 		float ratio = shootY / shootX;
@@ -559,7 +559,7 @@ public class VAVA1 : Vile {
 		Point? nullablePos = cannonSprite?.animData.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
 		if (nullablePos == null) {
 		}
-		Point cannonSpritePOI = nullablePos ?? Point.zero;
+		Point cannonSpritePOI = nullablePos ?? pos.addxy(20 * xDir, -35);
 
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}

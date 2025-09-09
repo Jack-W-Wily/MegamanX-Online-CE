@@ -799,7 +799,8 @@ public enum ProjIds {
 	VileGrab,
 	HexaInvolute2,
 	NapalmGrenade,
-
+	LockDownMissileStart,
+	LockDownMissileWall,
 	VAVA2GRAB,
 	VileStomp2,
 	VileStomp,

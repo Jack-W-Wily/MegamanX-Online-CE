@@ -1,5 +1,6 @@
 using System;
 using SFML.Graphics;
+using System.Collections.Generic;
 
 namespace MMXOnline;
 
@@ -259,9 +260,39 @@ public class VileSuperKickState : CharState {
 
 public class VilePunch1 : CharState {
 	bool fired = false;
-	
+
 
 	public VilePunch1() : base("punch_1", "", "", "") {
+
+	}
+
+	public override void update() {
+		base.update();
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+
+public class VilePunch2 : CharState {
+	bool fired = false;
+	
+
+	public VilePunch2() : base("punch_2", "", "", "") {
 	
 	}
 
@@ -304,7 +335,6 @@ public class VileResistDeath : CharState {
 
 		if (!once && character.frameIndex >= 1 && sprite == "die") {
 			character.playSound("ching", sendRpc: true);
-			player.health = 1;
 			character.addHealth(player.maxHealth);
 
 
@@ -325,8 +355,10 @@ public class VileResistDeath : CharState {
 		base.onEnter(oldState);
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
 		character.playSound("xRevive", sendRpc: true);
+		character.alive = true;
 		VAVA2? vile = Global.level.mainPlayer.character as VAVA2;
-		vile.ResitDeathTimes ++;
+		vile.ResitDeathTimes++;
+		player.health = 1;
 	}
 
 	public override void onExit(CharState newState) {
@@ -805,5 +837,96 @@ public class VileStompState : CharState {
 		character.useGravity = true;
 		victim.grabInvulnTime = 0.5f;
 		victim?.releaseGrab(character);
+	}
+}
+
+
+
+
+public class LockDownMissileStart : Projectile {
+	public Character character;
+
+	public LockDownMissileStart(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 1, player, "missile_lockdown_proj_start", 
+		Global.defFlinch, 0.75f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 0.25f;
+		projId = (int)ProjIds.LockDownMissileStart;
+		destroyOnHit = false;
+		character = player.character;
+		
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new LockDownMissileStart(
+			LightningWeb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (!ownedByLocalPlayer) {return;}
+		if (character.player.input.isR2Pressed(character.player)) {
+			destroySelf();
+		}
+	}
+	public override void onDestroy() {
+		base.onDestroy();
+		if (ownedByLocalPlayer) {
+			new LockDownMissileWall(weapon, pos, xDir, base.owner, base.owner.getNextActorNetId(), rpc: true);
+		}
+	}
+}
+
+
+public class LockDownMissileWall : Projectile {
+
+	Wall wall;
+	public LockDownMissileWall(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "missile_lockdown_proj_wall", 
+		Global.halfFlinch, 1f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 1f;
+		projId = (int)ProjIds.LockDownMissileWall;
+		setIndestructableProperties();
+		fadeSprite = "explosion";
+		fadeOnAutoDestroy = true;
+	
+		collider.isClimbable = true;
+		collider.wallOnly = false;
+		isStatic = true;
+		
+		var rect = collider.shape.getRect().getPoints();
+		wall = new Wall("Collision Shape", new List<Point>()
+		{
+				rect[0].add(new Point(0, 0)),
+				rect[1].add(new Point(0, 0)),
+				rect[2].add(new Point(0, 0)),
+				rect[3].add(new Point(0, 0)),
+			});
+
+		Global.level.addGameObject(wall);
+		
+		if (player.character != null) zIndex = player.character.zIndex - 10;
+		
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new LockDownMissileWall(
+			LightningWeb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (wall != null) Global.level.removeGameObject(wall);
 	}
 }

@@ -75,7 +75,7 @@ public class RockmanX : MegamanX {
 		}
 
 
-		
+
 		
 		if (player.input.isBPressed(player) &&
 		player.input.isHeld(Control.Up, player) &&
@@ -104,26 +104,53 @@ public class RockmanX : MegamanX {
 
 
 
+
+
+		if (player.input.isR2Pressed(player) && OverDrive) {
+			if (player.input.isHeld(Control.Down, player)) {
+				enterParry();
+			} else if (charState is Dash or AirDash) {
+					charState.isGrabbing = true;
+			changeSpriteFromName("unpo_grab_dash", true);
+			} else {
+				changeState(new XUPPunchState(grounded), true);
+			}
+		}
+
+
 		return base.attackCtrl();
+	}
+
+	
+	
+	public void enterParry() {
+		if (absorbedProj != null) {
+			changeState(new XUPParryProjState(absorbedProj, true, false), true);
+			player.weapons.RemoveAll(w => w is AbsorbWeapon);
+			absorbedProj = null;
+			return;
+		}
+		changeState(new XUPParryStartState(), true);
+		return;
 	}
 
 
 	public override void update() {
 		base.update();
-	
 
-	
+
+
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref DodgeCD);
 
-	
+
 		if (Global.level.levelData.name == "zero_vs_x_1v1") {
 			hasUltimateArmor = true;
 			if (bonusHealth == 0) {
 				overDriveTimer = 999;
 			}
-			
+
 		}
 
 		if (canSpecialCancel) {
@@ -162,10 +189,10 @@ public class RockmanX : MegamanX {
 				weaponHealAmount--;
 				player.superAmmo = Helpers.clampMax(player.superAmmo + 1, player.superMaxAmmo);
 				playSound("healX3", forcePlay: true, true);
-				
+
 			}
 		}
-		
+
 	}
 
 
@@ -212,6 +239,11 @@ public class RockmanX : MegamanX {
 		Punch1,
 		Punch2,
 
+		DashGrab,
+		ParryBlock,
+		Punch,
+	
+
 
 	}
 
@@ -238,7 +270,10 @@ public class RockmanX : MegamanX {
 			// Light Helmet when it up-dashes.
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
-
+			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
+			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
+		
 			_ => MeleeIds.None
 		});
 	}
@@ -251,6 +286,14 @@ public class RockmanX : MegamanX {
 				 0, 0, isDeflectShield: true,
 				isZSaberClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
+			),
+			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
+				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,
+				0, 0, 60, addToLevel: addToLevel
+			),
+			(int)MeleeIds.Punch => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
+				3, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 				(int)MeleeIds.Grab => new RMXGenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,

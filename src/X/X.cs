@@ -629,7 +629,7 @@ public class MegamanX : Character {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		float dashSpeed = 3.5f * 60;
+		float dashSpeed = 210;
 		return dashSpeed * getRunDebuffs();
 	}
 

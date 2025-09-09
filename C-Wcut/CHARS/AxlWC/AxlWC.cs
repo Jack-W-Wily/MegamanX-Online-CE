@@ -322,8 +322,8 @@ public class AxlWC : Character {
 	}
 
 	public void updateArmAngleMouse() {
-		axlCursorPos.x = Input.mouseX;
-		axlCursorPos.y = Input.mouseY;
+		axlCursorPos.x = Input.mouseDeltaX;
+		axlCursorPos.y = Input.mouseDeltaY;
 
 		if (charState.normalCtrl && (canTurn() || charState is Run)) {
 			if (xDir == 1 && axlCursorPos.x < pos.x) {

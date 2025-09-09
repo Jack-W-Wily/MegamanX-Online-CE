@@ -549,6 +549,9 @@ public class WarpIdle : CharState {
 			character.health = Helpers.clampMax(
 				character.health + hpMod, character.maxHealth
 			);
+			character.bonusHealth = Helpers.clampMax(
+				character.bonusHealth + hpMod, character.maxHealth
+			);
 		} else {
 			fullHP = true;
 		}
@@ -704,7 +707,7 @@ public class Run : CharState {
 			if (character.canMove()) move.x = runSpeed;
 		}
 		if (move.magnitude > 0) {
-			character.movePoint(move);
+			character.move(move);
 		} else {
 			character.changeToIdleOrFall();
 		}
@@ -939,13 +942,13 @@ public class Dash : CharState {
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.moveXY(character.getRunSpeed() * inputXDir, 0);
+			character.move(new Point(character.getDashSpeed() * dashDir, 0));
 			character.changeState(character.getRunState(true), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
+			character.move(new Point(character.getDashSpeed() * dashDir, 0));;
 		}
 		// Dust effect.
 		if (dustTime >= 6 && !character.isUnderwater()) {

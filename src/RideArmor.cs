@@ -879,12 +879,12 @@ public class RideArmor : Actor, IDamagable {
 						centerPos, piecesSpriteName, 1, hasRaColorShader, this,
 						netOwner, netOwner.getNextActorNetId(), rpc: true);
 					piece.vel = shrapnelVels[i];
-					if (ncp != null) {
-					ncp =	new NecroBurstProj(
+			
+					new NecroBurstProj(
 							centerPos, xDir, this, netOwner,
 							netOwner.getNextActorNetId(), rpc: true
 								);
-					}
+					
 				}
 				piece.frameIndex = i;
 				piece.frameSpeed = 0;
@@ -1141,6 +1141,10 @@ public class RideArmor : Actor, IDamagable {
 		customData.Add((byte)(character != null ? 1 : 0)); 
 		customData.Add((byte)neutralId);
 		customData.Add((byte)MathF.Ceiling(health));
+			customData.Add(Helpers.boolArrayToByte([
+			isVava1Ride,
+		]));
+
 
 		return customData;
 	}
@@ -1154,6 +1158,7 @@ public class RideArmor : Actor, IDamagable {
 		} else if (isOwnerRiding == 1) {
 			character = netOwner?.character;
 		}
+	
 
 		neutralId = data[2];
 		health = data[3];

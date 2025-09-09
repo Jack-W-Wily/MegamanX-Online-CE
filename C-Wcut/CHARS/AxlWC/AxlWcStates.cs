@@ -987,7 +987,7 @@ public class AxlBlock : CharState {
 		exitOnAirborne = true;
 		normalCtrl = true;
 		attackCtrl = true;
-		stunResistant = true;
+	
 		immuneToWind = true;
 	}
 
@@ -1017,7 +1017,7 @@ public class AxlBlock2 : CharState {
 		exitOnAirborne = true;
 		normalCtrl = true;
 		attackCtrl = true;
-		stunResistant = true;
+	
 		immuneToWind = true;
 	}
 
