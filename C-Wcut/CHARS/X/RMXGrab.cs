@@ -106,7 +106,7 @@ public class RMXGrabState : CharState {
 		if (character.sprite.name.Contains("attack") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 1, 0, 0);
+				var damager = new Damager(player, 1, 0, 60);
 
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
 			}
@@ -115,7 +115,7 @@ public class RMXGrabState : CharState {
 		if (character.sprite.name.Contains("up") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 2, 0, 0);
+				var damager = new Damager(player, 2, 0, 60);
 			character.shakeCamera(sendRpc: true);
 				victim?.shakeCamera(sendRpc: true);
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
@@ -125,7 +125,7 @@ public class RMXGrabState : CharState {
 		if (character.sprite.name.Contains("down") && character.frameIndex == 8) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 0, 0);
+				var damager = new Damager(player, 3, 0, 60);
 				damager.applyDamage(victim, false, new FireWave(), character,
 				(int)ProjIds.MechFrogStompShockwave);
 				new MechFrogStompShockwave(new FireWave(),

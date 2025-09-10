@@ -190,30 +190,32 @@ public class VAVA2 : Vile {
 
 
 		Helpers.decrementTime(ref LockDownCD);
-		if (player.input.isR2Pressed(player) && LockDownCD == 0
-		&& charState is not VKamaeBDash or VAVAKamae or VKamaeDash or VKote
-		) {
-		
-		playSound("mk2stunshot", sendRpc: true);
-				new Anim(pos.addxy(0, -35), "dust", 1, player.getNextActorNetId(), true, true);
-			if (charState is not InRideArmor) {
-				new LockDownMissileStart(new VileMK2Grab(), pos.addxy(0, -35), xDir, player, player.getNextActorNetId(), true);
-				new LockDownMissileStart(new VileMK2Grab(), pos.addxy(0, -35), -xDir, player, player.getNextActorNetId(), true);
-			} else {
-				new LockDownMissileStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
-				new LockDownMissileStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
-			
-			}
-				LockDownCD = 2;
-		}
 
+		if (!isInDamageSprite()) {
+			if (player.input.isR2Pressed(player) && LockDownCD == 0
+			&& charState is not VKamaeBDash and not VAVAKamae and not VKamaeDash and not VKote
+			) {
+
+				playSound("mk2stunshot", sendRpc: true);
+				new Anim(pos.addxy(0, -35), "dust", 1, player.getNextActorNetId(), true, true);
+				if (charState is not InRideArmor) {
+					new LockDownMissileStart(new VileMK2Grab(), pos.addxy(0, -35), xDir, player, player.getNextActorNetId(), true);
+					new LockDownMissileStart(new VileMK2Grab(), pos.addxy(0, -35), -xDir, player, player.getNextActorNetId(), true);
+				} else {
+					new LockDownMissileStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
+					new LockDownMissileStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
+
+				}
+				LockDownCD = 2;
+			}
+		}
 		if (ResitDeathTimes > 0) {
 
 			selfDamageCooldown += Global.spf;
 			if (selfDamageCooldown >= 1 && !isInDamageSprite()
 			&& !isAttacking() && !sprite.name.Contains("grab")) {
 				selfDamageCooldown = 0;
-				applyDamage(0.5f * ResitDeathTimes, player, this, null, (int)ProjIds.SelfDmg);
+				applyDamage(2f * ResitDeathTimes, player, this, null, (int)ProjIds.SelfDmg);
 			}
 
 			deathsmoketime += Global.spf;
@@ -324,7 +326,7 @@ public class VAVA2 : Vile {
 		}
 
 		// vileteleport
-		if (charState is VileDodge &&
+		if (charState is CrimsonPhantomState &&
 		linkedRideArmor != null &&
 		player.input.isPressed(Control.Up, player)) {
 			changeState(new VileTeleport(linkedRideArmor.pos), true);
@@ -423,6 +425,7 @@ public class VAVA2 : Vile {
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
+		Helpers.decrementFrames(ref CrimsonphantomCD);
 
 
 		if (player.input.isPressed(Control.WeaponLeft, player)
@@ -447,16 +450,7 @@ public class VAVA2 : Vile {
 		}
 
 
-		if (charState is not VileStationaryHover &&
-			GenericDodgeCD == 0 && player.canControl) {
-			if (!isInDamageSprite() &&
-			   player.input.isPressed(Control.Dash, player)
-			 && player.input.checkDoubleTap(Control.Dash)) {
-				changeState(new VileDodge(), true);
-				rideArmorPlatform = null;
-				GenericDodgeCD = 1;
-			}
-		}
+	
 		if (charState is not VileStationaryHover && charState is not VileHover &&
 				player.input.isHeld(Control.AimAngleUp, player) &&
 			vileForm == 2 && player.canControl) {
@@ -486,7 +480,7 @@ public class VAVA2 : Vile {
 		}
 
 	}
-
+public float CrimsonphantomCD;
 
 	// Vile attacks
 	public override bool attackCtrl() {
@@ -625,12 +619,13 @@ public class VAVA2 : Vile {
 		}
 
 
-		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
+		if (BumptyBoomCD == 0
 		&& VileMode == 1 && (grounded || charState is AirDash)) {
 
 			changeState(new HardKnuckleVState(), true);
 				new HardKnuckleVProj(this, pos.addxy(0,-30), xDir, player.getNextActorNetId(), true, player);
 			playSound("super_adaptor_punch", sendRpc: true);
+			BumptyBoomCD = 2;
 	
 		}
 		if (VileMode == 0 && (grounded || charState is AirDash)) {
@@ -640,6 +635,8 @@ public class VAVA2 : Vile {
 
 		return false;
 	}
+
+
 
 	public bool dashGrabSpecial() {
 		if (charState is Dash || charState is AirDash) {
@@ -703,6 +700,17 @@ public class VAVA2 : Vile {
 			return true;
 		}
 
+		
+		if (player.input.isL2Held(player)) {
+			if (player.input.isAPressed(player)) {
+				changeState(new Vava1GrabStartState(), true);
+			}
+			if (player.input.isPressed(Control.Dash, player) && CrimsonphantomCD == 0) {
+				changeState(new CrimsonPhantomState(grounded), true);
+				CrimsonphantomCD = 0.3f;
+			}
+		}
+
 		if (!grounded &&
 			canVileHover() &&
 			player.input.isPressed(Control.Jump, player) &&
@@ -720,9 +728,6 @@ public class VAVA2 : Vile {
 			player.vileAmmo -= 10;
 		}
 		if (chargeLevel == 2) {
-			int input = player.input.getYDir(player);
-				new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
-				playSound("buster2", sendRpc: true);
 		
 			player.vileAmmo -= 15;
 		}
@@ -735,6 +740,7 @@ public class VAVA2 : Vile {
 				player.getNextActorNetId(), i * 85
 				);
 				}
+			
 			} else if (player.input.isLeftOrRightHeld(player)) {
 				playSound("noise_crush_charged");
 				new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
@@ -1051,14 +1057,16 @@ public class VAVA2 : Vile {
 			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.VileStomp, player, 0, 0, 0
 			, addToLevel : true);
 		}
-		if (sprite.name.Contains("vilemk5_stomp")) {
+		if (sprite.name.Contains("ra_bomb")) {
 			proj = new GenericMeleeProj(new VileStomp(),
 			centerPoint, ProjIds.VileStomp2, player, 0.3f, 0, 5f, addToLevel : true);
 		}
+		
+
 
 		if (sprite.name.Contains("air_bomb_attack")) {
 			proj = new GenericMeleeProj(new MechFrogStompWeapon(),
-			centerPoint, ProjIds.MechFrogStompShockwave, player, 0, 30, 0, addToLevel : true);
+			centerPoint, ProjIds.MechFrogStompShockwave, player, 0, 30, 0, addToLevel: true);
 		}
 		if (sprite.name.Contains("violentcrusher_grab")) {
 			proj = new GenericMeleeProj(new MechFrogStompWeapon(),
@@ -1067,7 +1075,7 @@ public class VAVA2 : Vile {
 
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, 
-			ProjIds.VileMK2Grab, player, 0, 0, 0, addToLevel : true);
+			ProjIds.VileMK2Grab2, player, 0, 0, 0, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("block")) {

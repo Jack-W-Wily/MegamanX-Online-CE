@@ -40,7 +40,6 @@ public class Iris : Character {
 			charState is not BlockWCUT
 		) {
 			changeState(new BlockWCUT());
-			return true;
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
 			changeState(new WcutGenericDodgeF(), true);	

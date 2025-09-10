@@ -56,7 +56,7 @@ public class VileDodge : CharState {
 	public float dashTime = 0;
 	public int initialDashDir;
 	
-	//public BanzaiBeetleProj Banzai;
+	public BanzaiBeetleProj Banzai;
 
 	public VileDodge() : base("roll", "", "") {
 		attackCtrl = false;
@@ -98,11 +98,11 @@ public class VileDodge : CharState {
 
 		if (character.sprite.name.Contains("banzai")
 		&& character.frameIndex == 4){	
-	//		if (Banzai == null){
-	//		Banzai=	new BanzaiBeetleProj(new VileMK2Grab(), 
-	//		character.pos.addxy(0,-30), character.xDir, player, 
-	//		player.getNextActorNetId(), true);
-	//		}
+			if (Banzai == null){
+			Banzai=	new BanzaiBeetleProj(new VileMK2Grab(), 
+			character.pos.addxy(0,-30), character.xDir, player, 
+			player.getNextActorNetId(), true);
+			}
 		}
 
 

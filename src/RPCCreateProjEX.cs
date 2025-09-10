@@ -338,8 +338,14 @@ public partial class RPCCreateProj : RPC {
 		{ (int)VAVA2ProjIds.WildCoilCharged, WildCoilChargedProj.rpcInvoke },
 		{ (int)VAVA2ProjIds.HardKnuckleV, HardKnuckleVProj.rpcInvoke },
 		{ (int)VAVA2ProjIds.SlashClawV, ArrowSlashProj.rpcInvoke },
+		{ (int)ProjIds.TerritorialPowProj, TerritorialPowProj.rpcInvoke },
+		{ (int)ProjIds.InfinityGigSecond, InfinityGigSecond.rpcInvoke },
+		{ (int)ProjIds.InfinityGigThird, InfinityGigThird.rpcInvoke },
+		{ (int)ProjIds.SwordBouquetProj, SwordBouquetProj.rpcInvoke },
+		{ (int)ProjIds.SwordBouquetStart, SwordBouquetStart.rpcInvoke },
+		{ (int)ProjIds.BurningDriveProj, BurningDriveProj.rpcInvoke },
 
-	
+		
 		// Kurumitos
 
 		{ (int)ProjIds.OrochinagiProj, OrochinagiChargedProj.rpcInvoke },

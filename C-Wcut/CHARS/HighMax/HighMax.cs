@@ -24,6 +24,10 @@ public class HighMax : Character {
 		return false;
 	}
 
+	public override bool canUseLadder() {
+		return false;
+	}
+
 	public override bool canWallClimb() {
 		return false;
 	}

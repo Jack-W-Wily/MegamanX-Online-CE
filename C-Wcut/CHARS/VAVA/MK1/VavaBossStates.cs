@@ -328,6 +328,9 @@ public class CrimsonPhantomState : CharState {
 		base.onEnter(oldState);
 		character.stopMoving();
 		character.useGravity = false;
+		if (character.sprite.name.Contains("mk2")) {
+			character.changeSpriteFromName("roll", true);
+		}
 	}
 
 	public override void onExit(CharState newState) {
@@ -564,6 +567,8 @@ public class VavaBurensen2 : CharState {
 				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
 						player.getNextActorNetId(), rpc: true
 				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
 			}
 
 		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {

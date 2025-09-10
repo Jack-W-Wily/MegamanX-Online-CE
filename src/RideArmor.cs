@@ -2273,6 +2273,17 @@ public class InRideArmor : CharState {
 			stunAnim = null;
 		}
 
+		if (player.input.isPressed(Control.Taunt,player)) {
+				character.changeSpriteFromName("ra_taunt", true);
+		}
+		 if (!character.sprite.name.Contains("ra_bomb") &&
+				!character.sprite.name.Contains("ra_taunt") &&
+				!character.sprite.name.Contains("ra_show") &&
+			 character.sprite.isAnimOver()) {
+				character.changeSpriteFromName("ra_idle", true);
+			}
+		
+
 		if (!isHiding) {
 			if (character.rideArmor != null && character.rideArmor.isAttacking()) {
 				character.changeSpriteFromName("ra_attack", true);
@@ -2309,6 +2320,13 @@ public class InRideArmor : CharState {
 		if (vile.napalmWeapon.shootCooldown > 0) {
 			return;
 		}
+		if (character.sprite.name.Contains("mk5")) {
+			character.changeSpriteFromName("ra_bomb", true);
+		}
+		if (character.sprite.name.Contains("mk2") && player.superAmmo >= player.superMaxAmmo) {
+			character.changeSpriteFromName("ra_bomb", true);
+			player.superMaxAmmo -= 32;
+		}
 		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new SplashHitGrenadeProj(
@@ -2324,7 +2342,7 @@ public class InRideArmor : CharState {
 		} else {
 			vile.setVileShootTime(vile.napalmWeapon, targetCooldownWeapon: new Napalm(NapalmType.RumblingBang));
 			grenade = new NapalmGrenadeProj(
-				character.pos.addxy(0, -3), character.xDir, vile, 
+				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		}

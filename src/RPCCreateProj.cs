@@ -200,6 +200,12 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.InfinityGigWC:
 				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.InfinityGig), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.EgotisticalPillProj:
+				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.EgotisticalPill), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.NapalmGrenade:
+				proj = new BumptyBoomProj(new Napalm(NapalmType.NoneBall), pos, xDir, player, netProjByte);
+				break;
 			//case (int)ProjIds.Vulcan:
 			//	proj = new VulcanProj(new Vulcan(VulcanType.CherryBlast), pos, xDir, player, netProjByte);
 			//	break;

@@ -129,18 +129,18 @@ public class LightDash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop) {
-			character.moveXY(character.getDashSpeed() * 1.15f * dashDir, 0);
+				character.move(new Point(character.getDashSpeed() * 1.2f * dashDir, 0));
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.moveXY(character.getRunSpeed() * inputXDir * 1.15f, 0);
+				character.move(new Point(character.getDashSpeed() * 1.2f * dashDir, 0));
 			character.changeState(character.getRunState(), true);
 			return;
 		}
 		// Speed at start and end.
 		else if (!stop || dashHeld) {
-			character.moveXY(character.getRunSpeed() * dashDir * 1.15f, 0);
-		}
+				character.move(new Point(character.getDashSpeed() * dashDir, 0));
+	}
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
 				character.pos.addxy(-15 * dashDir, -7),
@@ -239,15 +239,15 @@ public class GigaAirDash : CharState {
 		}
 		// Dash regular speed.
 		if (dashTime >= 4 && !stop || stop && dashHeld) {
-			character.moveXY(character.getDashSpeed() * 1.15f * dashDir, 0);
+				character.move(new Point(character.getDashSpeed() * 1.2f * dashDir, 0));
 		}
 		// Dash start and end while hold.
 		else if (!stop) {
-			character.moveXY(character.getDashSpeed() * dashDir * 1.15f, 0);
+				character.move(new Point(character.getDashSpeed() * 1.2f * dashDir, 0));
 		}
 		// Air move.
 		else if (inputXDir != 0) {
-			character.moveXY(character.getDashSpeed() * inputXDir, 0);
+				character.move(new Point(character.getDashSpeed() * 1.2f * dashDir, 0));
 		}
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
@@ -622,12 +622,12 @@ public class XTaunt : CharState {
 		if (!once) {
 			once = true;
 			character.playSound("ching", sendRpc: true);
-			new Anim(
-				character.pos.addxy(character.xDir * 4, -22f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
+	//		new Anim(
+	//			character.pos.addxy(character.xDir * 4, -22f),
+	//			"zero_ching", -character.xDir,
+	//			player.getNextActorNetId(),
+	//			destroyOnEnd: true, sendRpc: true
+	//		);
 		}
 	}
 }

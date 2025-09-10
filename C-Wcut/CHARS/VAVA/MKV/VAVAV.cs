@@ -545,9 +545,9 @@ public class VAVAV : Vile {
 		bool HeldDown = player.input.isHeld(Control.Down, player);
 		bool dashorairdash = charState is Dash || charState is AirDash;
 		if (!grounded && !dashorairdash) {
-			if (!HeldDown && AirBombCD == 0 && VileMode == 0) {
+			if ( AirBombCD == 0 && VileMode == 0) {
 				AirBombCD = 0.5f;
-				changeState(new ExplosiveRoundState(), true);
+				changeState(new MetalBladeKnee(), true);
 				player.vileAmmo -= 4;
 			}
 			if (!HeldDown && AirBombCD == 0 && VileMode == 1) {
@@ -555,11 +555,7 @@ public class VAVAV : Vile {
 				changeState(new SpreadShotKnee(), true);
 			}
 
-			if (HeldDown && AirSplashHitCD == 0 && VileMode == 0) {
-				AirSplashHitCD = 0.5f;
-				changeState(new PeaceOutRollerAttack(), true);
-				player.vileAmmo -= 8;
-			}
+			
 			if (HeldDown && AirSplashHitCD == 0 && VileMode == 1) {
 				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
 			}
@@ -574,9 +570,9 @@ public class VAVAV : Vile {
 
 
 		if (player.input.isHeld(Control.Down, player)
-		&& BumptyBoomCD == 0 && VileMode == 0 && grounded) {
+		&& BumptyBoomCD == 0 && VileMode == 1 && grounded) {
 			BumptyBoomCD = 0.8f;
-			changeState(new BumptyBoomGranadeLaunch(), true);
+			changeState(new AirFireNadeLaunch(), true);
 			player.vileAmmo -= 8;
 		}
 
@@ -587,13 +583,7 @@ public class VAVAV : Vile {
 			player.vileAmmo -= 8;
 		}
 
-		if (player.input.isHeld(Control.Up, player)
-		&& AirSplashHitCD == 0 && VileMode == 0 && (vileForm == 1 || isVava2)) {
-			AirSplashHitCD = 1.5f;
-			changeState(new AirFireNadeLaunch(), true);
-			player.vileAmmo -= 8;
-		}
-
+		
 
 		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
 		&& VileMode == 1 && (grounded || charState is AirDash)) {
@@ -680,12 +670,16 @@ public class VAVAV : Vile {
 		}
 		return base.normalCtrl();
 	}
-	public void shoot(int chargeLevel) {
+	public override void shoot(int chargeLevel) {
 		if (chargeLevel == 1) {
-				changeState(new HexaInvoluteState(), true);
+				
 			player.vileAmmo -= 10;
 		}
 		if (chargeLevel == 2) {
+				int input = player.input.getYDir(player);
+				new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
+				playSound("buster2", sendRpc: true);
+		
 			player.vileAmmo -= 15;
 		}
 
@@ -1006,7 +1000,7 @@ public class VAVAV : Vile {
 
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, 
-			ProjIds.VileMK2Grab, player, 0, 0, 0, addToLevel : true);
+			ProjIds.VileMK2Grab2, player, 0, 0, 0, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("block")) {
@@ -1092,7 +1086,7 @@ public class VAVAV : Vile {
 
 		if (sprite.name.Contains("spring_grab") && VileMode == 0) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileMK2Grab, player,
+				new VileStomp(), centerPoint, ProjIds.VileMK2Grab2, player,
 				0, 0, 15f, isDeflectShield: true
 			, addToLevel : true);
 		}

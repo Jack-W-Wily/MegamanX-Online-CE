@@ -367,6 +367,24 @@ public class RockmanX : MegamanX {
 
 	
 
+	
+	public override void render(float x, float y) {
+
+
+
+	
+
+		if (player.isMainPlayer && overDriveTimer > 0) {
+			float healthPct = Helpers.clamp01((15 - overDriveTimer) / 15);
+			float sy = -27;
+			float sx = 20;
+			if (xDir == -1) sx = 90 - 20;
+			drawFuelMeter(healthPct, sx, sy);
+		}
+		base.render(x, y);
+	}
+
+
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
 			chargeEffect.stop();

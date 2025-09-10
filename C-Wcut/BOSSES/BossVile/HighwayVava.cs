@@ -265,7 +265,10 @@ public class HighwayVAVA : Vile {
 		if (player.input.isBPressed(player)) {
 			if (grounded) {
 				if (player.input.isHeld(Control.Up, player)) {
-					changeState(new WildHorseKickState(), true);
+					if (player.vileAmmo > 20) {
+						changeState(new WildHorseKickState(), true);
+						player.vileAmmo -= 20;
+					}
 				} else if (player.input.isHeld(Control.Down, player)) {
 					
 				} else {
@@ -577,7 +580,7 @@ public class HighwayVAVA : Vile {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"vilemk2_block"  => MeleeIds.Blocking,
-			"vilemk2_deadlift"  => MeleeIds.DeadLiftEX,
+			"vilemk2_deadlift"   => MeleeIds.DeadLiftEX,
 			"vilemk2_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vilemk2_jab_1" => MeleeIds.Jab,
 			"vilemk2_jab_2" => MeleeIds.Jab2,

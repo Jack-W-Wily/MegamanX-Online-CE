@@ -45,13 +45,13 @@ public class HardKnuckleVProj : Projectile {
 	public float minTime;
 	public Actor? target;
 	public HardKnuckleV? HardKnuckleV;
-	float projSpeed = 240;
+	float projSpeed = 140;
 
 	public HardKnuckleVProj(
 		Actor owner, Point pos, int xDir, ushort? netProjId, 
 		bool rpc = false, Player? altPlayer = null
 	) : base(
-			pos, xDir, owner, "rocket_punch_proj", netProjId, altPlayer
+			pos, xDir, owner, "vilemk2_hardknuckle", netProjId, altPlayer
 	) {
 
 		projId = (int)VAVA2ProjIds.HardKnuckleV;
@@ -71,7 +71,7 @@ public class HardKnuckleVProj : Projectile {
 
 		vel.x = projSpeed * xDir;
 		damager.damage = 3;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
 
 		if (rpc) {
