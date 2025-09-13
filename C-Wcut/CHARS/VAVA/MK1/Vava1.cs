@@ -228,13 +228,21 @@ public class VAVA1 : Vile {
 			if (player.input.isAPressed(player)) {
 				if (grounded) {
 					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 14) {
-						changeState(new InfinityGigAttack(), true);
+						if (player.vileAmmo >= 25) {
+							changeState(new InfinityGigAttackBossVer(), true);
+							player.vileAmmo -= 25;
 						}			
 					}
 					 else if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 14) {
-						changeState(new SpoiledBratPunch(), true);
+						if (upPressedTimes >= 2) {
+							if (player.vileAmmo >= 20) {
+								changeState(new EgotisticalPillAttack(), true);
+								upPressedTimes = 0;
+							}
+						} else {
+							if (player.vileAmmo >= 14) {
+								changeState(new SpoiledBratPunch(), true);
+							}
 						}
 					}
 					
@@ -246,17 +254,24 @@ public class VAVA1 : Vile {
 						}
 					} else {
 						if (!player.input.isHeld(Control.Down, player)) {
-							if (charState is not InfinityGigAttack or SpoiledBratPunch) {
+							if (charState is not InfinityGigAttackBossVer or SpoiledBratPunch) {
 								changeState(new VAVAJab1(), true);
 							}
 						} else {
-							changeState(new VAVAUpperCutPunch(), true);
+							if (downPressedTimes >= 2 && player.vileAmmo >= 26) {
+								changeState(new VAVAGoldenRight(), true);
+								player.vileAmmo -= 26;
+								downPressedTimes = 0;
+							} else {
+								changeState(new VAVAUpperCutPunch(), true);
+							}
 						}
 					}
 				} else {
 					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 14) {
-						changeState(new InfinityGigAttack(), true);
+							if (player.vileAmmo >= 25) {
+							changeState(new InfinityGigAttackBossVer(), true);
+							player.vileAmmo -= 25;
 						}			
 					} else {
 						if (player.vileAmmo >= 4) {
@@ -273,7 +288,17 @@ public class VAVA1 : Vile {
 				if (player.input.isHeld(Control.Up, player)) {
 					changeState(new WildHorseKickState(), true);
 				} else if (player.input.isHeld(Control.Down, player)) {
-					changeState(new BumptyBoomGranadeLaunch(), true);
+					if (downPressedTimes >= 2) {
+						if (player.vileAmmo >= 15) {
+							changeState(new RumblingBangLaunch(), true);
+							player.vileAmmo -= 15;
+						}
+					} else {
+						if (player.vileAmmo >= 25) {
+							changeState(new BumptyBoomGranadeLaunch(), true);
+							player.vileAmmo -= 25;
+						}
+						}
 				} else {
 					if (player.input.isLeftOrRightHeld(player)) {
 					} else {
@@ -290,14 +315,30 @@ public class VAVA1 : Vile {
 						if (player.input.isHeld(Control.Up, player)) {
 							if (player.vileAmmo > 15){
 								if (!player.input.isL2Held(player)) {
-									changeState(new PeaceOutRollerAttack());
+									if (getChargeLevel() > 2) {
+										changeState(new SwordBouqueteLaunch());
+										stopCharge();
+									} else {
+										changeState(new PeaceOutRollerAttack());
+									}
 								} else {
-									changeState(new AirSplashHitGranadeLaunch(), true);	
+									if (getChargeLevel() > 2) {
+										changeState(new BurningDriveState());
+										stopCharge();
+									} else {
+										changeState(new TerriotiralPowState());
+									}
+										
 								}
 							player.vileAmmo -= 15;
 							}
 						} else {
-							changeState(new ExplosiveRoundState(), true);
+								if (!player.input.isL2Held(player)) {
+									changeState(new ExplosiveRoundState());
+								} else {
+									changeState(new AirSplashHitGranadeLaunch(), true);			
+								}
+						
 							player.vileAmmo -= 10;
 						}
 					}
@@ -604,7 +645,7 @@ public class VAVA1 : Vile {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"vava_block"  => MeleeIds.Blocking,
-			"vava_deadlift"  => MeleeIds.DeadLiftEX,
+			"vava_deadlift" or "vava_golden_right" => MeleeIds.DeadLiftEX,
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vava_jab_1" => MeleeIds.Jab,
 			"vava_jab_2" => MeleeIds.Jab2,

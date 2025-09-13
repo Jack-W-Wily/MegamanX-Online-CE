@@ -103,7 +103,7 @@ public class JunkShieldPiece : Anim {
 	Anim magnet;
 	float startAng;
 	float ang;
-	float radius = 80;
+	float radius = 120;
 	public JunkShieldPiece(
 		Point pos, int xDir, Character character, ushort? netId, float ang, Anim magnet
 	) : base(
@@ -178,12 +178,14 @@ public class JunkShieldProj : Projectile {
 	Player? player;
 	Vile? vile;
 	float ang;
-	float radius = 30;
+	float radius = 40;
 	bool sound;
+	
+	public Pickup? pickup;
 
 	public JunkShieldProj(
-		Actor owner, Point pos, int xDir, float ang, 
-		ushort? netProjId, bool rpc = false, Player? altPlayer = null 
+		Actor owner, Point pos, int xDir, float ang,
+		ushort? netProjId, bool rpc = false, Player? altPlayer = null
 	) : base(
 		pos, xDir, owner, "junk_shield_pieces", netProjId, altPlayer
 	) {
@@ -196,17 +198,17 @@ public class JunkShieldProj : Projectile {
 				changePos(vile.getCenterPos().add(Point.createFromByteAngle(ang).times(radius)));
 			}
 		}
-		
+
 		damager.damage = 1;
 		damager.flinch = 1;
 		damager.hitCooldown = 15;
 
 		destroyOnHit = true;
 		frameSpeed = 0;
-		
+
 		player = altPlayer;
 		this.ang = ang;
-		
+
 		canBeLocal = false;
 
 		if (rpc) {
@@ -242,15 +244,29 @@ public class JunkShieldProj : Projectile {
 
 		if (player == null) return;
 
-		if ((time >= (Global.speedMul * 15) / 60 && player.input.isPressed(Control.Shoot, player))	) {
+		if ((time >= (Global.speedMul * 50) / 120 && player.input.isPressed(Control.Shoot, player))	) {
 			shootProjs();
 		}
 	}
+
+		public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is Pickup && pickup == null) {
+			pickup = other.gameObject as Pickup;
+			if (!pickup?.ownedByLocalPlayer == true) {
+				pickup?.takeOwnership();
+				RPC.clearOwnership.sendRpc(pickup?.netId);
+			}
+		}
+	
+	}
+	
 	
 	public override void onDestroy() {
 		base.onDestroy();
 		if (!ownedByLocalPlayer || vile == null) return;
-		
+
 		vile.junkShieldProjs.Remove(this);
 	}
 
@@ -285,17 +301,36 @@ public class JunkShieldProj : Projectile {
 
 	public void shoot(float a) {
 		if (vile == null) return;
-
-		new JunkShieldProj2(
+		if (Helpers.randomRange(0, 1) == 0) {
+			new JunkShieldProj2(
 			vile, vile.getCenterPos(), xDir, damager.owner.getNextActorNetId(), frameIndex, a, true
 		);
+		} else {
+				new JunkShieldProj2(
+			vile, vile.getCenterPos(), -xDir, damager.owner.getNextActorNetId(), frameIndex, a, true
+		);
+		}
 
 		destroySelf();
 	}
 }
 
 
+
+
 public class JunkShieldProj2 : Projectile {
+
+	public float angleDist = 0;
+	public float turnDir = 1;
+	public Pickup? pickup;
+	public float angle2;
+
+	public float maxSpeed = 350;
+	public float returnTime = 0.15f;
+	public float turnSpeed = 300;
+	public float maxAngleDist = 180;
+	public float soundCooldown;
+
 	public JunkShieldProj2(
 		Actor owner, Point pos, int xDir, ushort? netId,
 		int fi, float ang, bool rpc = false, Player? altPlayer = null
@@ -310,10 +345,75 @@ public class JunkShieldProj2 : Projectile {
 		damager.damage = 2;
 		damager.hitCooldown = 60;
 
-		vel = Point.createFromByteAngle(ang).times(180);
+			vel = new Point(350 * xDir, 50);
+		
 
 		if (rpc) rpcCreate(pos, owner, ownerPlayer, netId, xDir, new byte[] { (byte)fi, (byte)ang });
 	}
+
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is Pickup && pickup == null) {
+			pickup = other.gameObject as Pickup;
+			if (!pickup?.ownedByLocalPlayer == true) {
+				pickup?.takeOwnership();
+				RPC.clearOwnership.sendRpc(pickup?.netId);
+			}
+		}
+
+		if (time > returnTime && other.gameObject is Character character && character.player == damager.owner) {
+			if (pickup != null) {
+				pickup.changePos(character.getCenterPos());
+			}
+			destroySelf();
+			character.addAmmo(8);
+		}
+	}
+	public override void onDestroy() {
+		base.onDestroy();
+		if (pickup != null) {
+			pickup.useGravity = true;
+			pickup.collider.isTrigger = false;
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!destroyed && pickup != null) {
+			pickup.collider.isTrigger = true;
+			pickup.useGravity = false;
+			pickup.changePos(pos);
+		}
+
+		soundCooldown -= Global.spf;
+		if (soundCooldown <= 0) {
+			soundCooldown = 0.3f;
+		
+		}
+
+
+		if (time > returnTime) {
+			if (angleDist < maxAngleDist) {
+				var angInc = (-xDir * turnDir) * Global.spf * turnSpeed;
+				angle2 += angInc;
+				angleDist += MathF.Abs(angInc);
+				vel.x = Helpers.cosd(angle2) * maxSpeed;
+				vel.y = Helpers.sind(angle2) * maxSpeed;
+			}  else if (damager.owner.character != null) {
+				var dTo = pos.directionTo(damager.owner.character.getCenterPos()).normalize();
+				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
+				destAngle = Helpers.to360(destAngle);
+				angle2 = Helpers.lerpAngle(angle2, destAngle, Global.spf * 10);
+				vel.x = Helpers.cosd(angle2) * maxSpeed;
+				vel.y = Helpers.sind(angle2) * maxSpeed;
+			} else {
+				destroySelf();
+			}
+		}
+	}
+
 
 	public static Projectile rpcInvoke(ProjParameters arg) {
 		return new JunkShieldProj2(
@@ -322,3 +422,8 @@ public class JunkShieldProj2 : Projectile {
 		);
 	}
 }
+
+
+
+
+

@@ -55,7 +55,7 @@ public class ZeroSlash1State : ZeroGenericMeleeState {
 			zero.specialPressTime > zero.shootPressTime &&
 			character.sprite.frameIndex >= 8 
 		) {
-			zero.groundSpecial.attack2(zero);
+			zero.changeState(new Raijingeki(true), true);
 			return true;
 		}
 		if (zero.shootPressed || player.isAI) {
@@ -80,7 +80,7 @@ public class ZeroSlash2State : ZeroGenericMeleeState {
 			zero.specialPressTime > zero.shootPressTime &&
 			character.sprite.frameIndex >= 6 
 		) {
-			zero.groundSpecial.attack2(zero);
+			zero.changeState(new Raijingeki(true), true);
 			return true;
 		}
 		if (zero.shootPressed || player.isAI) {
@@ -151,9 +151,18 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 			return;
 		}
 	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (zero.isViral){
+		zero.changeSpriteFromName("cmoon", true);
+		}
+	}
+
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		zero.kuuenzanCooldown = 30;
+		
 	}
 }
 
@@ -195,6 +204,7 @@ public class ZeroShippuugaState : ZeroGenericMeleeState {
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		
 		altCtrls[1] = true;
 	}
 }

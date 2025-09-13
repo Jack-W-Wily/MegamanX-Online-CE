@@ -943,29 +943,31 @@ class Program {
 
 		// Set up special sprites.
 		// Mods that does not use this should remove this thing.
-		Sprite.xArmorBootsBitmap[0] = Global.textures["XBoots"];
-		Sprite.xArmorBodyBitmap[0] = Global.textures["XBody"];
-		Sprite.xArmorHelmetBitmap[0] = Global.textures["XHelmet"];
-		Sprite.xArmorArmBitmap[0] = Global.textures["XArm"];
+		/*
+			Sprite.xArmorBootsBitmap[0] = Global.textures["XBoots"];
+			Sprite.xArmorBodyBitmap[0] = Global.textures["XBody"];
+			Sprite.xArmorHelmetBitmap[0] = Global.textures["XHelmet"];
+			Sprite.xArmorArmBitmap[0] = Global.textures["XArm"];
 
-		Sprite.xArmorBootsBitmap[1] = Global.textures["XBoots2"];
-		Sprite.xArmorBodyBitmap[1] = Global.textures["XBody2"];
-		Sprite.xArmorHelmetBitmap[1] = Global.textures["XHelmet2"];
-		Sprite.xArmorArmBitmap[1] = Global.textures["XArm2"];
+			Sprite.xArmorBootsBitmap[1] = Global.textures["XBoots2"];
+			Sprite.xArmorBodyBitmap[1] = Global.textures["XBody2"];
+			Sprite.xArmorHelmetBitmap[1] = Global.textures["XHelmet2"];
+			Sprite.xArmorArmBitmap[1] = Global.textures["XArm2"];
 
-		Sprite.xArmorBootsBitmap[2] = Global.textures["XBoots3"];
-		Sprite.xArmorBodyBitmap[2] = Global.textures["XBody3"];
-		Sprite.xArmorHelmetBitmap[2] = Global.textures["XHelmet3"];
-		Sprite.xArmorArmBitmap[2] = Global.textures["XArm3"];
+			Sprite.xArmorBootsBitmap[2] = Global.textures["XBoots3"];
+			Sprite.xArmorBodyBitmap[2] = Global.textures["XBody3"];
+			Sprite.xArmorHelmetBitmap[2] = Global.textures["XHelmet3"];
+			Sprite.xArmorArmBitmap[2] = Global.textures["XArm3"];
 
-		Sprite.xArmorBootsBitmap[3] = Global.textures["UAXBoots"];
-		Sprite.xArmorBodyBitmap[3] = Global.textures["UAXChest"];
-		Sprite.xArmorHelmetBitmap[3] = Global.textures["UAXHelmet"];
-		Sprite.xArmorArmBitmap[3] = Global.textures["UAXPlasma"];
+			Sprite.xArmorBootsBitmap[3] = Global.textures["UAXBoots"];
+			Sprite.xArmorBodyBitmap[3] = Global.textures["UAXChest"];
+			Sprite.xArmorHelmetBitmap[3] = Global.textures["UAXHelmet"];
+			Sprite.xArmorArmBitmap[3] = Global.textures["UAXPlasma"];
 
-		Sprite.xSaberBitmap[0] = Global.textures["MaxSaber"];
-		Sprite.xSaberBitmap[1] = Global.textures["MaxSaberFront"];
-
+			Sprite.xSaberBitmap[0] = Global.textures["MaxSaber"];
+			Sprite.xSaberBitmap[1] = Global.textures["MaxSaberFront"];
+		*/
+	
 		Sprite.axlArmBitmap = Global.textures["axlArm"];
 
 

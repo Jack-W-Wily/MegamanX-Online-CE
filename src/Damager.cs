@@ -302,6 +302,9 @@ public class Damager {
 				case (int)ProjIds.ParasiticBomb:
 					damagerMessage = onParasiticBombDamage(damagable, owner);
 					break;
+				case (int)ProjIds.BanzaiBeetleProj:
+					damagerMessage = onBanzaiLatch(damagable, owner);
+					break;
 				case (int)ProjIds.SpreadShot:
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
@@ -371,12 +374,13 @@ public class Damager {
 					if (zarzo.charState is not ZeroDoubleBuster and not
 					ZeroSlash1State and not ZeroSlash2State
 					)
-					zarzo.charState.attackCtrl = true;
+						zarzo.charState.attackCtrl = true;
+						zarzo.dashedInAir = 0;
 				}
 				if (zarzo.charState.canSpecialCancel) {
 					zarzo.charState.spcCancel = true;
 				}
-				zarzo.dashedInAir = 0;
+			
 				if (owner.superAmmo != owner.superMaxAmmo) {
 					zarzo.gigaAttack.ammo += 1;
 				}
@@ -772,12 +776,21 @@ public class Damager {
 
 			}
 
+
+			
+				if (projId == (int)ProjIds.VileMK2Grab2) {
+					owner?.character.changeState(new VAVA2GrabState(character));
+					character?.changeState(new ForceGrabbed(owner.character));
+				}
+				
+
+				
 				if (owner?.character is Dragoon) {
 				if (projId == (int)ProjIds.ForceGrabState) {
 					owner?.character.changeState(new DragoonGrab());
 					character?.changeState(new ForceGrabbed(owner.character));
 				}
-				}
+			}
 
 
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
@@ -1698,6 +1711,16 @@ public class Damager {
 		var chr = damagable as Character;
 		if (chr != null && chr.ownedByLocalPlayer && !chr.hasParasite) {
 			chr.addParasite(attacker);
+			chr.playSound("parasiteBombLatch", sendRpc: true);
+		}
+
+		return null;
+	}
+
+	public static DamagerMessage? onBanzaiLatch(IDamagable damagable, Player attacker) {
+		var chr = damagable as Character;
+		if (chr != null && chr.ownedByLocalPlayer && !chr.hasParasite) {
+			chr.addBanzai(attacker);
 			chr.playSound("parasiteBombLatch", sendRpc: true);
 		}
 

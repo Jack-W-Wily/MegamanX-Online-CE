@@ -162,9 +162,9 @@ public class GBD : Character {
 
 	public override void update() {
 		base.update();
-
-		if (OverDrive && vel.x > 0 * xDir){
-			Helpers.decrementTime(ref trailTime);
+		Helpers.decrementTime(ref trailTime);
+		if (OverDrive && vel.x != 0){
+			
 			if (trailTime <= 0) {
 			trailTime = 0.04f;
 			new FStagTrailProj(
@@ -303,13 +303,21 @@ public class GBD : Character {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("kick")) {
+			if (isDashing) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 4f, 20, 5f, isZSaberClang: true, addToLevel: true);
+			}
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true);
+			
 		}
 		if (sprite.name.Contains("grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.ForceGrabState, player, 2f, 0, 5f, isZSaberClang: false, addToLevel: true);
 		}
 		if (sprite.name.Contains("pipe_slash_2")) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, isZSaberClang: true, addToLevel: true);
+			if (isDashing) {
+				return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, isZSaberClang: true, addToLevel: true);
+			}
+				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true);
+		
 		}
 		if (sprite.name.EndsWith("pipe_slash")) {
 			if (isDashing) {

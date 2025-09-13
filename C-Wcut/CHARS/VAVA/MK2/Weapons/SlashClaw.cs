@@ -22,11 +22,11 @@ public class ArrowSlashProj : Projectile {
 	) : base(
 		pos, xDir, owner, "vilemk2_proj_slash", netProjId, altPlayer
 	) {
-		maxTime = 1f;
+		maxTime = 0.2f;
 		projId = (int)VAVA2ProjIds.SlashClawV;
 		fadeSprite = "vilemk2_proj_slash_2";
 		damager.damage = 2;
-		damager.flinch = 5;
+		damager.flinch = 20;
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir);
@@ -43,10 +43,10 @@ public class ArrowSlashProj : Projectile {
 	public override void update() {
 		base.update();
 
-		if (isAnimOver()) {
-			timeMoving += Global.spf;
-			base.vel.x = 240 * xDir;
-		}
+
+		timeMoving += Global.spf;
+		base.vel.x = 240 * xDir;
+		
 
 		if (timeMoving >= Global.spf * 8 && base.vel.y > -120) base.vel.y -= 5;
 

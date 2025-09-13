@@ -56,8 +56,15 @@ public class CallDownMech : VileState {
 		}
 	}
 
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.stopMoving();
+		character.useGravity = false;
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
 	}

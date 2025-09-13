@@ -347,6 +347,7 @@ public class Sprite {
 
 			compositeBitmaps.Add(bitmap);
 			if (armors[2] > 0) {
+
 				compositeBitmaps.Add(rxArmorHelmetBitmap[armors[2] - 1]);
 				compositeBitmaps.Add(xArmorHelmetBitmap[armors[2] - 1]);
 			}
@@ -366,6 +367,70 @@ public class Sprite {
 				isCompositeSprite = true;
 			}
 		}
+
+
+		if (armors != null && animData.RXSprite && !Options.main.fastShaders && !Options.main.disableShaders) {
+			bool isShootSprite = needsX3BusterCorrection();
+		
+			var x3ArmShaders = new List<ShaderWrapper>(shaders);
+			if (hyperBusterReady) {
+				if (Global.isOnFrameCycle(5)) {
+					if (Global.shaderWrappers.ContainsKey("hit")) {
+						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
+					}
+				}
+			}
+
+			compositeBitmaps.Add(bitmap);
+			if (armors[2] > 0) {
+
+				compositeBitmaps.Add(rxArmorHelmetBitmap[armors[2] - 1]);
+			}
+			if (armors[0] > 0) {
+				compositeBitmaps.Add(rxArmorBootsBitmap[armors[0] - 1]);
+			}
+			if (armors[1] > 0) {
+				compositeBitmaps.Add(rxArmorBodyBitmap[armors[1] - 1]);
+			}
+			if (armors[3] > 0) {
+				compositeBitmaps.Add(rxArmorArmBitmap[armors[3] - 1]);
+			}
+			if (compositeBitmaps.Count > 1) {
+				isCompositeSprite = true;
+			}
+		}
+
+			if (armors != null && animData.RXSprite2 && !Options.main.fastShaders && !Options.main.disableShaders) {
+			bool isShootSprite = needsX3BusterCorrection();
+		
+			var x3ArmShaders = new List<ShaderWrapper>(shaders);
+			if (hyperBusterReady) {
+				if (Global.isOnFrameCycle(5)) {
+					if (Global.shaderWrappers.ContainsKey("hit")) {
+						x3ArmShaders.Add(Global.shaderWrappers["hit"]);
+					}
+				}
+			}
+
+			compositeBitmaps.Add(bitmap);
+			if (armors[2] > 0) {
+
+				compositeBitmaps.Add(rxArmorHelmetBitmap2[armors[2] - 1]);
+			}
+			if (armors[0] > 0) {
+				compositeBitmaps.Add(rxArmorBootsBitmap2[armors[0] - 1]);
+			}
+			if (armors[1] > 0) {
+				compositeBitmaps.Add(rxArmorBodyBitmap2[armors[1] - 1]);
+			}
+			if (armors[3] > 0) {
+				compositeBitmaps.Add(rxArmorArmBitmap2[armors[3] - 1]);
+			}
+			if (compositeBitmaps.Count > 1) {
+				isCompositeSprite = true;
+			}
+		}
+
 		if (armors != null && drawXSaber && animData.isXSprite &&
 			!Options.main.fastShaders && !Options.main.disableShaders
 		) {
@@ -1037,6 +1102,13 @@ public class AnimData {
 
 		if (textureName == "RMX_Basics") {
 			RXSprite = true;
+		}
+
+			if (textureName == "GBD") {
+			isVavaMk1SpriteBasics = true;
+		}
+			if (textureName == "RMX_Moves1") {
+			RXSprite2 = true;
 		}
 		if (textureName == "axl") {
 			isAxlSprite = true;

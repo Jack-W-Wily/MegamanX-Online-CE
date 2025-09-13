@@ -1670,7 +1670,7 @@ public class GameMode {
 			return;
 		}
 
-		if (player.character is VAVA1) {
+		if (player.character is VAVA1 or VAVA2 or VAVAV) {
 			baseY += 25;
 			Global.sprites["hud_weapon_base"].drawToHUD(39, baseX, baseY);
 			baseY -= 16;

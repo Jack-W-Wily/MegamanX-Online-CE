@@ -11,6 +11,7 @@ public enum RocketPunchType {
 	GoGetterRight,
 	SpoiledBrat,
 	InfinityGig,
+	EgotisticalPill,
 }
 
 public class RocketPunch : Weapon {
@@ -69,6 +70,21 @@ public class RocketPunch : Weapon {
 			displayName = "Infinity Gig";
 			vileAmmoUsage = 16;
 			projSprite = "rocket_punch_ig_proj";
+			description = new string[] { "Advanced homing technology can be", "difficult to get a handle on." };
+			killFeedIndex = 78;
+			vileWeight = 3;
+			ammousage = vileAmmoUsage;
+			damage = "3";
+			hitcooldown = "0.5";
+			flinch = "13";
+			flinchCD = "1";
+			effect = "Homing,Travels further.";
+		}
+		if (rocketPunchType == RocketPunchType.EgotisticalPill) {
+			fireRate = 60;
+			displayName = "Infinity Gig";
+			vileAmmoUsage = 16;
+			projSprite = "rocket_punch_ep_proj";
 			description = new string[] { "Advanced homing technology can be", "difficult to get a handle on." };
 			killFeedIndex = 78;
 			vileWeight = 3;

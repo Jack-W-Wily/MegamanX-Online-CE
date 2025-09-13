@@ -194,7 +194,7 @@ public class Vile : Character {
 		} else if (!isShootingLongshotGizmo && !isShootingVulcan) {
 			energy.addAmmo(0.25f * speedMul, player);
 		}
-
+		energy.ammo = player.vileAmmo;
 
 		if (energy.ammo >= energy.maxAmmo) {
 			weaponHealAmount = 0;

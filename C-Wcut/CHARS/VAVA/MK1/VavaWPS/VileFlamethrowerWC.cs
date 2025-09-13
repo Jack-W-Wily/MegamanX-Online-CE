@@ -205,3 +205,105 @@ public class GreenEyedLampState : CharState {
 		character.useGravity = true;
 	}
 }
+
+
+
+
+
+
+
+
+
+public class BurningDriveProj : Projectile {
+	public BurningDriveProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId,
+		float damage = 6, int flinch = 26, bool rpc = false
+	) : base(
+		pos, xDir, owner, "burningdrive_proj", netId, player
+	) {
+		damager.damage = damage;
+		damager.flinch = flinch;
+		damager.hitCooldown = 30;
+		reflectable = false;
+		setIndestructableProperties();
+		maxTime = 10f / 60f;
+		projId = (int)ProjIds.BurningDriveProj;
+		isMelee = true;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+		if (ownerPlayer?.character != null) {
+			owningActor = ownerPlayer.character;
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BurningDriveProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+	public override void preUpdate() {
+		base.preUpdate();
+		if (frameIndex % 2 == 1) {
+			alpha = 0.125f;
+		} else {
+			alpha = 1f;
+		}
+	}
+
+	public override void postUpdate() {
+		base.postUpdate();
+		if (owner?.character != null) {
+			incPos(owner.character.deltaPos);
+		}
+	}
+}
+
+
+
+
+public class BurningDriveState : CharState {
+	int bombNum;
+
+	Vile vile = null!;
+
+	public BurningDriveState(string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+		useDashJumpSpeed = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		var poi = character.getFirstPOI();
+		if (!once && poi != null) {
+			once = true;
+			var proj = new BurningDriveProj(
+					poi.Value, character.xDir, vile, character.player,
+					character.player.getNextActorNetId(), rpc: true
+				);
+			proj.vel = new Point(character.xDir * 100, 0);
+			character.playSound("flamemOilBurn", forcePlay: false, sendRpc: true);
+
+		}
+
+		if (stateTime > 0.25f) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+		vile = character as Vile ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+

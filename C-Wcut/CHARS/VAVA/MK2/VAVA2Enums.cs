@@ -12,7 +12,7 @@ public enum VAVA2WeaponID {
 	FreezeCrackerV,
 	ThunderBolt,
 	JunkShield,
-
+	JunkShieldV,
 	NoiseCrushV,
 	DangerWrapV,
 
@@ -31,6 +31,7 @@ public enum VAVA2ProjIds {
 	ThunderBolt,
 	ThunderBoltSplit,
 	JunkShield,
+	MetalBladeV,
 	JunkShield2,
 	ScorchWheelSpawn,
 	ScorchWheel,
@@ -53,6 +54,7 @@ public enum VAVA2ProjIds {
 	RSBomb,
 	RSBombExplosion,
 	LegBreaker,
+	JunkShieldV,
 }
 
 

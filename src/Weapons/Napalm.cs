@@ -10,6 +10,12 @@ public enum NapalmType {
 	RumblingBang,
 	FireGrenade,
 	SplashHit,
+	
+	BumpityBoom,	
+	TerritorialPow,
+	BangAwayBomb,
+	FlameRound,
+	
 }
 
 public class Napalm : Weapon {
@@ -539,6 +545,41 @@ public class SplashHitProj : Projectile {
 		actor.move(new Point(xMoveVel * 50 * modifier, 0));
 	}
 }
+
+
+
+
+public class TerritorialPowProj : Projectile {
+	public TerritorialPowProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "napalm_tp_proj", netId, player
+	) {
+		weapon = XBuster.netWeapon;
+		damager.damage = 0.1f;
+		damager.hitCooldown = 15;
+		maxTime = 2f;
+		setIndestructableProperties();
+		isShield = true;
+		fadeSprite = "rakuhouha_fade";
+		projId = (int)ProjIds.TerritorialPowProj;
+		destroyOnHit = false;
+		netcodeOverride = NetcodeModel.FavorDefender;
+
+		if (rpc) {
+			rpcCreate(pos, player, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BusterPlasmaHitProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+}
+
+
+
 
 public abstract class NapalmAttackTypes : VileState {
 	public string sound = "";

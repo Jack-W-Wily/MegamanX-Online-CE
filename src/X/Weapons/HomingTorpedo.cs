@@ -176,6 +176,8 @@ public class TorpedoProjX : Projectile, IDamagable {
 		return false;
 	}
 } 
+
+
 public class TorpedoProjChargedX : Projectile, IDamagable {
 	public Actor? target;
 	public float smokeTime = 0;
@@ -183,7 +185,7 @@ public class TorpedoProjChargedX : Projectile, IDamagable {
 	public TorpedoProjChargedX(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, float? angle = null, bool rpc = false
 	) : base(
-		pos, xDir, owner, "torpedo_charge", netId, player	
+		pos, xDir, owner, "torpedo_charge", netId, player
 	) {
 		weapon = HomingTorpedo.netWeapon;
 		netcodeOverride = NetcodeModel.FavorDefender;

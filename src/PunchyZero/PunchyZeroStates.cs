@@ -1028,12 +1028,12 @@ public class PZeroTaunt : CharState {
 		if (character.frameIndex == 6 && !once) {
 			once = true;
 			character.playSound("ching", sendRpc: true);
-			new Anim(
-				character.pos.addxy(character.xDir * -7, -28f),
-				"zero_ching", -character.xDir,
-				player.getNextActorNetId(),
-				destroyOnEnd: true, sendRpc: true
-			);
+	//		new Anim(
+	//			character.pos.addxy(character.xDir * -7, -28f),
+	//			"zero_ching", -character.xDir,
+	//			player.getNextActorNetId(),
+	//			destroyOnEnd: true, sendRpc: true
+	//		);
 		}
 	}
 }
