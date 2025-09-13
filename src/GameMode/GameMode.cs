@@ -685,7 +685,7 @@ public class GameMode {
 					}
 					yStart -= 2;
 				}
-				Global.sprites["hud_bars_generic"].drawToHUD(0, xStart, yStart);
+				Global.sprites["hud_health_top"].drawToHUD(0, xStart, yStart);
 			}
 			if (drawPlayer.character is Zero zero) {
 				int yStart = 159;
@@ -1459,53 +1459,25 @@ public class GameMode {
 				greyHp = (float)rmx.lastChipBaseHP;
 			}
 		}
-
-		int frameIndex = player.charNum;
-		if (player.charNum == (int)CharIds.PunchyZero) {
-			frameIndex = 1;
-		}
-		if (player.charNum == (int)CharIds.BusterZero) {
-			frameIndex = 1;
-		}
-
-		if (player.charNum == (int)CharIds.RockmanX) {
-			frameIndex = 0;
-		}
-		if (player.charNum == (int)CharIds.ZeroMID) {
-			
-				frameIndex = 1;
-			
-		}
-		if (player.charNum == (int)CharIds.VAVA1) {
-			frameIndex = 2;
-		}
-		if (player.charNum == (int)CharIds.AxlWC) {
+		int frameIndex = (CharIds)player.charNum switch {
+			CharIds.PunchyZero => 1,
+			CharIds.BusterZero => 1,
+			CharIds.RockmanX => 0,
+			CharIds.ZeroMID => 1,
+			CharIds.VAVA1 => 2,
+			CharIds.AxlWC => 3,
+			CharIds.Dynamo => 11,
+			CharIds.Iris => 18,
+			CharIds.Zain => 13,
+			CharIds.Dragoon => 12,
+			CharIds.GBD => 10,
+			CharIds.HighMax => 19,
+			CharIds.BossMMaverick => 9,
+			_ => player.charNum,
+		};
+		if (player.isDisguisedAxl) {
 			frameIndex = 3;
 		}
-		if (player.charNum == (int)CharIds.Dynamo) {
-			frameIndex = 11;
-		}
-		if (player.charNum == (int)CharIds.Iris) {
-			frameIndex = 18;
-		}
-		if (player.charNum == (int)CharIds.Zain) {
-			frameIndex = 13;
-		}
-		if (player.charNum == (int)CharIds.Dragoon) {
-			frameIndex = 12;
-		}
-		if (player.charNum == (int)CharIds.GBD) {
-			frameIndex = 10;
-		}
-		if (player.charNum == (int)CharIds.HighMax) {
-			frameIndex = 19;
-		}
-		if (player.charNum == (int)CharIds.BossMMaverick) {
-			frameIndex = 9;
-		}
-
-		if (player.isDisguisedAxl) frameIndex = 3;
-
 		float baseX = position.x;
 		float baseY = position.y;
 
@@ -1551,7 +1523,7 @@ public class GameMode {
 		baseY += 25;
 		var healthBaseSprite = spriteName;
 		Global.sprites[healthBaseSprite].drawToHUD(frameIndex, baseX, baseY);
-		baseY -= 16;
+		baseY -= 14;
 		int barIndex = 0;
 		int sBarIndex = 4;
 
@@ -1602,7 +1574,7 @@ public class GameMode {
 			}
 			baseY -= 2;
 		}
-		Global.sprites["hud_bars_generic"].drawToHUD(0, baseX, baseY);
+		Global.sprites["hud_health_top"].drawToHUD(0, baseX, baseY);
 
 		return true;
 	}

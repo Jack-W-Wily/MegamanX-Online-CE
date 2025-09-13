@@ -39,7 +39,7 @@ public class Options {
 
 	// Video settings
 	public bool fullScreen = false;
-	public bool integerFullscreen = true;
+	public bool integerFullscreen = false;
 	public int? graphicsPreset = null;  // 0 = low, 1 = medium, 2 = high, 3 = custom
 	public uint windowScale = 2;
 	public bool disableShaders;

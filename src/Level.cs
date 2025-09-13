@@ -376,7 +376,7 @@ public partial class Level {
 			Global.srtBuffer1 = Global.srtBuffer1L;
 			Global.srtBuffer2 = Global.srtBuffer2L;
 		} else {
-			Global.viewSize = 0.8f;
+			Global.viewSize = 0.833333333f;
 			Global.view.Size = new Vector2f(Global.viewScreenW, Global.viewScreenH);
 			Global.screenRenderTexture = Global.screenRenderTextureS;
 			Global.srtBuffer1 = Global.srtBuffer1S;
