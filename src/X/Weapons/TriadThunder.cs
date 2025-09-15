@@ -312,7 +312,15 @@ public class TriadThunderProjCharged : Projectile {
 			changeSprite("voltc_proj_ground_thunder", true);
 			maxTime = 0.9f;
 			wallCrawlSpeed = 185;
-		} else {
+		}  else if (type == 3) {
+			projId = (int)ProjIds.MissileElecSpark;
+			changeSprite("enemy_missilelec_eball", true);
+			maxTime = 1f;
+
+		}
+		
+		
+		else {
 			maxTime = 1f;
 		}
 
@@ -390,7 +398,7 @@ public class TriadThunderChargedState : CharState {
 			} else {
 				groundedOnce = true;
 				sprite = "punch_ground";
-				character.changeSprite("mmx_punch_ground", true);
+				character.changeSprite("rmx_punch_ground", true);
 			}
 		}
 		if (character.frameIndex >= 6 && !fired) {

@@ -619,8 +619,14 @@ public class LevelData {
 		{ "weathercontrol2", "MakenaiAiGaKittoAru" },
 		{ "sigmaruins", "SigmaRuins" },
 		{ "forest3", "StanUp" },
-		{ "junkfactory_1v1", "DayAfterDay_haji"},
+		{ "junkfactory_1v1", "HellPlant"},
+		{ "redandblue_vs_purple_1v1", "XvsZeroV1_megasfc"},
 		{ "stag_1v1", "VolcanosWrath" },
+
+		{ "st_vava_c1", "VileSelect_MHX_repliroidedofuturo"},
+
+
+		{ "st_x_x1_highway", "CentralHighway"},
 
 	};
 

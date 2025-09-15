@@ -274,7 +274,7 @@ public class Weapon {
 	) {
 	}
 
-	public virtual void vavaShoot(WeaponIds weaponInput, VAVA1 vile) {
+	public virtual void vavaShoot(WeaponIds weaponInput, Vile vile) {
 	}
 	
 	public virtual void vileShoot(WeaponIds weaponInput, Vile vile) {

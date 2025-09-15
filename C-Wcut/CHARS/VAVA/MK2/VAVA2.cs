@@ -334,7 +334,12 @@ public class VAVA2 : Vile {
 
 
 
-
+			if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
+				  player.input.isR2Pressed(player) && player.superAmmo >= player.superMaxAmmo
+			) {
+			changeState(new Vilemk2Mijo(), true);
+			player.superAmmo = 0;
+			}
 
 
 		if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
@@ -1057,7 +1062,7 @@ public float CrimsonphantomCD;
 			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.VileStomp, player, 0, 0, 0
 			, addToLevel : true);
 		}
-		if (sprite.name.Contains("ra_bomb")) {
+		if (sprite.name.Contains("ra_bomb") || sprite.name.Contains("mijo") ) {
 			proj = new GenericMeleeProj(new VileStomp(),
 			centerPoint, ProjIds.VileStomp2, player, 0.3f, 0, 5f, addToLevel : true);
 		}
@@ -1075,7 +1080,7 @@ public float CrimsonphantomCD;
 
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, 
-			ProjIds.VileMK2Grab2, player, 0, 0, 0, addToLevel : true);
+			ProjIds.VileMK2Grab2, player, 0, 0, 120, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("block")) {

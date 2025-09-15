@@ -331,7 +331,7 @@ public partial class MegamanXA : Character {
 		}
 
 		if (shotgunIceChargeTime > 0 && ownedByLocalPlayer) {
-			changeSprite("mmx_" + charState.shootSprite, true);
+			changeSprite("rmx_" + charState.shootSprite, true);
 			shotgunIceChargeTime -= Global.spf;
 			var busterPos = getShootPos().addxy(xDir * 10, 0);
 			if (shotgunIceChargeCooldown == 0) {
@@ -349,12 +349,12 @@ public partial class MegamanXA : Character {
 			if (shotgunIceChargeTime < 0) {
 				shotgunIceChargeTime = 0;
 				shotgunIceChargeCooldown = 0;
-				changeSprite("mmx_" + charState.defaultSprite, true);
+				changeSprite("rmx_" + charState.defaultSprite, true);
 			}
 		}
 
 		if (isShootingRaySplasher && ownedByLocalPlayer) {
-			changeSprite("mmx_" + charState.shootSprite, true);
+			changeSprite("rmx_" + charState.shootSprite, true);
 
 			if (raySplasherCooldown > 0) {
 				raySplasherCooldown += Global.spf;
@@ -375,7 +375,7 @@ public partial class MegamanXA : Character {
 					if (raySplasherMod % 3 == 0) {
 						if (raySplasherMod >= 21) {
 							setShootRaySplasher(false);
-							changeSprite("mmx_" + charState.defaultSprite, true);
+							changeSprite("rmx_" + charState.defaultSprite, true);
 						} else {
 							raySplasherCooldown = Global.spf;
 						}
@@ -604,7 +604,7 @@ public partial class MegamanXA : Character {
 	public void setShootAnim() {
 		string shootSprite = getSprite(charState.shootSprite);
 		if (!Global.sprites.ContainsKey(shootSprite)) {
-			if (grounded) { shootSprite = "mmx_shoot"; } else { shootSprite = "mmx_fall_shoot"; }
+			if (grounded) { shootSprite = "rmx_shoot"; } else { shootSprite = "rmx_fall_shoot"; }
 		}
 		
 		changeSprite(shootSprite, false);
@@ -863,7 +863,7 @@ public partial class MegamanXA : Character {
 		chargedTornadoFang = null;
 		strikeChainProj = null;
 		strikeChainChargedProj = null;
-		changeSprite("mmx_" + charState.sprite, true);
+		changeSprite("rmx_" + charState.sprite, true);
 	}
 
 	public bool hasBusterProj() {
@@ -1027,19 +1027,19 @@ public partial class MegamanXA : Character {
 		}
 
 		return (int)(sprite.name switch {
-			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
-			"mmx_shoryuken" => MeleeIds.Shoryuken,
-			"mmx_beam_saber" or
-			"mmx_beam_saber_air" => MeleeIds.X3Saber,
-			"mmx_beam_saber2" or
-			"mmx_beam_saber_air2" => MeleeIds.X6Saber,
-			"mmx_nova_strike" or
-			"mmx_nova_strike_down" or
-			"mmx_nova_strike_up" => MeleeIds.NovaStrike,
-			"mmx_unpo_grab_dash" => MeleeIds.UPGrab,
-			"mmx_unpo_punch" or
-			"mmx_unpo_air_punch" => MeleeIds.UPPunch,
-			"mmx_unpo_parry_start" => MeleeIds.UPParryBlock,
+			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"rmx_shoryuken" => MeleeIds.Shoryuken,
+			"rmx_beam_saber" or
+			"rmx_beam_saber_air" => MeleeIds.X3Saber,
+			"rmx_beam_saber2" or
+			"rmx_beam_saber_air2" => MeleeIds.X6Saber,
+			"rmx_nova_strike" or
+			"rmx_nova_strike_down" or
+			"rmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_unpo_grab_dash" => MeleeIds.UPGrab,
+			"rmx_unpo_punch" or
+			"rmx_unpo_air_punch" => MeleeIds.UPPunch,
+			"rmx_unpo_parry_start" => MeleeIds.UPParryBlock,
 
 			_ => MeleeIds.None
 		});
@@ -1047,12 +1047,12 @@ public partial class MegamanXA : Character {
 
 	string[] headbuttSprite() {
 		return new string[] {
-			"mmx_jump",
-			"mmx_jump_shoot",
-			"mmx_wall_kick",
-			"mmx_wall_kick_shoot",
-			"mmx_up_dash",
-			"mmx_up_dash_shoot"
+			"rmx_jump",
+			"rmx_jump_shoot",
+			"rmx_wall_kick",
+			"rmx_wall_kick_shoot",
+			"rmx_up_dash",
+			"rmx_up_dash_shoot"
 		};
 	}
 
@@ -1376,7 +1376,7 @@ public partial class MegamanXA : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "mmx_" + spriteName;
+		return "rmx_" + spriteName;
 	}
 
 	public override List<ShaderWrapper> getShaders() {

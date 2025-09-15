@@ -84,7 +84,7 @@ public class Iris : Character {
 
 	public override void update() {
 		base.update();
-		
+
 		// Perifericos
 		if (!isInDamageSprite()) {
 
@@ -122,6 +122,20 @@ public class Iris : Character {
 				new IrisStabProj(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 		}
+
+		if (player.input.isPressed(Control.Special2, player) && linkedRideArmor == null && player.currency > 2) {
+			int raIndex = 7;
+			player.currency -= 3;
+			linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
+			changeState(new CallDownMech(linkedRideArmor, true), true);
+
+		}
+
+		if (player.input.isPressed(Control.Special2, player) && linkedRideArmor != null) {
+				changeState(new CallDownMech(linkedRideArmor, true), true);
+
+		}
+		
 
 
 		// Cooldowns

@@ -249,13 +249,7 @@ public class GigaAirDash : CharState {
 		else if (inputXDir != 0) {
 				character.move(new Point(character.getDashSpeed() * 1.2f * dashDir, 0));
 		}
-		if (exaust == null && dashTime > 3 && !stop) {
-			exaust = new Anim(
-				character.pos.addxy(-15 * dashDir, -7),
-				"fakezero_exhaust", dashDir, player.getNextActorNetId(),
-				false, sendRpc: true, zIndex: character.zIndex - 100, host: character 
-			);
-		}
+	
 		dashTime += character.speedMul;
 
 		if (stop && character.isAnimOver()) {
@@ -353,7 +347,7 @@ public class UpDash : CharState {
 		character.isDashing = true;
 		bool animOver = character.isAnimOver();
 		string fullSpriteName = character.sprite.name;
-		string spriteName = character.sprite.name.RemovePrefix("mmx_");
+		string spriteName = character.sprite.name.RemovePrefix("rmx_");
 		int currentFrame = character.frameIndex;
 		float currentFrameTime = character.frameTime;
 

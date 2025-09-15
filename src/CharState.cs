@@ -531,7 +531,21 @@ public class WarpIdle : CharState {
 		refillNormal();
 
 		if ((character.isAnimOver() || character.sprite.loopCount >= 1) && fullHP && fullAlt) {
-			character.changeToIdleOrFall();
+			if (character is not FinalVava){
+				if (character.isWCUTBoss) {
+					character.changeState(new BossWait(), true);
+				} else {
+					character.changeToIdleOrFall();
+				}
+			} else {
+				if (stateTime > 25){
+					if (character.isWCUTBoss) {
+					character.changeState(new BossWait(), true);
+					} else {
+					character.changeToIdleOrFall();
+					}
+				}
+			}
 		}
 	}
 
@@ -567,10 +581,67 @@ public class WarpIdle : CharState {
 		character.useGravity = false;
 		specialId = SpecialStateIds.WarpIdle;
 		character.invulnTime = firstSpawn ? 5 : 0;
+		if (character is FinalVava) {
+			character.addMusicSource("Vile_vs_X_Zero_Cutscene", character.getCenterPos(), false, loop: false);
+
+		}
+
+		if (Global.level.levelData.name == "st_vava_c1" && player.isAI) {
+			getTestStageEnemies();
+
+		}
+
+		if (Global.level.levelData.name == "st_x_x1_highway" && player.isAI){
+			getHighWayEnemies();
+	
+		}
+
+
+	}
+
+
+	public void getHighWayEnemies() {
+		new MissileElecBlue(player, new Point(740, 640),  new Point(740, 640), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new MissileElecBlue(player, new Point(1200, 600),  new Point(1200, 600), 1, player.getNextActorNetId(), true, sendRpc: true);
+			new MissileElecBlue(player, new Point(4630, 590),  new Point(4630, 590), 1, player.getNextActorNetId(), true, sendRpc: true);
+		
+	
+		new GreenDog(player, new Point(5912, 660), new Point(5912, 660), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new MetClassic(player, new Point(5902, 660),new Point(5902, 660), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new GreenDog(player, new Point(6432, 700), new Point(6432, 700), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new HogumerEasy(player, new Point(6432, 700), new Point(6432, 700),  1, player.getNextActorNetId(), true, sendRpc: true);
+
+		new ViralSigmaShootProj(new MechaniloidWeapon(player, MechaniloidType.BallWalker),
+		new Point(2994, 693), 1, player, player.getNextActorNetId(), rpc: true);
+		new ViralSigmaShootProj(new MechaniloidWeapon(player, MechaniloidType.BallWalker), 
+		new Point(3164, 693), 1, player, player.getNextActorNetId(), rpc: true);
+			
+		new AbelhudoIrregular(player, new Point(2712, 500),  new Point(2712, 500), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new AbelhudoIrregular(player, new Point(3383, 640),  new Point(3383, 640), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new AbelhudoIrregular(player, new Point(5473, 603),  new Point(5473, 603), 1, player.getNextActorNetId(), true, sendRpc: true);
+	
+	}
+
+	
+	public void getTestStageEnemies() {
+		new GreenDog(player, new Point(612, 160), new Point(612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new MetClassic(player, new Point(112, 160), new Point(112, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new GreenDog(player, new Point(1612, 160), new Point(1612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new HogumerEasy(player, new Point(1612, 160), new Point(1612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+
+		new MetClassic(player, new Point(412, 160), new Point(412, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new MetClassic(player, new Point(1080, 124), new Point(1080, 124), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new GreenDog(player, new Point(2612, 166), new Point(2612, 166), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new HogumerEasy(player, new Point(2612, 166), new Point(2612, 166), 1, player.getNextActorNetId(), true, sendRpc: true);
+		new FakeZero(player, new Point(3612, 166), new Point(3612, 166), 1, player.getNextActorNetId(), true, sendRpc: true);
+
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
+		if (character is FinalVava) {
+			character.destroyMusicSource();
+		}
 		character.visible = true;
 		character.useGravity = true;
 		character.splashable = true;
@@ -1415,6 +1486,8 @@ public class LadderEnd : CharState {
 	}
 }
 
+
+
 public class Taunt : CharState {
 	float tauntTime = 1;
 	public Taunt() : base("win") {
@@ -1424,6 +1497,10 @@ public class Taunt : CharState {
 		if (stateTime >= tauntTime) {
 			character.changeToIdleOrFall();
 		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
 	}
 }
 

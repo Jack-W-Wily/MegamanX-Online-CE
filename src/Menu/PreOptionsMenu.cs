@@ -252,15 +252,17 @@ public class PreCPUMenu : IMainMenu {
 	public int selectY;
 	public bool inGame;
 	public float startX = Global.halfScreenW;
-	public int[] optionPos = new int[2];
+	public int[] optionPos = new int[3];
 	public int lineH = 24;
 	public int[] cursorHandler = {
 		(int)Global.halfScreenW - 50,
 		(int)Global.halfScreenW - 70,
+		(int)Global.halfScreenW - 90,
 	};
 	public int[] cursorHandler2 = {
 		(int)Global.halfScreenW + 50,
 		(int)Global.halfScreenW + 70,
+		(int)Global.halfScreenW + 90,
 	};
 	public float Time = 1, Time2;
 	public bool Confirm = false, Confirm2 = false;
@@ -274,7 +276,7 @@ public class PreCPUMenu : IMainMenu {
 	}
 
 	public void update() {
-		Helpers.menuUpDown(ref selectY, 0, 1);
+		Helpers.menuUpDown(ref selectY, 0, 2);
 		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
 			switch (selectY) {
 				case 0:
@@ -282,6 +284,9 @@ public class PreCPUMenu : IMainMenu {
 					break;
 				case 1:
 					enterTraining();
+					break;
+				case 2:
+					enterVavaStage();
 					break;
 			}
 		}
@@ -299,19 +304,43 @@ public class PreCPUMenu : IMainMenu {
 				Menu.change(prevMenu);
 		}
 	}
+
 	public void enterTraining() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == Global.quickStartMap).Value;
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "training").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.X;
+		int spawnAsX = (int)CharIds.RockmanX;
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "training" && GameMode.isStringTeamMode(Global.quickStartTrainingGameMode)) me.alliance = Global.quickStartTeam;
-		if (selectedLevel.name != "training" && GameMode.isStringTeamMode(Global.quickStartGameMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "training" ? Global.quickStartTrainingGameMode : Global.quickStartGameMode;
+		if (selectedLevel.name == "training" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "training" ? Global.quickStartGameMode : Global.quickStartGameMode;
 		int botCount = selectedLevel.name == "training" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
 		bool disableVehicles = selectedLevel.name == "training" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
 		var localServer = new Server(
 			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, Global.quickStartPlayTo, botCount, selectedLevel.maxPlayers, 0, false, false,
+			gameMode, 9999, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+	public void enterVavaStage() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_c1").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.VAVA1;
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_vava_c1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_vava_c1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_vava_c1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_vava_c1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
 			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
 			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
 			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
@@ -342,14 +371,21 @@ public class PreCPUMenu : IMainMenu {
 					selectedFont: inGame ? FontType.Orange : FontType.DarkOrange);
 					Fonts.drawText(FontType.Blue, ">", cursorHandler2[i] - 1, optionPos[i], Alignment.Center, selected: selectY == i,
 					selectedFont: inGame ? FontType.Orange : FontType.DarkOrange);
+					
 				}
 			}
 		}
-		string Name = "Select Stage";
+		string Name = "Host Offline Match";
 		Fonts.drawText(menuFont, Name, startX, optionPos[0], Alignment.Center, selected: selectY == 0);
 		Fonts.drawText(menuFont, "Enter Fast Training", startX, optionPos[1], Alignment.Center, selected: selectY == 1);
+		Fonts.drawText(menuFont, "Game Start", startX, optionPos[2], Alignment.Center, selected: selectY == 2);
+		
 		if (selectY == 1) {
 			Fonts.drawText(menuFont, "You can enter through \n" + Name + "\nand customize your settings",
+			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
+		}
+		if (selectY == 2) {
+			Fonts.drawText(menuFont, "Game's Story mode \n" + Name + "\nA Fresh Start",
 			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
 		}
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.screenW / 2, Global.screenH - 9, Alignment.Center);

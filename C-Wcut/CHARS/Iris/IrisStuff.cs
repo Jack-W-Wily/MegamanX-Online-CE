@@ -909,7 +909,7 @@ public class IrisSlashProj : Projectile {
 	public IrisSlashProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 3, player, "iris_cannon_slash", 25, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 10, 3, player, "iris_cannon_slash", 25, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = false;
 		destroyOnHit = false;
@@ -961,7 +961,7 @@ public class IrisStabProj : Projectile {
 	public IrisStabProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "iris_cannon_stab", 20, 0.1f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 10, 1, player, "iris_cannon_stab", 20, 0.1f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = false;
 		destroyOnHit = false;
@@ -1135,7 +1135,7 @@ public class IrisFireBallProj : Projectile {
 		bool isHanging, Player player, ushort netProjId, bool sendRpc = false
 	) : base(
 		weapon, pos, xDir, 0, 1, player, "neont_projectile_start",
-		0, 0.01f, netProjId, player.ownedByLocalPlayer
+		1, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.IrisFireBallProj;
 		maxTime = 0.875f;

@@ -119,7 +119,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.AimingLaser, AimingLaserProj.rpcInvoke },
 		{ (int)ProjIds.AimingLaserCharged, AimingLaserChargedProj.rpcInvoke },
 		{ (int)ProjIds.AimingLaserMissle, PeacockMissle.rpcInvoke },
-		
+
 		{ (int)ProjIds.DoubleCyclone, DoubleCycloneProj.rpcInvoke },
 		{ (int)ProjIds.TwinSlasher, TwinSlasherProj.rpcInvoke },
 		{ (int)ProjIds.TwinSlasher2, TwinSlasherProj.rpcInvoke },
@@ -161,6 +161,8 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.ParasiteSword, VileParasiteSword.rpcInvoke },
 		{ (int)ProjIds.MaroonedTomahawk, VileMaroonedTomahawk.rpcInvoke },
 		{ (int)ProjIds.QuickHomesick, VileQuickHomesick.rpcInvoke },
+		{ (int)ProjIds.MetalCrescent, MetalCrescent.rpcInvoke },
+		{ (int)ProjIds.TwoHeadedSlash, TwoHeadedSlash.rpcInvoke },
 		{ (int)ProjIds.WildHorseKick, FlamethrowerWildHorseKick.rpcInvoke },
 		{ (int)ProjIds.DragonsWrath, FlamethrowerDragonsWrath.rpcInvoke },
 		{ (int)ProjIds.SeaDragonRage, FlamethrowerSeaDragonRage.rpcInvoke },
@@ -318,11 +320,12 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.AssassinBulletEX, AssassinationProj.rpcInvoke },
 		// Rides
 		{ (int)ProjIds.MechTorpedo, TorpedoProjMech.rpcInvoke },
-
+		{ (int)ProjIds.MechTorpedo2, TorpedoProjMech2.rpcInvoke },
 
 		// WCut Chars RPCEX
 
 		// VAVA
+		{ (int)ProjIds.ZipZapperProj, ZipZapperProj.rpcInvoke },
 		{ (int)ProjIds.TridentLine, VileCannonProj.rpcInvoke },
 		{ (int)ProjIds.LockDownMissileStart, LockDownMissileStart.rpcInvoke },
 		{ (int)ProjIds.LockDownMissileWall, LockDownMissileWall.rpcInvoke },
@@ -333,7 +336,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)VAVA2ProjIds.JunkShield, JunkShieldProj.rpcInvoke},
 		{ (int)VAVA2ProjIds.JunkShield2, JunkShieldProj2.rpcInvoke},
 		{ (int)VAVA2ProjIds.NoiseCrushV, NoiseCrushVProj.rpcInvoke },
-		{ (int)VAVA2ProjIds.NoiseCrushVCharged, NoiseCrushVChargedProj.rpcInvoke },		
+		{ (int)VAVA2ProjIds.NoiseCrushVCharged, NoiseCrushVChargedProj.rpcInvoke },
 		{ (int)VAVA2ProjIds.WildCoil, WildCoilProj.rpcInvoke },
 		{ (int)VAVA2ProjIds.WildCoilCharged, WildCoilChargedProj.rpcInvoke },
 		{ (int)VAVA2ProjIds.HardKnuckleV, HardKnuckleVProj.rpcInvoke },
@@ -362,7 +365,7 @@ public partial class RPCCreateProj : RPC {
 		// Highmax
 		{ (int)ProjIds.HighmaxHomingProj, HighmaxHomingProj.rpcInvoke },
 		{ (int)ProjIds.HighmaxStunShot, HighmaxStunShot.rpcInvoke },
-	
+
 	};
 
 }

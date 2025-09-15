@@ -795,6 +795,57 @@ public class ShinMessenkouState : ZeroGigaAttack {
 	}
 }
 
+
+
+public class ShinMessenkouStateZB : CharState {
+	public float shotDistance = 40;
+	
+		public bool shoot;
+
+	public ShinMessenkouStateZB() : base("rakuhouha") {
+
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex >= 7 && !shoot) {
+			shoot = true;
+			for (int i = 1; i < 3; i++) {
+				int j = i + 1;
+				Global.level.delayedActions.Add(
+					new DelayedAction(() => {
+						shootProj(j);
+					},
+					(i * 8) / 60f)
+				);
+			}
+			shootProj(1);
+			character.shakeCamera(sendRpc: true);
+			character.playSound("crash", sendRpc: true);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+	}
+
+
+	void shootProj(int i) {
+		Point shootPos = character.pos.addxy(4 * character.xDir, 0);
+		new ShinMessenkouProj(
+			shootPos.addxy(shotDistance * i * character.xDir, 0),
+			1, character, player, player.getNextActorNetId(), rpc: true
+		);
+		new ShinMessenkouProj(
+			shootPos.addxy(shotDistance * i * -character.xDir, 0),
+			-1, character, player, player.getNextActorNetId(), rpc: true
+		);
+		character.playSound("zeroshinmessenkoubullet");
+	}
+}
+
+
 public class DarkHoldShootState : CharState {
 	public bool shoot;
 	public Weapon gigaAttack;

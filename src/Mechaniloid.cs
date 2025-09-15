@@ -9,6 +9,10 @@ public enum MechaniloidType {
 	Hopper,
 	Bird,
 	Fish,
+
+	BallWalker,
+
+
 }
 
 public class MechaniloidWeapon : Weapon {
@@ -135,6 +139,7 @@ public class Mechaniloid : Actor, IDamagable {
 
 	public static string getSpriteFromType(MechaniloidType type) {
 		if (type == MechaniloidType.Tank) return "sigma2_tank";
+		if (type == MechaniloidType.BallWalker) return "enemy_walkball";
 		if (type == MechaniloidType.Hopper) return "sigma2_hopper";
 		return "sigma2_fish";
 	}
@@ -153,6 +158,13 @@ public class Mechaniloid : Actor, IDamagable {
 			attackRange = 125;
 			useGravity = true;
 			netActorCreateId = NetActorCreateId.MechaniloidTank;
+		}
+		
+		if (type == MechaniloidType.BallWalker) {
+			speed = 100;
+			attackRange = 125;
+			useGravity = true;
+			netActorCreateId = NetActorCreateId.BallWalker;
 		}
 		if (type == MechaniloidType.Fish) {
 			speed = 75;
@@ -208,7 +220,7 @@ public class Mechaniloid : Actor, IDamagable {
 
 		var leeway = 500;
 		time += Global.spf;
-		if (time > maxTime || pos.x > Global.level.width + leeway || pos.x < -leeway || pos.y > Global.level.height + leeway || pos.y < -leeway) {
+		if (time > maxTime && !netOwner.isAI || pos.x > Global.level.width + leeway || pos.x < -leeway || pos.y > Global.level.height + leeway || pos.y < -leeway) {
 			destroySelf();
 			return;
 		}
@@ -223,7 +235,7 @@ public class Mechaniloid : Actor, IDamagable {
 
 		// Patrolling
 		if (state == 0) {
-			if (type == MechaniloidType.Tank || type == MechaniloidType.Fish) {
+			if (type == MechaniloidType.Tank || type == MechaniloidType.Fish || type == MechaniloidType.BallWalker ) {
 				patrol();
 			}
 			if (type == MechaniloidType.Tank || type == MechaniloidType.Hopper) {

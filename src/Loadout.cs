@@ -44,6 +44,7 @@ public class XLoadout {
 
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
 		var indices = new List<byte>();
+		indices.Add((int)WeaponIds.Buster);
 		indices.Add((byte)weapon1);
 		indices.Add((byte)weapon2);
 		indices.Add((byte)weapon3);

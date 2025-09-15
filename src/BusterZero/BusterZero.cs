@@ -67,15 +67,9 @@ public class BusterZero : Character {
 		if (!ownedByLocalPlayer) {
 			return;
 		}
-		// Hypermode music.
-		if (!Global.level.isHyper1v1()) {
-			if (isBlackZero && ownedByLocalPlayer) {
-				if (musicSource == null) {
-					addMusicSource("zero_X3", getCenterPos(), true);
-				}
-			} else {
-				destroyMusicSource();
-			}
+
+		if (musicSource == null) {
+			addMusicSource("zero_X3", getCenterPos(), true);
 		}
 		// Charge and release charge logic.
 		chargeLogic(shoot);
@@ -112,12 +106,63 @@ public class BusterZero : Character {
 			changeState(new HyperBusterZeroStart(), true);
 			return true;
 		}
+
+		// If we changed state this frame. Return.
+		// This is to prevent jumping guard shenanigans.
+		bool changedState = base.normalCtrl();
+		if (changedState) {
+			return true;
+		}
+		// Guard!
+		if (
+				player.input.isL2Held(player)
+			)
+		{
+
+			changeState(new BlockWCUT());
+			return true;
+		} 
+
+
+
+
+
+
 		return base.normalCtrl();
 	}
 
 	public override bool attackCtrl() {
 		bool shootPressed = player.input.isAPressed(player);
 		bool specialPressed = player.input.isBPressed(player);
+
+		
+		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
+			changeState(new ZeroGrabStart(), forceChange: true);
+		}
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
+
+		if (grounded && player.superAmmo >= 16 &&
+		downPressedTimes >= 2 && player.input.isBHeld(player)) {
+			changeState(new ShinMessenkouStateZB(), true);
+
+			downPressedTimes = 0;
+			player.superAmmo -= 16;
+			return true;
+		}
+
+
+		if (grounded && player.superAmmo >= player.superMaxAmmo &&
+		downPressedTimes >= 2 && player.input.isR2Held(player)) {
+			changeState(new GenmureiStateZB(), true);
+
+			downPressedTimes = 0;
+			player.superAmmo -= 32;
+			return true;
+		}
+
+		
 		if (specialPressed) {
 			if (zSaberCooldown == 0) {
 				if (stockedSaber) {
@@ -169,6 +214,8 @@ public class BusterZero : Character {
 				}
 			}
 		}
+
+
 		return base.attackCtrl();
 	}
 
@@ -256,7 +303,12 @@ public class BusterZero : Character {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zarzo_projswing" or "zarzo_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zarzo_grab_start" => MeleeIds.Grab,
+			"zarzo_grab_ex" => MeleeIds.GrabEX,
+			"zarzo_grab_ex_end" => MeleeIds.GrabEnd,
+			"zarzo_block" => MeleeIds.Block,
+			
 			_ => MeleeIds.None
 		});
 	}
@@ -265,10 +317,31 @@ public class BusterZero : Character {
 		Projectile? proj = id switch {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.DZMelee, player,
-				isBlackZero ? 4 : 3, Global.defFlinch, isReflectShield: true,
+				stockedSaber ? 17 : 4, Global.defFlinch, isReflectShield: true,
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
+			(int)MeleeIds.Grab => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 0, 0, 40, isReflectShield: true,
+				isZSaberEffect2: false, isZSaberClang: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.GrabEX => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 1, 0, 5, isReflectShield: true,
+				isZSaberEffect2: false, isZSaberClang: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.GrabEnd => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.HeavyPush, player, 5, 30, 15, isReflectShield: true,
+				isZSaberEffect2: false, isZSaberClang: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.Block => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
+				addToLevel: addToLevel
+			) {
+				highPiority = true
+			},
 			_ => null
 		};
 		return proj;
@@ -276,14 +349,30 @@ public class BusterZero : Character {
 
 	public enum MeleeIds {
 		None = -1,
+		Block,
 		SaberSwing,
+		GrabEnd,
+		GrabEX,
+		Grab,
+		
 	}
+
+
+	
+	public override int getMaxHealth() {
+		if (isATrans) {
+			return base.getMaxHealth();
+		}
+		return MathInt.Ceiling(Player.getModifiedHealth(40) * Player.getHpMod());
+	}
+
+
 
 	public override string getSprite(string spriteName) {
 		if (Global.sprites.ContainsKey("bzero_" + spriteName)) {
 			return "bzero_" + spriteName;
 		}
-		return "zero_" + spriteName;
+		return "zarzo_" + spriteName;
 	}
 
 	public override bool chargeButtonHeld() {
@@ -298,9 +387,9 @@ public class BusterZero : Character {
 
 	public override float getRunSpeed() {
 		float runSpeed = Physics.WalkSpeed;
-		if (isBlackZero) {
+		
 			runSpeed *= 1.15f;
-		}
+		
 		return runSpeed * getRunDebuffs();
 	}
 
@@ -309,9 +398,9 @@ public class BusterZero : Character {
 			return getRunSpeed();
 		}
 		float dashSpeed = 210;
-		if (isBlackZero) {
+		
 			dashSpeed *= 1.15f;
-		}
+		
 		return dashSpeed * getRunDebuffs();
 	}
 

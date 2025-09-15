@@ -901,17 +901,17 @@ public class MegamanX : Character {
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"mmx_speedburner" => MeleeIds.SpeedBurnerCharged,
-			"mmx_shoryuken" => MeleeIds.Shoryuken,
-			"mmx_beam_saber" or "mmx_beam_saber_air" => MeleeIds.MaxZSaber,
-			"mmx_beam_saber2" => MeleeIds.ZSaber,
-			"mmx_beam_saber_air2" => MeleeIds.ZSaberAir,
-			"mmx_nova_strike" or "mmx_nova_strike_down" or "mmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"rmx_shoryuken" => MeleeIds.Shoryuken,
+			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
+			"rmx_beam_saber2" => MeleeIds.ZSaber,
+			"rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
+			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
-			"mmx_jump" or "mmx_jump_shoot" or "mmx_wall_kick" or "mmx_wall_kick_shoot"
+			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
-			"mmx_up_dash" or "mmx_up_dash_shoot"
+			"rmx_up_dash" or "rmx_up_dash_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			_ => MeleeIds.None
@@ -1023,14 +1023,14 @@ public class MegamanX : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "mmx_" + spriteName;
+		return "rmx_" + spriteName;
 	}
 
 	public override void render(float x, float y) {
 		if (!shouldRender(x, y)) {
 			return;
 		}
-		if (sprite.name == "mmx_frozen") {
+		if (sprite.name == "rmx_frozen") {
 			Global.sprites["frozen_block"].draw(
 				0, pos.x + x - (xDir * 2), pos.y + y + 1, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);

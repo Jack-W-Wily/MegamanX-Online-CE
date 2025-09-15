@@ -1169,7 +1169,21 @@ public class MDie : MaverickState {
 			maverick.visible = false;
 			Anim.createGibEffect("fakezero_piece", maverick.getCenterPos(), player, gibPattern: GibPattern.SemiCircle, sendRpc: true);
 			maverick.playSound("explosion", sendRpc: true);
+		} else if (maverick is GreenDog) {
+			maverick.visible = false;
+			Anim.createGibEffect("enemy_greendog_anim_die", maverick.getCenterPos(), player, gibPattern: GibPattern.SemiCircle, sendRpc: true);
+			maverick.playSound("explosion", sendRpc: true);
+			new Anim(maverick.pos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, maverick.ownedByLocalPlayer);
+				
+		}	else if (maverick.dismantleTypeDeath) {
+			maverick.visible = false;
+			maverick.playSound("explosion", sendRpc: true);
+			new Anim(maverick.pos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true, maverick.ownedByLocalPlayer);
+				
 		}
+
+
+
 		if (isEnvDeath) {
 			maverick.lastGroundedPos = null;
 		}
@@ -1189,7 +1203,7 @@ public class MDie : MaverickState {
 		if (stateTime > maxTime && !once) {
 			once = true;
 
-			if (maverick is not Velguarder && maverick is not FakeZero) {
+			if (maverick is not Velguarder && maverick is not FakeZero && !maverick.dismantleTypeDeath) {
 				var dieEffect = ExplodeDieEffect.createFromActor(maverick.player, maverick, 20, 5.5f, true, overrideCenterPos: maverick.getCenterPos());
 				Global.level.addEffect(dieEffect);
 			}

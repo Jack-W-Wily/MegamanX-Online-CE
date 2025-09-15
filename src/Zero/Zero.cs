@@ -22,8 +22,8 @@ public class Zero : Character {
 	public int awakenedAuraFrame;
 	public float awakenedAuraAnimTime;
 	public byte hypermodeBlink;
-	public Sprite auraSprite = new Sprite("zero_awakened_aura");
-	public Sprite auraSprite2 = new Sprite("zero_awakened_aura2");
+	public Sprite auraSprite = new Sprite("zarzo_awakened_aura");
+	public Sprite auraSprite2 = new Sprite("zarzo_awakened_aura2");
 
 	// Weapons.
 	public ZSaber meleeWeapon = new();
@@ -103,8 +103,13 @@ public class Zero : Character {
 			2 => new RekkohaWeapon(),
 			_ => new RakuhouhaWeapon(),
 		};
-
-		hyperMode = 2;//loadout.hyperMode;
+		if (this is ZeroMID) {
+			hyperMode = 2;//loadout.hyperMode;
+		} else if (this is ZeroEND) {
+			hyperMode = 0;
+        } else {
+            hyperMode = loadout.hyperMode;
+        }
 		altCtrlsLength = 2;
 		altSoundId = AltSoundIds.X3;
 		
@@ -756,7 +761,7 @@ public class Zero : Character {
 		return dashSpeed * getRunDebuffs();
 	}
 	public override string getSprite(string spriteName) {
-		return "zero_" + spriteName;
+		return "zarzo_" + spriteName;
 	}
 
 	// Simple giga ammo logic.
@@ -848,16 +853,16 @@ public class Zero : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			// Ground
-			"zero_attack" => MeleeIds.HuSlash,
-			"zero_attack2" => MeleeIds.HaSlash,
-			"zero_attack3" => MeleeIds.HuhSlash,
-			"zero_attack_crouch" => MeleeIds.CrouchSlash,
+			"zarzo_attack" => MeleeIds.HuSlash,
+			"zarzo_attack2" => MeleeIds.HaSlash,
+			"zarzo_attack3" => MeleeIds.HuhSlash,
+			"zarzo_attack_crouch" => MeleeIds.CrouchSlash,
 			// Dash
-			"zero_attack_dash" => MeleeIds.DashSlash,
-			"zero_attack_dash2" => MeleeIds.Shippuuga,
+			"zarzo_attack_dash" => MeleeIds.DashSlash,
+			"zarzo_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
-			"zero_attack_air" or "zero_attack_air_ground" => MeleeIds.AirSlash,
-			"zero_attack_air2" => MeleeIds.RollingSlash,
+			"zarzo_attack_air" or "zarzo_attack_air_ground" => MeleeIds.AirSlash,
+			"zarzo_attack_air2" => MeleeIds.RollingSlash,
 			"zero_hyoroga_attack" => MeleeIds.Hyoroga,
 			// Ground Speiclas
 			"zero_raijingeki" => MeleeIds.Raijingeki,
@@ -875,8 +880,8 @@ public class Zero : Character {
 			// Others.
 			"zero_ladder_attack" => MeleeIds.LadderSlash,
 			"zero_wall_slide_attack" => MeleeIds.WallSlash,
-			"zero_block" => MeleeIds.Gokumonken,
-			"zero_projswing" or "zero_projswing_air" => MeleeIds.Hadangeki,
+			"zarzo_block" => MeleeIds.Gokumonken,
+			"zarzo_projswing" or "zarzo_projswing_air" => MeleeIds.Hadangeki,
 			_ => MeleeIds.None
 		});
 	}
@@ -1253,7 +1258,7 @@ public class Zero : Character {
 		if (charState.attackCtrl && !player.isDead && sprite.name != null && !isWildDance && !isInvulnerable() &&
 		 	aiAttackCooldown <= 0 && isFacingTarget && charState is not SwordBlock or ZeroGigaAttack or RekkohaState) {
 			int ZSattack = Helpers.randomRange(0, 11);
-			if (!(sprite.name == "zero_attack" || sprite.name == "zero_attack3" || sprite.name == "zero_attack2")) {
+			if (!(sprite.name == "zarzo_attack" || sprite.name == "zarzo_attack3" || sprite.name == "zarzo_attack2")) {
 				switch (ZSattack) {
 					//Randomizador
 					case 0 when grounded && enemyDist <= 70 && !isBlocking:
@@ -1351,7 +1356,7 @@ public class Zero : Character {
 		if (!(charState is HyperZeroStart or DarkHoldState or Hurt or RakuhouhaState or RekkohaState) &&
 			sprite.name != null && !player.isMainPlayer && !isWildDance
 		) { //least insane else if chain be like:	
-			if (sprite.name == "zero_attack3") {
+			if (sprite.name == "zarzo_attack3") {
 				switch (Helpers.randomRange(1, 2)) {
 					case 1 when sprite.frameIndex >= 10:
 						switch (Helpers.randomRange(1, 5)) {
@@ -1447,7 +1452,7 @@ public class Zero : Character {
 						break;
 				}
 			}
-			if (sprite.name == "zero_attack_dash2" && sprite.frameIndex >= 7) {
+			if (sprite.name == "zarzo_attack_dash2" && sprite.frameIndex >= 7) {
 				switch (Helpers.randomRange(1, 3)) {
 					case 1:
 						changeState(new ZeroSlash1State(), true);
@@ -1490,15 +1495,15 @@ public class Zero : Character {
 			slideVel = xDir * getDashSpeed() * 2f;
 		}
 		if (!charState.attackCtrl) {
-			if (sprite.name == "zero_attack_dash2" && sprite.frameIndex >= 7) {
+			if (sprite.name == "zarzo_attack_dash2" && sprite.frameIndex >= 7) {
 				changeState(new ZeroSlash1State(), true);
 				stopMoving();
 			}
-			if (sprite.name == "zero_attack3" && sprite.frameIndex >= 6) {
+			if (sprite.name == "zarzo_attack3" && sprite.frameIndex >= 6) {
 				changeState(new ZeroDashSlashState(), true);
 				slideVel = xDir * getDashSpeed() * 2f;
 			}
-			if (sprite.name == "zero_attack_dash" && sprite.frameIndex >= 3) {
+			if (sprite.name == "zarzo_attack_dash" && sprite.frameIndex >= 3) {
 				playSound("gigaCrushAmmoFull");
 				switch (Helpers.randomRange(1, 3)) {
 					case 1:

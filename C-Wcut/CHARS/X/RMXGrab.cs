@@ -64,6 +64,10 @@ public class RMXGrabState : CharState {
 			//	return;
 		}
 
+		if (victim == null || victim.health <= 0) {
+			character.changeToIdleOrFall();
+		}
+
 		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
 			victimWasGrabbedSpriteOnce = true;
 		}

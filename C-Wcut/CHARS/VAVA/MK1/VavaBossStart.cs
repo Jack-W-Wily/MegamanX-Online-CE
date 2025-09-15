@@ -129,7 +129,7 @@ public class RagingDemonSuccess : CharState {
 
 
 public class VB3 : CharState {
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	bool first;
 	bool second;
@@ -165,7 +165,7 @@ public class VB3 : CharState {
 		}
 	}
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		bool isMK2 = vile.isVileMK2;
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
@@ -200,7 +200,7 @@ public class VB3 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		character.turnToInput(player.input, player);
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
@@ -213,7 +213,7 @@ public class VB3 : CharState {
 
 
 public class VB4 : CharState {
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	float leechTime = 1;
 
@@ -245,7 +245,7 @@ public class VB4 : CharState {
 	}
 
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		bool isMK2 = vile.isVileMK2;
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
@@ -269,7 +269,7 @@ public class VB4 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
 		}

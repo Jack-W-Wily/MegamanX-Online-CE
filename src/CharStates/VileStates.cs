@@ -19,7 +19,7 @@ public class VileState : CharState {
 	}
 }
 
-public class CallDownMech : VileState {
+public class CallDownMech : CharState {
 	public RideArmor rideArmor;
 	public bool isNew;
 
@@ -48,7 +48,7 @@ public class CallDownMech : VileState {
 			}
 			*/
 
-			if (vile.isVileMK5 != true && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
+			if (character is Vile vile && vile.isVileMK5 != true && MathF.Abs(character.pos.x - rideArmor.pos.x) < 10) {
 				rideArmor.putCharInRideArmor(character);
 			} else {
 				character.changeToIdleOrFall();

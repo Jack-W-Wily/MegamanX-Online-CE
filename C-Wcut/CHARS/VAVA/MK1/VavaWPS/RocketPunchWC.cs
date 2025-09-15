@@ -79,7 +79,7 @@ public class RocketPunchProjWC : Projectile {
 		}
 
 		if (ownedByLocalPlayer && !reversed && reflectCount == 0 &&
-			(type == (int)RocketPunchType.InfinityGig || damager.owner?.character is VAVA1 vile2
+			(type == (int)RocketPunchType.InfinityGig || damager.owner?.character is Vile vile2
 			&& vile2.phase2) && type != (int)RocketPunchType.EgotisticalPill
 		) {
 			if (target == null && owner.character != null) {
@@ -98,10 +98,7 @@ public class RocketPunchProjWC : Projectile {
 				move(pos.directionToNorm(targetPos).times(speed));
 				if (pos.distanceTo(targetPos) < 5) {
 					
-					if (type == (int)RocketPunchType.InfinityGig  ) {
-					new InfinityGigSecond(pos.addxy(-70, 2), xDir, owner.character, owner, owner.getNextActorNetId(true), 30, true);
-						destroySelf();
-					}
+				
 					
 					reversed = true;
 					
@@ -109,7 +106,7 @@ public class RocketPunchProjWC : Projectile {
 				forceNetUpdateNextFrame = true;
 			}
 		}
-		if (!reversed && type == (int)RocketPunchType.GoGetterRight && damager.owner?.character is VAVA1 vile) {
+		if (!reversed && type == (int)RocketPunchType.GoGetterRight && damager.owner?.character is Vile vile) {
 			if (vile.player.input.isHeld(Control.Up, vile.player)) {
 				incPos(new Point(0, -300 * Global.spf));
 			} else if (vile.player.input.isHeld(Control.Down, vile.player)) {
@@ -160,10 +157,7 @@ public class RocketPunchProjWC : Projectile {
 			reversed = true;
 			
 		}
-			if (type == (int)RocketPunchType.InfinityGig  ) {
-					new InfinityGigSecond(pos.addxy(-70, 2), xDir, owner.character, owner, owner.getNextActorNetId(true), 30, true);
-						destroySelf();
-					}
+		
 		if (isRunByLocalPlayer() && type != (int)RocketPunchType.EgotisticalPill) {
 			reversed = true;
 			RPC.actorToggle.sendRpc(netId, RPCActorToggleType.ReverseRocketPunch);
@@ -453,6 +447,78 @@ public class VAVAGoldenRight : CharState {
 		base.update();
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+
+
+public class Vilemk2Mijo : CharState {
+
+
+	public Vilemk2Mijo() : base("mijo") {
+		canSpecialCancel = true;
+		enterSound = "rocketPunch";
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		character.playSound("rocketPunch", true);
+		character.playSound("crash", true);
+		if (stateTime > 2) {
+			character.changeToIdleOrFall();
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+public class ZeroNuclear : CharState {
+
+
+	public ZeroNuclear() : base("nuclear") {
+		canSpecialCancel = true;
+		enterSound = "rocketPunch";
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.frameIndex > 6) {
+			character.playSound("rekkoha", true);
+			character.playSound("crash", true);
+			character.shakeCamera(true);
+		}
+
+		if (character.frameIndex > 8) {
+			
+		}
+		if (stateTime > 8) {
+			character.changeToIdleOrFall();
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			
 		}
 	}
 	public override void onEnter(CharState oldState) {

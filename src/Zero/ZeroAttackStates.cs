@@ -443,3 +443,32 @@ public class GenmureiState : ZeroState {
 		}
 	}
 }
+
+
+
+public class GenmureiStateZB : CharState {
+	bool fired;
+	public GenmureiStateZB() : base("genmu") { }
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex >= 8 && !fired) {
+			fired = true;
+			character.playSound("genmureix5", sendRpc: true);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 0, 
+				 true ,
+				character, player, player.getNextActorNetId(), rpc: true
+			);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, -25), character.xDir, 1, 
+				 true ,
+				character, player, player.getNextActorNetId(), rpc: true
+			);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+}

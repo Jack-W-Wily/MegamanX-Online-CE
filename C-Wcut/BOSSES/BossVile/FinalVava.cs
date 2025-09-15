@@ -9,7 +9,7 @@ namespace MMXOnline;
 
 
 
-public class HighwayVAVA : Vile {
+public class FinalVava : Vile {
 
 
 	public float aiAttackCooldown;
@@ -70,7 +70,7 @@ public class HighwayVAVA : Vile {
 
 
 
-	public HighwayVAVA(
+	public FinalVava(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
@@ -81,7 +81,7 @@ public class HighwayVAVA : Vile {
 		charId = CharIds.VAVA1;
 
 		ShouldExplode = true;
-
+	
 		if (charState is WarpIn) player.superAmmo = 0;
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
 		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
@@ -99,14 +99,16 @@ public class HighwayVAVA : Vile {
 		};
 		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
-		vileForm = 1;
+		spriteFrameToSounds["vile_run/4"] = "vileWalk";
+		spriteFrameToSounds["vile_run/8"] = "vileWalk";
+		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
+
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
-		isWCUTBoss = true;
+
 	}
 
-	public bool isMadjoey => Global.level.levelData.name == "st_vava_c1";
-	public bool isImortalVile => Global.level.levelData.name == "st_x_x1_highway";
+
 
 	public override bool normalCtrl() {
 		if (player.input.isL2Held(player) && grounded) {
@@ -157,9 +159,9 @@ public class HighwayVAVA : Vile {
 
 
 		public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 16){
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32){
 			changeState(new VavaBurensen1(), true);	
-			player.superAmmo -= 16;
+			player.superAmmo = 0;
 			playSound("chingX4");
 		}
 		return !sprite.name.Contains("hurt") ||
@@ -214,26 +216,50 @@ public class HighwayVAVA : Vile {
 	}
 
 	public override bool attackCtrl() {
+		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 
-			SpecialMoves();
-		
+		SpecialMoves();
+		if (WeaponRightHeld) {
+			if (player.input.isHeld(Control.Up, player)) {
+                if (player.vileAmmo >= 15) {
+					changeState(new VavaDistantNeedler(), true);
+					player.vileAmmo -= 15;
+				}
+            }
+			if (charState is Crouch) {
+				if (player.vileAmmo >= 5) {
+					changeState(new VavaZipZapper(), true);
+					player.vileAmmo -= 5;
+				}
+			} else {
+				vulcanWeapon.vileShoot(0, this);
+			}
+		}
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
 		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
 		&& charState is not VAVAKamae) {
 			if (player.input.isAPressed(player)) {
 				if (grounded) {
 					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 14) {
-						changeState(new InfinityGigAttack(), true);
+						if (player.vileAmmo >= 25) {
+							changeState(new InfinityGigAttack(), true);
+							player.vileAmmo -= 25;
 						}			
 					}
-					if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 14) {
-						changeState(new SpoiledBratPunch(), true);
+					 else if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
+						if (upPressedTimes >= 2) {
+							if (player.vileAmmo >= 20) {
+								changeState(new EgotisticalPillAttack(), true);
+								upPressedTimes = 0;
+							}
+						} else {
+							if (player.vileAmmo >= 14) {
+								changeState(new SpoiledBratPunch(), true);
+							}
 						}
 					}
 					
-					if (player.input.isLeftOrRightHeld(player)) {
+				 	else if (player.input.isLeftOrRightHeld(player)) {
 						if (!player.input.isHeld(Control.Down, player)) {
 							if (player.vileAmmo >= 8) {
 								changeState(new GoGetterRightAttack(), true);
@@ -245,13 +271,20 @@ public class HighwayVAVA : Vile {
 								changeState(new VAVAJab1(), true);
 							}
 						} else {
-							changeState(new VAVAUpperCutPunch(), true);
+							if (downPressedTimes >= 2 && player.vileAmmo >= 26) {
+								changeState(new VAVAGoldenRight(), true);
+								player.vileAmmo -= 26;
+								downPressedTimes = 0;
+							} else {
+								changeState(new VAVAUpperCutPunch(), true);
+							}
 						}
 					}
 				} else {
 					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 14) {
-						changeState(new InfinityGigAttack(), true);
+							if (player.vileAmmo >= 25) {
+							changeState(new InfinityGigAttack(), true);
+							player.vileAmmo -= 25;
 						}			
 					} else {
 						if (player.vileAmmo >= 4) {
@@ -266,12 +299,22 @@ public class HighwayVAVA : Vile {
 		if (player.input.isBPressed(player)) {
 			if (grounded) {
 				if (player.input.isHeld(Control.Up, player)) {
-					if (player.vileAmmo > 20) {
-						changeState(new WildHorseKickState(), true);
-						player.vileAmmo -= 20;
+					if (player.vileAmmo >= 15) {
+					changeState(new WildHorseKickState(), true);
+							player.vileAmmo -= 15;
 					}
 				} else if (player.input.isHeld(Control.Down, player)) {
-					
+					if (downPressedTimes >= 2) {
+						if (player.vileAmmo >= 15) {
+							changeState(new RumblingBangLaunch(), true);
+							player.vileAmmo -= 15;
+						}
+					} else {
+						if (player.vileAmmo >= 25) {
+							changeState(new BumptyBoomGranadeLaunch(), true);
+							player.vileAmmo -= 25;
+						}
+						}
 				} else {
 					if (player.input.isLeftOrRightHeld(player)) {
 					} else {
@@ -287,11 +330,31 @@ public class HighwayVAVA : Vile {
 					if (player.vileAmmo > 10 && charState is not GreenEyedLampState) {
 						if (player.input.isHeld(Control.Up, player)) {
 							if (player.vileAmmo > 15){
-							changeState(new PeaceOutRollerAttack());
+								if (!player.input.isL2Held(player)) {
+									if (getChargeLevel() > 2) {
+										changeState(new SwordBouqueteLaunch());
+										stopCharge();
+									} else {
+										changeState(new PeaceOutRollerAttack());
+									}
+								} else {
+									if (getChargeLevel() > 2) {
+										changeState(new BurningDriveState());
+										stopCharge();
+									} else {
+										changeState(new TerriotiralPowState());
+									}
+										
+								}
 							player.vileAmmo -= 15;
 							}
 						} else {
-							changeState(new ExplosiveRoundState(), true);
+								if (!player.input.isL2Held(player)) {
+									changeState(new ExplosiveRoundState());
+								} else {
+									changeState(new AirSplashHitGranadeLaunch(), true);			
+								}
+						
 							player.vileAmmo -= 10;
 						}
 					}
@@ -377,10 +440,14 @@ public class HighwayVAVA : Vile {
 	public override void update() {
 		base.update();
 
-
-	
+		if (overDriveTimer > 0) {
+			OverDrive = true;
+		} else {
+			OverDrive = false;
+		}
+		if (isVileMK5) {
 			phase2 = true;
-		
+		}
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref CrimsonphantomCD);
@@ -390,7 +457,23 @@ public class HighwayVAVA : Vile {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref CannonCD);
 
-	
+
+
+		if (player.isAI && health < 5 && !phase2 && !isWarpIn() && isBossVile && AIStart) {
+			changeState(new VAVAPhase2Start(false), true);
+			phase2 = true;
+			stopMoving();
+			bonusHealth = 60;
+		}
+
+		// Hypermode music.
+		if (!Global.level.isHyper1v1()) {
+			if (phase2 && ownedByLocalPlayer) {
+				if (musicSource == null) {
+					addMusicSource("fake", getCenterPos(), true);
+				}
+			} 
+		}
 
 		if (OverDrive) {
 			stockedTime += Global.spf;
@@ -422,8 +505,6 @@ public class HighwayVAVA : Vile {
 		if (isShootingVulcan) {
 			vileAmmoRechargeCooldown = 0.15f;
 		}
-		
-		
 
 		if (vileAmmoRechargeCooldown > 0) {
 			Helpers.decrementTime(ref vileAmmoRechargeCooldown);
@@ -534,7 +615,7 @@ public class HighwayVAVA : Vile {
 		Point? nullablePos = cannonSprite?.animData.frames?.ElementAtOrDefault(cannonAimNum)?.POIs?.FirstOrDefault();
 		if (nullablePos == null) {
 		}
-		Point cannonSpritePOI = nullablePos ?? Point.zero;
+		Point cannonSpritePOI = nullablePos ?? pos.addxy(20 * xDir, -35);
 
 		return poiPos.addxy(cannonSpritePOI.x * getShootXDir(), cannonSpritePOI.y);
 	}
@@ -545,9 +626,6 @@ public class HighwayVAVA : Vile {
 	}
 
 	public override string getSprite(string spriteName) {
-		if (isMadjoey) {
-			return "madjoey_" + spriteName;
-		}
 		return "vava_" + spriteName;
 	}
 
@@ -572,7 +650,8 @@ public class HighwayVAVA : Vile {
 		Kote,
 
 		GizmoGrab,
-		GodPress,
+		DropKick,
+		CannonExecution,
 		DeadLiftEX,
 	}
 
@@ -580,24 +659,26 @@ public class HighwayVAVA : Vile {
 	// VAva melee stuff
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"vilemk2_block"  => MeleeIds.Blocking,
-			"vilemk2_deadlift"   => MeleeIds.DeadLiftEX,
-			"vilemk2_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
-			"vilemk2_jab_1" => MeleeIds.Jab,
-			"vilemk2_jab_2" => MeleeIds.Jab2,
-			"vilemk2_punch_2" => MeleeIds.UpperCut,
-			"vilemk2_gizmo_dash_grab" => MeleeIds.GizmoGrab,
-			"vilemk2_kamae_unblockable" or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB,
-			"vilemk2_kamae_kote" => MeleeIds.Kote,
-			"vilemk2_spring_grab" => MeleeIds.Grab,
-			"vilemk2_dash_grab" => MeleeIds.Grabmk2dash,
-			"vilemk2_hoticecle" => MeleeIds.HotIcecle,
-			"vilemk2_green_eyed_lamp" => MeleeIds.GreenEyedLamp,
-			"vilemk2_burensen_1" => MeleeIds.BurensenStart,
-			"vilemk2_burensen_2" => MeleeIds.BurensenStomp,
-			"vilemk2_ragingdemon_dash" => MeleeIds.RagingDemon,
-			"vilemk2_hyperdash_end" => MeleeIds.BurensenENDCPU,
-			"vilemk2_hyperdash_attack" => MeleeIds.GodPress,
+			"vava_block"  => MeleeIds.Blocking,
+			"vava_deadlift" or "vava_golden_right" => MeleeIds.DeadLiftEX,
+			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
+			"vava_jab_1" => MeleeIds.Jab,
+			"vava_jab_2" => MeleeIds.Jab2,
+			"vava_punch_2" => MeleeIds.UpperCut,
+			"vava_gizmo_dash_grab" => MeleeIds.GizmoGrab,
+			"vava_kamae_unblockable" or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB,
+			"vava_kamae_kote" => MeleeIds.Kote,
+			"vava_spring_grab" => MeleeIds.Grab,
+			"vava_dash_grab" => MeleeIds.Grabmk2dash,
+			"vava_hoticecle" => MeleeIds.HotIcecle,
+			"vava_drop_kick" => MeleeIds.DropKick,
+			"vava_cannon_execution" => MeleeIds.CannonExecution,
+			"vava_green_eyed_lamp" => MeleeIds.GreenEyedLamp,
+			"vava_burensen_1" => MeleeIds.BurensenStart,
+			"vava_burensen_2" => MeleeIds.BurensenStomp,
+			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
+			"vava_burensen_finish" or "vava_hyperdash_attack" when !player.isAI => MeleeIds.BurensenEND,
+			"vava_burensen_finish" or "vava_hyperdash_attack" when player.isAI => MeleeIds.BurensenENDCPU,
 			_ => MeleeIds.None
 		});
 	}
@@ -635,9 +716,15 @@ public class HighwayVAVA : Vile {
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
-			(int)MeleeIds.GodPress => new Vava1GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.ForceGrabState, player,
-				 2, 0, 0, isReflectShield: false,
+			(int)MeleeIds.DropKick => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
+				 2, 40, 42, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.CannonExecution => new Vava1GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
+				 2, 0, 42, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
@@ -741,6 +828,7 @@ public class HighwayVAVA : Vile {
 	// Ammo section
 	public override void addAmmo(float amount) {
 		weaponHealAmount += amount;
+		 player.vileAmmo += amount;
 	}
 
 	public override void addPercentAmmo(float amount) {
@@ -779,13 +867,16 @@ public class HighwayVAVA : Vile {
 
 	public override void increaseCharge() {
 		float factor = 1;
-		if (OverDrive) factor = 1.5f; // this means during OverDrive he gets a chargespeed buff
+		if (OverDrive) factor = 1.2f; // this means during OverDrive he gets a chargespeed buff
 		chargeTime += Global.speedMul * factor;
 	}
 
 	public override float getRunSpeed() {
-		
-		return 0 * getRunDebuffs();
+		float runSpeed = 90;
+		if (OverDrive) { // this means during OverDrive he gets a speed buff
+			runSpeed *= 1.15f;
+		}
+		return runSpeed * getRunDebuffs();
 	}
 
 
@@ -803,19 +894,24 @@ public class HighwayVAVA : Vile {
 			}
 		} else if (chargeLevel == 1) {
 			cannonWeapon.type = (int)VileCannonType.FrontRunner;
-		//		cannonWeapon.vavaShoot(0, this);
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel == 2) {
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
-		//	cannonWeapon.vavaShoot(0, this);
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel == 3) {
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
-		//	cannonWeapon.vavaShoot(0, this);
+			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
 		} else if (chargeLevel >= 4) {
-			cannonWeapon.type = (int)VileCannonType.FatBoy;
-		//	cannonWeapon.vavaShoot(0, this);
+				if (player.input.isHeld(Control.Down, player)) {
+				changeState(new NecroBurstAttack(grounded), true);
+			} else if (player.input.isHeld(Control.Up, player)) {
+				changeState(new RisingSpecterState(grounded), true);
+			} else if (player.input.isLeftOrRightHeld(player)) {
+				changeState(new StraightNightmareAttack(grounded), true);
+			}
 			stopCharge();
 		}
 		if (chargeLevel >= 1) {
@@ -900,7 +996,7 @@ public class HighwayVAVA : Vile {
 	}
 
 	public bool isVileMK5Linked() {
-		return isVileMK5 && linkedRideArmor?.character == this;
+		return false;
 	}
 
 	public bool canVileHover() {
@@ -964,7 +1060,7 @@ public class HighwayVAVA : Vile {
 					if (linkedRideArmor != null) linkedRideArmor.selfDestructTime = 1000;
 					buyRideArmor();
 					mmw.isMenuOpened = false;
-					int raIndex = 1;
+					int raIndex = player.selectedRAIndex;
 					if (isVileMK5 && raIndex == 4) raIndex++;
 					linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
 					if (linkedRideArmor.raNum == 4) summonedGoliath = true;
@@ -1034,7 +1130,6 @@ public class HighwayVAVA : Vile {
 		if (charState is RisingSpecterState) {
 			vel = new Point(1, -0.75f);
 		}
-		
 
 		/*
 		if (charState is CutterAttackState)
@@ -1098,8 +1193,11 @@ public class HighwayVAVA : Vile {
 		ShaderWrapper? palette = null;
 
 
-	
-	
+		
+		if (player.skinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+		
 		if (palette != null) {
 			shaders.Add(palette);
 		}
@@ -1124,13 +1222,13 @@ public class HighwayVAVA : Vile {
 
 
 		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
-		if (visible && phase2) {
+		if (visible && (OverDrive || phase2) ) {
 			// Position to draw the sprite to.
 			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
 			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
 			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
 
-			float auraAlpha = 0.1f;
+			float auraAlpha = 0.75f;
 
 			// Draw aura.
 			Global.sprites[sprite.name].draw(
@@ -1210,14 +1308,13 @@ public class HighwayVAVA : Vile {
 		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
 		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
-	
+		if (Global.level.is1v1()) {
 			isBossVile = true;
-		
-			if (isImortalVile) {
-			health = 100;
-			if (linkedRideArmor != null) {
-				linkedRideArmor.health = 100;
-			}
+		}
+		if (isBossVile) {
+			player.superAmmo = player.superMaxAmmo;
+		} else {
+			AIStart = true;
 		}
 
 		if (!AIStart && charState.attackCtrl) {
@@ -1241,45 +1338,35 @@ public class HighwayVAVA : Vile {
 
 
 				if (charState is InRideArmor && linkedRideArmor != null) {
-
-					if (musicSource == null && isMadjoey) {
-						addMusicSource("boss_X1", getCenterPos(), true);
-						linkedRideArmor.neutralId = 1;
-			} else {
-						if (musicSource == null) {
-						addMusicSource("fake", getCenterPos(), true);
-						}
-					}
-	
 					switch (Vattack) {
 						case 1 when isFacingTarget && isTargetClose:
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
+							
 							break;
 						case 2 when isFacingTarget && isTargetClose:
 
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
+							
 							break;
 						case 3 when isFacingTarget:
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
+							
 							break;
 						case 4 when isFacingTarget:
 							linkedRideArmor.changeState(new RAJump());
-
+				
 							break;
-						case 5 when isFacingTarget && !isMadjoey:
+						case 5 when isFacingTarget:
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
+							
 							break;
-						case 6 when isFacingTarget && !isMadjoey:
+						case 6 when isFacingTarget:
 
 							Point shootVel = getVileShootVel(true);
-							new StunShotProj(
-						pos, xDir, MathF.Round(shootVel.byteAngle), this,
-							player, player.getNextActorNetId(), rpc: true
-							);
+								new StunShotProj(
+							pos, xDir, MathF.Round(shootVel.byteAngle), this,
+								player, player.getNextActorNetId(), rpc: true
+								);
 
 
 							break;
@@ -1292,31 +1379,158 @@ public class HighwayVAVA : Vile {
 							player.getNextActorNetId(), rpc: true);
 							break;
 					}
-				}  else  {
+				} 
+				
+				
+				 if (isTargetClose && grounded) {
 					switch (Vattack) {
-						case 1 when isFacingTarget&& linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 1 when isFacingTarget && player.superAmmo >= player.superMaxAmmo:
+							changeState(new VavaBurensen1());
+							player.superAmmo -= 32;
 							break;
-						case 2 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
 							break;
-						case 3 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 3 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new InfinityGigAttackBossVer());
+							} else {
+								changeState(new VAVAUpperCutPunch());
+							}
 							break;
-						case 4 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 4 when isFacingTarget:
+							if (phase2) {
+								changeState(new RagingDemonStart());
+							} else {
+								changeState(new Vava1GrabStartState());
+							}
 							break;
-						case 5 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 5 when isFacingTarget:
+							changeState(new VKamaeHotIcecle());
 							break;
-						case 6 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 6 when isFacingTarget:
+							changeState(new VAVAKamae());
 							break;
-						case 7 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 7 when isFacingTarget:
+							changeState(new VavaBurensen1());
 							break;
 					}
-				}	
+				} 
+				
+				
+				 if (!isTargetClose && grounded && isWishinRangedMoves) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new ShoulderCannon(grounded));
+							} else {
+								shoot(0);
+							}
+							break;
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
+							break;
+						case 3 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new InfinityGigAttackBossVer());
+							} else {
+								changeState(new InfinityGigAttack());
+							}
+							break;
+						case 4 when isFacingTarget:
+							changeState(new VKamaeUnblockableStart());
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VKamaeDash());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new VileDashChargeState());
+							break;
+						case 7 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new PopcornHell(grounded));
+							} else {
+								shoot(1);
+							}
+							break;
+					}
+				} 
+				
+				
+				 if (isTargetClose && !grounded) {
+					switch (Vattack) {
+						case 1 when isFacingTarget && player.superAmmo >= player.superMaxAmmo:
+							changeState(new VavaBurensen1());
+							player.superAmmo -= 32;
+							break;
+						case 2 when isFacingTarget:
+							changeState(new GreenEyedLampState());
+							break;
+						case 3 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new InfinityGigAttackBossVer());
+							} else {
+								changeState(new VAVAUpperCutPunch());
+							}
+							break;
+						case 4 when isFacingTarget:
+							if (phase2) {
+								changeState(new BurningDriveState());
+							} else {
+								changeState(new Vava1GrabStartState());
+							}
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VKamaeHotIcecle());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new SplashHitState());
+							break;
+						case 7 when isFacingTarget:
+							changeState(new Vava1GizmoDash());
+							break;
+					}
+				} 
+				
+				
+				 if (!isTargetClose && !grounded && isWishinRangedMoves) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new SwordBouqueteLaunch());
+							} else {
+								shoot(0);
+							}
+							break;
+						case 2 when isFacingTarget:
+							changeState(new BumptyBoomGranadeLaunch());
+							break;
+						case 3 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new VileDashChargeState());
+							} else {
+								changeState(new InfinityGigAttack());
+							}
+							break;
+						case 4 when isFacingTarget:
+							changeState(new VKamaeUnblockableStart());
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VKamaeDash());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new VileDashChargeState());
+							break;
+						case 7 when isFacingTarget:
+							if (isBossVile) {
+								changeState(new PeaceOutRollerAttack());
+							} else {
+								shoot(1);
+							}
+							break;
+					}
+				}
+
 
 				aiAttackCooldown = Helpers.randomRange(0, 30);
 			}
@@ -1350,15 +1564,24 @@ public class HighwayVAVA : Vile {
 		Helpers.decrementFrames(ref aiDodgeCD);
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance &&
-			(charState.attackCtrl && charState is not InRideArmor)) {
+			(charState.attackCtrl || charState is ShoulderCannon or PopcornHell)) {
 				//Projectile is not 
 				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
 					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
 					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
 				) {
 					if (Helpers.randomRange(0, 1) == 1) {
-						if (aiDodgeCD == 0 && linkedRideArmor != null) {
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						if (aiDodgeCD == 0) {
+							if (phase2) {
+								aiDodgeCD = Helpers.randomRange(0, 20);
+							} else {
+								aiDodgeCD = Helpers.randomRange(0, 60);
+							}
+							if (Helpers.randomRange(0, 1) == 1) {
+								changeState(new CrimsonPhantomState(grounded), true);
+							} else {
+								changeState(new CrimsonPhantomState2(grounded), true);
+							}
 						}
 					} else {
 						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
@@ -1374,6 +1597,4 @@ public class HighwayVAVA : Vile {
 	
 		base.aiDodge(target);
 	}
-	
-
 }

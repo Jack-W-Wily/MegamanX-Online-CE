@@ -202,14 +202,14 @@ public class RagingChargeX : Character {
 	}
 
 	public override float getDashSpeed() {
-		if (sprite.name == "mmx_unpo_grab_dash") {
+		if (sprite.name == "rmx_unpo_grab_dash") {
 			return 1.25f * base.getDashSpeed();
 		}
 		return base.getDashSpeed();
 	}
 
 	public override string getSprite(string spriteName) {
-		return "mmx_" + spriteName;
+		return "rmx_" + spriteName;
 	}
 
 	public void enterParry() {
@@ -286,11 +286,11 @@ public class RagingChargeX : Character {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"mmx_beam_saber2" or "mmx_beam_saber_air2" or "mmx_beam_saber_crouch" => MeleeIds.ZSaber,
-			"mmx_unpo_grab_dash" => MeleeIds.DashGrab,
-			"mmx_unpo_punch" or "mmx_unpo_air_punch" => MeleeIds.Punch,
-			"mmx_unpo_parry_start" => MeleeIds.ParryBlock,
-			"mmx_beam_saber" or "mmx_beam_saber_air" => MeleeIds.MaxZSaber,
+			"rmx_beam_saber2" or "rmx_beam_saber_air2" or "rmx_beam_saber_crouch" => MeleeIds.ZSaber,
+			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
+			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
+			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
 			_ => MeleeIds.None
 		});
 	}

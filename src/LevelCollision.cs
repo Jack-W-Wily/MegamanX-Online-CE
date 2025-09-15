@@ -1000,7 +1000,7 @@ public partial class Level {
 		// Prioritize certain colliders over others, running them first
 		return triggerList.OrderBy(trigger => {
 			if (trigger.gameObject is GenericMeleeProj && trigger.otherCollider.flag == (int)HitboxFlag.None &&
-				(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zero_block")) {
+				(trigger.otherCollider.originalSprite == "sigma_block" || trigger.otherCollider.originalSprite == "zarzo_block")) {
 				return 0;
 			} else if (trigger.otherCollider.originalSprite.StartsWith("kaisersigma") == true && trigger.otherCollider.name == "head") {
 				return 0;

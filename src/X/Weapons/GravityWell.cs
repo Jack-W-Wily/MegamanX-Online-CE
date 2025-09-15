@@ -404,8 +404,8 @@ public class GravityWellChargedState : CharState {
 
 	public GravityWellChargedState() : base("point_up") {
 		superArmor = true;
-		landSprite = "point_up";
-		airSprite = "point_up_air";
+		//landSprite = "point_up";
+		//airSprite = "point_up_air";
 		useDashJumpSpeed = true;
 	}
 

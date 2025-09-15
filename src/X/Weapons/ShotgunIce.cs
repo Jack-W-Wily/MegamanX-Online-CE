@@ -338,10 +338,10 @@ public class ShotgunIceChargedShot : CharState {
 				character.changeSpriteFromName("fall_shoot", false);
 			}
 		}
-		if (character.sprite.name == "mmx_fall_shoot" && character.grounded) {
+		if (character.sprite.name == "rmx_fall_shoot" && character.grounded) {
 			character.changeSpriteFromName("land_shoot", false);
 		}
-		if (character.sprite.name == "mmx_land_shoot") {
+		if (character.sprite.name == "rmx_land_shoot") {
 			time++;
 			if (time >= 8) character.changeSpriteFromName("shoot", false);
 		}

@@ -9,7 +9,7 @@ namespace MMXOnline;
 
 
 
-public class HighwayVAVA : Vile {
+public class Vava2Goliath : Vile {
 
 
 	public float aiAttackCooldown;
@@ -50,7 +50,7 @@ public class HighwayVAVA : Vile {
 	public float CannonCD;
 
 	
-
+	
 	public VileCannonWC cannonWeapon;
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
@@ -70,7 +70,7 @@ public class HighwayVAVA : Vile {
 
 
 
-	public HighwayVAVA(
+	public Vava2Goliath(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true
@@ -102,11 +102,12 @@ public class HighwayVAVA : Vile {
 		vileForm = 1;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
-		isWCUTBoss = true;
+		if (player.isAI) {
+			isWCUTBoss = true;
+		}
 	}
 
-	public bool isMadjoey => Global.level.levelData.name == "st_vava_c1";
-	public bool isImortalVile => Global.level.levelData.name == "st_x_x1_highway";
+
 
 	public override bool normalCtrl() {
 		if (player.input.isL2Held(player) && grounded) {
@@ -266,10 +267,7 @@ public class HighwayVAVA : Vile {
 		if (player.input.isBPressed(player)) {
 			if (grounded) {
 				if (player.input.isHeld(Control.Up, player)) {
-					if (player.vileAmmo > 20) {
-						changeState(new WildHorseKickState(), true);
-						player.vileAmmo -= 20;
-					}
+					changeState(new WildHorseKickState(), true);
 				} else if (player.input.isHeld(Control.Down, player)) {
 					
 				} else {
@@ -377,7 +375,11 @@ public class HighwayVAVA : Vile {
 	public override void update() {
 		base.update();
 
-
+		if (overDriveTimer > 0) {
+			OverDrive = true;
+		} else {
+			OverDrive = false;
+		}
 	
 			phase2 = true;
 		
@@ -389,8 +391,7 @@ public class HighwayVAVA : Vile {
 		Helpers.decrementTime(ref gizmoCooldown);
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref CannonCD);
-
-	
+		
 
 		if (OverDrive) {
 			stockedTime += Global.spf;
@@ -422,7 +423,6 @@ public class HighwayVAVA : Vile {
 		if (isShootingVulcan) {
 			vileAmmoRechargeCooldown = 0.15f;
 		}
-		
 		
 
 		if (vileAmmoRechargeCooldown > 0) {
@@ -545,10 +545,7 @@ public class HighwayVAVA : Vile {
 	}
 
 	public override string getSprite(string spriteName) {
-		if (isMadjoey) {
-			return "madjoey_" + spriteName;
-		}
-		return "vava_" + spriteName;
+		return "vilemk2_" + spriteName;
 	}
 
 
@@ -581,7 +578,7 @@ public class HighwayVAVA : Vile {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"vilemk2_block"  => MeleeIds.Blocking,
-			"vilemk2_deadlift"   => MeleeIds.DeadLiftEX,
+			"vilemk2_deadlift"  => MeleeIds.DeadLiftEX,
 			"vilemk2_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vilemk2_jab_1" => MeleeIds.Jab,
 			"vilemk2_jab_2" => MeleeIds.Jab2,
@@ -784,8 +781,11 @@ public class HighwayVAVA : Vile {
 	}
 
 	public override float getRunSpeed() {
-		
-		return 0 * getRunDebuffs();
+		float runSpeed = 90;
+		if (OverDrive) { // this means during OverDrive he gets a speed buff
+			runSpeed *= 1.15f;
+		}
+		return runSpeed * getRunDebuffs();
 	}
 
 
@@ -1034,7 +1034,6 @@ public class HighwayVAVA : Vile {
 		if (charState is RisingSpecterState) {
 			vel = new Point(1, -0.75f);
 		}
-		
 
 		/*
 		if (charState is CutterAttackState)
@@ -1096,10 +1095,7 @@ public class HighwayVAVA : Vile {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
-
-
-	
-	
+		
 		if (palette != null) {
 			shaders.Add(palette);
 		}
@@ -1210,19 +1206,18 @@ public class HighwayVAVA : Vile {
 		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
 		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
-	
+		if (Global.level.is1v1()) {
 			isBossVile = true;
-		
-			if (isImortalVile) {
-			health = 100;
-			if (linkedRideArmor != null) {
-				linkedRideArmor.health = 100;
-			}
+		}
+		if (isBossVile) {
+			player.superAmmo = player.superMaxAmmo;
+		} else {
+			AIStart = true;
 		}
 
 		if (!AIStart && charState.attackCtrl) {
 			if (isBossVile) {		
-					int raIndex = 0;
+					int raIndex = 4;
 					linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
 					changeState(new CallDownMech(linkedRideArmor, true), true);
 				AIStart = true;
@@ -1230,7 +1225,7 @@ public class HighwayVAVA : Vile {
 			
 		} else {
 
-					if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
+			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
 						&& aiAttackCooldown <= 0 && charState.attackCtrl || charState is InRideArmor && aiAttackCooldown <= 0) {
 
 				if (charState is Dash or AirDash && isFacingTarget && isBossVile) {
@@ -1239,84 +1234,241 @@ public class HighwayVAVA : Vile {
 					changeSpriteFromName("dash_grab", true);
 				}
 
-
-				if (charState is InRideArmor && linkedRideArmor != null) {
-
-					if (musicSource == null && isMadjoey) {
-						addMusicSource("boss_X1", getCenterPos(), true);
-						linkedRideArmor.neutralId = 1;
-			} else {
-						if (musicSource == null) {
-						addMusicSource("fake", getCenterPos(), true);
-						}
-					}
-	
+				
+					if (charState is InRideArmor && linkedRideArmor != null) {
+						string? attackSprite = linkedRideArmor.rideArmorState?.attackSprite;
 					switch (Vattack) {
 						case 1 when isFacingTarget && isTargetClose:
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
+					
 							break;
 						case 2 when isFacingTarget && isTargetClose:
 
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
+							
 							break;
 						case 3 when isFacingTarget:
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
-
 							break;
 						case 4 when isFacingTarget:
 							linkedRideArmor.changeState(new RAJump());
-
+							linkedRideArmor.changeSprite(attackSprite, false);
 							break;
-						case 5 when isFacingTarget && !isMadjoey:
-							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
+						case 5 when isFacingTarget:
+							if (Helpers.randomRange(0, 8) == 1) {
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(70, -35), xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(-70, -35), -xDir, player, player.getNextActorNetId(), true);
+			
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(-170, 0), xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(170, 0), -xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
 
+							} else {
+								linkedRideArmor.changeState(new RADash());
+								linkedRideArmor.changeSprite(attackSprite, false);
+							}
 							break;
-						case 6 when isFacingTarget && !isMadjoey:
+						case 6 when isFacingTarget:
 
-							Point shootVel = getVileShootVel(true);
-							new StunShotProj(
-						pos, xDir, MathF.Round(shootVel.byteAngle), this,
+
+							new StunShotProj2(
+								pos, xDir, 0, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 1, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 2, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 3, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 4, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 5, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 6, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 7, 0, this,
 							player, player.getNextActorNetId(), rpc: true
 							);
 
-
 							break;
 						case 7 when isFacingTarget:
-							new VileBombProj(
-							pos, xDir, 0, this, player,
-							player.getNextActorNetId(), rpc: true);
-							new VileBombProj(
-							pos, xDir, 1, this, player,
-							player.getNextActorNetId(), rpc: true);
+							new MK2NapalmGrenadeProj(
+							pos, xDir, this, player,
+							player.getNextActorNetId(), rpc: true
+							);
+
 							break;
 					}
-				}  else  {
+				} else if (isTargetClose && grounded) {
 					switch (Vattack) {
-						case 1 when isFacingTarget&& linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 1 when isFacingTarget && player.superAmmo >= player.superMaxAmmo:
+							changeState(new VileDashChargeState());
+							player.superAmmo -= 32;
 							break;
-						case 2 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
 							break;
-						case 3 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 3 when isFacingTarget:
+							changeState(new InfinityGigAttack());
 							break;
-						case 4 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 4 when isFacingTarget:
+							changeState(new VileDashChargeState());
 							break;
-						case 5 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 5 when isFacingTarget:
+							changeState(new VKamaeHotIcecle());
 							break;
-						case 6 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						case 6 when isFacingTarget:
+							changeState(new VileDashState(2f));
 							break;
 						case 7 when isFacingTarget && linkedRideArmor != null:
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+							changeState(new VileDashState(2f));
+							linkedRideArmor.explode(true);
+							linkedRideArmor.playSound("necroburst", sendRpc: true);
+							new GigaCrushProj(
+							linkedRideArmor.pos, xDir, 
+							this, player, player.getNextActorNetId(), rpc: true
+							);
 							break;
 					}
-				}	
+				}	else	if (!grounded) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+							
+								changeState(new ExplosiveRoundStateBoss());
+							
+							break;
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
+							break;
+						case 3 when isFacingTarget:
+						
+								changeState(new VileDashState(0.5f));
+							
+							break;
+						case 4 when isFacingTarget:
+						
+								changeState(new SpreadShotKnee());
+							
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VavaWindCoil());
+								new StunShotProj2(
+								pos, xDir, 0, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 1, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 2, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 3, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 4, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 5, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 6, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							new StunShotProj2(
+								pos, xDir, 7, 0, this,
+							player, player.getNextActorNetId(), rpc: true
+							);
+							break;
+						case 6 when isFacingTarget:
+							changeState(new InfinityGigAttack());
+							break;
+						case 7 when isFacingTarget && linkedRideArmor != null:
+							changeState(new VileDashState(0.5f));
+							linkedRideArmor.explode(true);
+							new NecroBurstProj(
+							linkedRideArmor.pos, xDir, this, player,
+							player.getNextActorNetId(), rpc: true
+								);
+							linkedRideArmor.playSound("necroburst", sendRpc: true);
+							new GigaCrushProj(
+							linkedRideArmor.pos, xDir, 
+							this, player, player.getNextActorNetId(), rpc: true
+							);
+							break;
+					}
+				}
+
+			else	if (!isTargetClose && grounded && isWishinRangedMoves) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+
+							changeState(new SpreadShotKnee());
+							vel.y = -getJumpPower();
+							break;
+						case 2 when isFacingTarget:
+							changeState(new SpoiledBratPunch());
+							break;
+						case 3 when isFacingTarget:
+						
+							changeState(new InfinityGigAttack());
+							
+							break;
+						case 4 when isFacingTarget:
+							changeState(new ExplosiveRoundStateBoss());
+							vel.y = -getJumpPower();
+							break;
+						case 5 when isFacingTarget:
+							changeState(new VileDashState(2f));
+
+							break;
+						case 6 when isFacingTarget:
+							changeState(new VileDashChargeState());
+									new LockDownMissileStart(new VileMK2Grab(), pos.addxy(70, -35), xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(-70, -35), -xDir, player, player.getNextActorNetId(), true);
+			
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(-170, 0), xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos.addxy(170, 0), -xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
+								new LockDownMissileStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
+
+							break;
+							//to make it so AI vile can Explode his own Ride
+						case 7 when isFacingTarget && linkedRideArmor != null:
+							changeState(new VileDashState(2f));
+							linkedRideArmor.explode(true);
+							new NecroBurstProj(
+							linkedRideArmor.pos, xDir, this, player,
+							player.getNextActorNetId(), rpc: true
+								);
+							linkedRideArmor.playSound("necroburst", sendRpc: true);
+							new GigaCrushProj(
+							linkedRideArmor.pos, xDir, 
+							this, player, player.getNextActorNetId(), rpc: true
+							);
+							break;
+					}
+				}
 
 				aiAttackCooldown = Helpers.randomRange(0, 30);
 			}
@@ -1350,15 +1502,24 @@ public class HighwayVAVA : Vile {
 		Helpers.decrementFrames(ref aiDodgeCD);
 		foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {
 			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance &&
-			(charState.attackCtrl && charState is not InRideArmor)) {
+			(charState.attackCtrl || charState is ShoulderCannon or PopcornHell)) {
 				//Projectile is not 
 				if (!(proj.projId == (int)ProjIds.RollingShieldCharged || proj.projId == (int)ProjIds.RollingShield
 					|| proj.projId == (int)ProjIds.MagnetMine || proj.projId == (int)ProjIds.FrostShield || proj.projId == (int)ProjIds.FrostShieldCharged
 					|| proj.projId == (int)ProjIds.FrostShieldAir || proj.projId == (int)ProjIds.FrostShieldChargedPlatform || proj.projId == (int)ProjIds.FrostShieldPlatform)
 				) {
 					if (Helpers.randomRange(0, 1) == 1) {
-						if (aiDodgeCD == 0 && linkedRideArmor != null) {
-							changeState(new CallDownMech(linkedRideArmor, true), true);
+						if (aiDodgeCD == 0) {
+							if (phase2) {
+								aiDodgeCD = Helpers.randomRange(0, 20);
+							} else {
+								aiDodgeCD = Helpers.randomRange(0, 60);
+							}
+							if (Helpers.randomRange(0, 1) == 1) {
+								changeState(new CrimsonPhantomState(grounded), true);
+							} else {
+								changeState(new CrimsonPhantomState2(grounded), true);
+							}
 						}
 					} else {
 						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded

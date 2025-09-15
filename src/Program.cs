@@ -738,7 +738,7 @@ class Program {
 		var menuImages = Helpers.getFiles(Global.assetPath + "assets/menu", true, "png", "psd");
 		var fontSprites = Helpers.getFiles(Global.assetPath + "assets/fonts", true, "png", "psd");
 		spritesheets.AddRange(menuImages);
-		spritesheets.AddRange(fontSprites);
+	spritesheets.AddRange(fontSprites);
 	
 
 		for (int i = 0; i < spritesheets.Count; i++) {

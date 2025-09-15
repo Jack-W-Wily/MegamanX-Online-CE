@@ -137,6 +137,21 @@ public class BlockWCUT : CharState {
 
 
 
+public class BossWait : CharState {
+
+
+
+
+	public BossWait() : base("lose") {
+		attackCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+	
+	}
+}
+
 
 
 public class GlobalParryState : CharState {

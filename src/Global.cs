@@ -71,6 +71,7 @@ public partial class Global {
 	// Training
 	public static int quickStartTrainingBotCount = 1;
 	public static string quickStartTrainingGameMode = GameMode.Deathmatch;
+	public static string quickStartStoryMode = GameMode.Elimination;
 	public static bool spawnTrainingHealth = true;
 	public static bool underwaterTraining = false;
 	public static bool quickStartTrainingLoadout = true;

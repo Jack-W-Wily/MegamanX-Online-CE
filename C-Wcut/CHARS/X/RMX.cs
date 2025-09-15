@@ -52,37 +52,46 @@ public class RockmanX : MegamanX {
 	}
 
 
+		public bool canSummonZero => player.loadout.xLoadout.weapon1 < 9 &&
+		 player.loadout.xLoadout.weapon2 < 9 &&  player.loadout.xLoadout.weapon3 < 9
+		;
+
+		
+
+		
+		
+
 	// AttackCtrl: is for you to add moves to your character that he can only perform
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
 
 
-
+		
 
 		if (player.input.isL2Held(player)
 		&& player.input.isAPressed(player)) {
 			changeState(new RMXGrabStartState(), true);
-			
+
 		}
 
 		if (player.input.isL2Held(player)
 		&& player.input.isPressed(Control.Dash, player) && DodgeCD == 0) {
 
-		
-				changeState(new WarpDodge(pos), true);
-			
+
+			changeState(new WarpDodge(pos), true);
+
 			DodgeCD = 1.2f;
 		}
 
 
 
-		
+
 		if (player.input.isBPressed(player) &&
 		player.input.isHeld(Control.Up, player) &&
 		player.input.isLeftOrRightHeld(player) &&
 		!player.input.checkShoryuken(player, xDir, Control.R2)
 		&& charState is not RMXDoubleKick) {
-				changeState(new RMXDoubleKick(), true);
+			changeState(new RMXDoubleKick(), true);
 		}
 
 		if (player.input.isBPressed(player) &&
@@ -103,23 +112,35 @@ public class RockmanX : MegamanX {
 		}
 
 
+	
 
+		if (player.input.isR2Pressed(player) && player.input.isHeld(Control.Up, player) && canSummonZero) {
+			if (helperZero == null) {
+				helperZero = new FakeZero(player, pos, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+				player.superAmmo -= 32;
+			}
+		}
+		bool canUseSupers = player.superAmmo >= 16;
 
+		if (player.input.isR2Pressed(player) && !player.input.isHeld(Control.Up, player) && canUseSupers) {
 
-		if (player.input.isR2Pressed(player) && OverDrive) {
 			if (player.input.isHeld(Control.Down, player)) {
 				enterParry();
 			} else if (charState is Dash or AirDash) {
-					charState.isGrabbing = true;
-			changeSpriteFromName("unpo_grab_dash", true);
+				charState.isGrabbing = true;
+				changeSpriteFromName("unpo_grab_dash", true);
 			} else {
 				changeState(new XUPPunchState(grounded), true);
+			}
+			if (!OverDrive) {
+				player.superAmmo -= 16;
 			}
 		}
 
 
 		return base.attackCtrl();
 	}
+
 
 	
 	
@@ -134,12 +155,24 @@ public class RockmanX : MegamanX {
 		return;
 	}
 
+	public FakeZero helperZero;
 
+	public bool helperzeroOnce = false;
+
+		public bool becomeragingcharge = false;
 	public override void update() {
 		base.update();
 
+		if (!helperzeroOnce && helperZero == null && Global.level.levelData.name == "redandblue_vs_purple_1v1") {
+			helperZero = new FakeZero(player, pos, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			helperzeroOnce = true;
+		}
 
-
+		if (charState is not WarpIn and not WarpIdle && bonusHealth == 0 && health < 4 && Global.level.levelData.name == "redandblue_vs_purple_1v1" && !becomeragingcharge) {
+			stopMoving();
+			becomeragingcharge = true;
+			changeState(new XReviveStart(), true);
+		}
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref DodgeCD);
@@ -211,7 +244,7 @@ public class RockmanX : MegamanX {
 		if (Global.sprites.ContainsKey("rmx_" + spriteName)) {
 			return "rmx_" + spriteName;
 		}
-		return "mmx_" + spriteName;
+		return "rmx_" + spriteName;
 	}
 
 
@@ -295,6 +328,12 @@ public class RockmanX : MegamanX {
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
 				3, Global.defFlinch, 30, addToLevel: addToLevel
 			),
+			(int)MeleeIds.DashGrab => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.newUpGrab, player,
+				3, 0, 120, addToLevel: addToLevel
+			),
+
+			
 				(int)MeleeIds.Grab => new RMXGenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1, 0, isDeflectShield: true,
@@ -328,7 +367,7 @@ public class RockmanX : MegamanX {
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				3, Global.defFlinch, 50, addToLevel: addToLevel
+				2, Global.defFlinch, 50, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Shoryuken => new RMXGenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
@@ -396,13 +435,6 @@ public class RockmanX : MegamanX {
 		}
 	}
 
-
-
-	public override void increaseCharge() {
-		float factor = 1;
-		if (OverDrive) factor = 2.5f; // this means during OverDrive he gets a chargespeed buff
-		chargeTime += Global.speedMul * factor;
-	}
 
 	public override float getRunSpeed() {
 		float runSpeed = 90;

@@ -123,7 +123,7 @@ public class NovaStrikeState : CharState {
 		character.visible = false;
 		Nova = new Anim(
 			character.getCenterPos().addxy(character.xDir*8, 10),
-			"mmx_nova_strike", character.xDir, player.getNextActorNetId(), false, sendRpc: true
+			"rmx_nova_strike", character.xDir, player.getNextActorNetId(), false, sendRpc: true
 		);
 	}
 

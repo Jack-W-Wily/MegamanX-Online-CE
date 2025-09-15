@@ -24,9 +24,9 @@ public class FakeZero : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(FakeZeroMeleeState), new(30) },
-			{ typeof(FakeZeroGroundPunchState), new(60) },
-			{ typeof(FakeZeroShootState), new(30, true) },
+			{ typeof(FakeZeroMeleeState), new(20) },
+			{ typeof(FakeZeroGroundPunchState), new(30) },
+			{ typeof(FakeZeroShootState), new(20, true) },
 		};
 
 		weapon = getWeapon();
@@ -154,6 +154,7 @@ public class FakeZero : Maverick {
 	}
 
 	public override string getMaverickPrefix() {
+		if (player.isX) return "zerox1";
 		return "fakezero";
 	}
 
@@ -167,23 +168,21 @@ public class FakeZero : Maverick {
 
 	public override MaverickState[] aiAttackStates() {
 		List<MaverickState> aiStates = [
-			new FakeZeroShootState(1)
+			new FakeZeroShootState(2)
 		];
 		float enemyDist = 300;
 
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		if (ammo >= shootLv2Ammo * 2 || ammo >= shootLv2Ammo && Helpers.randomRange(0, 2) == 0) {
-			aiStates.Add(new FakeZeroShootState(2));
-		}
-		if (ammo >= shootLv3Ammo) {
-			aiStates.Add(getBusterComboState());
-		}
+		
+			aiStates.Add(new FakeZeroC2State());
+			aiStates.Add(new FakeZeroC1State());
+
+	
 		if (enemyDist <= 70) {
 			aiStates.Add(new FakeZeroGroundPunchState());
-		}
-		else {
+		} else {
 			aiStates.Add(new FakeZeroMeleeState(true));
 		}
 		return aiStates.ToArray();
@@ -191,7 +190,7 @@ public class FakeZero : Maverick {
 
 	public override void aiUpdate() {
 		base.aiUpdate();
-		if (controlMode == MaverickModeId.Summoner &&
+		if ((controlMode == MaverickModeId.Summoner || player.isX)&&
 			Helpers.randomRange(0, 2) == 1 && ammo >= 8 && state.aiAttackCtrl
 		) {
 			foreach (GameObject gameObject in getCloseActors(64, true, false, false)) {

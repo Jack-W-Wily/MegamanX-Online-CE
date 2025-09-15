@@ -49,8 +49,26 @@ public enum NetActorCreateId {
 	DrDoppler,
 	RideChaser,
 
+
+	// For WCUT enemies
+	MetClassic,
+	GreenDog,
+	HogumerEasy,
+	MissileElecBlue,
+	MissileElecRed,
+	MissileElecGreen,
+	MissileElecPurple,
+	MissileElecBlack,
+	Abelhudo,
+	AbelhudoIrregular,
+	TurtleRed,
+
+	BallWalker,
+
+
 	// For Classic Era WPS stuff
 	DWrapBigBubble,
+
 	
 }
 
@@ -175,6 +193,9 @@ public class RPCCreateActor : RPC {
 			case (int)NetActorCreateId.MechaniloidFish:
 				new Mechaniloid(pos, player, xDir, new MechaniloidWeapon(player, MechaniloidType.Fish), MechaniloidType.Fish, netProjByte, false);
 				break;
+			case (int)NetActorCreateId.BallWalker:
+				new Mechaniloid(pos, player, xDir, new MechaniloidWeapon(player, MechaniloidType.BallWalker), MechaniloidType.BallWalker, netProjByte, false);
+				break;
 			case (int)NetActorCreateId.BlizzardBuffalo:
 				new BlizzardBuffalo(player, pos, pos, xDir, netProjByte, false);
 				break;
@@ -204,6 +225,33 @@ public class RPCCreateActor : RPC {
 				break;
 			case (int)NetActorCreateId.RideChaser:
 				new RideChaser(player, pos, 0, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.GreenDog:
+				new GreenDog(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.MetClassic:
+				new MetClassic(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.HogumerEasy:
+				new HogumerEasy(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.MissileElecBlue:
+				new MissileElecBlue(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.MissileElecRed:
+				new MissileElecRed(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.MissileElecGreen:
+				new MissileElecGreen(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.MissileElecPurple:
+				new MissileElecPurple(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.MissileElecBlack:
+				new MissileElecBlack(player, pos, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.AbelhudoIrregular:
+				new AbelhudoIrregular(player, pos, pos, xDir, netProjByte, false);
 				break;
 		}
 	}

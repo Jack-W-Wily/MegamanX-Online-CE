@@ -67,6 +67,35 @@ public class ZBuster3Proj : Projectile {
 	}
 }
 
+
+
+public class ZBuster3Proj2 : Projectile {
+	public ZBuster3Proj2(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "zbuster2", netId, player	
+	) {
+		weapon = ZeroBuster.netWeapon;
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
+		vel = new Point(350 * xDir, 0);
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster2_fade";
+		reflectable = true;
+		maxTime = 0.2f;
+		projId = (int)ProjIds.ZBuster3;
+		ZBuster2Proj.hyorogaCode(this, player);
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new ZBuster3Proj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+}
+
 public class ZBuster4Proj : Projectile {
 	float partTime;
 	public ZBuster4Proj(
@@ -205,7 +234,7 @@ public class GenmuProj : Projectile {
 		pos, xDir, owner, "genmu_proj", netId, player
 	) {
 		weapon = Genmu.netWeapon;
-		damager.damage = 12;
+		damager.damage = 20;
 		damager.hitCooldown = 30;
 		damager.flinch = Global.defFlinch;
 		vel = new Point(300 * xDir, 0);

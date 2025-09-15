@@ -81,6 +81,8 @@ public class Maverick : Actor, IDamagable {
 	public bool canFly;
 	public float maxFlyBar = 16;
 	public float flyBar = 16;
+
+	public bool dismantleTypeDeath;
 	public (int icon, int units) flyBarIndexes = (0, 0);
 
 	// Defense.
@@ -739,7 +741,7 @@ public class Maverick : Actor, IDamagable {
 					changeState(mState);
 				}
 			}
-		} else if (aiBehavior == MaverickAIBehavior.Follow && controlMode != MaverickModeId.Striker) {
+		} else if (player.isX && !player.isAI || aiBehavior == MaverickAIBehavior.Follow && controlMode != MaverickModeId.Striker) {
 			if (player.character != null && state.normalCtrl) {
 				Character chr = player.character;
 				float dist = chr.pos.x - pos.x;
@@ -928,10 +930,15 @@ public class Maverick : Actor, IDamagable {
 		return sprite.name.Contains("attack");
 	}
 
+	public bool shouldDealColisionDmg = false;
+
 	public override Dictionary<int, Func<Projectile>> getGlobalProjs() {
 		var retProjs = new Dictionary<int, Func<Projectile>>();
 
-		if (globalCollider != null && Global.level.is1v1() && player.maverick1v1 != null && (sprite.name.Contains("_jump") || sprite.name.Contains("_fall"))) {
+		if (globalCollider != null && Global.level.is1v1() && player.maverick1v1 != null
+
+
+		&& (sprite.name.Contains("_jump") || sprite.name.Contains("_fall"))) {
 			retProjs[(int)ProjIds.MaverickContactDamage] = () => {
 				Point centerPoint = globalCollider.shape.getRect().center();
 				float damage = 3;
@@ -945,6 +952,26 @@ public class Maverick : Actor, IDamagable {
 				return proj;
 			};
 		}
+
+
+			if (globalCollider != null && shouldDealColisionDmg
+		&& !sprite.name.Contains("frozen") && !sprite.name.Contains("knocked") 
+		&& !sprite.name.Contains("grabbed") && !sprite.name.Contains("_hurt") 
+		&& !sprite.name.Contains("_hurt")  && !sprite.name.Contains("_die")) {
+			retProjs[(int)ProjIds.MaverickContactDamage] = () => {
+				Point centerPoint = globalCollider.shape.getRect().center();
+				float damage = 3;
+				int flinch = 20;
+				Projectile proj = new GenericMeleeProj(
+					weapon, centerPoint, ProjIds.MaverickContactDamage,
+					player, damage, flinch,
+					addToLevel: true
+				);
+				proj.globalCollider = globalCollider.clone();
+				return proj;
+			};
+		}
+
 
 		return retProjs;
 	}
@@ -1230,7 +1257,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 
-	public void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
+	public virtual void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			killer.addKill();
 			if (Global.level.gameMode is TeamDeathMatch) {
@@ -1457,7 +1484,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool isInvincible(Player attacker, int? projId) {
-		return player.character.overDriveTimer > 0 || sprite.name == "armoreda_charge" || sprite.name.Contains("_shell") || sprite.name.EndsWith("eat_loop");
+		return  state.invincible || player.character.overDriveTimer > 0 || sprite.name == "armoreda_charge" || sprite.name.Contains("_shell") || sprite.name.EndsWith("eat_loop");
 	}
 
 	public bool canBeHealed(int healerAlliance) {

@@ -386,34 +386,67 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is VAVA1 vava1 && vava1.health > 0) {
+				if (owner.character is ZeroEND zeroE && zeroE.health > 0) {
+				if (zeroE.OverDrive) {
+					if (zeroE.charState is not ZeroDoubleBuster and not
+					ZeroSlash1State and not ZeroSlash2State
+					)
+						zeroE.charState.attackCtrl = true;
+						zeroE.dashedInAir = 0;
+				}
+				if (zeroE.charState.canSpecialCancel) {
+					zeroE.charState.spcCancel = true;
+				}
+			
+				if (owner.superAmmo != owner.superMaxAmmo) {
+					zeroE.gigaAttack.ammo += 1;
+				}
+			}
+
+			if (owner.character is Vile vava1 && vava1.health > 0) {
 				if (vava1.OverDrive) {
 					owner.character.addHealth(0.25f);
 				}
 				if (vava1.charState.canSpecialCancel) {
 					vava1.charState.spcCancel = true;
 				}
-				if (owner.superAmmo != owner.superMaxAmmo && vava1.charState is not VavaBurensen2){
-				owner.superAmmo += 1;
+				if (owner.superAmmo != owner.superMaxAmmo && vava1.charState is not VavaBurensen2) {
+					owner.superAmmo += 1;
 				}
+				
+				if (!vava1.OverDrive) {
+                    
+                damage *= 0.5f;
+				}
+				
 			}
 			
 			if (owner.character is VAVA2 vava2 && vava2.health > 0) {
 				if (vava2.OverDrive) {
 					owner.character.addHealth(0.5f);
 				}
-			
-				if (owner.superAmmo != owner.superMaxAmmo){
-				owner.superAmmo += 1;
+
+				if (owner.superAmmo != owner.superMaxAmmo) {
+					owner.superAmmo += 1;
+				}
+				
+				if (!vava2.OverDrive) {
+                    
+                damage *= 0.5f;
 				}
 			}
 
 			if (owner.character is VAVAV vavav && vavav.health > 0) {
-			
-				if (owner.superAmmo != owner.superMaxAmmo && projId !=(int)ProjIds.HexaInvolute
-				&& projId !=(int)ProjIds.HexaInvolute2
-				){
-				owner.superAmmo += 1;
+
+				if (owner.superAmmo != owner.superMaxAmmo && projId != (int)ProjIds.HexaInvolute
+				&& projId != (int)ProjIds.HexaInvolute2
+				) {
+					owner.superAmmo += 1;
+				}
+				
+				if (!vavav.OverDrive) {
+                    
+                damage *= 0.5f;
 				}
 			}
 			
@@ -427,7 +460,7 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
+			if (owner.character is BusterZero or Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
 
 				if (owner.character.charState.canSpecialCancel) {
 					owner.character.charState.spcCancel = true;
@@ -510,6 +543,9 @@ public class Damager {
 				//Freeze effects	
 					case (int)ProjIds.IceGattlingWC:
 					character.addIgFreezeProgress(1);
+					break;
+					case (int)ProjIds.DistanceNeedler:
+					character.addIgFreezeProgress(3);
 					break;
 
 				case (int)ProjIds.IceGattling:
@@ -781,6 +817,11 @@ public class Damager {
 				if (projId == (int)ProjIds.VileMK2Grab2) {
 					owner?.character.changeState(new VAVA2GrabState(character));
 					character?.changeState(new ForceGrabbed(owner.character));
+				}
+
+				if (projId == (int)ProjIds.newUpGrab) {
+					owner?.character.changeState(new XUPGrabState(character));
+					character?.changeState(new UPGrabbed(owner.character));
 				}
 				
 

@@ -47,6 +47,7 @@ public class AcidBurstProj : Projectile {
 	) {
 		weapon = AcidBurst.netWeapon;
 		useGravity = true;
+		destroyOnDMG = true;
 		maxTime = 1.5f;
 		projId = (int)ProjIds.AcidBurst;
 		vel = new Point(xDir * 100, -200);
@@ -104,6 +105,7 @@ public class AcidBurstProjSmall : Projectile {
 		weapon = isSeahorse ? ToxicSeahorse.netWeapon : AcidBurst.netWeapon;
 		useGravity = true;
 		maxTime = 1.5f;
+		destroyOnDMG = true;
 		this.projId = (int)projId;
 		fadeSprite = "acidburst_fade";
 		this.vel = vel;
@@ -159,6 +161,7 @@ public class AcidBurstProjCharged : Projectile {
 		projId = (int)ProjIds.AcidBurstCharged;
 		useGravity = true;
 		fadeSound = "acidBurst";
+		destroyOnDMG = true;
 		if (type == 0) {
 			vel = new Point(xDir * 75, -270);
 		} else if (type == 1) {

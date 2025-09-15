@@ -1171,6 +1171,10 @@ public partial class Character : Actor, IDamagable {
 			invulnTime = 1f;
 		}
 
+		if (player.superAmmo > player.superMaxAmmo){
+			player.superAmmo = player.superMaxAmmo;
+		}
+
 
 		// Wcut Burst System
 
@@ -2125,7 +2129,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public bool isSpriteInvulnerable() {
-		return sprite.name == "mmx_gigacrush" || sprite.name == "zero_hyper_start" || sprite.name == "axl_hyper_start" || sprite.name == "zero_rakuhouha" ||
+		return sprite.name == "rmx_gigacrush" || sprite.name == "zero_hyper_start" || sprite.name == "axl_hyper_start" || sprite.name == "zero_rakuhouha" ||
 			sprite.name == "zero_rekkoha" || sprite.name == "zero_cflasher" || sprite.name.Contains("vile_revive") || sprite.name.Contains("warp_out") || sprite.name.Contains("nova_strike");
 	}
 

@@ -49,7 +49,7 @@ public class BusterZeroMelee : BusterZeroState {
 			sprite = "projswing_air";
 			character.changeSpriteFromName(sprite, true);
 		}
-		zero.zSaberCooldown = 56;
+		//zero.zSaberCooldown = 56;
 	}
 
 	public override void onExit(CharState? newState) {
@@ -83,7 +83,7 @@ public class BusterZeroMeleeWall : BusterZeroState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero.zSaberCooldown = 56;
+		//zero.zSaberCooldown = 56;
 		character.useGravity = false;
 	}
 
@@ -248,7 +248,7 @@ public class BusterZeroHadangeki : BusterZeroState {
 			defaultSprite = sprite;
 			character.changeSpriteFromName(sprite, true);
 		}
-		zero.zSaberCooldown = 56;
+		//zero.zSaberCooldown = 56;
 	}
 
 	public override void onExit(CharState? newState) {
@@ -289,7 +289,7 @@ public class BusterZeroHadangekiWall : BusterZeroState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		zero.zSaberCooldown = 56;
+		//zero.zSaberCooldown = 56;
 		character.useGravity = false;
 	}
 

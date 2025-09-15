@@ -122,6 +122,7 @@ public class DZHadangekiProj : Projectile {
 	) {
 		weapon = ZeroBuster.netWeapon;
 		damager.damage = 3;
+		damager.flinch = 40;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "zsaber_shot_fade";

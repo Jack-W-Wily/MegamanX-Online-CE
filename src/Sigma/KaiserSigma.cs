@@ -72,7 +72,7 @@ public partial class KaiserSigma : Character {
 		if (isATrans) {
 			return base.getMaxHealth();
 		}
-		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
+		return MathInt.Ceiling(Player.getModifiedHealth(40) * Player.getHpMod());
 	}
 
 	public override void update() {

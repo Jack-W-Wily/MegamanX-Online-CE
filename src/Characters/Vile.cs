@@ -21,6 +21,8 @@ public class Vile : Character {
 	public bool hasFrozenCastle;
 	public bool hasSpeedDevil;
 	public bool summonedGoliath;
+
+	public bool phase2;
 	public int vileForm;
 	public bool isVileMK1 { get { return vileForm == 0; } }
 	public bool isVileMK2 { get { return vileForm == 1; } }
@@ -93,7 +95,7 @@ public class Vile : Character {
 		}
 		loadout ??= player.loadout.vileLoadout.clone();
 		this.loadout = loadout;
-
+		
 		vulcanWeapon = new Vulcan((VulcanType)loadout.vulcan);
 		cannonWeapon = new VileCannon((VileCannonType)loadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
@@ -252,8 +254,18 @@ public class Vile : Character {
 	}
 	public override bool attackCtrl() {
 
-		if (this is not VAVA1 and not MysteriousMaverick and not VAVA2
-		and not VAVAV) {
+		if (	this is not VAVA1
+			and not VAVA2
+			and not VAVAV
+			and not MysteriousMaverick
+			and not HighwayVAVA
+			and not FinalVava
+			and not Vava2Goliath
+			
+		
+		
+		
+		) {
 			bool specialPressed = player.input.isPressed(Control.Special1, player);
 			bool shootHeld = player.input.isHeld(Control.Shoot, player);
 
@@ -603,6 +615,7 @@ public class Vile : Character {
 			energy.addAmmo(amount, player);
 			return;
 		}
+		player.vileAmmo += amount;
 		weaponHealAmount += amount;
 	}
 	public override void addPercentAmmo(float amount) {
@@ -950,6 +963,8 @@ public class Vile : Character {
 			and not VAVAV
 			and not MysteriousMaverick
 			and not HighwayVAVA
+			and not FinalVava
+			and not Vava2Goliath
 			
 			
 			

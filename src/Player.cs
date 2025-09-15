@@ -1208,31 +1208,48 @@ public partial class Player {
 
 		Character newChar;
 		// Bosses
-		
+
 		int htCount = getStartHeartTanksForChar();
 
-		if (isAI && Global.level.levelData.name == "junkfactory_1v1" && charNum >= 0 && isAI) {
-				charNum = (int)CharIds.BossMMaverick;
-				newChar = new MysteriousMaverick(
-				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
-			);
-		}
-		else if (isAI && Global.level.levelData.name == "zerovirus_1v1" && charNum >= 0 && isAI) {
+
+		if (isAI && Global.level.levelData.name == "redandblue_vs_purple_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossMMaverick;
+			newChar = new FinalVava(
+			this, pos.x, pos.y, xDir,
+			false, charNetId, ownedByLocalPlayer
+		);
+		} else if (isAI && Global.level.levelData.name == "dopplerlab_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossMMaverick;
+			newChar = new Vava2Goliath(
+			this, pos.x, pos.y, xDir,
+			false, charNetId, ownedByLocalPlayer
+		);
+		} else if (isAI && Global.level.levelData.name == "junkfactory_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossMMaverick;
+			newChar = new MysteriousMaverick(
+			this, pos.x, pos.y, xDir,
+			false, charNetId, ownedByLocalPlayer
+		);
+		} else if (isAI && Global.level.levelData.name == "zerovirus_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Sigma;
 			newChar = new ZeroMID(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}
-		else if (isAI && Global.level.levelData.name == "highway_1v1" && charNum >= 0 && isAI) {
+		} else if (isAI &&
+
+		(Global.level.levelData.name == "highway_1v1" ||
+		Global.level.levelData.name == "st_vava_c1" ||
+		Global.level.levelData.name == "st_x_x1_highway"
+		)
+
+		&& charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Vile;
 			newChar = new HighwayVAVA(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}
-		else if (isAI && Global.level.levelData.name == "zero_vs_x_1v1" && charNum >= 0 && isAI) {
+		} else if (isAI && Global.level.levelData.name == "zero_vs_x_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Sigma;
 			newChar = new RockmanX(
 				this, pos.x, pos.y, xDir,
@@ -1250,16 +1267,13 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}else if (isAI && Global.level.levelData.name == "factory_1v1" && charNum >= 0 && isAI) {
+		} else if (isAI && Global.level.levelData.name == "factory_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.BossClaudio;
 			newChar = new BossMammoth(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		}
-		
-		
-		 else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI) {
+		} else if (isAI && Global.level.levelData.name == "vs_zain_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Zain;
 			newChar = new Zain(
 				this, pos.x, pos.y, xDir,
@@ -1417,17 +1431,32 @@ public partial class Player {
 				);
 			}
 		} else if (charNum == (int)CharIds.RockmanX) {
-
-			newChar = new RockmanX(
+			if (input.isR2Held(this) && !X3ZeroOncePermatch && canX3Zero) {
+				charNum = (int)CharIds.Zero;
+				newChar = new BusterZero(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount
 			);
+				X3ZeroOncePermatch = true;
+			} else {
+				newChar = new RockmanX(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				);
+			}
 		} else if (charNum == (int)CharIds.ZeroMID) {
-
+			if (input.isR2Held(this)) {
+			newChar = new ZeroEND(
+					this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+			}else {
 			newChar = new ZeroMID(
 					this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
+			}
 		} else if (charNum == (int)CharIds.Zain) {
 
 			newChar = new Zain(
@@ -1537,6 +1566,13 @@ public partial class Player {
 		}
 		return newChar;
 	}
+
+
+
+		public bool canX3Zero => loadout.xLoadout.weapon1 >= 17 &&
+		 loadout.xLoadout.weapon2 >= 17 &&  loadout.xLoadout.weapon3 >= 17
+		 && loadout.xLoadout.weapon1 <= 24 &&
+		 loadout.xLoadout.weapon2  <= 24 &&  loadout.xLoadout.weapon3  <= 24;
 
 	public void startPossess(Player possesser, bool sendRpc = false) {
 		possessedTime = maxPossessedTime;
@@ -2587,6 +2623,27 @@ public partial class Player {
 		return true;
 	}
 
+
+	public bool showX3ZeroMessage() {
+		if (!canX3Zero) {
+			return false;
+		}
+		if (X3ZeroOncePermatch) {
+			return false;
+		}
+		if (character.isATrans) {
+			return false;
+		}
+		if (character?.charState is not Die) {
+			return false;
+		}
+		if (character is not RockmanX ) {
+			return false;
+		}
+		return true;
+	}
+
+
 	public bool canReviveSigma(out Point spawnPoint, int sigmaHypermode) {
 		spawnPoint = Point.zero;
 		if (character?.charState is not Die) {
@@ -2751,6 +2808,10 @@ public partial class Player {
 		}
 		RPC.reviveSigma.sendRpc(form, spawnPoint, id, newNetId);
 	}
+
+
+	public bool X3ZeroOncePermatch;
+
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
 		if (form >= 2) {

@@ -72,7 +72,7 @@ public class VileCannonWC : Weapon {
 		}
 	}
 
-	public override void vavaShoot(WeaponIds weaponInput, VAVA1 vile) {
+	public override void vavaShoot(WeaponIds weaponInput, Vile vile) {
 		if (vile.cannonWeapon.type == (int)VileCannonType.None) return;
 
 		bool isLongshotGizmo = type == (int)VileCannonType.LongshotGizmo;
@@ -136,7 +136,7 @@ public class VileCannonWC : Weapon {
 
 public class Vava1Stunshot : CharState {
 	bool isGizmo;
-	private VAVA1 vile = null!;
+	private Vile vile = null!;
 	public Vava1Stunshot(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
 		useDashJumpSpeed = true;
 		this.isGizmo = false;
@@ -168,7 +168,7 @@ public class Vava1Stunshot : CharState {
 		}
 	}
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
 			return;
 		}
@@ -215,7 +215,7 @@ public class Vava1Stunshot : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		shootLogic(vile);
 		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
 			exitOnAirborne = true;
@@ -241,7 +241,7 @@ public class Vava1Stunshot : CharState {
 
 public class Vava1FrontRunner : CharState {
 	bool isGizmo;
-	private VAVA1 vile = null!;
+	private Vile vile = null!;
 	public Vava1FrontRunner(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
 		useDashJumpSpeed = true;
 		this.isGizmo = false;
@@ -273,7 +273,7 @@ public class Vava1FrontRunner : CharState {
 		}
 	}
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
 			return;
 		}
@@ -320,7 +320,7 @@ public class Vava1FrontRunner : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		shootLogic(vile);
 		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
 			exitOnAirborne = true;
@@ -347,7 +347,7 @@ public class Vava1FrontRunner : CharState {
 
 
 public class Vava1TridentLine : CharState {
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	bool first;
 	bool second;
@@ -385,7 +385,7 @@ public class Vava1TridentLine : CharState {
 		}
 	}
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		bool isMK2 = vile.isVileMK2;
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
@@ -411,7 +411,7 @@ public class Vava1TridentLine : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
@@ -462,7 +462,7 @@ public class Vava1GizmoDash : CharState {
 
 public class VavaGizmoGrabState : CharState {
 
-    public VAVA1 vile = null!;
+    public Vile vile = null!;
 	public Character? victim;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
@@ -521,7 +521,7 @@ public class VavaGizmoGrabState : CharState {
     
     public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;

@@ -236,7 +236,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 
 		if (raNum == 4 && character != null && musicSource == null) {
-			addMusicSource("vile_X3", getCenterPos(), true);
+			addMusicSource("fortressBoss_X3", getCenterPos(), true);
 		}
 		if (character == null && musicSource != null) {
 			destroyMusicSource();
@@ -670,7 +670,9 @@ public class RideArmor : Actor, IDamagable {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		if (sprite.name.Contains("attack")) {
-			if (raNum == 0 || sprite.name.Contains("ridearmor")) return (int)MeleeIds.Punch;
+			if (raNum == 0 || sprite.name.Contains("ridearmor") 
+			|| sprite.name.Contains("blackbear2") 
+			|| sprite.name.Contains("raiden")) return (int)MeleeIds.Punch;
 			if (raNum == 1) return (int)MeleeIds.KPunch;
 			if (raNum == 4) return (int)MeleeIds.GPunch;
 			if (raNum == 5) return (int)MeleeIds.DPunch;
@@ -686,7 +688,7 @@ public class RideArmor : Actor, IDamagable {
 		}
 		bool canDamage = deltaPos.y > 150 * Global.spf;
 		if (hitbox.name.Contains("stomp") && canDamage) {
-			if (raNum == 0 || sprite.name.Contains("ridearmor")) return (int)MeleeIds.Stomp;
+			if (raNum == 0 || sprite.name.Contains("ridearmor") || sprite.name.Contains("blackbear2")) return (int)MeleeIds.Stomp;
 			if (raNum == 1) return (int)MeleeIds.KStomp;
 			if (raNum == 2) return (int)MeleeIds.HStomp;
 			if (raNum == 3) return (int)MeleeIds.FStomp;
@@ -1039,14 +1041,16 @@ public class RideArmor : Actor, IDamagable {
 		lastCrashSoundTime = Global.time;
 	}
 
-	public bool isVava1Ride => netOwner.character is VAVA1 or HighwayVAVA;
+	public bool isVava1Ride => netOwner.character is VAVA1;
 	public string getRaTypeName() {
 		if (raNum == 1 && !isVava1Ride) {
 			return "kangaroo";
 		} else if (raNum == 2 && !isVava1Ride) return "hawk";
 		else if (raNum == 3 && !isVava1Ride) return "frog";
 		else if (raNum == 4 && !isVava1Ride) return "goliath";
-		else if (raNum == 5 && !isVava1Ride ) return "devilbear";
+		else if (raNum == 5 && !isVava1Ride) return "devilbear";
+		else if (raNum == 6) return "blackbear2";
+		else if (raNum == 7) return "raiden";
 		else {
 			if (!isNeutral) return "ridearmor";
 			else return "neutralra";
@@ -1222,7 +1226,7 @@ public class RideArmorState {
 	}
 
 	public bool inTransition() {
-		if (Global.level.rideArmorFlight) {
+		if (!Global.level.rideArmorFlight) {
 			return false;
 		}
 
@@ -1312,7 +1316,13 @@ public class RideArmorState {
 				rideArmor.move(move);
 			}
 
-			if (rideArmor.raNum == 3 && player.input.isPressed(Control.Dash, player) && player.input.isHeld(Control.Down, player)) {
+			if (
+
+				(rideArmor.raNum == 3
+				|| rideArmor.raNum == 4
+				|| rideArmor.raNum == 6
+				)
+			&& player.input.isPressed(Control.Dash, player) && player.input.isHeld(Control.Down, player)) {
 				rideArmor.changeState(new RAGroundPoundStart(), true);
 			}
 		}
@@ -1447,7 +1457,10 @@ public class RAIdle : RideArmorState {
 
 		Helpers.decrementTime(ref attackCooldown);
 
-		if (player != null && rideArmor.raNum == 1 && player.input.isAHeld(player) && !rideArmor.isAttacking()) {
+		if (player != null && (rideArmor.raNum == 1 || rideArmor.raNum == 6 )
+		
+		
+		 && player.input.isAHeld(player) && !rideArmor.isAttacking()) {
 			shootHeldTime += Global.spf;
 			if (shootHeldTime > 0.5f) {
 				shootHeldTime = 0;
@@ -1458,7 +1471,9 @@ public class RAIdle : RideArmorState {
 		if (rideArmor.isAttacking()) shootHeldTime = 0;
 
 		if (character.flag == null) {
-			if (character is Vile && player.input.isHeld(Control.Down, player)) {
+			if (character is Vile or Iris or GBD or Dynamo
+			
+			&& player.input.isHeld(Control.Down, player)) {
 				(character.charState as InRideArmor)?.setHiding(true);
 				if (!rideArmor.isAttacking()) {
 					if (player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
@@ -1473,7 +1488,11 @@ public class RAIdle : RideArmorState {
 		if (player != null) {
 			bool jumpHeld = player.input.isHeld(Control.Jump, player);
 			bool dashHeld = player.input.isHeld(Control.Dash, player) && character.flag == null;
-			if (jumpHeld && rideArmor.raNum == 3 && character.flag == null) {
+			if (jumpHeld && (rideArmor.raNum == 3  || rideArmor.raNum == 4)
+			
+			
+			
+			&& character.flag == null) {
 				if (rideArmor.consecutiveJumpTimeout > 0 && character.flag == null && !rideArmor.isUnderwater()) {
 					rideArmor.consecutiveJumpTimeout = 0;
 					rideArmor.consecutiveJump++;
@@ -1994,7 +2013,7 @@ public class RAChainCharge : RideArmorState {
 		base.update();
 		if (!rideArmor.ownedByLocalPlayer) return;
 	if (player != null) {
-			if (player.isAI) {
+			if (!player.isAI) {
 				if (!player.input.isAHeld(player)) {
 					rideArmor.changeState(new RAChainAttack(), true);
 					return;
@@ -2029,6 +2048,9 @@ public class RAChainCharge : RideArmorState {
 		}
 	}
 }
+
+
+
 
 public class RAChainChargeDash : RideArmorState {
 	string dashControl;
@@ -2092,7 +2114,7 @@ public class RAChainChargeDash : RideArmorState {
 		}
 		rideArmor.chainSoundTime += Global.spf;
 		rideArmor.chainTotalSoundTime += Global.spf;
-		if (rideArmor.chainSoundTime > 60f/60f && rideArmor.chainTotalSoundTime < 4) {
+		if (rideArmor.chainSoundTime > 60f / 60f && rideArmor.chainTotalSoundTime < 4) {
 			rideArmor.playSound("kangarooDrillX3", sendRpc: true);
 			rideArmor.chainSoundTime = 0;
 		}
@@ -2113,7 +2135,7 @@ public class RAChainAttack : RideArmorState {
 	public override void update() {
 		base.update();
 		if (!rideArmor.ownedByLocalPlayer) return;
-		if (player == null) {
+		if (player == null || rideArmor.raNum != 1) {
 			rideArmor.changeState(new RAIdle(), true);
 			return;
 		}
@@ -2142,7 +2164,7 @@ public class RAChainAttack : RideArmorState {
 		}
 
 		if (rideArmor.frameIndex == 8) {
-			if (frame5Time < 30f/60f) {
+			if (frame5Time < 30f / 60f) {
 				rideArmor.frameTime = 0;
 			}
 			frame5Time += Global.spf;
@@ -2158,6 +2180,62 @@ public class RAChainAttack : RideArmorState {
 		mcp?.destroySelf();
 	}
 }
+
+
+
+
+public class RAAIDashAttack : RideArmorState {
+	string dashControl;
+	public float dashTime;
+	public bool isSlow;
+	public RAAIDashAttack(string dashControl, bool isSlow) : base("ridearmor_attack") {
+		this.dashControl = dashControl;
+		this.isSlow = isSlow;
+		enterSound = "ridedash";
+	}
+
+	public override void onEnter(RideArmorState? oldState) {
+		if (enterSound == "ridedash" && rideArmor.raNum >= 1 && rideArmor.raNum <= 4) {
+			enterSound = "ridedashx3";
+		}
+		base.onEnter(oldState);
+		rideArmor.isDashing = true;
+		new Anim(rideArmor.pos, "dash_sparks", rideArmor.xDir, null, true);
+	}
+
+	public override void onExit(RideArmorState? newState) {
+		base.onExit(newState);
+		
+	}
+
+	public override void update() {
+		base.update();
+		if (!rideArmor.ownedByLocalPlayer) return;
+
+		if (!rideArmor.grounded) {
+			rideArmor.changeState(new RAFall());
+			return;
+		}
+		float modifier = (isSlow ? 0.5f : 0.75f);
+		rideArmor.move(new Point(rideArmor.xDir * rideArmor.getRunSpeed() * rideArmor.getDashSpeed() * modifier, 0));
+		
+	
+		if (stateTime > 0.1) {
+			stateTime = 0;
+			new Anim(rideArmor.pos.addxy(0, -4), "dust", rideArmor.xDir, null, true);
+		}
+		dashTime += Global.spf;
+		if (dashTime > 0.6f) {
+			dashTime = 0;
+				rideArmor.changeState(rideArmor.grounded ? new RAIdle() : new RAFall());
+		
+		}
+		rideArmor.chainSoundTime += Global.spf;
+		rideArmor.chainTotalSoundTime += Global.spf;
+		
+	}
+}
+
 
 public class RAGoliathShoot : RideArmorState {
 	bool grounded;
@@ -2276,12 +2354,12 @@ public class InRideArmor : CharState {
 		if (player.input.isPressed(Control.Taunt,player)) {
 				character.changeSpriteFromName("ra_taunt", true);
 		}
-		 if (!character.sprite.name.Contains("ra_bomb") &&
-				!character.sprite.name.Contains("ra_taunt") &&
-				!character.sprite.name.Contains("ra_show") &&
-			 character.sprite.isAnimOver()) {
+		 if (character.sprite.name.Contains("ra_bomb") &&
+				character.sprite.name.Contains("ra_taunt") &&
+				character.sprite.name.Contains("ra_show") &&
+		 character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
-			}
+		}
 		
 
 		if (!isHiding) {

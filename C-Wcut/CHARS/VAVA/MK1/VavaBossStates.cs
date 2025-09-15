@@ -80,7 +80,7 @@ public class RagingDemonDash : CharState {
 
 
 public class PopcornHell : CharState {
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	float leechTime = 1;
 
@@ -114,7 +114,7 @@ public class PopcornHell : CharState {
 	}
 
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		bool isMK2 = vile.isVileMK2;
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
@@ -137,7 +137,7 @@ public class PopcornHell : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
 		}
@@ -201,7 +201,7 @@ public class ExplosiveRoundStateBoss : CharState {
 
 
 public class ShoulderCannon : CharState {
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	bool first;
 	bool second;
@@ -239,7 +239,7 @@ public class ShoulderCannon : CharState {
 		}
 	}
 
-	public static void shootLogic(VAVA1 vile) {
+	public static void shootLogic(Vile vile) {
 		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
 		bool isMK2 = vile.isVileMK2;
 		Point? headPosNullable = vile.getVileMK2StunShotPos();
@@ -274,7 +274,7 @@ public class ShoulderCannon : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 
 		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
 			exitOnAirborne = true;
@@ -343,7 +343,7 @@ public class CrimsonPhantomState : CharState {
 
 public class InfinityGigAttackBossVer : CharState {
 	bool shot = false;
-	RocketPunchProjWC? proj;
+	InfinityGigSecond? proj;
 	float specialPressTime;
 
 	public float pushBackSpeed;
@@ -356,9 +356,6 @@ public class InfinityGigAttackBossVer : CharState {
 
 		Helpers.decrementTime(ref specialPressTime);
 
-		if (proj != null && !player.input.isBHeld(player) && proj.time >= proj.minTime) {
-			proj.reversed = true;
-		}
 
 		if (!shot && character.sprite.frameIndex == 3) {
 			shoot();
@@ -403,7 +400,8 @@ public class InfinityGigAttackBossVer : CharState {
 		character.frameTime = 0;
 		var poi = character.sprite.getCurrentFrame().POIs[0];
 		poi.x *= character.xDir;
-		proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.InfinityGig), character.pos.add(poi), character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+		proj = new InfinityGigSecond(character.pos.add(poi), character.xDir, character, player, player.getNextActorNetId(true), 30, true);
+					
 	}
 
 	public void reset() {

@@ -230,7 +230,7 @@ public class GigaCrushEffect : Effect {
 			return;
 		}
 
-		if (character.sprite.name != "mmx_gigacrush" || character.frameIndex > 2) {
+		if (character.sprite.name != "rmx_gigacrush" || character.frameIndex > 2) {
 			return;
 		}
 
@@ -245,7 +245,7 @@ public class GigaCrushEffect : Effect {
 	public override void render(float offsetX, float offsetY) {
 		base.render(offsetX, offsetY);
 
-		if (character.sprite.name != "mmx_gigacrush" || character.frameIndex > 2) {
+		if (character.sprite.name != "rmx_gigacrush" || character.frameIndex > 2) {
 			return;
 		}
 

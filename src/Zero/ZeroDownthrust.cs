@@ -206,7 +206,12 @@ public class ZeroDownthrustLand : CharState {
 		altCtrls[1] = true;
 		switch (type) {
 			case ZeroDownthrustType.Hyouretsuzan:
+			if (character is not ZeroEND){
 				character.breakFreeze(player, character.pos.addxy(character.xDir * 5, 0), sendRpc: true);
+			} else {
+				character.playSound("crash", sendRpc: true);
+				character.shakeCamera(true);
+			}
 				break;
 			case ZeroDownthrustType.Rakukojin:
 				character.playSound("swordthud", sendRpc: true);

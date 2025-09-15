@@ -220,7 +220,20 @@ public class VAVA1 : Vile {
 
 		SpecialMoves();
 		if (WeaponRightHeld) {
-			vulcanWeapon.vileShoot(0, this);
+			if (player.input.isHeld(Control.Up, player)) {
+                if (player.vileAmmo >= 15) {
+					changeState(new VavaDistantNeedler(), true);
+					player.vileAmmo -= 15;
+				}
+            }
+			if (charState is Crouch) {
+				
+					changeState(new VavaZipZapper(), true);
+					
+				
+			} else {
+				vulcanWeapon.vileShoot(0, this);
+			}
 		}
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
 		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
@@ -229,7 +242,7 @@ public class VAVA1 : Vile {
 				if (grounded) {
 					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
 						if (player.vileAmmo >= 25) {
-							changeState(new InfinityGigAttackBossVer(), true);
+							changeState(new InfinityGigAttack(), true);
 							player.vileAmmo -= 25;
 						}			
 					}
@@ -254,7 +267,7 @@ public class VAVA1 : Vile {
 						}
 					} else {
 						if (!player.input.isHeld(Control.Down, player)) {
-							if (charState is not InfinityGigAttackBossVer or SpoiledBratPunch) {
+							if (charState is not InfinityGigAttack or SpoiledBratPunch) {
 								changeState(new VAVAJab1(), true);
 							}
 						} else {
@@ -270,7 +283,7 @@ public class VAVA1 : Vile {
 				} else {
 					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
 							if (player.vileAmmo >= 25) {
-							changeState(new InfinityGigAttackBossVer(), true);
+							changeState(new InfinityGigAttack(), true);
 							player.vileAmmo -= 25;
 						}			
 					} else {
@@ -443,10 +456,10 @@ public class VAVA1 : Vile {
 
 
 
-		if (player.isAI && health < 5 && !phase2 && !isWarpIn() && isBossVile) {
+		if (player.isAI && health < 5 && !phase2 && !isWarpIn() && isBossVile && AIStart) {
 			changeState(new VAVAPhase2Start(false), true);
 			stopMoving();
-			bonusHealth = 40;
+			bonusHealth = 60;
 		}
 
 		// Hypermode music.
@@ -813,6 +826,7 @@ public class VAVA1 : Vile {
 	// Ammo section
 	public override void addAmmo(float amount) {
 		weaponHealAmount += amount;
+		 player.vileAmmo += amount;
 	}
 
 	public override void addPercentAmmo(float amount) {
@@ -873,16 +887,55 @@ public class VAVA1 : Vile {
 		if (chargeLevel == 0) {
 			stopCharge();
 			if (player.vileAmmo > 9) {
-				changeState(new Vava1Stunshot(grounded, false), true);
+				if (!player.input.isL2Held(player)) {
+					changeState(new Vava1Stunshot(grounded, false), true);
+				} else {
+					changeState(new VavaTomahawk(), true);
+					invulnTime = 0.2f;
+					var tomahawk1 = new VileMaroonedTomahawk(
+					getShootPos(), xDir, this, player,
+					player.getNextActorNetId(), rpc: true
+						);
+					var tomahawk2 = new VileMaroonedTomahawk(
+				getShootPos(), xDir, this, player,
+				player.getNextActorNetId(), rpc: true
+					);
+					tomahawk2.vel.y = -30;
+				}
+				
 				player.vileAmmo -= 10;
 			}
 		} else if (chargeLevel == 1) {
+			if (!player.input.isL2Held(player)) {
 			cannonWeapon.type = (int)VileCannonType.FrontRunner;
 			cannonWeapon.vavaShoot(0, this);
+			} else {
+                new VileParasiteSword(
+				getShootPos(), xDir, this, player,
+				player.getNextActorNetId(), rpc: true);
+				player.vileAmmo -= 20;
+            }
 			stopCharge();
 		} else if (chargeLevel == 2) {
+			if (!player.input.isL2Held(player)) {
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
 			cannonWeapon.vavaShoot(0, this);
+			} else {
+				new MetalCrescent(
+			getShootPos(), xDir, this, player,
+			player.getNextActorNetId(), rpc: true);
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					new MetalCrescent(
+				getShootPos(), xDir, this, player,
+				player.getNextActorNetId(), rpc: true);
+				}, 0.15f));
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					new MetalCrescent(
+				getShootPos(), xDir, this, player,
+				player.getNextActorNetId(), rpc: true);
+				}, 0.25f));
+				player.vileAmmo -= 20;
+			}
 			stopCharge();
 		} else if (chargeLevel == 3) {
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
@@ -1044,14 +1097,9 @@ public class VAVA1 : Vile {
 					if (linkedRideArmor != null) linkedRideArmor.selfDestructTime = 1000;
 					buyRideArmor();
 					mmw.isMenuOpened = false;
-					int raIndex = player.selectedRAIndex;
-					if (isVileMK5 && raIndex == 4) raIndex++;
+					int raIndex = 6;
 					linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
-					if (linkedRideArmor.raNum == 4) summonedGoliath = true;
-					if (isVileMK5) {
-						linkedRideArmor.ownedByMK5 = true;
-						linkedRideArmor.zIndex = zIndex - 1;
-					}
+					
 					changeState(new CallDownMech(linkedRideArmor, true), true);
 				}
 			} else {

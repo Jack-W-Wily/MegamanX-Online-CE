@@ -542,7 +542,7 @@ public class VileDashStateEnd : CharState {
 
 
 public class CallDownMechWC : CharState {
-	VAVA1 vile = null!;
+	Vile vile = null!;
 	RideArmor rideArmor;
 	bool isNew;
 
@@ -583,7 +583,7 @@ public class CallDownMechWC : CharState {
 		base.onEnter(oldState);
 		rideArmor.changeState(new RACalldown(character.pos, isNew), true);
 		rideArmor.xDir = character.xDir;
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 	}
 }
 
@@ -591,7 +591,7 @@ public class VileReviveWC : CharState {
 	public float radius = 200;
 	Anim? drDopplerAnim;
 	bool isMK5;
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	public VileReviveWC(bool isMK5) : base(isMK5 ? "revive_to5" : "revive") {
 		invincible = true;
@@ -641,7 +641,7 @@ public class VileReviveWC : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
 		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);
@@ -683,11 +683,72 @@ public class VileReviveWC : CharState {
 
 
 
+public class VavaTomahawk : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public VavaTomahawk(string transitionSprite = "")
+		: base("tomahawk", "", "", transitionSprite)
+	{
+	airMove = true;	
+	}
+
+	public override void update()
+	{
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+	//	new Anim(character.pos,"iris_crystal_bash_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true	);
+
+
+		character.playSound("dynamoslash", sendRpc: true);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
+		}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+
+
 public class VAVAPhase2Start : CharState {
 	public float radius = 200;
 	Anim? drDopplerAnim;
 	bool isMK5;
-	public VAVA1 vile = null!;
+	public Vile vile = null!;
 
 	public VAVAPhase2Start(bool isMK5) : base(isMK5 ? "start_phase2" : "start_phase2") {
 		invincible = true;
@@ -733,10 +794,10 @@ public class VAVAPhase2Start : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vile = character as VAVA1 ?? throw new NullReferenceException();
+		vile = character as Vile ?? throw new NullReferenceException();
 		//character.setzIndex(ZIndex.Foreground);
 		character.playSound("revive");
-	
+
 	}
 
 	public override void onExit(CharState? newState) {

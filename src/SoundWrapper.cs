@@ -51,8 +51,8 @@ public class SoundBufferWrapper {
 					charNum = 1;
 				//} else if (subpiece == "vile") {
 				//	charNum = 2;
-				} else if (subpiece == "axl") {
-					charNum = 3;
+				//} else if (subpiece == "axl") {
+				//	charNum = 3;
 				} else if (subpiece == "sigma") {
 					charNum = 4;
 				}

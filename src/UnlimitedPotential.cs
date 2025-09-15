@@ -113,7 +113,7 @@ public class UPParryMeleeProj : Projectile {
 	public UPParryMeleeProj(
 		Point pos, int xDir, float damage, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "mmx_unpo_parry_proj", netId, player
+		pos, xDir, owner, "rmx_unpo_parry_proj", netId, player
 	) {
 		weapon = RCXParry.netWeapon;
 		damager.damage = damage;
@@ -604,7 +604,7 @@ public class XReviveStart : CharState {
 public class XRevive : CharState {
 	public float radius = 200;
 	XReviveAnim reviveAnim = null!;
-	RagingChargeX rcx = null!;
+	//RagingChargeX rcx = null!;
 
 	public XRevive() : base("revive_shake") {
 		invincible = true;
@@ -642,13 +642,13 @@ public class XRevive : CharState {
 		base.onEnter(oldState);
 		character.visible = true;
 		reviveAnim = new XReviveAnim(character.getCenterPos(), player.getNextActorNetId(), sendRpc: true);
-		rcx = character as RagingChargeX ?? throw new NullReferenceException();
+	//	rcx = character as RagingChargeX ?? throw new NullReferenceException();
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		rcx.invulnTime = 2;
+	//	rcx.invulnTime = 2;
 	}
 }
 

@@ -509,7 +509,7 @@ public class PunchyZero : Character {
 		if (Global.sprites.ContainsKey("pzero_" + spriteName)) {
 			return "pzero_" + spriteName;
 		}
-		return "zero_" + spriteName;
+		return "zarzo_" + spriteName;
 	}
 
 	public override bool isToughGuyHyperMode() {
@@ -581,16 +581,16 @@ public class PunchyZero : Character {
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zero_punch" => MeleeIds.Punch,
-			"zero_punch2" => MeleeIds.Punch2,
+			"zarzo_punch" => MeleeIds.Punch,
+			"zarzo_punch2" => MeleeIds.Punch2,
 			"zero_spinkick" => MeleeIds.Spin,
 			"zero_kick_air" => MeleeIds.AirKick,
-			"zero_parry_start" => MeleeIds.Parry,
-			"zero_parry" => MeleeIds.ParryAttack,
+			"zarzo_parry_start" => MeleeIds.Parry,
+			"zarzo_parry" => MeleeIds.ParryAttack,
 			"zero_shoryuken" => MeleeIds.Uppercut,
 			"zero_megapunch" => MeleeIds.StrongPunch,
-			"zero_dropkick" => MeleeIds.DropKick,
-			"zero_projswing" or "zero_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zarzo_dropkick" => MeleeIds.DropKick,
+			"zarzo_projswing" or "zarzo_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
@@ -768,9 +768,9 @@ public class PunchyZero : Character {
 			float xOff = 0;
 			int auraXDir = 1;
 			float yOff = 5;
-			string auraSprite = "zero_awakened_aura";
+			string auraSprite = "zarzo_awakened_aura";
 			if (sprite.name.Contains("dash")) {
-				auraSprite = "zero_awakened_aura2";
+				auraSprite = "zarzo_awakened_aura2";
 				auraXDir = xDir;
 				yOff = 8;
 			}

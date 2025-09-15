@@ -324,7 +324,7 @@ public class Sprite {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
 			if (isShootSprite) {
-				if (name.Contains("mmx_wall_slide_shoot")) {
+				if (name.Contains("rmx_wall_slide_shoot")) {
 					flippedExtraW = 5;
 					extraW = flippedExtraW;
 					extraXOff = -flippedExtraW * flipX;
@@ -437,7 +437,7 @@ public class Sprite {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
 			if (isShootSprite) {
-				if (name.Contains("mmx_wall_slide_shoot")) {
+				if (name.Contains("rmx_wall_slide_shoot")) {
 					flippedExtraW = 5;
 					extraW = flippedExtraW;
 					extraXOff = -flippedExtraW * flipX;
@@ -890,8 +890,8 @@ public class Sprite {
 	}
 
 	public bool needsX3BusterCorrection() {
-		return name.Contains("mmx_shoot") || name.Contains("mmx_run_shoot") || name.Contains("mmx_fall_shoot") || name.Contains("mmx_jump_shoot") || name.Contains("mmx_dash_shoot") || name.Contains("mmx_ladder_shoot")
-			|| name.Contains("mmx_wall_slide_shoot") || name.Contains("mmx_up_dash_shoot") || name.Contains("mmx_wall_kick_shoot");
+		return name.Contains("rmx_shoot") || name.Contains("rmx_run_shoot") || name.Contains("rmx_fall_shoot") || name.Contains("rmx_jump_shoot") || name.Contains("rmx_dash_shoot") || name.Contains("rmx_ladder_shoot")
+			|| name.Contains("rmx_wall_slide_shoot") || name.Contains("rmx_up_dash_shoot") || name.Contains("rmx_wall_kick_shoot");
 	}
 
 	public Frame getCurrentFrame(int frameIndex = -1) {

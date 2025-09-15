@@ -416,8 +416,8 @@ public class RaySplasherChargedState : CharState {
 	bool fired = false;
 	public RaySplasherChargedState() : base("point_up") {
 		superArmor = true;
-		landSprite = "point_up";
-		airSprite = "point_up_air";
+	//	landSprite = "point_up";
+	//	airSprite = "point_up_air";
 		useDashJumpSpeed = true;
 	}
 

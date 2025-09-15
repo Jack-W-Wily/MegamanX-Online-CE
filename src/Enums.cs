@@ -340,6 +340,7 @@ public enum ProjIds {
 	Torpedo,
 	TorpedoCharged,
 	MechTorpedo,
+	MechTorpedo2,
 	Sting,
 	StingDiag,
 	RollingShield,
@@ -511,6 +512,7 @@ public enum ProjIds {
 	FlameRoundFlameProj,
 	VileMK2Grab,
 	VileMK2Grab2,
+	newUpGrab,
 	NecroBurst,
 	NecroBurstShrapnel,
 	RisingSpecter,
@@ -818,6 +820,11 @@ public enum ProjIds {
 	VileAirRaidPlusKnock,
 	BanzaiBeetleProj,
 
+	TwoHeadedSlash,
+	MetalCrescent,
+
+ZipZapperProj,
+
 	// Zain 
 
 	ZainSaberProj,
@@ -851,6 +858,7 @@ public enum ProjIds {
 
 	// Extras
 	BlockableLaunch,
+
 
 	NormalPush,
 	HeavyPush,
@@ -945,6 +953,8 @@ public enum ProjIds {
 	DesmumeProj4,
 	// EnemyRPCs (PROJIDS)
 	HGM2RPC,
+	EnemyWheeler,
+	MissileElecSpark,
 
 	// Special damage types.
 	SelfDmg = 30000,

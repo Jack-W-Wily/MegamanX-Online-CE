@@ -1586,12 +1586,16 @@ public class GameMode {
 
 		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
 			// Draw HP
-			if (twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
+			if (!isMech && twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
 				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
 			} else if (i < curHP) {
+				if (curHP > 10){
 				Global.sprites["hud_health_full"].drawToHUD(barIndex, baseX, baseY);
+				} else {
+				Global.sprites["hud_health_red"].drawToHUD(sBarIndex, baseX, baseY);
+				}
 			} else if (i < savings) {
-				Global.sprites["hud_health_full"].drawToHUD(sBarIndex, baseX, baseY);
+				Global.sprites["hud_health_red"].drawToHUD(sBarIndex, baseX, baseY);
 			} else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 				if (i < ceilCurHP) {
@@ -3151,6 +3155,17 @@ public class GameMode {
 					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);
 			}
+
+			if (level.mainPlayer.showX3ZeroMessage()) {
+				string reviveText = Helpers.controlText(
+						$"Hold R2 To Rescue X!"
+					);
+					Fonts.drawText(
+						FontType.Green, reviveText,
+						Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
+					);
+				
+			}
 			#region  ReviveVile HUD
 			if (level.mainPlayer.canReviveVile()) {
 				if (level.mainPlayer.lastDeathWasVileMK2) {
@@ -3188,7 +3203,7 @@ public class GameMode {
 					FontType.Green, reviveText,
 					Global.screenW / 2, 10 + Global.screenH / 2, Alignment.Center
 				);
-                #endregion
+				#endregion
 			} 
 		}
 

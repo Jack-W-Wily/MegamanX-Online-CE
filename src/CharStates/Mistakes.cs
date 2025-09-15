@@ -171,7 +171,7 @@ public class XTeleportState : CharState {
 		Collider col = new Collider(
 			teleportCollider.getPoints(), false, tempClone, false, false, 0, new Point(0, 0)
 		);
-		tempClone.changeSprite("mmx_land", false);
+		tempClone.changeSprite("rmx_land", false);
 		tempClone.globalCollider = col;
 		tempClone.alpha = 0.5f;
 		tempClone.xDir = character.xDir;

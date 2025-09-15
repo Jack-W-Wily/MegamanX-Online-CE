@@ -142,7 +142,8 @@ public class FSplasherState : ZeroState {
 		var move = new Point(0, 0);
 		move.x = character.getDashSpeed() * character.xDir * modifier;
 		move.y = upSpeed * 1.65f;
-		character.move(move);
+			character.move(new Point(character.getDashSpeed() * character.xDir, upSpeed));
+	
 		if (stateTime > 0.1) {
 			stateTime = 0;
 		}
@@ -212,13 +213,13 @@ public class HyorogaStartState : CharState {
 		if (stateTime > 60f / 60f) {
 			character.changeToIdleOrFall();
 		}
-		if (character.sprite.name == "zero_hyoroga_rise") {
+		if (character.sprite.name.Contains("hyoroga_rise")) {
 			if (character.deltaPos.isCloseToZero()) {
-				character.changeSprite("zero_hyoroga_start", true);
+				character.changeSpriteFromName("hyoroga_start", true);
 				character.gravityModifier = -1;
 				character.useGravity = true;
 			}
-		} else if (character.sprite.name == "zero_hyoroga_start") {
+		} else if (character.sprite.name.Contains("hyoroga_start") || stateTime > 0.5f) {
 			if (character.isAnimOver()) {
 				character.changeState(new HyorogaState(), true);
 			}
@@ -331,7 +332,7 @@ public class HyorogaStateB : ZeroState {
 					player, player.getNextActorNetId(), rpc: true);
 					break;
 			}
-			player.currency--;
+			//player.currency--;
 			character.stopCharge();
 		}
 

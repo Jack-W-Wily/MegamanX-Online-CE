@@ -21,7 +21,8 @@ public class PreJoinOrHostMenu : IMainMenu {
 		optionPos = new Point[] {
 			new Point(40, 107), //70
 			new Point(40, 107 + lineH),
-			new Point(40, 107 + (lineH * 2))
+			new Point(40, 107 + (lineH * 2)),
+			new Point(40, 107 + (lineH * 3))
 		};
 	}
 

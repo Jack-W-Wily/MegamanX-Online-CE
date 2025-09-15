@@ -1000,7 +1000,7 @@ public class VAVAV : Vile {
 
 		if (sprite.name.Contains("dash_grab")) {
 			proj = new GenericMeleeProj(new VileMK2Grab(), centerPoint, 
-			ProjIds.VileMK2Grab2, player, 0, 0, 0, addToLevel : true);
+			ProjIds.VileMK2Grab2, player, 0, 0, 120, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("block")) {

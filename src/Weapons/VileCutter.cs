@@ -110,21 +110,19 @@ public class CutterAttackState : VileState {
 		poi.x *= vile.xDir;
 		var player = vile.player;
 		int xDir = vile.xDir;
-		Point muzzlePos = vile.pos.add(poi).addxy(14*xDir,2);
+		Point muzzlePos = vile.pos.add(poi).addxy(14 * xDir, 2);
 		vile.playSound("frontrunner", sendRpc: true);
 		if (vile.cutterWeapon.type == ((int)VileCutterType.ParasiteSword)) {
 			new VileParasiteSword(
 				muzzlePos, xDir, vile, player,
 				player.getNextActorNetId(), rpc: true
 			);
-		}
-		else if (vile.cutterWeapon.type == ((int)VileCutterType.MaroonedTomahawk)) {
+		} else if (vile.cutterWeapon.type == ((int)VileCutterType.MaroonedTomahawk)) {
 			new VileMaroonedTomahawk(
 				muzzlePos, xDir, vile, player,
 				player.getNextActorNetId(), rpc: true
 			);
-		}
-		else if (vile.cutterWeapon.type == ((int)VileCutterType.QuickHomesick)) {
+		} else if (vile.cutterWeapon.type == ((int)VileCutterType.QuickHomesick)) {
 			new VileQuickHomesick(
 				muzzlePos, xDir, vile, player,
 				player.getNextActorNetId(), rpc: true
@@ -140,6 +138,9 @@ public class CutterAttackState : VileState {
 		shootLogic(vile);
 	}
 }
+
+
+
 public class VileParasiteSword : Projectile {
 	float soundCooldown;
 	public VileParasiteSword(
@@ -175,10 +176,13 @@ public class VileParasiteSword : Projectile {
 		}
 		if (xScale < 2) {
 			xScale += Global.spf * 2;
-			yScale += Global.spf * 2;			
+			yScale += Global.spf * 2;
 		}
 	}
 }
+
+
+
 public class VileMaroonedTomahawk : Projectile {
 	float soundCooldown;
 	public VileMaroonedTomahawk(
@@ -190,7 +194,7 @@ public class VileMaroonedTomahawk : Projectile {
 		weapon = VileCutter.netWeaponMT;
 		damager.damage = 1;
 		damager.hitCooldown = 20;
-		vel = new Point(250*xDir, -125);
+		vel = new Point(250 * xDir, -125);
 		maxTime = 3f;
 		projId = (int)ProjIds.MaroonedTomahawk;
 		destroyOnHit = false;
@@ -212,11 +216,66 @@ public class VileMaroonedTomahawk : Projectile {
 			soundCooldown = 0.3f;
 			playSound("cutter", sendRpc: true);
 		}
-		if (time > 6f/60f) {
+		if (time > 6f / 60f) {
 			stopMoving();
+		}
+
+		if (owner.input.isPressed(Control.Taunt, owner)) {
+			new TwoHeadedSlash(
+				pos, xDir, owner.character, owner,
+				owner.getNextActorNetId(), rpc: true);
+			destroySelf();
+        }
+	}
+}
+
+
+
+public class TwoHeadedSlash : Projectile {
+	float soundCooldown;
+	public TwoHeadedSlash(
+		Point pos, int xDir,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "cutter_mt", netId, player
+	) {
+		weapon = VileCutter.netWeaponPS;
+		damager.damage = 4;
+		damager.flinch = 20;
+		damager.hitCooldown = 30;
+		if (Helpers.randomRange(0, 1) == 0) {
+			vel = new Point(250 * xDir, -250);
+		} else {
+            vel = new Point(250 * xDir, 250);
+        }
+		maxTime = 1f;
+		projId = (int)ProjIds.TwoHeadedSlash;
+		destroyOnHit = false;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TwoHeadedSlash(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		soundCooldown -= Global.spf;
+		if (soundCooldown <= 0) {
+			soundCooldown = 0.3f;
+			playSound("cutter", sendRpc: true);
+		}
+		if (xScale < 2) {
+			xScale += Global.spf * 2;
+			yScale += Global.spf * 2;
 		}
 	}
 }
+
 public class VileQuickHomesick : Projectile {
 	public float angleDist = 0;
 	public float turnDir = 1;
@@ -235,7 +294,9 @@ public class VileQuickHomesick : Projectile {
 		pos, xDir, owner, "cutter_qh", netId, player
 	) {
 		weapon = VileCutter.netWeaponQH;
-		damager.damage = 2;
+		damager.damage = 3;
+		damager.flinch = 10;
+		destroyOnHit = false;
 		damager.hitCooldown = 30;
 		vel = new Point(350 * xDir, 50);
 		maxTime = 3f;
@@ -302,7 +363,108 @@ public class VileQuickHomesick : Projectile {
 				angleDist += MathF.Abs(angInc);
 				vel.x = Helpers.cosd(angle2) * maxSpeed;
 				vel.y = Helpers.sind(angle2) * maxSpeed;
-			}  else if (damager.owner.character != null) {
+			} else if (damager.owner.character != null) {
+				var dTo = pos.directionTo(damager.owner.character.getCenterPos()).normalize();
+				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
+				destAngle = Helpers.to360(destAngle);
+				angle2 = Helpers.lerpAngle(angle2, destAngle, Global.spf * 10);
+				vel.x = Helpers.cosd(angle2) * maxSpeed;
+				vel.y = Helpers.sind(angle2) * maxSpeed;
+			} else {
+				destroySelf();
+			}
+		}
+	}
+}
+
+
+
+public class MetalCrescent : Projectile {
+	public float angleDist = 0;
+	public float turnDir = 1;
+	public Pickup? pickup;
+	public float angle2;
+
+	public float maxSpeed = 350;
+	public float returnTime = 0.15f;
+	public float turnSpeed = 300;
+	public float maxAngleDist = 180;
+	public float soundCooldown;
+	public MetalCrescent(
+		Point pos, int xDir,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "cutter_mc", netId, player
+	) {
+		weapon = VileCutter.netWeaponQH;
+		damager.damage = 2;
+		damager.hitCooldown = 30;
+		vel = new Point(350 * xDir, 50);
+		maxTime = 3f;
+		projId = (int)ProjIds.MetalCrescent;
+		angle2 = 0;
+		if (xDir == -1) angle2 = -180;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new MetalCrescent(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+	public override void onCollision(CollideData other) {
+		base.onCollision(other);
+		if (!ownedByLocalPlayer) return;
+		if (other.gameObject is Pickup && pickup == null) {
+			pickup = other.gameObject as Pickup;
+			if (!pickup?.ownedByLocalPlayer == true) {
+				pickup?.takeOwnership();
+				RPC.clearOwnership.sendRpc(pickup?.netId);
+			}
+		}
+
+		if (time > returnTime && other.gameObject is Character character && character.player == damager.owner) {
+			if (pickup != null) {
+				pickup.changePos(character.getCenterPos());
+			}
+			destroySelf();
+			character.addAmmo(8);
+		}
+	}
+	public override void onDestroy() {
+		base.onDestroy();
+		if (pickup != null) {
+			pickup.useGravity = true;
+			pickup.collider.isTrigger = false;
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!destroyed && pickup != null) {
+			pickup.collider.isTrigger = true;
+			pickup.useGravity = false;
+			pickup.changePos(pos);
+		}
+
+		soundCooldown -= Global.spf;
+		if (soundCooldown <= 0) {
+			soundCooldown = 0.3f;
+			playSound("cutter", sendRpc: true);
+		}
+
+
+		if (time > returnTime) {
+			if (angleDist < maxAngleDist) {
+				var angInc = (-xDir * turnDir) * Global.spf * turnSpeed;
+				angle2 += angInc;
+				angleDist += MathF.Abs(angInc);
+				vel.x = Helpers.cosd(angle2) * maxSpeed;
+				vel.y = Helpers.sind(angle2) * maxSpeed;
+			} else if (damager.owner.character != null) {
 				var dTo = pos.directionTo(damager.owner.character.getCenterPos()).normalize();
 				var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
 				destAngle = Helpers.to360(destAngle);
