@@ -174,7 +174,7 @@ public class ShotgunIceProjCharged : Projectile {
 
 		isOwnerLinked = true;
 		if (ownerPlayer?.character != null) {
-			owningActor = ownerPlayer.character;
+			ownerActor = ownerPlayer.character;
 		}
 	}
 
@@ -327,7 +327,8 @@ public class ShotgunIceChargedShot : CharState {
 			}
 		}
 		States();
-		if (stateTime > 60f/60f) {
+		mmx.stopCharge();
+		if (stateTime > 60f / 60f) {
 			character.changeToIdleOrFall();
 		}
 	}

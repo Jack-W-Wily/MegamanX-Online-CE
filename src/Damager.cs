@@ -140,7 +140,7 @@ public class Damager {
 			return false;
 		}
 		if (damagingActor is GenericMeleeProj tgmp &&
-			tgmp.owningActor is Character { isDarkHoldState: true }
+			tgmp.ownerActor is Character { isDarkHoldState: true }
 		) {
 			return false;
 		}
@@ -182,8 +182,8 @@ public class Damager {
 				gmp.meleeId != -1
 			) {
 				linkedMeleeId = (byte)gmp.meleeId;
-				if (gmp.owningActor?.netId != null) {
-					actorNetIdBytes = BitConverter.GetBytes(gmp.owningActor?.netId ?? 0);
+				if (gmp.ownerActor?.netId != null) {
+					actorNetIdBytes = BitConverter.GetBytes(gmp.ownerActor?.netId ?? 0);
 				} else {
 					actorNetIdBytes = BitConverter.GetBytes(gmp.owner.character?.netId ?? 0);
 				}
@@ -217,7 +217,7 @@ public class Damager {
 			owner.character.disguiseCoverBlown = true;
 		}
 		if (damagingActor is Projectile tempProj &&
-			tempProj.owningActor is Character atChar &&
+			tempProj.ownerActor is Character atChar &&
 			atChar.isATrans
 		) {
 			atChar.disguiseCoverBlown = true;
@@ -243,7 +243,7 @@ public class Damager {
 			if (owner.isMainPlayer) {
 				owner.delaySubtank();
 			}
-			if (damagingActor is Projectile proj && proj.owningActor is Character chara) {
+			if (damagingActor is Projectile proj && proj.ownerActor is Character chara) {
 				chara.enterCombat();
 			} else {
 				owner.character?.enterCombat();
@@ -341,7 +341,7 @@ public class Damager {
 			}
 			// Ride armor stomp
 			if (isStompWeapon) {
-				character.flattenedTime = 0.5f;
+				character.flattenedTime = 30;
 			}
 
 			if (character.charState is SwordBlock || character.charState is SigmaBlock) {
@@ -487,10 +487,10 @@ public class Damager {
 					break;
 				case (int)ProjIds.FlameRoundWallProj:
 				case (int)ProjIds.FlameRoundProj:
-					character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 1); ;
+					character.addBurnTime(owner, FireGrenade.netWeapon, 1); ;
 					break;
 				case (int)ProjIds.FlameRoundFlameProj:
-					character.addBurnTime(owner, new Napalm(NapalmType.FireGrenade), 0.5f);
+					character.addBurnTime(owner, FireGrenade.netWeapon, 0.5f);
 					break;
 				case (int)ProjIds.Ryuenjin:
 					character.addBurnTime(owner, RyuenjinWeapon.staticWeapon, 2);
@@ -1655,8 +1655,8 @@ public class Damager {
 
 		if (damager is Projectile proj) {
 			if (proj.isMelee || proj.isOwnerLinked) {
-				if (proj.owningActor != null) {
-					damagePos = proj.owningActor.pos;
+				if (proj.ownerActor != null) {
+					damagePos = proj.ownerActor.pos;
 				} else if (projOwner?.character != null) {
 					damagePos = projOwner.character.pos;
 				}

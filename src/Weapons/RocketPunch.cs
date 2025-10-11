@@ -345,8 +345,4 @@ public class RocketPunchAttack : VileState {
 		stateTime = 0;
 		shot = false;
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	}
 }

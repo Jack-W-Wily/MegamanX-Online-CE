@@ -427,8 +427,7 @@ public class WarpIn : CharState {
 
 			if (character.isAnimOver()) {
 				character.grounded = true;
-				character.pos.y = destY;
-				character.pos.x = destX;
+				character.changePos(destX, destY);
 				if (refillHP && !player.warpedInOnce) {
 					character.changeState(new WarpIdle(player.warpedInOnce));
 				} else {
@@ -677,7 +676,7 @@ public class WarpOut : CharState {
 			character.playSound("warpOut", forcePlay: true, sendRpc: true);
 		}
 
-		warpAnim.pos.y -= Global.spf * 1000;
+		warpAnim.incPos(0, -16 * character.speedMul);
 
 		if (character.pos.y <= destY) {
 			warpAnim.destroySelf();
@@ -997,9 +996,7 @@ public class Dash : CharState {
 		if (dashTime > 32 && !stop) {
 			dashTime = 0;
 			stop = true;
-			sprite = "dash_end";
-			shootSprite = "dash_end_shoot";
-			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
+			character.changeState(new DashEnd(), true);
 		}
 		if (character.frameIndex  <= 0 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
@@ -1083,6 +1080,28 @@ public class Dash : CharState {
 		}
 	}
 }
+public class DashEnd : CharState {
+	public DashEnd() : base("dash_end", "dash_end_shoot") {
+		attackCtrl = true;
+		normalCtrl = true;
+		useDashJumpSpeed = true;
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+			exitOnAirborne = true;
+		} else {
+			exitOnAirborne = false;
+		}
+	}
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		if (!character.grounded) exitOnLanding = true;
+	}
+}
 
 public class AirDash : CharState {
 	public float dashTime;
@@ -1114,9 +1133,7 @@ public class AirDash : CharState {
 			dashTime = 0;
 			stop = true;
 			if (character is not Doppma or CmdSigma) {
-				sprite = "dash_end";
-				shootSprite = "dash_end_shoot";
-				character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
+				character.changeState(new DashEnd(), true);
 			}
 			else if (character is Doppma) {
 				character.changeSpriteFromName("fall", false);
@@ -1134,16 +1151,16 @@ public class AirDash : CharState {
 			}
 		}
 		// Dash regular speed.
-		if (character.frameIndex > 0 && !stop) {
-			character.move(new Point(character.getDashSpeed() * dashDir, 0));
+		if (dashTime >= 4 && !stop) {
+			character.moveXY(character.getDashSpeed() * dashDir, 0);
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.move(new Point(character.getDashSpeed() * inputXDir, 0));
+			character.moveXY(character.getDashSpeed() * inputXDir, 0);
 		}
 		// Speed at start and end.
 		else if (!stop) {
-			character.move(new Point(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0));
+			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
 		}
 		// Timer
 		dashTime += character.speedMul;
@@ -1196,6 +1213,7 @@ public class WallSlide : CharState {
 		this.wallDir = wallDir;
 		this.wallCollider = wallCollider;
 		accuracy = 2;
+		normalCtrl = true;
 		attackCtrl = true;
 		enterSound = "wallLand";
 		enterSoundArgs = "larmor";

@@ -76,7 +76,7 @@ public class NeoSigma : BaseSigma {
 					changeState(new SigmaUpDownSlashState(true), true);
 				}
 				return true;
-			} else if (player.input.isHeld(Control.Down, player) && !grounded && getDistFromGround() > 25) {
+			} else if (player.input.isHeld(Control.Down, player)) {
 				if (sigmaDownSlashCooldown == 0) {
 					sigmaUpSlashCooldown += 0.5f;
 					sigmaDownSlashCooldown = 1f;
@@ -97,7 +97,12 @@ public class NeoSigma : BaseSigma {
 				playSound("sigma2slash", sendRpc: true);
 				return true;
 			}
-			changeState(new SigmaClawState(charState, !grounded), true);
+			if (charState is Dash) {
+				slideVel = xDir * getRunSpeed() * 1.65f;
+				changeState(new Sigma2DashSlashState(), true);
+			} else {
+				changeState(new SigmaClawState(charState, !grounded), true);
+			}
 			return true;
 		}
 		if (grounded && player.input.isPressed(Control.Special1, player) &&

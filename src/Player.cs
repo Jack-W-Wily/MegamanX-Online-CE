@@ -13,11 +13,11 @@ public partial class Player {
 	public static Player stagePlayer = new Player(
 		"Stage", 255, -1,
 		new PlayerCharData() { charNum = -1 },
-		false, true, GameMode.neutralAlliance,
+		false, true, GameMode.stageAlliance,
 		new Input(false),
 		new ServerPlayer(
 			"Stage", 255, false,
-			-1, GameMode.neutralAlliance, "NULL", null, 0
+			-1, GameMode.stageAlliance, "NULL", null, 0
 		)
 	);
 	public static Player errorPlayer = new Player(
@@ -958,10 +958,10 @@ public partial class Player {
 		if (character is Vile vile) {
 			if (isSelectingRA()) {
 				int maxRAIndex = vile.isVileMK1 ? 3 : 4;
-				if (input.isPressedMenu(Control.MenuDown)) {
+				if (input.isPressedMenu(Control.MenuLeft)) {
 					selectedRAIndex--;
 					if (selectedRAIndex < 0) selectedRAIndex = maxRAIndex;
-				} else if (input.isPressedMenu(Control.MenuUp)) {
+				} else if (input.isPressedMenu(Control.MenuRight)) {
 					selectedRAIndex++;
 					if (selectedRAIndex > maxRAIndex) selectedRAIndex = 0;
 				}
@@ -2507,8 +2507,7 @@ public partial class Player {
 				return false;
 			}
 			/*
-			if (character?.charState?.isGrabbedState == true)
-			{
+			if (character?.charState?.isGrabbedState == true) {
 				return false;
 			}
 			*/

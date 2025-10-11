@@ -52,7 +52,11 @@ public partial class Actor : GameObject {
 
 	public int xDir; //-1 or 1
 	public int yDir;
-	public Point pos; //Current location
+	public Point pos {
+		get => unsafePos;
+		set => changePos(value);
+	}
+	public Point unsafePos; //Current location
 	public Point prevPos;
 	public Point deltaPos;
 	public Point stackedMoveDelta;
@@ -185,7 +189,7 @@ public partial class Actor : GameObject {
 			sprite.name = "null";
 		}
 		// Initalize other stuff.
-		this.pos = pos;
+		unsafePos = pos;
 		prevPos = pos;
 		/*
 		if (Global.debug && Global.serverClient != null && netId != null
@@ -819,7 +823,7 @@ public partial class Actor : GameObject {
 				if (oldPos.x == pos.x && oldPos.y == pos.y) {
 					xIceVel = 0f;
 				}
-				pos = oldPos;
+				unsafePos = oldPos;
 				deltaPos = oldDeltaPos;
 			}
 		}
@@ -843,7 +847,7 @@ public partial class Actor : GameObject {
 			grounded = false;
 		} else if (physicsCollider != null && !isStatic && (canBeGrounded || useGravity)) {
 			float yDist = 1 * Global.gameSpeed;
-			if (grounded && vel.y * yMod >= 0 && !movedUpOnFrame) {
+			if (grounded && vel.y * yMod >= 0 && prevPos.y >= pos.y && !movedUpOnFrame) {
 				yDist = 4 * Global.gameSpeed;
 			}
 			yDist *= yMod;
@@ -919,6 +923,9 @@ public partial class Actor : GameObject {
 				grounded = false;
 				groundedIce = false;
 			}
+		}
+		if (grounded) {
+			lastGroundedPos = pos;
 		}
 		movedUpOnFrame = false;
 	}
@@ -1695,7 +1702,7 @@ public partial class Actor : GameObject {
 	}
 
 	public Point? getFirstPOI(int index = 0) {
-		if (sprite.getCurrentFrame().POIs.Length > 0) {
+		if (sprite.getCurrentFrame().POIs.Length > index) {
 			Point poi = sprite.getCurrentFrame().POIs[index];
 			return getPoiOrigin().addxy(poi.x * xDir * xScale, poi.y * yScale);
 		}
@@ -1781,6 +1788,7 @@ public partial class Actor : GameObject {
 	public const int labelNameOffY = 10;
 
 	public float currentLabelY;
+	public Point lastGroundedPos;
 
 	public void deductLabelY(float amount) {
 		currentLabelY -= amount;

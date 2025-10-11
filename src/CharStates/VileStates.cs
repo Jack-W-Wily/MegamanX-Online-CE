@@ -16,6 +16,7 @@ public class VileState : CharState {
 	
 	public override void onEnter(CharState oldState) {
 		vile = character as Vile ?? throw new NullReferenceException();
+		base.onEnter(oldState);
 	}
 }
 
@@ -125,6 +126,7 @@ public class VileRevive : VileState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		//character.setzIndex(ZIndex.Foreground);
+		character.clenaseAllDebuffs();
 		character.alive = true;
 		character.playSound("revive");
 		character.addMusicSource("demo_X3", character.getCenterPos(), false, loop: false);

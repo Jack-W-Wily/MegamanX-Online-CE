@@ -766,6 +766,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual CharState getIdleState() => new Idle();
+	public virtual CharState getCrouchState() => new Crouch();
 	public virtual CharState getRunState(bool skipInto = false) => new Run(skipInto);
 	public virtual CharState getJumpState() => new Jump();
 	public virtual CharState getAirJumpState() => new Jump();
@@ -776,7 +777,7 @@ public partial class Character : Actor, IDamagable {
 		return Physics.WalkSpeed * getRunDebuffs();
 	}
 
-	public float getRunDebuffs() {
+	public virtual float getRunDebuffs() {
 		if (isSlowImmune()) {
 			return 1;
 		}
@@ -1085,10 +1086,7 @@ public partial class Character : Actor, IDamagable {
 				removeBurn();
 			}
 		}
-		if (flattenedTime > 0 && !(charState is Die)) {
-			flattenedTime -= Global.spf;
-			if (flattenedTime < 0) flattenedTime = 0;
-		}
+		Helpers.decrementFrames(ref flattenedTime);
 		Helpers.decrementTime(ref slowdownTime);
 		igFreezeRecoveryCooldown += speedMul;
 		if (igFreezeRecoveryCooldown > 12) {
@@ -1707,7 +1705,7 @@ public partial class Character : Actor, IDamagable {
 					return true;
 				}
 			if (player.isCrouchHeld() && canCrouch() && charState is not Crouch) {
-				changeState(new Crouch());
+				changeState(getCrouchState());
 				return true;
 			}
 			if (player.input.isPressed(Control.Taunt, player)) {
@@ -2075,15 +2073,24 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual void clenaseAllDebuffs() {
+		// Remove all DOT.
 		removeBurn();
 		removeAcid();
+		// Remove debuffs.
 		oilTime = 0;
 		parasiteTime = 0;
 		parasiteMashTime = 0;
 		parasiteDamager = null;
+		// Remove slows.
 		igFreezeProgress = 0;
 		virusTime = 0;
 		slowdownTime = 0;
+		xFlinchPushVel = 0;
+		// Remove stuns & grabs.
+		if (charState is Hurt or GenericStun or VileMK2Grabbed or GenericGrabbedState) {
+			changeToIdleOrFall();
+			return;
+		}
 	}
 
 	// If factorHyperMode = true, then invuln frames in a hyper mode won't count as "invulnerable".
@@ -2362,7 +2369,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void changeToCrouchOrFall() {
 		if (grounded) {
-			changeState(new Crouch(), true);
+			changeState(getCrouchState());
 		} else {
 			if (vel.y * gravityModifier < 0 && charState.canStopJump && !charState.stoppedJump) {
 				CharState jumpState = getJumpState();
@@ -2387,7 +2394,7 @@ public partial class Character : Actor, IDamagable {
 					stateFrames = wallSlide.stateFrames
 				}
 			),
-			Crouch when canCrouch() => new Crouch(),
+			Crouch when canCrouch() => getCrouchState(),
 			Run => getRunState(true),
 			_ => null
 		};
@@ -2750,6 +2757,11 @@ public partial class Character : Actor, IDamagable {
 						);
 					}
 				}
+			} else {
+				Fonts.drawText(
+					FontType.Grey, charState.GetType().ToString().RemovePrefix("MMXOnline."),
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
+				);
 			}
 		}
 
@@ -3310,7 +3322,7 @@ public partial class Character : Actor, IDamagable {
 				player.delaySubtank();
 				enterCombat();
 			}
-			if (actor is Projectile proj && proj.owningActor != null) {
+			if (actor is Projectile proj && proj.ownerActor != null) {
 
 			}
 			else if (player.character != null) {

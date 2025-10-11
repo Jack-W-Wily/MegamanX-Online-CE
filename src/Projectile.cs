@@ -55,7 +55,7 @@ public class Projectile : Actor {
 	public bool isMelee;
 	public int meleeId = -1;
 	public bool isOwnerLinked;
-	public Actor? owningActor;
+	public Actor? ownerActor;
 
 	const float leeway = 500;
 
@@ -133,8 +133,9 @@ public class Projectile : Actor {
 		ownerPlayer = (
 			player ?? owner?.netOwner ?? Global.level.getPlayerByIdSafe(netId)
 		);
+		ownerActor = owner;
 		damager = new Damager(ownerPlayer, 0, 0, 0);
-		owningActor = owner;
+		ownerActor = owner;
 		this.xDir = xDir;
 		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != ownerPlayer &&
 			this is not NapalmPartProj or FlameBurnerProj
@@ -486,7 +487,7 @@ public class Projectile : Actor {
 		}
 
 		if (ownedByLocalPlayer) {
-			if (shouldVortexSuck && otherProj is GenericMeleeProj otherGmp && otherProj.projId == (int)ProjIds.WheelGEat && damager.owner.alliance != otherProj.damager.owner.alliance && otherGmp.owningActor is WheelGator wheelGator) {
+			if (shouldVortexSuck && otherProj is GenericMeleeProj otherGmp && otherProj.projId == (int)ProjIds.WheelGEat && damager.owner.alliance != otherProj.damager.owner.alliance && otherGmp.ownerActor is WheelGator wheelGator) {
 				destroySelfNoEffect();
 				if (wheelGator.ownedByLocalPlayer) {
 					wheelGator.feedWheelGator(damager.damage);
@@ -497,7 +498,7 @@ public class Projectile : Actor {
 				return;
 			}
 
-			if (shouldVortexSuck && otherProj is GenericMeleeProj otherGmp2 && otherProj.projId == (int)ProjIds.DrDopplerAbsorb && damager.owner.alliance != otherProj.damager.owner.alliance && otherGmp2.owningActor is DrDoppler drDoppler) {
+			if (shouldVortexSuck && otherProj is GenericMeleeProj otherGmp2 && otherProj.projId == (int)ProjIds.DrDopplerAbsorb && damager.owner.alliance != otherProj.damager.owner.alliance && otherGmp2.ownerActor is DrDoppler drDoppler) {
 				destroySelfNoEffect();
 				if (drDoppler.ownedByLocalPlayer) {
 					drDoppler.healDrDoppler(damager.owner, damager.damage);

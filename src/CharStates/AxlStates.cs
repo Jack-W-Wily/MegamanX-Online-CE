@@ -35,7 +35,7 @@ public class HyperAxlStart : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.clenaseAllDebuffs();
-		axl = character as Axl ?? throw new NullReferenceException() ;
+		axl = character as Axl ?? throw new NullReferenceException();
 		if (!axl.hyperAxlUsed) {
 			axl.hyperAxlUsed = true;
 			axl.player.currency -= 10;
@@ -148,7 +148,6 @@ public class DodgeRoll : CharState {
 		if (character.burnTime < 0) {
 			character.burnTime = 0;
 		}
-
 		initialDashDir = character.xDir;
 		if (player.input.isHeld(Control.Left, player)) initialDashDir = -1;
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
@@ -156,13 +155,12 @@ public class DodgeRoll : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		if (Global.level.server?.customMatchSettings != null)
-			 axl.dodgeRollCooldown = Global.level.server.customMatchSettings.axlDodgerollCooldown;
-		else axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown;
+		axl.dodgeRollCooldown = Global.customSettings?.axlDodgerollCooldown ?? Axl.maxDodgeRollCooldown;
 	}
 
 	public override void update() {
 		base.update();
+		axl.dodgeRollCooldown = Global.customSettings?.axlDodgerollCooldown ?? Axl.maxDodgeRollCooldown;
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -175,7 +173,7 @@ public class DodgeRoll : CharState {
 
 		var move = new Point(0, 0);
 		move.x = character.getDashSpeed() * initialDashDir;
-		character.move(move);
+		character.moveXY(move.x ,0);
 		if (stateTime > 0.1) {
 			stateTime = 0;
 			//new Anim(this.character.pos.addxy(0, -4), "dust", this.character.xDir, null, true);
