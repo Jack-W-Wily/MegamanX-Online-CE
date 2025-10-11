@@ -56,7 +56,7 @@ public class VAVAV : Vile {
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
-	public Napalm napalmWeapon;
+	public VileNapalm napalmWeapon;
 	public VileBall grenadeWeapon;
 	public VileCutter cutterWeapon;
 	public VileFlamethrower flamethrowerWeapon;
@@ -89,11 +89,6 @@ public class VAVAV : Vile {
 	
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
 
-		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannon((VileCannonType)vileLoadout.cannon);
-		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
 
 		spriteFrameToSounds["vilemk2_run/2"] = "vileMk2Walk";
 		spriteFrameToSounds["vilemk2_run/5"] = "vileMk2Walk";
@@ -104,17 +99,46 @@ public class VAVAV : Vile {
 		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
 
 
-		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
-		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
-		flamethrowerWeapon = vileLoadout.flamethrower switch {
+		vulcanWeapon = new Vulcan((VulcanType)loadout.vulcan);
+		cannonWeapon = new VileCannon((VileCannonType)loadout.cannon);
+		missileWeapon = new VileMissile((VileMissileType)loadout.missile);
+		rocketPunchWeapon = new RocketPunch((RocketPunchType)loadout.rocketPunch);
+		napalmWeapon = loadout.napalm switch {
+			1 => new FireGrenade(),
+			2 => new SplashHit(),
+			_ => new RumblingBang()
+		};
+		grenadeWeapon = loadout.ball switch {
+			1 => new SpreadShot(),
+			2 => new PeaceOutRoller(),
+			_ => new ExplosiveRound()
+		};
+		cutterWeapon = new VileCutter((VileCutterType)loadout.cutter);
+		flamethrowerWeapon = loadout.flamethrower switch {
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
 			_ => new WildHorseKick()
 		};
-		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
+		downSpWeapon = loadout.downSpWeapon switch {
+			0 => napalmWeapon,
+			1 => grenadeWeapon,
+			2 => flamethrowerWeapon,
+			_ => napalmWeapon,
+		};
+		airSpWeapon = loadout.airSpWeapon switch {
+			0 => napalmWeapon,
+			1 => grenadeWeapon,
+			2 => flamethrowerWeapon,
+			_ => napalmWeapon,
+		};
+		downAirSpWeapon = loadout.downAirSpWeapon switch {
+			0 => napalmWeapon,
+			1 => grenadeWeapon,
+			2 => flamethrowerWeapon,
+			_ => napalmWeapon,
+		};
+		laserWeapon = new VileLaser((VileLaserType)loadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
-
-		//Vile Cooldowns
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
 	}
