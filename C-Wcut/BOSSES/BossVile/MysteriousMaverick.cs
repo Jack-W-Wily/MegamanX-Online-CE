@@ -55,8 +55,7 @@ public class MysteriousMaverick : Vile {
 	public Vulcan vulcanWeapon;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
-	public Napalm napalmWeapon;
-	public VileBall grenadeWeapon;
+		public VileBall grenadeWeapon;
 	public VileCutter cutterWeapon;
 	public VileFlamethrower flamethrowerWeapon;
 	public VileLaser laserWeapon;
@@ -84,21 +83,7 @@ public class MysteriousMaverick : Vile {
 
 		if (charState is WarpIn) player.superAmmo = 0;
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
-		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannonWC((VileCannonType)vileLoadout.cannon);
-		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
-		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
-		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
-		flamethrowerWeapon = vileLoadout.flamethrower switch {
-			-1 => new NoneFlamethrower(),
-			1 => new SeaDragonRage(),
-			2 => new DragonsWrath(),
-			_ => new WildHorseKick()
-		};
-		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
-		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+		
 		vileForm = 1;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;

@@ -324,7 +324,7 @@ public class RumblingBangLaunch : CharState {
 		var poi = character.getFirstPOI();
 		if (!once && poi != null) {
 			once = true;
-			var proj = new NapalmGrenadeProj(
+			var proj = new VileNapalmGrenadeProj(
 				poi.Value, character.xDir, vile, character.player,
 				character.player.getNextActorNetId(), rpc: true
 			);

@@ -458,7 +458,7 @@ public class RideArmor : Actor, IDamagable {
 										shootPos, xDir * xDirMod, vile, player, player.getNextActorNetId(), rpc: true
 									);
 								} else {
-									grenade = new NapalmGrenadeProj(
+									grenade = new VileNapalmGrenadeProj(
 										shootPos, xDir * xDirMod, vile, player, player.getNextActorNetId(), rpc: true
 									);
 								}
@@ -510,7 +510,7 @@ public class RideArmor : Actor, IDamagable {
 				hawkBombCount--;
 				var targetCooldownWeapon = vile.napalmWeapon;
 				//if (targetCooldownWeapon.type == (int)NapalmType.NoneFlamethrower || targetCooldownWeapon.type == (int)NapalmType.NoneBall) {
-					//targetCooldownWeapon = new Napalm(NapalmType.RumblingBang);
+					//targetCooldownWeapon = new VileNapalm(NapalmType.RumblingBang);
 				//}
 				vile.setVileShootTime(vile.napalmWeapon, 2, targetCooldownWeapon);
 				punchCooldown = 0.56f;
@@ -2419,7 +2419,7 @@ public class InRideArmor : CharState {
 			);
 		} else {
 			vile.setVileShootTime(vile.napalmWeapon);
-			grenade = new NapalmGrenadeProj(
+			grenade = new VileNapalmGrenadeProj(
 				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);

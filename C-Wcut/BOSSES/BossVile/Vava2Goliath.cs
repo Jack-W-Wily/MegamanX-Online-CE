@@ -88,7 +88,7 @@ public class Vava2Goliath : Vile {
 		cannonWeapon = new VileCannonWC((VileCannonType)vileLoadout.cannon);
 		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
 		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		napalmWeapon = new Napalm((NapalmType)vileLoadout.napalm);
+		napalmWeapon = new VileNapalm((NapalmType)vileLoadout.napalm);
 		grenadeWeapon = new VileBall((VileBallType)vileLoadout.ball);
 		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
 		flamethrowerWeapon = vileLoadout.flamethrower switch {

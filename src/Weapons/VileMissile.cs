@@ -79,7 +79,7 @@ public class VileMissile : Weapon {
 			shootCooldown > 0) {
 			return;
 		}
-		vile.changeState(new MissileAttack(vile.grounded));
+		vile.changeState(new VileMissileAttack(vile.grounded));
 		if (vile.charState is InRideArmor) {
 			vile.missileWeapon.shoot(vile, []);
 			vile.missileWeapon.shootCooldown = vile.missileWeapon.fireRate;
@@ -138,10 +138,10 @@ public class VileMissile : Weapon {
 	}
 }
 
-public class MissileAttack : VileState {
+public class VileMissileAttack : VileState {
 	public bool shoot;
 
-	public MissileAttack(bool grounded) : base(getSprite(grounded)) {
+	public VileMissileAttack(bool grounded) : base(getSprite(grounded)) {
 		useDashJumpSpeed = true;
 		airMove = true;
 		canJump = true;

@@ -41,10 +41,10 @@ public class RumblingBang : VileNapalm {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		vile.changeState(new NapalmAttacks(this), true);
+	//	vile.changeState(new VileNapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
-		new NapalmGrenadeProj(
+		new VileNapalmGrenadeProj(
 			character.getCenterPos(), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
@@ -67,7 +67,7 @@ public class FireGrenade : VileNapalm {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		vile.changeState(new NapalmAttacks(this), true);
+	//	vile.changeState(new VileNapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
 		new MK2NapalmGrenadeProj(
@@ -93,7 +93,7 @@ public class SplashHit : VileNapalm {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		vile.changeState(new NapalmAttacks(this), true);
+	//	vile.changeState(new VileNapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
 		new SplashHitGrenadeProj(
@@ -104,9 +104,9 @@ public class SplashHit : VileNapalm {
 }
 #endregion
 #region Projectiles
-public class NapalmGrenadeProj : Projectile {
+public class VileNapalmGrenadeProj : Projectile {
 	bool exploded;
-	public NapalmGrenadeProj(
+	public VileNapalmGrenadeProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
 		pos, xDir, owner, "napalm_grenade", netId, player
@@ -126,7 +126,7 @@ public class NapalmGrenadeProj : Projectile {
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
-		return new NapalmGrenadeProj(
+		return new VileNapalmGrenadeProj(
 			args.pos, args.xDir, args.owner, args.player, args.netId
 		);
 	}
@@ -154,7 +154,7 @@ public class NapalmGrenadeProj : Projectile {
 		if (ownedByLocalPlayer) {
 			int[] distances = [-30, 30, -10, 10];
 			foreach (int distance in distances) {
-				new NapalmPartProj(
+				new VileNapalmPartProj(
 					pos, xDir, this, owner,
 					owner.getNextActorNetId(),
 					distance * xDir, rpc: true
@@ -165,7 +165,7 @@ public class NapalmGrenadeProj : Projectile {
 	}
 }
 
-public class NapalmPartProj : Projectile {
+public class VileNapalmPartProj : Projectile {
 	float xDist;
 	float maxXDist;
 	float timeOffset;
@@ -176,7 +176,7 @@ public class NapalmPartProj : Projectile {
 	int firstDir = 1;
 	int secondDir = 1;
 
-	public NapalmPartProj(
+	public VileNapalmPartProj(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, int xDist, bool rpc = false
 	) : base(
 		pos, xDir, owner, "napalm_part", netId, player
@@ -208,7 +208,7 @@ public class NapalmPartProj : Projectile {
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
-		return new NapalmPartProj(
+		return new VileNapalmPartProj(
 			args.pos, args.xDir, args.owner, args.player, args.netId, args.extraData[0]
 		);
 	}
@@ -593,9 +593,9 @@ public class NapalmAttacks : VileState {
 /*
 public class Napalm : Weapon {
 	public float vileAmmoUsage;
-	public static Napalm netWeaponRB = new Napalm(NapalmType.RumblingBang);
-	public static Napalm netWeaponFG = new Napalm(NapalmType.FireGrenade);
-	public static Napalm netWeaponSH = new Napalm(NapalmType.SplashHit);
+	public static Napalm netWeaponRB = new VileNapalm(NapalmType.RumblingBang);
+	public static Napalm netWeaponFG = new VileNapalm(NapalmType.FireGrenade);
+	public static Napalm netWeaponSH = new VileNapalm(NapalmType.SplashHit);
 	public Napalm(NapalmType napalmType) : base() {
 		index = (int)WeaponIds.Napalm;
 		weaponBarBaseIndex = 0;
@@ -667,7 +667,7 @@ public class Napalm : Weapon {
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.napalmWeapon.type == (int)NapalmType.None) return;
-		vile.changeState(new NapalmAttackNapalm(), true);
+		vile.changeState(new VileNapalmAttackNapalm(), true);
 	}
 }
 
@@ -761,7 +761,7 @@ public class NapalmAttackNapalm : NapalmAttackTypes {
 			poi.x *= character.xDir;
 			if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
 				vile.setVileShootTime(vile.napalmWeapon);
-				new NapalmGrenadeProj(
+				new VileNapalmGrenadeProj(
 					character.pos.add(poi), character.xDir, vile, character.player,
 					character.player.getNextActorNetId(), rpc: true
 				);
@@ -919,7 +919,7 @@ public class NapalmAttack : VileState {
 				Projectile proj;
 				if (napalmAttackType == NapalmAttackType.Napalm) {
 					if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
-						proj = new NapalmGrenadeProj(
+						proj = new VileNapalmGrenadeProj(
 							character.pos.add(poi), character.xDir, vile, character.player,
 							character.player.getNextActorNetId(), rpc: true
 						);

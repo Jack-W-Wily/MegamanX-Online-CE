@@ -173,22 +173,22 @@ public partial class RPCCreateProj : RPC {
 				proj = new GreenSpinnerExplosionProj(new Weapon(), pos, xDir, player, 0, null, 1, netProjByte);
 				break;
 			/*case (int)ProjIds.RumblingBangGrenade:
-				proj = new NapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
+				proj = new VileNapalmGrenadeProj(new Weapon(), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.RumblingBangProj:
-				proj = new NapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
+				proj = new VileNapalmPartProj(new Weapon(), pos, xDir, player, netProjByte, extraData[0]);
 				break;
 			case (int)ProjIds.FlameRoundGrenade:
-				proj = new MK2NapalmGrenadeProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new MK2NapalmGrenadeProj(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.FlameRoundProj:
-				proj = new MK2NapalmProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new MK2NapalmProj(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.FlameRoundWallProj:
-				proj = new MK2NapalmWallProj(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new MK2NapalmWallProj(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.FlameRoundFlameProj:
-				proj = new MK2NapalmFlame(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new MK2NapalmFlame(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			*/
 			case (int)ProjIds.RocketPunchWC:
@@ -204,7 +204,7 @@ public partial class RPCCreateProj : RPC {
 				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.EgotisticalPill), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.NapalmGrenade:
-				proj = new BumptyBoomProj(new Napalm(NapalmType.NoneBall), pos, xDir, player, netProjByte);
+				proj = new BumptyBoomProj(new VileNapalm(NapalmType.NoneBall), pos, xDir, player, netProjByte);
 				break;
 			//case (int)ProjIds.Vulcan:
 			//	proj = new VulcanProj(new Vulcan(VulcanType.CherryBlast), pos, xDir, player, netProjByte);
@@ -333,10 +333,10 @@ public partial class RPCCreateProj : RPC {
 				proj = new MechFrogStompShockwave(new MechFrogStompWeapon(), pos, xDir, player, netProjByte);
 				break;
 			//case (int)ProjIds.SplashHitGrenade:
-			//	proj = new SplashHitGrenadeProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
+			//	proj = new SplashHitGrenadeProj(new VileNapalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 			//	break;
 			//case (int)ProjIds.SplashHitProj:
-			//	proj = new SplashHitProj(new Napalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
+			//	proj = new SplashHitProj(new VileNapalm(NapalmType.SplashHit), pos, xDir, player, netProjByte);
 			//	break;
 			//case (int)ProjIds.ShinMessenkou:
 			//	proj = new ShinMessenkouProj(new ShinMessenkou(), pos, xDir, player, netProjByte);
@@ -829,16 +829,16 @@ public partial class RPCCreateProj : RPC {
 				break;
 
 				case (int)ProjIds.DesmumeProj1:
-				proj = new DesmumeProj1(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new DesmumeProj1(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.DesmumeProj2:
-				proj = new DesmumeProj2(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new DesmumeProj2(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.DesmumeProj3:
-				proj = new DesmumeProj3(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new DesmumeProj3(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.DesmumeProj4:
-				proj = new DesmumeProj4(new Napalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
+				proj = new DesmumeProj4(new VileNapalm(NapalmType.FireGrenade), pos, xDir, player, netProjByte);
 				break;
 
 			//case (int)ProjIds.HexaInvolute:

@@ -578,7 +578,7 @@ public class AirBombNapalm : NapalmAttackTypes {
 			shot = true;
 			vile.setVileShootTime(vile.napalmWeapon);
 			if (vile.napalmWeapon.type == (int)NapalmType.RumblingBang) {
-				new NapalmGrenadeProj(
+				new VileNapalmGrenadeProj(
 					character.pos, character.xDir, vile, character.player,
 					character.player.getNextActorNetId(), rpc: true
 				);
