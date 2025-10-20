@@ -100,8 +100,8 @@ public class ZainUPParryStartState : CharState {
 	//	}
 		
 		if (damagingActor is Projectile proj) {
-			if (proj.owningActor != null) {
-				counterAttackTarget = proj.owningActor;
+			if (proj.ownerActor != null) {
+				counterAttackTarget = proj.ownerActor;
 			}
 			if (!proj.isMelee && proj.shouldVortexSuck) {
 				absorbedProj = proj;
@@ -309,7 +309,7 @@ public class ZainParryStartState : CharState {
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
 		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
+			counterAttackTarget = gmp.ownerActor;
 		}
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
@@ -425,7 +425,7 @@ public class ZainDashParryState : CharState {
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
 		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
+			counterAttackTarget = gmp.ownerActor;
 		}
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;
@@ -575,7 +575,7 @@ public class ZainParryShinStartState : CharState {
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
 		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
+			counterAttackTarget = gmp.ownerActor;
 		}
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;

@@ -698,7 +698,7 @@ public class AimingLaserBlade : Projectile {
 		projId = (int)ProjIds.AimingLaserBlade;
 		isMelee = true;
 		if (player.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 
 		if (rpc) {

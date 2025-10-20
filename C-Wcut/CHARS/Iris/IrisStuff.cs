@@ -922,7 +922,7 @@ public class IrisSlashProj : Projectile {
 
 		projId = (int)ProjIds.IrisSlashProj;
 		if (player.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 
 		if (rpc) {
@@ -973,7 +973,7 @@ public class IrisStabProj : Projectile {
 		maxTime = 1.5f;
 		projId = (int)ProjIds.IrisStabProj;
 		if (player.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 
 		if (rpc) {
@@ -1075,22 +1075,29 @@ public class IrisCannon : Projectile {
 				// X axis follow.
 				if (pos.x < targetPosX) {
 					move(new Point(moveSpeed, 0));
-					if (pos.x > targetPosX) { pos.x = targetPosX; }
+					if (pos.x > targetPosX) { 
+					changePos(ownerActor.getCenterPos()); }
 				} else if (pos.x > targetPosX) {
 					move(new Point(-moveSpeed, 0));
-					if (pos.x < targetPosX) { pos.x = targetPosX; }
+					if (pos.x < targetPosX) {
+					changePos(ownerActor.getCenterPos());
+						}
 				}
 				// Y axis follow.
 				if (pos.y < targetPosY) {
 					move(new Point(0, moveSpeed));
-					if (pos.y > targetPosY) { pos.y = targetPosY; }
+					if (pos.y > targetPosY) {
+					changePos(ownerActor.getCenterPos());
+					}
 				} else if (pos.y > targetPosY) {
 					move(new Point(0, -moveSpeed));
-					if (pos.y < targetPosY) { pos.y = targetPosY; }
+					if (pos.y < targetPosY) {
+					changePos(ownerActor.getCenterPos());
+					}
 				}
 			}
 
-			
+				
 				if (LaserCD == 0 && owner.character != null &&  owner.superAmmo > 15 &&
 				
 				owner.input.isPressed(Control.WeaponRight,owner)

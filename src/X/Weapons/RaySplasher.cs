@@ -152,7 +152,7 @@ public class RayClaw : Projectile {
 		projId = (int)ProjIds.RayClaw;
 		isMelee = true;
 		if (player.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 
 		if (rpc) {

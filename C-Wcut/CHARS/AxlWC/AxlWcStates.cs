@@ -235,7 +235,7 @@ public class AxlFlashKickProj : Projectile {
 		projId = (int)ProjIds.AxlFlashKickProj;
 		isMelee = true;
 		if (player.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 
 		if (rpc) {

@@ -145,7 +145,7 @@ public class Vile : Character {
 	}
 
 	public (Sprite? spr, Point drawPos, Point shootPos) getCannonSprite() {
-		string vilePrefix = "vile_";
+		string vilePrefix = "vava1_";
 		if (isVileMK2) { vilePrefix = "vilemk2_"; }
 		if (isVileMK5) { vilePrefix = "vilemk5_"; }
 		string cannonSprite = vilePrefix + "cannon";
@@ -650,7 +650,7 @@ public class Vile : Character {
 		}
 	}
 
-	public Point getVileShootVel(bool aimable) {
+	public virtual Point getVileShootVel(bool aimable) {
 		Point vel = new Point(1, 0);
 		if (!aimable) {
 			return vel;

@@ -81,15 +81,15 @@ public class AxlMeleeBullet : Projectile {
 			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir, (byte)byteAngle);
 		}
 
-		if (owningActor != null) {
-			offset = pos - owningActor.pos;
+		if (ownerActor != null) {
+			offset = pos - ownerActor.pos;
 		}
 	}
 
 	public override void postUpdate() {
 		base.postUpdate();
-		if (owningActor != null) {
-			changePos(owningActor.pos + offset);
+		if (ownerActor != null) {
+			changePos(ownerActor.pos + offset);
 		}
 	}
 

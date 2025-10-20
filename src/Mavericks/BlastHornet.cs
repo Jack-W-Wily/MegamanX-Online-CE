@@ -159,7 +159,7 @@ public class BlastHornet : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.Stinger => new GenericMeleeProj(
 				weapon, pos, ProjIds.BHornetSting, player,
-				7, Global.defFlinch, owningActor: this,
+				7, Global.defFlinch, ownerActor: this,
 				addToLevel: addToLevel
 			),
 			_ => null

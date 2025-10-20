@@ -63,6 +63,11 @@ public class VAVA1 : Vile {
 	public MechMenuWeapon rideMenuWeapon;
 
 
+	public VileSaveData saveData {
+		get {
+			return VileSaveData.vileSaveData;
+		}
+	}
 
 
 	public float stockedTime;
@@ -186,7 +191,7 @@ public class VAVA1 : Vile {
 
 
 
-		public bool Supers() {
+	public bool Supers() {
 		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32){
 			changeState(new VavaBurensen1(), true);	
 			player.superAmmo = 0;
@@ -247,145 +252,7 @@ public class VAVA1 : Vile {
 		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 
 		SpecialMoves();
-		if (WeaponRightHeld) {
-			if (player.input.isHeld(Control.Up, player)) {
-                if (player.vileAmmo >= 15) {
-					changeState(new VavaDistantNeedler(), true);
-					player.vileAmmo -= 15;
-				}
-            }
-			if (charState is Crouch) {
-				
-					changeState(new VavaZipZapper(), true);
-					
-				
-			} else {
-				vulcanWeapon.vileShoot(0, this);
-			}
-		}
-		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
-		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
-		&& charState is not VAVAKamae) {
-			if (player.input.isAPressed(player)) {
-				if (grounded) {
-					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
-						if (player.vileAmmo >= 25) {
-							changeState(new InfinityGigAttack(), true);
-							player.vileAmmo -= 25;
-						}			
-					}
-					 else if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
-						if (upPressedTimes >= 2) {
-							if (player.vileAmmo >= 20) {
-								changeState(new EgotisticalPillAttack(), true);
-								upPressedTimes = 0;
-							}
-						} else {
-							if (player.vileAmmo >= 14) {
-								changeState(new SpoiledBratPunch(), true);
-							}
-						}
-					}
-					
-				 	else if (player.input.isLeftOrRightHeld(player)) {
-						if (!player.input.isHeld(Control.Down, player)) {
-							if (player.vileAmmo >= 8) {
-								changeState(new GoGetterRightAttack(), true);
-							}
-						}
-					} else {
-						if (!player.input.isHeld(Control.Down, player)) {
-							if (charState is not InfinityGigAttack or SpoiledBratPunch) {
-								changeState(new VAVAJab1(), true);
-							}
-						} else {
-							if (downPressedTimes >= 2 && player.vileAmmo >= 26) {
-								changeState(new VAVAGoldenRight(), true);
-								player.vileAmmo -= 26;
-								downPressedTimes = 0;
-							} else {
-								changeState(new VAVAUpperCutPunch(), true);
-							}
-						}
-					}
-				} else {
-					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
-							if (player.vileAmmo >= 25) {
-							changeState(new InfinityGigAttack(), true);
-							player.vileAmmo -= 25;
-						}			
-					} else {
-						if (player.vileAmmo >= 4) {
-							changeState(new SpoiledBratPunch(), true);
-						}
-					}
-				}
-			}
-		}
-		
 
-		if (player.input.isBPressed(player)) {
-			if (grounded) {
-				if (player.input.isHeld(Control.Up, player)) {
-					changeState(new WildHorseKickState(), true);
-				} else if (player.input.isHeld(Control.Down, player)) {
-					if (downPressedTimes >= 2) {
-						if (player.vileAmmo >= 15) {
-							changeState(new RumblingBangLaunch(), true);
-							player.vileAmmo -= 15;
-						}
-					} else {
-						if (player.vileAmmo >= 25) {
-							changeState(new BumptyBoomGranadeLaunch(), true);
-							player.vileAmmo -= 25;
-						}
-						}
-				} else {
-					if (player.input.isLeftOrRightHeld(player)) {
-					} else {
-					}
-					
-				}
-				
-			} else {
-				if (player.input.isHeld(Control.Down, player)) {
-					if (player.vileAmmo > 8 && charState is not GreenEyedLampState)
-					changeState(new SeaDragonRageState(), true);
-				}else {
-					if (player.vileAmmo > 10 && charState is not GreenEyedLampState) {
-						if (player.input.isHeld(Control.Up, player)) {
-							if (player.vileAmmo > 15){
-								if (!player.input.isL2Held(player)) {
-									if (getChargeLevel() > 2) {
-										changeState(new SwordBouqueteLaunch());
-										stopCharge();
-									} else {
-										changeState(new PeaceOutRollerAttack());
-									}
-								} else {
-									if (getChargeLevel() > 2) {
-										changeState(new BurningDriveState());
-										stopCharge();
-									} else {
-										changeState(new TerriotiralPowState());
-									}
-										
-								}
-							player.vileAmmo -= 15;
-							}
-						} else {
-								if (!player.input.isL2Held(player)) {
-									changeState(new ExplosiveRoundState());
-								} else {
-									changeState(new AirSplashHitGranadeLaunch(), true);			
-								}
-						
-							player.vileAmmo -= 10;
-						}
-					}
-				}
-			}
-		}
 
 		if (player.input.isL2Held(player)) {
 			if (player.input.isAPressed(player)) {
@@ -397,6 +264,13 @@ public class VAVA1 : Vile {
 			}
 		}
 
+
+		getCannonMoves();
+
+		return base.attackCtrl();
+	}
+
+	public bool getCannonMoves() {
 		if (!player.input.checkHadoken(player, xDir, Control.R2)
 		&& !player.input.checkShoryuken(player, xDir, Control.R2)
 		&& charState is not Vava1GizmoDash
@@ -404,9 +278,11 @@ public class VAVA1 : Vile {
 			// finally added Tridentline
 			if (player.input.isR2Pressed(player)) {
 				if (downPressedTimes >= 2 && player.vileAmmo > 15) {
-					changeState(new Vava1TridentLine(grounded), true);
+					if (saveData.vavaDataSave.Tridentline) {
+						changeState(new Vava1TridentLine(grounded), true);
+						player.vileAmmo -= 15;
+					}
 					downPressedTimes = 0;
-					player.vileAmmo -= 15;
 				} else {
 					if (CannonCD == 0) {
 						shoot(0);
@@ -414,15 +290,59 @@ public class VAVA1 : Vile {
 					}
 				}
 			}
-		}	
+			return true;
+		}
+		return false;
+	}
+	
+	public bool getVulcanMoves() {
+			if (player.input.isHeld(Control.Up, player)) {
+				if (player.vileAmmo >= 15) {
+					changeState(new VavaDistantNeedler(), true);
+					player.vileAmmo -= 15;
+				}
+			}
+			if (charState is Crouch) {
+				changeState(new VavaZipZapper(), true);
+			} else {
+				vulcanWeapon.vileShoot(0, this);
+			}
+
+		return false;
+	}
+	
+
+	public bool getFlamethrowerMoves() {
+		if (getChargeLevel() > 2) {
+			changeState(new BurningDriveState());
+			stopCharge();
+		}  else
+		if (player.input.isHeld(Control.Down, player) && !player.input.isLeftOrRightHeld(player)) {
+			if (player.vileAmmo > 8)
+				changeState(new SeaDragonRageState(), true);
+			return true;
+		} else 
+
+		if (player.input.isHeld(Control.Down, player) && player.input.isLeftOrRightHeld(player)) {
+			if (player.vileAmmo > 8)
+				changeState(new GreenEyedLampState(), true);
+			return true;
+		} else
+
+		if (player.input.isHeld(Control.Up, player)) {
+            	changeState(new DragonsWrathState(), true);
+        } else {
+            changeState(new WildHorseKickState(), true);
+        }
 		
+									
 
 
-		return base.attackCtrl();
+		return false;
 	}
 
 
-	
+
 
 	public bool RideArmorAttacks() {
 		var raState = charState as InRideArmor;
@@ -467,6 +387,9 @@ public class VAVA1 : Vile {
 
 		if (overDriveTimer > 0) {
 			OverDrive = true;
+			// test
+			saveData.vavaDataSave.Tridentline = true;
+			saveData.saveToFile();
 		} else {
 			OverDrive = false;
 		}
@@ -593,11 +516,10 @@ public class VAVA1 : Vile {
 			return;
 		}
 		chargeLogic(shoot);
-
-
-
-
 	}
+
+
+
 
 
 
@@ -1158,7 +1080,7 @@ public class VAVA1 : Vile {
 		}
 	}
 
-	public Point getVileShootVel(bool aimable) {
+	public override Point getVileShootVel(bool aimable) {
 		Point vel = new Point(1, 0);
 		if (!aimable) {
 			return vel;

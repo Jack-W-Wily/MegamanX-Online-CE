@@ -181,7 +181,7 @@ public class GlobalParryState : CharState {
 	public void counterAttack(Player damagingPlayer, Actor damagingActor, float damage) {
 		Actor? counterAttackTarget = null;
 		if (damagingActor is GenericMeleeProj gmp) {
-			counterAttackTarget = gmp.owningActor;
+			counterAttackTarget = gmp.ownerActor;
 		}
 		if (counterAttackTarget == null) {
 			counterAttackTarget = damagingPlayer?.character ?? damagingActor;

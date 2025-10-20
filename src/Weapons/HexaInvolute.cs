@@ -414,8 +414,8 @@ public class HexaInvoluteProj2 : Projectile {
 				damager.applyDamage(damagable, false, weapon, this, projId, overrideDamage: overrideDamage, overrideFlinch: overrideFlinch);
 			}
 		}
-		if (owningActor != null) {
-			changePos(owningActor.getCenterPos());
+		if (owner.character != null) {
+			changePos(owner.character.getCenterPos());
 		}
 
 		for (int i = particles.Count - 1; i >= 0; i--) {

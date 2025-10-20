@@ -100,7 +100,7 @@ public class Projectile : Actor {
 		damager = new Damager(player, damage, flinch, hitCooldown);
 		this.xDir = xDir;
 		if ((Global.level.gameMode.isTeamMode && Global.level.mainPlayer != player) &&
-			this is not NapalmPartProj or FlameBurnerProj
+			this is not VileNapalmPartProj or FlameBurnerProj
 		) {
 			RenderEffectType? allianceEffect = player.alliance switch {
 				0 => RenderEffectType.BlueShadow,
@@ -138,7 +138,7 @@ public class Projectile : Actor {
 		ownerActor = owner;
 		this.xDir = xDir;
 		if (Global.level.gameMode.isTeamMode && Global.level.mainPlayer != ownerPlayer &&
-			this is not NapalmPartProj or FlameBurnerProj
+			this is not VileNapalmPartProj or FlameBurnerProj
 		) {
 			RenderEffectType? allianceEffect = ownerPlayer.alliance switch {
 				0 => RenderEffectType.BlueShadow,

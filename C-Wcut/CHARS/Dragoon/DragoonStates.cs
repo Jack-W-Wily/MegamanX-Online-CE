@@ -26,7 +26,7 @@ public class DragoonSpark : Projectile {
 		projId = (int)ProjIds.DragoonSpark;
 		isMelee = true;
 		if (player.character != null) {
-			owningActor = player.character;
+			ownerActor = player.character;
 		}
 
 		if (rpc) {
