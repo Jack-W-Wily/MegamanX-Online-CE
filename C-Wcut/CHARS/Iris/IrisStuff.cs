@@ -1087,12 +1087,12 @@ public class IrisCannon : Projectile {
 				if (pos.y < targetPosY) {
 					move(new Point(0, moveSpeed));
 					if (pos.y > targetPosY) {
-					changePos(ownerActor.getCenterPos());
+					pos = ownerActor.pos;
 					}
 				} else if (pos.y > targetPosY) {
 					move(new Point(0, -moveSpeed));
 					if (pos.y < targetPosY) {
-					changePos(ownerActor.getCenterPos());
+					pos = ownerActor.pos;
 					}
 				}
 			}

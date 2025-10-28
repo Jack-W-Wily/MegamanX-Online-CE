@@ -629,7 +629,7 @@ public class MegamanX : Character {
 		if (flag != null || !isDashing) {
 			return getRunSpeed();
 		}
-		return 3.5f * getRunDebuffs();
+		return 210f * getRunDebuffs();
 	}
 
 	public override void onFlagPickup(Flag flag) {

@@ -83,12 +83,20 @@ public class HighwayVAVA : Vile {
 		ShouldExplode = true;
 
 		if (charState is WarpIn) player.superAmmo = 0;
-		
+		VileLoadout vileLoadout = player.loadout.vileLoadout;
+		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
+		cannonWeapon = new VileCannonWC((VileCannonType)vileLoadout.cannon);
+		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
+		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
+		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
 	
-		vileForm = 1;
+		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
+		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+		vileForm = 0;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
-		isWCUTBoss = true;
+		if (player.isAI) {
+		}
 	}
 
 	public bool isMadjoey => Global.level.levelData.name == "st_vava_c1";
@@ -449,7 +457,6 @@ public class HighwayVAVA : Vile {
 		vulcanWeapon.update();
 		missileWeapon.update();
 		rocketPunchWeapon.update();
-		napalmWeapon.update();
 		grenadeWeapon.update();
 		cutterWeapon.update();
 		laserWeapon.update();

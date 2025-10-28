@@ -1151,16 +1151,18 @@ public class AirDash : CharState {
 			}
 		}
 		// Dash regular speed.
-		if (dashTime >= 4 && !stop) {
-			character.moveXY(character.getDashSpeed() * dashDir, 0);
+		if (character.frameIndex > 0 && !stop) {
+			character.move(new Point(character.getDashSpeed() * dashDir, 0));
 		}
 		// End move.
 		else if (stop && inputXDir != 0) {
-			character.moveXY(character.getDashSpeed() * inputXDir, 0);
+			character.move(new Point(character.getDashSpeed() * dashDir, 0));
+			character.changeState(character.getRunState(true), true);
+			return;
 		}
 		// Speed at start and end.
-		else if (!stop) {
-			character.moveXY(Physics.DashStartSpeed * character.getRunDebuffs() * dashDir, 0);
+		else if (!stop || dashHeld) {
+			character.move(new Point(character.getDashSpeed() * dashDir, 0));;
 		}
 		// Timer
 		dashTime += character.speedMul;

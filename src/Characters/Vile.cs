@@ -145,7 +145,7 @@ public class Vile : Character {
 	}
 
 	public (Sprite? spr, Point drawPos, Point shootPos) getCannonSprite() {
-		string vilePrefix = "vava1_";
+		string vilePrefix = "vava_";
 		if (isVileMK2) { vilePrefix = "vilemk2_"; }
 		if (isVileMK5) { vilePrefix = "vilemk5_"; }
 		string cannonSprite = vilePrefix + "cannon";

@@ -203,7 +203,7 @@ public class RagingChargeX : Character {
 
 	public override float getDashSpeed() {
 		if (sprite.name == "rmx_unpo_grab_dash") {
-			return 1.25f * base.getDashSpeed();
+			return 210f * base.getDashSpeed();
 		}
 		return base.getDashSpeed();
 	}

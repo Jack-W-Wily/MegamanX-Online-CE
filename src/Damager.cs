@@ -840,7 +840,7 @@ public class Damager {
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
-				if (owner?.character is VAVA1) {
+				if (owner?.character is VAVA1 or FinalVava) {
 					character.changeState(new Vava1Grabbed(owner.character));
 					owner.character?.changeState(new Vava1GrabState(character));
 				}
@@ -851,7 +851,7 @@ public class Damager {
 			}
 
 			if (projId == (int)ProjIds.GizmoGrab) {
-				if (owner?.character is VAVA1) {
+				if (owner?.character is VAVA1 or FinalVava) {
 					character.changeState(new ForceGrabbed(owner.character));
 					owner.character?.changeState(new VavaGizmoGrabState(character));
 				}
@@ -972,7 +972,7 @@ public class Damager {
 
 
 
-			if (owner?.character is VAVA1) {
+			if (owner?.character is VAVA1 or FinalVava) {
 				switch (projId) {
 					case (int)ProjIds.GenericWCUTGrabProjID:
 						owner.character.changeState(new Vava1GrabState(character), true);
