@@ -283,7 +283,7 @@ public class XUPParryProjState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		mmx = player.character;// as Character ?? throw new NullReferenceException();
 		character.clenaseDmgDebuffs();
 		if (!shootProj || absorbThenShoot) {
 			absorbAnim = new Anim(

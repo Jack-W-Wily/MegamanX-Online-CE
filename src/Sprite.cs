@@ -320,6 +320,10 @@ public class Sprite {
 			drawXSaber = true;
 		}
 
+		if (name is "explosion" && frameIndex == 0) {
+			Global.level.mainPlayer.character?.shakeCamera();
+		}
+
 		if (armors != null && animData.isXSprite && !Options.main.fastShaders && !Options.main.disableShaders) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
@@ -530,6 +534,9 @@ public class Sprite {
 					);
 				}
 			}
+
+
+		
 
 			if (name is "boomerk_dash" or "boomerk_bald_dash" or "sigma1alt_roll" && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
