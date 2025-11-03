@@ -13,30 +13,25 @@ public class SelectVileWeaponMenu : IMainMenu {
 
 	public static (string name, Weapon[] weapons)[] vileWeaponCategories = {
 			("Cannon", [
-				new VileCannon(VileCannonType.None),
-				new VileCannon(VileCannonType.FrontRunner),
-				new VileCannon(VileCannonType.LongshotGizmo),
-				new VileCannon(VileCannonType.FatBoy)
+				FrontRunner.netWeapon,
+				FatBoy.netWeapon,
+				LongShotGizmo.netWeapon
 			]),
 			("Vulcan", [
-				new Vulcan(VulcanType.None),
-				new Vulcan(VulcanType.NoneCutter),
-				new Vulcan(VulcanType.NoneMissile),
-				new Vulcan(VulcanType.CherryBlast),
-				new Vulcan(VulcanType.DistanceNeedler),
-				new Vulcan(VulcanType.BuckshotDance)
+				CherryBlast.netWeapon,
+				DistanceNeedler.netWeapon,
+				BuckshotDance.netWeapon,
 			]),
 			("Missile", [
-				new VileMissile(VileMissileType.None),
-				new VileMissile(VileMissileType.ElectricShock),
-				new VileMissile(VileMissileType.HumerusCrush),
-				new VileMissile(VileMissileType.PopcornDemon)
+				NoneMissile.netWeapon,
+				HumerusCrush.netWeapon,
+				PopcornDemon.netWeapon,
+				ElectricShock.netWeapon,
 			]),
 			("R.Punch", [
-				new RocketPunch(RocketPunchType.None),
-				new RocketPunch(RocketPunchType.GoGetterRight),
-				new RocketPunch(RocketPunchType.SpoiledBrat),
-				new RocketPunch(RocketPunchType.InfinityGig),
+				GoGetterRight.netWeapon,
+				SpoiledBrat.netWeapon,
+				InfinityGig.netWeapon,
 			]),
 			("Napalm", [
 				RumblingBang.netWeapon,
@@ -49,10 +44,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				PeaceOutRoller.netWeapon
 			]),
 			("Cutter", [
-				new VileCutter(VileCutterType.None),
-				new VileCutter(VileCutterType.QuickHomesick),
-				new VileCutter(VileCutterType.ParasiteSword),
-				new VileCutter(VileCutterType.MaroonedTomahawk)
+				QuickHomesick.netWeapon,
+				MaroonedTomahawk.netWeapon,
+				ParasiteSword.netWeapon,
 			]),
 			("Flamethrower", [
 				WildHorseKick.netWeapon,
@@ -60,10 +54,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				DragonsWrath.netWeapon,
 			]),
 			("Laser", [
-				new VileLaser(VileLaserType.None),
-				new VileLaser(VileLaserType.RisingSpecter),
-				new VileLaser(VileLaserType.NecroBurst),
-				new VileLaser(VileLaserType.StraightNightmare)
+				NecroBurst.netWeapon,
+				StraightNightmare.netWeapon,
+				RisingSpecter.netWeapon,
 			]),
 		};
 

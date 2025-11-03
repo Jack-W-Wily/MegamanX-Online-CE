@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 #region Weapons
 public enum NapalmType {
+	None = -1,
 	RumblingBang,
 	FireGrenade,
 	SplashHit,
@@ -70,8 +71,10 @@ public class FireGrenade : VileNapalm {
 	//	vile.changeState(new VileNapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
 		new MK2NapalmGrenadeProj(
-			character.getCenterPos(), character.xDir, character, character.player,
+			character.pos.add(poi), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
 	}
@@ -96,10 +99,20 @@ public class SplashHit : VileNapalm {
 	//	vile.changeState(new VileNapalmAttacks(this), true);
 	}
 	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
 		new SplashHitGrenadeProj(
-			character.getCenterPos(), character.xDir, character, character.player,
+			character.pos.add(poi), character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
+	}
+}
+public class NoneNapalm : VileNapalm {
+	public static NoneNapalm netWeapon = new();
+	public NoneNapalm() : base() {
+		type = (int)NapalmType.None;
+		displayName = "None";
+		killFeedIndex = 126;
 	}
 }
 #endregion

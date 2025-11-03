@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace MMXOnline;
 
 public enum VileBallType {
+	None = -1,
 	ExplosiveRound,
 	SpreadShot,
 	PeaceOutRoller,
@@ -105,6 +106,14 @@ public class PeaceOutRoller : VileBall {
 		);
 	}
 }
+public class NoneBall : VileBall {
+	public static NoneBall netWeapon = new();
+	public NoneBall() : base() {
+		type = (int)VileBallType.None;
+		displayName = "None";
+		killFeedIndex = 126;
+	}
+}
 #region States
 public class BallAttacks : VileState {
 	public string sound = "FireNappalmMK2";
@@ -122,7 +131,13 @@ public class BallAttacks : VileState {
 
 	public override void update() {
 		base.update();
-		if (vile.energy.ammo < weapon.vileAmmoUsage) {
+
+		if (vile.energy.ammo < weapon.vileAmmoUsage && character.isAnimOver()) {
+			character.changeToCrouchOrFall();
+			return;
+		}
+
+		if (bombNum > 0 && player.input.isPressed(Control.Special1, player)) {
 			character.changeToCrouchOrFall();
 			return;
 		}
@@ -145,7 +160,7 @@ public class BallAttacks : VileState {
 				for (int i = 0; i < 7; i++) {
 					if (stateTime > i * 0.1f && bombNum == i) {
 						bombNum++;
-						weapon.shoot(vile, [i+1]);
+						weapon.shoot(vile, [i + 1]);
 					}
 				}
 			} else if (weapon is PeaceOutRoller && !shot) {
@@ -158,8 +173,8 @@ public class BallAttacks : VileState {
 			character.changeToCrouchOrFall();
 		}
 
-		if (stateTime > 60f/60f) character.changeToCrouchOrFall();
-		
+		if (stateTime > 60f / 60f) character.changeToCrouchOrFall();
+
 	}
 
 	public override void onEnter(CharState oldState) {

@@ -86,6 +86,7 @@ public class XHover : CharState {
 	}
 }
 
+
 public class LightDash : CharState {
 	public float dashTime;
 	public float dustTime;
@@ -115,9 +116,12 @@ public class LightDash : CharState {
 			if (exaust?.destroyed == false) {
 				exaust.destroySelf();
 			}
+			character.isDashing = false;
 			dashTime = 0;
 			stop = true;
-			character.changeState(new DashEnd(), true);
+			sprite = "dash_end";
+			shootSprite = "dash_end_shoot";
+			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
 		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
@@ -214,9 +218,15 @@ public class GigaAirDash : CharState {
 		base.update();
 		if (!player.isAI && !player.input.isHeld(initialDashButton, player) && !stop) {
 			dashTime = 900;
+			character.isDashing = false;
 		}
 		int inputXDir = player.input.getXDir(player);
 		bool dashHeld = player.input.isHeld(initialDashButton, player);
+
+		if (character.canWallClimb() && character.isCWallClose != null && inputXDir == character.xDir) {
+			character.changeToIdleOrFall();
+			return;
+		}
 
 		if (dashTime > 28 && !stop) {
 			if (exaust?.destroyed == false) {
@@ -225,7 +235,9 @@ public class GigaAirDash : CharState {
 			character.useGravity = true;
 			dashTime = 0;
 			stop = true;
-			character.changeState(new DashEnd(), true);
+			sprite = "dash_end";
+			shootSprite = "dash_end_shoot";
+			character.changeSpriteFromName(character.shootAnimTime > 0 ? shootSprite : sprite, true);
 		}
 		if (dashTime < 4 || stop) {
 			if (inputXDir != 0 && inputXDir != dashDir) {
@@ -337,7 +349,6 @@ public class UpDash : CharState {
 	public void changeToFall() {
 		if (character.vel.y < 0) {
 			character.vel.y *= 0.4f;
-			if (character.vel.y > -1) { character.vel.y = -1; }
 		}
 		character.gravityModifier = 1;
 		character.isDashing = true;
@@ -574,6 +585,10 @@ public class X3ChargeShot : CharState {
 		if (mmx == null) {
 			throw new NullReferenceException();
 		}
+		if (!character.grounded) {
+			sprite = "cross_air_shot";
+            character.changeSpriteFromName(sprite, true);
+        }
 		if (mmx.stockedMaxBusterLv >= 2) {
 			sprite = "cross_shot";
 			defaultSprite = sprite;

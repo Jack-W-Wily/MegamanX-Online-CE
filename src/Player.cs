@@ -609,12 +609,6 @@ public partial class Player {
 	}
 
 	public int getSameCharNum() {
-		if (Global.level?.server?.customMatchSettings != null) {
-			if (Global.level.gameMode.isTeamMode && alliance == GameMode.redAlliance) {
-				return Global.level.server.customMatchSettings.redSameCharNum;
-			}
-			return Global.level.server.customMatchSettings.sameCharNum;
-		}
 		return -1;
 	}
 
@@ -2210,7 +2204,6 @@ public partial class Player {
 			if (dnaCore.hyperMode == DNACoreHyperMode.WhiteAxl) {
 				axl.whiteAxlTime = axl.maxHyperAxlTime;
 			}
-			axl.axlSwapTime = 0.25f;
 		} else if (retChar is CmdSigma sigma) {
 			sigma.ballWeapon.ammo = dnaCore.altCharAmmo;
 		} else if (retChar is NeoSigma neoSigma) {
@@ -2607,18 +2600,14 @@ public partial class Player {
 		) {
 			return false;
 		}
-		if (character.isATrans) {
-			return false;
-		}
-		if (character?.charState is not Die) {
-			return false;
-		}
-		if (character is Vile vile2 && vile2.isVileMK5) {
-			return false;
-		}
-		if (character is not Vile vile || vile.summonedGoliath) {
-			return false;
-		}
+		if (character?.isATrans == true) return false;	
+		if (character?.charState is not Die) return false;
+		if (character is not Vile) return false;
+		if (character is Vile vava) {
+			if (vava.isVileMK5) return false;
+			if (vava.summonedGoliath) return false;
+			if (vava.deadCooldown > 0) return false;
+        }
 		return true;
 	}
 
