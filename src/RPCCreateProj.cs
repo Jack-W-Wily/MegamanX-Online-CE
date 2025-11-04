@@ -192,16 +192,16 @@ public partial class RPCCreateProj : RPC {
 				break;
 			*/
 			case (int)ProjIds.RocketPunchWC:
-				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.GoGetterRight), pos, xDir, player, netProjByte);
+				proj = new RocketPunchProjWC(new RocketPunchWC(RocketPunchType.GoGetterRight), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.SpoiledBratWC:
-				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.SpoiledBrat), pos, xDir, player, netProjByte);
+				proj = new RocketPunchProjWC(new RocketPunchWC(RocketPunchType.SpoiledBrat), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.InfinityGigWC:
-				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.InfinityGig), pos, xDir, player, netProjByte);
+				proj = new RocketPunchProjWC(new RocketPunchWC(RocketPunchType.InfinityGig), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.EgotisticalPillProj:
-				proj = new RocketPunchProjWC(new RocketPunch(RocketPunchType.EgotisticalPill), pos, xDir, player, netProjByte);
+				proj = new RocketPunchProjWC(new RocketPunchWC(RocketPunchType.EgotisticalPill), pos, xDir, player, netProjByte);
 				break;
 			case (int)ProjIds.NapalmGrenade:
 				proj = new BumptyBoomProj(new VileNapalm(), pos, xDir, player, netProjByte);

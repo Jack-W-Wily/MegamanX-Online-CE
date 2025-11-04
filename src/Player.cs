@@ -1407,7 +1407,10 @@ public partial class Player {
 			);
 		}
 		  // Vile WCUT
+		
 		  else if (charNum == (int)CharIds.VAVA1) {
+			/*  I'm temporarily disabling VAVAmk2 and MKV for they need ajustments
+
 			if (Options.main.SkinSlot == 1) {
 				newChar = new VAVA2(
 					this, pos.x, pos.y, xDir,
@@ -1419,14 +1422,15 @@ public partial class Player {
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
 			} else {
+			*/
 				newChar = new VAVA1(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
-			}
+		//	}
 		} else if (charNum == (int)CharIds.RockmanX) {
 			if (input.isR2Held(this) && !X3ZeroOncePermatch && canX3Zero) {
-				charNum = (int)CharIds.Zero;
+				charNum = (int)CharIds.BusterZero;
 				newChar = new BusterZero(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
@@ -1441,15 +1445,15 @@ public partial class Player {
 			}
 		} else if (charNum == (int)CharIds.ZeroMID) {
 			if (input.isR2Held(this)) {
-			newChar = new ZeroEND(
-					this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
-			);
-			}else {
-			newChar = new ZeroMID(
-					this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
-			);
+				newChar = new ZeroEND(
+						this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
+			} else {
+				newChar = new ZeroMID(
+						this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer
+				);
 			}
 		} else if (charNum == (int)CharIds.Zain) {
 

@@ -1072,40 +1072,34 @@ public class IrisCannon : Projectile {
 				// X axis follow.
 				if (pos.x < targetPosX) {
 					move(new Point(moveSpeed, 0));
-					if (pos.x > targetPosX) { 
-					changePos(ownerActor.getCenterPos()); }
+					if (pos.x > targetPosX) { unsafePos.x = targetPosX; }
 				} else if (pos.x > targetPosX) {
 					move(new Point(-moveSpeed, 0));
-					if (pos.x < targetPosX) {
-					changePos(ownerActor.getCenterPos());
-						}
+					if (pos.x < targetPosX) { unsafePos.x = targetPosX; }
 				}
 				// Y axis follow.
 				if (pos.y < targetPosY) {
 					move(new Point(0, moveSpeed));
-					if (pos.y > targetPosY) {
-					pos = ownerActor.pos;
-					}
+					if (pos.y > targetPosY) { unsafePos.y = targetPosY; }
 				} else if (pos.y > targetPosY) {
 					move(new Point(0, -moveSpeed));
-					if (pos.y < targetPosY) {
-					pos = ownerActor.pos;
-					}
+					if (pos.y < targetPosY) { unsafePos.y = targetPosY; }
 				}
 			}
 
-				
-				if (LaserCD == 0 && owner.character != null &&  owner.superAmmo > 15 &&
-				
-				owner.input.isPressed(Control.WeaponRight,owner)
-				&& owner.input.isHeld(Control.Up,owner)){
-				new IrisLaserProjFoward(pos, owner.character.xDir, owner.character, owner,
-					owner.getNextActorNetId(), rpc: true
-			);
+
+
+		if (LaserCD == 0 && owner.character != null && owner.superAmmo > 15 &&
+
+		owner.input.isPressed(Control.WeaponRight, owner)
+		&& owner.input.isHeld(Control.Up, owner)) {
+			new IrisLaserProjFoward(pos, owner.character.xDir, owner.character, owner,
+				owner.getNextActorNetId(), rpc: true
+		);
 			LaserCD = 2;
 			owner.superAmmo -= 16;
-				playSound("irislaser2", sendRpc: true);
-			}
+			playSound("irislaser2", sendRpc: true);
+		}
 
 
 			
