@@ -43,7 +43,7 @@ public class FrontRunner : VileCannon {
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
 		if (vile.charState is Crouch) {
-			shoot(vile, []); 
+			shoot(vile, []);
 			return;
 		}
 		vile.changeState(new CannonAttack(this), true);
@@ -82,7 +82,7 @@ public class FatBoy : VileCannon {
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
 		if (vile.charState is Crouch) {
-			shoot(vile, []); 
+			shoot(vile, []);
 			return;
 		}
 		vile.changeState(new CannonAttack(this), true);
@@ -145,6 +145,130 @@ public class NoneCannon : VileCannon {
 	}
 }
 
+// === TridentLine ===
+public class TridentLine : VileCannon {
+	public static TridentLine netWeapon = new();
+	public TridentLine() : base() {
+		type = (int)VileCannonType.TridentLine;
+		index = (int)WeaponIds.TridentLine;
+		fireRate = ; // TODO: definir
+		vileAmmoUsage = ; // TODO: definir
+		ammousage = vileAmmoUsage;
+		damage = ""; // TODO: definir
+		displayName = "Trident Line";
+		vileWeight = ; // TODO: definir
+		effect = ""; // TODO: definir
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
+		if (vile.charState is Crouch) {
+			shoot(vile, []);
+			return;
+		}
+		vile.changeState(new CannonAttack(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		Point shootVel = vava.getVileShootVel(true);
+		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vava.getShootXDir() == -1)
+			shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
+		new TridentLineProj(
+			shootPos, character.xDir, MathF.Round(shootVel.byteAngle),
+			character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+		vava.setVileShootTime(this);
+		vava.playSound("tridentline", sendRpc: true);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+	}
+}
+
+// === BigBoy ===
+public class BigBoy : VileCannon {
+	public static BigBoy netWeapon = new();
+	public BigBoy() : base() {
+		type = (int)VileCannonType.BigBoy;
+		index = (int)WeaponIds.BigBoy;
+		fireRate = ; // TODO
+		vileAmmoUsage = ; // TODO
+		ammousage = vileAmmoUsage;
+		damage = ""; // TODO
+		displayName = "Big Boy";
+		vileWeight = ; // TODO
+		effect = ""; // TODO
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
+		if (vile.charState is Crouch) {
+			shoot(vile, []);
+			return;
+		}
+		vile.changeState(new CannonAttack(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		Point shootVel = vava.getVileShootVel(true);
+		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vava.getShootXDir() == -1)
+			shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
+		new BigBoyProj(
+			shootPos, character.xDir, MathF.Round(shootVel.byteAngle),
+			character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+		vava.setVileShootTime(this);
+		vava.playSound("bigboy", sendRpc: true);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+	}
+}
+
+// === FireMountain ===
+public class FireMountain : VileCannon {
+	public static FireMountain netWeapon = new();
+	public FireMountain() : base() {
+		type = (int)VileCannonType.FireMourain; // ou FireMountain se corrigir o nome
+		index = (int)WeaponIds.FireMountain;
+		fireRate = ; // TODO
+		vileAmmoUsage = ; // TODO
+		ammousage = vileAmmoUsage;
+		damage = ""; // TODO
+		displayName = "Fire Mountain";
+		vileWeight = ; // TODO
+		effect = ""; // TODO
+	}
+	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
+		if (vile.charState is Crouch) {
+			shoot(vile, []);
+			return;
+		}
+		vile.changeState(new CannonAttack(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		Point shootVel = vava.getVileShootVel(true);
+		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vava.getShootXDir() == -1)
+			shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
+		new FireMountainProj(
+			shootPos, character.xDir, MathF.Round(shootVel.byteAngle),
+			character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+		vava.setVileShootTime(this);
+		vava.playSound("firemountain", sendRpc: true);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+	}
+}
+
+
 #region States
 public class CannonAttack : VileState {
 	public bool shot;
@@ -187,8 +311,8 @@ public class CannonAttack : VileState {
 			if (vile.energy.ammo < weapon.vileAmmoUsage) {
 				character.changeToIdleOrFall();
 				return;
-            }
-        }
+			}
+		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -200,14 +324,14 @@ public class CannonAttack : VileState {
 			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);
 			if (lockAir) {
-                character.useGravity = false;
+				character.useGravity = false;
 				character.stopMoving();
 				character.vel = new Point();
 				airMove = false;
-            }
+			}
 		}
 		if (weapon is LongShotGizmo) {
-			airMove = false;	
+			airMove = false;
 			if (character.grounded) sprite = "idle_gizmo";
 			else sprite = "cannon_gizmo_air";
 			character.changeSpriteFromName(sprite, true);
@@ -215,7 +339,7 @@ public class CannonAttack : VileState {
 			character.stopMoving();
 			character.vel = new Point();
 			canJump = false;
-        }
+		}
 	}
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
@@ -223,7 +347,168 @@ public class CannonAttack : VileState {
 		if (weapon is LongShotGizmo) {
 			vile.isShootingGizmo = false;
 			weapon.fireRate = 30;
-        }
+		}
+	}
+}
+
+public class TridentLineAttack : VileState {
+	public bool shot;
+	public int shootFrame = 0;
+	public VileCannon weapon;
+	public float shootTime;
+	public int loopNum;
+	public bool lockAir => Options.main.lockInAirCannon;
+
+	public TridentLineAttack(VileCannon weapon) : base("idle_shoot") {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		airSprite = "cannon_air";
+		landSprite = "idle_shoot";
+		this.weapon = weapon;
+	}
+
+	public override void update() {
+		base.update();
+		character.turnToInput(player.input, player);
+		if (vile.energy.ammo < weapon.vileAmmoUsage && !lockAir && !character.grounded) {
+			character.changeToCrouchOrFall();
+			return;
+		}
+		if (character.frameIndex >= shootFrame && !shot) {
+			shot = true;
+			weapon.shoot(vile, []);
+		}
+		shootTime += Global.speedMul;
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			sprite = "cannon_air";
+			character.changeSpriteFromName(sprite, true);
+			if (lockAir) {
+				character.useGravity = false;
+				character.stopMoving();
+				character.vel = new Point();
+				airMove = false;
+			}
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+public class BigBoyAttack : VileState {
+	public bool shot;
+	public int shootFrame = 0;
+	public VileCannon weapon;
+	public float shootTime;
+	public bool lockAir => Options.main.lockInAirCannon;
+
+	public BigBoyAttack(VileCannon weapon) : base("idle_shoot") {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		airSprite = "cannon_air";
+		landSprite = "idle_shoot";
+		this.weapon = weapon;
+	}
+
+	public override void update() {
+		base.update();
+		character.turnToInput(player.input, player);
+		if (vile.energy.ammo < weapon.vileAmmoUsage && !lockAir && !character.grounded) {
+			character.changeToCrouchOrFall();
+			return;
+		}
+		if (character.frameIndex >= shootFrame && !shot) {
+			shot = true;
+			weapon.shoot(vile, []);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			sprite = "cannon_air";
+			character.changeSpriteFromName(sprite, true);
+			if (lockAir) {
+				character.useGravity = false;
+				character.stopMoving();
+				character.vel = new Point();
+				airMove = false;
+			}
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+public class FireMountainAttack : VileState {
+	public bool shot;
+	public int shootFrame = 0;
+	public VileCannon weapon;
+	public float shootTime;
+	public bool lockAir => Options.main.lockInAirCannon;
+
+	public FireMountainAttack(VileCannon weapon) : base("idle_shoot") {
+		useDashJumpSpeed = true;
+		airMove = true;
+		canJump = true;
+		canStopJump = true;
+		airSprite = "cannon_air";
+		landSprite = "idle_shoot";
+		this.weapon = weapon;
+	}
+
+	public override void update() {
+		base.update();
+		character.turnToInput(player.input, player);
+		if (vile.energy.ammo < weapon.vileAmmoUsage && !lockAir && !character.grounded) {
+			character.changeToCrouchOrFall();
+			return;
+		}
+		if (character.frameIndex >= shootFrame && !shot) {
+			shot = true;
+			weapon.shoot(vile, []);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			sprite = "cannon_air";
+			character.changeSpriteFromName(sprite, true);
+			if (lockAir) {
+				character.useGravity = false;
+				character.stopMoving();
+				character.vel = new Point();
+				airMove = false;
+			}
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
 	}
 }
 #endregion
@@ -316,6 +601,92 @@ public class LongshotGizmoProj : Projectile {
 	}
 }
 
+public class TridentLineProj : Projectile {
+	public TridentLineProj(
+		Point pos, int xDir, float byteAngle,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_mk2_tl_proj", netId, player
+	) {
+		weapon = TridentLine.netWeapon;
+		xScale = xDir;
+		fadeSprite = "buster2_fade";
+		fadeOnAutoDestroy = true;
+		damager.damage = 2; // TODO
+		projId = (int)ProjIds.TridentLine;
+		maxTime = 0.5f; // TODO
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = 300 * Helpers.sinb(byteAngle); // TODO
+		vel.y = 300 * Helpers.cosb(byteAngle); // TODO
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new TridentLineProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
+	}
+}
+
+public class BigBoyProj : Projectile {
+	public BigBoyProj(
+		Point pos, int xDir, float byteAngle,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_mk2_bb_proj", netId, player
+	) {
+		weapon = BigBoy.netWeapon;
+		xScale = xDir;
+		fadeSprite = "vile_mk2_bb_proj_fade";
+		fadeOnAutoDestroy = true;
+		damager.damage = ; // TODO
+		projId = (int)ProjIds.BigBoy;
+		maxTime = ; // TODO
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = ; // TODO
+		vel.y = ; // TODO
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new BigBoyProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
+	}
+}
+
+public class FireMountainProj : Projectile {
+	public FireMountainProj(
+		Point pos, int xDir, float byteAngle,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vile_mk2_fm_proj", netId, player
+	) {
+		weapon = FireMountain.netWeapon;
+		xScale = xDir;
+		fadeSprite = "vile_mk2_fm_proj_fade";
+		fadeOnAutoDestroy = true;
+		damager.damage = ; // TODO
+		projId = (int)ProjIds.FireMountain;
+		maxTime = ; // TODO
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = ; // TODO
+		vel.y = ; // TODO
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FireMountainProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
+	}
+}
 #endregion
 
 #region OldStuff

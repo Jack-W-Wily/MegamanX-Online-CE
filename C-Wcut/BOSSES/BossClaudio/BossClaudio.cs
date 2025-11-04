@@ -15,6 +15,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 //olá -RMS
 //Saudações - Jakkus
+//Minhas saudações - Kazen
 
 public class BossClaudio : Character {
 
