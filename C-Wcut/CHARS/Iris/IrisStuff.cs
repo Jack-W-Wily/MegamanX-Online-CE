@@ -404,7 +404,6 @@ public class IrisLaserProjDiagonal : Projectile {
 	) : base(
 		poi, xDir, owner, "empty", netId, player
 	) {
-		weapon = VileLaser.netWeaponRS;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
@@ -509,7 +508,6 @@ public class IrisLaserProjUp : Projectile {
 		poi, xDir, owner, "empty", netId, player
 	) {
 		destroyOnDMG = true;
-		weapon = VileLaser.netWeaponRS;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
@@ -615,7 +613,6 @@ public class IrisLaserProjFoward : Projectile {
 		poi, xDir, owner, "empty", netId, player
 	) {
 		destroyOnDMG = true;
-		weapon = VileLaser.netWeaponRS;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;

@@ -495,88 +495,8 @@ public class StraightNightmareProj : Projectile {
 		actor.move(new Point(maxSpeed * 0.9f * xDir * modifier * blowModifier, 0));
 	}
 }
+
 #endregion
-/*
-public class VileLaser : Weapon {
-	public float vileAmmoUsage;
-	public static VileLaser netWeaponRS = new VileLaser(VileLaserType.RisingSpecter);
-	public static VileLaser netWeaponNB = new VileLaser(VileLaserType.NecroBurst);
-	public static VileLaser netWeaponSN = new VileLaser(VileLaserType.StraightNightmare);
-	public VileLaser(VileLaserType vileLaserType) : base() {
-		index = (int)WeaponIds.VileLaser;
-		type = (int)vileLaserType;
-
-		if (vileLaserType == VileLaserType.None) {
-			displayName = "None";
-			description = new string[] { "Do not equip a Laser." };
-			killFeedIndex = 126;
-			ammousage = 0;
-			vileAmmoUsage = 0;
-			fireRate = 0;
-			vileWeight = 0;
-		} else if (vileLaserType == VileLaserType.RisingSpecter) {
-			index = (int)WeaponIds.RisingSpecter;
-			displayName = "Rising Specter";
-			vileAmmoUsage = 8;
-			description = new string[] { "It cannot be aimed,", "but its wide shape covers a large area." };
-			killFeedIndex = 120;
-			vileWeight = 3;
-			ammousage = 24;
-			damage = "6";
-			hitcooldown = "0.5";
-			flinch = "26";
-			effect = "Insane Hitbox.";
-		} else if (vileLaserType == VileLaserType.NecroBurst) {
-			index = (int)WeaponIds.NecroBurst;
-			displayName = "Necro Burst";
-			vileAmmoUsage = 5;
-			description = new string[] { "Use up all your energy at once to", "unleash a powerful energy burst." };
-			killFeedIndex = 75;
-			vileWeight = 3;
-			ammousage = 32;
-			damage = "6";
-			hitcooldown = "0.5";
-			flinch = "26";
-			effect = "Self Damages.";
-		} else if (vileLaserType == VileLaserType.StraightNightmare) {
-			index = (int)WeaponIds.StraightNightmare;
-			displayName = "Straight Nightmare";
-			vileAmmoUsage = 8;
-			description = new string[] { "Though slow, this laser can burn", "through multiple enemies in a row." };
-			killFeedIndex = 171;
-			vileWeight = 3;
-			ammousage = 24;
-			damage = "1";
-			hitcooldown = "0.15";
-			effect = "Won't destroy on hit.";
-		}
-	}
-
-	public override float getAmmoUsage(int chargeLevel) {
-		if (type == (int)VileLaserType.NecroBurst) {
-			return 32;
-		} else {
-			return 24;
-		}
-	}
-
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
-		if (type == (int)VileLaserType.None) return;
-
-		if (type == (int)VileLaserType.NecroBurst && vile.charState is InRideArmor inRideArmor) {
-			NecroBurstAttack.shoot(vile);
-			vile.rideArmor?.explode(shrapnel: inRideArmor.isHiding);
-		} else {
-			if (type == (int)VileLaserType.NecroBurst) {
-				vile.changeState(new NecroBurstAttack(vile.grounded), true);
-			} else if (type == (int)VileLaserType.RisingSpecter) {
-				vile.changeState(new RisingSpecterState(vile.grounded), true);
-			} else if (type == (int)VileLaserType.StraightNightmare) {
-				vile.changeState(new StraightNightmareAttack(vile.grounded), true);
-			}
-		}
-	}
-}
 
 public class RisingSpecterState : CharState {
 	bool shot = false;
@@ -690,4 +610,3 @@ public class StraightNightmareAttack : CharState {
 		}
 	}
 }
-*/

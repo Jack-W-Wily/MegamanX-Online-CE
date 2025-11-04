@@ -51,15 +51,6 @@ public class MysteriousMaverick : Vile {
 
 	
 	
-	public VileCannonWC cannonWeapon;
-	public Vulcan vulcanWeapon;
-	public VileMissile missileWeapon;
-	public RocketPunch rocketPunchWeapon;
-		public VileBall grenadeWeapon;
-	public VileCutter cutterWeapon;
-	public VileFlamethrower flamethrowerWeapon;
-	public VileLaser laserWeapon;
-	public MechMenuWeapon rideMenuWeapon;
 
 
 
@@ -334,9 +325,7 @@ public class MysteriousMaverick : Vile {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-
-					}
+				
 				}
 				if (goliathShotPressed) {
 					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {

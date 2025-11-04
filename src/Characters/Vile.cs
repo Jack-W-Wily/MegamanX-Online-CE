@@ -1001,8 +1001,7 @@ public class Vile : Character {
 		int Vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-			&& !(charState is VileRevive or HexaInvoluteState or NecroBurstAttack
-			or StraightNightmareAttack or RisingSpecterState or VileMK2GrabState 
+			&& !(charState is VileRevive or HexaInvoluteState or VileMK2GrabState 
 			or GenericStun or Hurt or Die) && aiAttackCooldown <= 0 &&
 			this is not VAVA1
 			and not VAVA2

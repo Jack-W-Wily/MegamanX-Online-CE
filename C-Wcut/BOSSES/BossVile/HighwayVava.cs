@@ -51,17 +51,6 @@ public class HighwayVAVA : Vile {
 
 	
 
-	public VileCannonWC cannonWeapon;
-	public Vulcan vulcanWeapon;
-	public VileMissile missileWeapon;
-	public RocketPunch rocketPunchWeapon;
-	public VileNapalm napalmWeapon;
-	public VileBall grenadeWeapon;
-	public VileCutter cutterWeapon;
-	public VileFlamethrower flamethrowerWeapon;
-	public VileLaser laserWeapon;
-	public MechMenuWeapon rideMenuWeapon;
-
 
 
 
@@ -83,15 +72,7 @@ public class HighwayVAVA : Vile {
 		ShouldExplode = true;
 
 		if (charState is WarpIn) player.superAmmo = 0;
-		VileLoadout vileLoadout = player.loadout.vileLoadout;
-		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannonWC((VileCannonType)vileLoadout.cannon);
-		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
-	
-		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
-		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+		
 		vileForm = 0;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
@@ -345,9 +326,7 @@ public class HighwayVAVA : Vile {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-
-					}
+				
 				}
 				if (goliathShotPressed) {
 					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {

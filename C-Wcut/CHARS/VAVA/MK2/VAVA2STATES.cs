@@ -566,9 +566,7 @@ public class VAVA2GrabState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.angle = 0;
-		if (character is Vile vile) {
-			vile.grabCooldown = 1;
-		}
+	
 		if (newState is not VAVA2GrabState && victim != null) {
 			victim.grabInvulnTime = 0.5f;
 			//victim.stunInvulnTime = 0.5f;

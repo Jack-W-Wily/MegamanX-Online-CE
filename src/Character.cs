@@ -191,6 +191,7 @@ public partial class Character : Actor, IDamagable {
 
 
 	//StateCooldown System (wcut)
+	public float grabCooldown;
 	public float genericGrabCooldown;
 	public float genericParryCooldown;
 

@@ -52,7 +52,7 @@ public class Vava2Goliath : Vile {
 	
 	
 	public VileCannonWC cannonWeapon;
-	public Vulcan vulcanWeapon;
+	
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
 	public VileNapalm napalmWeapon;
@@ -84,13 +84,7 @@ public class Vava2Goliath : Vile {
 
 		if (charState is WarpIn) player.superAmmo = 0;
 		VileLoadout vileLoadout = player.loadout.vileLoadout;
-		vulcanWeapon = new Vulcan((VulcanType)vileLoadout.vulcan);
-		cannonWeapon = new VileCannonWC((VileCannonType)vileLoadout.cannon);
-		missileWeapon = new VileMissile((VileMissileType)vileLoadout.missile);
-		rocketPunchWeapon = new RocketPunch((RocketPunchType)vileLoadout.rocketPunch);
-		cutterWeapon = new VileCutter((VileCutterType)vileLoadout.cutter);
 	
-		laserWeapon = new VileLaser((VileLaserType)vileLoadout.laser);
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 		vileForm = 1;
 		hasFrozenCastle = player.frozenCastle;
@@ -342,9 +336,7 @@ public class Vava2Goliath : Vile {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-
-					}
+				
 				}
 				if (goliathShotPressed) {
 					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {

@@ -170,10 +170,8 @@ public class KurumaGrabState : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		if (character is Vile vile) {
-			vile.grabCooldown = 1;
-		}
-		if (newState is not VileMK2GrabState && victim != null &&
+	
+		if (victim != null &&
 
 		!character.sprite.name.Contains("up") &&
 		 !character.sprite.name.Contains("down") &&

@@ -391,9 +391,7 @@ public class FinalVava : Vile {
 					goliathShotPressed = oldStunShotPressed;
 				}
 				if (stunShotPressed && !HeldDown) {
-					if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-
-					}
+				
 				}
 				if (goliathShotPressed) {
 					if (Goliath && !rideArmor.isAttacking() && mechBusterCooldown == 0) {
