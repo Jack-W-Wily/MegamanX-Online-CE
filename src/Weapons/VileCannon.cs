@@ -151,12 +151,12 @@ public class TridentLine : VileCannon {
 	public TridentLine() : base() {
 		type = (int)VileCannonType.TridentLine;
 		index = (int)WeaponIds.TridentLine;
-		fireRate = ; // TODO: definir
-		vileAmmoUsage = ; // TODO: definir
+		fireRate = 0; // TODO: definir
+		vileAmmoUsage = 0; // TODO: definir
 		ammousage = vileAmmoUsage;
 		damage = ""; // TODO: definir
 		displayName = "Trident Line";
-		vileWeight = ; // TODO: definir
+		vileWeight = 0; // TODO: definir
 		effect = ""; // TODO: definir
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
@@ -192,12 +192,12 @@ public class BigBoy : VileCannon {
 	public BigBoy() : base() {
 		type = (int)VileCannonType.BigBoy;
 		index = (int)WeaponIds.BigBoy;
-		fireRate = ; // TODO
-		vileAmmoUsage = ; // TODO
+		fireRate = 0; // TODO
+		vileAmmoUsage = 0; // TODO
 		ammousage = vileAmmoUsage;
 		damage = ""; // TODO
 		displayName = "Big Boy";
-		vileWeight = ; // TODO
+		vileWeight = 0; // TODO
 		effect = ""; // TODO
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
@@ -227,18 +227,18 @@ public class BigBoy : VileCannon {
 	}
 }
 
-// === FireMountain ===
-public class FireMountain : VileCannon {
-	public static FireMountain netWeapon = new();
-	public FireMountain() : base() {
-		type = (int)VileCannonType.FireMourain; // ou FireMountain se corrigir o nome
-		index = (int)WeaponIds.FireMountain;
-		fireRate = ; // TODO
-		vileAmmoUsage = ; // TODO
+// === FireMourain ===
+public class FireMourain : VileCannon {
+	public static FireMourain netWeapon = new();
+	public FireMourain() : base() {
+		type = (int)VileCannonType.FireMourain; // ou FireMourain se corrigir o nome
+		index = (int)WeaponIds.FireMourain;
+		fireRate = 0; // TODO
+		vileAmmoUsage = 0; // TODO
 		ammousage = vileAmmoUsage;
 		damage = ""; // TODO
 		displayName = "Fire Mountain";
-		vileWeight = ; // TODO
+		vileWeight = 0; // TODO
 		effect = ""; // TODO
 	}
 	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
@@ -257,13 +257,13 @@ public class FireMountain : VileCannon {
 		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
 		if (vava.getShootXDir() == -1)
 			shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
-		new FireMountainProj(
+		new FireMourainProj(
 			shootPos, character.xDir, MathF.Round(shootVel.byteAngle),
 			character, character.player,
 			character.player.getNextActorNetId(), rpc: true
 		);
 		vava.setVileShootTime(this);
-		vava.playSound("firemountain", sendRpc: true);
+		vava.playSound("FireMourain", sendRpc: true);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 	}
 }
@@ -459,14 +459,14 @@ public class BigBoyAttack : VileState {
 	}
 }
 
-public class FireMountainAttack : VileState {
+public class FireMourainAttack : VileState {
 	public bool shot;
 	public int shootFrame = 0;
 	public VileCannon weapon;
 	public float shootTime;
 	public bool lockAir => Options.main.lockInAirCannon;
 
-	public FireMountainAttack(VileCannon weapon) : base("idle_shoot") {
+	public FireMourainAttack(VileCannon weapon) : base("idle_shoot") {
 		useDashJumpSpeed = true;
 		airMove = true;
 		canJump = true;
@@ -641,13 +641,13 @@ public class BigBoyProj : Projectile {
 		xScale = xDir;
 		fadeSprite = "vile_mk2_bb_proj_fade";
 		fadeOnAutoDestroy = true;
-		damager.damage = ; // TODO
+		damager.damage = 0; // TODO
 		projId = (int)ProjIds.BigBoy;
-		maxTime = ; // TODO
+		maxTime = 0; // TODO
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;
-		vel.x = ; // TODO
-		vel.y = ; // TODO
+		vel.x = 0; // TODO
+		vel.y = 0; // TODO
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -659,30 +659,30 @@ public class BigBoyProj : Projectile {
 	}
 }
 
-public class FireMountainProj : Projectile {
-	public FireMountainProj(
+public class FireMourainProj : Projectile {
+	public FireMourainProj(
 		Point pos, int xDir, float byteAngle,
 		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
 		pos, xDir, owner, "vile_mk2_fm_proj", netId, player
 	) {
-		weapon = FireMountain.netWeapon;
+		weapon = FireMourain.netWeapon;
 		xScale = xDir;
 		fadeSprite = "vile_mk2_fm_proj_fade";
 		fadeOnAutoDestroy = true;
-		damager.damage = ; // TODO
-		projId = (int)ProjIds.FireMountain;
-		maxTime = ; // TODO
+		damager.damage = 0; // TODO
+		projId = (int)ProjIds.FireMourain;
+		maxTime = 0; // TODO
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;
-		vel.x = ; // TODO
-		vel.y = ; // TODO
+		vel.x = 0; // TODO
+		vel.y = 0; // TODO
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
-		return new FireMountainProj(
+		return new FireMourainProj(
 			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
 		);
 	}
@@ -817,75 +817,6 @@ public class VileCannon : Weapon {
 	}
 }
 
-public class VileCannonProj : Projectile {
-	public int type = 0;
-	public VileCannonProj(
-		Point pos, int xDir, int type, float byteAngle, string sprite,
-		Actor owner, Player player, ushort? netId, bool rpc = false
-	) : base(
-		pos, xDir, owner, sprite , netId, player
-	) {
-		xScale = xDir;
-		maxTime = 0.5f;
-		destroyOnHit = true;
-		this.type = type;
-		if (type == (int)VileCannonType.FrontRunner) {
-			weapon = VileCannon.netWeaponFR;
-			sprite = "vile_mk2_proj";
-			fadeSprite = "vile_mk2_proj_fade";
-			fadeOnAutoDestroy = true;
-			damager.damage = 3;
-			damager.flinch = Global.halfFlinch;
-			projId = (int)ProjIds.FrontRunner;
-		} else if (type == (int)VileCannonType.FatBoy) {
-			weapon = VileCannon.netWeaponFB;
-			sprite = "vile_mk2_fb_proj";
-			fadeSprite = "vile_mk2_fb_proj_fade";
-			fadeOnAutoDestroy = true;
-			damager.damage = 4;
-			damager.flinch = Global.defFlinch;
-			projId = (int)ProjIds.FatBoy;
-			maxTime = 0.35f;
-		} else if (type == (int)VileCannonType.LongshotGizmo) {
-			weapon = VileCannon.netWeaponLG;	
-			sprite = "vile_mk2_lg_proj";
-			fadeSprite = "vile_mk2_lg_proj_fade";
-			fadeOnAutoDestroy = true;	
-			damager.damage = 1;
-			damager.flinch = Global.defFlinch;
-			projId = (int)ProjIds.LongshotGizmo;
-		} else if (type == (int)VileCannonType.TridentLine) {
-			weapon = VileCannon.netWeaponLG;	
-			sprite = "vava_proj_trident_line";
-			fadeSprite = "buster2_fade";
-			fadeOnAutoDestroy = true;	
-			damager.damage = 2;
-			damager.flinch = Global.defFlinch;
-			projId = (int)ProjIds.TridentLine;
-		}
-		byteAngle = byteAngle % 256;
-		this.byteAngle = byteAngle;
-		vel.x = 300 * Helpers.cosb(byteAngle);
-		vel.y = 300 * Helpers.sinb(byteAngle);
-		
-
-		if (rpc) {
-			List<Byte> extraBytes = new List<Byte> {
-			};
-			extraBytes.Add((byte)type);
-			extraBytes.AddRange(Encoding.ASCII.GetBytes(sprite));
-			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle, extraBytes.ToArray());
-
-		}
-	}
-
-	public static Projectile rpcInvoke(ProjParameters args) {
-		string sprite = Encoding.ASCII.GetString(args.extraData[1..]);
-		return new VileCannonProj(
-			args.pos, args.xDir, args.extraData[0], args.byteAngle, sprite, args.owner, args.player, args.netId
-		);
-	}
-}
 
 public class CannonAttack : CharState {
 	bool isGizmo;

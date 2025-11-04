@@ -344,7 +344,75 @@ public class Vava1FrontRunner : CharState {
 
 
 
+public class VileCannonProj : Projectile {
+	public int type = 0;
+	public VileCannonProj(
+		Point pos, int xDir, int type, float byteAngle, string sprite,
+		Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, sprite , netId, player
+	) {
+		xScale = xDir;
+		maxTime = 0.5f;
+		destroyOnHit = true;
+		this.type = type;
+		if (type == (int)VileCannonType.FrontRunner) {
+			weapon = FrontRunner.netWeapon;
+			sprite = "vile_mk2_proj";
+			fadeSprite = "vile_mk2_proj_fade";
+			fadeOnAutoDestroy = true;
+			damager.damage = 3;
+			damager.flinch = Global.halfFlinch;
+			projId = (int)ProjIds.FrontRunner;
+		} else if (type == (int)VileCannonType.FatBoy) {
+			weapon = FatBoy.netWeapon;
+			sprite = "vile_mk2_fb_proj";
+			fadeSprite = "vile_mk2_fb_proj_fade";
+			fadeOnAutoDestroy = true;
+			damager.damage = 4;
+			damager.flinch = Global.defFlinch;
+			projId = (int)ProjIds.FatBoy;
+			maxTime = 0.35f;
+		} else if (type == (int)VileCannonType.LongshotGizmo) {
+			weapon = TridentLine.netWeapon;	
+			sprite = "vile_mk2_lg_proj";
+			fadeSprite = "vile_mk2_lg_proj_fade";
+			fadeOnAutoDestroy = true;	
+			damager.damage = 1;
+			damager.flinch = Global.defFlinch;
+			projId = (int)ProjIds.LongshotGizmo;
+		} else if (type == (int)VileCannonType.TridentLine) {
+			weapon = TridentLine.netWeapon;	
+			sprite = "vava_proj_trident_line";
+			fadeSprite = "buster2_fade";
+			fadeOnAutoDestroy = true;	
+			damager.damage = 2;
+			damager.flinch = Global.defFlinch;
+			projId = (int)ProjIds.TridentLine;
+		}
+		byteAngle = byteAngle % 256;
+		this.byteAngle = byteAngle;
+		vel.x = 300 * Helpers.cosb(byteAngle);
+		vel.y = 300 * Helpers.sinb(byteAngle);
+		
 
+		if (rpc) {
+			List<Byte> extraBytes = new List<Byte> {
+			};
+			extraBytes.Add((byte)type);
+			extraBytes.AddRange(Encoding.ASCII.GetBytes(sprite));
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle, extraBytes.ToArray());
+
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		string sprite = Encoding.ASCII.GetString(args.extraData[1..]);
+		return new VileCannonProj(
+			args.pos, args.xDir, args.extraData[0], args.byteAngle, sprite, args.owner, args.player, args.netId
+		);
+	}
+}
 
 public class Vava1TridentLine : CharState {
 	public Vile vile = null!;

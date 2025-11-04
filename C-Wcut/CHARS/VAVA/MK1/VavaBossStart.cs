@@ -191,7 +191,7 @@ public class VB3 : CharState {
 		vile.playSound("risingSpecter", sendRpc: true);
 
 		new VileCannonProj(
-				shootPos, vile.xDir, 0, MathF.Round(shootVel.byteAngle), vile.cannonWeapon.projSprite,
+				shootPos, vile.xDir, 0, MathF.Round(shootVel.byteAngle), "vile_mk2_proj",
 			vile, vile.player, vile.player.getNextActorNetId(), rpc: true
 		);
 
@@ -258,7 +258,7 @@ public class VB4 : CharState {
 		}
 		vile.playSound("mk2stunshot", sendRpc: true);
 		new VileMissileProj(
-				vile.pos.addxy(-50 * vile.xDir,-30), xDir, 2, MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
+				vile.pos.addxy(-50 * vile.xDir,-30), xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
 				vile, vile.player, vile.player.getNextActorNetId(), rpc: true
 			);
 		new TorpedoProjChargedX(vile.pos.addxy(0,-30), vile.xDir, vile, vile.player, vile.player.getNextActorNetId(true), 0, true);

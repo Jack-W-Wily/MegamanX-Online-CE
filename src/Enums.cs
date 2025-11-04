@@ -131,7 +131,7 @@ public enum WeaponIds {
 	TunnelRhino,
 	DrDoppler,
 	// Sigma summons end here.
-	
+
 	// Zero stuff.
 	ZSaber,
 	ZSaberProjSwing,
@@ -305,9 +305,14 @@ public enum WeaponIds {
 
 	// Wcut STuff
 
+	//new Vava Stuff
+	TridentLine,
+	BigBoy,
+	FireMourain,
+
 	IrisCrystal,
 
-	
+
 	// Zain
 
 	ZainParry,
@@ -788,6 +793,8 @@ public enum ProjIds {
 	// VAVA (WCUT)
 
 	TridentLine,
+	BigBoy,
+	FireMourain,
 	VJab1,
 	VJab2,
 	RocketPunchWC,
@@ -814,16 +821,13 @@ public enum ProjIds {
 	InfinityGigThird,
 	SwordBouquetStart,
 	SwordBouquetProj,
-
 	BurningDriveProj,
 	VileAirRaidStart,
 	VileAirRaidPlusKnock,
 	BanzaiBeetleProj,
-
 	TwoHeadedSlash,
 	MetalCrescent,
-
-ZipZapperProj,
+	ZipZapperProj,
 
 	// Zain 
 

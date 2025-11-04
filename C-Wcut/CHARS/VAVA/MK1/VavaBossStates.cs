@@ -127,7 +127,7 @@ public class PopcornHell : CharState {
 		}
 		vile.playSound("mk2stunshot", sendRpc: true);
 		new VileMissileProj(
-				vile.pos, xDir, 2, MathF.Round(shootVel.byteAngle), vile.missileWeapon.projSprite,
+				vile.pos, xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
 				vile, vile.player, vile.player.getNextActorNetId(), rpc: true
 			);
 
@@ -265,7 +265,7 @@ public class ShoulderCannon : CharState {
 			vile.playSound("risingSpecter", sendRpc: true);
 		}
 		new VileCannonProj(
-				shootPos, vile.xDir, 0, MathF.Round(shootVel.byteAngle), vile.cannonWeapon.projSprite,
+				shootPos, vile.xDir, 0, MathF.Round(shootVel.byteAngle), "vile_mk2_proj",
 			vile, vile.player, vile.player.getNextActorNetId(), rpc: true
 		);
 

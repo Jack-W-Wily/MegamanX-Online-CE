@@ -22,7 +22,7 @@ public class ArrowSlashProj : Projectile {
 	) : base(
 		pos, xDir, owner, "vilemk2_proj_slash", netProjId, altPlayer
 	) {
-		maxTime = 0.2f;
+		maxTime = 0.3f;
 		projId = (int)VAVA2ProjIds.SlashClawV;
 		fadeSprite = "vilemk2_proj_slash_2";
 		damager.damage = 2;
