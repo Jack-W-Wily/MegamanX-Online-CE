@@ -13,7 +13,7 @@ using SFML.Graphics;
 // To make sure most things work without you having errors when you want to use Math for example
 
 namespace MMXOnline;
-
+//olá -RMS
 
 public class BossClaudio : Character {
 
