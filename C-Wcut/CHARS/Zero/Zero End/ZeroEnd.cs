@@ -754,15 +754,15 @@ public class ZeroEND : Zero {
 
 							return true;
 						}
-						changeState(new BusterZeroDoubleBuster(true, stockedBusterLv), true);
+						changeState(new ZeroDoubleBuster(true, true), true);
 						return true;
 					}
 					if (stockedSaber) {
 						if (charState is WallSlide wsState) {
-							changeState(new BusterZeroHadangekiWall(wsState.wallDir, wsState.wallCollider), true);
+							changeState(new AwakenedZeroHadangekiWall(wsState.wallDir, wsState.wallCollider), true);
 							return true;
 						}
-						changeState(new BusterZeroHadangeki(), true);
+						changeState(new AwakenedZeroHadangeki(), true);
 						return true;
 					}
 
