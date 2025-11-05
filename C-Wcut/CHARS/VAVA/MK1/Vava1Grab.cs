@@ -44,7 +44,7 @@ public class Vava1GrabState : CharState {
 	float regenTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 
-	public bool UsedGrabFinisherOnce;
+	public bool UsedGrabFinisherOnce = false;
 	float timeWaiting;
 
 	public Vava1GrabState(Character? victim) : base("grab") {
@@ -78,6 +78,7 @@ public class Vava1GrabState : CharState {
 		if (player.input.isAPressed(player) && !UsedGrabFinisherOnce) {
 
 			character.changeSpriteFromName("grab_attack", true);
+			
 		}
 
 		if (player.input.isPressed(Control.Up, player) && !UsedGrabFinisherOnce) {
@@ -103,7 +104,7 @@ public class Vava1GrabState : CharState {
 				leechTime = 0;
 				var damager = new Damager(player, 1, 0, 2);
 
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 			}
 		}
 	

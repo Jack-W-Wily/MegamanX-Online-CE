@@ -501,25 +501,25 @@ public class VavaBurensen1 : CharState {
 
 public class VavaBurensen2 : CharState {
 	public Character? victim;
-	float leechTime = 1;
+	public float leechTime = 1;
 
-	float timein = 0;
-
-
-
-	bool Dashed;
-
-	bool deadlifted;
-
-	bool dropkicked;
-
-	bool stomped;
+	public float timein = 0;
 
 
-	bool fired;
 
-	public bool victimWasGrabbedSpriteOnce;
-	float timeWaiting;
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
 	public VavaBurensen2(Character? victim) : base("hyperdash_start", "", "", "") {
 		this.victim = victim;
 		grabTime = 30;
@@ -531,10 +531,675 @@ public class VavaBurensen2 : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 		timein += Global.spf;
+		if (timein > 0.2f
+		) {
+		
+			character.changeState(new VavaBurensen3(victim), true);
+			
+		}
+			
+		
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	
+	}
+}
+
+
+
+
+
+
+
+
+public class VavaBurensen3 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen3(Character? victim) : base("hyperdash_attack", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
+		if (timein > 0.4f) {
+		
+			character.changeState(new VavaBurensen4(victim), true);
+			
+		}
+
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
+			}
+
+		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+		}
+		
+		if (character.sprite.name.Contains("burensen_2")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
+				leechTime = 0;
+				character.addHealth(0.13f);
+				character.shakeCamera(sendRpc: true);
+				var damager = new Damager(player, 2f, 0, 3);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+			}
+
+		}
+
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("deadlift") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	
+	}
+}
+
+
+
+
+public class VavaBurensen4 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen4(Character? victim) : base("golden_right", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
+		if (timein > 0.5f) {
+		
+			character.changeState(new VavaBurensen5(victim), true);
+			
+		}
+
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
+			}
+
+		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+		}
+		
+		if (character.sprite.name.Contains("burensen_2")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
+				leechTime = 0;
+				character.addHealth(0.13f);
+				character.shakeCamera(sendRpc: true);
+				var damager = new Damager(player, 2f, 0, 3);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+			}
+
+		}
+
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("golden_right") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getCenterPos();
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, 0);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	
+	}
+}
+
+
+
+
+
+public class VavaBurensen5 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen5(Character? victim) : base("burensen_2", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
+		if (timein > 0.2f) {
+		
+			character.changeState(new VavaBurensen6(victim), true);
+			
+		}
+
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
+			}
+
+		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+		}
+		
+		if (character.sprite.name.Contains("burensen_2")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
+				leechTime = 0;
+				character.addHealth(0.13f);
+				character.shakeCamera(sendRpc: true);
+				var damager = new Damager(player, 2f, 0, 3);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+			}
+
+		}
+
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("deadlift") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		
+	}
+}
+
+
+
+
+
+public class VavaBurensen6 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen6(Character? victim) : base("burensen_3", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
+		if (timein > 2f
+		&& victim != null) {
+		
+			character.changeState(new VavaBurensen7(victim), true);
+			
+		}
+
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
+			}
+
+		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+		}
+		
+		if (character.sprite.name.Contains("burensen_2")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
+				leechTime = 0;
+				character.addHealth(0.13f);
+				character.shakeCamera(sendRpc: true);
+				var damager = new Damager(player, 2f, 0, 3);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+			}
+
+		}
+
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("deadlift") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		victim?.releaseGrab(character);
+		victim?.changeToIdleOrFall();
+	}
+}
+
+
+
+
+
+public class VavaBurensen7 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen7(Character? victim) : base("cannon_execution", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
+		
+
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
+			}
+
+		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+		}
+		
+		if (character.sprite.name.Contains("burensen_2")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
+				leechTime = 0;
+				character.addHealth(0.13f);
+				character.shakeCamera(sendRpc: true);
+				var damager = new Damager(player, 2f, 0, 3);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+			}
+
+		}
+
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("deadlift") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		victim?.releaseGrab(character);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+public class VavaBurensen8 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen8(Character? victim) : base("hyperdash_start", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
 		if (timein > 0.2f && !Dashed
-		&& !character.sprite.name.Contains("hyperdash_start")) {
-			character.changeSpriteFromName("hyperdash_attack", true);
+		&& !character.sprite.name.Contains("hyperdash_attack")) {
 			Dashed = true;
+			character.changeSpriteFromName("hyperdash_attack", true);
+			
 		}
 			
 		if (timein > 0.6f && !deadlifted) {
@@ -545,7 +1210,7 @@ public class VavaBurensen2 : CharState {
 			character.changeSpriteFromName("drop_kick", true);
 			dropkicked = true;
 		}
-			if (timein > 1.5f && !stomped) {
+		if (timein > 1.5f && !stomped) {
 			character.changeSpriteFromName("burensen_2", true);
 			stomped = true;
 		}
@@ -624,7 +1289,151 @@ public class VavaBurensen2 : CharState {
 
 		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
 			character.changeToIdleOrFall();
-			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+}
+
+
+
+
+/*
+
+public class VavaBurensen7 : CharState {
+	public Character? victim;
+	public float leechTime = 1;
+
+	public float timein = 0;
+
+
+
+	public bool Dashed = false;
+
+	public bool deadlifted = false;
+
+	public bool dropkicked = false;
+
+	public bool stomped = false;
+
+
+	public bool fired = false;
+
+	public bool victimWasGrabbedSpriteOnce = false;
+	public float timeWaiting;
+	public VavaBurensen7(Character? victim) : base("hyperdash_start", "", "", "") {
+		this.victim = victim;
+		grabTime = 30;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+		timein += Global.spf;
+		if (timein > 0.2f && !Dashed
+		&& !character.sprite.name.Contains("hyperdash_attack")) {
+			Dashed = true;
+			character.changeSpriteFromName("hyperdash_attack", true);
+			
+		}
+			
+		if (timein > 0.6f && !deadlifted) {
+			character.changeSpriteFromName("deadlift", true);
+			deadlifted = true;
+		}
+		if (timein > 1f && !dropkicked) {
+			character.changeSpriteFromName("drop_kick", true);
+			dropkicked = true;
+		}
+		if (timein > 1.5f && !stomped) {
+			character.changeSpriteFromName("burensen_2", true);
+			stomped = true;
+		}
+	
+		if (timein > 2.3f && !character.sprite.name.Contains("burensen_3")
+		&& !character.sprite.name.Contains("cannon_execution")) {
+			character.changeSpriteFromName("burensen_3", true);
+		}
+		
+		if (timein > 5 && !character.sprite.name.Contains("cannon_execution")) {
+			character.changeSpriteFromName("cannon_execution", true);
+			}
+
+		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
+				fired = true;
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+			character.shakeCamera(true);
+			}
+
+		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+		}
+		
+		if (character.sprite.name.Contains("burensen_2")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
+				leechTime = 0;
+				character.addHealth(0.13f);
+				character.shakeCamera(sendRpc: true);
+				var damager = new Damager(player, 2f, 0, 3);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+			}
+
+		}
+
+		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+			if (character.sprite.name.Contains("deadlift") && !character.isAnimOver()) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+			}
+
+		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
+			character.changeToIdleOrFall();
 		}
 	}
 
@@ -640,3 +1449,5 @@ public class VavaBurensen2 : CharState {
 		victim?.changeToIdleOrFall();
 	}
 }
+
+*/

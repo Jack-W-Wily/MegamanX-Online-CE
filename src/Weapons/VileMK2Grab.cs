@@ -51,7 +51,7 @@ public class VileMK2GrabState : CharState {
 			leechTime = 0;
 			character.addHealth(1);
 			var damager = new Damager(player, 1, 0, 0);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 		}
 
 		if (stateFrames >= 2 && player.input.isBPressed(player)) {

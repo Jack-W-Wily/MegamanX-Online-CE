@@ -975,7 +975,9 @@ public class Damager {
 			if (owner?.character is VAVA1 or FinalVava) {
 				switch (projId) {
 					case (int)ProjIds.GenericWCUTGrabProjID:
-						owner.character.changeState(new Vava1GrabState(character), true);
+						if (owner.character.charState is not Vava1GrabState) {
+							owner.character.changeState(new Vava1GrabState(character), true);
+						}
 						character.changeState(new Vava1Grabbed(owner.character), true);
 						break;
 					case (int)ProjIds.RagingDemon:

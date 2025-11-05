@@ -38,11 +38,11 @@ public class RMXGrabStartState : CharState {
 
 public class RMXGrabState : CharState {
 	public Character? victim;
-	float leechTime = 1;
+	public float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 
 	public bool UsedGrabFinisherOnce;
-	float timeWaiting;
+	public float timeWaiting;
 
 	public RMXGrabState(Character? victim) : base("grab") {
 		this.victim = victim;
@@ -112,7 +112,7 @@ public class RMXGrabState : CharState {
 				leechTime = 0;
 				var damager = new Damager(player, 1, 0, 60);
 
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 			}
 		}
 		

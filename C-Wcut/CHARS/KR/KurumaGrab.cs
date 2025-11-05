@@ -100,7 +100,7 @@ public class KurumaGrabState : CharState {
 				leechTime = 0;
 				var damager = new Damager(player, 1, 0, 2);
 
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 			}
 		}
 		

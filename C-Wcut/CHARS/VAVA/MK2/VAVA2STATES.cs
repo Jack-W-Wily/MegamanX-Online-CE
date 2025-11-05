@@ -518,7 +518,7 @@ public class VAVA2GrabState : CharState {
 			leechTime = 0;
 			character.addHealth(0.5f);
 			var damager = new Damager(player, 1, 0, 0.1f);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
+			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 		}
 
 		if (stateFrames >= 2 && player.input.isPressed(Control.Special1, player)) {
