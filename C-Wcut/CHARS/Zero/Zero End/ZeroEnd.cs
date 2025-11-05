@@ -755,6 +755,7 @@ public class ZeroEND : Zero {
 							return true;
 						}
 						changeState(new ZeroDoubleBuster(true, true), true);
+						stockedBusterLv = 0;
 						return true;
 					}
 					if (stockedSaber) {
