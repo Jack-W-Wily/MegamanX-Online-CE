@@ -97,7 +97,7 @@ public class SonicSlicerProj : Projectile {
 			collider.wallOnly = true;
 		}
 		projId = (int)ProjIds.SonicSlicer;
-
+		hitSound = "htsnd_slash1";
 		twin = new Sprite("sonicslicer_twin");
 
 		vel.y = 50;

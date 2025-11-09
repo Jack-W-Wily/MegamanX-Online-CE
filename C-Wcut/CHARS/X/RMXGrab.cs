@@ -129,11 +129,8 @@ public class RMXGrabState : CharState {
 		if (character.sprite.name.Contains("down") && character.frameIndex == 8) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 0, 60);
-				damager.applyDamage(victim, false, new FireWave(), character,
-				(int)ProjIds.MechFrogStompShockwave);
 				new MechFrogStompShockwave(new FireWave(),
-				character.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
+				victim.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
 				player.getNextActorNetId(), rpc: true);
 				victim.playSound("crash", true);
 			}

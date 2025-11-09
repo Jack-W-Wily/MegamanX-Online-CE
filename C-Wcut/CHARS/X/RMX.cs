@@ -314,7 +314,7 @@ public class RockmanX : MegamanX {
 	// this is where you effectively make the melee hitboxes trigger
 	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
-					(int)MeleeIds.Blocking => new RMXGenericMeleeProj(
+					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
 				isZSaberClang: true, isZSaberEffect: false,
@@ -325,8 +325,8 @@ public class RockmanX : MegamanX {
 				0, 0, 60, addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch => new GenericMeleeProj(
-				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				3, Global.defFlinch, 30, addToLevel: addToLevel
+				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
+				3, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
 			(int)MeleeIds.DashGrab => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.newUpGrab, player,
@@ -334,58 +334,58 @@ public class RockmanX : MegamanX {
 			),
 
 			
-				(int)MeleeIds.Grab => new RMXGenericMeleeProj(
+				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1, 0, isDeflectShield: true,
 				isZSaberClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
-			(int)MeleeIds.SpeedBurnerCharged => new RMXGenericMeleeProj(
+			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-			(int)MeleeIds.LightHeadbutt => new RMXGenericMeleeProj(
+			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				2, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
-			(int)MeleeIds.DoubleKick => new RMXGenericMeleeProj(
+			(int)MeleeIds.DoubleKick => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 30, addToLevel: addToLevel
+				2, 0, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_1"
 			),
-			(int)MeleeIds.DoubleKick2 => new RMXGenericMeleeProj(
+			(int)MeleeIds.DoubleKick2 => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel
+				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
 			),
-			(int)MeleeIds.Punch1 => new RMXGenericMeleeProj(
+			(int)MeleeIds.Punch1 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel
+				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
 			),
-			(int)MeleeIds.Punch2 => new RMXGenericMeleeProj(
+			(int)MeleeIds.Punch2 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.VJab1, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel
+				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 50, addToLevel: addToLevel
+				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
 			),
-			(int)MeleeIds.Shoryuken => new RMXGenericMeleeProj(
+			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
-				2, Global.defFlinch, 10, addToLevel: addToLevel
+				2, Global.defFlinch, 10, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
 			),
-			(int)MeleeIds.MaxZSaber => new RMXGenericMeleeProj(
+			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
-			(int)MeleeIds.ZSaber => new RMXGenericMeleeProj(
+			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
 				1, Global.halfFlinch, 5, addToLevel: addToLevel, isZSaberEffect: true
 			),
-			(int)MeleeIds.ZSaberAir => new RMXGenericMeleeProj(
+			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
 				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
-			(int)MeleeIds.NovaStrike => new RMXGenericMeleeProj(
+			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),

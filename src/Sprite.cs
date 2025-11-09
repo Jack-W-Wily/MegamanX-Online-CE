@@ -320,10 +320,6 @@ public class Sprite {
 			drawXSaber = true;
 		}
 
-		if (name is "explosion" && frameIndex == 0) {
-			Global.level.mainPlayer.character?.shakeCamera();
-		}
-
 		if (armors != null && animData.isXSprite && !Options.main.fastShaders && !Options.main.disableShaders) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*

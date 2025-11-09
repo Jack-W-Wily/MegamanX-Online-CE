@@ -469,7 +469,7 @@ public static CharSelection[] selections => [
 				isZSaberClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
-			(int)MeleeIds.Grab => new KRGenericMeleeProj(
+			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1,0,10, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,

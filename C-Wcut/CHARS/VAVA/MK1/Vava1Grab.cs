@@ -52,16 +52,23 @@ public class Vava1GrabState : CharState {
 		grabTime = Vava1Grabbed.maxGrabTime;
 	}
 
-	public override void update() {
+public override void update() {
 		base.update();
 		grabTime -= Global.spf;
-		regenTime += Global.spf;
 		leechTime += Global.spf;
-
+		if (character.xDir == -1) {
+			victim.xDir = 1;
+		} else {
+			victim.xDir = -1;
+		}
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")
 		) {
 			//	character.changeToIdleOrFall();
 			//	return;
+		}
+
+		if (victim == null || victim.health <= 0) {
+			character.changeToIdleOrFall();
 		}
 
 		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
@@ -75,80 +82,73 @@ public class Vava1GrabState : CharState {
 		}
 
 		
-		if (player.input.isAPressed(player) && !UsedGrabFinisherOnce) {
-
-			character.changeSpriteFromName("grab_attack", true);
-			
-		}
+//		if (player.input.isAPressed(player) && !UsedGrabFinisherOnce) {
+//
+	//		character.changeSpriteFromName("grab_attack", true);
+	//	}
 
 		if (player.input.isPressed(Control.Up, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
-			character.changeSpriteFromName("deadlift", true);
+			sprite = "deadlift";
+			character.changeSpriteFromNameIfDifferent("deadlift", true);
 		}
 
 		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
-			character.changeSpriteFromName("violentcrusher_grab", true);
+			if (character.xDir == 1) {
+				character.xDir = -1;
+			} else {
+				character.xDir = 1;
+			}
+			sprite = "violentcrusher_grab";
+			character.changeSpriteFromNameIfDifferent("violentcrusher_grab", true);
 		}
 		
-			if ((player.input.isPressed(Control.Left, player)
+		if ((player.input.isPressed(Control.Left, player)
 			|| player.input.isPressed(Control.Right, player))&& !UsedGrabFinisherOnce) {
 			character.turnToInput(player.input,player);
 			UsedGrabFinisherOnce = true;
-			character.changeSpriteFromName("throw", true);
+			sprite = "superkick";
+			character.changeSpriteFromNameIfDifferent("superkick", true);
 		}
+		
+		if (character.sprite.name.Contains("deadlift") && character.frameIndex == 2) {
 
-
-		if (character.sprite.name.Contains("attack") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 1, 0, 2);
-
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
+				var damager = new Damager(player, 2, 0, 60);
+			character.shakeCamera(sendRpc: true);
+				victim?.shakeCamera(sendRpc: true);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
 			}
 		}
-	
 
-		if (character.sprite.name.Contains("violentcrusher_grab") && character.frameIndex == 1) {
+		if (character.sprite.name.Contains("violentcrusher_grab") && character.frameIndex == 3) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 0, 2);
-				damager.applyDamage(victim, false, new FireWave(), character,
-				(int)ProjIds.MechFrogStompShockwave);
 				new MechFrogStompShockwave(new FireWave(),
-				character.pos.addxy(6 * victim.xDir, 0f), victim.xDir, player,
+				victim.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
 				player.getNextActorNetId(), rpc: true);
-				victim.changeState(new KnockedDown(victim.pos.x < character?.pos.x ? -1 : 1), true);
 				victim.playSound("crash", true);
 			}
 		}
 
-		if (character.sprite.name.Contains("throw") && character.frameIndex == 1) {
+		if (character.sprite.name.Contains("superkick") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 20, 2);
-				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.UPPunch);
+				var damager = new Damager(player, 2, 0, 0);
+				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
 			}
 		}
 
-		if (regenTime > 0.4f) {
-			regenTime = 0;
-			character.addHealth(0.5f);
-			//damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.VileMK2Grab);
-		}
 
 
-
-		if ((character.sprite.name.Contains("up"))
-		&& character.isAnimOver()) {
-			character.changeToIdleOrFall();
-			return;
-		}
+	
 
 		
-		if ((character.sprite.name.Contains("up")
+		if ((character.sprite.name.Contains("deadlift")
 		|| character.sprite.name.Contains("violentcrusher_grab")
-		|| character.sprite.name.Contains("throw")
+		|| character.sprite.name.Contains("superkick")
 		)
 		&& character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -172,19 +172,11 @@ public class Vava1GrabState : CharState {
 		if (character is Vile vile) {
 			vile.grabCooldown = 1;
 		}
-
-			if (character.sprite.name.Contains("deadlift")) {
-				new VileQuickHomesick(
-			character.pos.addxy(0, -30), character.xDir, character, player,
-			player.getNextActorNetId(), rpc: true
-			);
-				character.invulnTime = 0.2f;
-			}
 		if (newState is not VileMK2GrabState && victim != null &&
 
 		!character.sprite.name.Contains("up") &&
-		 !character.sprite.name.Contains("violentcrusher_grab") &&
-		 !character.sprite.name.Contains("throw")) {
+		 !character.sprite.name.Contains("down")&&
+		 !character.sprite.name.Contains("foward")	) {
 			victim.grabInvulnTime = 2;
 			victim.stunInvulnTime = 1;
 			victim?.releaseGrab(character, true);

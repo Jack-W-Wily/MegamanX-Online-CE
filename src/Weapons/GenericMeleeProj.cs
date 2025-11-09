@@ -2,6 +2,9 @@
 
 namespace MMXOnline;
 
+
+
+	
 public class GenericMeleeProj : Projectile {
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
@@ -10,7 +13,7 @@ public class GenericMeleeProj : Projectile {
 		bool addToLevel = false, float? hitCooldownSeconds = null,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false, bool isZSaberClang = false,
 		bool isJuggleProjectile = false, bool isPushProjectile = false,
-		bool ShouldClang = false
+		bool ShouldClang = false, string hitSound = "hit"
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
 	) {
@@ -22,11 +25,9 @@ public class GenericMeleeProj : Projectile {
 		damager.flinch = flinch ?? weapon.damager?.flinch ?? 0;
 		if (hitCooldown != null) {
 			damager.hitCooldown = hitCooldown.Value;
-		}
-		else if (hitCooldownSeconds != null) {
+		} else if (hitCooldownSeconds != null) {
 			damager.hitCooldownSeconds = hitCooldownSeconds.Value;
-		}
-		else {
+		} else {
 			damager.hitCooldown = weapon?.damager?.hitCooldown ?? 0;
 		}
 		if (hitCooldownSeconds == null && damager.hitCooldown <= 0) {
@@ -44,6 +45,7 @@ public class GenericMeleeProj : Projectile {
 		this.isJuggleProjectile = isJuggleProjectile;
 		this.isPushProjectile = isPushProjectile;
 		this.ShouldClang = ShouldClang;
+		this.hitSound = hitSound;
 		isMelee = true;
 	}
 
@@ -149,8 +151,8 @@ public class GenericMeleeProj : Projectile {
 		}
 	}
 
-	public override DamagerMessage? onDamage(IDamagable? damagable, Player? attacker) {	
-		Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0,0);
+	public override DamagerMessage? onDamage(IDamagable? damagable, Player? attacker) {
+		Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0, 0);
 		Collider? hitbox = getGlobalCollider();
 		Collider? collider = (damagable as Actor)?.collider;
 		if (hitbox?.shape != null && collider?.shape != null) {
@@ -170,7 +172,7 @@ public class GenericMeleeProj : Projectile {
 					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 			}
 			if (isZSaberEffectBool(false, true)) {
-				new Anim(hitPoint.Value, SaberSlashFade, xDir*-1,
+				new Anim(hitPoint.Value, SaberSlashFade, xDir * -1,
 					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 			}
 		}

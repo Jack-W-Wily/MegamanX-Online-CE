@@ -864,7 +864,7 @@ public class SwordBlock : CharState {
 		}
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
-				character.changeState(character.getTauntState());
+				character.changeSpriteFromName("win", true);
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					character.changeSpriteFromName("lose", true);

@@ -121,12 +121,12 @@ public class HyperZeroStart : ZeroState {
 			zero.hyperModeTimer = 99999;
 		}
 		virusEffectParts?.destroySelf();
-		bool playedHitSound = false;
+		bool playedhitSound = false;
 		for (int i = 0; i < virusAnim.Length; i++) {
 			if (virusAnim[i]?.destroyed == false) {
-				if (!playedHitSound) {
+				if (!playedhitSound) {
 					character?.playSound("shingetsurinx5", true);
-					playedHitSound = true;
+					playedhitSound = true;
 				}
 				virusAnim[i]?.destroySelf();
 			}

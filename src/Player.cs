@@ -1315,11 +1315,15 @@ public partial class Player {
 		  else if (spawnCharNum == (int)CharIds.Vile) {
 			bool mk2VileOverride = Global.level.isHyperMatch();
 
-			newChar = new Vile(
-				this, pos.x, pos.y, xDir, false, charNetId,
-				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
-				isWarpIn: isWarpIn, heartTanks: htCount
-			);
+			//newChar = new Vile(
+			//	this, pos.x, pos.y, xDir, false, charNetId,
+			//	ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
+			//	isWarpIn: isWarpIn, heartTanks: htCount
+			//);
+				newChar = new VAVA1(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
+				);
 		}
 		  // GM19 Axl.
 		  else if (spawnCharNum == (int)CharIds.Axl) {

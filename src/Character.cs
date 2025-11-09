@@ -625,7 +625,7 @@ public partial class Character : Actor, IDamagable {
 	// Stuck in place and can't do any action but still can activate controls, etc.
 	public virtual bool isSoftLocked() {
 		if (currentMaverick != null) return true;
-		if (charState is WarpOut) return true;
+		if (charState is WarpOut or VileStomped) return true;
 		return false;
 	}
 

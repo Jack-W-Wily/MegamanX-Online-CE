@@ -11,6 +11,8 @@ public class Projectile : Actor {
 	}
 	public string fadeSprite = "";
 	public string fadeSound = "";
+
+	public string hitSound = "hit";
 	public float time = 0;
 	public float maxTime = float.MaxValue;
 	public bool fadeOnAutoDestroy;
@@ -171,7 +173,7 @@ public class Projectile : Actor {
 
 		time += Global.spf;
 		moveDistance += deltaPos.magnitude;
-
+		Helpers.decrementFrames(ref hitSoundCD);
 		/*
 		if (moveDistance > Global.screenW)
 		{
@@ -702,16 +704,21 @@ public class Projectile : Actor {
 	// so if you want an effect to favor the shooter, then
 	// it needs to be in the Damager class as a "on<PROJ>Damage() method"
 	// Also, this runs on every hit regardless of hit cooldown, so if hit cooldown must be factored, use onDamage
+
+	public float hitSoundCD;
+
+	public SoundWrapper HTSND; 
+
 	public virtual void onHitDamagable(IDamagable damagable) {
 
 
-		if (isJuggleProjectile && damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isPushImmune()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 0 * modifier, -300));
-		}
+			if (isJuggleProjectile && damagable is Character chr) {
+				float modifier = 1;
+				if (chr.isUnderwater()) modifier = 2;
+				if (chr.isPushImmune()) return;
+				float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+				chr.move(new Point(xMoveVel * 0 * modifier, -300));
+			}
 
 		if (isPushProjectile){
 
@@ -746,6 +753,9 @@ public class Projectile : Actor {
 
 		damager.damage = damage ?? damager.damage;
 		damager.flinch = flinch ?? damager.flinch;
+		// HitSound (WCUT)
+		damager.hitSound = hitSound;
+		//
 		if (ownedByLocalPlayer && netId != null) {
 			RPC.changeDamage.sendRpc(netId.Value, damager.damage, damager.flinch);
 		}

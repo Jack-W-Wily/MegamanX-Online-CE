@@ -12,6 +12,8 @@ public class Damager {
 	}
 	public float hitCooldown;
 	public int flinch; // Number of frames to flinch
+
+	public string hitSound = "";
 	public float knockback;
 
 	public const float envKillDamage = 2000;
@@ -69,12 +71,13 @@ public class Damager {
 		{ (int)ProjIds.HexaInvolute, 60 },
 	};
 
-	public Damager(Player owner, float damage, int flinch, float hitCooldown, float knockback = 0) {
+	public Damager(Player owner, float damage, int flinch, float hitCooldown, float knockback = 0, string hitSound = "hit") {
 		this.owner = owner;
 		this.damage = damage;
 		this.flinch = flinch;
 		this.hitCooldownSeconds = hitCooldown;
 		this.knockback = knockback;
+		this.hitSound = hitSound;
 	}
 
 	// Normally, sendRpc would default to false, but literally over 20 places need it to true
@@ -126,7 +129,7 @@ public class Damager {
 	public static bool applyDamage(
 		Player owner, float damage, float hitCooldown, int flinch,
 		Actor victim, bool weakness, int weaponIndex, int weaponKillFeedIndex,
-		Actor? damagingActor, int projId, bool sendRpc = true
+		Actor? damagingActor, int projId, bool sendRpc = true, string hitSound = "hit"
 	) {
 		if (owner == null) {
 			throw new Exception("Null damage player source. Use stage or self if not from another player.");
@@ -266,6 +269,7 @@ public class Damager {
 				damagerMessage = proj.onDamage(damagable, owner);
 				if (damagerMessage?.flinch != null) flinch = damagerMessage.flinch.Value;
 				if (damagerMessage?.damage != null) damage = damagerMessage.damage.Value;
+				hitSound = proj.hitSound;
 			}
 
 			switch (projId) {
@@ -976,20 +980,20 @@ public class Damager {
 				switch (projId) {
 					case (int)ProjIds.GenericWCUTGrabProjID:
 						if (owner.character.charState is not Vava1GrabState) {
-							owner.character.changeState(new Vava1GrabState(character), true);
+							owner.character.changeState(new Vava1GrabState(character));
 						}
 						character.changeState(new Vava1Grabbed(owner.character), true);
 						break;
 					case (int)ProjIds.RagingDemon:
 						if (character is not MysteriousMaverick) {
-							owner.character.changeState(new RagingDemonSuccess(character), true);
+							owner.character.changeState(new RagingDemonSuccess(character));
 							character.changeState(new Vava1Grabbed(owner.character), true);
 						} else {
 							owner.character.changeState(new ZeroClang(character.xDir), true);
 						}
 						break;
 					case (int)ProjIds.BurensenStart:
-						owner.character.changeState(new VavaBurensen2(character), true);
+						owner.character.changeState(new VavaBurensen2(character));
 						character.changeState(new PushedOver2(owner.character.xDir), true);
 						break;
 					case (int)ProjIds.BurensenStomp:
@@ -1069,7 +1073,7 @@ public class Damager {
 
 				// Flinch above 0 and is not weakness
 				if (flinch > 0 && !weakness) {
-					character.playAltSound("hurt", altParams: "carmor");
+					character.playSound(hitSound);
 					character.setHurt(hurtDir, flinch, spiked);
 				}
 				// Weakness is true and character is not frozen in Shotgun Ice.
@@ -1094,20 +1098,10 @@ public class Damager {
 						}
 					}
 				} else {
-					if (character.altSoundId == Character.AltSoundIds.X1) {
-						victim.playSound("hit");
-					} else if (character.altSoundId == Character.AltSoundIds.X2) {
-						victim.playSound("hitX2");
-					} else if (character.altSoundId == Character.AltSoundIds.X3) {
-						victim.playSound("hitX3");
-					}
-					if (mmx?.chestArmor == ArmorId.Light || mmx?.chestArmor == ArmorId.None) {
-						victim.playSound("hit");
-					} else if (mmx?.chestArmor == ArmorId.Giga) {
-						victim.playSound("hitX2");
-					} else if (mmx?.chestArmor == ArmorId.Max) {
-						victim.playSound("hitX3");
-					}
+				
+					victim.playSound(hitSound);
+					
+					
 				}
 			}
 		}
@@ -1132,10 +1126,10 @@ public class Damager {
 				rideArmor.xFlinchPushVel = pushDirection * tempPush;
 			}
 			if (damage > 1 || flinch > 0) {
-				victim.playSound("hurt");
+				victim.playSound(hitSound);
 				rideArmor.playHurtAnim();
 			} else {
-				victim.playSound("hit");
+				victim.playSound(hitSound);
 			}
 		}
 		// Maverick section

@@ -16,6 +16,7 @@ public class BusterProj : Projectile {
 		vel = new Point(250 * xDir, 0);
 		fadeSprite = "buster1_fade";
 		reflectable = true;
+		hitSound = "hit";
 		maxTime = 0.5175f;
 		projId = (int)ProjIds.Buster;
 		if (rpc) {
@@ -53,6 +54,7 @@ public class Buster2Proj : Projectile {
 		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
+		hitSound = "htsnd_common_x4";
 		projId = (int)ProjIds.Buster2;
 		fadeOnAutoDestroy = true;
 		if (rpc) {
@@ -78,6 +80,7 @@ public class Buster3LightProj : Projectile {
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
+		hitSound = "htsnd_common_x4";
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster3;
@@ -106,6 +109,7 @@ public class Buster3GigaProj : Projectile {
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
+		hitSound = "htsnd_common_x4";
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster3Giga;
@@ -134,6 +138,7 @@ public class Buster3GigaProjMelee : Projectile {
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
+		hitSound = "htsnd_common_x4";
 		reflectable = true;
 		useGravity = true;
 		maxTime = 0.1f;
@@ -164,6 +169,7 @@ public class Buster3MaxProj : Projectile {
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
+		hitSound = "htsnd_common_x4";
 		reflectable = true;
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster3Max;
@@ -198,6 +204,7 @@ public class Buster4GigaProj: Projectile {
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
+		hitSound = "htsnd_common_x4";
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster4Giga;
 		if (rpc) {
@@ -224,6 +231,7 @@ public class Buster4Giga2Proj: Projectile {
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster4_x2_fade";
+		hitSound = "htsnd_common_x4";
 		maxTime = 0.5f;
 		projId = (int)ProjIds.Buster4Giga2;
 		if (rpc) {
@@ -288,6 +296,7 @@ public class Buster4MaxProj: Projectile {
 		fadeSprite = "buster3_fade";
 		maxTime = 0.85f;
 		projId = (int)ProjIds.Buster4Max;
+		hitSound = "htsnd_common_x4";
 		vel.x = 0;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -331,6 +340,7 @@ public class Buster4Proj : Projectile {
 		this.type = type;
 		initY = this.pos.y;
 		this.smoothStart = smoothStart;
+		hitSound = "htsnd_common_x4";
 		maxTime = 0.6f;
 		projId = (int)ProjIds.Buster4;
 		vel = new Point(396*xDir,0);
@@ -372,6 +382,7 @@ public class BusterX3Proj2 : Projectile {
 		damager.damage = 1;
 		vel = new Point(400 * xDir, 0);
 		fadeSprite = "buster4_fade";
+		hitSound = "htsnd_common_x4";
 		fadeOnAutoDestroy = true;
 		this.type = type;
 		reflectable = true;
@@ -428,6 +439,7 @@ public class BusterPlasmaProj : Projectile {
 		maxTime = 0.5f;
 		projId = (int)ProjIds.BusterX3Plasma;
 		fadeSprite = "buster4_x3_muzzle";
+		hitSound = "htsnd_common_x4";
 		fadeOnAutoDestroy = true;
 		destroyOnHit = false;
 		xScale = 0.75f;
@@ -469,6 +481,7 @@ public class BusterPlasmaHitProj : Projectile {
 		weapon = XBuster.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 15;
+		hitSound = "htsnd_common_x4";
 		maxTime = 2f;
 		projId = (int)ProjIds.BusterX3PlasmaHit;
 		destroyOnHit = false;
