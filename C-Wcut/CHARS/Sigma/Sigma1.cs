@@ -31,6 +31,7 @@ public class Sigma1 : BaseSigma {
 		altSoundId = AltSoundIds.X1;
 		ballWeapon = new SigmaBallWeapon();
 		ShouldExplode = true;
+		charId = CharIds.Sigma;
 	}
 
 	public override void update() {
@@ -234,15 +235,15 @@ public class Sigma1 : BaseSigma {
 			},
 			MeleeIds.GenericSlash => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 2, 20,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			MeleeIds.HellGaze => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.ElectricShock, player, 2, 0, 5,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_lightning1"
 			),
 			MeleeIds.ViralSlash => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaViralSlash, player, 2, 30, 5,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash_deep3"
 			),
 			MeleeIds.Parry => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.HeavyPush, player, 6, 0, 5,
@@ -250,11 +251,11 @@ public class Sigma1 : BaseSigma {
 			),
 			MeleeIds.Grab => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.ForceGrabState, player, 0, 0,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_grab2"
 			),
 			MeleeIds.Sigkick => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.BlockableLaunch, player, 4, 0,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_knock1"
 			),
 			_ => null
 		};

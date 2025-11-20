@@ -147,6 +147,7 @@ public class DynamoCrossProj : Projectile {
 		maxTime = 1.5f;
 		this.vel.y = 0;
 		angle2 = 0;
+		hitSound = "htsnd_slash1";
 		if (xDir == -1) angle2 = -180;
 
 		angle = angle;
@@ -347,6 +348,7 @@ public class DynamoAxeProj : Projectile {
 	) {
 		fadeSprite = "explosion";
 		maxTime = 1;
+		hitSound = "htsnd_slash1";
 		projId = (int)ProjIds.DynamoAxeProj;
 		destroyOnHit = false;
 
@@ -645,6 +647,7 @@ public class DynamoBoomerangProj : Projectile {
 	) {
 		projId = (int)ProjIds.DynamoBoomerangProj;
 		destroyOnHit = false;
+		hitSound = "htsnd_slash1";
 		shouldShieldBlock = false;
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
 		minTime = 0.4f;
@@ -1244,6 +1247,7 @@ public class DynamoBeam : Projectile {
 		shouldVortexSuck = false;
 		destroyOnHit = false;
 		maxTime = 1f;
+		hitSound = "kofhtsnd_lightning1";
 		this.player = player;
 
 		if (sendRpc) {
@@ -1550,6 +1554,7 @@ public class DynamoKnifeProj : Projectile {
 		maxTime = 0.4f;
 		ShouldClang = true;
 		this.hitChar = hitChar;
+		hitSound = "htsnd_slash1";
 		if (type == 1) {
 			damager.damage = 3;
 			changeSprite("dynamo_dagger_proj", true);

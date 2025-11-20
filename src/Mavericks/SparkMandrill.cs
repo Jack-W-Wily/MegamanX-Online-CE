@@ -62,7 +62,11 @@ public class SparkMandrill : Maverick {
 					changeState(new SparkMDashPunchState());
 				} else if (shootPressed()) {
 					changeState(new SparkMPunchState());
+				}else if (input.isR2Pressed(player) && player.superAmmo >= 15) {
+					changeState(getShootState2());
+					player.superAmmo -= 16;
 				}
+
 			} else if (state is MJump || state is MFall) {
 				if (input.isHeld(Control.Up, player)) {
 					var hit = Global.level.checkTerrainCollisionOnce(this, 0, -15);
@@ -85,6 +89,19 @@ public class SparkMandrill : Maverick {
 			new TriadThunderProjCharged(pos, -xDir, 1, this, player, player.getNextActorNetId(), rpc: true);
 		}, "sparkmSparkX1");
 	}
+
+
+	public MaverickState getShootState2() {
+		return new MShoot((Point pos, int xDir) => {
+			state.sprite = "palm";
+			changeSpriteFromName("palm", true);
+			
+			shakeCamera(sendRpc: true);
+			new ElectricSparkProjChargedStart(pos, xDir, this, player, player.getNextActorNetId(), true);
+		
+		}, "electricSpark");
+	}
+
 
 	public override MaverickState[] strikerStates() {
 		return [
@@ -113,6 +130,7 @@ public class SparkMandrill : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		Punch,
+		Palm,
 		DashPunch,
 		Shoot,
 		Fall,	
@@ -125,6 +143,7 @@ public class SparkMandrill : Maverick {
 			"sparkm_dash_punch" => MeleeIds.DashPunch,
 			"sparkm_shoot" => MeleeIds.Shoot,
 			"sparkm_fall" => MeleeIds.Fall,
+			"sparkm_palm" => MeleeIds.Palm,
 			_ => MeleeIds.None
 		});
 	}
@@ -134,15 +153,19 @@ public class SparkMandrill : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.Punch => new GenericMeleeProj(
 				punchWeapon, pos, ProjIds.SparkMPunch, player,
-				4, Global.defFlinch, 45, addToLevel: addToLevel
+				4, Global.defFlinch, 45, addToLevel: addToLevel, hitSound : "kofhtsnd_punch3"
 			),
 			MeleeIds.DashPunch => new GenericMeleeProj(
 				punchWeapon, pos, ProjIds.SparkMPunch, player,
-				4, Global.defFlinch, 45, addToLevel: addToLevel
+				4, Global.defFlinch, 45, addToLevel: addToLevel, hitSound : "kofhtsnd_punch3"
 			),
 			MeleeIds.Shoot => new GenericMeleeProj(
 				sparkWeapon, pos, ProjIds.SparkMSpark, player,
-				4, Global.defFlinch, addToLevel: addToLevel
+				4, Global.defFlinch, addToLevel: addToLevel, hitSound : "htsnd_lighting"
+			),
+			MeleeIds.Palm => new GenericMeleeProj(
+				sparkWeapon, pos, ProjIds.HeavyPush, player,
+				6, 0, addToLevel: addToLevel, hitSound : "htsnd_lighting"
 			),
 			MeleeIds.Fall => new GenericMeleeProj(
 				stompWeapon, pos, ProjIds.SparkMStomp, player,
@@ -198,6 +221,8 @@ public class SparkMPunchState : MaverickState {
 		}
 	}
 }
+
+
 
 public class SparkMDashPunchState : MaverickState {
 	public float dustTime;

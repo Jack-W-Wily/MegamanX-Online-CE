@@ -192,14 +192,14 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("parry_start"))
 			{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.ForceGrabState, player, 1, 0, 5, addToLevel: true
+			 ProjIds.ForceGrabState, player, 1, 0, 5, addToLevel: true, hitSound : "kofhtsnd_grab1"
 			);
 		}
 
 		if (sprite.name.Contains("grab"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.HeavyPush, player, 1, 0, 30, addToLevel: true
+			 ProjIds.HeavyPush, player, 1, 0, 30, addToLevel: true, hitSound : "GDash"
 			);
 		}
 
@@ -207,13 +207,13 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("punch") && !sprite.name.Contains("2"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 20, 15, ShouldClang : true, addToLevel: true
+			 ProjIds.FireWave, player, 2, 20, 15, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch1"
 			);
 		}
 			if (sprite.name.Contains("punch") && sprite.name.Contains("2"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 3, 20, 15, ShouldClang : true, addToLevel: true
+			 ProjIds.FireWave, player, 3, 20, 15, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch2"
 			);
 		}
 			if (sprite.name.Contains("kick") && !sprite.name.Contains("spin")  && !sprite.name.Contains("drop"))
@@ -225,45 +225,49 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("kick") && sprite.name.Contains("spin"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 20, 8, ShouldClang : true, addToLevel: true
+			 ProjIds.FireWave, player, 2, 20, 8, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch3"
 			);
 		}
 			if (sprite.name.Contains("kick") && sprite.name.Contains("drop"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.MechFrogStompShockwave, player, 3, 20, 8, ShouldClang : true, addToLevel: true
+			 ProjIds.MechFrogStompShockwave, player, 3, 20, 8, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch4"
 			);
 		}
 			if (sprite.name.Contains("shoryuken") && charState is DragoonRising)
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 1f, 20, 12, ShouldClang : true, isJuggleProjectile : true, addToLevel: true
+			 ProjIds.FireWave, player, 1f, 30, 12, ShouldClang : true, isJuggleProjectile : true, addToLevel: true, hitSound : "kofhtsnd_punch4"
 			);
 		}
 
 			if (sprite.name.Contains("shoryuken") && charState is not DragoonRising )
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 20, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true
+			 ProjIds.FireWave, player, 2, 35, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true, hitSound : "kofhtsnd_punch4"
 			);
 		}
 		
 
 		if (  sprite.name.Contains("risingfire"))
 		{
-			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableLaunch, player, 5f, 0, 10f, null, isShield: true, isDeflectShield: true , addToLevel: true);
+			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableLaunch, player, 
+			5f, 0, 10f, null, isShield: true, isDeflectShield: true , addToLevel: true, hitSound : "kofhtsnd_megapunch1"
+			);
 		}
 
 			if (  sprite.name.Contains("spit"))
 		{
-			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.HeavyPush, player, 5f, 0, 10f, null, isShield: true, isDeflectShield: true , addToLevel: true);
+			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.HeavyPush, 
+			player, 5f, 0, 10f, null, isShield: true, isDeflectShield: true , addToLevel: true, hitSound : "kofhtsnd_megapunch1"
+			);
 		}
 
 
 			if (sprite.name.Contains("ragingdemon"))
 		{
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
-			 ProjIds.RagingDemon, player, 0f, 0, 15f, addToLevel: true
+			 ProjIds.RagingDemon, player, 0f, 0, 15f, addToLevel: true, hitSound : "kofhtsnd_megapunch1"
 			);
 		}
 

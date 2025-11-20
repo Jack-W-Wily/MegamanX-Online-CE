@@ -204,32 +204,37 @@ public class Iris : Character {
 		 if (  sprite.name.Contains("attack") && !sprite.name.Contains("rising"))
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.VirusSlash,
-			player, 2f, 20, 20, isZSaberClang : true ,addToLevel: true);
+			player, 2f, 20, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_lightning1"
+			);
 		}
 		
 		 if (  sprite.name.Contains("grab") && !sprite.name.Contains("ex") )
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.ForceGrabState,
-			player, 0f, 0, 20, isZSaberClang : true ,addToLevel: true);
+			player, 0f, 0, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_grab1"
+			);
 		}
 
 		 if (  sprite.name.Contains("grab") && sprite.name.Contains("ex") )
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.BlockableLaunch,
-			player, 3f, 0, 20, isZSaberClang : false ,addToLevel: true);
+			player, 3f, 0, 20, isZSaberClang : false ,addToLevel: true, hitSound : "swordswipeGG"
+			);
 		}
 
 		 if (sprite.name.Contains("rising")) {
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint,
 			ProjIds.VirusSlash, player, 3f, 20, 20,
-			isZSaberClang: true, addToLevel: true, isJuggleProjectile: true);
+			isZSaberClang: true, addToLevel: true, isJuggleProjectile: true, hitSound : "kofhtsnd_lightning1"
+			);
 		}
 
 		 if (  sprite.name.Contains("dive_kick"))
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint,
 			ProjIds.GBDKick, player, 2f, 20, 20, 
-			isZSaberClang : true ,addToLevel: true);
+			isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_punch3"
+			);
 		}
 
 

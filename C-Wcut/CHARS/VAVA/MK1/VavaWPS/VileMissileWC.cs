@@ -99,3 +99,131 @@ public class BanzaiCarry : CharState {
 		}
 	}
 }
+
+
+
+
+
+
+
+public class VMissiLeStance : CharState {
+
+ 	public Vile? vava = null;
+	public VMissiLeStance() : base("missile_stance") {
+
+	}
+
+	public override void update() {
+		base.update();
+		if (vava != null){
+		Point shootVel = vava.getVileShootVel(true);
+	
+		//int xDir = character.getShootXDir();
+	
+
+		if (character.frameIndex > 0) {
+			if (player.input.isPressed(Control.Jump, player)) {
+				character.changeToIdleOrFall();
+			}
+
+
+			if (player.input.isAPressed(player)  && player.vileAmmo >= 6) {
+				player.vileAmmo -= 6;
+				character.frameIndex = 5;
+				character.playSound("vileMissile", true);
+					new VileMissileProj(
+			character.pos.addxy(8 * character.xDir , -21), character.xDir, 1, MathF.Round(shootVel.byteAngle), "missile_hc_proj",
+			character, character.player, character.player.getNextActorNetId(), rpc: true
+		);
+			}
+
+			if (player.input.isBPressed(player) && player.vileAmmo >= 10) {
+				player.vileAmmo -= 10;
+				character.frameIndex = 5;
+				character.playSound("vileMissile", true);
+				new VileMissileProj(
+			character.pos.addxy(8 * character.xDir , -21), character.xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
+			character, character.player, character.player.getNextActorNetId(), rpc: true
+		);
+			}
+
+			if (player.input.isR2Pressed(player) && player.vileAmmo >= 20) {
+				player.vileAmmo -= 20;
+				character.frameIndex = 5;
+				character.playSound("vileMissile", true);
+				new BanzaiBeetleProj(new VileMK2Grab(), 
+			character.pos.addxy(0,-30), character.xDir, player, 
+			player.getNextActorNetId(), true);
+			}
+
+			if (character.xDir == 1) {
+				if (player.input.isPressed(Control.Left, player) && player.input.checkDoubleTap(Control.Left)) {
+					character.changeState(new VMissileDash(), true);
+				}
+			
+
+			}
+			if (character.xDir == -1) {
+			
+				if (player.input.isPressed(Control.Right, player) && player.input.checkDoubleTap(Control.Right)) {
+				character.changeState(new VMissileDash(), true);
+					}
+				
+				}
+			}
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vava = character as Vile;
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+
+public class VMissileDash : CharState {
+
+
+	public VMissileDash() : base("missile_b_dash") {
+		immuneToWind = true;
+		enterSound = "GDash";
+		specialId = SpecialStateIds.AxlRoll;
+	}
+
+	public override void update() {
+		base.update();
+			character.move(new Point(character.xDir * -350, 0));
+			if (player.input.isBPressed(player)) {
+				character.changeState(new VKamaeHotIcecle(), true);
+			}
+
+		
+
+		if (stateTime > 0.2f) {
+			character.changeState(new VMissiLeStance(), true);
+			return;
+		}
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+
+
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		character.slideVel = character.xDir * -character.getDashSpeed() * 0.9f;
+		specialId = SpecialStateIds.None;
+	}
+}

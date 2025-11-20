@@ -65,7 +65,7 @@ public class BaseSigma : Character {
 	}
 
 	public override int baselineMaxHealth() {
-		return 20;
+		return 34;
 	}
 
 	public Collider getSigmaHeadCollider() {

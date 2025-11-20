@@ -47,6 +47,8 @@ public class Vava1GrabState : CharState {
 	public bool UsedGrabFinisherOnce = false;
 	float timeWaiting;
 
+	public bool hitONCE = false;
+
 	public Vava1GrabState(Character? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = Vava1Grabbed.maxGrabTime;
@@ -82,10 +84,18 @@ public override void update() {
 		}
 
 		
-//		if (player.input.isAPressed(player) && !UsedGrabFinisherOnce) {
-//
-	//		character.changeSpriteFromName("grab_attack", true);
-	//	}
+		if (player.input.isAPressed(player) && !UsedGrabFinisherOnce) {
+					sprite = "grab_attack";
+			character.changeSpriteFromName("grab_attack", true);
+		}
+
+		if (character.sprite.name.Contains("grab_attack")
+		
+		&& character.isAnimOver()) {
+			sprite = "grab";
+			character.changeSpriteFromName("grab", true);
+		}
+
 
 		if (player.input.isPressed(Control.Up, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
@@ -95,13 +105,9 @@ public override void update() {
 
 		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
-			if (character.xDir == 1) {
-				character.xDir = -1;
-			} else {
-				character.xDir = 1;
-			}
-			sprite = "violentcrusher_grab";
-			character.changeSpriteFromNameIfDifferent("violentcrusher_grab", true);
+		
+			sprite = "grab_down";
+			character.changeSpriteFromNameIfDifferent("grab_down", true);
 		}
 		
 		if ((player.input.isPressed(Control.Left, player)
@@ -112,20 +118,11 @@ public override void update() {
 			character.changeSpriteFromNameIfDifferent("superkick", true);
 		}
 		
-		if (character.sprite.name.Contains("deadlift") && character.frameIndex == 2) {
+		
 
-			if (leechTime > 0.3f) {
-				leechTime = 0;
-				var damager = new Damager(player, 2, 0, 60);
-			character.shakeCamera(sendRpc: true);
-				victim?.shakeCamera(sendRpc: true);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
-			}
-		}
-
-		if (character.sprite.name.Contains("violentcrusher_grab") && character.frameIndex == 3) {
-			if (leechTime > 0.3f) {
-				leechTime = 0;
+		if (character.sprite.name.Contains("grab_down") && character.frameIndex == 8) {
+			if (!hitONCE) {
+				hitONCE = true;
 				new MechFrogStompShockwave(new FireWave(),
 				victim.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
 				player.getNextActorNetId(), rpc: true);
@@ -134,8 +131,8 @@ public override void update() {
 		}
 
 		if (character.sprite.name.Contains("superkick") && character.frameIndex == 2) {
-			if (leechTime > 0.3f) {
-				leechTime = 0;
+			if (!hitONCE) {
+				hitONCE = true;
 				var damager = new Damager(player, 2, 0, 0);
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
 			}
@@ -147,7 +144,7 @@ public override void update() {
 
 		
 		if ((character.sprite.name.Contains("deadlift")
-		|| character.sprite.name.Contains("violentcrusher_grab")
+		|| character.sprite.name.Contains("grab_down")
 		|| character.sprite.name.Contains("superkick")
 		)
 		&& character.isAnimOver()) {
@@ -161,6 +158,11 @@ public override void update() {
 			return;
 		}
 
+
+			if (leechTime > 0.3f) {
+				leechTime = 0;
+				character.addHealth(0.5f);
+			}
 		if (grabTime <= 0) {
 			character.changeToIdleOrFall();
 			return;

@@ -2013,8 +2013,10 @@ public class RAChainCharge : RideArmorState {
 		base.update();
 		if (!rideArmor.ownedByLocalPlayer) return;
 	if (player != null) {
+
+			player.vileAmmo -= 0.5f;
 			if (!player.isAI) {
-				if (!player.input.isAHeld(player)) {
+				if (!player.input.isAHeld(player) || player.vileAmmo == 0) {
 					rideArmor.changeState(new RAChainAttack(), true);
 					return;
 				}
@@ -2032,7 +2034,7 @@ public class RAChainCharge : RideArmorState {
 				}
 			} else {
 				if (stateTime > 0.5f) {
-					if (Helpers.randomRange(0, 1) == 0) {
+					if (Helpers.randomRange(0, 1) <= 0) {
 						rideArmor.changeState(new RAChainAttack(), true);
 					} else {
 						rideArmor.changeState(new RAChainChargeDash(Control.Dash, false), true);
@@ -2045,6 +2047,7 @@ public class RAChainCharge : RideArmorState {
 		if (rideArmor.chainSoundTime > 60f/60f && rideArmor.chainTotalSoundTime < 4) {
 			rideArmor.playSound("kangarooDrillX3", sendRpc: true);
 			rideArmor.chainSoundTime = 0;
+		
 		}
 	}
 }
@@ -2086,19 +2089,21 @@ public class RAChainChargeDash : RideArmorState {
 			rideArmor.changeState(new RAFall());
 			return;
 		}
+	
 		float modifier = (isSlow ? 0.5f : 0.75f);
 		rideArmor.move(new Point(rideArmor.xDir * rideArmor.getRunSpeed() * rideArmor.getDashSpeed() * modifier, 0));
 		if (player != null) {
+				player.vileAmmo -= 0.5f;
 			if (!player.isAI) {
 				if (!player.input.isHeld(dashControl, player)) {
 					rideArmor.changeState(new RAChainCharge(), true);
 					return;
-				} else if (!player.input.isAHeld(player)) {
+				} else if (!player.input.isAHeld(player) || player.vileAmmo == 0) {
 					rideArmor.changeState(new RAChainAttack(), true);
 					return;
 				}
 			} else {
-				if (stateTime > 2) {
+				if (stateTime > 2 || player.vileAmmo <= 0) {
 					rideArmor.changeState(new RAChainCharge(), true);
 				}
 			}
@@ -2117,6 +2122,7 @@ public class RAChainChargeDash : RideArmorState {
 		if (rideArmor.chainSoundTime > 60f / 60f && rideArmor.chainTotalSoundTime < 4) {
 			rideArmor.playSound("kangarooDrillX3", sendRpc: true);
 			rideArmor.chainSoundTime = 0;
+			
 		}
 	}
 }

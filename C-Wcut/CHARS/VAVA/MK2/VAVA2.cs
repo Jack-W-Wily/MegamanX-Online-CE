@@ -291,6 +291,8 @@ public class VAVA2 : Vile {
 		bool HoldA = player.input.isHeld(Control.Shoot, player);
 		bool HoldR = player.input.isHeld(Control.WeaponRight, player);
 
+
+		
 		if (PressA && charState is VileStompState && frameIndex > 2) {
 			changeState(new VileSuperKickState(), true);
 		}

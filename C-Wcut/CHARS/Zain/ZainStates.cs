@@ -614,7 +614,7 @@ public class ZainParryShinStartState : CharState {
 	
 		public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-			if (player.isSigma){
+			if (!player.isZain){
 			character.changeSpriteFromName("parry_start", true);
 			}
 			character.playSound("distortion_d");
@@ -644,7 +644,7 @@ public class ZainParryShinMeleeState : CharState {
 				}
 			}
 		}
-		if (player.isSigma){
+		if (!player.isZain){
 			character.changeSpriteFromName("parry", true);
 		}
 		if (character.isAnimOver()) {

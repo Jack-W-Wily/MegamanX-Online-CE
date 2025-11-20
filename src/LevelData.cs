@@ -555,6 +555,13 @@ public class LevelData {
 		return name.EndsWith("_collosal") || name.EndsWith("_xl");
 	}
 
+	public bool isStoryMode() {
+		if (customSize != -1) {
+			return customSize == 6;
+		}
+		return name.StartsWith("st_");
+	}
+
 	// TODO: Add this info to the level format themsleves
 	public static Dictionary<string, string> stageSongs = new Dictionary<string, string>() {
 		// X1 stuff.
@@ -628,7 +635,10 @@ public class LevelData {
 		{ "redandblue_vs_purple_1v1", "XvsZeroV1_megasfc"},
 		{ "stag_1v1", "VolcanosWrath" },
 
-		{ "st_vava_c1", "VileSelect_MHX_repliroidedofuturo"},
+
+		{ "st_vava_c1", "ihateEverything"},
+
+		{ "st_vava_hunterbase1", "VileSelect_MHX_repliroidedofuturo"},
 
 
 		{ "st_x_x1_highway", "CentralHighway"},

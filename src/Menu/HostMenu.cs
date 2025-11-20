@@ -270,7 +270,9 @@ public class HostMenu : IMainMenu {
 					mediumMaps.Add(levelData);
 				}
 				else {
+					if (!levelData.isStoryMode()){
 					largeMaps.Add(levelData);
+					}
 				}
 				trainingMaps.Sort(mapSortFunc);
 				foxOnlyMaps.Sort(mapSortFunc);
@@ -294,6 +296,7 @@ public class HostMenu : IMainMenu {
 				else if (levelData.isCollosal()) {
 					collosalCustomMaps.Add(levelData);
 				}
+
 				else {
 					largeCustomMaps.Add(levelData);
 				}

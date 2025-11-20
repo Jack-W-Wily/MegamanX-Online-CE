@@ -195,7 +195,8 @@ public class VAVA1 : Vile {
 	
 
 	public override bool spcCancel() {
-	
+		
+
 		// Dash Cancel
 		if (player.dashPressed(out string dashControl)) {
 			if (grounded) {
@@ -250,6 +251,14 @@ public class VAVA1 : Vile {
 		&& player.input.isAPressed(player) 
 		){
 			changeState(new VAVAKamae(), true);	
+			return true;
+		}
+
+		if (player.input.isHeld(Control.Down, player)
+		&& player.input.isLeftOrRightHeld(player)
+		&& player.input.isBPressed(player)  && grounded
+		){
+			changeState(new VMissiLeStance(), true);	
 			return true;
 		}
 
@@ -550,10 +559,50 @@ public class VAVA1 : Vile {
 
 	//Bonus VAVA CD Stuff
 	public float CrimsonphantomCD;
+
+	public float ShieldHealthCD;
+
+	public float ThirstTimer;
 	
 	public override void update() {
 		base.update();
+		// DisrespectFactor
 
+		bool PressA = player.input.isPressed(Control.Shoot, player);
+		
+		if (PressA && charState is VileStompState && frameIndex > 2) {
+			changeState(new VileSuperKickState(), true);
+		}
+		if (PressA && charState is VileChainGrabState && frameIndex > 2) {
+			changeState(new VilePunch1(), true);
+		}
+
+
+		Helpers.decrementTime(ref ShieldHealthCD);
+		if (ThirstTimer > 15){
+			ThirstTimer = 15;
+		}
+		if (inCombatCooldown == 0) {
+			ThirstTimer += Global.spf;
+			if (ThirstTimer > 6){
+           		if (ShieldHealthCD == 0 && bonusHealth > 0) {
+                health -= 1;
+				ShieldHealthCD = 1;
+            	}
+			}
+        }
+		if (inCombatCooldown > 0) {
+            if (!isInDamageSprite() && charState is not Taunt) {
+				ThirstTimer = 0;
+                if (player.input.isPressed(Control.Taunt, player)) {
+                    if (Helpers.randomRange(0, 1 ) == 0) {
+                        changeState(new ZainParryShinStartState(), true);
+                    } else {
+                        changeState(new Taunt(), true);
+                    }
+                }
+            }
+        }
 		if (overDriveTimer > 0) {
 			OverDrive = true;
 			// test
@@ -771,13 +820,17 @@ public class VAVA1 : Vile {
 		CannonExecution,
 		DeadLiftEX,
 		GoldenRight,
+		StompStart,
+		GrabNonFlinchAT,
 	}
 
 
 	// VAva melee stuff
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
+			"vava_crouch_start"  => MeleeIds.StompStart,
 			"vava_block"  => MeleeIds.Blocking,
+			"vava_grab_attack" or "vava_grab_down"  => MeleeIds.GrabNonFlinchAT,
 			"vava_deadlift" => MeleeIds.DeadLiftEX,
 			"vava_golden_right" => MeleeIds.GoldenRight,
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
@@ -794,10 +847,12 @@ public class VAVA1 : Vile {
 			"vava_cannon_execution" => MeleeIds.CannonExecution,
 			"vava_green_eyed_lamp" => MeleeIds.GreenEyedLamp,
 			"vava_burensen_1" => MeleeIds.BurensenStart,
-			"vava_burensen_2" => MeleeIds.BurensenStomp,
+			"vava_burensen_2" or "vava_stomp" => MeleeIds.BurensenStomp,
 			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
 			"vava_burensen_finish" or "vava_hyperdash_attack" when !player.isAI => MeleeIds.BurensenEND,
 			"vava_burensen_finish" or "vava_hyperdash_attack" when player.isAI => MeleeIds.BurensenENDCPU,
+			"vava_superkick"  => MeleeIds.BurensenENDCPU,
+			
 			_ => MeleeIds.None
 		});
 	}
@@ -812,6 +867,14 @@ public class VAVA1 : Vile {
 
 
 				),
+
+
+			(int)MeleeIds.StompStart => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.VileStomp, player,
+				 0, 0, 0, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
@@ -837,6 +900,12 @@ public class VAVA1 : Vile {
 				 2, 40, 42, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+			),
+			(int)MeleeIds.GrabNonFlinchAT => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
+				 1, 0, 10, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
@@ -899,35 +968,35 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				3, 30, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2"
 			),
 
 			(int)MeleeIds.BurensenStart => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStart, player,
 				2, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1"
 			),
 
 			(int)MeleeIds.BurensenStomp => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
 				1, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2"
 			),
 
 			(int)MeleeIds.BurensenEND => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				2, 0, 30, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
 			),
 
 			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				4, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
 			),
 
 			(int)MeleeIds.RagingDemon => new GenericMeleeProj(
@@ -1421,34 +1490,6 @@ public class VAVA1 : Vile {
 		}
 		base.render(x, y);
 	}
-
-
-	
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = base.getCustomActorNetData();
-
-		customData.Add(Helpers.boolArrayToByte([
-			hasFrozenCastle,
-			hasSpeedDevil,
-			OverDrive
-		]));
-
-		return customData;
-	}
-
-	public override void updateCustomActorNetData(byte[] data) {
-		// Update base arguments.
-		base.updateCustomActorNetData(data);
-		data = data[data[0]..];
-
-		// Per-character data.
-		bool[] boolData = Helpers.byteToBoolArray(data[0]);
-		hasFrozenCastle = boolData[0];
-		hasSpeedDevil = boolData[1];
-		OverDrive = boolData[2];
-	}
-
-
 
 	public bool dashGrabSpecial() {
 		if (charState is Dash || charState is AirDash) {

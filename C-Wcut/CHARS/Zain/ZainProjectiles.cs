@@ -21,6 +21,7 @@ public class ZainSaberProj : Projectile {
 		reflectable = true;
 		projId = (int)ProjIds.ZainSaberProj;
 		useGravity = true;
+		hitSound = "kofhtsnd_superslash";
 		collider.wallOnly = true;
 		destroyOnHit = false;
 		maxTime = 2;

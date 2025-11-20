@@ -407,11 +407,14 @@ public class KillZone : Geometry {
 	public float damage;
 	public bool flinch;
 	public float hitCooldown;
+
+	public string kName;
 	public KillZone(string name, List<Point> points, bool killInvuln, float? damage, bool flinch, float hitCooldown) : base(name, points) {
 		this.killInvuln = killInvuln;
 		this.damage = damage ?? Damager.envKillDamage;
 		this.flinch = flinch;
 		this.hitCooldown = hitCooldown;
+		this.kName = name;
 		collider.isTrigger = true;
 	}
 

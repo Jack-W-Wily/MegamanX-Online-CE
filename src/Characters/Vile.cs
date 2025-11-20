@@ -976,7 +976,7 @@ public class Vile : Character {
 		player.lastDeathWasVileV = isVileMK5;
 		deadCooldown = maxdeadCooldown;
 	}
-
+/*
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 
@@ -1000,6 +1000,9 @@ public class Vile : Character {
 		hasSpeedDevil = boolData[1];
 		OverDrive = boolData[2];
 	}
+
+	*/
+	
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
 		int Vattack = Helpers.randomRange(1, 7);

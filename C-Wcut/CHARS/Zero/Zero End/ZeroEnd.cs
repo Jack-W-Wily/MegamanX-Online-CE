@@ -115,6 +115,13 @@ public class ZeroEND : Zero {
 		return 0;
 	}
 
+
+
+	public override int baselineMaxHealth() {
+		return 24;
+	}
+
+
 	public override void update() {
 		hyperMode = 0;
 		// Hypermode effects.
@@ -218,6 +225,7 @@ public class ZeroEND : Zero {
 		} else if (isBlack) {
 			chargeLogic(shootb);
 		} else {
+			
 			chargeLogic(shoot);
 		}
 	}
@@ -260,6 +268,9 @@ public class ZeroEND : Zero {
 		
 			
 			string shootSprite = getSprite(charState.shootSpriteEx);
+
+
+
 			if (!Global.sprites.ContainsKey(shootSprite)) {
 				if (grounded) { shootSprite = "zero_shoot"; } else { shootSprite = "zero_fall_shoot"; }
 			}
@@ -279,8 +290,8 @@ public class ZeroEND : Zero {
 			shootAnimTime = DefaultShootAnimTime;
 			Point shootPos = getShootPos();
 			int xDir = getShootXDir();
-
-			if (chargeLevel == 0) {
+			if (gigaAttack.ammo > 5){
+			if (chargeLevel == 0 ) {
 				playSound("busterX3", sendRpc: true);
 				var lemon = new DZBusterProj(
 					shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
@@ -322,6 +333,8 @@ public class ZeroEND : Zero {
 			}
 			if (chargeLevel >= 1) {
 				stopCharge();
+				gigaAttack.ammo -=6;
+			}
 			}
 		
 	}
@@ -1048,72 +1061,72 @@ public class ZeroEND : Zero {
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber1, player, 1, Global.miniFlinch, 15, isReflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber2, player, 1, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect2B: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
-				1, Global.defFlinch, 1, isReflectShield: true,
+				0.5f, Global.defFlinch, 3, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 2, Global.halfFlinch, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
 				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.defFlinch, 15,
 				isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 1, Global.miniFlinch, 5, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
 				1, 10, 5, isDeflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
 				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, Global.superFlinch, 15,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			// Ground Specials
 			(int)MeleeIds.Raijingeki => new GenericMeleeProj(
-				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 1, Global.defFlinch, 4,
-				addToLevel: addToLevel
+				RaijingekiWeapon.staticWeapon, projPos, ProjIds.Raijingeki, player, 0.5f, Global.defFlinch, 4,
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.RaijingekiWeak => new GenericMeleeProj(
-				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.ElectricShock, player, 1, 0, 4,
-				addToLevel: addToLevel
+				Raijingeki2Weapon.staticWeapon, projPos, ProjIds.ElectricShock, player, 0.5f, 0, 4,
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Dairettsui => new GenericMeleeProj(
 				TBreakerWeapon.staticWeapon, projPos, ProjIds.TBreaker, player, 3, Global.defFlinch, 10,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Suiretsusen => new GenericMeleeProj(
 				SuiretsusenWeapon.staticWeapon, projPos, ProjIds.SuiretsusanProj, player, 6, Global.defFlinch, 45,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			// Up Specials
 			(int)MeleeIds.Ryuenjin => new GenericMeleeProj(
 				RyuenjinWeapon.staticWeapon, projPos, ProjIds.Ryuenjin, player, 2, Global.defFlinch, 15,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
 				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, 30, 6,
@@ -1122,7 +1135,7 @@ public class ZeroEND : Zero {
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
 				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 30,
 				isZSaberEffect: true,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound : "htsnd_slash1"
 			),
 			// Down specials
 			(int)MeleeIds.Hyouretsuzan => new GenericMeleeProj(
@@ -1159,7 +1172,7 @@ public class ZeroEND : Zero {
 			(int)MeleeIds.Hadangeki => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
 				3, Global.defFlinch, 30, isReflectShield: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.AwakenedAura => new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player,

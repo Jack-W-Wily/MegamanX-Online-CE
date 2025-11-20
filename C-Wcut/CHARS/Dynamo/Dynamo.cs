@@ -280,58 +280,63 @@ public class Dynamo : Character {
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock,
-				player, 0, 0, 0, isDeflectShield: true, addToLevel: true
+				player, 0.5f, 0, 20, isDeflectShield: true, addToLevel: true, hitSound : "htsnd_slash1"
 			);
 		}
 
 		if (sprite.name.Contains("blade_attack") && !sprite.name.Contains("air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber2, player, 3f, 20, 15, isZSaberClang: true, addToLevel: true);
+			 ProjIds.ZSaber2, player, 3f, 20, 15, isZSaberClang: true, addToLevel: true, hitSound : "htsnd_slash_deep1"
+			 );
 		}
 
 		if (sprite.name.Contains("blade_attack_air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.DynamoDropSlash, player, 3f, 25, 15f, isZSaberClang: true, addToLevel: true);
+			 ProjIds.DynamoDropSlash, player, 3f, 25, 15f, isZSaberClang: true, addToLevel: true, hitSound : "htsnd_slash_deep2"
+			 );
 		}
 
 		if (sprite.name.Contains("whipattack")) {
 			return new GenericMeleeProj(new StrikeChain(), centerPoint,
 			 ProjIds.ZSaber1, player, 2f, 15, 15f, isZSaberClang: true
-			 , isJuggleProjectile: true, addToLevel: true);
+			 , isJuggleProjectile: true, addToLevel: true, hitSound : "mugenhtsnd_hit2"
+			 );
 		}
 
 
 		if (sprite.name.Contains("slide") && !sprite.name.Contains("jump")) {
 			return new GenericMeleeProj(new SpinningBlade(), centerPoint,
-			 ProjIds.ZSaber1, player, 1f, 15, 10f, isZSaberClang: true, addToLevel: true);
+			 ProjIds.ZSaber1, player, 1f, 15, 10f, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_punch1"
+			 );
 		}
 
 		if (sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new StrikeChain(), centerPoint,
-			 ProjIds.ZSaber3, player, 2f, 15, 10f, isZSaberClang: true
+			 ProjIds.ZSaber3, player, 2f, 15, 10f, isZSaberClang: true, hitSound : "htsnd_slash_deep3"
 			 , isJuggleProjectile: true, addToLevel: true);
 		}
 
 		if (sprite.name.Contains("slide_jump")) {
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
 			 ProjIds.GBDKick, player, 2f, 15, 15f, isZSaberClang: true
-			 , isJuggleProjectile: true, addToLevel: true);
+			 , isJuggleProjectile: true, addToLevel: true, hitSound : "kofhtsnd_punch3"
+			 );
 		}
 
 		if (!sprite.name.Contains("charge") && sprite.name.Contains("groundpunch")) {
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
-			 ProjIds.MechFrogStompShockwave, player, 3f, 0, 15f, isZSaberClang: true
+			 ProjIds.MechFrogStompShockwave, player, 3f, 0, 15f, isZSaberClang: true, hitSound : "kofhtsnd_knock1"
 			 , isJuggleProjectile: true, addToLevel: true);
 		}
 		if (sprite.name.Contains("charge") && sprite.name.Contains("groundpunch")) {
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
-			 ProjIds.ForceGrabState, player, 0f, 0, 15f, addToLevel: true
+			 ProjIds.ForceGrabState, player, 0f, 0, 15f, addToLevel: true, hitSound : "kofhtsnd_grab2"
 			);
 		}
 
 		if (sprite.name.Contains("bladedash")) {
 			return new GenericMeleeProj(new ShotgunIce(), centerPoint,
-			 ProjIds.HeavyPush, player, 2f, 30, 15f, isZSaberClang: true, addToLevel: true
+			 ProjIds.HeavyPush, player, 2f, 30, 15f, isZSaberClang: true, addToLevel: true, hitSound : "htsnd_slash_deep2"
 			);
 		}
 

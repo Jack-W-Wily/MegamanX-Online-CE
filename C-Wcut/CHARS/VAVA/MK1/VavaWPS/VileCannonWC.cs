@@ -502,6 +502,7 @@ public class Vava1GizmoDash : CharState {
 
 	public override void update() {
 		base.update();
+		character.move(new Point(character.xDir * 250, 0));
 
 	
 		if (character.isAnimOver()) {
@@ -515,7 +516,6 @@ public class Vava1GizmoDash : CharState {
     public override void onEnter(CharState oldState) {
         base.onEnter(oldState);
         character.useGravity = false;
-        character.slideVel = character.xDir * character.getDashSpeed();
 	}
 
     public override void onExit(CharState? newState) {
@@ -536,6 +536,10 @@ public class VavaGizmoGrabState : CharState {
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
 
+	public bool UsedGrabFinisherOnce = false;
+
+	public bool hitONCE = false;
+
 	public VavaGizmoGrabState(Character? victim) : base("gizmo_grab_success") {
 		this.victim = victim;
 		grabTime = 1;
@@ -545,6 +549,24 @@ public class VavaGizmoGrabState : CharState {
 		base.update();
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
+
+
+		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
+			UsedGrabFinisherOnce = true;
+			sprite = "violentcrusher_grab";
+			character.changeSpriteFromNameIfDifferent("violentcrusher_grab", true);
+		}
+
+		if (player.input.isPressed(Control.Down, player) && !UsedGrabFinisherOnce) {
+			UsedGrabFinisherOnce = true;
+			if (character.xDir == 1) {
+				character.xDir = -1;
+			} else {
+				character.xDir = 1;
+			}
+			sprite = "violentcrusher_grab";
+			character.changeSpriteFromNameIfDifferent("violentcrusher_grab", true);
+		}
 
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
 			character.changeToIdleOrFall();
@@ -576,8 +598,7 @@ public class VavaGizmoGrabState : CharState {
 		}
 
 		if (stateFrames >= 2 && player.input.isR2Pressed(player)) {
-			vile.cannonWeapon.type = (int)VileCannonType.LongshotGizmo;
-			vile.cannonWeapon.vavaShoot(0, vile);
+			vile.changeState(new CannonAttack(new LongShotGizmo()), true);
 			return;
 		}
 
@@ -585,6 +606,27 @@ public class VavaGizmoGrabState : CharState {
 			character.changeToIdleOrFall();
 			return;
 		}
+
+		if (character.sprite.name.Contains("violentcrusher_grab") && character.frameIndex == 3) {
+			if (!hitONCE) {
+				hitONCE = true;
+				new MechFrogStompShockwave(new FireWave(),
+				victim.pos.addxy(30 * victim.xDir, 0f), victim.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+				victim.playSound("crash", true);
+			}
+		}
+
+			if ((character.sprite.name.Contains("deadlift")
+		|| character.sprite.name.Contains("violentcrusher_grab")
+		|| character.sprite.name.Contains("superkick")
+		)
+		&& character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
 	}
     
     public override void onEnter(CharState oldState) {
