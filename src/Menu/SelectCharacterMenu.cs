@@ -101,6 +101,7 @@ public class CharSelection {
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
 		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		new CharSelection("Axl", (int)CharIds.AxlWC, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
+		new CharSelection("Axl?", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
 	//	new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
@@ -122,6 +123,7 @@ public class CharSelection {
 		 ){offset = new Point(0, 20)},              // Make sure to end the whole thing with a "," ion the end
 		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
+		
 	];
 
 	public static CharSelection[] selections1v1 => [

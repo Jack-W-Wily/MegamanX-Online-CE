@@ -35,6 +35,11 @@ public class Axl : Character {
 	}
 	// Zoom Stuff
 	public bool isNonOwnerZoom;
+
+	public int armDir => charState is WallSlide ? -xDir : xDir;
+	public float armAngle = 0;
+
+
 	public Point nonOwnerScopeStartPos;
 	public Point nonOwnerScopeEndPos;
 	public Point? netNonOwnerScopeEndPos;
@@ -415,11 +420,70 @@ public class Axl : Character {
 
 	}
 
+	public float reChargeCD;
+
 	public override void update() {
 		base.update();
 
+		Helpers.decrementTime(ref reChargeCD);
+
+		reChargeCD += Global.spf;
+
+		if (reChargeCD > 1) {
+            reChargeCD = 0;
+			if (player.superAmmo < player.superMaxAmmo){
+			player.superAmmo += 1;
+			}
+        }
+		whiteAxlTime = 10;
 		if (stealthActive) addRenderEffect(RenderEffectType.StealthModeBlue);
 		else removeRenderEffect(RenderEffectType.StealthModeBlue);
+
+
+
+				if (player.superAmmo > 5) {
+            if (!isInDamageSprite() ) {
+				
+                if (player.input.isPressed(Control.Taunt, player)) {
+                    if (Helpers.randomRange(0, 1 ) == 0) {
+                        changeState(new ZainParryShinStartState(), true);
+                    } else {
+                        changeState(new GlobalParryState(), true);
+                    }
+					player.superAmmo -= 6;
+                }
+            }
+        }
+
+
+
+			// For String Cancels
+		if (sprite.name.Contains("string")) {
+			if (player.input.checkDoubleTap(Control.Dash) &&
+				player.input.isPressed(Control.Dash, player) && canDash() && flag == null
+			) {
+				changeState(new DodgeRoll(), true);
+			}
+			if (//(wasGrounded || grounded) && 
+				// There's no need for this move to be Grounded only 
+			 player.input.isHeld(Control.Up, player) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				changeState(new AxlFlashKick(), true);
+			}
+
+		}
+		// For Cancels on Dodgeroll
+		if (charState is DodgeRoll) {
+			if (player.input.isHeld(Control.Up, player)
+				&& player.input.isPressed(Control.Jump, player)) {
+				changeState(new AxlFlashKick(), true);
+			}
+			//	if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
+			//		changeState(new EvasionBarrage(), true);
+			//	}
+		}
+		// Weapon update.
 
 		// Cutoff point for things not controlled by the local player.
 		if (!ownedByLocalPlayer) return;
@@ -507,7 +571,54 @@ public class Axl : Character {
         }
 	}
 
+	
+	public override bool attackCtrl() {
+		var axl = this;
+		Point inputDir = axl.player.input.getInputDir(axl.player);
+		bool specialPressed = axl.player.input.isR2Pressed(player);
+		// Shoryken does not use negative edge at all.
+		if (axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1)) {
+			axl.changeState(new RainStormWA(), true);
+			return true;
+		}
+		// Negative edge inputs.
+		if (axl.grounded && inputDir.y == -1 && axl.charState is not RisingBarrageWA && (
+				axl.charState is Dash or AirDash ||
+				axl.player.input.isPressed(Control.Dash, axl.player)
+			)
+		) {
+			axl.changeState(new RisingBarrageWA(), true);
+			return true;
+		}
+		if (specialPressed && inputDir.y == -1) {
+			if (axl.grounded) {
+				axl.changeState(new TailShotWA(), true);
+			} else {
+				axl.changeState(new AxlRainDropWA(), true);
+			}
+			return true;
+		}
+		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
+			axl.changeState(new OcelotSpin(), true);
+			return true;
+		}
+		//if (specialPressed && ammo > 0) {
+		//	axl.changeState(new EvasionBarrage(), true);
+		//	return true;
+		//}
+		return false;
+	}
+
+
 	public override bool normalCtrl() {
+
+		if (grounded && player.input.isL2Held(player)&&
+			charState is not BlockWCUT and not Dash and not OcelotSpin
+		) {
+			changeState(new BlockWCUT(), true);
+			return true;
+		}
+
 		if (jumpPressed && canJump() && !grounded &&
 		 	!isDashing && canAirDash() && flag == null
 		) {
@@ -968,6 +1079,13 @@ public class Axl : Character {
 	public override void render(float x, float y) {
 		base.render(x, y);
 
+
+		if (OverDrive && visible) {
+			addRenderEffect(RenderEffectType.Trail);
+		} else {
+			removeRenderEffect(RenderEffectType.Trail);
+		}
+
 		if (!ownedByLocalPlayer) {
 			if (shouldDrawArmNet) {
 				drawArm(netArmAngle);
@@ -1210,8 +1328,160 @@ public class Axl : Character {
 			}
 		} else if (charState is LadderEnd) ladderClimb = true;
 
-		return !(charState is HyperAxlStart || isWarpIn() || charState is Hurt || charState is Die || charState is GenericStun || charState is InRideArmor || charState is DodgeRoll || charState is VileMK2Grabbed || charState is KnockedDown
-			|| sprite.name.Contains("win") || sprite.name.Contains("lose") || ladderClimb || charState is DeadLiftGrabbed || charState is UPGrabbed || charState is WhirlpoolGrabbed || charState is InRideChaser);
+
+		
+		return	sprite.name != "axl_win" &&
+			sprite.name != "axl_lose" &&
+			charState is not Hurt and
+			not AxlBlock and
+			not AxlBlock2 and
+			not BlockWCUT and
+			not HyperAxlStart and
+			not HyperAxlWcStart and
+			not Die and
+			not GenericStun and
+			not InRideArmor and
+			not DodgeRollAxlWC and
+			not VileMK2Grabbed and
+			not KnockedDown and
+			not DeadLiftGrabbed and
+			//not MammothSlammed and
+			not UPGrabbed and
+			not WhirlpoolGrabbed and
+			not RainStormWA and
+			not EvasionBarrageWA and
+			not RisingBarrageWA and
+			not OcelotSpin and
+			not TailShotWA and
+			not AxlString1WA and
+			not AxlString2WA and
+			not AxlString3WA and
+			not AxlString4WA and
+			not AxlString5WA and
+			not AxlRainDropWA and
+			not AxlSpinKick and
+			not AxlRollBump and
+			not InRideChaser and
+			not LadderEnd and
+			not InRideChaser and
+			not AxlFlashKick;
+			}
+
+
+
+	
+	public enum MeleeIds {
+		None = -1,
+		Block,
+		String1,
+		String2,
+		String3,
+		String4,
+		String5,
+		OcelotSpin,
+		TailShot,
+		EnemyStep,
+		RainStorm,
+		RainDrop,
+		SpinKick,
+		RollBump,
+		RisingBarrage
+	}
+
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"axl_block" => MeleeIds.Block,
+			"axl_ocelotspin" => MeleeIds.OcelotSpin,
+			"axl_string_1" => MeleeIds.String1,
+			"axl_string_2" => MeleeIds.String2,
+			"axl_string_3" => MeleeIds.String3,
+			"axl_string_4" => MeleeIds.String4,
+			"axl_string_5" => MeleeIds.String5,
+			"axl_tailshot" => MeleeIds.TailShot,
+			"axl_risingbarrage" or "axl_flashkick" => MeleeIds.RisingBarrage,
+			"axl_rainstorm" => MeleeIds.RainStorm,
+			"axl_fall_step" => MeleeIds.EnemyStep,
+			"axl_rollbump" => MeleeIds.RollBump,
+			"axl_spinkick" => MeleeIds.SpinKick,
+			"axl_raindrop" => MeleeIds.RainDrop,
+			_ => MeleeIds.None
+		});
+	}
+
+	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
+		return (MeleeIds)id switch {
+			MeleeIds.Block => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.SigmaSwordBlock, player,
+				0, 0, 0, isDeflectShield: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.EnemyStep => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.GBDKick, player,
+			 2, Global.halfFlinch, addToLevel: addToLevel, ShouldClang: true
+			),
+			MeleeIds.RainStorm => new GenericMeleeProj(
+				new RCXPunch(), pos, ProjIds.ForceGrabState, player,
+			 2, 0, addToLevel: addToLevel, ShouldClang: true
+			),
+			MeleeIds.OcelotSpin => new GenericMeleeProj(
+				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
+				1, Global.halfFlinch, 4, ShouldClang: true, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.TailShot => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.FireWave, player,
+				3, Global.defFlinch, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String1 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.ShotgunIce, player,
+				2, Global.defFlinch, 6,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String2 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.VirusSlash, player,
+				2, Global.defFlinch, 6,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String3 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.AcidBurst, player,
+				2, Global.defFlinch, 5,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String4 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.Raijingeki2, player,
+				2, 0, 6,
+				addToLevel: addToLevel
+			),
+			MeleeIds.String5 => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.BurensenEND, player,
+				2, 0, 6,
+				addToLevel: addToLevel
+			),
+			
+			MeleeIds.RisingBarrage => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.BlockableLaunch, player,
+				3, 0, isJuggleProjectile: true,
+				addToLevel: addToLevel
+			),
+			MeleeIds.RainDrop => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.SpreadShot, player,
+				3, 0,
+				addToLevel: addToLevel
+			),
+			MeleeIds.SpinKick => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.SpreadShot, player,
+				2, 30,
+				addToLevel: addToLevel
+			),
+			MeleeIds.RollBump => new GenericMeleeProj(
+				FireWave.netWeapon, pos, ProjIds.MechFrogStompShockwave, player,
+				2, 0,
+				addToLevel: addToLevel
+			),
+			_ => null
+		};
 	}
 
 	public Point getAxlBulletDir() {

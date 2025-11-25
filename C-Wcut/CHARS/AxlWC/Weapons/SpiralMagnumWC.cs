@@ -41,8 +41,48 @@ public class  SpiralMagnumWC : AxlWeaponWC {
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 		Point bulletDir = Point.createFromByteAngle(byteAngle);
 		ushort netId = axl.player.getNextActorNetId();
-		new FormidAcidProj(axl, pos, byteAngle, netId, sendRpc: true);
+		new SpiralMagnumWCProj(
+			axl, pos, byteAngle, netId, sendRpc: true
+		);
 	}
+
+
+	public override bool attackCtrl(AxlWC axl) {
+		Point inputDir = axl.player.input.getInputDir(axl.player);
+		bool specialPressed = axl.player.input.isHeld(Control.Special1, axl.player);
+		// Shoryken does not use negative edge at all.
+		if (axl.player.input.checkShoryuken(axl.player, axl.xDir, Control.Special1) && ammo > 0) {
+			axl.changeState(new RainStorm(), true);
+			return true;
+		}
+		// Negative edge inputs.
+		if (axl.grounded && ammo > 0 && inputDir.y == -1 && axl.charState is not RisingBarrage && (
+				axl.charState is Dash or AirDash ||
+				axl.player.input.isPressed(Control.Dash, axl.player)
+			)
+		) {
+			axl.changeState(new RisingBarrage(), true);
+			return true;
+		}
+		if (specialPressed && inputDir.y == -1 && ammo > 0) {
+			if (axl.grounded) {
+				axl.changeState(new TailShot(), true);
+			} else {
+				axl.changeState(new AxlRainDrop(), true);
+			}
+			return true;
+		}
+		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
+			axl.changeState(new OcelotSpin(), true);
+			return true;
+		}
+		//if (specialPressed && ammo > 0) {
+		//	axl.changeState(new EvasionBarrage(), true);
+		//	return true;
+		//}
+		return false;
+	}
+
 
 	public override float getFireRate(AxlWC axl, int chargeLevel) {
 		if (axl.isWhite) {

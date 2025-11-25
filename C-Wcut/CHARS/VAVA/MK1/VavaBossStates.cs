@@ -127,7 +127,7 @@ public class PopcornHell : CharState {
 		}
 		vile.playSound("mk2stunshot", sendRpc: true);
 		new VileMissileProj(
-				vile.pos, xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
+				vile.pos.addxy(8 * vile.xDir,-21), xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
 				vile, vile.player, vile.player.getNextActorNetId(), rpc: true
 			);
 
@@ -477,7 +477,7 @@ public class VavaBurensen1 : CharState {
 
 
 	public VavaBurensen1() : base("burensen_1") {
-
+		canGainMeter = false;
 	}
 
 	public override void update() {
@@ -524,6 +524,7 @@ public class VavaBurensen2 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -585,6 +586,7 @@ public class VavaBurensen3 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -705,6 +707,7 @@ public class VavaBurensen4 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -827,6 +830,7 @@ public class VavaBurensen4second : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -949,6 +953,7 @@ public class VavaBurensen5 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -1070,6 +1075,7 @@ public class VavaBurensen6 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -1194,6 +1200,7 @@ public class VavaBurensen7 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {
@@ -1311,6 +1318,7 @@ public class VavaBurensen8 : CharState {
 		this.victim = victim;
 		grabTime = 30;
 		invincible = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {

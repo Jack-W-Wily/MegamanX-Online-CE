@@ -47,11 +47,12 @@ public class Kurumitos : Character {
 
 
 	public Kurumitos(
-		Player player, float x, float y, int xDir,
+			Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
-		) : base( // Make sure it looks exactly like this
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
+	) : base(
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
+	) {
 
 		ShouldExplode = true;
 		charId = CharIds.Kurumitos; // This is the char ID, you can rename it later

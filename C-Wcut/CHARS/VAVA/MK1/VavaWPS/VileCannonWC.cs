@@ -146,12 +146,18 @@ public class Vava1Stunshot : CharState {
 		if (isGizmo) {
 			return grounded ? "idle_gizmo" : "cannon_gizmo_air";
 		}
-		return grounded ? "idle_shoot" : "cannon_air";
+		if (!grounded){
+		return "cannon_air";
+		}
+		return "idle_shoot" ;
 	}
 
 	public override void update() {
 		base.update();
-
+		if (character.grounded) {
+            sprite = "idle_shoot";
+			character.changeSpriteFromName("idle_shoot", false);
+        }
 		if (vile.isShootingLongshotGizmo) {
 			if (vile.cannonWeapon.shootCooldown == 0) {
 				vile.cannonWeapon.vavaShoot(0, vile);

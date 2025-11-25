@@ -584,9 +584,9 @@ public class Zero : Character {
 				changeState(new AwakenedZeroHadangekiWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 				return true;
 			}
-			if (isDashing && grounded) {
-				slideVel = xDir * getDashSpeed() * 0.9f;
-			}
+			//if (isDashing && grounded) {
+			//	slideVel = xDir * getDashSpeed() * 0.9f;
+			//}
 			if (grounded && vel.y >= 0 && isGenmuZero) {
 				if (genmureiCooldown == 0) {
 					genmureiCooldown = 120;

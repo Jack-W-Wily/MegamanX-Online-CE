@@ -558,25 +558,31 @@ public class LaunchedFowardState : CharState {
 
 	public override void update() {
 		base.update();
-
-
-		character.move(new Point(character.xDir * -350, 0));
-
-		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, -character.xDir, 0);
-		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer ||
-		(character.grounded) && stateTime > 0.2f) {
-			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+		if (character.downPressedTimes > 10 || character.upPressedTimes > 10 || character.leftPressedTimes > 10
+		|| character.rightPressedTimes > 10) {
+            character.changeToIdleOrFall();
+        }
+		character.angle += 10;
+		character.move(new Point(character.xDir * 350, 0));
+		if (stateTime > 2f) {
 			character.changeToIdleOrFall();
-			character.playSound("hurt", sendRpc: true);
-			character.shakeCamera(sendRpc: true);
-			return;
-		} 
-		if (stateTime > 3f) {
-			character.changeToIdleOrFall();
-			character.shakeCamera(sendRpc: true);
-			return;
 		}
 
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+		character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+					character.changeState(
+							new KnockedDown(
+								-character.xDir
+							), true
+						);
+			character.playSound("mugenhtsnd_hit3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
+			
+		} 
+		
 
 	}
 
@@ -584,10 +590,14 @@ public class LaunchedFowardState : CharState {
 		base.onEnter(oldState);
 		character.useGravity = true;
 		character.vel.y = -character.getJumpPower() * 0.75f;
+	
+            character.xDir = -character.xDir;
+        
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
+		character.angle = 0;
 	}
 }
 
@@ -796,11 +806,46 @@ public class DropDown : CharState {
 
 public class ForceGrabbed : GenericGrabbedState {
 	public const float maxGrabTime = 4;
+	public bool Teched;
+	public float techTimer;
 	public ForceGrabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
 	}
 
 
 	public override void update() {
+		techTimer += Global.spf;
+		if (!Teched && techTimer > 0.2f && techTimer < 0.4f && player.input.isPressed(Control.Jump, player)) {
+            character.changeToIdleOrFall();
+			Teched = true;
+			character.playSound("htsnd_block", true);
+			character.addHealth(3);
+			if (grabber is Character grabberChar) {
+                grabberChar?.changeState(new ZeroClang(grabberChar.xDir), true);
+            }
+					Global.level.gameMode.setHUDErrorMessage(
+					player, "Tech Bonus!!!!",
+					playSound: false, resetCooldown: true
+				);
+        }
+
+		if (player.input.isPressed(Control.Jump, player)) {
+            Teched = true;
+			if (techTimer < 0.2f && techTimer >0.4f ){
+			character.playSound("error", true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Tech Fail.",
+					playSound: false, resetCooldown: true
+				);
+			}
+        }
+
+		if (techTimer > 0.2f && techTimer < 0.4f ){
+			Global.level.gameMode.setHUDErrorMessage(
+					player, "PRESS JUMP TO TECH.",
+					playSound: false, resetCooldown: true
+				);
+			}
+
 		trySnapToGrabPoint(true);
 		if (!grabber.sprite.name.Contains("gbd_b")) {
 			if (grabber.sprite.name.Contains("idle") ||

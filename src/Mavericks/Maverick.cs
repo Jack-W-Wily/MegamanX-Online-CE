@@ -1292,7 +1292,7 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
-	public void awardXWeapon(Player player) {
+	public virtual void awardXWeapon(Player player) {
 		if (player.character is not MegamanX) {
 			return;
 		}
@@ -1336,7 +1336,7 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
-	public bool checkWeakness(WeaponIds weaponId, ProjIds projId, out MaverickState? newState, bool isAttackerMaverick) {
+	public virtual bool checkWeakness(WeaponIds weaponId, ProjIds projId, out MaverickState? newState, bool isAttackerMaverick) {
 		newState = null;
 		if (player.maverick1v1 != null && isAttackerMaverick) {
 			return false;

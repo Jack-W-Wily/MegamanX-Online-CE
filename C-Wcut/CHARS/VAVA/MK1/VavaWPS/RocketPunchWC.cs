@@ -575,8 +575,8 @@ public class ZeroNuclear : CharState {
 
 	public ZeroNuclear() : base("nuclear") {
 		canSpecialCancel = true;
-		enterSound = "rocketPunch";
 		superArmor = true;
+			canGainMeter = false;
 	}
 
 	public override void update() {

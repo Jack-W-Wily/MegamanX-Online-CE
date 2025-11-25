@@ -19,12 +19,16 @@ public class RockmanX : MegamanX {
 
 
 	public RockmanX(
-		Player player, float x, float y, int xDir,
+			Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true, XLoadout? xLoadout = null
+		bool isWarpIn = true, XLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn, player.loadout.xLoadout,
+		heartTanks, isATrans
 	) {
+
 		specialButtonMode = 0;	
 		charId = CharIds.RockmanX;
 
@@ -276,7 +280,8 @@ public class RockmanX : MegamanX {
 		ParryBlock,
 		Punch,
 	
-
+		GrabKickLV1,
+		GrabKickLV2,
 
 	}
 
@@ -306,6 +311,10 @@ public class RockmanX : MegamanX {
 			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
 			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
 			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
+
+
+			"rmx_grab_foward"   => MeleeIds.GrabKickLV1, 
+			"rmx_light_kick"   => MeleeIds.GrabKickLV2, 
 		
 			_ => MeleeIds.None
 		});
@@ -389,6 +398,17 @@ public class RockmanX : MegamanX {
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
+
+			(int)MeleeIds.GrabKickLV1 => new GenericMeleeProj(
+				HyperNovaStrike.netWeapon, projPos, ProjIds.HeavyPush, player,
+				2, 0, 30, addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.GrabKickLV2 => new GenericMeleeProj(
+				HyperNovaStrike.netWeapon, projPos, ProjIds.BurensenEND, player,
+				4, 0, 30, addToLevel: addToLevel
+			),
+
 
 			_ => null
 		};

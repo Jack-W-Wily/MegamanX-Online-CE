@@ -73,9 +73,11 @@ public class ZeroMID : Zero {
 	// Creation code.
 	public ZeroMID(
 		Player player, float x, float y, int xDir,
-		bool isVisible, ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, ZeroLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, player.loadout.zeroLoadout ,heartTanks, isATrans
 	) {
 		charId = CharIds.ZeroMID;
 		// Loadout stuff.

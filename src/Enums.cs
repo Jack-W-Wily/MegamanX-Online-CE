@@ -790,6 +790,7 @@ public enum ProjIds {
 	YamiBaraiProj,
 	OrochinagiProj,
 
+	DynamoBlockSlash,
 	// VAVA (WCUT)
 
 	TridentLine,

@@ -108,15 +108,15 @@ public class BanzaiCarry : CharState {
 
 public class VMissiLeStance : CharState {
 
- 	public Vile? vava = null;
+ 	public Vile? vile = null;
 	public VMissiLeStance() : base("missile_stance") {
 
 	}
 
 	public override void update() {
 		base.update();
-		if (vava != null){
-		Point shootVel = vava.getVileShootVel(true);
+		if (vile != null){
+		Point shootVel = vile.getVileShootVel(true);
 	
 		//int xDir = character.getShootXDir();
 	
@@ -130,21 +130,15 @@ public class VMissiLeStance : CharState {
 			if (player.input.isAPressed(player)  && player.vileAmmo >= 6) {
 				player.vileAmmo -= 6;
 				character.frameIndex = 5;
-				character.playSound("vileMissile", true);
-					new VileMissileProj(
-			character.pos.addxy(8 * character.xDir , -21), character.xDir, 1, MathF.Round(shootVel.byteAngle), "missile_hc_proj",
-			character, character.player, character.player.getNextActorNetId(), rpc: true
-		);
+				character.playSound("mk2stunshot", true);
+				shootPopcorn(vile);
 			}
 
 			if (player.input.isBPressed(player) && player.vileAmmo >= 10) {
 				player.vileAmmo -= 10;
 				character.frameIndex = 5;
 				character.playSound("vileMissile", true);
-				new VileMissileProj(
-			character.pos.addxy(8 * character.xDir , -21), character.xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
-			character, character.player, character.player.getNextActorNetId(), rpc: true
-		);
+				shootHumerus(vile);
 			}
 
 			if (player.input.isR2Pressed(player) && player.vileAmmo >= 20) {
@@ -152,7 +146,7 @@ public class VMissiLeStance : CharState {
 				character.frameIndex = 5;
 				character.playSound("vileMissile", true);
 				new BanzaiBeetleProj(new VileMK2Grab(), 
-			character.pos.addxy(0,-30), character.xDir, player, 
+			vile.pos.addxy(8 * vile.xDir,-21), character.xDir, player, 
 			player.getNextActorNetId(), true);
 			}
 
@@ -173,9 +167,52 @@ public class VMissiLeStance : CharState {
 			}
 		}
 	}
+
+
+
+	
+	public static void shootPopcorn(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
+		bool isMK2 = vile.isVileMK2;
+		Point? headPosNullable = vile.getVileMK2StunShotPos();
+		if (headPosNullable == null) return;
+		Point shootVel = vile.getVileShootVel(true);
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		int xDir = vile.xDir;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+		new VileMissileProj(
+				vile.pos.addxy(8 * vile.xDir,-21), xDir, 2, MathF.Round(shootVel.byteAngle), "missile_pd_proj",
+				vile, vile.player, vile.player.getNextActorNetId(), rpc: true
+			);
+
+		}
+
+		public static void shootHumerus(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) return;
+		bool isMK2 = vile.isVileMK2;
+		Point? headPosNullable = vile.getVileMK2StunShotPos();
+		if (headPosNullable == null) return;
+		Point shootVel = vile.getVileShootVel(true);
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		int xDir = vile.xDir;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+		new VileMissileProj(
+				vile.pos.addxy(8 * vile.xDir,-21), xDir, 1, MathF.Round(shootVel.byteAngle), "missile_hc_proj",
+				vile, vile.player, vile.player.getNextActorNetId(), rpc: true
+			);
+
+		}
+
+
+
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		vava = character as Vile;
+		vile = character as Vile;
 	}
 	public override void onExit(CharState newState) {
 		base.onExit(newState);

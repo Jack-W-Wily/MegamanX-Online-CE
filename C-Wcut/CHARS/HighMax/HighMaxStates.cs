@@ -314,6 +314,8 @@ public class DesmumeSpam : CharState {
 	public DesmumeSpam(string transitionSprite = "")
 		: base("ultimate", "", "", transitionSprite) {
 		superArmor = true;
+		airMove = true;
+			canGainMeter = false;
 	}
 
 	public Point AimPoint() {
@@ -416,6 +418,7 @@ public class DesmumeSpam2 : CharState {
 		: base("ultimate", "", "", transitionSprite)
 	{
 	superArmor = true;
+		canGainMeter = false;
 	}
 
 		public Point AimPoint() {

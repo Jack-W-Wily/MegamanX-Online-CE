@@ -42,7 +42,7 @@ public class RayGunWC : AxlWeaponWC {
 	public override void shootAlt(AxlWC axl, Point pos, float byteAngle, int chargeLevel) {
 	//	Point bulletDir = Point.createFromByteAngle(byteAngle);
 		ushort netId = axl.player.getNextActorNetId();
-		new VoltTornadoProjWC(this, pos.addxy(-30 * axl.xDir, 25), axl.xDir, axl.player, netId, sendRpc: true);
+		new VoltTornadoProj(this, pos.addxy(-30 * axl.xDir, 25), axl.xDir, axl.player, netId, sendRpc: true);
 	}
 
 	public override float getFireRate(AxlWC axl, int chargeLevel) {

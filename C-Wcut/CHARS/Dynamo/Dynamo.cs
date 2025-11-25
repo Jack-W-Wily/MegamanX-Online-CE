@@ -9,11 +9,11 @@ using SFML.Window;
 
 public class Dynamo : Character {
 	public Dynamo(
-		Player player, float x, float y, int xDir,
+	Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Dynamo;
 	}
@@ -279,7 +279,7 @@ public class Dynamo : Character {
 
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock,
+				new SonicSlicer(), centerPoint, ProjIds.DynamoBlockSlash,
 				player, 0.5f, 0, 20, isDeflectShield: true, addToLevel: true, hitSound : "htsnd_slash1"
 			);
 		}

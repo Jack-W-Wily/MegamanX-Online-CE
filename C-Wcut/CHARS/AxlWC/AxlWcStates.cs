@@ -141,7 +141,7 @@ public class DodgeRollAxlWC : CharState {
 public class OcelotSpin : CharState {
 	public bool specialPressed;
 	public float soundTimer;
-	private AxlWC axl = null!;
+//	private AxlWC axl = null!;
 
 	public OcelotSpin() : base("ocelotspin") {
 		exitOnAirborne = true;
@@ -170,14 +170,14 @@ public class OcelotSpin : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			axl.armAngle = -64;
+	//		axl.armAngle = -64;
 			character.changeToIdleOrFall();
 		}
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as AxlWC ?? throw new NullReferenceException();
+	//	axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
 
@@ -205,7 +205,7 @@ public class AxlFlashKick : CharState {
 		}
 
 		if (character.isAnimOver()) {
-			axl.armAngle = 0;
+		//	axl.armAngle = 0;
 			character.changeToIdleOrFall();
 		}
 	}
@@ -214,7 +214,7 @@ public class AxlFlashKick : CharState {
 		base.onEnter(oldState);
 		character.vel.y = 0;
 		character.iframesTime = 8;
-		axl = character as AxlWC ?? throw new NullReferenceException();
+	//	axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
 
@@ -797,7 +797,7 @@ public class AxlSpinKick : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as AxlWC ?? throw new NullReferenceException();
+	//	axl = character as AxlWC ?? throw new NullReferenceException();
 		if (!character.grounded) {
 			character.stopMoving();
 			pushBackSpeed = 100;
@@ -876,7 +876,7 @@ public class AxlAirRaid : CharState {
 
 
 public class AxlRollBump : CharState {
-	public AxlWC axl = null!;
+//	public AxlWC axl = null!;
 	private bool shot;
 
 	public AxlRollBump() : base("rollbump") {
@@ -888,19 +888,19 @@ public class AxlRollBump : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 0 && axl.grounded) {
+		if (character.frameIndex <= 0 && character.grounded) {
 			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3) {
 			float xInput = player.input.getXDir(player);
-			float moveSpeed = 90 * axl.getRunDebuffs();
+			float moveSpeed = 90 * character.getRunDebuffs();
 			if (xInput == 0) {
-				xInput = -axl.xDir * 0.5f;
+				xInput = -character.xDir * 0.5f;
 			}
 			character.move(new Point(moveSpeed * xInput, 0));
 		}
 		if (character.frameIndex >= 3 && !shot) {
-			Point gunpos = character.getFirstPOI() ?? axl.pos;
+			Point gunpos = character.getFirstPOI() ?? character.pos;
 			shot = true;
 			new AxlFlashKickProj(
 				new StormTornado(), character.pos.addxy(15 * character.xDir, 0),
@@ -919,7 +919,7 @@ public class AxlRollBump : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		axl = character as AxlWC ?? throw new NullReferenceException();
+	//	axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 }
 

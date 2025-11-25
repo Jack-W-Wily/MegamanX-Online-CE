@@ -43,6 +43,7 @@ public class RMXGrabState : CharState {
 
 	public bool UsedGrabFinisherOnce;
 	public float timeWaiting;
+	public MegamanX? mmx = null;
 
 	public RMXGrabState(Character? victim) : base("grab") {
 		this.victim = victim;
@@ -53,11 +54,19 @@ public class RMXGrabState : CharState {
 		base.update();
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
+		if (!character.sprite.name.Contains("light")){
 		if (character.xDir == -1) {
 			victim.xDir = 1;
 		} else {
 			victim.xDir = -1;
 		}
+		} else {
+           if (character.xDir == -1) {
+			victim.xDir = -1;
+		} else {
+			victim.xDir = 1;
+		} 
+        }
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")
 		) {
 			//	character.changeToIdleOrFall();
@@ -103,7 +112,10 @@ public class RMXGrabState : CharState {
 			|| player.input.isPressed(Control.Right, player))&& !UsedGrabFinisherOnce) {
 			character.turnToInput(player.input,player);
 			UsedGrabFinisherOnce = true;
-			character.changeSpriteFromName("grab_foward", true);
+			
+            character.changeSpriteFromName("light_kick", true);
+			character.playSound("recoilRod2", true);
+            
 		}
 
 
@@ -172,6 +184,7 @@ public class RMXGrabState : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
+		mmx = character as RockmanX;
 		if (character is Vile vile) {
 			vile.grabCooldown = 1;
 		}

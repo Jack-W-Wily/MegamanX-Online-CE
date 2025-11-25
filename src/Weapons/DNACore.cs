@@ -119,6 +119,9 @@ public class DNACore : AxlWeapon {
 		} else if (character is RagingChargeX rcx) {
 			altCharAmmo = rcx.ragingBuster.ammo;
 		}
+
+
+
 		// For any hyper modes added here.
 		// be sure to de-apply them if "preserve undisguise" is used in: axl.updateDisguisedAxl()
 		if (character.sprite.name.Contains("vilemk2")) {
@@ -128,6 +131,10 @@ public class DNACore : AxlWeapon {
 		} else if (character is Axl axl && axl.isWhiteAxl()) {
 			hyperMode = DNACoreHyperMode.WhiteAxl;
 		}
+
+
+
+
 		fireRate = 60;
 		index = (int)WeaponIds.DNACore;
 		weaponBarBaseIndex = 30 + charNum;
@@ -172,10 +179,10 @@ public class DNACore : AxlWeapon {
 			Global.level.gameMode.setHUDErrorMessage(character.player, "Cannot transform with flag");
 			return;
 		}
-		if (!oldATrans && (!Global.level.isHyperMatch() && (axl.isWhiteAxl() || axl.isStealthMode()))) {
-			Global.level.gameMode.setHUDErrorMessage(character.player, "Cannot transform as Hyper Axl");
-			return;
-		}
+	//	if (!oldATrans && (!Global.level.isHyperMatch() && (axl.isWhiteAxl() || axl.isStealthMode()))) {
+	//		Global.level.gameMode.setHUDErrorMessage(character.player, "Cannot transform as Hyper Axl");
+	//		return;
+	//	}
 		if (oldATrans || !usedOnce) {
 			if (character.player.currency < 1) {
 				Global.level.gameMode.setHUDErrorMessage(character.player, "Transformation requires 1 Metal");
@@ -191,7 +198,11 @@ public class DNACore : AxlWeapon {
 			axl.weapons.RemoveAt(character.player.weaponSlot);
 		}
 		character.player.preTransformedChar = character.player.character;
+		if (charNum == (int)CharIds.Dragoon) {
+        character.player.startAtransDragoonMain(this, character.player.getNextATransNetId());
+        } else {
 		character.player.startAtransMain(this, character.player.getNextATransNetId());
+		}
 		character.playSound("transform", sendRpc: true);
 		character.undisguiseTime = 6;
 	}

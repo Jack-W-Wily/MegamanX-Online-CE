@@ -78,11 +78,15 @@ public class VAVA1 : Vile {
 
 
 	public VAVA1(
-		Player player, float x, float y, int xDir,
+				Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
-		) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
+		bool isWarpIn = true, bool mk2VileOverride = false, bool mk5VileOverride = false,
+		VileLoadout? loadout = null,
+		int? heartTanks = null, bool isATrans = false
+	) : base(
+		player, x, y, xDir, isVisible,
+		netId, ownedByLocalPlayer, isWarpIn, false , false , player.loadout.vileLoadout, heartTanks, isATrans
+	) {
 
 
 		charId = CharIds.VAVA1;
@@ -251,14 +255,6 @@ public class VAVA1 : Vile {
 		&& player.input.isAPressed(player) 
 		){
 			changeState(new VAVAKamae(), true);	
-			return true;
-		}
-
-		if (player.input.isHeld(Control.Down, player)
-		&& player.input.isLeftOrRightHeld(player)
-		&& player.input.isBPressed(player)  && grounded
-		){
-			changeState(new VMissiLeStance(), true);	
 			return true;
 		}
 
@@ -446,7 +442,7 @@ public class VAVA1 : Vile {
 		}
 
 
-
+		 getCannonMoves();
 		return base.attackCtrl();
 	}
 
@@ -568,6 +564,28 @@ public class VAVA1 : Vile {
 		base.update();
 		// DisrespectFactor
 
+
+		
+		if (charState is not VileStationaryHover &&
+			GenericDodgeCD == 0 && player.canControl) {
+			if (!isInDamageSprite() &&
+			   player.input.isPressed(Control.Dash, player)
+			 && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new VileDodge(), true);
+				rideArmorPlatform = null;
+				GenericDodgeCD = 1;
+			}
+		}
+
+			// vileteleport
+		if (charState is VileDodge &&
+		linkedRideArmor != null &&
+		player.input.isPressed(Control.Up, player)) {
+			changeState(new VileTeleport(linkedRideArmor.pos), true);
+		}
+
+
+
 		bool PressA = player.input.isPressed(Control.Shoot, player);
 		
 		if (PressA && charState is VileStompState && frameIndex > 2) {
@@ -578,31 +596,32 @@ public class VAVA1 : Vile {
 		}
 
 
-		Helpers.decrementTime(ref ShieldHealthCD);
-		if (ThirstTimer > 15){
-			ThirstTimer = 15;
+		if (charState is VAVAJab1 or VAVAJab2 or VAVAUpperCutPunch){
+		if (player.input.isHeld(Control.Down, player)
+		&& player.input.isLeftOrRightHeld(player)
+		&& player.input.isBPressed(player)  && grounded
+		){
+			changeState(new VMissiLeStance(), true);	
 		}
-		if (inCombatCooldown == 0) {
-			ThirstTimer += Global.spf;
-			if (ThirstTimer > 6){
-           		if (ShieldHealthCD == 0 && bonusHealth > 0) {
-                health -= 1;
-				ShieldHealthCD = 1;
-            	}
-			}
-        }
+		}
+
+
+	
+	
 		if (inCombatCooldown > 0) {
             if (!isInDamageSprite() && charState is not Taunt) {
-				ThirstTimer = 0;
+			
                 if (player.input.isPressed(Control.Taunt, player)) {
                     if (Helpers.randomRange(0, 1 ) == 0) {
                         changeState(new ZainParryShinStartState(), true);
                     } else {
-                        changeState(new Taunt(), true);
+                        changeState(new GlobalParryState(), true);
                     }
                 }
             }
         }
+
+
 		if (overDriveTimer > 0) {
 			OverDrive = true;
 			// test
@@ -822,6 +841,8 @@ public class VAVA1 : Vile {
 		GoldenRight,
 		StompStart,
 		GrabNonFlinchAT,
+
+		SpeedDemon,
 	}
 
 
@@ -849,8 +870,10 @@ public class VAVA1 : Vile {
 			"vava_burensen_1" => MeleeIds.BurensenStart,
 			"vava_burensen_2" or "vava_stomp" => MeleeIds.BurensenStomp,
 			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
-			"vava_burensen_finish" or "vava_hyperdash_attack" when !player.isAI => MeleeIds.BurensenEND,
+			"vava_burensen_finish" when !player.isAI => MeleeIds.BurensenEND,
 			"vava_burensen_finish" or "vava_hyperdash_attack" when player.isAI => MeleeIds.BurensenENDCPU,
+			"vava_hyperdash_attack" or "vava_missile_stance" =>  MeleeIds.SpeedDemon,
+
 			"vava_superkick"  => MeleeIds.BurensenENDCPU,
 			
 			_ => MeleeIds.None
@@ -868,7 +891,7 @@ public class VAVA1 : Vile {
 
 				),
 
-
+			
 			(int)MeleeIds.StompStart => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.VileStomp, player,
 				 0, 0, 0, isReflectShield: false,
@@ -899,43 +922,43 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
 				 2, 40, 42, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				addToLevel: addToLevel, hitSound : "htsnd_punch_3", isJuggleProjectile : true
 			),
 			(int)MeleeIds.GrabNonFlinchAT => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
 				 1, 0, 10, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
 				 2, 40, 42, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			(int)MeleeIds.CannonExecution => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				 2, 0, 42, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			(int)MeleeIds.KamaeBlock => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 0.25f, 5, 10, isReflectShield: true,
 			isZSaberClang: true, isZSaberEffect: true,
-			addToLevel: addToLevel, hitSound : "htsnd_slash1"
+			addToLevel: addToLevel, hitSound : "htsnd_slash1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.Jab => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 1, 20, 25, isReflectShield: true,
 			isZSaberClang: true, isZSaberEffect: true,
-			addToLevel: addToLevel, hitSound : "htsnd_punch_1"
+			addToLevel: addToLevel, hitSound : "htsnd_punch_1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.Jab2 => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab2, player,
 			 1, 26, 20, isReflectShield: true,
 			isZSaberClang: true, isZSaberEffect: true,
-			addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+			addToLevel: addToLevel, hitSound : "htsnd_punch_2", isJuggleProjectile : true
 			),
 
 
@@ -943,14 +966,14 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.DeadLiftEX => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				2, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 
@@ -958,7 +981,7 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				3, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, hitSound : "dbzclang"
+				addToLevel: addToLevel, hitSound : "dbzclang", isJuggleProjectile : true
 			),
 
 
@@ -966,58 +989,66 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.Kote => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
-				3, 30, 20, isReflectShield: true,
+				3, 40, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2"
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenStart => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStart, player,
 				2, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1"
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenStomp => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
 				1, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2"
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
+			),
+
+
+			(int)MeleeIds.SpeedDemon => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.HeavyPush, player,
+				2, 0, 30, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenEND => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				2, 0, 30, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				4, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.RagingDemon => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.RagingDemon, player,
 				5, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
 				3, 30, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, hitSound : "htsnd_glass"
+				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
 				3, 30, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			_ => null

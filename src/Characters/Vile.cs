@@ -942,6 +942,7 @@ public class Vile : Character {
 		return shaders;
 	}
 
+/*
 	public override float getRunSpeed() {
 		if (hasSpeedDevil) {
 			return base.getRunSpeed() * 1.1f;
@@ -958,7 +959,7 @@ public class Vile : Character {
 			dashSpeed *= 1.1f;
 		}
 		return dashSpeed * getRunDebuffs();
-	}
+	}*/
 
 	public override Point getParasitePos() {
 		if (sprite.name.Contains("_ra_")) {
@@ -976,7 +977,7 @@ public class Vile : Character {
 		player.lastDeathWasVileV = isVileMK5;
 		deadCooldown = maxdeadCooldown;
 	}
-/*
+
 	public override List<byte> getCustomActorNetData() {
 		List<byte> customData = base.getCustomActorNetData();
 
@@ -1001,7 +1002,7 @@ public class Vile : Character {
 		OverDrive = boolData[2];
 	}
 
-	*/
+	
 	
 	public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {

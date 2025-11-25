@@ -68,10 +68,11 @@ public class AxlWC : Character {
 	public float backwardsShootTime;
 
 	public AxlWC(
-		Player player, float x, float y, int xDir, bool isVisible,
-		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = true
+		Player player, float x, float y, int xDir,
+		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.AxlWC;
 		spriteFrameToSounds["axl_run/4"] = "run";
@@ -173,6 +174,12 @@ public class AxlWC : Character {
 		player.input.isHeld(Control.Up, player)) {
 			changeState(new UpDash(Control.Dash), true);
 		}
+
+		if (isWhite && !isInDamageSprite() && player.input.isPressed(Control.Dash, player) &&
+		player.input.isHeld(Control.Up, player)) {
+			changeState(new UpDash(Control.Dash), true);
+		}
+
 		if (!isInDamageSprite()) {
 			if (player.input.isR2Pressed(player)
 			&& player.superAmmo >= 32) {
@@ -919,6 +926,8 @@ public class AxlWC : Character {
 			not AxlBlock and
 			not AxlBlock2 and
 			not BlockWCUT and
+			not HyperAxlStart and
+			not HyperAxlWcStart and
 			not Die and
 			not GenericStun and
 			not InRideArmor and

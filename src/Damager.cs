@@ -415,12 +415,9 @@ public class Damager {
 					vava1.charState.spcCancel = true;
 				}
 				if (owner.superAmmo != owner.superMaxAmmo && vava1.charState is not VavaBurensen2) {
+					if (owner.character.charState.canGainMeter){
 					owner.superAmmo += 1;
-				}
-				
-				if (!vava1.OverDrive) {
-                    
-                damage *= 0.5f;
+					}
 				}
 				
 			}
@@ -431,7 +428,9 @@ public class Damager {
 				}
 
 				if (owner.superAmmo != owner.superMaxAmmo) {
+						if (owner.character.charState.canGainMeter){
 					owner.superAmmo += 1;
+					}
 				}
 				
 				if (!vava2.OverDrive) {
@@ -445,7 +444,9 @@ public class Damager {
 				if (owner.superAmmo != owner.superMaxAmmo && projId != (int)ProjIds.HexaInvolute
 				&& projId != (int)ProjIds.HexaInvolute2
 				) {
+						if (owner.character.charState.canGainMeter){
 					owner.superAmmo += 1;
+					}
 				}
 				
 				if (!vavav.OverDrive) {
@@ -460,7 +461,9 @@ public class Damager {
 					sig1.charState.spcCancel = true;
 				}
 				if (owner.superAmmo != owner.superMaxAmmo && sig1.charState is not HellGaze) {
+						if (owner.character.charState.canGainMeter){
 					owner.superAmmo += 1;
+					}
 				}
 			}
 
@@ -470,9 +473,15 @@ public class Damager {
 					owner.character.charState.spcCancel = true;
 				}
 				if (owner.superAmmo != owner.superMaxAmmo) {
+						if (owner.character.charState.canGainMeter){
 					owner.superAmmo += 1;
+					}
 				}
 			}
+
+			if (character.DamageScaling > 1.5f) {
+                damage *= 0.5f;
+            }
 
 			switch (projId) {
 				//burn [to the ground] section
@@ -570,6 +579,10 @@ public class Damager {
 					break;
 				case (int)ProjIds.IceGattlingAltWC:
 					character.addIgFreezeProgress(4);
+					flinch = 0;
+					break;
+				case (int)ProjIds.DynamoIceDagger:
+					character.addIgFreezeProgress(1);
 					flinch = 0;
 					break;
 				case (int)VAVA2ProjIds.FreezeCrackerV:
@@ -691,6 +704,12 @@ public class Damager {
 				}
 			}
 
+			if (character != null) {
+                if (XWeaknesses.checkWeakness(character.player, (ProjIds)projId)) {
+					weakness = true;
+				}
+            }
+
 			if (!character.isFlinchImmune() &&
 				!character.isInvulnerable(false, true) &&
 				!isDot(projId) && (
@@ -768,7 +787,8 @@ public class Damager {
 				projId != (int)ProjIds.MechFrogStompShockwave &&
 				projId != (int)ProjIds.ForceGrabState &&
 				projId != (int)ProjIds.BoomerangKDeadLift &&
-				projId != (int)ProjIds.BurensenEND
+				projId != (int)ProjIds.BurensenEND &&
+				projId != (int)ProjIds.DynamoBlockSlash
 				) {
 					if (flinch < Global.halfFlinch) {
 						flinch = Global.halfFlinch;
@@ -1014,17 +1034,17 @@ public class Damager {
 
 			// For Boss Grabs
 			if (projId == (int)ProjIds.ForceGrabState) {
-				if (owner.character is BossStag) {
+				if (owner?.character is BossStag) {
 					owner.character.changeState(new BFStagUppercutState(character));
 				}
-				if (owner.character is BossMammoth) {
+				if (owner?.character is BossMammoth) {
 					owner.character.changeState(new BFlameMGrabFinisher());
 				}
 				character?.changeState(new ForceGrabbed(owner.character));
 			}
 
 			if (projId == (int)ProjIds.ForceGrabState && !character.isBlocking()) {
-				if (owner.character is MysteriousMaverick) {
+				if (owner?.character is MysteriousMaverick) {
 					owner.character.addHealth(6);
 				}
 				character?.changeState(new ForceGrabbed(owner.character));

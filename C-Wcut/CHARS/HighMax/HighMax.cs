@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 public class HighMax : Character {
 	public HighMax(
-			Player player, float x, float y, int xDir,
+	Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.HighMax;
 	}
@@ -25,7 +25,7 @@ public class HighMax : Character {
 	}
 
 	public override bool canUseLadder() {
-		return false;
+		return true;
 	}
 
 	public override bool canWallClimb() {
@@ -43,6 +43,12 @@ public class HighMax : Character {
 			changeState(new HighMaxHover(), true);
 			return true;
 		}
+
+		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
+			changeState(new ZeroGrabStart(), forceChange: true);
+		}
+
+
 
 		return base.normalCtrl();
 	}
@@ -139,7 +145,12 @@ public class HighMax : Character {
 	public override void update() {
 		base.update();
 
-
+		if (charState is ZeroGrabStart) {
+            charState.superArmor = true;
+        }
+		if (charState is ZeroGrabEX) {
+            charState.invincible = true;
+        }
 		//KillingSpreeThemes
 		//	if (KillingSpree == 3){
 		//			if (musicSource == null) {
@@ -298,21 +309,38 @@ public class HighMax : Character {
 
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
+		if (hitbox.flag == (int)HitboxFlag.Hitbox) {
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
 				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, isZSaberClang: false, addToLevel: true
 			);
 		}
+
+		if (  sprite.name.Contains("grab") && !sprite.name.Contains("ex") )
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.ForceGrabState,
+			player, 0f, 0, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_grab1"
+			);
+		}
+
+		 if (  sprite.name.Contains("grab") && sprite.name.Contains("ex") )
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.BurensenEND,
+			player, 3f, 0, 20, isZSaberClang : false ,addToLevel: true, hitSound : "swordswipeGG"
+			);
+		}
+
+
 		if (sprite.name.Contains("idle_punch")) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint, 
 			ProjIds.MechFrogGroundPound, player, 3f, 20, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp1"
 			);
 		}
-		if (sprite.name.Contains("land")) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, 
-			ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true
-			);
-		}
+	//	if (sprite.name.Contains("land")) {
+	//		return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, 
+	//		ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true
+	//		);
+	//	}
 		if (sprite.name.Contains("crouch_punch")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint,
 			 ProjIds.UPPunch, player, 2f, 25, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp2"
@@ -343,9 +371,10 @@ public class HighMax : Character {
 		}
 		if (sprite.name.EndsWith("foward_punch") && charState is HighMaxSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), 
-			centerPoint, ProjIds.HeavyPush, player, 6f, 0, 20f, null, 
-			isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			centerPoint, ProjIds.BurensenEND, player, 6f, 0, 20f, null, 
+			isShield: true, isDeflectShield: true, isZSaberClang: false, addToLevel: true, hitSound : "kofhtsnd_knock1"
 			);
+		}
 		}
 		return proj;
 	}

@@ -738,7 +738,7 @@ public float CrimsonphantomCD;
 				getCenterPos(), xDir, this,
 				player.getNextActorNetId(), i * 85
 				);
-				}
+			}
 			
 			} else if (player.input.isLeftOrRightHeld(player)) {
 				playSound("noise_crush_charged");

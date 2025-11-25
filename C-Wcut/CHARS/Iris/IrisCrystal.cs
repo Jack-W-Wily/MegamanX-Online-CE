@@ -63,7 +63,9 @@ public float angleDist = 0;
 		destroyOnHit = false;
 		maxAngleDist = 45;
 		returnTime = 0;
-	
+		damager.damage = 2;
+		damager.flinch = 30;
+		damager.hitCooldown = 20;
 		this.vel.y = 50;
 		angle2 = 0;
 		if (xDir == -1) angle2 = -180;
@@ -110,21 +112,34 @@ public float angleDist = 0;
 			return;
 		}
 
-		if (owner.character.charState is IrisCrystalRisingBash )state = 1;
+		if (owner.character.charState is IrisCrystalRisingBash || 
+		owner.character.charState is IrisCrystalCharge &&
+		owner.input.isHeld(Control.Up, owner) && owner.input.isAPressed(owner)){
+			state = 1;
+		}
 		if (state == 1){
 			if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
+			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);
+			}
 		}
 
-		if (owner.character.charState is IrisCrystalBashState )state = 2;		
+		if (owner.character.charState is IrisCrystalBashState  || 
+		owner.character.charState is IrisCrystalCharge &&
+		!owner.input.isHeld(Control.Up, owner) && owner.input.isAPressed(owner)){
+			state = 2;		
+		}
 		if (state == 2){
 			if (sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
+			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);
+			}
 		}
 
 		
-		if (owner.character.charState is IrisCrystalCharge) state = 4;
+		if (owner.character.charState is IrisCrystalCharge ) state = 4;
 		if (state == 4) {
+
 		if (owner.input.isHeld(Control.Up, owner)) {
 				vel.y = -150;
 			} 

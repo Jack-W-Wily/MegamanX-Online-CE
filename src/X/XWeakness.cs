@@ -59,6 +59,9 @@ public static class XWeaknesses {
 		return false;
 	}
 	public static bool checkWeakness(Player player, ProjIds projId) {
+		
+		if (player.character is BossMammoth)return projId == ProjIds.Tornado || projId == ProjIds.TornadoCharged;
+
 		switch (player.weapon) {
 			case HomingTorpedo:
 				return projId == ProjIds.RollingShield || projId == ProjIds.RollingShieldCharged;

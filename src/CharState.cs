@@ -70,6 +70,9 @@ public class CharState {
 
 	public bool spcCancel;
 
+	public bool canGainMeter = true;
+
+
 	public bool canSpecialCancel;
 
 	public bool wiffCancel;

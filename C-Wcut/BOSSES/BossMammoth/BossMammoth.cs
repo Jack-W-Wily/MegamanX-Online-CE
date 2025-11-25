@@ -77,11 +77,35 @@ public class BossMammoth : Character {
 	}
 
 
+	public override Collider getBlockCollider() {
+		Rect rect = Rect.createFromWH(0, 0, 18, 40);
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+	
+
+	public bool phase1Theme;
+
+	public bool phase2Theme;
+	public bool phase3Theme;
+
 	public override void update() {
 		base.update();
 
-		
-
+		if (!isWarpIn() && charState is not WarpIdle  ){
+		if (bonusHealth > 0) {
+				
+			} else {
+				if (health > 10 && !phase1Theme){
+					phase1Theme = true;
+				addMusicSource("Xvs8Generals_BossX1", getCenterPos(), true);
+				} 
+				if (health < 10 && !phase2Theme){
+					phase2Theme = true;
+					iframesTime = 600;
+				addMusicSource("Xvs8Generals_RAGEMODE", getCenterPos(), true);
+				}
+		}
+		}
 	
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref ShikiYamiBaraiCD);
@@ -482,9 +506,14 @@ public class BossMammoth : Character {
 				}
 			}
 			if (bonusHealth > 0) {
-				aiAttackCooldown = Helpers.randomRange(20, 60);
+				aiAttackCooldown = Helpers.randomRange(60, 120);
 			} else {
+				if (health > 10){
+				aiAttackCooldown = Helpers.randomRange(20, 60);
+				} 
+				if (health < 10){
 				aiAttackCooldown = Helpers.randomRange(0, 30);
+				}
 			}
 		}
 

@@ -293,7 +293,15 @@ public class MegamanX : Character {
 		// Charge and release charge logic.
 		chargeLogic(shoot);
 		player.changeWeaponControls();
+
+		if (legArmor == ArmorId.Light) {
+             altGrabAnimLight = true;
+        } else {
+             altGrabAnimLight = false;
+        }
 	}
+
+	public bool altGrabAnimLight;
 
 	// Late updates. Before render.
 	public override void postUpdate() {
@@ -306,6 +314,9 @@ public class MegamanX : Character {
 		}
 		hyperChargeActive = currentWeapon is HyperCharge;
 	}
+
+
+	
 
 	public override bool normalCtrl() {
 		quickArmorUpgrade();

@@ -2096,7 +2096,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isToughGuyHyperMode() {
-		return false;
+		return DamageScaling > 4;
 	}
 
 	public virtual void clenaseDmgDebuffs() {
@@ -3302,6 +3302,22 @@ public partial class Character : Actor, IDamagable {
 						damageSavings += (originalDamage * 0.125m);
 					}
 				}
+
+
+				if (this != null) {
+					if (DamageScaling >= 2) {
+						if (DamageScaling >= 3) {
+							damageSavings += (originalDamage * 0.5m);
+						} else {
+							damageSavings += (originalDamage * 0.25m);
+						}
+					}
+					if (DamageScaling >= 1) {
+						damageSavings += (originalDamage * 0.125m);
+					}
+				
+				}
+
 				if (vile != null && vile.hasFrozenCastle) {
 					damageSavings += originalDamage * Vile.frozenCastlePercent;
 				}
