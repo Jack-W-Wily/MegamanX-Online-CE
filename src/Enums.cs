@@ -949,7 +949,8 @@ public enum ProjIds {
 	AxlDiscardedWeapon,
 
 	DragoonSpark,
-
+	HighmaxWallStart,
+	HighmaxWall,
 	HighmaxHomingProj,
 	HighmaxStunShot,
 	DesmumeProj1,

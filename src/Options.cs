@@ -113,6 +113,7 @@ public class Options {
 	// Sigma
 	public int sigmaWeaponSlot;
 	public bool puppeteerHoldOrToggle;
+	public bool iLikeMagicalGirls;
 	public SigmaLoadout sigmaLoadout = new SigmaLoadout();
 	public bool maverickStartFollow = true;
 	public bool puppeteerCancel;

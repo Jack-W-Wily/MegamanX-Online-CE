@@ -564,7 +564,7 @@ public class LaunchedFowardState : CharState {
         }
 		character.angle += 10;
 		character.move(new Point(character.xDir * 350, 0));
-		if (stateTime > 2f) {
+		if (stateTime > 2f || stateTime > 0.2f && character.grounded) {
 			character.changeToIdleOrFall();
 		}
 
@@ -589,7 +589,7 @@ public class LaunchedFowardState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = true;
-		character.vel.y = -character.getJumpPower() * 0.75f;
+		character.vel.y = -character.getJumpPower() * 0.6f;
 	
             character.xDir = -character.xDir;
         
@@ -598,8 +598,13 @@ public class LaunchedFowardState : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.angle = 0;
+
 	}
 }
+
+
+
+
 
 
 
@@ -644,6 +649,51 @@ public class WcutGenericDodgeF : CharState {
 		specialId = SpecialStateIds.None;
 	}
 }
+
+
+
+
+
+
+public class PassDoor : CharState {
+
+	
+	public PassDoor() : base("warp_door", "", "", "") {
+	
+	}
+
+	public override void update() {
+		base.update();
+	
+
+		if (stateTime >0.5f) {
+		character.move(new Point(character.xDir * 50, 0));
+
+		}
+
+		
+
+
+		if (stateTime > 1.3f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+	
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+
+	}
+}
+
 
 
 

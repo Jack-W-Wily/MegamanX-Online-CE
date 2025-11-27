@@ -584,6 +584,7 @@ public class LongshotGizmoProj : Projectile {
 		fadeSprite = "vile_mk2_lg_proj_fade";
 		fadeOnAutoDestroy = true;
 		damager.damage = 1;
+		damager.flinch = 30;
 		projId = (int)ProjIds.LongshotGizmo;
 		maxTime = 0.5f;
 		byteAngle = byteAngle % 256;

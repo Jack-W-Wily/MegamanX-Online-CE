@@ -383,6 +383,7 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["warp_beam"] = null;
 		spriteToCollider["warp_out"] = null;
 		spriteToCollider["warp_in"] = null;
+		spriteToCollider["warp_door"] = null;
 		spriteToCollider["revive"] = null;
 		spriteToCollider["revive_to5"] = null;
 		spriteToCollider["die"] = null;
@@ -941,7 +942,14 @@ public partial class Character : Actor, IDamagable {
 
 			if (killZone.kName == "enterHunterBase2") {
                 enterVavaHunterBase2();
-            } else {
+            } else 
+			if (killZone.kName.Contains("Door")) {
+               changeState(new PassDoor(), true);
+            } else 
+			
+			
+			
+			{
 			killZone.applyDamage(this);
 			}
 		}

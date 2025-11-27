@@ -286,7 +286,11 @@ public class PreCPUMenu : IMainMenu {
 					enterTraining();
 					break;
 				case 2:
+					if (Options.main.preferredCharacter == 2){
 					enterVavaStage();
+					} else {
+                    enterXStage();
+                    }
 					break;
 			}
 		}
@@ -352,6 +356,34 @@ public class PreCPUMenu : IMainMenu {
 		Global.level.teamNum = localServer.teamNum;
 		Global.level.startLevel(localServer, false);
 	}
+
+
+
+		public void enterXStage() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_x_x1_highway").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_x_x1_highway" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_x_x1_highway" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_x_x1_highway" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_x_x1_highway" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
 	public void TimeUpdate() {
 		if (Confirm == false) Time -= Global.spf * 2;
 		if (Time <= 0) {

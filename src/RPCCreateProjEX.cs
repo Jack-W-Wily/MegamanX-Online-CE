@@ -365,7 +365,9 @@ public partial class RPCCreateProj : RPC {
 		// Highmax
 		{ (int)ProjIds.HighmaxHomingProj, HighmaxHomingProj.rpcInvoke },
 		{ (int)ProjIds.HighmaxStunShot, HighmaxStunShot.rpcInvoke },
-
+		{ (int)ProjIds.HighmaxWallStart, HighmaxWallStart.rpcInvoke },
+		{ (int)ProjIds.HighmaxWall, HighmaxWallProj.rpcInvoke },
+	
 	};
 
 }

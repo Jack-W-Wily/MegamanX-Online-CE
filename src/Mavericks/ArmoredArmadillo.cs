@@ -89,6 +89,9 @@ public class ArmoredArmadillo : Maverick {
 				} else if (input.isPressed(Control.Dash, player)) {
 					if (ammo >= 2) {
 						deductAmmo(2);
+						if (input.isHeld(Control.Up, player)) {
+                        changeState(new DilloOverHead());
+                        }
 						changeState(new ArmoredARollEnterState());
 					}
 				}
@@ -481,6 +484,41 @@ public class ArmoredAZappedState : ArmadilloMState {
 	}
 }
 
+
+public class DilloOverHead : ArmadilloMState {
+	public DilloOverHead() : base("roll_enter") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.vel.y = -ArmoredArmadillo.rollTransJumpPower;
+		maverick.frameSpeed = 0;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		maverick.stopCeiling();
+		if (maverick.isAnimOver()){
+			sprite = "roll";
+            maverick.changeSpriteFromName("roll", true);
+        }
+		if (maverick.vel.y > 0) {
+			maverick.frameSpeed = 1;
+		}
+		if (maverick.grounded && stateFrame >= 2) {
+			maverick.changeState(new ArmoredARollExitState());
+			new MechFrogStompShockwave(new FireWave(),
+				maverick.pos, maverick.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+				maverick.playSound("crash", true);
+
+		}
+	}
+}
+
+
 public class ArmoredARollEnterState : ArmadilloMState {
 	public ArmoredARollEnterState() : base("roll_enter") {
 	}
@@ -501,7 +539,7 @@ public class ArmoredARollEnterState : ArmadilloMState {
 			maverick.frameSpeed = 1;
 		}
 		if (maverick.grounded && stateFrame >= 2) {
-			maverick.changeState(new ArmoredARollState());
+			maverick.changeState(new ArmoredARollExitState());
 		}
 	}
 }
@@ -639,4 +677,12 @@ public class ArmoredARollExitState : ArmadilloMState {
 		}
 	}
 }
+
+
+
+
+
+
+
+
 #endregion

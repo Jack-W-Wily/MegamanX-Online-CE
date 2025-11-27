@@ -905,9 +905,13 @@ public partial class Level {
 				if (Global.quickStartSameChar != null) {
 					charNum = Global.quickStartSameChar.Value;
 				}
+				string CPUName = "CPU" + (i + 1).ToString();
+				if (Global.level.levelData.name == "highway_1v1") {
+                    CPUName = "VAVA";
+                }
 
 				var cpu = new Player(
-					"CPU" + (i + 1).ToString(), id, charNum,
+					CPUName, id, charNum,
 					playerData, true, true, alliance, new Input(true), null
 				);
 				players.Add(cpu);
@@ -932,6 +936,10 @@ public partial class Level {
 		//var p = Global.level.mainPlayer;
 		//new Mechaniloid(new Point(128, 128), p, 1, new MechaniloidWeapon(p, MechaniloidType.Hopper), MechaniloidType.Hopper, p.getNextActorNetId(), true);
 	}
+
+
+	
+
 
 	public void changeCameraScale(float scale) {
 		if (server.fixedCamera) {

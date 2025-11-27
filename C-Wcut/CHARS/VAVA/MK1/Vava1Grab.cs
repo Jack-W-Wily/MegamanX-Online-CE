@@ -130,15 +130,7 @@ public override void update() {
 			}
 		}
 
-		if (character.sprite.name.Contains("superkick") && character.frameIndex == 2) {
-			if (!hitONCE) {
-				hitONCE = true;
-				var damager = new Damager(player, 2, 0, 0);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
-			}
-		}
-
-
+	
 
 	
 

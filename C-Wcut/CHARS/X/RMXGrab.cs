@@ -113,7 +113,7 @@ public class RMXGrabState : CharState {
 			character.turnToInput(player.input,player);
 			UsedGrabFinisherOnce = true;
 			
-            character.changeSpriteFromName("light_kick", true);
+            character.changeSpriteFromName("grab_foward", true);
 			character.playSound("recoilRod2", true);
             
 		}
@@ -129,13 +129,7 @@ public class RMXGrabState : CharState {
 		}
 		
 		if (character.sprite.name.Contains("up") && character.frameIndex == 2) {
-			if (leechTime > 0.3f) {
-				leechTime = 0;
-				var damager = new Damager(player, 2, 0, 60);
-			character.shakeCamera(sendRpc: true);
-				victim?.shakeCamera(sendRpc: true);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
-			}
+		
 		}
 
 		if (character.sprite.name.Contains("down") && character.frameIndex == 8) {
@@ -149,11 +143,7 @@ public class RMXGrabState : CharState {
 		}
 
 		if (character.sprite.name.Contains("foward") && character.frameIndex == 2) {
-			if (leechTime > 0.3f) {
-				leechTime = 0;
-				var damager = new Damager(player, 2, 0, 0);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.HeavyPush);
-			}
+		
 		}
 
 

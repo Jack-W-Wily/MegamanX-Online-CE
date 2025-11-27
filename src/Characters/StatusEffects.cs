@@ -89,6 +89,10 @@ public class Hurt : CharState {
 		}
 
 		if (stateFrames >= flinchTime) {
+			if (player.input.isHeld(Control.Jump, player)) {
+                character.vel.y = -character.getJumpPower() * 0.5f;
+				character.invulnTime = 0.2f;
+            }
 			character.changeToLandingOrFall(false);
 		}
 	}

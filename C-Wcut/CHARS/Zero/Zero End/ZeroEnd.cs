@@ -668,7 +668,7 @@ public class ZeroEND : Zero {
 		return base.spcCancel();
 	}
 
-	public bool groundAttacks() {
+	public override bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed && downPressedTimes >= 2) {
@@ -717,8 +717,12 @@ public class ZeroEND : Zero {
 				changeState(new ZeroShippuugaState(), true);
 				return true;
 			}
-		
+			if (player.superAmmo > 5){
 			changeState(new ZeroDashSlashState(), true);
+			player.superAmmo -= 6;
+			} else {
+        	changeState(new ZeroSlash1State(), true && stockedBusterLv == 0);
+            }
 			if (specialPressTime == 0){
 			invulnTime = 0.4f;
 			slideVel = xDir * getDashSpeed() * 2;

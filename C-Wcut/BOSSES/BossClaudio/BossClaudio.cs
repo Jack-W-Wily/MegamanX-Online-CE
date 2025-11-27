@@ -152,7 +152,6 @@ public class BossClaudio : Character {
 		FireWave,
 
 		DashSlash, 
-		
 		TrippleBusterSlash,
 
 		

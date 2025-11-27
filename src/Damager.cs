@@ -312,6 +312,7 @@ public class Damager {
 				case (int)ProjIds.SpreadShot:
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
+				case (int)ProjIds.HighmaxStunShot:
 				case (int)ProjIds.MorphMPowder:
 					preCharacter?.paralize();
 					break;
@@ -1257,6 +1258,7 @@ public class Damager {
 				case ProjIds.SpreadShot:
 				case ProjIds.ElectricShock:
 				case ProjIds.MK2StunShot:
+				case ProjIds.HighmaxStunShot:
 				case ProjIds.MorphMPowder:
 					maverick.addSlowdownTime(4);
 					break;
@@ -1375,7 +1377,32 @@ public class Damager {
 							}
 						}
 					}
+				} 
+
+
+				// Kuwanger Parry
+				if (maverick.sprite.name == "boomerk_guard" && damage > 0 && !isArmorPiercing(projId)) {
+					if (hitFromFront(maverick, damagingActor, owner, projId)) {
+						if (maverick.ownedByLocalPlayer && damage > 2 &&
+							damagingActor is Projectile proj && proj.shouldVortexSuck && proj.destroyOnHit
+						) {
+							maverick.changeState(new BoomerkParrySucess(damage * 2));
+						}
+						flinch = 0;
+						damage = 0;
+						maverick.playSound("m10ding");
+						if (owner.ownedByLocalPlayer == true &&
+							owner.character is Zero zero &&
+							!zero.hypermodeActive()
+						) {
+							//What in the..
+							if (damagingActor is Projectile proj1 && proj1.isZSaberClang) {
+								owner.character.changeState(new ZeroClang(-owner.character.xDir));
+							}
+						}
+					}
 				}
+
 			}
 			if (damage > 0) {
 				if (flinch > 0 && !isOnFlinchCooldown) {

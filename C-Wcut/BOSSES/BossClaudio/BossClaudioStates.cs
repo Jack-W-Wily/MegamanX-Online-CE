@@ -44,6 +44,9 @@ public class ClaudioBossDash : CharState {
 	}
 }
 
+
+
+
 public class ClaudioTrppleSlash : CharState {
 
 
@@ -61,6 +64,33 @@ public class ClaudioTrppleSlash : CharState {
 		base.onEnter(oldState);
 	}
 	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+
+public class ClaudioTrppleSlashMaverick : MaverickState {
+
+
+	public ClaudioTrppleSlashMaverick() : base("trippleslash") {
+
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 
 	}
@@ -97,6 +127,39 @@ public class ClaudioFWave : CharState {
 
 }
 
+
+
+public class ClaudioFWaveMaverick : MaverickState {
+
+
+	public ClaudioFWaveMaverick() : base("firewave") {
+
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		
+	}
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+
+		var character = maverick;
+		character.playSound("flamemOilBurn", sendRpc: true);
+		new FireWaveProjChargedStart(character.pos, character.xDir, character, player, player.getNextActorNetId(), true);
+		
+
+	}
+
+}
+
+
 public class ClaudioShingetsurin : CharState {
 
 
@@ -128,6 +191,40 @@ public class ClaudioShingetsurin : CharState {
 	}
 
 }
+
+
+
+
+public class ClaudioShingetsurinMaverick : MaverickState {
+
+
+	public ClaudioShingetsurinMaverick() : base("shoot") {
+
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+		if (character.isAnimOver()) {
+				character.changeToIdleOrFall();	
+		}
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		new ShingetsurinProj(
+			character.getShootPos(), character.xDir,
+			0f, character, player, player.getNextActorNetId(), rpc: true
+		);
+		character.playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
+	}
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
 
 
 
@@ -221,6 +318,41 @@ public class ClaudioChargedSlash : CharState {
 	}
 
 }
+
+
+
+
+public class ClaudioChargedSlashMaverick : MaverickState {
+
+	bool once = false;
+	public ClaudioChargedSlashMaverick() : base("chargeslash") {
+
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+		if (character.isAnimOver()) {
+			character.changeState(new MIdle());
+		}
+
+		if (character.frameIndex >= 4 && !once) {
+			once = true;
+			character.playSound("crash");
+			new Anim(character.pos, "claudio_charge_slash_ef", character.xDir, null, true);
+		}
+	
+	}
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
 
 
 
@@ -319,6 +451,68 @@ player.getNextActorNetId(), sendRpc: true
 		}
 	}
 	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+
+
+
+
+public class ClaudioTrippleBusterMaverick : MaverickState {
+	int shootNum;
+	int lastShootFrame;
+	public ClaudioTrippleBusterMaverick() : base("shoot2") {
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+
+		Point? shootPos = character.getFirstPOI();
+
+
+		if (shootPos != null && character.frameIndex != lastShootFrame) {
+			if (shootNum == 0) {
+				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
+				new FakeZeroBusterProj3(
+					shootPos.Value, character.xDir, 0, character,
+					 player.getNextActorNetId(), sendRpc: true
+				);
+			} else if (shootNum == 1) {
+				character.playSound("buster3X2", forcePlay: false, sendRpc: true);
+				new FakeZeroBusterProj3(
+					shootPos.Value, character.xDir, 1, character,
+					 player.getNextActorNetId(), sendRpc: true
+				);
+			} else if (shootNum == 2) {
+				character.playSound("buster4X2", forcePlay: false, sendRpc: true);
+				new FakeZeroSwordBeamProj(
+		shootPos.Value, character.xDir, character,
+		player.getNextActorNetId(), sendRpc: true
+			);
+
+			}
+			shootNum++;
+			lastShootFrame = character.frameIndex;
+		}
+
+		if (shootPos != null && character.frameIndex != lastShootFrame) {
+
+			shootNum++;
+			lastShootFrame = character.frameIndex;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeState(new MIdle());
+		}
+	}
+	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 	}
 }

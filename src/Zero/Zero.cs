@@ -605,7 +605,7 @@ public class Zero : Character {
 		}
 	}
 
-	public bool groundAttacks() {
+	public virtual bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {

@@ -18,6 +18,8 @@ public class HighMax : Character {
 	public float shootCooldown;
 
 	public float ZetsubouCooldown;
+
+	public float wallCooldown;
 	public float CrouchPunchCooldown;
 
 	public override bool canDash() {
@@ -94,14 +96,26 @@ public class HighMax : Character {
 		}
 
 		if (specialPressed) {
-			if (ZetsubouCooldown == 0) {
+			
 
+				if (player.input.isHeld(Control.Down, player)) {
+				if (wallCooldown == 0) {
+				playSound("warpIn", sendRpc: true);
+					new HighmaxWallStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
+					new HighmaxWallStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
+               	wallCooldown = 4;
+				}
+				 } else {
+				if (ZetsubouCooldown == 0) {
 				changeState(new DesmumeState(), true);
-				ZetsubouCooldown = 2f;
+				ZetsubouCooldown = 2;
+				}
+				}
+				
 				return true;
 
 
-			}
+			
 		}
 
 
@@ -145,6 +159,10 @@ public class HighMax : Character {
 	public override void update() {
 		base.update();
 
+
+		
+
+
 		if (charState is ZeroGrabStart) {
             charState.superArmor = true;
         }
@@ -182,6 +200,7 @@ public class HighMax : Character {
 		Helpers.decrementTime(ref shootCooldown);
 		Helpers.decrementTime(ref ZetsubouCooldown);
 		Helpers.decrementTime(ref highmaxArmorCooldown);
+		Helpers.decrementTime(ref wallCooldown);
 
 		if (charState is Hurt && charState.stateFrames == 0) {
 			highmaxDmgCount += 1;

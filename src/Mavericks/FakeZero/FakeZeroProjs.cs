@@ -202,7 +202,7 @@ public class FakeZeroMeleeProj : Projectile {
 			damager.flinch = Global.halfFlinch;
 		} else {
 			damager.damage = 2;
-			damager.flinch = 0;
+			damager.flinch = 10;
 		}
 	}
 }

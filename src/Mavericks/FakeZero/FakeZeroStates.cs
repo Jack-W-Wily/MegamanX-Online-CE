@@ -224,7 +224,7 @@ public class FakeZeroMeleeState : FakeZeroMState {
 
 	public FakeZeroMeleeState(bool isAiAttack = false) : base("run_attack") {
 		this.isAiAttack = isAiAttack;
-		enterSound = "saber3";
+		enterSound = "zerosaberx3";
 		normalCtrl = true;
 		canReloadAmmo = true;
 		useGravity = false;

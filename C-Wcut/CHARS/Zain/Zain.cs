@@ -323,8 +323,8 @@ public class Zain : Character {
 		if (sprite.name.Contains("grab")
 		&& !sprite.name.Contains("2") && !sprite.name.Contains("stab")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber1, player, 3f, 20, 15f, isZSaberClang: false
-			 , addToLevel: true);
+			 ProjIds.BurensenEND, player, 3f, 0, 15f, isZSaberClang: false
+			 , addToLevel: true , hitSound : "clang2GG");
 
 		}
 

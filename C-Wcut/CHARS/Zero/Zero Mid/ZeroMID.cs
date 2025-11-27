@@ -634,7 +634,7 @@ public class ZeroMID : Zero {
 		return base.spcCancel();
 	}
 
-	public bool groundAttacks() {
+	public override bool groundAttacks() {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed && downPressedTimes >= 2) {

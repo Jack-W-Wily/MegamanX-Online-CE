@@ -251,9 +251,9 @@ public class VileMaroonedTomahawk : Projectile {
 			stopMoving();
 		}
 
-		if (owner.input.isPressed(Control.Taunt, owner)) {
+		if (owner.input.isPressed(Control.Taunt, owner) && ownerActor != null) {
 			new TwoHeadedSlash(
-				pos, xDir, owner.character, owner,
+				pos, xDir, ownerActor, owner,
 				owner.getNextActorNetId(), rpc: true);
 			destroySelf();
         }
@@ -426,7 +426,7 @@ public class MetalCrescent : Projectile {
 		Point pos, int xDir,
 		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "cutter_qh", netId, player
+		pos, xDir, owner, "cutter_mc", netId, player
 	) {
 	
 		damager.damage = 2;

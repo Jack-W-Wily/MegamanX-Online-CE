@@ -246,7 +246,7 @@ public class HighmaxShoot2 : CharState {
 		}
 		if (poi != null) {
 			if (!first && character.sprite.frameIndex > 2) {
-				new HighmaxHomingProj(
+				new HighmaxStunShot(
 					poi.Value, character.xDir, character,
 					player, player.getNextActorNetId(), 0, rpc: true
 					);
@@ -254,7 +254,7 @@ public class HighmaxShoot2 : CharState {
 				character.playSound("boundBlaster");
 			}
 			if (!seccond && character.sprite.frameIndex > 4) {
-				new HighmaxHomingProj(
+				new HighmaxStunShot(
 					poi.Value, character.xDir, character,
 					player, player.getNextActorNetId(), 0, rpc: true
 					);
@@ -262,7 +262,7 @@ public class HighmaxShoot2 : CharState {
 				character.playSound("boundBlaster");
 			}
 			if (!third && character.sprite.frameIndex > 6) {
-				new HighmaxHomingProj(
+				new HighmaxStunShot(
 					poi.Value, character.xDir, character,
 					player, player.getNextActorNetId(), 0, rpc: true
 					);
@@ -270,7 +270,7 @@ public class HighmaxShoot2 : CharState {
 				character.playSound("boundBlaster");
 			}
 			if (!fourth && character.sprite.frameIndex > 8) {
-				new HighmaxHomingProj(
+				new HighmaxStunShot(
 					poi.Value, character.xDir, character,
 					player, player.getNextActorNetId(), 0, rpc: true
 					);
@@ -345,6 +345,24 @@ public class DesmumeSpam : CharState {
 
 	public override void update() {
 
+
+		if ( character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
+		&& !player.input.isHeld(Control.Down, player)) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+		if (!character.sprite.name.Contains("shoot2") && player.input.isHeld(Control.Up, player)){
+			if(player.input.isHeld(Control.Dash, player)){
+			character.vel.y = -character.getJumpPower() * 1f;
+			} else {character.vel.y = -character.getJumpPower() * 0.3f;}
+		}
+		if (!character.sprite.name.Contains("shoot2") && player.input.isHeld(Control.Down, player)){
+			if (player.input.isHeld(Control.Dash, player)){
+			character.vel.y = +character.getJumpPower() * 1f;
+			} else {character.vel.y = +character.getJumpPower() * 0.3f;}
+		}
+
+
 		var poi = character.getFirstPOI();
 		accuracy = 0;
 		Point prevPos = character.pos;
@@ -364,6 +382,10 @@ public class DesmumeSpam : CharState {
 				poi.Value, 1, character,
 				player, player.getNextActorNetId(), 0, rpc: true
 				);
+				new HighmaxHomingProj(
+				poi.Value, -1, character,
+				player, player.getNextActorNetId(), 0, rpc: true
+				);
 			}
 			if (Helpers.randomRange(0, 2) == 1 && supercooldown == 0) {
 				supercooldown = 0.3f;
@@ -374,9 +396,9 @@ public class DesmumeSpam : CharState {
 				supercooldown = 0.3f;
 				character.playSound("boundBlaster");
 				new HighmaxStunShot(
-						poi.Value, character.xDir, MathF.Round(shootVel.byteAngle), character,
-						character.player, character.player.getNextActorNetId(), rpc: true
-					);
+						poi.Value, character.xDir, character,
+				player, player.getNextActorNetId(), 0, rpc: true
+				);
 			}
 		}
 
@@ -968,6 +990,100 @@ public class HighMaxSlamDownState : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (proj != null && !proj.destroyed) proj.destroySelf();
+	}
+}
+
+
+
+
+
+
+public class HighmaxWallStart : Projectile {
+	public Character character;
+
+	public HighmaxWallStart(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 300, 1, player, "highmax_wall_proj", 
+		Global.defFlinch, 0.75f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 0.25f;
+		projId = (int)ProjIds.HighmaxWallStart;
+		destroyOnHit = false;
+		character = player.character;
+		
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new HighmaxWallStart(
+			LightningWeb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (!ownedByLocalPlayer) {return;}
+		if (character.player.input.isR2Pressed(character.player)) {
+			destroySelf();
+		}
+	}
+	public override void onDestroy() {
+		base.onDestroy();
+		if (ownedByLocalPlayer) {
+			new HighmaxWallProj(weapon, pos, xDir, base.owner, base.owner.getNextActorNetId(), rpc: true);
+		}
+	}
+}
+
+
+public class HighmaxWallProj : Projectile {
+
+	Wall wall;
+	public HighmaxWallProj(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "highmax_wall_proj", 
+		Global.halfFlinch, 1f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 4f;
+		projId = (int)ProjIds.HighmaxWall;
+		setIndestructableProperties();
+		fadeSprite = "explosion";
+		fadeOnAutoDestroy = true;
+		isShield = true;
+		isReflectShield = true;
+		collider.isClimbable = true;
+		collider.wallOnly = false;
+		isStatic = true;
+		
+		var rect = collider.shape.getRect().getPoints();
+		wall = new Wall("Collision Shape", new List<Point>()
+		{
+				rect[0].add(new Point(0, 0)),
+				rect[1].add(new Point(0, 0)),
+				rect[2].add(new Point(0, 0)),
+				rect[3].add(new Point(0, 0)),
+			});
+
+		Global.level.addGameObject(wall);
+		
+		if (player.character != null) zIndex = player.character.zIndex - 10;
+		
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new HighmaxWallProj(
+			LightningWeb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (wall != null) Global.level.removeGameObject(wall);
 	}
 }
 

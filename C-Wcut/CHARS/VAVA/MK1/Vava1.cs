@@ -1324,7 +1324,7 @@ public class VAVA1 : Vile {
 						);
 					} else {
 						Global.level.gameMode.setHUDErrorMessage(
-							player, $"Devil Bear armor requires 10 {Global.nameCoins}"
+							player, $"Blackbear Bear armor requires 10 {Global.nameCoins}"
 						);
 					}
 				} else {
@@ -1332,7 +1332,8 @@ public class VAVA1 : Vile {
 					if (linkedRideArmor != null) linkedRideArmor.selfDestructTime = 1000;
 					buyRideArmor();
 					mmw.isMenuOpened = false;
-					int raIndex = 6;
+					int raIndex = player.selectedRAIndex;
+					if (raIndex == 4) raIndex = 6;
 					linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
 					
 					changeState(new CallDownMech(linkedRideArmor, true), true);

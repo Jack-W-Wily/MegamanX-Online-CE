@@ -319,6 +319,8 @@ public partial class Global {
 	// First: existing, second: new cloned sprite
 	public static Dictionary<string, string> spriteAliases = new Dictionary<string, string>()
 	{
+			{ "rmx_run", "rmx_warp_door" },
+
 			{ "chillp_fall", "chillp_enter" },
 			{ "chillp_jump", "chillp_exit" },
 			{ "chillp_die", "chillp_hurt" },

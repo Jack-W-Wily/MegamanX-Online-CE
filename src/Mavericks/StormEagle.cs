@@ -85,7 +85,7 @@ public class StormEagle : Maverick {
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
 			new TornadoProj(pos, xDir, true, this, player, player.getNextActorNetId(), rpc: true);
-		}, "tornado");
+		}, "tornadoNonX");
 
 	}
 
@@ -140,7 +140,7 @@ public class StormEagle : Maverick {
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Dive => new GenericMeleeProj(
-				diveWeapon, pos, ProjIds.StormEDive, player,
+				diveWeapon, pos, ProjIds.MechFrogGroundPound, player,
 				4, Global.defFlinch, addToLevel: addToLevel
 			),
 			_ => null
@@ -529,7 +529,7 @@ public class StormEAirShootState : SEagleMState {
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
-			maverick.playSound("tornado", sendRpc: true);
+			maverick.playSound("tornadoNonX", sendRpc: true);
 			new TornadoProj(
 				shootPos.Value, maverick.xDir, true, StormEagleed,
 				player, player.getNextActorNetId(), rpc: true

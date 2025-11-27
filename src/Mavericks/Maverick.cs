@@ -1336,6 +1336,21 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
+
+
+	public virtual Point? getNullableShootPos() {
+		var busterOffset = currentFrame.getBusterOffset();
+		if (busterOffset == null) {
+			return null;
+		}
+		return pos.addxy(busterOffset.Value.x * xDir, busterOffset.Value.y);
+	}
+	
+	public virtual Point getShootPos() {
+		return getNullableShootPos() ?? getCenterPos();
+	}
+
+
 	public virtual bool checkWeakness(WeaponIds weaponId, ProjIds projId, out MaverickState? newState, bool isAttackerMaverick) {
 		newState = null;
 		if (player.maverick1v1 != null && isAttackerMaverick) {

@@ -83,12 +83,23 @@ public class BoomerangKuwanger : Maverick {
 			if (bald) {
 				return;
 			}
-
+			if (input.isR2Pressed(player) && player.superAmmo > 10) {
+				changeState(new BoomerangKCutterCharged());
+				player.superAmmo -= 10;
+			}
 			if (shootPressed()) {
 				changeState(getShootState());
 			}
 			else if (specialPressed()) {
+				if (input.isHeld(Control.Up, player)){
 				changeState(new BoomerKDeadLiftState());
+				} else if (input.isLeftOrRightHeld(player)){
+				changeState(new BoomerKick());
+				} else if (input.isHeld(Control.Down, player)){
+				changeState(new BoomerkBlock());
+				} else {
+                changeState(new BoomerORAORA());
+                }
 			}
 			else if (player.dashPressed(out _) && teleportCooldown == 0) {
 				if (ammo >= 8) {
@@ -113,7 +124,7 @@ public class BoomerangKuwanger : Maverick {
 
 	public MaverickState getShootState() {
 		return new MShoot((Point pos, int xDir) => {
-			bald = true;
+		//	bald = true;
 			int inputAngle = 25;
 			var inputDir = !isAI ? input.getInputDir(player) : Point.zero;
 			if (inputDir.x != 0 && inputDir.y == 0) inputAngle = 0;
@@ -161,12 +172,18 @@ public class BoomerangKuwanger : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		DeadLift,
+		JumpSlash,
+		SuperKick,
+		SuperThrow,
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"boomerk_deadlift" => MeleeIds.DeadLift,
+			"boomerk_double_throw" => MeleeIds.DeadLift,
+			"boomerk_orara" or "boomerk_fall" => MeleeIds.JumpSlash,
+			"boomerk_kick" => MeleeIds.SuperKick,
 			_ => MeleeIds.None
 		});
 	}
@@ -176,7 +193,15 @@ public class BoomerangKuwanger : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.DeadLift => new GenericMeleeProj(
 				deadLiftWeapon, pos, ProjIds.BoomerangKDeadLift, player,
-				0, 0, 0, addToLevel: addToLevel
+				0, 0, 0, addToLevel: addToLevel, hitSound: "htsnd_slash1"
+			),
+			MeleeIds.SuperKick => new GenericMeleeProj(
+				deadLiftWeapon, pos, ProjIds.HeavyPush, player,
+				3, 0, 30, addToLevel: addToLevel, hitSound: "kofhtsnd_clamp2"
+			),
+			MeleeIds.JumpSlash => new GenericMeleeProj(
+				deadLiftWeapon, pos, ProjIds.BoomerangCharged, player,
+				1, 20, 10, addToLevel: addToLevel, isJuggleProjectile: true, hitSound: "htsnd_slash1"
 			),
 			_ => null
 		};
@@ -481,6 +506,16 @@ public class BoomerKTeleportState : BoomerMState {
 		if (clone != null) {
 			clone.destroySelf();
 		}
+
+		new VileMaroonedTomahawk(
+					maverick.pos.addxy(-5 * maverick.xDir, -31), maverick.xDir, maverick, player,
+					player.getNextActorNetId(), rpc: true
+						);
+		new VileMaroonedTomahawk(
+					maverick.pos.addxy(25 * maverick.xDir, -31), maverick.xDir, maverick, player,
+					player.getNextActorNetId(), rpc: true
+						);
+
 	}
 
 	public bool canChangePos() {
@@ -617,4 +652,173 @@ public class DeadLiftGrabbed : GenericGrabbedState {
 		}
 	}
 }
+
+
+
+public class BoomerKick : BoomerMState {
+
+	public BoomerKick() : base("kick") {
+	}
+
+	public override void update() {
+		base.update();
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+}
+
+
+public class BoomerORAORA : BoomerMState {
+
+	public BoomerORAORA() : base("orara") {
+	}
+
+	public override void update() {
+		base.update();
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+
+}
+
+
+
+public class BoomerangKCutterCharged : BoomerMState {
+
+	public bool ShootOnce = false;
+	public BoomerangKCutterCharged() : base("doublethrow") {
+	}
+
+	public override void update() {
+		base.update();
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+		var pos = maverick.pos;
+		var xDir = maverick.xDir;
+
+		if (maverick.frameIndex == 4 && !ShootOnce) {
+            var twin1 = new BoomerangProjCharged(pos.addxy(0, 5), null, xDir, maverick, player, 90, 1, player.getNextActorNetId(true), null, true);
+			var twin2 = new BoomerangProjCharged(pos.addxy(5, 0), null, xDir, maverick, player, 0, 1, player.getNextActorNetId(true), null, true);
+			var twin3 = new BoomerangProjCharged(pos.addxy(0, -5), null, xDir, maverick, player, -90, 1, player.getNextActorNetId(true), null, true);
+			var twin4 = new BoomerangProjCharged(pos.addxy(-5, 0), null, xDir, maverick, player, -180, 1, player.getNextActorNetId(true), null, true);
+			
+			var a = new BoomerangProjCharged(pos.addxy(0, 5), pos.addxy(0, 35), xDir, maverick, player, 90, 0, player.getNextActorNetId(true), twin1, true);
+			var b = new BoomerangProjCharged(pos.addxy(5, 0), pos.addxy(35, 0), xDir, maverick, player, 0, 0, player.getNextActorNetId(true), twin2, true);
+			var c = new BoomerangProjCharged(pos.addxy(0, -5), pos.addxy(0, -35), xDir, maverick, player, -90, 0, player.getNextActorNetId(true), twin3, true);
+			var d = new BoomerangProjCharged(pos.addxy(-5, 0), pos.addxy(-35, 0), xDir, maverick, player, -180, 0, player.getNextActorNetId(true), twin4, true);
+
+			twin1.twin = a;
+			twin2.twin = b;
+			twin3.twin = c;
+			twin4.twin = d;
+        }
+	}
+
+}
+
+
+
+
+
+
+public class BoomerkBlock : BoomerMState {
+	public BoomerkBlock() : base("guard") {
+		aiAttackCtrl = true;
+		attackCtrl = true;
+		canBeCanceled = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		if (input.isHeld(Control.Left, player)) maverick.xDir = -1;
+		else if (input.isHeld(Control.Right, player)) maverick.xDir = 1;
+
+		
+		if (maverick.aiBehavior == MaverickAIBehavior.Control && !player.input.isBHeld(player)) {
+			maverick.changeState(new MIdle());
+			return;
+		}
+		if (isAI) {
+				if (stateTime > 30f / 60f) {
+					maverick.changeToIdleFallOrFly();
+				}
+			
+		}
+
+		if (maverick.ammo <= 0) {
+			maverick.changeToIdleOrFall();
+			return;
+		}
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick) && maverick is ArmoredArmadillo aa && !aa.noArmor;
+	}
+}
+
+public class BoomerkParrySucess : BoomerMState {
+	float damage;
+
+
+	public BoomerkParrySucess(float damage) : base("charge") {
+		this.damage = damage;
+		aiAttackCtrl = true;
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.playSound("ching", sendRpc: true);
+	}
+
+	public override void update() {
+		base.update();
+		if (stateTime > 0f) {
+			maverick.changeState(new BoomerkParryRelease(damage));
+		}
+	}
+}
+
+public class BoomerkParryRelease : ArmadilloMState {
+	float damage;
+
+	public VileParasiteSword? projectile;
+	public BoomerkParryRelease(float damage) : base("sidethrow") {
+		aiAttackCtrl = true;
+		this.damage = damage;
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+
+		if (!once && maverick.frameIndex >= 1) {
+			once = true;
+			projectile = new VileParasiteSword(
+				maverick.getCenterPos(), maverick.xDir, maverick, player,
+				player.getNextActorNetId(), rpc: true);
+		}	
+
+
+		if (projectile != null){
+			projectile.damager.damage = damage;
+		}
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new MIdle());
+		}
+	}
+}
+
+
+
+
 #endregion

@@ -204,10 +204,17 @@ public class RockmanX : MegamanX {
 
 
 		if (helmetArmor == ArmorId.Light) {
-			if (charState is Jump && player.input.isHeld(Control.Down, player)) {
+			if (charState is Jump && player.input.isHeld(Control.Down, player) && player.superAmmo >= 5) {
 				changeSpriteFromName("headbutt", false);
+				  vel.y = -getJumpPower() * 0.5f;
+				  player.superAmmo -= 5;
 			}
 		}
+
+		if (sprite.name == "rmx_grab_foward" && legArmor == ArmorId.Light) {
+            sprite.name = "rmx_light_kick";
+			changeSpriteFromName("light_kick", false);
+        }
 
 
 

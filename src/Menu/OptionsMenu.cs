@@ -1493,6 +1493,25 @@ public class OptionsMenu : IMainMenu {
 					},
 					"If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held."
 				),
+
+				new MenuOption(
+					30, startY,
+					() => {
+						Helpers.menuLeftRightBool(ref Options.main.iLikeMagicalGirls);
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Ilike Magical Girls :",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, (Options.main.iLikeMagicalGirls ? "yes" : "no"),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"If set to Hold, Puppeteer Sigma will control\na Maverick only as long as WEAPON L/R is held."
+				),
+
 				// Maverick follow start.
 				new MenuOption(
 					30, startY,
