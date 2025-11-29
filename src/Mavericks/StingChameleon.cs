@@ -22,12 +22,12 @@ public class StingChameleon : Maverick {
 	) {
 		tongueWeapon = new StingCTongueWeapon();
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) },
-			{ typeof(StingCTongueState), new(60, true) },
-			{ typeof(StingCClimbTongueState), new(60, true) },
-			{ typeof(StingCJumpAI), new(2 * 60) },
-			{ typeof(StingCHangState), new(2 * 60) },
-			{ typeof(StingCClingShootState), new(30) }
+//			{ typeof(MShoot), new(45, true) },
+//			{ typeof(StingCTongueState), new(60, true) },
+//			{ typeof(StingCClimbTongueState), new(60, true) },
+//			{ typeof(StingCJumpAI), new(2 * 60) },
+//			{ typeof(StingCHangState), new(2 * 60) },
+//			{ typeof(StingCClingShootState), new(30) }
 		};
 
 		weapon = new Weapon(WeaponIds.StingCGeneric, 98);

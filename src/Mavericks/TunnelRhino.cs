@@ -15,9 +15,9 @@ public class TunnelRhino : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(TunnelRShootState), new(45, false, true) },
-			{ typeof(TunnelRShoot2State), new(45, false, true) },
-			{ typeof(TunnelRDashState), new(60) }
+	//		{ typeof(TunnelRShootState), new(45, false, true) },
+	//		{ typeof(TunnelRShoot2State), new(45, false, true) },
+	//		{ typeof(TunnelRDashState), new(60) }
 		};
 
 		weapon = getWeapon();

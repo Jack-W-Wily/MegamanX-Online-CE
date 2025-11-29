@@ -19,10 +19,10 @@ public class ChillPenguin : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(ChillPIceBlowState), new(2 * 60, false, true) },
-			{ typeof(ChillPSlideState), new(30, false, true) },
-			{ typeof(ChillPBlizzardState), new(3 * 60) },
-			{ typeof(MShoot), new(45, true) }
+	//		{ typeof(ChillPIceBlowState), new(2 * 60, false, true) },
+	//		{ typeof(ChillPSlideState), new(30, false, true) },
+	//		{ typeof(ChillPBlizzardState), new(3 * 60) },
+	//		{ typeof(MShoot), new(45, true) }
 		};
 		spriteToCollider["slide"] = getDashCollider();
 

@@ -20,7 +20,7 @@ public class BoomerangKuwanger : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) },
+	//		{ typeof(MShoot), new(45, true) },
 			//{ typeof(BoomerKDeadLiftState), new(45, true) }
 		};
 		deadLiftWeapon = new BoomerangKDeadLiftWeapon(player);

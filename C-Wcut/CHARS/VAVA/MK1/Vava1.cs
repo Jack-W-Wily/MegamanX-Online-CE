@@ -387,6 +387,9 @@ public class VAVA1 : Vile {
 				} else {
 					if (player.input.isLeftOrRightHeld(player)) {
 					} else {
+                        	changeState(new VavaKneeAttack(), true);
+					
+                    
 					}
 					
 				}
@@ -821,6 +824,8 @@ public class VAVA1 : Vile {
 		KamaeBlock,
 		Jab,
 		Jab2,
+		
+		VavaKneeAttack,
 		UpperCut,
 		Grab,
 		Grabmk2dash,
@@ -843,6 +848,8 @@ public class VAVA1 : Vile {
 		GrabNonFlinchAT,
 
 		SpeedDemon,
+
+
 	}
 
 
@@ -855,6 +862,7 @@ public class VAVA1 : Vile {
 			"vava_deadlift" => MeleeIds.DeadLiftEX,
 			"vava_golden_right" => MeleeIds.GoldenRight,
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
+			"vava_knee" => MeleeIds.VavaKneeAttack,
 			"vava_jab_1" => MeleeIds.Jab,
 			"vava_jab_2" => MeleeIds.Jab2,
 			"vava_punch_2" => MeleeIds.UpperCut,
@@ -923,6 +931,12 @@ public class VAVA1 : Vile {
 				 2, 40, 42, isReflectShield: false,
 				isZSaberClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "htsnd_punch_3", isJuggleProjectile : true
+			),
+			(int)MeleeIds.VavaKneeAttack => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
+				 2, 20, 22, isReflectShield: false,
+				isZSaberClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.GrabNonFlinchAT => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,

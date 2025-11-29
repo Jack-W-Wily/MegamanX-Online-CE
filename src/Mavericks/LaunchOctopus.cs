@@ -16,10 +16,10 @@ public class LaunchOctopus : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(60, true) },
-			{ typeof(LaunchOShoot), new(20, true) },
-			{ typeof(LaunchOHomingTorpedoState), new(90, true) },
-			{ typeof(LaunchOWhirlpoolState), new(2 * 60) }
+	//		{ typeof(MShoot), new(60, true) },
+	//		{ typeof(LaunchOShoot), new(20, true) },
+	//		{ typeof(LaunchOHomingTorpedoState), new(90, true) },
+	//		{ typeof(LaunchOWhirlpoolState), new(2 * 60) }
 		};
 
 		weapon = new Weapon(WeaponIds.LaunchOGeneric, 96);
@@ -190,7 +190,8 @@ public class LaunchOMissile : Projectile, IDamagable {
 		pos, xDir, owner, "launcho_proj_missile", netId, player
 	) {
 		weapon = LaunchOMissileWeapon.netWeapon;
-		damager.damage = 3;
+		damager.damage = 2;
+		damager.flinch = 20;
 		damager.hitCooldown = 9;
 		vel = new Point(100 * xDir, 0);
 		projId = (int)ProjIds.LaunchOMissle;

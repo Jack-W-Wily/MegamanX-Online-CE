@@ -20,11 +20,11 @@ public class WireSponge : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(WSpongeSeedThrowState), new MaverickStateCooldown(45, true) },
-			{ typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(45, true) },
-			{ typeof(WSpongeLightningState), new MaverickStateCooldown(45, true) },
-			{ typeof(WSpongeChainSpinState), new MaverickStateCooldown(45, true) },
-			{ typeof(WSpongeChargeState), new MaverickStateCooldown(isAI ? 60 : 0, true) }
+	//		{ typeof(WSpongeSeedThrowState), new MaverickStateCooldown(45, true) },
+	//		{ typeof(WSpongeHangSeedThrowState), new MaverickStateCooldown(45, true) },
+	//		{ typeof(WSpongeLightningState), new MaverickStateCooldown(45, true) },
+	//		{ typeof(WSpongeChainSpinState), new MaverickStateCooldown(45, true) },
+	//		{ typeof(WSpongeChargeState), new MaverickStateCooldown(isAI ? 60 : 0, true) }
 
 		};
 

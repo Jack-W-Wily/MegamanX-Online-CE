@@ -14,9 +14,9 @@ public class CrushCrawfish : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) },
-			{ typeof(CrushCShootArmState), new(45, true) },
-			{ typeof(CrushCDashState), new(30) }
+	//		{ typeof(MShoot), new(45, true) },
+	//		{ typeof(CrushCShootArmState), new(45, true) },
+		//	{ typeof(CrushCDashState), new(30) }
 		};
 
 		weapon = getWeapon();

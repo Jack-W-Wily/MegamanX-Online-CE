@@ -1253,7 +1253,7 @@ public partial class Character : Actor, IDamagable {
 			DamageScalingCD = 0.5f;
 		}
 		
-
+		
 		Helpers.decrementFrames(ref genericGrabCooldown);
 		Helpers.decrementFrames(ref genericParryCooldown);
 

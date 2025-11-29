@@ -15,9 +15,9 @@ public class DrDoppler : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) },
-			{ typeof(DrDopplerAbsorbState), new(45, true) },
-			{ typeof(DrDopplerDashStartState), new(90) }
+	//		{ typeof(MShoot), new(45, true) },
+		//	{ typeof(DrDopplerAbsorbState), new(45, true) },
+	//		{ typeof(DrDopplerDashStartState), new(90) }
 		};
 
 		weapon = getWeapon();
@@ -72,7 +72,7 @@ public class DrDoppler : Maverick {
 				}
 			}
 
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MJump or MFall) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new DrDopplerShootState());
 				} else if (input.isPressed(Control.Special1, player) && ammo >= 8) {
@@ -174,7 +174,7 @@ public class DrDoppler : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.Charge => new GenericMeleeProj(
 				weapon, pos, ProjIds.DrDopplerDash, player,
-				4, Global.defFlinch, addToLevel: addToLevel
+				4, 50, addToLevel: addToLevel
 			),
 			MeleeIds.ChargeUnderwater => new GenericMeleeProj(
 				weapon, pos, ProjIds.DrDopplerDashWater, player,

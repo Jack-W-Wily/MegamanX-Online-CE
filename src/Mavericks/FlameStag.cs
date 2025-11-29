@@ -30,8 +30,8 @@ public class FlameStag : Maverick {
 		spriteFrameToSounds["fstag_run/6"] = "run";
 
 		//stateCooldowns.Add(typeof(FStagShoot), new MaverickStateCooldown(false, false, 0.25f));
-		stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(45, false, true));
-		stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(45, false, true));
+		//stateCooldowns.Add(typeof(FStagDashChargeState), new MaverickStateCooldown(45, false, true));
+		//stateCooldowns.Add(typeof(FStagDashState), new MaverickStateCooldown(45, false, true));
 
 		awardWeaponId = WeaponIds.SpeedBurner;
 		weakWeaponId = WeaponIds.BubbleSplash;

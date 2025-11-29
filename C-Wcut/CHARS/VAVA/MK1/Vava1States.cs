@@ -96,6 +96,33 @@ public class VAVAUpperCutPunch : CharState {
 
 
 
+public class VavaKneeAttack : CharState {
+
+
+	public VavaKneeAttack() : base("knee") {
+		wiffCancel = true;
+		canSpecialCancel = true;
+		enterSound = "punch2";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
 
 
 

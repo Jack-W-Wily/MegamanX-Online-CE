@@ -1128,7 +1128,7 @@ public class VavaBurensen6 : CharState {
 
 		}
 
-		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+		if (character.sprite.name.Contains("burensen_3") && !character.isAnimOver()) {
 			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
 			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
 
@@ -1212,6 +1212,8 @@ public class VavaBurensen7 : CharState {
 
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
+					new Anim(character.pos, "ef_laser_finisher_vava", character.xDir, null, true);
+			
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
 				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
 						player.getNextActorNetId(), rpc: true
@@ -1248,7 +1250,7 @@ public class VavaBurensen7 : CharState {
 
 		}
 
-		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+		if (character.sprite.name.Contains("cannon_execution") && character.frameIndex < 7) {
 			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
 			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
 
@@ -1357,6 +1359,8 @@ public class VavaBurensen8 : CharState {
 
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
+				new Anim(character.pos, "ef_laser_finisher_vava", -character.xDir, null, true);
+			
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
 				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
 						player.getNextActorNetId(), rpc: true
@@ -1393,7 +1397,7 @@ public class VavaBurensen8 : CharState {
 
 		}
 
-		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
+		if (character.sprite.name.Contains("cannon_execution") && !character.isAnimOver()) {
 			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
 			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
 

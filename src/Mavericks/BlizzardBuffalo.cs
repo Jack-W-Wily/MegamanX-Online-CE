@@ -12,12 +12,12 @@ public class BlizzardBuffalo : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) },
-			{ typeof(BBuffaloDashState), new(75, true) },
-			{ typeof(BBuffaloShootBeamState), new(2 * 60) },
-			{ typeof(BBuffaloShootAI), new(60, true) },
-		};
+//		stateCooldowns = new() {
+//			{ typeof(MShoot), new(45, true) },
+//			{ typeof(BBuffaloDashState), new(75, true) },
+//			{ typeof(BBuffaloShootBeamState), new(2 * 60) },
+//			{ typeof(BBuffaloShootAI), new(60, true) },
+//		};
 
 		spriteFrameToSounds["bbuffalo_run/2"] = "walkStomp";
 		spriteFrameToSounds["bbuffalo_run/8"] = "walkStomp";

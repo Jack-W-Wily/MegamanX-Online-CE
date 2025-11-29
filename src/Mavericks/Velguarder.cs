@@ -13,7 +13,7 @@ public class Velguarder : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) }
+	//		{ typeof(MShoot), new(45, true) }
 		};
 		canClimbWall = true;
 

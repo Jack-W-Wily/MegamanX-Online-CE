@@ -14,11 +14,11 @@ public class StormEagle : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(StormEAirShootState), new(120, true, true) },
-			{ typeof(MShoot), new(120, false, false) },
-			{ typeof(StormEEggState), new(90, true) },
-			{ typeof(StormEGustState), new(45, true) },
-			{ typeof(StormEDiveState), new(60) }
+	//		{ typeof(StormEAirShootState), new(120, true, true) },
+	//		{ typeof(MShoot), new(120, false, false) },
+	//		{ typeof(StormEEggState), new(90, true) },
+	//		{ typeof(StormEGustState), new(45, true) },
+	//		{ typeof(StormEDiveState), new(60) }
 		};
 
 		diveWeapon = new StormEDiveWeapon();
@@ -53,8 +53,9 @@ public class StormEagle : Maverick {
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand) {
-				if (shootPressed()) {
+				if (shootPressed() && ammo > 5) {
 					changeState(getShootState());
+					ammo -= 6;
 				}
 				if (specialPressed()) {
 					changeState(new StormEEggState(true));
@@ -66,8 +67,9 @@ public class StormEagle : Maverick {
 					changeState(new StormEDiveState());
 				}
 			} else if (state is MFly) {
-				if (shootPressed()) {
+				if (shootPressed()  && ammo > 5) {
 					changeState(new StormEAirShootState());
+					ammo -= 6;
 				}
 				if (specialPressed()) {
 					changeState(new StormEEggState(false));

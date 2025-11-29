@@ -16,8 +16,8 @@ public class MorphMoth : Maverick {
 		overrideState: isHatch ? new MorphMHatchState() : null
 	) {
 		stateCooldowns = new() {
-			{ typeof(MorphMShoot), new(30, false, true) },
-			{ typeof(MorphMShootAir), new(30, false, true) }
+	//		{ typeof(MorphMShoot), new(30, false, true) },
+	//		{ typeof(MorphMShootAir), new(30, false, true) }
 		};
 
 		weapon = getWeapon();

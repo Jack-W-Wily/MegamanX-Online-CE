@@ -391,6 +391,16 @@ public class Damager {
 				}
 			}
 
+			
+			if (owner.character is Zain esZain && esZain.health > 0) {
+				esZain.dashedInAir = 0;
+			
+				esZain.charState.spcCancel = true;
+				
+			}
+
+
+
 				if (owner.character is ZeroEND zeroE && zeroE.health > 0) {
 				if (zeroE.OverDrive) {
 					if (zeroE.charState is not ZeroDoubleBuster and not

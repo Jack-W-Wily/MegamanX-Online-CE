@@ -19,12 +19,12 @@ public class BlastHornet : Maverick {
 	) : base(
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
-		stateCooldowns = new() {
-			{ typeof(BHornetShootState), new(2 * 60) },
-			{ typeof(BHornetShootCursorState), new(15) },
-			{ typeof(BHornetStingState), new(30) },
-			//{ typeof(BHornetShoot2State), new(0) }
-		};
+//		stateCooldowns = new() {
+//			{ typeof(BHornetShootState), new(2 * 60) },
+//			{ typeof(BHornetShootCursorState), new(15) },
+//			{ typeof(BHornetStingState), new(30) },
+//			//{ typeof(BHornetShoot2State), new(0) }
+//		};
 
 		weapon = new Weapon(WeaponIds.BHornetGeneric, 158);
 		wings = new Sprite("bhornet_wings");

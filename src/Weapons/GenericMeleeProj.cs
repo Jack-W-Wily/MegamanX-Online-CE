@@ -108,6 +108,15 @@ public class GenericMeleeProj : Projectile {
 	public override void onHitDamagable(IDamagable damagable) {
 		base.onHitDamagable(damagable);
 
+
+			if (isJuggleProjectile && damagable is Character chr) {
+				float modifier = 1;
+				if (chr.isUnderwater()) modifier = 2;
+				if (chr.isPushImmune()) return;
+				float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
+				chr.move(new Point(xMoveVel * 0 * modifier, -300));
+			}
+			
 		if (projId == (int)ProjIds.QuakeBlazer) {
 			if (owner.character?.charState is ZeroDownthrust hyouretsuzanState) {
 				hyouretsuzanState.quakeBlazerExplode(false);

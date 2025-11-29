@@ -18,9 +18,9 @@ public class GravityBeetle : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(GBeetleShoot), new(60) },
-			{ typeof(GBeetleGravityWellState), new(60) },
-			{ typeof(GBeetleDashState), new(90) }
+		//	{ typeof(GBeetleShoot), new(60) },
+		//	{ typeof(GBeetleGravityWellState), new(60) },
+		//	{ typeof(GBeetleDashState), new(90) }
 		};
 
 		weapon = getWeapon();

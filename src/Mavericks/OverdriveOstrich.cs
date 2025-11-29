@@ -19,9 +19,9 @@ public class OverdriveOstrich : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(OverdriveOShootState), new(45, true) },
-			{ typeof(OverdriveOShoot2State), new(2 * 60, true, true) },
-			{ typeof(OverdriveOJumpKickState), new(60, true, true) }
+		//	{ typeof(OverdriveOShootState), new(45, true) },
+		//	{ typeof(OverdriveOShoot2State), new(2 * 60, true, true) },
+		//	{ typeof(OverdriveOJumpKickState), new(60, true, true) }
 		};
 
 		weapon = getWeapon();

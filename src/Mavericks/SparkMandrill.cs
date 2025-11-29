@@ -16,9 +16,9 @@ public class SparkMandrill : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(SparkMPunchState), new(60, true, true) },
-			{ typeof(SparkMDashPunchState), new(45, false, true) },
-			{ typeof(MShoot), new(2 * 60, true, true) }
+	//		{ typeof(SparkMPunchState), new(60, true, true) },
+	//		{ typeof(SparkMDashPunchState), new(45, false, true) },
+	//		{ typeof(MShoot), new(2 * 60, true, true) }
 		};
 		spriteToCollider["dash_punch"] = getDashCollider();
 

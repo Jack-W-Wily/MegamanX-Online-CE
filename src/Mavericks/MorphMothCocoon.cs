@@ -21,8 +21,8 @@ public class MorphMothCocoon : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(45, true) },
-			{ typeof(MorphMCThreadState), new(45, true) }
+	//		{ typeof(MShoot), new(45, true) },
+	//		{ typeof(MorphMCThreadState), new(45, true) }
 		};
 
 		weapon = getWeapon();

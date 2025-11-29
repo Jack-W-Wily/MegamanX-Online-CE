@@ -1761,9 +1761,9 @@ public class GenericGrabbedState : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		character.grabInvulnTime = 2;
+		character.grabInvulnTime = 0;
 		if (this is VileMK2Grabbed) {
-			character.stunInvulnTime = 1;
+			character.stunInvulnTime = 0;
 		}
 		character.useGravity = true;
 		character.setzIndex(savedZIndex);

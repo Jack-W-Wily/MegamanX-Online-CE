@@ -205,7 +205,7 @@ public class GenericStun : CharState {
 		}
 		reduceStunFrames(ref character.paralyzedTime);
 		character.stunInvulnTime = 2;
-
+		character.useGravity = false;
 		if (paralyzeAnim == null && character.paralyzedTime > 0) {
 			paralyzeAnim = new Anim(
 				character.getCenterPos(), "vile_stun_static",
@@ -290,6 +290,7 @@ public class GenericStun : CharState {
 				RPC.playerToggle, (byte)character.player.id, (byte)RPCToggleType.StopCrystalize
 			);
 		}
+		character.useGravity = true;
 		character.paralyzedTime = 0;
 		character.frozenTime = 0;
 		character.crystalizedTime = 0;

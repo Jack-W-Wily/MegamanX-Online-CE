@@ -18,7 +18,7 @@ public class NeonTiger : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(NeonTClawState), new(20, true) },
+//			{ typeof(NeonTClawState), new(20, true) },
 			//{ typeof(MShoot), new(20, true) },
 			//{ typeof(NeonTDashClawState), new(30, true) }
 		};

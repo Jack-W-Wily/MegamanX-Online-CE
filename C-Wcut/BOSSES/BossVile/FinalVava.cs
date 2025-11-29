@@ -291,11 +291,13 @@ public class FinalVava : Vile {
 							changeState(new BumptyBoomGranadeLaunch(), true);
 							player.vileAmmo -= 25;
 						}
-						}
-				} else {
-					if (player.input.isLeftOrRightHeld(player)) {
-					} else {
 					}
+
+				} else if (!player.input.isHeld(Control.Up, player) &&
+				!player.input.isHeld(Control.Down, player)) {
+				
+						changeState(new VavaKneeAttack(), true);
+					
 					
 				}
 				

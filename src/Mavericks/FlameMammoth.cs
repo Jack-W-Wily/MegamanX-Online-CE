@@ -12,8 +12,8 @@ public class FlameMammoth : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(30, true) },
-			{ typeof(FlameMOilState), new(30, true) }
+		//	{ typeof(MShoot), new(30, true) },
+		//	{ typeof(FlameMOilState), new(30, true) }
 		};
 
 		awardWeaponId = WeaponIds.FireWave;

@@ -15,9 +15,9 @@ public class ToxicSeahorse : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MShoot), new(60, true, true) },
-			{ typeof(TSeahorseShoot2State), new(2 * 60, true, true) },
-			{ typeof(TSeahorseTeleportState), new(45, true) }
+	//		{ typeof(MShoot), new(60, true, true) },
+	//		{ typeof(TSeahorseShoot2State), new(2 * 60, true, true) },
+	//		{ typeof(TSeahorseTeleportState), new(45, true) }
 		};
 
 		weapon = getWeapon();

@@ -84,6 +84,22 @@ public class Zain : Character {
 		return base.attackCtrl();
 	}
 
+	public override bool spcCancel() {
+		if (player.dashPressed(out string dashControl)) {
+			if (grounded) {
+				changeState(new Dash(dashControl), true);
+			} else {
+				changeState(new AirDash(dashControl), true);
+			}
+				return true;
+		}
+
+
+
+		return base.spcCancel();
+	}
+
+
 
 
 	public override void update() {

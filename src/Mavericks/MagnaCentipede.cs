@@ -24,9 +24,9 @@ public class MagnaCentipede : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(MagnaCShootState), new(30, true) },
-			{ typeof(MagnaCMagnetPullState), new(2 * 60, false, true) },
-			{ typeof(MagnaCDrainState), new(2 * 60, false, true) }
+	//		{ typeof(MagnaCShootState), new(30, true) },
+	//		{ typeof(MagnaCMagnetPullState), new(2 * 60, false, true) },
+	//		{ typeof(MagnaCDrainState), new(2 * 60, false, true) }
 		};
 
 		weapon = getWeapon();

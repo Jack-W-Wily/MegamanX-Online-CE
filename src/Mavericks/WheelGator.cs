@@ -23,8 +23,8 @@ public class WheelGator : Maverick {
 		player, pos, destPos, xDir, netId, ownedByLocalPlayer
 	) {
 		stateCooldowns = new() {
-			{ typeof(WheelGShootState), new MaverickStateCooldown(75) },
-			{ typeof(WheelGSpinState), new MaverickStateCooldown(2 * 60) }
+	//		{ typeof(WheelGShootState), new MaverickStateCooldown(75) },
+	//		{ typeof(WheelGSpinState), new MaverickStateCooldown(2 * 60) }
 		};
 
 		weapon = getWeapon();
