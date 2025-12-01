@@ -19,6 +19,7 @@ public class HexaInvoluteStateWC : CharState {
 	Character vile;
 
 
+
 	public HexaInvoluteStateWC() : base("super") {
 		superArmor = true;
 		immuneToWind = true;
@@ -41,7 +42,7 @@ public class HexaInvoluteStateWC : CharState {
 			Helpers.decrementTime(ref ammoTime);
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
-				player.vileAmmo--;
+				player.vileAmmo -= 2;
 			}
 		}
 
@@ -58,15 +59,20 @@ public class HexaInvoluteStateWC : CharState {
 		character.useGravity = false;
 		character.grounded = false;
 		character.stopMoving();
-		vile.getOffMK5Platform();
+		//character.getOffMK5Platform();
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		proj?.destroySelf();
+		if (!character.OverDrive){
+			proj?.destroySelf();
+		}
 		character.useGravity = true;
 	}
 }
+
+
+
 
 public class HexaInvolutePartWC {
 	public float time;
@@ -110,7 +116,7 @@ public class HexaInvoluteProjWC : Projectile {
 	public List<HexaInvolutePartWC> parts = new List<HexaInvolutePartWC>();
 	public HexaInvoluteProjWC(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 1, player, "empty", Global.defFlinch, 0.15f, netProjId, player.ownedByLocalPlayer) {
-		projId = (int)ProjIds.HexaInvolute;
+		projId = (int)ProjIds.HexaInvoluteProjWC;
 		setIndestructableProperties();
 		sprite.hitboxes = new Collider[6];
 
@@ -262,3 +268,37 @@ public class HexaInvoluteProjWC : Projectile {
 		ang = BitConverter.ToSingle(data, 0);
 	}
 }
+
+
+
+
+
+public class LifeStealProj : Projectile {
+
+	public LifeStealProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "vilemk5_null_proj", netId, player
+	) {
+	
+		projId = (int)ProjIds.LifeSteal;
+		damager.damage = 0.01f;
+		maxTime = 0.1f;
+		shouldShieldBlock = false;
+		destroyOnHit = false;
+		shouldVortexSuck = false;
+
+		
+	}
+
+	public override void update() {
+		base.update();
+		if (sprite.loopCount > 30) {
+			destroySelf();
+		}
+	}
+
+
+	
+}
+

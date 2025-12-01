@@ -59,7 +59,20 @@ public class AxlWC : Character {
 	public bool isCursorAim => (
 		!player.isAI && player == Global.level.mainPlayer && Options.main.axlAimMode == 2
 	);
+
+
+	// Cursor stuff.
 	public Point axlCursorPos;
+	public Point? assassinCursorPos;
+	public Point axlScopeCursorWorldPos;
+	public Point axlScopeCursorWorldLerpPos;
+	public Point axlZoomOutCursorDestPos;
+	public Point axlLockOnCursorPos;
+	public Point axlGenericCursorWorldPos {
+		get {
+			return axlCursorWorldPos;
+		}
+	}
 	public Point axlCursorWorldPos => axlCursorPos.addxy(Global.level.camX, Global.level.camY);
 	public float savedCamX;
 	public float savedCamY;
@@ -328,9 +341,83 @@ public class AxlWC : Character {
 		}
 	}
 
+
+
+	public void updateAxlCursorPos() {
+		float aimThreshold = 5;
+		bool axisXMoved = false;
+		bool axisYMoved = false;
+		// Options.main.aimSensitivity is a float from 0 to 1.
+		float distFromNormal = Options.main.aimSensitivity - 0.5f;
+		float sensitivity = 1;
+		if (distFromNormal > 0) {
+			sensitivity += distFromNormal * 7.5f;
+		} else {
+			sensitivity += distFromNormal * 1.75f;
+		}
+
+		// Controller joystick axis move section
+		if (Input.aimX > aimThreshold && Input.aimX >= Input.lastAimX) {
+			axlCursorPos.x += Global.spf * Global.screenW * (Input.aimX / 100f) * sensitivity;
+			axisXMoved = true;
+		} else if (Input.aimX < -aimThreshold && Input.aimX <= Input.lastAimX) {
+			axlCursorPos.x -= Global.spf * Global.screenW * (MathF.Abs(Input.aimX) / 100f) * sensitivity;
+			axisXMoved = true;
+		}
+		if (Input.aimY > aimThreshold && Input.aimY >= Input.lastAimY) {
+			axlCursorPos.y += Global.spf * Global.screenW * (Input.aimY / 100f) * sensitivity;
+			axisYMoved = true;
+		} else if (Input.aimY < -aimThreshold && Input.aimY <= Input.lastAimY) {
+			axlCursorPos.y -= Global.spf * Global.screenW * (MathF.Abs(Input.aimY) / 100f) * sensitivity;
+			axisYMoved = true;
+		}
+
+		// Controller or keyboard button based aim section
+		if (!axisXMoved) {
+			if (player.input.isHeld(Control.AimLeft, player)) {
+				axlCursorPos.x -= Global.spf * 200 * sensitivity;
+			} else if (player.input.isHeld(Control.AimRight, player)) {
+				axlCursorPos.x += Global.spf * 200 * sensitivity;
+			}
+		}
+		if (!axisYMoved) {
+			if (player.input.isHeld(Control.AimUp, player)) {
+				axlCursorPos.y -= Global.spf * 200 * sensitivity;
+			} else if (player.input.isHeld(Control.AimDown, player)) {
+				axlCursorPos.y += Global.spf * 200 * sensitivity;
+			}
+		}
+
+		// Mouse based aim
+		if (!Menu.inMenu && !player.isAI) {
+			if (Options.main.useMouseAim) {
+				axlCursorPos.x += Input.mouseDeltaX * 0.125f * sensitivity;
+				axlCursorPos.y += Input.mouseDeltaY * 0.125f * sensitivity;
+			}
+			axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+			axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
+		}
+
+		if (isWarpIn()) {
+			axlCursorPos = getCenterPos().addxy(-Global.level.camX + 50 * xDir, -Global.level.camY);
+		}
+
+		// aimbot
+		if (player.isAI) {
+			var target = Global.level.getClosestTarget(pos, player.alliance, true);
+			if (target != null) {
+				axlCursorPos = target.pos.addxy(
+					-Global.level.camX,
+					-Global.level.camY - ((target as Character)?.charState is InRideArmor ? 0 : 16)
+				);
+			};
+		}
+
+	//	getMouseTargets();
+	}
 	public void updateArmAngleMouse() {
-		axlCursorPos.x = Input.mouseDeltaX;
-		axlCursorPos.y = Input.mouseDeltaY;
+			axlCursorPos.x = Helpers.clamp(axlCursorPos.x, 0, Global.viewScreenW);
+			axlCursorPos.y = Helpers.clamp(axlCursorPos.y, 0, Global.viewScreenH);
 
 		if (charState.normalCtrl && (canTurn() || charState is Run)) {
 			if (xDir == 1 && axlCursorPos.x < pos.x) {

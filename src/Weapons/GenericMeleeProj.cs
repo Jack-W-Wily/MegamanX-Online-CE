@@ -157,6 +157,9 @@ public class GenericMeleeProj : Projectile {
 			case (int)ProjIds.BBuffaloDrag when ownerActor is BlizzardBuffalo bb:
 				maverickGrabCode(CommandGrabScenario.BBuffaloGrab, bb, damagable, new BBuffaloDragged(bb));
 				break;
+			case (int)ProjIds.MammothGrab when ownerActor is FlameMammoth Fm:
+				maverickGrabCode(CommandGrabScenario.MammothGrab, Fm, damagable, new BBuffaloDragged(Fm));
+				break;
 		}
 	}
 

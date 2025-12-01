@@ -1598,6 +1598,7 @@ public enum CommandGrabScenario {
 	CrushCGrab,
 	BBuffaloGrab,
 	Release,
+	MammothGrab,
 }
 
 public class RPCCommandGrabPlayer : RPC {
@@ -1727,7 +1728,15 @@ public class RPCCommandGrabPlayer : RPC {
 					grabberMaverick, victimChar,
 					new BBuffaloDragged(blizzardBuffalo), isDefenderFavored
 				);
+			} else if (hookScenario == CommandGrabScenario.MammothGrab && grabber is FlameMammoth Fm) {
+				maverickGrabCode(
+					grabberMaverick, victimChar,
+					new BBuffaloDragged(Fm), isDefenderFavored
+				);
+					grabberMaverick.changeState(new FlameMGrabFinish(), true);
 			}
+		
+
 		}
 	}
 

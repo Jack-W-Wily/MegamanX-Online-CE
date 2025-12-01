@@ -48,11 +48,10 @@ public class HexaInvoluteState : VileState {
 			if (ammoTime == 0) {
 				ammoTime = 0.125f;
 				vile.addAmmo(-1);
-				player.vileAmmo -= 1;
 			}
 		}
 
-		if ( player.vileAmmo <= 0 || vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateFrames >= 60)) {
+		if (vile.energy.ammo <= 0 || (player.input.isPressed(Control.Special1, player) && stateFrames >= 60)) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -134,15 +133,11 @@ public class HexaInvoluteProj : Projectile {
 			beamDest[i] = pos;
 		}
 
-
-		var rect = new Rect(0, 0, 10, 10);
-		globalCollider = new Collider(rect.getPoints(), true, this, false, false, 0, new Point(0, 0));
-
 		if (sendRpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
-
+	
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new HexaInvoluteProj(
 			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
@@ -213,7 +208,6 @@ public class HexaInvoluteProj : Projectile {
 		foreach (HexaInvolutePart part in particles) {
 			Point partPos = part.getPos();
 			float partSize = part.getRadius();
-
 			Global.sprites["vilemk5_super_part"].draw(
 				0, partPos.x, partPos.y, 1, 1, null, part.getAlpha(), partSize, partSize, zIndex + 1
 			);
@@ -296,9 +290,6 @@ public class HexaInvoluteProj : Projectile {
 	}
 }
 
-
-
-
 public class VavaVOverdriveStart : VileState {
 	public HexaInvoluteProj2? proj;
 	public bool startGrounded;
@@ -362,7 +353,7 @@ public class VavaVOverdriveStart : VileState {
 public class HexaInvoluteProj2 : Projectile {
 	public Anim? muzzle;
 	public int hitboxNum = 10;
-	public float radius = 50;
+	public float radius = 100;
 	public SoundWrapper? sound;
 	public float soundCooldown;
 	public List<HexaInvolutePart> particles = [];

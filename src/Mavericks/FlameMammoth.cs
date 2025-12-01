@@ -41,7 +41,18 @@ public class FlameMammoth : Maverick {
 					changeState(getShootState(false));
 				} else if (specialPressed()) {
 					changeState(new FlameMOilState());
-				}
+				} else if (input.isPressed(Control.Dash, player)) {
+                    if (input.isHeld(Control.Up, player)) {
+                        changeState(new FlameMGrabStart());
+                    } else {
+                        changeState(new FlameMThousandHandStart());
+                    }
+                } else if (input.isR2Pressed(player)) {
+                    if (player.superAmmo == player.superMaxAmmo) {
+                         changeState(new FlameMInfernoCharge());
+						 player.superAmmo = 0;
+                    }
+                }
 			} else if (state is MJump || state is MFall) {
 				if (input.isPressed(Control.Dash, player)) {
 					changeState(new FlameMJumpPressState());
@@ -95,12 +106,19 @@ public class FlameMammoth : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		Fall,
+
+		Grab,
+		GrabEnd,
+		ThousandHands,
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"flamem_fall" => MeleeIds.Fall,
+			"flamem_thousand_hands" =>  MeleeIds.ThousandHands,
+			"flamem_grab" =>  MeleeIds.Grab,
+			"flamem_grab_finih" =>  MeleeIds.GrabEnd,
 			_ => MeleeIds.None
 		});
 	}
@@ -111,6 +129,18 @@ public class FlameMammoth : Maverick {
 			MeleeIds.Fall => new GenericMeleeProj(
 				stompWeapon, pos, ProjIds.FlameMStomp, player,
 				6, Global.defFlinch, addToLevel: addToLevel
+			),
+			MeleeIds.GrabEnd => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.MechFrogStompShockwave, player,
+				6, 0, addToLevel: addToLevel
+			),
+			MeleeIds.Grab => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.MammothGrab, player,
+				2, 0, addToLevel: addToLevel
+			),
+			MeleeIds.ThousandHands => new GenericMeleeProj(
+				stompWeapon, pos, ProjIds.FireWave, player,
+				2, 10, addToLevel: addToLevel
 			),
 			_ => null
 		};
@@ -489,6 +519,147 @@ public class FlameMOilState : MammothMState {
 	}
 }
 
+
+
+
+public class FlameMGrabStart : MammothMState {
+	public FlameMGrabStart() : base("grab") {
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+}
+
+
+public class FlameMGrabFinish : MammothMState {
+	public FlameMGrabFinish() : base("grab_finisher") {
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
+
+
+
+
+public class FlameMThousandHandStart : MammothMState {
+	public FlameMThousandHandStart() : base("thousand_start") {
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+
+
+		if (maverick.isAnimOver()) {
+			maverick.changeState(new FlameMThousandHandState());
+		}
+	}
+}
+
+
+
+
+
+public class FlameMThousandHandState : MammothMState {
+	public FlameMThousandHandState() : base("thousand_hands") {
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+
+
+		if (stateTime > 1.6f) {
+			maverick.changeState(new FlameMThousandHandEnd());
+		}
+	}
+}
+
+
+
+
+public class FlameMThousandHandEnd : MammothMState {
+	public FlameMThousandHandEnd() : base("thousand_end") {
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
+
+
 public class FlameMJumpPressState : MammothMState {
 	public FlameMJumpPressState() : base("fall") {
 	}
@@ -528,4 +699,90 @@ public class FlameMJumpStateAI : MammothMState {
 		maverick.vel.y = -maverick.getJumpPower() * 1.25f;
 	}
 }
+
+
+
+
+public class FlameMInfernoCharge : MammothMState {
+	public FlameMInfernoCharge() : base("inferno_charge") {
+		
+	}
+
+	public override bool canEnter(Maverick maverick) {
+		return base.canEnter(maverick);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+
+		if (stateTime > 1 && !once) {
+			once = true;
+			maverick.changeSpriteFromName("inferno_maxed", true);
+		}
+
+		if (stateTime > 2) {
+			maverick.changeState(new FlameMInfernoRelease(), true);
+		}
+	}
+}
+
+
+
+public class FlameMInfernoRelease : MammothMState {
+	public FlameMInfernoRelease() : base("inferno_release") {
+	}
+
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMoving();
+	}
+
+	public override void update() {
+		base.update();
+		if (BurninNoumander == null) return;
+		var character = maverick;
+		if (maverick.frameIndex == 6 && !once) {
+			once = true;
+			new FlameMStompShockwave(
+			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir,
+			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			maverick.shakeCamera(sendRpc: true);
+			character.playSound("flamemTaunt", sendRpc: true);
+			maverick.playSound("flamemOilBurn", sendRpc: true);
+
+
+			new FlameMBigFireProj(character.pos.addxy(30, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(60, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(90, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(120, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(150, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(180, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(210, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-30, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-60, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-90, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-120, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-150, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-180, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+			new FlameMBigFireProj(character.pos.addxy(-210, 0), character.xDir, 0, character, player, player.getNextActorNetId(), rpc: true);
+
+
+
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
 #endregion

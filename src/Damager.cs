@@ -453,7 +453,7 @@ public class Damager {
 			if (owner.character is VAVAV vavav && vavav.health > 0) {
 
 				if (owner.superAmmo != owner.superMaxAmmo && projId != (int)ProjIds.HexaInvolute
-				&& projId != (int)ProjIds.HexaInvolute2
+				&& projId != (int)ProjIds.HexaInvolute2 && projId != (int)ProjIds.HexaInvoluteProjWC
 				) {
 						if (owner.character.charState.canGainMeter){
 					owner.superAmmo += 1;
@@ -792,6 +792,9 @@ public class Damager {
 				projId != (int)ProjIds.Burn &&
 				projId != (int)ProjIds.FireWave &&
 				projId != (int)ProjIds.VelGFire &&
+				projId != (int)ProjIds.HexaInvolute2 &&
+				projId != (int)ProjIds.HexaInvoluteProjWC &&
+				projId != (int)ProjIds.AcidBurstPoison &&
 				projId != (int)ProjIds.Burn
 			) {
 				if (
@@ -908,6 +911,7 @@ public class Damager {
 			||	projId == (int)ProjIds.Burn
 			
 			
+			
 			) && character.isWCUTBoss
 			) {
 					damage = 0;
@@ -952,7 +956,11 @@ public class Damager {
 				//			victim.addDamageText("ABSORBED!", 1);		
 				//	}
 
-				if (projId == (int)ProjIds.HexaInvolute2 && owner.health > 0) {
+				if (projId == (int)ProjIds.HexaInvoluteProjWC && owner.health > 0) {
+					owner.character.addHealth(0.1f);
+				}
+
+				if (projId == (int)ProjIds.LifeSteal && owner.health > 0) {
 					owner.character.addHealth(0.1f);
 				}
 
@@ -973,8 +981,12 @@ public class Damager {
 				(
 					projId == (int)ProjIds.VileAirRaidStart
 				|| projId == (int)ProjIds.VileAirRaidPlusKnock
-				)) {
+				) && owner.character.isAnimOver()) {
 					owner.character.changeState(new VileAirRaid(character), true);
+
+					if ( projId == (int)ProjIds.VileAirRaidPlusKnock) {
+							character.changeState(new LaunchedState(owner.character), true);
+                    }
 				}
 
 
@@ -1228,6 +1240,9 @@ public class Damager {
 					maverick.addAcidDot(owner, 2);
 					break;
 				case ProjIds.AcidBurstCharged:
+					maverick.addAcidDot(owner, 3);
+					break;
+				case ProjIds.HydroStormProj:
 					maverick.addAcidDot(owner, 3);
 					break;
 				// Freeze effects	

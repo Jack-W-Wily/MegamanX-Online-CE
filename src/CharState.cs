@@ -749,7 +749,9 @@ public class Idle : CharState {
 		if (Global.level.gameMode.isOver) {
 			if (Global.level.gameMode.playerWon(player)) {
 				string winSprite = "win";
+				if (character.sprite.name.Contains("win")){
 				character.changeSpriteFromName(winSprite, true);
+				}
 			} else {
 				if (!character.sprite.name.Contains("lose")) {
 					string loseSprite = "lose";

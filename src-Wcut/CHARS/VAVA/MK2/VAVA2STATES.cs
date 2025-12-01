@@ -24,6 +24,7 @@ public class VavaVSlashRun : CharState {
 		character.move(new Point(character.xDir * 150, 0));
 	   if (character.sprite.name.Contains("slashrun")
 	  	&& character.isAnimOver()) {
+			sprite = "air_bomb_attack";
 			character.changeSpriteFromName("air_bomb_attack", true);	
 		}
 	  if (character.sprite.name.Contains("air_bomb_attack")
@@ -90,6 +91,7 @@ public class VileDodge : CharState {
 		if (player.input.isPressed(Control.Special1, player)) {
 			character.playSound("vileMissile", true);
 			character.changeSpriteFromName("banzai_launch", true);	
+			sprite = "banzai_launch";
 					character.turnToInput(player.input, player);
 		}
 
@@ -485,7 +487,7 @@ public class VAVA2GrabState : CharState {
 				
 				&& !once) {
 				once = true;
-				sound = character.playSound("vileHover", forcePlay: false, sendRpc: true);
+				character.playSound("vileHover", forcePlay: false, sendRpc: true);
 				}
 			}
 		//}
@@ -544,6 +546,7 @@ public class VAVA2GrabState : CharState {
 			&& player.input.isPressed(Control.Shoot, player)
 			 || player.isAI && AIExecution == 1) {
 			character.changeSpriteFromName("violentcrusher_grab", true);
+			sprite = "violentcrusher_grab";
 			return;	
 		}
 
@@ -637,18 +640,22 @@ public class VileAirRaid : CharState {
 		
 			 if (Helpers.randomRange(0,3) == 1 ){
 			character.changeSpriteFromName("punch_2", true);
+			sprite = "punch_2";
 			
 			}
 			else if (Helpers.randomRange(0,3) == 2){
 			character.changeSpriteFromName("kick", true);
+			sprite = "kick";
 			
 			}
 			else if (Helpers.randomRange(0,3) == 3 ){
 			character.changeSpriteFromName("kick_2", true);
+			sprite = "kick_2";
 			
  			} 
 			else {
 				character.changeSpriteFromName("punch_1", true);
+				sprite = "punch_1";
 			}
 			
 		}
@@ -656,6 +663,7 @@ public class VileAirRaid : CharState {
 			if ( player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Shoot, player)) {
 			character.changeSpriteFromName("air_bomb_attack", true);	
+			sprite = "air_bomb_attack";
 		}
 
 
@@ -663,6 +671,7 @@ public class VileAirRaid : CharState {
 			&& player.input.isPressed(Control.Special1, player)) {
 			character.changeSpriteFromName("banzai_launch", true);	
 				character.playSound("vileMissile", true);
+				sprite = "banzai_launch";
 		}
 
 		if (character.sprite.name.Contains("banzai")

@@ -402,7 +402,10 @@ public class DesmumeSpam : CharState {
 			}
 		}
 
-
+		if (stateTime > 7) {
+            character.changeToIdleOrFall();
+        }
+		
 		if (player.input.isPressed(Control.Jump, player)) {
 			character.changeToIdleOrFall();
 		}
@@ -494,6 +497,10 @@ public class DesmumeSpam2 : CharState {
 		if (player.input.isPressed(Control.Jump, player)) {
 			character.changeToIdleOrFall();
 		}
+
+		if (stateTime > 7) {
+            character.changeToIdleOrFall();
+        }
 		if (character.isAnimOver() || stateTime > 10) {
 			if (character.grounded) {
 				character.changeState(new Idle());

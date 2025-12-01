@@ -211,3 +211,84 @@ public class RollingShieldProjCharged : Projectile {
 		}
 	}
 }
+
+
+
+
+public class RollingShieldProjCharged2 : Projectile {
+	
+	public LoopingSound? rollingShieldSound;
+	public float ammoDecCooldown = 0;
+	public RollingShieldProjCharged2(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "rolling_shield_charge_flash", netId, player	
+	) {
+		weapon = RollingShield.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 20;
+		maxTime = 10;
+		vel = new Point(0 * xDir, 0);
+		projId = (int)ProjIds.RollingShieldCharged;
+		fadeSprite = "rolling_shield_charge_break";
+		fadeSound = "hit";
+		useGravity = false;
+		rollingShieldSound = new LoopingSound("rollingShieldCharge", "rollingShieldChargeLoop", this);
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		shouldVortexSuck = false;
+		neverReflect = true;
+		canBeLocal = false;
+
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new RollingShieldProjCharged2(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (!ownedByLocalPlayer) {
+			if (rollingShieldSound != null) {
+				rollingShieldSound.play();
+			}
+			return;
+		}
+		// In case it gets reflected (somehow) it implodes.
+		// This to prevent it from killing X when reflected.
+		
+		if (isAnimOver() && sprite.name == "rolling_shield_charge_flash") {
+			changeSprite("rolling_shield_charge", true);
+		}
+	
+		if (rollingShieldSound != null) {
+			rollingShieldSound.play();
+		}
+		changePos(ownerActor?.getCenterPos() ?? new Point(0,0));
+		if (ammoDecCooldown > 0) {
+			ammoDecCooldown -= speedMul;
+			if (ammoDecCooldown <= 0) ammoDecCooldown = 0;
+		}
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		if (ownerActor is not null) {
+			base.onHitDamagable(damagable);
+		}
+	}
+
+
+	public override void onDestroy() {
+		
+		if (rollingShieldSound != null) {
+			rollingShieldSound.destroy();
+			rollingShieldSound = null;
+		}
+	}
+}
+

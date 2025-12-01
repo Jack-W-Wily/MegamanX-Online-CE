@@ -1647,3 +1647,76 @@ public class DynamoKnifeProj : Projectile {
 		);
 	}
 }
+
+
+
+
+
+
+
+public class DynamoHydroStorm : CharState {
+
+	public DynamoHydroStorm() : base("hydrostorm") {
+		
+	}
+
+
+
+	public override void update() {
+		base.update();
+		if (!once && character.frameIndex == 2) {
+					once = true;
+					float topY = Global.level.getTopScreenY(character.pos.y);
+				
+					new HydroStormProj(
+						new Point(character.pos.x, topY), character.xDir, character,
+						player, player.getNextActorNetId(), rpc: true
+					);
+					
+					character.playSound("chillpBlizzard", sendRpc: true);
+				}
+				if (character.sprite.isAnimOver()) {
+					character.changeState(new Fall());
+		}
+	}
+}
+
+
+
+
+
+
+public class HydroStormProj : Projectile {
+
+	public HydroStormProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "dynamo_hydrostorm_proj", netId, player
+	) {
+		weapon = ChillPBlizzardWeapon.netWeapon;
+		projId = (int)ProjIds.HydroStormProj;
+		damager.damage = 0.01f;
+		shouldShieldBlock = false;
+		destroyOnHit = false;
+		shouldVortexSuck = false;
+
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new HydroStormProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (sprite.loopCount > 30) {
+			destroySelf();
+		}
+	}
+
+
+	
+}

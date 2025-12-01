@@ -631,7 +631,7 @@ public class BBuffaloCrashProj : Projectile {
 public class BBuffaloDragged : GenericGrabbedState {
 	public const float maxGrabTime = 4;
 	public BBuffaloDragged(
-		BlizzardBuffalo grabber
+		Maverick grabber
 	) : base(
 		grabber, maxGrabTime, "_dash", reverseZIndex: true,
 		freeOnHitWall: false, lerp: true, additionalGrabSprite: "_dash_grab"

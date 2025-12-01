@@ -91,10 +91,30 @@ public class ArmoredArmadillo : Maverick {
 						deductAmmo(2);
 						if (input.isHeld(Control.Up, player)) {
                         changeState(new DilloOverHead());
-                        }
+                        } else {
 						changeState(new ArmoredARollEnterState());
+						}
 					}
-				}
+				} else if (input.isR2Pressed(player)) {
+                    if (input.isHeld(Control.Up, player)) {
+						if (player.character != null && player.superAmmo > 15){
+						changeState(new MTaunt(), true);
+                        new RollingShieldProjCharged2(
+						player.character.pos, player.character.xDir, player.character, player, player.getNextActorNetId(), true
+						);
+						 new RollingShieldProjCharged2(
+						pos, xDir,this, player, player.getNextActorNetId(), true
+						);
+						player.superAmmo -= 16;
+						} else {
+                            if (player.superAmmo > 10) {
+                                player.superAmmo -= 10;
+								changeState(new ArmoredAGuardReleaseState(6), true);
+                            }
+
+                        }
+                    }
+                }
 			}
 		} else {
 			if (state is MIdle or MRun or MLand or MShoot && collider != null) {
@@ -492,7 +512,7 @@ public class DilloOverHead : ArmadilloMState {
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
 		maverick.vel.y = -ArmoredArmadillo.rollTransJumpPower;
-		maverick.frameSpeed = 0;
+
 	}
 
 	public override void update() {
@@ -504,15 +524,15 @@ public class DilloOverHead : ArmadilloMState {
 			sprite = "roll";
             maverick.changeSpriteFromName("roll", true);
         }
-		if (maverick.vel.y > 0) {
-			maverick.frameSpeed = 1;
-		}
+
 		if (maverick.grounded && stateFrame >= 2) {
-			maverick.changeState(new ArmoredARollExitState());
+			
 			new MechFrogStompShockwave(new FireWave(),
 				maverick.pos, maverick.xDir, player,
 				player.getNextActorNetId(), rpc: true);
 				maverick.playSound("crash", true);
+
+			maverick.changeState(new ArmoredARollExitState());
 
 		}
 	}
@@ -539,7 +559,7 @@ public class ArmoredARollEnterState : ArmadilloMState {
 			maverick.frameSpeed = 1;
 		}
 		if (maverick.grounded && stateFrame >= 2) {
-			maverick.changeState(new ArmoredARollExitState());
+			maverick.changeState(new ArmoredARollState());
 		}
 	}
 }

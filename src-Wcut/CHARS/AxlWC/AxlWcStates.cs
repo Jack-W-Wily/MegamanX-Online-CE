@@ -749,7 +749,7 @@ public class AxlRainDrop : CharState {
 }
 
 public class AxlSpinKick : CharState {
-	public AxlWC axl = null!;
+	//public AxlWC axl = null!;
 	public float pushBackSpeed;
 
 	public AxlSpinKick() : base("spinkick") {
@@ -783,9 +783,9 @@ public class AxlSpinKick : CharState {
 		}
 
 		if (character.frameIndex > 4) {
-			if (player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
-				character.changeState(new AxlString1(), true);
-			}
+		//	if (player.input.isPressed(Control.Shoot, player) && axl.mainWeapon.ammo > 0) {
+			//	character.changeState(new AxlString1(), true);
+			//}
 			if (player.input.isPressed(Control.Special1, player)) {
 				character.changeState(new AxlRollBump(), true);
 			}

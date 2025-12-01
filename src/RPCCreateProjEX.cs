@@ -175,6 +175,8 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.BuckshotDance, VulcanBuckshotDance.rpcInvoke },
 		{ (int)ProjIds.HexaInvolute, HexaInvoluteProj.rpcInvoke },
 		{ (int)ProjIds.HexaInvolute2, HexaInvoluteProj2.rpcInvoke },
+	
+
 
 		// Zero
 		{ (int)ProjIds.SuiretsusanProj, SuiretsusenProj.rpcInvoke },

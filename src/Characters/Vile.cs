@@ -444,7 +444,7 @@ public class Vile : Character {
 		return !isInvulnerable(true) && charState is not Die && invulnTime == 0 && energy.ammo >= laserWeapon.getAmmoUsage(0);
 	}
 	public override int getMaxChargeLevel() {
-		return isVileMK5 ? 4 : 3;
+		return 4;
 	}
 	public override bool canShoot() {
 		if (isInvulnerableAttack()) return false;

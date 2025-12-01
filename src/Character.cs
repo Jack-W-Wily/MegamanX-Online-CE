@@ -1180,10 +1180,12 @@ public partial class Character : Actor, IDamagable {
 			if (health > 10 && bonusHealth == 0) {
 				overDriveTimer = 30;
 			}
-			if (this is VAVAV){
-				changeState(new VavaVOverdriveStart(), true);
-			}
+			if (this is Vile){
+			changeState(new VavaVOverdriveStart(), true);
+			playSound("ching_vile");
+			} else {
 			playSound("ching");
+			}
 			addDamageText("O V E R D R I V E", 0);
 			invulnTime = 1f;
 		}
@@ -1236,10 +1238,11 @@ public partial class Character : Actor, IDamagable {
 		//Damage Systems (WCUT)
 		Helpers.decrementFrames(ref ComboTimer);
 		Helpers.decrementFrames(ref ignoreStateCooldownTime);
-		Helpers.decrementFrames(ref DamageScalingCD);
+		
+		Helpers.decrementTime(ref DamageScalingCD);
 
 		if (DamageScalingCD == 0) {
-			Helpers.decrementFrames(ref DamageScaling);
+			Helpers.decrementTime(ref DamageScaling);
 		}
 
 

@@ -782,6 +782,10 @@ public enum ProjIds {
 
 	ForceGrabState,
 
+	// Mavericks stuff wcut
+
+	MammothGrab,
+
 	// Kurumitos Stuff
 	KRStandingKick,
 	KRAirDunk,
@@ -790,8 +794,15 @@ public enum ProjIds {
 	YamiBaraiProj,
 	OrochinagiProj,
 
+
+	// Dynamo
 	DynamoBlockSlash,
+
+	HydroStormProj,
 	// VAVA (WCUT)
+	
+	LifeSteal,
+	HexaInvoluteProjWC,
 
 	TridentLine,
 	BigBoy,
@@ -939,6 +950,8 @@ public enum ProjIds {
 	IrisSlashProj,
 	IrisStabProj,
 	IrisCannon,
+
+
 
 	IrisLaserProjDiagonal,
 	IrisLaserProjFoward,

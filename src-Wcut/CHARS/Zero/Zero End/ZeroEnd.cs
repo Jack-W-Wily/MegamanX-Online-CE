@@ -159,7 +159,8 @@ public class ZeroEND : Zero {
 		gigaAttack.update();
 		gigaAttack.charLinkedUpdate(this, true);
 		base.update();
-
+		if (sprite.name == "bzero_attack_dash") charState.invincible = true;
+		
 		// Hypermode timer.
 		if (hyperModeTimer > 0) {
 			hyperModeTimer -= Global.speedMul;
@@ -717,14 +718,14 @@ public class ZeroEND : Zero {
 				changeState(new ZeroShippuugaState(), true);
 				return true;
 			}
-			if (player.superAmmo > 5){
+			if (player.superAmmo > 10){
 			changeState(new ZeroDashSlashState(), true);
-			player.superAmmo -= 6;
+			gigaAttack.ammo -= 10;
 			} else {
         	changeState(new ZeroSlash1State(), true && stockedBusterLv == 0);
             }
 			if (specialPressTime == 0){
-			invulnTime = 0.4f;
+		
 			slideVel = xDir * getDashSpeed() * 2;
 			}
 			return true;
@@ -1059,24 +1060,24 @@ public class ZeroEND : Zero {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.GrabEnd => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.HeavyPush, player, 5, 0, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.BurensenEND, player, 2, 0, 15, isReflectShield: true,
 				isZSaberEffect2: false, isZSaberClang: false,
 				addToLevel: addToLevel
 			),
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber1, player, 1, Global.miniFlinch, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber1, player, 0.5f, Global.miniFlinch, 15, isReflectShield: true,
 				isZSaberEffect2: true, isZSaberClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.ZSaber2, player, 1, Global.halfFlinch, 15, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.ZSaber2, player, 0.5f, Global.halfFlinch, 15, isReflectShield: true,
 				isZSaberEffect2B: true, isZSaberClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
-				0.5f, Global.defFlinch, 3, isReflectShield: true,
+				0.5f, Global.defFlinch, 5, isReflectShield: true,
 				isZSaberEffect: true, isZSaberClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),

@@ -160,6 +160,16 @@ public class Dynamo : Character {
 
 		}
 
+		if (player.input.isR2Pressed(player)) {
+            if (player.input.isHeld(Control.Up, player)) {
+               if (player.superAmmo >= 32) {
+                    player.superAmmo -= 32;
+					changeState(new DynamoHydroStorm(), true);
+			
+                } 
+            }
+        }
+
 
 		if (player.input.isPressed(Control.Special1, player) &&
 		player.input.isHeld(Control.Down, player) &&
