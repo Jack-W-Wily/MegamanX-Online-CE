@@ -369,7 +369,7 @@ public class HexaInvoluteProj2 : Projectile {
 		damager.damage = 0.1f;
 		damager.hitCooldown = 9;
 		projId = (int)ProjIds.HexaInvolute2;
-		zIndex = ZIndex.Backwall;
+		zIndex = ZIndex.Background;
 		setIndestructableProperties();
 		sprite.hitboxes = popullateHitboxes();
 		for (int i = 0; i < beamDest.Length; i++) {
@@ -389,6 +389,13 @@ public class HexaInvoluteProj2 : Projectile {
 
 	public override void update() {
 		base.update();
+		if (owner.character != null){
+		if (owner.character.isInDamageSprite()){
+				damager.damage = 0;
+			} else {
+            damager.damage = 0.1f;    
+            }
+		}
 		if (isRunByLocalPlayer()) {
 			foreach (var go in getCloseActors(MathInt.Ceiling(radius + 20))) {
 				var chr = go as Character;
@@ -424,9 +431,13 @@ public class HexaInvoluteProj2 : Projectile {
 			sound = owner.character?.playSound("hexaInvolute");
 			soundCooldown = 126;
 		}
-
+		if (owner.character != null){
+				if (!owner.character.isInDamageSprite()){
 		byteAngle += speedMul * 0.6f * xDir;
 		updateBeams();
+				}
+		}
+		
 
 		if (!owner.character.OverDrive || owner.character == null || owner.character.charState is Die &&
 		owner.character.charState.stateTime > 2) {

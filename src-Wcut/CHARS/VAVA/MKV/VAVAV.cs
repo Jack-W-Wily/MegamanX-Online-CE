@@ -102,25 +102,10 @@ public class VAVAV : Vile {
 			loadout ??= player.loadout.vileLoadout.clone();
 		this.loadout = loadout;
 
-		vulcanWeapon = loadout.vulcan switch {
-			1 => new DistanceNeedler(),
-			2 => new BuckshotDance(),
-			3 => new NoneVulcan(),
-			_ => new CherryBlast()
-		};
+		vulcanWeapon = new DistanceNeedler();
 		cannonWeapon = new VileCannonWC(0);
-		missileWeapon = loadout.missile switch {
-			1 => new HumerusCrush(),
-			2 => new PopcornDemon(),
-			3 => new NoneMissile(),
-			_ => new ElectricShock()
-		};
-		rocketPunchWeapon = loadout.rocketPunch switch {
-			1 => new SpoiledBrat(),
-			2 => new InfinityGig(),
-			3 => new NoneRocketPunch(),
-			_ => new GoGetterRight()
-		};
+		missileWeapon = new ElectricShock();
+		rocketPunchWeapon = new InfinityGig();
 		napalmWeapon = loadout.napalm switch {
 			1 => new FireGrenade(),
 			2 => new SplashHit(),
@@ -133,18 +118,8 @@ public class VAVAV : Vile {
 			3 => new NoneBall(),
 			_ => new ExplosiveRound()
 		};
-		cutterWeapon = loadout.cutter switch {
-			1 => new ParasiteSword(),
-			2 => new MaroonedTomahawk(),
-			3 => new NoneCutter(),
-			_ => new QuickHomesick()
-		};
-		flamethrowerWeapon = loadout.flamethrower switch {
-			1 => new SeaDragonRage(),
-			2 => new DragonsWrath(),
-			3 => new NoneFlamethrower(),
-			_ => new WildHorseKick()
-		};
+		cutterWeapon = new MaroonedTomahawk();
+		flamethrowerWeapon =  new SeaDragonRage();
 		downSpWeapon = loadout.downSpWeapon switch {
 			0 => napalmWeapon,
 			1 => grenadeWeapon,
@@ -344,7 +319,9 @@ public class VAVAV : Vile {
 
 
 		if ( player.input.isL2Held( player)
-		&& player.input.isAPressed(player) && !isInDamageSprite()) {
+		&& player.input.isAPressed(player) && !isInDamageSprite()
+		
+		&& charState is not VileChainGrabState and not VAVA2GrabState) {
 			changeState(new VileChainGrabState(), true);
 		}
 
@@ -739,7 +716,13 @@ public class VAVAV : Vile {
 			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
 		}
 		if (chargeLevel == 4 ) {
-			changeState(new HexaInvoluteStateWC(), true);
+			if (player.input.isHeld(Control.Down, player)) {
+				changeState(new NecroBurstAttack(grounded), true);
+			} else if (player.input.isHeld(Control.Up, player)) {
+				changeState(new RisingSpecterState(grounded), true);
+			} else if (player.input.isLeftOrRightHeld(player)) {
+				changeState(new StraightNightmareAttack(grounded), true);
+			}
 		}
 	}
 	public override bool chargeButtonHeld() {
@@ -1066,7 +1049,7 @@ public class VAVAV : Vile {
 		if (sprite.name.Contains("slashrun")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				2f, 0, 15f, isDeflectShield: true, ShouldClang: true,
+				2f,30, 15, isDeflectShield: true, ShouldClang: true,
 				isPushProjectile: true,
 				 isZSaberEffect2: true
 			, addToLevel : true);

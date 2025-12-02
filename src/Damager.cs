@@ -443,11 +443,7 @@ public class Damager {
 					owner.superAmmo += 1;
 					}
 				}
-				
-				if (!vava2.OverDrive) {
-                    
-                damage *= 0.5f;
-				}
+
 			}
 
 			if (owner.character is VAVAV vavav && vavav.health > 0) {
@@ -460,10 +456,7 @@ public class Damager {
 					}
 				}
 				
-				if (!vavav.OverDrive) {
-                    
-                damage *= 0.5f;
-				}
+				
 			}
 			
 			if (owner.character is Sigma1 sig1 && sig1.health > 0) {
@@ -846,7 +839,7 @@ public class Damager {
 				if (owner.character.charState is ZeroGrabStart) {
 					owner.character.changeState(new ZeroGrabEX());
 				}	
-				
+				character?.changeState(new ForceGrabbed(owner.character));
 
 			}
 
@@ -981,11 +974,13 @@ public class Damager {
 				(
 					projId == (int)ProjIds.VileAirRaidStart
 				|| projId == (int)ProjIds.VileAirRaidPlusKnock
-				) && owner.character.isAnimOver()) {
+				)) {
 					owner.character.changeState(new VileAirRaid(character), true);
 
 					if ( projId == (int)ProjIds.VileAirRaidPlusKnock) {
+							
 							character.changeState(new LaunchedState(owner.character), true);
+							
                     }
 				}
 

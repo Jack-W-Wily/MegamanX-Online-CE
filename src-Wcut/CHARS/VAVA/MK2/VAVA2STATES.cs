@@ -487,7 +487,7 @@ public class VAVA2GrabState : CharState {
 				
 				&& !once) {
 				once = true;
-				character.playSound("vileHover", forcePlay: false, sendRpc: true);
+				//character.playSound("vileHover", forcePlay: false, sendRpc: true);
 				}
 			}
 		//}

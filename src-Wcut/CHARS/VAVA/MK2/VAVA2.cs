@@ -388,7 +388,7 @@ public class VAVA2 : Vile {
 
 
 		if (player.input.isL2Held(player)
-		&& player.input.isAPressed(player) && !isInDamageSprite()) {
+		&& player.input.isAPressed(player) && !isInDamageSprite() && charState is not VileChainGrabState and not VAVA2GrabState) {
 			changeState(new VileChainGrabState(), true);
 		}
 

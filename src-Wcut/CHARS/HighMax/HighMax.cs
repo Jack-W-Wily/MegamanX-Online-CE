@@ -191,7 +191,7 @@ public class HighMax : Character {
 			changeState(new BlockWCUT());
 
 		}
-		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player) && Global.level.isRace()) {
 			changeState(new WcutGenericDodgeF(), true);
 		}
 		// Cooldowns.

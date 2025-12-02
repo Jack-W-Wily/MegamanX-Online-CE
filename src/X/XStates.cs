@@ -146,7 +146,7 @@ public class LightDash : CharState {
 		if (exaust == null && dashTime > 3 && !stop) {
 			exaust = new Anim(
 				character.pos.addxy(-15 * dashDir, -7),
-				"fakezero_exhaust", dashDir, player.getNextActorNetId(),
+				"rmx_dash_effect", dashDir, player.getNextActorNetId(),
 				false, sendRpc: true, zIndex: character.zIndex - 100, host: character 
 			);
 		}

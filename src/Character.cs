@@ -1180,7 +1180,7 @@ public partial class Character : Actor, IDamagable {
 			if (health > 10 && bonusHealth == 0) {
 				overDriveTimer = 30;
 			}
-			if (this is Vile){
+			if (this is VAVAV){
 			changeState(new VavaVOverdriveStart(), true);
 			playSound("ching_vile");
 			} else {
@@ -1245,7 +1245,7 @@ public partial class Character : Actor, IDamagable {
 			Helpers.decrementTime(ref DamageScaling);
 		}
 
-
+/* Too Buggy will fix later   - W
 		if (sprite.name.Contains("hurt")
 		|| sprite.name.Contains("frozen")
 		|| sprite.name.Contains("knocked")
@@ -1255,7 +1255,7 @@ public partial class Character : Actor, IDamagable {
 			DamageScaling += Global.spf * 2;
 			DamageScalingCD = 0.5f;
 		}
-		
+*/		
 		
 		Helpers.decrementFrames(ref genericGrabCooldown);
 		Helpers.decrementFrames(ref genericParryCooldown);
@@ -3972,7 +3972,7 @@ public partial class Character : Actor, IDamagable {
 			return health > Math.Floor(maxHealth / 2);
 		}
 		if (this is VAVAV) {
-			return bonusHealth >= maxHealth;
+			return player.currency >= 3;
 		}
 		if (this is VAVA2) {
 			return player.currency >= 3;
@@ -3986,7 +3986,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		if (this is VAVAV) {
-			bonusHealth -= maxHealth;
+			player.currency -= 3;
 			return;
 
 		}

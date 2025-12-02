@@ -1417,12 +1417,12 @@ public partial class Player {
 		  else if (charNum == (int)CharIds.VAVA1) {
 			///*  I'm temporarily disabling VAVAmk2 and MKV for they need ajustments
 
-			if (Options.main.SkinSlot == 1) {
+			if (Options.main.SkinSlot == 1 && Options.main.C7E1FBE2E00 == 888) {
 				newChar = new VAVA2(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
-			} else if (Options.main.SkinSlot == 2) {
+			} else if (Options.main.SkinSlot == 2 && Options.main.C7E1FBE2E00 == 888) {
 				newChar = new VAVAV(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn

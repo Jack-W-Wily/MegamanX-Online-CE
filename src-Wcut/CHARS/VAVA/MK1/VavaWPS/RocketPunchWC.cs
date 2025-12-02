@@ -111,7 +111,7 @@ public class RocketPunchProjWC : Projectile {
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
 			damager.damage = 0.5f;
-			//damager.hitCooldown = 6;
+			damager.hitCooldown = 0;
 			maxTime = 0.15f;
 			destroyOnHit = true;
 			projId = (int)ProjIds.SpoiledBratWC;

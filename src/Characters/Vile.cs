@@ -8,7 +8,7 @@ namespace MMXOnline;
 public class Vile : Character {
 	public const float maxCalldownMechCooldown = 120;
 	public float vulcanLingerTime;
-	public const int callNewMechCost = 5;
+	public const int callNewMechCost = 3;
 	public float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public int buckshotDanceNum;

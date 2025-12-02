@@ -309,7 +309,7 @@ public class DesmumeSpam : CharState {
 
 	private float specialPressTime;
 
-	public float pushBackSpeed;
+	public float projCount;
 
 	public DesmumeSpam(string transitionSprite = "")
 		: base("ultimate", "", "", transitionSprite) {
@@ -400,9 +400,10 @@ public class DesmumeSpam : CharState {
 				player, player.getNextActorNetId(), 0, rpc: true
 				);
 			}
+			projCount += 1;
 		}
 
-		if (stateTime > 7) {
+		if (stateTime > 7 || projCount >= 20) {
             character.changeToIdleOrFall();
         }
 		
@@ -437,7 +438,7 @@ public class DesmumeSpam2 : CharState {
 
 	private float specialPressTime;
 	
-	public float pushBackSpeed;
+	public float projCount;
 
 	public DesmumeSpam2(string transitionSprite = "")
 		: base("ultimate", "", "", transitionSprite)
@@ -490,7 +491,7 @@ public class DesmumeSpam2 : CharState {
 				character.playSound("buster4");
 				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 				new DesmumeProj1(new XBuster(), poi.Value, -character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
-			
+				projCount += 1;
 		}
 
 
@@ -498,7 +499,7 @@ public class DesmumeSpam2 : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (stateTime > 7) {
+		if (stateTime > 7 || projCount > 20) {
             character.changeToIdleOrFall();
         }
 		if (character.isAnimOver() || stateTime > 10) {
