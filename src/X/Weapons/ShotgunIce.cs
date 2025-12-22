@@ -62,6 +62,7 @@ public class ShotgunIceProj : Projectile {
 	) {
 		weapon = ShotgunIce.netWeapon;
 		damager.damage = 2;
+		damager.flinch = 10;
 		damager.hitCooldown = 1;
 		vel = new Point(400 * xDir, 0);
 		projId = (int)ProjIds.ShotgunIce;
@@ -317,6 +318,9 @@ public class ShotgunIceChargedShot : CharState {
 	MegamanX mmx = null!;
 	public float time;
 	public ShotgunIceChargedShot() : base("shoot") {
+		airMove = true;
+		useDashJumpSpeed = true;
+		attackCtrl = true;
 	}
 	public override void update() {
 		base.update();

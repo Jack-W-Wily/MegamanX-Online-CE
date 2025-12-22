@@ -312,7 +312,7 @@ public class AxlString2WA : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 0) {
+		if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3 && axl.grounded) {
@@ -362,7 +362,7 @@ public class AxlString3WA : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 0) {
+		if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3 && axl.grounded) {
@@ -412,7 +412,7 @@ public class AxlString4WA : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 0 && axl.grounded) {
+		if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3) {
@@ -463,7 +463,7 @@ public class AxlString5WA : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 3 && axl.grounded) {
+		if (character.frameIndex <= 3 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 
@@ -513,7 +513,7 @@ public class EvasionBarrageWA : CharState {
 
 	public override void update() {
 		base.update();
-			if (character.frameIndex <= 0) {
+			if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (pushBackSpeed > 0) {
@@ -592,7 +592,7 @@ public class RisingBarrageWA : CharState {
 	public override void update() {
 		base.update();
 		Point? gunpos = character.getFirstPOI();
-				if (character.frameIndex <= 0) {
+				if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (character.sprite.frameIndex >= 2 && gunpos != null) {
@@ -649,7 +649,7 @@ public class AxlRainDropWA : CharState {
 	}
 
 	public override void update() {
-		if (character.frameIndex <= 0) {
+		if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (!character.grounded && pushBackSpeed > 0) {
@@ -722,7 +722,7 @@ public class AxlSpinKickWA : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 0) {
+		if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3 && character.grounded) {
@@ -851,7 +851,7 @@ public class AxlRollBumpWA : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.frameIndex <= 0 && axl.grounded) {
+		if (character.frameIndex <= 0 && character.OverDrive) {
 			character.iframesTime = 10;
 		}
 		if (character.frameIndex < 3) {

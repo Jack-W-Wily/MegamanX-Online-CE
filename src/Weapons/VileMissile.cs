@@ -56,7 +56,7 @@ public class ElectricShock : VileMissile {
 		if (isMK2) {
 			shootPos = vava.getVileMK2StunShotPos();
 		} else {
-			shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+			shootPos = vava.getVileMK2StunShotPos();
 		}
 
 		int xDir = character.getShootXDir();

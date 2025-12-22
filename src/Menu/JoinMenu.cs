@@ -221,16 +221,17 @@ public class JoinMenu : IMainMenu {
 	}
 
 	public static void joinServer(Server serverToJoin) {
-		if (Helpers.compareVersions(Global.version, serverToJoin.gameVersion) == -1) {
-			Menu.change(new ErrorMenu(new string[] { "Your game version is too old. Update to v" + serverToJoin.gameVersion.ToString() }, new MainMenu()));
-			return;
-		} else if (Helpers.compareVersions(Global.version, serverToJoin.gameVersion) == 1) {
-			Menu.change(new ErrorMenu(new string[] { "The match game version (v" + serverToJoin.gameVersion.ToString() + ") is too old." }, new MainMenu()));
-			return;
-		} else if (Global.checksum != serverToJoin.gameChecksum) {
-			Menu.change(new ErrorMenu(new string[] { "Client and server have different", "checksum version numbers.", "Yours: " + Global.checksum, "Theirs: " + serverToJoin.gameChecksum }, new MainMenu()));
-			return;
-		} else if (!string.IsNullOrEmpty(serverToJoin.customMapChecksum)) {
+	//	if (Helpers.compareVersions(Global.version, serverToJoin.gameVersion) == -1) {
+	//		Menu.change(new ErrorMenu(new string[] { "Your game version is too old. Update to v" + serverToJoin.gameVersion.ToString() }, new MainMenu()));
+	//		return;
+	//	} else if (Helpers.compareVersions(Global.version, serverToJoin.gameVersion) == 1) {
+	//		Menu.change(new ErrorMenu(new string[] { "The match game version (v" + serverToJoin.gameVersion.ToString() + ") is too old." }, new MainMenu()));
+	//		return;
+	//	} else if (Global.checksum != serverToJoin.gameChecksum) {
+	//		Menu.change(new ErrorMenu(new string[] { "Client and server have different", "checksum version numbers.", "Yours: " + Global.checksum, "Theirs: " + serverToJoin.gameChecksum }, new MainMenu()));
+	//		return;
+	//	} else
+		 if (!string.IsNullOrEmpty(serverToJoin.customMapChecksum)) {
 			var myLevelChecksum = LevelData.getChecksumFromName(serverToJoin.level);
 			if (string.IsNullOrEmpty(myLevelChecksum)) {
 				string customMapUrl = serverToJoin.customMapUrl;

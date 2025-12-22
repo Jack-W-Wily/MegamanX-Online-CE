@@ -73,18 +73,23 @@ public override bool normalCtrl() {
 		
 		if (hadokenCheck) {
 			changeState(new DragoonHadoukenCrouch(), true);	
+			charState.invincible = true;
 		}
 		if (hadokenCheck2) {
-			changeState(new DragoonHadouken(), true);	
+			changeState(new DragoonHadouken(), true);
+			charState.invincible = true;	
 		}
 		if (shoryukenCheck) {
 			changeState(new DragoonRising(), true);	
+			charState.invincible = true;
 		}
 		if (shoryukenCheck2) {
 			changeState(new DragoonShoryuken(isUnderwater()), true);	
+			charState.invincible = true;
 		}
 		if (senpukiakuCheck) {
 			changeState(new DragoonSenpukiaku(), true);	
+			charState.invincible = true;
 		}
 
 
@@ -119,6 +124,29 @@ public override bool attackCtrl() {
 		player.input.isHeld(Control.Down,player)){
 			changeState(new DragoonDiveKick(), true);
 		}
+
+
+
+
+		if (player.input.isR2Pressed(player)) {
+            if (player.input.isHeld(Control.Up, player)) {
+            
+			 if (player.input.isLeftOrRightHeld(player)) {
+                changeState(new DragoonRising(), true);	
+          	 	} else {
+                changeState(new DragoonShoryuken(isUnderwater()), true);
+                }
+				
+            } else if (player.input.isHeld(Control.Down, player)) {
+            changeState(new DragoonHadoukenCrouch(), true);	    
+            } else {
+                if (player.input.isLeftOrRightHeld(player)) {
+                changeState(new DragoonSenpukiaku(), true);	
+          	 	} else {
+                changeState(new DragoonHadouken(), true);	
+                }
+            }
+        }
 
 
 

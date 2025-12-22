@@ -62,6 +62,7 @@ public class SpeedBurnerProj : Projectile {
 	) {
 		weapon = SpeedBurner.netWeapon;
 		damager.damage = 2;
+		damager.flinch = 30;
 		vel = new Point(275 * xDir, 0);
 		maxTime = 0.6f;
 		projId = (int)ProjIds.SpeedBurner;

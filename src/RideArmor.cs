@@ -126,13 +126,13 @@ public class RideArmor : Actor, IDamagable {
 
 	public void setMaxHealth() {
 		if (raNum == 2) {
-			maxHealth = 24;
+			maxHealth = 40;
 			// + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
 		} else if (raNum == 3) {
-			maxHealth = 24;
+			maxHealth = 40;
 			// + Helpers.clampMax(netOwner.heartTanks * netOwner.getHeartTankModifier(), 8);
 		} else {
-			maxHealth = 32;
+			maxHealth = 64;
 		}
 		if (raNum == 4) {
 			goliathHealth = MathF.Ceiling(32 * Player.getHpMod());
@@ -2359,13 +2359,19 @@ public class InRideArmor : CharState {
 
 		if (player.input.isPressed(Control.Taunt,player)) {
 				character.changeSpriteFromName("ra_taunt", true);
+				sprite = "ra_taunt";
 		}
 		 if (character.sprite.name.Contains("ra_bomb") &&
 				character.sprite.name.Contains("ra_taunt") &&
 				character.sprite.name.Contains("ra_show") &&
 		 character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
+				sprite = "ra_idle";
 		}
+
+		if (character is Vile vile && player.input.isPressed(Control.WeaponRight, player)) {
+				tossGrenade(vile);
+		}	
 		
 
 		if (!isHiding) {
@@ -2384,11 +2390,7 @@ public class InRideArmor : CharState {
 			} else if (!character.sprite.name.Contains("ra_show") || character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
 			}
-		} else {
-			if (character is Vile vile && player.input.isBPressed(player)) {
-				tossGrenade(vile);
-			}
-		}
+		} 
 
 		bool ejectInput = character.player.input.isHeld(Control.Up, player) && character.player.input.isPressed(Control.Jump, player);
 		if (ejectInput) {
@@ -2405,19 +2407,21 @@ public class InRideArmor : CharState {
 			return;
 		}
 		if (character.sprite.name.Contains("mk5")) {
+			sprite = "ra_bomb";
 			character.changeSpriteFromName("ra_bomb", true);
 		}
 		if (character.sprite.name.Contains("mk2") && player.superAmmo >= player.superMaxAmmo) {
 			character.changeSpriteFromName("ra_bomb", true);
+			
 			player.superMaxAmmo -= 32;
 		}
-		if (vile.napalmWeapon.type == (int)NapalmType.SplashHit) {
+		if (player.input.isHeld(Control.Up, player)) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new SplashHitGrenadeProj(
 				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
-		} else if (vile.napalmWeapon.type == (int)NapalmType.FireGrenade) {
+		} else if (player.input.isHeld(Control.Down, player)) {
 			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new MK2NapalmGrenadeProj(
 				character.pos.addxy(0, -3), character.xDir, vile,

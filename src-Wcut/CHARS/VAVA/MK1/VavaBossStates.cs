@@ -475,7 +475,7 @@ public class CrimsonPhantomState2 : CharState {
 
 public class VavaBurensen1 : CharState {
 
-
+	public RekkohaEffect? effect;
 	public VavaBurensen1() : base("burensen_1") {
 		canGainMeter = false;
 	}
@@ -488,7 +488,9 @@ public class VavaBurensen1 : CharState {
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
 	}
 	public override void onExit(CharState newState) {
 		base.onExit(newState);

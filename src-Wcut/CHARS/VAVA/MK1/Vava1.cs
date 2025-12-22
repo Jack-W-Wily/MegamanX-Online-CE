@@ -236,6 +236,25 @@ public class VAVA1 : Vile {
 			player.superAmmo = 0;
 			playSound("chingX4");
 		}
+
+		if (OverDrive && 
+		downPressedTimes >= 2 &&
+		upPressedTimes >= 2 &&
+		leftPressedTimes >= 2 &&
+		rightPressedTimes >= 2 &&
+		player.input.isR2Held(player) &&
+		player.superAmmo >= 32){
+			changeState(new VavaVOverdriveStart(), true);	
+			player.superAmmo = 0;
+			downPressedTimes = 0;
+			upPressedTimes= 0;
+			leftPressedTimes= 0;
+			rightPressedTimes = 0;
+			playSound("chingX4");
+		}
+
+
+
 		return !sprite.name.Contains("hurt") ||
 		!sprite.name.Contains("frozen") ||
 		!sprite.name.Contains("grabbed") || 
@@ -480,11 +499,49 @@ public class VAVA1 : Vile {
 					changeState(new VavaDistantNeedler(), true);
 					player.vileAmmo -= 15;
 				}
-			}
-			if (charState is Crouch) {
+			} else if (charState is Crouch) {
 				changeState(new VavaZipZapper(), true);
 			} else {
+				if (getChargeLevel() == 1) {
+                		int input = player.input.getYDir(player);
+				new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
+				playSound("buster2", sendRpc: true);
+				changeSpriteFromName("buster_1", true);
+				stopCharge();
+				player.vileAmmo -= 15;
+            	} else if (getChargeLevel() == 1) {
+                new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
+				playSound("thunder_bolt", sendRpc: true);
+				player.vileAmmo -= 15;
+				changeSpriteFromName("buster_1", true);
+				stopCharge();
+          		} else if (getChargeLevel() == 2) {
+             	if (player.input.isLeftOrRightHeld(player)) {
+				playSound("noise_crush_charged");
+				new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(6 * -xDir, 0), xDir, 0, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(12 * -xDir, 0), xDir, 1, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(18 * -xDir, 0), xDir, 2, player.getNextActorNetId(), true);
+				new NoiseCrushVChargedProj(this, getShootPos().addxy(24 * -xDir, 0), xDir, 3, player.getNextActorNetId(), true);
+
+				} else {
+					new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
+				playSound("thunder_bolt", sendRpc: true);
+				player.vileAmmo -= 15;
+				}
+				changeSpriteFromName("buster_1", true);
+				stopCharge();
+          		} else if (getChargeLevel() >= 3) {
+            	for (int i = 0; i < 3; i++) {
+					new JunkShieldMagnet(
+				getCenterPos(), xDir, this,
+				player.getNextActorNetId(), i * 85
+				);
+				}
+          		} else {
+
 				vulcanWeapon.vileShoot(0, this);
+				}
 			}
 
 		return false;
@@ -1330,7 +1387,7 @@ public class VAVA1 : Vile {
 			if (alreadySummonedNewMech) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
 			} else if (canAffordRideArmor()) {
-				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+			//	if (!(charState is Idle || charState is Run || charState is Crouch)) return;
 				if (player.selectedRAIndex == 4 && player.currency < 10) {
 					if (isVileMK2) {
 						Global.level.gameMode.setHUDErrorMessage(

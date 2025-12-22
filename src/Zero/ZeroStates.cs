@@ -280,14 +280,38 @@ public class KKnuckleParryMeleeState : CharState {
 }
 
 public class AwakenedTaunt : ZeroState {
+
+	public float superRegen;
 	public AwakenedTaunt() : base("az_taunt") {
 	}
 
 	public override void update() {
 		base.update();
-		if (stateTime >= 150f / 60f && !Global.level.gameMode.playerWon(player)) {
+		superRegen += Global.spf;
+		if (!player.input.isHeld(Control.Special2,player)
+		&& !Global.level.gameMode.playerWon(player)) {
 			character.changeToIdleOrFall();
 		}
+
+
+		if (superRegen > 0.5f) {
+            superRegen = 0;
+			character.addAmmo(1);
+        }
+
+		if (player.superAmmo >= 32) {
+            character.changeToIdleOrFall();
+			if (character.OverDrive) {
+                zero.awakenedPhase = 1;
+				character.addHealth(5);
+            }
+
+				character.invulnTime = 1f;
+				new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+				character.playSound("crash", true);
+        }
 		if (!once) {
 			once = true;
 			character.playSound("awakenedaura", forcePlay: true, sendRpc: true);
@@ -301,7 +325,7 @@ public class AwakenedTaunt : ZeroState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		zero.tauntCooldown = 180;
+		//zero.tauntCooldown = 180;
 	}
 }
 

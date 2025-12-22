@@ -28,7 +28,8 @@ public class RockmanX : MegamanX {
 		netId, ownedByLocalPlayer, isWarpIn, player.loadout.xLoadout,
 		heartTanks, isATrans
 	) {
-
+		spriteFrameToSounds["rmx_run/4"] = "run";
+		spriteFrameToSounds["rmx_run/9"] = "run";
 		specialButtonMode = 0;	
 		charId = CharIds.RockmanX;
 
@@ -58,7 +59,7 @@ public class RockmanX : MegamanX {
 
 		public bool canSummonZero => player.loadout.xLoadout.weapon1 < 9 &&
 		 player.loadout.xLoadout.weapon2 < 9 &&  player.loadout.xLoadout.weapon3 < 9
-		;
+		&& player.superAmmo == player.superMaxAmmo;
 
 		
 
@@ -124,7 +125,7 @@ public class RockmanX : MegamanX {
 				player.superAmmo -= 32;
 			}
 		}
-		bool canUseSupers = player.superAmmo >= 16;
+		bool canUseSupers = player.superAmmo >= 16 || OverDrive;
 
 		if (player.input.isR2Pressed(player) && !player.input.isHeld(Control.Up, player) && canUseSupers) {
 
@@ -172,6 +173,10 @@ public class RockmanX : MegamanX {
 			helperzeroOnce = true;
 		}
 
+		if (charState is Die) {
+            helperZero?.destroySelf();
+        }
+
 		if (charState is not WarpIn and not WarpIdle && bonusHealth == 0 && health < 4 && Global.level.levelData.name == "redandblue_vs_purple_1v1" && !becomeragingcharge) {
 			stopMoving();
 			becomeragingcharge = true;
@@ -206,8 +211,13 @@ public class RockmanX : MegamanX {
 		if (helmetArmor == ArmorId.Light) {
 			if (charState is Jump && player.input.isHeld(Control.Down, player) && player.superAmmo >= 5) {
 				changeSpriteFromName("headbutt", false);
-				  vel.y = -getJumpPower() * 0.5f;
+
+				  vel.y = -getJumpPower() * 2f;
+				
+				  if (!charState.once){
 				  player.superAmmo -= 5;
+				  charState.once = true;
+				  }
 			}
 		}
 
@@ -493,10 +503,14 @@ public class RockmanX : MegamanX {
 			index = player.weapons[player.hyperChargeSlot].index;
 		}
 		if (hasFullHyperMaxArmor) {
-			index = 25;
+			index = 37;
 		}
 		if (hasUltimateArmor && index == 0) {
-			index = 30;
+			if (OverDrive){
+			index = 38;
+			} else {
+            index = 40;   
+            }
 		}
 		palette = player.xPaletteShader;
 

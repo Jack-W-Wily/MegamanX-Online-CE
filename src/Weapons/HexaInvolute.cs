@@ -122,11 +122,11 @@ public class HexaInvoluteProj : Projectile {
 	) : base(
 		pos, xDir, owner, "empty", netId, altPlayer
 	) {
-		damager.damage = 1;
-		damager.flinch = Global.defFlinch;
+		damager.damage = 0.1f;//1;
+		damager.flinch = 0;// Global.defFlinch;
 		damager.hitCooldown = 9;
 		projId = (int)ProjIds.HexaInvolute;
-		zIndex = ZIndex.Backwall;
+		zIndex = ZIndex.Background;
 		setIndestructableProperties();
 		sprite.hitboxes = popullateHitboxes();
 		for (int i = 0; i < beamDest.Length; i++) {
@@ -149,7 +149,15 @@ public class HexaInvoluteProj : Projectile {
 
 		if (ownerActor != null) {
 			changePos(ownerActor.getCenterPos());
+
+
+			if (ownerActor is Character chr && chr.isInDamageSprite() ){
+                destroySelf();
+				chr.hexa = null;
+            }
 		}
+
+
 
 		for (int i = particles.Count - 1; i >= 0; i--) {
 			particles[i].time += Global.spf;
@@ -291,7 +299,10 @@ public class HexaInvoluteProj : Projectile {
 }
 
 public class VavaVOverdriveStart : VileState {
-	public HexaInvoluteProj2? proj;
+	public Projectile? proj;
+
+	public RekkohaEffect? effect;
+
 	public bool startGrounded;
 	public float moveTime;
 	public float ammoTime;
@@ -313,11 +324,7 @@ public class VavaVOverdriveStart : VileState {
 
 		if (!shot && character.frameIndex >= 2) {
 			shot = true;
-			proj = new HexaInvoluteProj2(
-				character.getCenterPos(),
-				character.xDir, character, player.getNextActorNetId(),
-				sendRpc: true
-			);
+			character.ActivateHEXA = true;
 		}
 
 		if (proj != null) {
@@ -338,6 +345,9 @@ public class VavaVOverdriveStart : VileState {
 		base.onEnter(oldState);
 		if (character.grounded) {
 			startGrounded = true;
+		}
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
 		}
 		character.stopMovingS();
 		vile.vileHoverTime = vile.vileMaxHoverTime;

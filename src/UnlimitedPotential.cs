@@ -71,6 +71,7 @@ public class XUPParryStartState : CharState {
 			}
 		}
 		character.playSound("upParry", sendRpc: true);
+		
 		character.changeState(new XUPParryMeleeState(counterAttackTarget, damage), true);
 	}
 
@@ -180,7 +181,7 @@ public class XUPParryMeleeState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		mmx = character;// as RagingChargeX ?? throw new NullReferenceException();
 		character.clenaseDmgDebuffs();
 		//character.frameIndex = 2;
 	}

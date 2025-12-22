@@ -46,6 +46,46 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+	// Armor variables.
+	public ArmorId chestArmor;
+	public ArmorId armArmor;
+	public ArmorId legArmor;
+	public ArmorId helmetArmor;
+
+	public ArmorId hyperChestArmor => (hyperChestActive ? helmetArmor : ArmorId.None);
+	public ArmorId hyperArmArmor => (hyperArmActive ? armArmor : ArmorId.None);
+	public ArmorId hyperLegArmor => (hyperLegActive ? legArmor : ArmorId.None);
+	public ArmorId hyperHelmetArmor => (hyperHelmetActive ? helmetArmor : ArmorId.None);
+
+	public ArmorId fullArmor => (
+		chestArmor == armArmor &&
+		armArmor == legArmor &&
+		legArmor == helmetArmor
+		? chestArmor
+		: 0
+	);
+
+	public bool anyFullArmor => (
+		chestArmor > 0 &&
+		armArmor > 0 &&
+		legArmor > 0 &&
+		helmetArmor > 0
+	);
+
+	public bool hyperChestActive;
+	public bool hyperArmActive;
+	public bool hyperLegActive;
+	public bool hyperHelmetActive;
+
+	public const int headArmorCost = 2;
+	public const int chestArmorCost = 3;
+	public const int armArmorCost = 3;
+	public const int bootsArmorCost = 2;
+
+	public float headbuttAirTime = 0;
+	public int hyperChargeTarget;
+
+
 	// Statemachine stuff.
 	public CharState charState;
 	public bool isDashing;
@@ -258,8 +298,8 @@ public partial class Character : Actor, IDamagable {
 	// Weapon-specific.
 	public RollingShieldProjCharged? chargedRollingShieldProj;
 	public List<BubbleSplashProjCharged> chargedBubbles = new();
-	public StrikeChainProj? strikeChainProj;
-	public StrikeChainProjCharged? strikeChainChargedProj;
+	public Projectile? strikeChainProj;
+	public Projectile? strikeChainChargedProj;
 	//public StrikeChainSemiCharged? strikeChainSemiChargedProj;
 	public GravityWellProjCharged? chargedGravityWell;
 	public SpinningBladeProjCharged? chargedSpinningBlade;
@@ -1161,6 +1201,12 @@ public partial class Character : Actor, IDamagable {
 
 	public int SkinSlot = 0; 
 
+	// For  overdrives
+
+	public HexaInvoluteProj? hexa;
+
+	public bool ActivateHEXA;
+
 	public override void update() {
 
 
@@ -1180,8 +1226,10 @@ public partial class Character : Actor, IDamagable {
 			if (health > 10 && bonusHealth == 0) {
 				overDriveTimer = 30;
 			}
-			if (this is VAVAV){
-			changeState(new VavaVOverdriveStart(), true);
+			if (this is Vile){
+				if (this is VAVAV){
+				changeState(new VavaVOverdriveStart(), true);
+				}
 			playSound("ching_vile");
 			} else {
 			playSound("ching");
@@ -1189,6 +1237,15 @@ public partial class Character : Actor, IDamagable {
 			addDamageText("O V E R D R I V E", 0);
 			invulnTime = 1f;
 		}
+
+
+		if (ActivateHEXA && OverDrive && !isInDamageSprite() && hexa == null) {
+            hexa = new HexaInvoluteProj(
+				getCenterPos(),
+				xDir, this, player.getNextActorNetId(),
+				sendRpc: true
+			);
+        }
 
 		if (player.superAmmo > player.superMaxAmmo){
 			player.superAmmo = player.superMaxAmmo;

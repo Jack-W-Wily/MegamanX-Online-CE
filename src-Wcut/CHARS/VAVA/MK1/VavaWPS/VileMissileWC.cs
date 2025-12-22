@@ -109,6 +109,8 @@ public class BanzaiCarry : CharState {
 public class VMissiLeStance : CharState {
 
  	public Vile? vile = null;
+
+	public Anim? xh;
 	public VMissiLeStance() : base("missile_stance") {
 
 	}
@@ -117,7 +119,13 @@ public class VMissiLeStance : CharState {
 		base.update();
 		if (vile != null){
 		Point shootVel = vile.getVileShootVel(true);
-	
+		if (character.frameIndex == 5 && xh == null) {
+             xh =  new Anim(
+				vile.pos.addxy(8 * vile.xDir,-21),
+				"vava_chargebuster_effect", character.xDir, player.getNextActorNetId(), true,
+				sendRpc: true
+			);
+        }
 		//int xDir = character.getShootXDir();
 	
 

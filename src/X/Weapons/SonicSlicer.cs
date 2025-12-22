@@ -54,6 +54,7 @@ public class SonicSlicerStart : Projectile {
 	) {
 		weapon = SonicSlicer.netWeapon;
 		damager.damage = 1;
+		damager.flinch = 10;
 		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.SonicSlicerStart;
 

@@ -18,7 +18,7 @@ public class VavaZipZapper : VileState {
 		character.turnToInput(player.input, player);
         bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 		shootTime += Global.speedMul;
-		if (shootTime >= 2) {
+		if (shootTime >= 5) {
 			player.vileAmmo -= 1;
 			shootTime = 0;
 			character.playSound("vulcan");
@@ -147,8 +147,9 @@ public class ZipZapperProj : Projectile {
     ) {
         weapon = WildHorseKick.netWeapon;
         damager.damage = 1;
+		damager.flinch = 1;
         damager.hitCooldown = 6;
-        maxTime = 0.15f;
+        maxTime = 0.19f;
         destroyOnHit = true;
         destroyOnHitWall = true;
         this.groundedVariant = groundedVariant;

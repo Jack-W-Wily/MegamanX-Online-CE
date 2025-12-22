@@ -561,7 +561,7 @@ public class Vile : Character {
 			if (alreadySummonedNewMech) {
 				Global.level.gameMode.setHUDErrorMessage(player, "Can only summon a mech once per life");
 			} else if (canAffordRideArmor()) {
-				if (!(charState is Idle || charState is Run || charState is Crouch)) return;
+				//if (!(charState is Idle || charState is Run || charState is Crouch)) return;
 				if (isVileMK1 && player.selectedRAIndex == 4) {
 					Global.level.gameMode.setHUDErrorMessage(player, brownOrGoliath + " only available as MKII"); return;
 				}

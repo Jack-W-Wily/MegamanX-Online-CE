@@ -193,6 +193,7 @@ public class RisingSpecterProj : Projectile {
 	) : base(
 		poi, xDir, owner, "empty", netId, player
 	) {
+		isJuggleProjectile = true;
 		weapon = RisingSpecter.netWeapon;
 		damager.damage = 6;
 		damager.flinch = Global.defFlinch;

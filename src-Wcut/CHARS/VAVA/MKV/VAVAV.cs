@@ -33,7 +33,7 @@ public class VAVAV : Vile {
 
 	public int ResitDeathTimes = 0;
 
-	public HexaInvoluteProj2? hexa;
+	
 	public float selfDamageCooldown;
 
 	public bool isVileMK1 { get { return vileForm == 0; } }

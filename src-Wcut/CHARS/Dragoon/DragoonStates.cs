@@ -760,6 +760,8 @@ public class DragoonDiveKick : CharState {
 		}
 		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
 			character.changeToLandingOrFall();
+				 new DragoonSpark(new SpeedBurner(), character.pos, character.xDir, player,  
+				 player.getNextActorNetId(), rpc : true);
 			return;
 		}
 		diveTime += Global.spf;
@@ -769,6 +771,7 @@ public class DragoonDiveKick : CharState {
 		base.onEnter(oldState);
 	    character.stopMoving();
 		character.useGravity = false;
+	
 	}
 
 	public override void onExit(CharState newState) {

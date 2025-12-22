@@ -80,6 +80,8 @@ public class ZeroMID : Zero {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, player.loadout.zeroLoadout ,heartTanks, isATrans
 	) {
 		charId = CharIds.ZeroMID;
+		spriteFrameToSounds["zarzo_run/4"] = "zerowalkx4";
+		spriteFrameToSounds["zarzo_run/9"] = "zerowalkx4";
 		// Loadout stuff.
 		isBlack = player.blackZarzo;
 		groundSpecial = new RaijingekiWeapon();
@@ -925,7 +927,7 @@ public class ZeroMID : Zero {
 			"zarzo_attack_dash2" => MeleeIds.Shippuuga,
 			// Air
 			"zarzo_attack_air" or "zarzo_attack_air_ground" => MeleeIds.AirSlash,
-			"zarzo_attack_air2" or "zarzo_cmoon" => MeleeIds.RollingSlash,
+			"zarzo_attack_air2" or "bzero_attack_air2" or "zarzo_cmoon" => MeleeIds.RollingSlash,
 			"zarzo_hyoroga_attack"  => MeleeIds.Hyoroga,
 			// Ground Speiclas
 			"zarzo_raijingeki" => MeleeIds.Raijingeki,

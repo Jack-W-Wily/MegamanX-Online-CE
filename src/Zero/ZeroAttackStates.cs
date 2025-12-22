@@ -127,7 +127,22 @@ public class ZeroAirSlashState : ZeroGenericMeleeState {
 		if (character.sprite.frameIndex >= comboFrame && !character.grounded) {
 			attackCtrl = true;
 		}
+
+		
 	}
+
+
+	
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	
+
+		if (zero is ZeroEND && zero.dashedInAir > 0) {
+            zero.changeSpriteFromName("attack_air2", true);
+        }
+	}
+
+
 }
 
 public class ZeroRollingSlashtate : ZeroGenericMeleeState {
@@ -146,10 +161,38 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 
 	public override void update() {
 		base.update();
-		if (zero.sprite.loopCount >= 1) {
+
+		if (zero is not ZeroEND){
+			if (!character.OverDrive){
+			if (zero.sprite.loopCount >= 1) {
+			
 			character.changeToIdleOrFall();
+		
 			return;
-		}
+			}
+			}
+			 else {
+            if ( character.frameIndex == 9) {
+                
+            character.frameIndex = 2;
+            }
+            
+      	  }
+		} else {
+			airMove = false;
+			canJump = true;
+			exitOnLanding = false;
+			useDashJumpSpeed = false;
+			canStopJump = false;
+			canSpecialCancel = false;
+            if (zero.sprite.loopCount >= 1) {
+			character.changeToIdleOrFall();
+		
+			return;
+			
+			}
+        }
+
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -157,11 +200,17 @@ public class ZeroRollingSlashtate : ZeroGenericMeleeState {
 		if (zero.isViral){
 		zero.changeSpriteFromName("cmoon", true);
 		}
+
+		if (zero is ZeroEND) {
+            character.stopMoving();
+			character.useGravity = false;
+        }
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		zero.kuuenzanCooldown = 30;
+		character.useGravity = true;
 		
 	}
 }
@@ -449,6 +498,17 @@ public class GenmureiState : ZeroState {
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
+		}
+	}
+
+
+	public RekkohaEffect? effect;
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
 		}
 	}
 }

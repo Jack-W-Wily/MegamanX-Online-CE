@@ -125,7 +125,7 @@ public partial class Player {
 	public const int reviveSigmaCost = 10;
 	public const int reviveXCost = 10;
 	public const int goldenArmorCost = 5;
-	public const int ultimateArmorCost = 10;
+	public const int ultimateArmorCost = 6;
 	public bool lastDeathCanRevive;
 	public int vileFormToRespawnAs;
 	public bool hyperSigmaRespawn;

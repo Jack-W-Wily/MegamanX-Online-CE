@@ -32,6 +32,8 @@ public class Sigma1 : BaseSigma {
 		ballWeapon = new SigmaBallWeapon();
 		ShouldExplode = true;
 		charId = CharIds.Sigma;
+		spriteFrameToSounds["sigma1alt_run/2"] = "sigmawalk";
+		spriteFrameToSounds["sigma1alt_run/7"] = "sigmawalk";
 	}
 
 	public override void update() {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using SFML.Graphics;
 
 namespace MMXOnline;
@@ -174,7 +175,7 @@ public class StrikeChainProj : Projectile {
 
 	int upOrDown;
 	int startDir;
-	MegamanX mmx;
+	Character mmx;
 	Player player;
 	float dist;
 	float distRetracted;
@@ -203,7 +204,7 @@ public class StrikeChainProj : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		mmx = player.character;
 		mmx.strikeChainProj = this;
 		this.player = player;
 
@@ -416,7 +417,7 @@ public class StrikeChainProjCharged : Projectile {
 
 	int upOrDown;
 	int startDir;
-	MegamanX mmx;
+	Character mmx;
 	Player player;
 	float dist;
 	float distRetracted;
@@ -445,7 +446,7 @@ public class StrikeChainProjCharged : Projectile {
 		//xScale = 1;
 
 		//Set character and player
-		mmx = player.character as MegamanX ?? throw new NullReferenceException();
+		mmx = player.character;
 		this.player = player;
 
 		//Reduce range if carrying a flag.

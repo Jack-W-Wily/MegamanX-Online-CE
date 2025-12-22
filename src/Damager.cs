@@ -412,10 +412,7 @@ public class Damager {
 				if (zeroE.charState.canSpecialCancel) {
 					zeroE.charState.spcCancel = true;
 				}
-			
-				if (owner.superAmmo != owner.superMaxAmmo) {
-					zeroE.gigaAttack.ammo += 1;
-				}
+		
 			}
 
 			if (owner.character is Vile vava1 && vava1.health > 0) {
@@ -449,6 +446,7 @@ public class Damager {
 			if (owner.character is VAVAV vavav && vavav.health > 0) {
 
 				if (owner.superAmmo != owner.superMaxAmmo && projId != (int)ProjIds.HexaInvolute
+				
 				&& projId != (int)ProjIds.HexaInvolute2 && projId != (int)ProjIds.HexaInvoluteProjWC
 				) {
 						if (owner.character.charState.canGainMeter){
@@ -786,6 +784,7 @@ public class Damager {
 				projId != (int)ProjIds.FireWave &&
 				projId != (int)ProjIds.VelGFire &&
 				projId != (int)ProjIds.HexaInvolute2 &&
+				projId != (int)ProjIds.HexaInvolute &&
 				projId != (int)ProjIds.HexaInvoluteProjWC &&
 				projId != (int)ProjIds.AcidBurstPoison &&
 				projId != (int)ProjIds.Burn

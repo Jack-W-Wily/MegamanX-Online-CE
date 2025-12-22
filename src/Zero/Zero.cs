@@ -127,7 +127,7 @@ public class Zero : Character {
 
 	public override CharState getTauntState() {
 		if (isAwakened && tauntCooldown <= 0) {
-			return new AwakenedTaunt();
+			return new ZeroTaunt();
 		}
 		return new ZeroTaunt();
 	}
@@ -146,7 +146,7 @@ public class Zero : Character {
 
 	public override void update() {
 		// Hypermode effects.
-
+		
 		if (player.blackZarzo) {
 			isBlack = true;
 		} else {
@@ -160,6 +160,9 @@ public class Zero : Character {
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
+		if (charState is AwakenedTaunt) {
+            updateAwakenedAura();
+        }
 		// Hypermode music.
 		if (!Global.level.isHyper1v1() ) {
 			if (isBlack && OverDrive) {

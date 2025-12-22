@@ -24,6 +24,7 @@ public class CmdSigmaStateWC : CharState {
 public class HellGaze : CmdSigmaStateWC {
 	bool fired;
 
+	
 	public HellGaze() : base("hellgaze") {
 		airMove = true;
 		superArmor = true;
@@ -39,6 +40,16 @@ public class HellGaze : CmdSigmaStateWC {
 			character.changeToIdleOrFall();
 		}
 		base.update();
+	}
+
+	public RekkohaEffect? effect;
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
 	}
 }
 
@@ -72,6 +83,18 @@ public class HellGazeEX : CmdSigmaStateWC {
 		}
 		base.update();
 	}
+
+
+		public RekkohaEffect? effect;
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+	
 }
 
 
@@ -596,7 +619,7 @@ public class VirusSlash1 : CharState {
 
 public class VirusSlash2 : CharState {
 	bool fired = false;
-	
+	public RekkohaEffect? effect;
 
 	public VirusSlash2() : base("slash_2", "", "", "") {
 	superArmor = true;
@@ -627,6 +650,9 @@ public class VirusSlash2 : CharState {
 		if (player.input.isHeld(Control.Dash,player)){
 			character.move(new Point( slideVel, 0));
 			
+		}
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
 		}
 	}
 

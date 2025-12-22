@@ -16,6 +16,8 @@ public class Dynamo : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.Dynamo;
+		spriteFrameToSounds["dynamo_run/4"] = "run2";
+		spriteFrameToSounds["dynamo_run/9"] = "run2";
 	}
 
 	private float ItemThrowCooldown;

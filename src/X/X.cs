@@ -1353,10 +1353,14 @@ public class MegamanX : Character {
 			index = weapons[player.hyperChargeSlot].index;
 		}
 		if (hasFullHyperMaxArmor) {
-			index = 25;
+			index = 37;
 		}
 		if (hasUltimateArmor && index == 0) {
-			index = 30;
+			if (OverDrive){
+			index = 38;
+			} else {
+            index = 40;   
+            }
 		}
 		palette = player.xPaletteShader;
 

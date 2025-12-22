@@ -18,7 +18,7 @@ public class RakuhouhaWeapon : Weapon {
 	public RakuhouhaWeapon() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
-		maxAmmo = 28;
+		maxAmmo = 32;
 		fireRate = 60;
 		index = (int)WeaponIds.Rakuhouha;
 		weaponBarBaseIndex = 27;
@@ -62,7 +62,7 @@ public class RekkohaWeapon : Weapon {
 	public RekkohaWeapon() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		ammo = 0;
-		maxAmmo = 28;
+		maxAmmo = 32;
 		fireRate = 120;
 		index = (int)WeaponIds.Rekkoha;
 		weaponBarBaseIndex = 40;
@@ -97,7 +97,7 @@ public class Messenkou : Weapon {
 	public Messenkou() : base() {
 		//damager = new Damager(player, 2, 0, 0.5f);
 		ammo = 0;
-		maxAmmo = 28;
+		maxAmmo = 32;
 		fireRate = 60;
 		index = (int)WeaponIds.Messenkou;
 		weaponBarBaseIndex = 41;
@@ -162,7 +162,7 @@ public class DarkHoldWeapon : Weapon {
 	public static DarkHoldWeapon netWeapon = new();
 	public DarkHoldWeapon() : base() {
 		ammo = 0;
-		maxAmmo = 28;
+		maxAmmo = 32;
 		fireRate = 60 * 3;
 		index = (int)WeaponIds.DarkHold;
 		type = (int)ZeroGigaType.DarkHold;

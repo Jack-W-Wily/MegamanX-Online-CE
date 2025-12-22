@@ -585,6 +585,7 @@ public class LevelData {
 		// X2 stuff.
 		{ "centralcomputer", "magnetCentipede" },
 		{ "crystalmine", "crystalSnail" },
+		{ "crystalmine2", "crystalSnail" },
 		{ "deepseabase", "bubbleCrab" },
 		{ "desertbase", "overdriveOstrich" },
 		{ "desertbase2", "credits_X2" },
@@ -600,14 +601,16 @@ public class LevelData {
 		{ "dopplerlab", "dopplerLab" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
-		{ "giantdam2", "GiantDam2_capcom" },
+		{ "giantdam2", "toxicSeahorse_carlonassar" },
 		{ "hunterbase", "hunterBase" },
 		{ "hunterbase2", "credits_X3" },
 		{ "powercenter", "voltCatfish" },
 		{ "quarry", "tunnelRhino" },
 		{ "safaripark", "neonTiger" },
+		{ "safaripark2", "XMA_psyloque_carlonassar" },
 		{ "shipyard", "crushCrawfish" },
-		{ "weaponsfactory", "blastHornet" },
+		{ "shipyard_md", "crushCrawfish" },
+		{ "weaponsfactory", "blastHornet_carlonassar" },
 
 		// Alt music.
 		{ "dopplerlab_1v1", "fortressBoss_X3" },

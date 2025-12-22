@@ -59,7 +59,7 @@ public class SilkShotProj : Projectile {
 		weapon = SilkShot.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 0;
-		damager.flinch = 0;
+		damager.flinch = 10;
 		vel = new Point(200 * xDir, 0);
 		maxTime = 6f;
 		fadeSprite = "explosion";

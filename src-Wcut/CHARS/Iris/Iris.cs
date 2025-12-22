@@ -15,6 +15,8 @@ public class Iris : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 			charId = CharIds.Iris;
+			spriteFrameToSounds["iris_run/4"] = "iriswalk";
+			spriteFrameToSounds["iris_run/9"] = "iriswalk";
 	}
 
 	public NewIrisCrystal irisCrystal;
