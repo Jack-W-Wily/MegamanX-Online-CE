@@ -12,6 +12,7 @@ public class MegamanX : Character {
 	public float specialSaberCooldown;
 	public XBuster specialBuster;
 	public int specialButtonMode;
+	public bool isSpecialButtonCharge;
 
 	// Armor variables.
 	public ArmorId chestArmor;
@@ -290,8 +291,12 @@ public class MegamanX : Character {
 		itemTracer?.update();
 		shootingRaySplasher?.burstLogic(this);
 
+		if (!weapons.Contains(specialBuster)) {
+			specialBuster.update();
+		}
+
 		// Charge and release charge logic.
-		chargeLogic(shoot);
+		chargeLogic(shootCharge);
 		player.changeWeaponControls();
 
 		if (legArmor == ArmorId.Light) {
@@ -482,6 +487,14 @@ public class MegamanX : Character {
 		shoot(chargeLevel, currentWeapon ?? specialBuster, false);
 	}
 
+	public void shootCharge(int chargeLevel) {
+		Weapon targetWeapon = currentWeapon ?? specialBuster;
+		if (isSpecialButtonCharge) {
+			targetWeapon = specialBuster;
+		}
+		shoot(chargeLevel, targetWeapon, false);
+	}
+
 	public void shoot(int chargeLevel, Weapon weapon, bool busterStock) {
 		lastShootPressed = 100;
 		
@@ -502,6 +515,10 @@ public class MegamanX : Character {
 			} else {
 				chargeLevel = 3;
 			}
+		}
+		if (charState is LadderClimb) {
+			useCrossShotAnim = false;
+			turnToInput(player.input, player);
 		}
 		if (!busterStock && chargeLevel >= 3 && hasFullHyperMaxArmor) {
 			stockedSaber = true;

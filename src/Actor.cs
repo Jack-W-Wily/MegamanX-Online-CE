@@ -146,12 +146,10 @@ public partial class Actor : GameObject {
 	float createRpcTime;
 
 	public bool splashable;
-	private Anim _waterWade = null!;
+	private Anim? _waterWade = null;
 	public Anim waterWade {
 		get {
-			if (_waterWade == null) {
-				_waterWade = new Anim(pos, "wade", 1, null, false);
-			}
+			_waterWade ??= new Anim(pos, "wade", 1, null, false);
 			return _waterWade;
 		}
 	}
@@ -1250,17 +1248,17 @@ public partial class Actor : GameObject {
 	) {
 		if (attacker == null) return;
 
-		float reportDamage = Helpers.clampMax(damage, maxHealth);
-		if (damage == Damager.ohkoDamage && damage >= maxHealth) {
+		if (damage >= Damager.ohkoDamage && damage >= maxHealth) {
 			if (Helpers.randomRange(0, 20) != 10) {
 				addDamageText("Instakill!", (int)FontType.RedishOrange);
 			} else {
 				addDamageText("Fatality!", (int)FontType.RedishOrange);
 			}
 		} else if (attacker.isMainPlayer) {
-			addDamageText(reportDamage);
-		} else if (ownedByLocalPlayer && sendRpc) {
-			RPC.addDamageText.sendRpc(attacker.id, netId, reportDamage);
+			addDamageText(damage);
+		}
+		if (ownedByLocalPlayer && sendRpc) {
+			RPC.addDamageText.sendRpc(attacker.id, netId, damage);
 		}
 	}
 
@@ -1504,6 +1502,9 @@ public partial class Actor : GameObject {
 
 
 	public SoundWrapper? playSound(string soundKey, bool forcePlay = false, bool sendRpc = false) {
+		if (soundKey == "") {
+			return null;
+		}
 		soundKey = soundKey.ToLowerInvariant();
 		if (!Global.soundBuffers.ContainsKey(soundKey)) {
 			throw new Exception($"Attempted playing missing sound with name \"{soundKey}\"");

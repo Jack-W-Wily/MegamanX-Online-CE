@@ -360,7 +360,8 @@ public class StormEGustProj : Projectile {
 
 #region states
 public class SEagleMState : MaverickState {
-	public StormEagle StormEagleed = null!;
+	public StormEagle stormEagleed = null!;
+
 	public SEagleMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -370,7 +371,7 @@ public class SEagleMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		StormEagleed = maverick as StormEagle ?? throw new NullReferenceException();
+		stormEagleed = maverick as StormEagle ?? throw new NullReferenceException();
 	}
 }
 public class StormEDiveState : SEagleMState {
@@ -459,7 +460,7 @@ public class StormEGustState : SEagleMState {
 
 	public override void update() {
 		base.update();
-		if (StormEagleed == null) return;
+		if (stormEagleed == null) return;
 
 		soundTime += Global.spf;
 		if (soundTime > 0.4f) {
@@ -473,7 +474,7 @@ public class StormEGustState : SEagleMState {
 			float randX = maverick.pos.x + maverick.xDir * Helpers.randomRange(0, 65);
 			Point pos = new Point(randX, maverick.pos.y);
 			new StormEGustProj(
-				pos, maverick.xDir, StormEagleed, player,
+				pos, maverick.xDir, stormEagleed, player,
 				player.getNextActorNetId(), rpc: true
 			);
 		}
@@ -502,13 +503,13 @@ public class StormEEggState : SEagleMState {
 
 	public override void update() {
 		base.update();
-		if (StormEagleed == null) return;
+		if (stormEagleed == null) return;
 
 		if (maverick.frameIndex == 3 && !once) {
 			once = true;
 			new StormEEggProj(
-				StormEagleed.getFirstPOI() ?? StormEagleed.getCenterPos(), maverick.xDir,
-				StormEagleed, player, player.getNextActorNetId(), rpc: true
+				stormEagleed.getFirstPOI() ?? stormEagleed.getCenterPos(), maverick.xDir,
+				stormEagleed, player, player.getNextActorNetId(), rpc: true
 			);
 		}
 
@@ -526,14 +527,14 @@ public class StormEAirShootState : SEagleMState {
 
 	public override void update() {
 		base.update();
-		if (StormEagleed == null) return;
+		if (stormEagleed == null) return;
 
 		Point? shootPos = maverick.getFirstPOI();
 		if (!shotOnce && shootPos != null) {
 			shotOnce = true;
 			maverick.playSound("tornadoNonX", sendRpc: true);
 			new TornadoProj(
-				shootPos.Value, maverick.xDir, true, StormEagleed,
+				shootPos.Value, maverick.xDir, true, stormEagleed,
 				player, player.getNextActorNetId(), rpc: true
 			);
 		}

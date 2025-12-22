@@ -212,7 +212,8 @@ public class VelGIceProj : Projectile {
 
 #region states
 public class VelguarderMState : MaverickState {
-	public Velguarder Velguader = null!;
+	public Velguarder velguader = null!;
+
 	public VelguarderMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -222,7 +223,7 @@ public class VelguarderMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		Velguader = maverick as Velguarder ?? throw new NullReferenceException();
+		velguader = maverick as Velguarder ?? throw new NullReferenceException();
 	}
 }
 public class VelGShootFireState : VelguarderMState {
@@ -233,7 +234,7 @@ public class VelGShootFireState : VelguarderMState {
 
 	public override void update() {
 		base.update();
-		if (Velguader == null) return;
+		if (velguader == null) return;
 
 		if (maverick.frameIndex == 1) {
 			var poi = maverick.getFirstPOIOrDefault();
@@ -242,7 +243,7 @@ public class VelGShootFireState : VelguarderMState {
 				shootTime = 0;
 				maverick.playSound("fireWave", sendRpc: true);
 				new VelGFireProj(
-					poi, maverick.xDir, Velguader,
+					poi, maverick.xDir, velguader,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -261,7 +262,7 @@ public class VelGShootIceState : VelguarderMState {
 	}
 	public override void update() {
 		base.update();
-		if (Velguader == null) return;
+		if (velguader == null) return;
 
 		maverick.turnToInput(input, player);
 
@@ -285,9 +286,9 @@ public class VelGShootIceState : VelguarderMState {
 		}
 	}
 	public void Proj(int type) {
-		var poi = Velguader.getFirstPOIOrDefault();
+		var poi = velguader.getFirstPOIOrDefault();
 		new VelGIceProj(
-			poi, maverick.xDir, type, Velguader, 
+			poi, maverick.xDir, type, velguader, 
 			player, player.getNextActorNetId(), rpc: true
 		);
 	}

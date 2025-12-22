@@ -318,7 +318,7 @@ public class ArmoredAChargeReleaseProj : Projectile {
 
 #region states
 public class ArmadilloMState : MaverickState {
-	public ArmoredArmadillo ArmorArmarge = null!;
+	public ArmoredArmadillo armorArmarge = null!;
 	public ArmadilloMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -328,7 +328,7 @@ public class ArmadilloMState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		ArmorArmarge = maverick as ArmoredArmadillo ?? throw new NullReferenceException();
+		armorArmarge = maverick as ArmoredArmadillo ?? throw new NullReferenceException();
 
 	}
 }
@@ -428,7 +428,7 @@ public class ArmoredAGuardChargeState : ArmadilloMState {
 
 	public override void update() {
 		base.update();
-		if (ArmorArmarge == null) return;
+		if (armorArmarge == null) return;
 
 		if (stateTime > 1.7f) {
 			maverick.changeState(new ArmoredAGuardReleaseState(damage));
@@ -457,7 +457,7 @@ public class ArmoredAGuardReleaseState : ArmadilloMState {
 			for (int i = 256; i >= 0; i -= 32) {
 				new ArmoredAChargeReleaseProj(
 					maverick.getCenterPos(), 1, i, damage,
-					ArmorArmarge, player, player.getNextActorNetId(), rpc: true);
+					armorArmarge, player, player.getNextActorNetId(), rpc: true);
 			}
 		}	
 

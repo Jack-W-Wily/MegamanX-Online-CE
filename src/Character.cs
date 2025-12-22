@@ -387,7 +387,7 @@ public partial class Character : Actor, IDamagable {
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, int? heartTanks = null, bool isATrans = false
 	) : base(
-		null!, new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
+		"", new Point(x, y), netId, ownedByLocalPlayer, addToLevel: true
 	) {
 		//hasStateMachine = true;
 		slideOnIce = true;
@@ -874,8 +874,7 @@ public partial class Character : Actor, IDamagable {
 
 	// For terrain collision.
 	public override Collider? getTerrainCollider() {
-		Collider? overrideGlobalCollider = null;
-		if (spriteToColliderMatch(sprite.name, out overrideGlobalCollider)) {
+		if (spriteToColliderMatch(sprite.name, out Collider? overrideGlobalCollider)) {
 			return overrideGlobalCollider;
 		}
 		if (physicsCollider == null) {
@@ -995,7 +994,8 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		// Crystal break.
-		if ((charState is Dash || charState is AirDash) &&
+		if (((charState is Dash or AirDash or LightDash or GigaAirDash) || 
+			(charState.useDashJumpSpeed || isDashing) && !(charState is Fall or Jump)) &&
 			other.gameObject is Character character && character.isCrystalized &&
 			character.player.alliance != player.alliance
 		) {
@@ -1566,9 +1566,7 @@ public partial class Character : Actor, IDamagable {
 			usedSubtank = null;
 		}
 
-		if (ai != null) {
-			ai.update();
-		}
+		ai?.update();
 
 		if (slideVel != 0) {
 			slideVel = Helpers.toZero(slideVel, Global.spf * 350, Math.Sign(slideVel));
@@ -2028,8 +2026,7 @@ public partial class Character : Actor, IDamagable {
 			int chargeType = 0;
 			if (!sprite.name.Contains("ra_hide")) {
 				int level = getDisplayChargeLevel();
-				var renderGfx = RenderEffectType.ChargeBlue;
-				renderGfx = level switch {
+				RenderEffectType renderGfx = level switch {
 					1 => RenderEffectType.ChargeBlue,
 					2 => RenderEffectType.ChargeYellow,
 					3 when (chargeType == 2) => RenderEffectType.ChargeOrange,
@@ -2583,11 +2580,9 @@ public partial class Character : Actor, IDamagable {
 			changeSprite(getSprite(newState.shootSpriteEx), true);
 		} else {
 			string spriteName = sprite.name;
-			string targetSprite = newState.sprite;
 			if (newState.sprite == newState.transitionSprite &&
 				!Global.sprites.ContainsKey(getSprite(newState.transitionSprite))
 			) {
-				targetSprite = newState.defaultSprite;
 				newState.sprite = newState.defaultSprite;
 			}
 			if (Global.sprites.ContainsKey(getSprite(newState.sprite))) {
@@ -2665,11 +2660,11 @@ public partial class Character : Actor, IDamagable {
 				0, pos.x + x, pos.y + y + yOff, xDir, 1, null, 1, 1, 1, zIndex + 1
 			);
 		}
-		List<Player> nonSpecPlayers = Global.level.nonSpecPlayers();
+		//List<Player> nonSpecPlayers = Global.level.nonSpecPlayers();
 
-		bool drawCursorChar = player.isMainPlayer && (
+		/*bool drawCursorChar = player.isMainPlayer && (
 			Global.level.is1v1() || Global.level.server.fixedCamera
-		);
+		);*/
 
 		bool shouldDrawName = false;
 		bool shouldDrawHealthBar = false;
@@ -2832,7 +2827,6 @@ public partial class Character : Actor, IDamagable {
 				Alignment.Center, true, depth: ZIndex.HUD
 			);
 			if (ai != null) {
-				var charTarget = ai.target as Character;
 				Fonts.drawText(
 					FontType.Grey, "dest:" + ai.aiState.getDestNodeName(),
 					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
@@ -2849,7 +2843,7 @@ public partial class Character : Actor, IDamagable {
 					FontType.Grey, ai.aiState.GetType().ToString().RemovePrefix("MMXOnline."),
 					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
 				);
-				if (charTarget != null) {
+				if (ai.target is Character charTarget) {
 					Fonts.drawText(
 						FontType.Grey, "target:" + charTarget?.name, textPosX, textPosY -= 10,
 						Alignment.Center, true, depth: ZIndex.HUD
@@ -2864,6 +2858,10 @@ public partial class Character : Actor, IDamagable {
 			} else {
 				Fonts.drawText(
 					FontType.Grey, charState.GetType().ToString().RemovePrefix("MMXOnline."),
+					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
+				);
+				Fonts.drawText(
+					FontType.Grey, sprite.name,
 					textPosX, textPosY -= 10, Alignment.Center, true, depth: ZIndex.HUD
 				);
 			}
@@ -2958,7 +2956,7 @@ public partial class Character : Actor, IDamagable {
 
 		if (charState is GenericStun gst) {
 			bool hasDrawn = false;
-			List<int> iconsToDraw = new();
+			List<int> iconsToDraw = [];
 			if (crystalizedTime > 0) {
 				drawStatusBar(crystalizedTime, gst.getTimerFalloff(), crystalizedMaxTime, new Color(247, 206, 247));
 				deductLabelY(5);
@@ -3290,8 +3288,15 @@ public partial class Character : Actor, IDamagable {
 		) {
 			damage = 0;
 		}
-
+		// Get armor penetration flag.
 		bool isArmorPiercing = Damager.isArmorPiercing(projId);
+		// Instakills and hits while dead also ignore armor.
+		if (originalDamage == (decimal)Damager.forceKillDamage ||
+			originalDamage == (decimal)Damager.ohkoDamage ||
+			originalDamage == (decimal)Damager.envKillDamage
+		) {
+			isArmorPiercing = true;
+		}
 
 		if (projId == (int)ProjIds.CrystalHunterDash &&
 			charState is GenericStun && crystalizedTime > 0 &&
@@ -3300,8 +3305,7 @@ public partial class Character : Actor, IDamagable {
 			crystalizedTime = 0; // Dash to destroy crystal
 		}
 
-		var inRideArmor = charState as InRideArmor;
-		if (inRideArmor != null && inRideArmor.crystalizeTime > 0) {
+		if (charState is InRideArmor inRideArmor && inRideArmor.crystalizeTime > 0) {
 			if (weaponIndex == 20 && damage > 0) inRideArmor.crystalizeTime = 0;   //Dash to destroy crystal
 			inRideArmor.checkCrystalizeTime();
 		}
@@ -4000,7 +4004,7 @@ public partial class Character : Actor, IDamagable {
 			shape = shape.clone(0, MathF.Abs(shape.maxY) + 1);
 		}
 
-		var collision = Global.level.checkCollisionShape(shape, new List<GameObject>() { rideArmor });
+		var collision = Global.level.checkCollisionShape(shape, [rideArmor]);
 		if (collision?.gameObject is not Wall) {
 			return true;
 		}

@@ -5,6 +5,26 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+public class RcxState : CharState {
+	public RagingChargeX mmx = null!;
+
+	public RcxState(
+		string sprite, string shootSprite = "", string attackSprite = "",
+		string transitionSprite = "", string transShootSprite = ""
+	) : base(
+		sprite, shootSprite, attackSprite,
+		transitionSprite, transShootSprite
+	) {
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+	}
+}
+
+public class XUPParryStartState : RcxState {
 public class XUPParryStartState : CharState {
 	public Character mmx = null!;
 	public XUPParryStartState() : base("unpo_parry_start") {
@@ -29,7 +49,7 @@ public class XUPParryStartState : CharState {
 		if (player.weapon is XBuster { isUnpoBuster: true }) {
 			player.weapon.ammo = player.weapon.maxAmmo;
 		}*/
-		mmx.addPercentAmmo(100);
+		character.addPercentAmmo(100);
 		if (damagingActor is Projectile proj) {
 			if (proj.ownerActor != null) {
 				counterAttackTarget = proj.ownerActor;
@@ -232,7 +252,7 @@ public class UPParryRangedProj : Projectile {
 	}
 }
 
-public class XUPParryProjState : CharState {
+public class XUPParryProjState : RcxState {
 	Projectile? otherProj;
 	Anim? absorbAnim;
 	bool shootProj;

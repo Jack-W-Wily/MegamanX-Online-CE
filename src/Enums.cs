@@ -301,6 +301,8 @@ public enum WeaponIds {
 	Sigma3KaiserStomp,
 	RideChaserGun,
 	RideChaserHit,
+	VileWeaponSystem,
+	DNACore = 250,
 
 
 	// Wcut STuff

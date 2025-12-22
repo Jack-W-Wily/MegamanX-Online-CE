@@ -534,7 +534,7 @@ public class FrontRunnerProj : Projectile {
 		vel.x = 300 * Helpers.cosb(byteAngle);
 		vel.y = 300 * Helpers.sinb(byteAngle);
 		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
@@ -563,7 +563,7 @@ public class FatBoyProj : Projectile {
 		vel.x = 300 * Helpers.cosb(byteAngle);
 		vel.y = 300 * Helpers.sinb(byteAngle);
 		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
@@ -592,7 +592,7 @@ public class LongshotGizmoProj : Projectile {
 		vel.x = 300 * Helpers.cosb(byteAngle);
 		vel.y = 300 * Helpers.sinb(byteAngle);
 		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {

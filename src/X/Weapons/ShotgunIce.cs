@@ -315,7 +315,7 @@ public class ShotgunIceProjSled : Projectile {
 public class ShotgunIceChargedShot : CharState {
 	public float[] StateTime = { 2/60f, 10/60f, 18/60f, 26/60f, 34/60f, 42/60f, 50/60f, 58/60f};
 	public bool[] fired = { false, false, false, false, false, false, false, false };
-	MegamanX mmx = null!;
+	MegamanX? mmx = null;
 	public float time;
 	public ShotgunIceChargedShot() : base("shoot") {
 		airMove = true;
@@ -331,7 +331,7 @@ public class ShotgunIceChargedShot : CharState {
 			}
 		}
 		States();
-		mmx.stopCharge();
+		mmx?.stopCharge();
 		if (stateTime > 60f / 60f) {
 			character.changeToIdleOrFall();
 		}
@@ -353,10 +353,12 @@ public class ShotgunIceChargedShot : CharState {
 	}
 	public void ShotProjectile() {
 		int xDir = character.xDir;
-		new ShotgunIceProjCharged(
-			mmx.getShootPos(), xDir, mmx, player, 1,
-			false, player.getNextActorNetId(), true
-		);
+		if (mmx != null) {
+			new ShotgunIceProjCharged(
+				mmx.getShootPos(), xDir, mmx, player, 1,
+				false, player.getNextActorNetId(), true
+			);
+		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
