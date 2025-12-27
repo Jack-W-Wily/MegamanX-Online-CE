@@ -188,7 +188,7 @@ public class HighMax : Character {
 			!isAttacking() && grounded && !player.input.isHeld(Control.Shoot, player) &&
 			charState is not BlockWCUT
 		) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player) && Global.level.isRace()) {

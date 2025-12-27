@@ -392,7 +392,7 @@ public class Sigma1 : BaseSigma {
 						changeState(new SigmaWallDashStateWC(-1, true), true);
 						break;
 					case 5 when isFacingTarget:
-						changeState(new BlockWCUT());
+						changeState(new BlockWCUT(), true);
 						break;
 					case 6 when isFacingTarget:
 						changeState(new VirusSlash2());

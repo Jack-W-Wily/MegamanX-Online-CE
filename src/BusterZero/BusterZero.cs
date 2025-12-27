@@ -119,7 +119,7 @@ public class BusterZero : Character {
 			)
 		{
 
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		} 
 

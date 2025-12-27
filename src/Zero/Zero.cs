@@ -1056,7 +1056,7 @@ public class Zero : Character {
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.AwakenedAura) {
 			if (isGenmuZero) {
-				proj.damager.damage = 4;
+				proj.damager.damage = 0;
 				proj.damager.flinch = Global.defFlinch;
 			}
 		}

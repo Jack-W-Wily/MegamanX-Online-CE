@@ -79,6 +79,8 @@ public class IrisCrystalRisingBash : CharState {
 	
 	public float pushBackSpeed;
 
+
+
 	public IrisCrystalRisingBash(string transitionSprite = "")
 		: base("attack_rising", "", "", transitionSprite)
 	{
@@ -296,6 +298,8 @@ public class IrisCrystalCharge : CharState {
 	public Projectile fSplasherProj;
 
 
+	public bool beam;
+
 
 	public IrisCrystalCharge()
 		: base("chargegp", "") {
@@ -312,6 +316,17 @@ public class IrisCrystalCharge : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+
+		if ((character as Iris).irisCrystal != null && beam) {
+				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
+				new IrisLaserProjUp((character as Iris).irisCrystal.pos, character.xDir, player.character, player,
+						player.getNextActorNetId(), rpc: true
+				);		
+				new IrisLaserProjFoward(character.getShootPos(), character.xDir, player.character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+		}
+
 	}
 
 	public override void update() {
@@ -348,6 +363,8 @@ public class IrisSpawnBeam : CharState
 
 	private bool fired;
 
+	public bool beam;
+
 	public IrisSpawnBeam()
 		: base("spawn_lightbeam", "")
 	{
@@ -375,13 +392,20 @@ public class IrisSpawnBeam : CharState
 		superArmor = true;
 		if (character.frameIndex == 3 && !fired){
 		fired = true;
-		 TriadThunder weapon = new TriadThunder();
+		
 			if ((character as Iris).irisCrystal != null) {
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
 				new IrisLaserProjUp((character as Iris).irisCrystal.pos, character.xDir, player.character, player,
 						player.getNextActorNetId(), rpc: true
 				);
+				if (beam){
+				new IrisLaserProjFoward(character.getShootPos(), character.xDir, player.character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				}
 			}
+
+			
 		}
 		
 	
@@ -715,6 +739,9 @@ public class IrisSpawnIce : CharState {
 
 	float shootTime;
 
+	public bool beam;
+
+	bool fired;
 
 	public IrisSpawnIce(string transitionSprite = "") :
 		base(getSprite(), "", "", transitionSprite) {
@@ -745,6 +772,15 @@ public class IrisSpawnIce : CharState {
 					(character as Iris).irisCrystal.pos, character.xDir, character,
 					player, 1, true, player.getNextActorNetId(), rpc: true
 				);
+
+				if (beam && !fired){
+				new IrisLaserProjFoward(character.getShootPos(), character.xDir, player.character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				character.playSound("irislaser2");
+				fired = true;
+				}
+			
 			}
 		}
 
@@ -780,7 +816,9 @@ public class IrisSpawnFire : CharState {
 
 	float shootTime;
 
+	public bool beam;
 
+	public bool fired;
 	public IrisSpawnFire(string transitionSprite = "") :
 		base(getSprite(), "", "", transitionSprite) {
 
@@ -809,7 +847,14 @@ public class IrisSpawnFire : CharState {
 				(character as Iris).irisCrystal.pos, character.xDir, player.input.isHeld(Control.Down, player),
 				character, player, player.getNextActorNetId(), rpc: true
 			);
-		
+
+			if (beam && !fired){
+				new IrisLaserProjFoward(character.getShootPos(), character.xDir, player.character, player,
+						player.getNextActorNetId(), rpc: true
+				);
+				character.playSound("irislaser2");
+				fired = true;
+				}
 			}
 		}
 

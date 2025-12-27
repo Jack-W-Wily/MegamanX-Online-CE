@@ -602,7 +602,7 @@ public class AxlWC : Character {
 		if (grounded && player.input.isL2Held(player)&&
 			charState is not BlockWCUT and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
 		) {
-			changeState(new BlockWCUT(), true);
+			changeState(new BlockWCUT(), true);;
 			return true;
 		}
 		return base.normalCtrl();

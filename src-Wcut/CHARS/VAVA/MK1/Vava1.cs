@@ -174,6 +174,9 @@ public class VAVA1 : Vile {
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 
 
+		weaponSystem = setupWeaponSystem();
+
+
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
 
@@ -183,7 +186,7 @@ public class VAVA1 : Vile {
 
 	public override bool normalCtrl() {
 		if (player.input.isL2Held(player) && grounded) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 
 		}
 	//	if (player.input.isPressed(Control.Special2, player)
@@ -296,7 +299,7 @@ public class VAVA1 : Vile {
 			return true;
 		}
 
-		if (player.vileAmmo >= 15 && canDash() &&
+		if (player.vileAmmo >= 15 && canDash() && player.speedDevil &&
 			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
 			changeState(new VileDashChargeState());
 			player.vileAmmo -= 15;
@@ -906,6 +909,8 @@ public class VAVA1 : Vile {
 
 		SpeedDemon,
 
+		AirRaid,
+
 
 	}
 
@@ -921,7 +926,7 @@ public class VAVA1 : Vile {
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vava_knee" => MeleeIds.VavaKneeAttack,
 			"vava_jab_1" => MeleeIds.Jab,
-			"vava_jab_2" => MeleeIds.Jab2,
+			"vava_jab_2" or "vava_punch_1" or "vava_kick" or "vava_kick_2" or "vava_kick_3" => MeleeIds.Jab2,
 			"vava_punch_2" => MeleeIds.UpperCut,
 			"vava_gizmo_dash_grab" => MeleeIds.GizmoGrab,
 			"vava_kamae_unblockable" or "vava_kamae_unblockable_land" => MeleeIds.KamaeUnB,
@@ -940,7 +945,7 @@ public class VAVA1 : Vile {
 			"vava_hyperdash_attack" or "vava_missile_stance" =>  MeleeIds.SpeedDemon,
 
 			"vava_superkick"  => MeleeIds.BurensenENDCPU,
-			
+			"vava_superkick_up"  => MeleeIds.AirRaid,
 			_ => MeleeIds.None
 		});
 	}
@@ -1118,6 +1123,13 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
 				3, 30, 20, isReflectShield: true,
+				isZSaberClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.AirRaid => new GenericMeleeProj(
+				new RyuenjinWeapon(), projPos, ProjIds.VileAirRaidPlusKnock, player,
+				3, 0, 20, isReflectShield: true,
 				isZSaberClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
@@ -1812,7 +1824,7 @@ public class VAVA1 : Vile {
 						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
 								&& aiBlocktime <= 0) {
 							turnToInput(player.input, player);
-							changeState(new BlockWCUT(), true);
+							changeState(new BlockWCUT(), true);;
 							aiBlocktime = Helpers.randomRange(0, 60);
 						}
 					}

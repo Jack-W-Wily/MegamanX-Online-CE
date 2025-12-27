@@ -202,3 +202,284 @@ public float angleDist = 0;
 
 
 
+
+
+
+
+
+
+public class IrisHoverState : CharState {
+	float hoverTime;
+	
+	public IrisHoverState() : base("idle", "idle", "idle", "idle") {
+		exitOnLanding = true;
+		airMove = true;
+		attackCtrl = true;
+		normalCtrl = true;
+		enterSound = "irisridefly";
+	}
+
+
+
+	public override void update() {
+		base.update();
+
+		if ( character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
+		&& !player.input.isHeld(Control.Down, player)) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+		if (!character.sprite.name.Contains("shoot2") && player.input.isHeld(Control.Up, player)){
+			if(player.input.isHeld(Control.Dash, player)){
+			character.vel.y = -character.getJumpPower() * 1f;
+			} else {character.vel.y = -character.getJumpPower() * 0.3f;}
+		}
+		if (!character.sprite.name.Contains("shoot2") && player.input.isHeld(Control.Down, player)){
+			if (player.input.isHeld(Control.Dash, player)){
+			character.vel.y = +character.getJumpPower() * 1f;
+			} else {character.vel.y = +character.getJumpPower() * 0.3f;}
+		}
+
+		if (character.gravityWellModifier > 1) {
+			character.vel.y = 53;
+		}
+
+
+		
+
+		hoverTime += Global.spf;
+	if ((hoverTime > 10) || hoverTime > 0.2f &&
+			character.player.input.isPressed(Control.Jump, character.player)
+		) {
+			character.changeState(new Fall(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	character.useGravity = false;
+	character.vel = new Point();
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+}
+
+
+
+
+
+
+public class RAIrisSlashState : CharState {
+	float hoverTime;
+	
+	public RAIrisSlashState() : base("slash", "", "", "") {
+		exitOnLanding = false;
+		airMove = true;
+		enterSound = "rideX4-1";
+	}
+
+
+
+	public override void update() {
+		base.update();
+
+		if ( character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
+		&& !player.input.isHeld(Control.Down, player)) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+	
+		if (character.gravityWellModifier > 1) {
+			character.vel.y = 53;
+		}
+
+
+		
+
+		
+	if (character.isAnimOver()
+		) {
+			character.changeState(new IrisHoverState(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	character.useGravity = false;
+	character.vel = new Point();
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+}
+
+
+
+
+
+
+
+public class RAIrisSlashStateRising : CharState {
+	float hoverTime;
+	
+	public RAIrisSlashStateRising() : base("rising", "", "", "") {
+		exitOnLanding = false;
+		airMove = true;
+
+		enterSound = "rideX4-1";
+	}
+
+
+
+	public override void update() {
+		base.update();
+
+		if ( character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
+		&& !player.input.isHeld(Control.Down, player)) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+	
+		if (character.gravityWellModifier > 1) {
+			character.vel.y = 53;
+		}
+
+
+		
+
+		
+	if (character.isAnimOver()
+		) {
+			character.changeState(new IrisHoverState(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	character.useGravity = false;
+	character.vel = new Point();
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+}
+
+
+
+
+
+
+public class RAIrisSlashStateReverse: CharState {
+	float hoverTime;
+	
+	public RAIrisSlashStateReverse() : base("slash_reverse", "", "", "") {
+		exitOnLanding = false;
+		airMove = true;
+		invincible = true;
+		enterSound = "fakeDoubleCyclone";
+	}
+
+
+
+	public override void update() {
+		base.update();
+
+		if ( character.vel.y < 0 && !player.input.isHeld(Control.Up, player) 
+		&& !player.input.isHeld(Control.Down, player)) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+	
+		if (character.gravityWellModifier > 1) {
+			character.vel.y = 53;
+		}
+
+
+		
+
+		
+	if (character.isAnimOver()
+		) {
+			character.changeState(new IrisHoverState(), true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	character.useGravity = false;
+	character.vel = new Point();
+
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+}
+
+
+
+
+
+
+
+
+public class RAIrisKuenzan : CharState {
+	
+	
+	public float soundTime = 0;
+
+	public RAIrisKuenzan() : base("kuenzan", "", "", "") {
+	
+		immuneToWind = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (stateTime > 0.2f){
+		character.move(new Point(character.xDir * 450, 0));
+		}
+		soundTime -= Global.speedMul;
+		if (soundTime <= 0) {
+			soundTime = 9;
+			character.playSound("rideX4-1", sendRpc: true);
+		}
+	    if (stateTime > 2f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+}
+}
+
+
+
+

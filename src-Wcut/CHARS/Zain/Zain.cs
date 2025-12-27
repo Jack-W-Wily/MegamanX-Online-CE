@@ -43,7 +43,7 @@ public class Zain : Character {
 			!isAttacking() && grounded &&
 			charState is not BlockWCUT
 		) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {

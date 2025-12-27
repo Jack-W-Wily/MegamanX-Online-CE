@@ -684,7 +684,7 @@ public class VAVAV : Vile {
 			charState is not BlockWCUT
 		) {
 			
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		}
 

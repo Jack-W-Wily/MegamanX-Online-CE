@@ -1054,6 +1054,7 @@ public class RideArmor : Actor, IDamagable {
 		else if (raNum == 5 && !isVava1Ride) return "devilbear";
 		else if (raNum == 6) return "blackbear2";
 		else if (raNum == 7) return "raiden";
+		else if (raNum == 8) return "eagle";
 		else {
 			if (!isNeutral) return "ridearmor";
 			else return "neutralra";
@@ -2416,19 +2417,16 @@ public class InRideArmor : CharState {
 			player.superMaxAmmo -= 32;
 		}
 		if (player.input.isHeld(Control.Up, player)) {
-			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new SplashHitGrenadeProj(
 				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		} else if (player.input.isHeld(Control.Down, player)) {
-			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new MK2NapalmGrenadeProj(
 				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		} else {
-			vile.setVileShootTime(vile.napalmWeapon);
 			grenade = new VileNapalmGrenadeProj(
 				character.pos.addxy(0, -3), character.xDir, vile,
 				character.player, character.player.getNextActorNetId(), rpc: true

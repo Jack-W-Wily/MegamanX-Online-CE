@@ -187,7 +187,7 @@ public class GBD : Character {
 			!isAttacking() && grounded && !player.input.isHeld(Control.Shoot, player) &&
 			charState is not BlockWCUT
 		) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 
 		}
 

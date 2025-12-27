@@ -536,7 +536,7 @@ public class ZeroMID : Zero {
 			)
 		{
 
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		} 
 

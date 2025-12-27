@@ -17,6 +17,8 @@ public class Iris : Character {
 			charId = CharIds.Iris;
 			spriteFrameToSounds["iris_run/4"] = "iriswalk";
 			spriteFrameToSounds["iris_run/9"] = "iriswalk";
+			spriteFrameToSounds["ra_iris_dash/1"] = "irisridedash";
+			spriteFrameToSounds["ra_iris_taunt/1"] = "irisridestart";
 	}
 
 	public NewIrisCrystal irisCrystal;
@@ -32,16 +34,30 @@ public class Iris : Character {
 
 	public float CannonStabCD;
 
+
+	public bool Metamorphosis;
+
 	public bool usedcannonONce = false;
+
+
+	
+		public override int getMaxHealth() {
+		if (Metamorphosis) {
+			return 40;
+		}
+		return MathInt.Ceiling(Player.getModifiedHealth(26) * Player.getHpMod());
+	}
+
 	
 
+
 	public override bool normalCtrl() {
-	
+		
 		if (player.input.isL2Held(player) &&
 			!isAttacking() && grounded &&
 			charState is not BlockWCUT
 		) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
 			changeState(new WcutGenericDodgeF(), true);	
@@ -51,32 +67,116 @@ public class Iris : Character {
 		}
 
 
+		if (charState is Fall && Metamorphosis) {
+				changeState(new IrisHoverState(), false);
+		}
+
+		if ( grounded && player.input.isHeld(Control.Taunt,player)
+			&& downPressedTimes >10 && player.currency > 7 && OverDrive && !Metamorphosis
+		) {
+			Metamorphosis = true;
+			player.currency -= 8;
+			Global.level.delayedActions.Add(new DelayedAction(() => { 
+			changeState(new Taunt(),true);
+			}, 0.15f));
 			
+			shakeCamera(sendRpc: true);
+			playSound("crash", sendRpc: true);
+			new FlameMStompShockwave(
+			pos, xDir,
+			this, player, player.getNextActorNetId(), rpc: true);
+			shakeCamera(sendRpc: true);
+			addHealth(maxHealth);
+			bonusHealth = maxHealth;
+
+			playSound("irislaser2", forcePlay: false, sendRpc: true);
+			new IrisLaserProjUp(pos, xDir, player.character, player,
+			player.getNextActorNetId(), rpc: true
+				);
+			new IrisLaserProjUp(pos.addxy(-30,0), xDir, player.character, player,
+			player.getNextActorNetId(), rpc: true
+				);
+			new IrisLaserProjUp(pos.addxy(30,0), xDir, player.character, player,
+			player.getNextActorNetId(), rpc: true
+				);
+		
+		}
+
 		return base.normalCtrl();
 	}
 
 
-	public override bool attackCtrl() {
 
-		if (player.input.isHeld(Control.Down, player) && !grounded &&
-		 player.input.isPressed(Control.Dash, player))
-		{	
-        changeState(new IrisDiveKick(), true);
+	public override void landingCode(bool useSound = true) {
+		base.landingCode(useSound);
+		if (Metamorphosis){
+		shakeCamera(sendRpc: true);
+		playSound("crash", sendRpc: true);
+		new FlameMStompShockwave(
+			pos, xDir,
+			this, player, player.getNextActorNetId(), rpc: true);
+			shakeCamera(sendRpc: true);
 		}
-		if (!player.input.isHeld(Control.Up, player) &&
-		 player.input.isPressed(Control.Shoot, player))
-		{	
-        changeState(new IrisCrystalBashState(), true);
+	}
+
+	public override bool attackCtrl() {
+		if (!Metamorphosis){
+			if (player.input.isHeld(Control.Down, player) && !grounded &&
+			player.input.isPressed(Control.Dash, player))
+			{	
+			changeState(new IrisDiveKick(), true);
+			}
+			if (!player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			changeState(new IrisCrystalBashState(), true);
+			}
+			if ( player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			changeState(new IrisCrystalRisingBash(), true);
+			}
+			if ( !player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Special1, player))
+			{	
+			changeState(new IrisCrystalCharge(), true);
+			}
 		}
-		if ( player.input.isHeld(Control.Up, player) &&
-		 player.input.isPressed(Control.Shoot, player))
-		{	
-        changeState(new IrisCrystalRisingBash(), true);
-		}
-		if ( !player.input.isHeld(Control.Up, player) &&
-		 player.input.isPressed(Control.Special1, player))
-		{	
-        changeState(new IrisCrystalCharge(), true);
+		else {
+				if (player.input.isHeld(Control.Down, player) && !grounded &&
+			player.input.isPressed(Control.Dash, player))
+			{	
+			changeState(new IrisDiveKick(), true);
+			}
+			if (!player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			changeState(new RAIrisSlashState(), true);
+			}
+			if ( player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			changeState(new RAIrisSlashStateRising(), true);
+			}
+			if ( !player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Special1, player))
+			{	
+			changeState(new IrisCrystalCharge(), true);
+			}
+
+			if ( player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.WeaponLeft, player) && player.superAmmo > 15)
+			{	
+			changeState(new RAIrisKuenzan(), true);
+			player.superAmmo -= 16;
+			}
+			if (!player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.WeaponLeft, player) && player.superAmmo > 15)
+			{	
+			changeState(new RAIrisSlashStateReverse(), true);
+			player.superAmmo -= 16;
+			}
+
 		}
 		return base.attackCtrl();
 	}
@@ -88,7 +188,7 @@ public class Iris : Character {
 		base.update();
 
 		// Perifericos
-		if (!isInDamageSprite()) {
+		if (!isInDamageSprite() && !Metamorphosis) {
 
 			if (iriscannon == null && player.health > 0
 			 && !usedcannonONce &&
@@ -138,6 +238,19 @@ public class Iris : Character {
 
 		}
 		
+
+		if (Metamorphosis && CannonSlashCD == 0) {
+			if (charState is IrisSpawnBeam beamState) {
+				beamState.beam = true;
+			}
+			if (charState is IrisSpawnFire beamState2) {
+				beamState2.beam = true;
+			}
+			if (charState is IrisCrystalCharge beamState3) {
+				beamState3.beam = true;
+			}
+			CannonSlashCD = 2;
+		}
 
 
 		// Cooldowns
@@ -192,6 +305,7 @@ public class Iris : Character {
 	}
 
 	public override string getSprite(string spriteName) {
+		if (Metamorphosis) return "ra_iris_" + spriteName;
 		return "iris_" + spriteName;
 	}
 
@@ -228,6 +342,31 @@ public class Iris : Character {
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint,
 			ProjIds.VirusSlash, player, 3f, 20, 20,
 			isZSaberClang: true, addToLevel: true, isJuggleProjectile: true, hitSound : "kofhtsnd_lightning1"
+			);
+		}
+
+
+
+		 if (  sprite.name.Contains("slash") && !sprite.name.Contains("rising") && !sprite.name.Contains("reverse"))
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.VirusSlash,
+			player, 2f, 20, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_lightning1"
+			);
+		}
+
+
+		 if (  sprite.name.Contains("reverse"))
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.BurensenEND,
+			player, 12f, 0, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_lightning1"
+			);
+		}
+
+
+		 if (  sprite.name.Contains("kuenzan"))
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.ForceGrabState,
+			player, 2f, 20, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_lightning1"
 			);
 		}
 

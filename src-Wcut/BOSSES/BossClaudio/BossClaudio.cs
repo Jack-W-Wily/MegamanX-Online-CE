@@ -57,7 +57,7 @@ public class BossClaudio : Character {
 	public override bool normalCtrl() {
 
 		if (player.input.isL2Held(player) && grounded){
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 		
 		}
 		

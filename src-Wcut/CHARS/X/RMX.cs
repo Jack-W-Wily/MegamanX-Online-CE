@@ -48,7 +48,7 @@ public class RockmanX : MegamanX {
 			!isAttacking() && grounded &&
 			charState is not BlockWCUT
 		) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		}
 	

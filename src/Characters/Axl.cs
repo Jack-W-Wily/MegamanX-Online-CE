@@ -617,7 +617,7 @@ public class Axl : Character {
 		if (grounded && player.input.isL2Held(player)&&
 			charState is not BlockWCUT and not Dash and not OcelotSpin
 		) {
-			changeState(new BlockWCUT(), true);
+			changeState(new BlockWCUT(), true);;
 			return true;
 		}
 

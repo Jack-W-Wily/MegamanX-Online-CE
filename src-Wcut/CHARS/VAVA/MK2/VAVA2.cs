@@ -767,7 +767,7 @@ public float CrimsonphantomCD;
 			charState is not BlockWCUT
 		) {
 			
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		}
 

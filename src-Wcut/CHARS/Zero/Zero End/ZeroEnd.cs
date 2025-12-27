@@ -562,7 +562,7 @@ public class ZeroEND : Zero {
 			)
 		{
 
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 			return true;
 		} 
 
@@ -1203,10 +1203,10 @@ public class ZeroEND : Zero {
 				[(int)ProjIds.AwakenedAura] = () => {
 					playSound("awakenedaura", forcePlay: true, sendRpc: true); 
 					Point centerPoint = globalCollider.shape.getRect().center();
-					float damage = 2;
+					float damage = 0;
 					int flinch = 0;
 					if (isGenmuZero) {
-						damage = 4;
+						damage = 0;
 						flinch = Global.defFlinch;
 					}
 					Projectile proj = new GenericMeleeProj(
@@ -1228,7 +1228,7 @@ public class ZeroEND : Zero {
 	public override void updateProjFromHitbox(Projectile proj) {
 		if (proj.projId == (int)ProjIds.AwakenedAura) {
 			if (isGenmuZero) {
-				proj.damager.damage = 4;
+				proj.damager.damage = 0;
 				proj.damager.flinch = Global.defFlinch;
 			}
 		}

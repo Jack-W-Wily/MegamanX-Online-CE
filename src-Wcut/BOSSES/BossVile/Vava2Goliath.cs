@@ -98,7 +98,7 @@ public class Vava2Goliath : Vile {
 
 	public override bool normalCtrl() {
 		if (player.input.isL2Held(player) && grounded) {
-			changeState(new BlockWCUT());
+			changeState(new BlockWCUT(), true);
 
 		}
 	//	if (player.input.isPressed(Control.Special2, player)
@@ -1502,7 +1502,7 @@ public class Vava2Goliath : Vile {
 						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
 								&& aiBlocktime <= 0) {
 							turnToInput(player.input, player);
-							changeState(new BlockWCUT(), true);
+							changeState(new BlockWCUT(), true);;
 							aiBlocktime = Helpers.randomRange(0, 60);
 						}
 					}
