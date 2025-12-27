@@ -517,22 +517,9 @@ public class LaunchedStateWeak : GenericGrabbedState {
 
 		if (launched) {
 			launchTime += Global.spf;
-			if (launchTime > 0.33f) {
+			if (launchTime > 0.13f) {
 				character.changeToIdleOrFall();
 				return;
-			}
-
-			for (int i = 1; i <= 4; i++) {
-				CollideData collideData = Global.level.checkTerrainCollisionOnce(character, 0, -10 * i, autoVel: true);
-				if (!character.grounded && collideData != null && collideData.gameObject is Wall wall
-					&& !wall.isMoving && !wall.topWall && collideData.isCeilingHit()) {
-					if (!once) {
-						once = true;
-						character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
-						character.playSound("crash", sendRpc: true);
-						character.shakeCamera(sendRpc: true);
-					}
-				}
 			}
 
 		}
@@ -540,7 +527,7 @@ public class LaunchedStateWeak : GenericGrabbedState {
 		if (!launched) {
 			launched = true;
 			character.unstickFromGround();
-			character.vel.y = -200;
+			character.vel.y = -400;
 		}
 	}
 }

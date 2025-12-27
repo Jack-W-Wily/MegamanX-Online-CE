@@ -10,7 +10,7 @@ namespace MMXOnline;
 
 
 
-public class RockmanX : MegamanX {
+public class XAnother : MegamanX {
 
 	
 	public bool canSpecialCancel = false;
@@ -18,7 +18,7 @@ public class RockmanX : MegamanX {
 	public float DodgeCD;
 
 
-	public RockmanX(
+	public XAnother(
 			Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, XLoadout? loadout = null,
@@ -262,8 +262,8 @@ public class RockmanX : MegamanX {
 
 	
 	public override string getSprite(string spriteName) {
-		if (Global.sprites.ContainsKey("rmx_" + spriteName)) {
-			return "rmx_" + spriteName;
+		if (Global.sprites.ContainsKey("rmxAn_" + spriteName)) {
+			return "rmxAn_" + spriteName;
 		}
 		return "rmx_" + spriteName;
 	}
@@ -502,7 +502,7 @@ public class RockmanX : MegamanX {
 			return shaders;
 		}
 		if (index >= (int)WeaponIds.GigaCrush) {
-			index = 0;
+			index = 40;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
 			index = player.weapons[player.hyperChargeSlot].index;
@@ -510,12 +510,15 @@ public class RockmanX : MegamanX {
 		if (hasFullHyperMaxArmor) {
 			index = 37;
 		}
-		if (hasUltimateArmor && index == 0) {
-			if (OverDrive){
-			index = 38;
-			} else {
+		if (index == 0 && !hasUltimateArmor) {
+		
             index = 40;   
-            }
+            
+		}
+		if (index == 0 && hasUltimateArmor) {
+		
+            index = 40;   
+            
 		}
 		palette = player.xPaletteShader;
 

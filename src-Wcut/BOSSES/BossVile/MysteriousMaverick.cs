@@ -52,6 +52,17 @@ public class MysteriousMaverick : Vile {
 	
 	
 
+	
+	public VileCannonWC cannonWeapon;
+	public VileVulcan vulcanWeapon;
+	public VileMissile missileWeapon;
+	public RocketPunch rocketPunchWeapon;
+	public VileNapalm napalmWeapon;
+	public VileBall grenadeWeapon;
+	public VileCutter cutterWeapon;
+	public VileFlamethrower flamethrowerWeapon;
+	public VileLaser laserWeapon;
+	public MechMenuWeapon rideMenuWeapon;
 
 
 
@@ -427,21 +438,8 @@ public class MysteriousMaverick : Vile {
 			}
 		}
 
-		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
-			vulcanLingerTime += Global.spf;
-			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
-				changeSpriteFromName(charState.sprite, resetFrame: false);
-			}
-		}
-		cannonWeapon.update();
-		vulcanWeapon.update();
-		missileWeapon.update();
-		rocketPunchWeapon.update();
-		napalmWeapon.update();
-		grenadeWeapon.update();
-		cutterWeapon.update();
-		laserWeapon.update();
-		flamethrowerWeapon.update();
+	
+	
 
 		if (calldownMechCooldown > 0) {
 			calldownMechCooldown -= Global.spf;

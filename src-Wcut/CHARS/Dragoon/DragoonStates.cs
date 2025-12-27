@@ -13,7 +13,7 @@ public class DragoonSpark : Projectile {
 	public DragoonSpark(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 1, player, "ground_spark", 4, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 1, player, "ground_spark", 0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		reflectable = false;
 		destroyOnHit = false;
@@ -57,7 +57,7 @@ public class DragoonPunchState : CharState {
 		: base("punch", "", "", transitionSprite)
 	{
 	airMove = true;
-	normalCtrl = true;
+	spcCancel = true;
 	}
 
 	public override void update()
@@ -94,8 +94,73 @@ public class DragoonPunchState : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		if (!character.grounded) {
+			sprite = "air_punch1";
+			character.changeSpriteFromName("air_punch1", true);
+		}
     }
 }
+
+
+
+
+public class DragoonLowPunchState : CharState {
+
+
+	
+	public float pushBackSpeed;
+
+
+
+	public DragoonLowPunchState(string transitionSprite = "")
+		: base("lowpunch1", "", "", transitionSprite)
+	{
+	airMove = true;
+		spcCancel = true;
+	}
+
+	public override void update()
+	{
+	
+		base.update();
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToCrouchOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}		
+
+		if (!character.grounded) {
+			sprite = "air_punch_low";
+			character.changeSpriteFromName("air_punch_low", true);
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
 
 
 
@@ -112,7 +177,7 @@ public class DragoonPunchState2 : CharState {
 		: base("punch2", "", "", transitionSprite)
 	{
 	airMove = true;
-	normalCtrl = true;
+	spcCancel = true;
 	}
 
 	public override void update()
@@ -222,7 +287,7 @@ public class DragoonKickState : CharState {
 
 
 	public DragoonKickState(string transitionSprite = "")
-		: base("kick_air", "", "", transitionSprite)
+		: base("kick1", "", "", transitionSprite)
 	{
 	airMove = true;
 	normalCtrl = true;
@@ -275,6 +340,7 @@ public class DragoonHadouken : CharState {
 
 	public DragoonHadouken() : base("hadouken_idle", "", "", "") {
 	superArmor = true;
+		spcCancel = true;
 	}
 
 	public override void update() {
@@ -647,10 +713,14 @@ public class DragoonShoryuken : CharState {
 
 
 
-public class DragoonSenpukiaku : CharState {
-	
 
-	public DragoonSenpukiaku() : base("spinkick", "", "", "") {
+
+public class DragoonSpinkick : CharState {
+	
+	
+	public float soundTime = 0;
+
+	public DragoonSpinkick() : base("spinkick", "", "", "") {
 	
 		immuneToWind = true;
 	}
@@ -658,10 +728,83 @@ public class DragoonSenpukiaku : CharState {
 	public override void update() {
 		base.update();
 
-	
-		character.move(new Point(character.xDir * 350, 0));
-
+		if (stateTime > 0.2f){
+		character.move(new Point(character.xDir * 250, 0));
+		}
+		soundTime -= Global.speedMul;
+		if (soundTime <= 0) {
+			soundTime = 9;
+			character.playSound("spinkick", sendRpc: true);
+		}
 	    if (stateTime > 0.6f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+}
+}
+
+
+
+
+public class DragoonUppercut : CharState {
+
+
+	public DragoonUppercut() : base("uppercut") {
+		wiffCancel = true;
+		canSpecialCancel = true;
+		enterSound = "punch2";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		if (player.input.isR2Pressed(player)) {
+			   character.playSound("speedBurner", sendRpc: true);
+            	new RisingFireProj(new RisingFire(), character.pos.addxy(30 * character.xDir,-43), character.xDir, player, player.getNextActorNetId(), true);
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+public class DragoonSenpukiaku : CharState {
+	
+
+	public DragoonSenpukiaku() : base("senpukiaku", "", "", "") {
+	
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex > 2  && character.frameIndex <11){
+		character.move(new Point(character.xDir * 350, 0));
+		}
+	    if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -758,10 +901,9 @@ public class DragoonDiveKick : CharState {
 				return;
 			}
 		}
-		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
+		if (character.grounded || diveTime >= 6f && character.deltaPos.y == 0) {
 			character.changeToLandingOrFall();
-				 new DragoonSpark(new SpeedBurner(), character.pos, character.xDir, player,  
-				 player.getNextActorNetId(), rpc : true);
+
 			return;
 		}
 		diveTime += Global.spf;
@@ -777,6 +919,10 @@ public class DragoonDiveKick : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+		if (character.grounded) {
+			 new DragoonSpark(new SpeedBurner(), character.pos, character.xDir, player,  
+				 player.getNextActorNetId(), rpc : true);
+		}
 		character.stopMoving();
 	}
 }

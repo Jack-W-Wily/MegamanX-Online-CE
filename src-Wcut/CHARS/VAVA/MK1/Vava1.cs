@@ -102,7 +102,7 @@ public class VAVA1 : Vile {
 
 
 		loadout ??= player.loadout.vileLoadout.clone();
-		this.loadout = loadout;
+		
 
 		vulcanWeapon = loadout.vulcan switch {
 			1 => new DistanceNeedler(),

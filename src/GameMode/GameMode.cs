@@ -746,7 +746,15 @@ public class GameMode {
 			}
 			#endregion
 			#region Vile
-			if (drawPlayer.character is Vile vava) {
+			if (drawPlayer.character is Vile vava && 
+			vava is not VAVA1 and not 
+			VAVA2 and not 
+			VAVAV and not
+			FinalVava and not
+			HighwayVAVA and not
+			Vava2Goliath and not
+			MysteriousMaverick
+			) {
 				int xStart = (int)Global.halfScreenW / 17;
 				int yStart = 160;
 				//This looks so bad LOL

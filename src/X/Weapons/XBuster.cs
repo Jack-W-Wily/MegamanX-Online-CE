@@ -152,6 +152,9 @@ public class XBuster : Weapon {
 		} else if (chargeLevel >= 3) {
 			if (isStock) {
 				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			}
 			else if (mmx.armArmor == ArmorId.Max) {
 				mmx.stockedMaxBusterLv += 2;
@@ -174,6 +177,9 @@ public class XBuster : Weapon {
 				}
 			}
 			else if (mmx.armArmor == ArmorId.Giga) {
+				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
+				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			} else {
 				shootLightBuster4(mmx, pos, xDir);

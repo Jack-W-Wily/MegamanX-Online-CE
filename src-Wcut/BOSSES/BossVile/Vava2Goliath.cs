@@ -444,15 +444,7 @@ public class Vava2Goliath : Vile {
 				changeSpriteFromName(charState.sprite, resetFrame: false);
 			}
 		}
-		cannonWeapon.update();
-		vulcanWeapon.update();
-		missileWeapon.update();
-		rocketPunchWeapon.update();
-		napalmWeapon.update();
-		grenadeWeapon.update();
-		cutterWeapon.update();
-		laserWeapon.update();
-		flamethrowerWeapon.update();
+	
 
 		if (calldownMechCooldown > 0) {
 			calldownMechCooldown -= Global.spf;

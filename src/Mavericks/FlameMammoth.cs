@@ -538,7 +538,7 @@ public class FlameMGrabStart : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 
 		if (maverick.isAnimOver()) {
@@ -563,7 +563,7 @@ public class FlameMGrabFinish : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 
 		if (maverick.isAnimOver()) {
@@ -593,7 +593,7 @@ public class FlameMThousandHandStart : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 
 		if (maverick.isAnimOver()) {
@@ -621,7 +621,7 @@ public class FlameMThousandHandState : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 
 		if (stateTime > 1.6f) {
@@ -648,7 +648,7 @@ public class FlameMThousandHandEnd : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 
 		if (maverick.isAnimOver()) {
@@ -720,7 +720,7 @@ public class FlameMInfernoCharge : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (stateTime > 1 && !once) {
 			once = true;
@@ -747,13 +747,13 @@ public class FlameMInfernoRelease : MammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 		var character = maverick;
 		if (maverick.frameIndex == 6 && !once) {
 			once = true;
 			new FlameMStompShockwave(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir,
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir,
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 			maverick.shakeCamera(sendRpc: true);
 			character.playSound("flamemTaunt", sendRpc: true);
 			maverick.playSound("flamemOilBurn", sendRpc: true);

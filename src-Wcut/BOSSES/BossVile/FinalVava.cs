@@ -93,76 +93,9 @@ public class FinalVava : Vile {
 
 
 		
-		loadout ??= player.loadout.vileLoadout.clone();
-		this.loadout = loadout;
-
-		vulcanWeapon = loadout.vulcan switch {
-			1 => new DistanceNeedler(),
-			2 => new BuckshotDance(),
-			3 => new NoneVulcan(),
-			_ => new CherryBlast()
-		};
+		
 		cannonWeapon = new VileCannonWC(0);
-		missileWeapon = loadout.missile switch {
-			1 => new HumerusCrush(),
-			2 => new PopcornDemon(),
-			3 => new NoneMissile(),
-			_ => new ElectricShock()
-		};
-		rocketPunchWeapon = loadout.rocketPunch switch {
-			1 => new SpoiledBrat(),
-			2 => new InfinityGig(),
-			3 => new NoneRocketPunch(),
-			_ => new GoGetterRight()
-		};
-		napalmWeapon = loadout.napalm switch {
-			1 => new FireGrenade(),
-			2 => new SplashHit(),
-			3 => new NoneNapalm(),
-			_ => new RumblingBang()
-		};
-		grenadeWeapon = loadout.ball switch {
-			1 => new SpreadShot(),
-			2 => new PeaceOutRoller(),
-			3 => new NoneBall(),
-			_ => new ExplosiveRound()
-		};
-		cutterWeapon = loadout.cutter switch {
-			1 => new ParasiteSword(),
-			2 => new MaroonedTomahawk(),
-			3 => new NoneCutter(),
-			_ => new QuickHomesick()
-		};
-		flamethrowerWeapon = loadout.flamethrower switch {
-			1 => new SeaDragonRage(),
-			2 => new DragonsWrath(),
-			3 => new NoneFlamethrower(),
-			_ => new WildHorseKick()
-		};
-		downSpWeapon = loadout.downSpWeapon switch {
-			0 => napalmWeapon,
-			1 => grenadeWeapon,
-			2 => flamethrowerWeapon,
-			_ => napalmWeapon,
-		};
-		airSpWeapon = loadout.airSpWeapon switch {
-			0 => napalmWeapon,
-			1 => grenadeWeapon,
-			2 => flamethrowerWeapon,
-			_ => napalmWeapon,
-		};
-		downAirSpWeapon = loadout.downAirSpWeapon switch {
-			0 => napalmWeapon,
-			1 => grenadeWeapon,
-			2 => flamethrowerWeapon,
-			_ => napalmWeapon,
-		};
-		laserWeapon = loadout.laser switch {
-			1 => new NecroBurst(),
-			2 => new StraightNightmare(),
-			3 => new NoneLaser(),
-			_ => new RisingSpecter()
-		};
+		
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
 
 
@@ -598,21 +531,6 @@ public class FinalVava : Vile {
 			}
 		}
 
-		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
-			vulcanLingerTime += Global.spf;
-			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
-				changeSpriteFromName(charState.sprite, resetFrame: false);
-			}
-		}
-		cannonWeapon.update();
-		vulcanWeapon.update();
-		missileWeapon.update();
-		rocketPunchWeapon.update();
-		napalmWeapon.update();
-		grenadeWeapon.update();
-		cutterWeapon.update();
-		laserWeapon.update();
-		flamethrowerWeapon.update();
 
 		if (calldownMechCooldown > 0) {
 			calldownMechCooldown -= Global.spf;

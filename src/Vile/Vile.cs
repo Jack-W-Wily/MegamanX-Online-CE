@@ -73,10 +73,7 @@ public class Vile : Character {
 	public float deadCooldown;
 	public const float maxdeadCooldown = 60;
 	public float[] chargeTimeEx = new float[3];
-	public VileLoadout loadout;
-	public MechMenuWeapon rideMenuWeapon;
 	public VileWeaponSystem weaponSystem;
-	public float aiAttackCooldown;
 
 	public Vile(
 		Player player, float x, float y, int xDir,

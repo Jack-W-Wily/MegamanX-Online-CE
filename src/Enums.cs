@@ -322,11 +322,6 @@ public enum WeaponIds {
 
 	// Kurumitos Stuff
 	KRMelee,
-
-
-
-
-	DNACore = 250
 }
 
 public enum ProjIds {
@@ -876,6 +871,10 @@ public enum ProjIds {
 
 	// Extras
 	BlockableLaunch,
+
+	BlockableWeak,
+
+		RollingShieldCharged2,
 
 
 	NormalPush,

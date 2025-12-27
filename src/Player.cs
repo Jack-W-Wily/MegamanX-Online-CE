@@ -1444,7 +1444,16 @@ public partial class Player {
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 				X3ZeroOncePermatch = true;
-			} else {
+			} else if (input.isHeld(Control.Taunt, this)) {
+				newChar = new XAnother(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount
+				);
+			}
+			
+			
+			else {
 				newChar = new RockmanX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,

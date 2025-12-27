@@ -7,7 +7,7 @@ using SFML.Graphics;
 namespace MMXOnline;
 
 public class BFMammothMState : CharState {
-	public BossMammoth BurninNoumander = null!;
+	public BossMammoth burningNoumander = null!;
 	public BFMammothMState(
 		string sprite, string transitionSprite = ""
 	) : base(
@@ -17,7 +17,7 @@ public class BFMammothMState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		BurninNoumander = character as BossMammoth ?? throw new NullReferenceException();
+		burningNoumander = character as BossMammoth ?? throw new NullReferenceException();
 	}
 }
 
@@ -38,7 +38,7 @@ public class BFlameMInfernoCharge : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (stateTime > 1 && !once) {
 			once = true;
@@ -68,13 +68,13 @@ public class BFlameMInfernoRelease : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (character.frameIndex == 6 && !once) {
 			once = true;
 			new FlameMStompShockwave(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir,
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir,
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 			character.shakeCamera(sendRpc: true);
 			character.playSound("flamemTaunt", sendRpc: true);
 			character.playSound("flamemOilBurn", sendRpc: true);
@@ -120,13 +120,13 @@ public class BFlameMGrabStart : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (character.frameIndex == 6 && !once && character.bonusHealth == 0) {
 			once = true;
 			new FlameMOilProj(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir,
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir,
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		if (character.isAnimOver()) {
@@ -153,13 +153,13 @@ public class BFlameMGrabFinisher : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (character.frameIndex == 6 && !once) {
 			once = true;
 			new FlameMStompShockwave(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir,
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir,
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 			character.shakeCamera(sendRpc: true);
 			character.playSound("crash", sendRpc: true);
 		}
@@ -188,14 +188,14 @@ public class BFlameMShootState : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (character.frameIndex == 1 && !once) {
 			once = true;
 			character.playSound("flamemShoot", sendRpc: true);
 			new FlameMFireballProj(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir, player.input.isHeld(Control.Down, player),
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir, player.input.isHeld(Control.Down, player),
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 		}
 
 
@@ -221,13 +221,13 @@ public class BFlameMAntiAir : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (character.frameIndex == 6 && !once) {
 			once = true;
 			new FlameMFireballProj(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir, player.input.isHeld(Control.Down, player),
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir, player.input.isHeld(Control.Down, player),
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 		}
 
 
@@ -251,13 +251,13 @@ public class BFlameMOilState : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (BurninNoumander == null) return;
+		if (burningNoumander == null) return;
 
 		if (character.frameIndex == 6 && !once) {
 			once = true;
 			new FlameMOilProj(
-			BurninNoumander.getFirstPOI() ?? BurninNoumander.getCenterPos(), character.xDir,
-			BurninNoumander, player, player.getNextActorNetId(), rpc: true);
+			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir,
+			burningNoumander, player, player.getNextActorNetId(), rpc: true);
 		}
 
 		if (character.isAnimOver()) {

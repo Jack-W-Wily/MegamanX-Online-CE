@@ -56,8 +56,8 @@ public class HighwayVAVA : Vile {
 
 	public float stockedTime;
 
-
-
+	public VileCannonWC cannonWeapon;
+	public MechMenuWeapon rideMenuWeapon;
 
 	public HighwayVAVA(
 		Player player, float x, float y, int xDir,
@@ -73,6 +73,12 @@ public class HighwayVAVA : Vile {
 
 		if (charState is WarpIn) player.superAmmo = 0;
 		
+		
+		cannonWeapon = new VileCannonWC(0);
+		
+		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
+
+
 		vileForm = 0;
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
@@ -426,20 +432,7 @@ public class HighwayVAVA : Vile {
 			}
 		}
 
-		if (vulcanLingerTime <= 0.1f && vulcanWeapon.shootCooldown == 0f) {
-			vulcanLingerTime += Global.spf;
-			if (vulcanLingerTime > 0.1f && sprite.name.EndsWith("shoot")) {
-				changeSpriteFromName(charState.sprite, resetFrame: false);
-			}
-		}
-		cannonWeapon.update();
-		vulcanWeapon.update();
-		missileWeapon.update();
-		rocketPunchWeapon.update();
-		grenadeWeapon.update();
-		cutterWeapon.update();
-		laserWeapon.update();
-		flamethrowerWeapon.update();
+		
 
 		if (calldownMechCooldown > 0) {
 			calldownMechCooldown -= Global.spf;

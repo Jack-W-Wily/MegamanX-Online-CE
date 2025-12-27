@@ -856,17 +856,28 @@ public class Damager {
 				
 
 				
-				if (owner?.character is Dragoon) {
-				if (projId == (int)ProjIds.ForceGrabState) {
-					owner?.character.changeState(new DragoonGrab());
-					character?.changeState(new ForceGrabbed(owner.character));
+				if (owner?.character is Dragoon drgn && drgn != null) {
+				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
+					drgn.changeState(new DragoonGrab());
+					character?.changeState(new RMXGrabbed(drgn));
+				}
+				if (projId == (int)ProjIds.DragoonSpark) {
+					if (character.sprite.name.Contains("grabbed") || character.isAttacking()){
+					character.changeState(new PushedOver2(drgn.xDir), true);
+					} else {
+						flinch = 10;
+					}
+				}
+
+				if (drgn.charState is DragoonRising) {
+					drgn.charState.attackCtrl = true;
 				}
 			}
 
 
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
-				if (owner?.character is RockmanX) {
-					character.changeState(new RMXGrabbed(owner.character));
+				if (owner?.character is RockmanX rx && rx != null) {
+					character?.changeState(new RMXGrabbed(rx));
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
@@ -1071,6 +1082,13 @@ public class Damager {
 
 				character.changeState(new LaunchedState(owner.character));
 			}
+
+
+			if (projId == (int)ProjIds.BlockableWeak && !character.isBlocking()) {
+
+				character.changeState(new LaunchedStateWeak(owner.character));
+			}
+
 
 			
 			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {

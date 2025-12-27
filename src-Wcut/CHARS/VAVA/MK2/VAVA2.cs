@@ -91,7 +91,7 @@ public class VAVA2 : Vile {
 
 		charId = CharIds.Vile;
 	
-		VileLoadout vileLoadout = player.loadout.vileLoadout;
+		VileLoadout loadout = player.loadout.vileLoadout;
 
 	
 		rideMenuWeapon = new MechMenuWeapon(VileMechMenuType.All);
@@ -114,7 +114,7 @@ public class VAVA2 : Vile {
 
 
 		loadout ??= player.loadout.vileLoadout.clone();
-		this.loadout = loadout;
+		loadout = loadout;
 
 		vulcanWeapon = loadout.vulcan switch {
 			1 => new DistanceNeedler(),
@@ -496,7 +496,6 @@ public class VAVA2 : Vile {
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
-		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref CrimsonphantomCD);
 
 

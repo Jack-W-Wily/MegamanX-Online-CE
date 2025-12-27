@@ -1479,13 +1479,13 @@ public class RAIdle : RideArmorState {
 			&& player.input.isHeld(Control.Down, player)) {
 				(character.charState as InRideArmor)?.setHiding(true);
 				if (!rideArmor.isAttacking()) {
-					if (vile.player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
-					if (vile.player.input.isHeld(Control.Right, player)) rideArmor.xDir = 1;
+					if (player.input.isHeld(Control.Left, player)) rideArmor.xDir = -1;
+					if (player.input.isHeld(Control.Right, player)) rideArmor.xDir = 1;
 				}
 				commonGroundCode();
 				return;
 			} else {
-				iraState.setHiding(false);
+				(character.charState as InRideArmor)?.setHiding(false);
 			}
 		}
 		if (player != null) {

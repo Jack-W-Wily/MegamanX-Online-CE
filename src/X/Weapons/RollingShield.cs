@@ -229,7 +229,7 @@ public class RollingShieldProjCharged2 : Projectile {
 		damager.hitCooldown = 20;
 		maxTime = 10;
 		vel = new Point(0 * xDir, 0);
-		projId = (int)ProjIds.RollingShieldCharged;
+		projId = (int)ProjIds.RollingShieldCharged2;
 		fadeSprite = "rolling_shield_charge_break";
 		fadeSound = "hit";
 		useGravity = false;

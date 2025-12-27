@@ -272,10 +272,26 @@ public class MegamanX : Character {
 		}
 	}
 
+
+
+	public virtual void updateXAnother() {
+		helmetArmor = 0;
+		chestArmor = 0;
+		legArmor = 0;
+		armArmor = 0;
+
+		if (OverDrive) {
+		hasUltimateArmor = true;
+		} else {
+		hasUltimateArmor = false;	
+		}
+	}
 	// General update.
 	public override void update() {
 		base.update();
-
+		if (this is XAnother) {
+			updateXAnother();
+		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -1372,13 +1388,26 @@ public class MegamanX : Character {
 		if (hasFullHyperMaxArmor) {
 			index = 37;
 		}
-		if (hasUltimateArmor && index == 0) {
+		if ((hasUltimateArmor && this is not XAnother) && index == 0) {
 			if (OverDrive){
 			index = 38;
 			} else {
             index = 40;   
             }
 		}
+		if (this is XAnother) {	
+           	if (index == 0 && !hasUltimateArmor) {
+		
+            index = 40;   
+            
+		}
+		if (index == 0 && hasUltimateArmor) {
+		
+            index = 40;   
+            
+		}    
+		}
+
 		palette = player.xPaletteShader;
 
 		palette?.SetUniform("palette", index);

@@ -24,7 +24,7 @@ public class RcxState : CharState {
 	}
 }
 
-public class XUPParryStartState : RcxState {
+
 public class XUPParryStartState : CharState {
 	public Character mmx = null!;
 	public XUPParryStartState() : base("unpo_parry_start") {

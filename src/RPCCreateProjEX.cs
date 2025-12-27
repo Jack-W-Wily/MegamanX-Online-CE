@@ -29,6 +29,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.StingDiag, StingProj.rpcInvoke },
 		{ (int)ProjIds.RollingShield, RollingShieldProj.rpcInvoke },
 		{ (int)ProjIds.RollingShieldCharged, RollingShieldProjCharged.rpcInvoke },
+		{ (int)ProjIds.RollingShieldCharged2, RollingShieldProjCharged2.rpcInvoke },
 		{ (int)ProjIds.FireWave, FireWaveProj.rpcInvoke },
 		{ (int)ProjIds.FireWaveChargedStart, FireWaveProjChargedStart.rpcInvoke },
 		{ (int)ProjIds.FireWaveCharged, FireWaveProjCharged.rpcInvoke },

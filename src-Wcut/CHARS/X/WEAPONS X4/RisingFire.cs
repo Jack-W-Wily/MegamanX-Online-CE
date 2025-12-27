@@ -93,14 +93,15 @@ public class RisingFireProj : Projectile {
 		Weapon weapon, Point pos, int xDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 0, 2, player, "risingfire_proj", 
-		20, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 0, 1.5f, player, "risingfire_proj", 
+		20, 0, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 0.6f;
 		projId = (int)ProjIds.RisingFire;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
-		destroyOnHit = false;
+		fadeSprite = "explosion";
+		destroyOnHit = true;
 		vel.y = -275;
 		
 		

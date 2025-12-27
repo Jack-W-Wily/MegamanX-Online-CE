@@ -87,7 +87,7 @@ public class VAVAV : Vile {
 
 		charId = CharIds.Vile;
 	
-		VileLoadout vileLoadout = player.loadout.vileLoadout;
+		VileLoadout loadout = player.loadout.vileLoadout;
 
 
 
@@ -99,8 +99,8 @@ public class VAVAV : Vile {
 
 
 		
-			loadout ??= player.loadout.vileLoadout.clone();
-		this.loadout = loadout;
+		loadout ??= player.loadout.vileLoadout.clone();
+		loadout = loadout;
 
 		vulcanWeapon = new DistanceNeedler();
 		cannonWeapon = new VileCannonWC(0);
@@ -425,8 +425,7 @@ public class VAVAV : Vile {
 		Helpers.decrementTime(ref grabCooldown);
 		Helpers.decrementTime(ref mechBusterCooldown);
 		Helpers.decrementTime(ref gizmoCooldown);
-		Helpers.decrementFrames(ref aiAttackCooldown);
-
+	
 
 		if (player.input.isPressed(Control.WeaponLeft, player)
 		&& ModeCD == 0

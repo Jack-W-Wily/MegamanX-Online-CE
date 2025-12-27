@@ -199,7 +199,7 @@ public class Buster4GigaProj: Projectile {
 		pos, xDir, owner, "buster3_x2", netId, player	
 	) {
 		weapon = XBuster.netWeapon;
-		damager.damage = 4;
+		damager.damage = 1;
 		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
@@ -226,7 +226,7 @@ public class Buster4Giga2Proj: Projectile {
 		pos, xDir, owner, "buster4_x2", netId, player	
 	) {
 		weapon = XBuster.netWeapon;
-		damager.damage = 4;
+		damager.damage = 1;
 		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
