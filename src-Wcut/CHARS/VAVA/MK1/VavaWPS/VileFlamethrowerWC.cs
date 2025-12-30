@@ -91,11 +91,22 @@ public class SeaDragonRageState : VileState {
 			} else {
 				poiPos = (character.getFirstPOI() ?? character.getPOIPos(groundShotPOI));
 			}
-		
+
+
+			if (!player.input.isHeld(Control.Up,player)){
 			new FlamethrowerSeaDragonRage(
 					poiPos, character.xDir, isGrounded, vile, player,
 					player.getNextActorNetId(), rpc: true
 				);
+			} else {
+				new FlamethrowerDragonsWrath(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
+
+			
+
 		}
 
 		if (character.loopCount >= 5 || !player.input.isBHeld(player)) {
@@ -148,11 +159,17 @@ public class WildHorseKickState : VileState {
 			} else {
 				poiPos = (character.getFirstPOI() ?? character.getPOIPos(groundShotPOI));
 			}
-		
+			if (!player.input.isHeld(Control.Up,player)){
 			new FlamethrowerWildHorseKick(
 					poiPos, character.xDir, isGrounded, vile, player,
 					player.getNextActorNetId(), rpc: true
 				);
+			} else {
+				new FlamethrowerDragonsWrath(
+					poiPos, character.xDir, isGrounded, vile, player,
+					player.getNextActorNetId(), rpc: true
+				);
+			}
 		}
 
 		if (character.loopCount >= 5 || !player.input.isBHeld(player)) {

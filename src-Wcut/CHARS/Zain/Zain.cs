@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.VisualBasic;
 
 
 
@@ -30,6 +31,8 @@ public class Zain : Character {
 
 	public float ZainCounters;
 
+	public bool Mugen;
+
 	public override void landingCode(bool useSound = true) {
 		base.landingCode(useSound);
 		shakeCamera(sendRpc: true);
@@ -48,6 +51,11 @@ public class Zain : Character {
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
 			changeState(new WcutGenericDodgeF(), true);	
+		}
+
+		if (player.input.isPressed(Control.Taunt, player) && downPressedTimes > 3 && player.currency > 0  )
+		{
+		Mugen = true;
 		}
 		return base.normalCtrl();
 	}
@@ -100,10 +108,35 @@ public class Zain : Character {
 	}
 
 
+	public float selfDamageCooldown;
 
 
 	public override void update() {
 		base.update();
+
+
+		if (player.currency < 1)
+		{
+			Mugen = false;
+		}
+
+		// Decay damage.
+		if (Mugen) {
+			if (selfDamageCooldown <= 0) {
+				player.currency -= 1;
+				selfDamageCooldown = 120;
+			
+			} else {
+				if (inCombatTime > 0) {
+					selfDamageCooldown -= speedMul;
+				} else {
+					selfDamageCooldown -= speedMul * 0.5f;
+				}
+				if (selfDamageCooldown < 0) { selfDamageCooldown = 0;  }
+			}
+
+			
+		}
 
 
 		if (ZainCounters == 0) player.superAmmo = 0;
@@ -120,7 +153,9 @@ public class Zain : Character {
 		//Helpers.decrementTime(ref CounterTimer);
 		Helpers.decrementTime(ref CounterCooldown);
 		Helpers.decrementTime(ref SlashCooldown);
-		if (ZainCounters > 8) ZainCounters = 8;
+		if (ZainCounters > 8 && !Mugen) {
+			ZainCounters = 8;
+		}
 		if (ZainCounters <= 0) {
 			ZainCounters = 0;
 			counterCooldown = 1;
@@ -199,11 +234,10 @@ public class Zain : Character {
 			}
 		}
 
-		if (ZainCounters >= 8) return;
 		if (OverDrive) {
-			player.vileAmmo += Global.spf * 20;
+			player.vileAmmo += Global.spf * 25;
 		} else {
-			player.vileAmmo += Global.spf * 10;	
+			player.vileAmmo += Global.spf * 15;	
 		}
 		if (player.vileAmmo > player.vileMaxAmmo) {
 			player.vileAmmo = 0;

@@ -93,6 +93,7 @@ public class SonicSlicerProj : Projectile {
 		damager.damage = 2;
 		vel = new Point(200 * xDir, 0);
 		maxTime = 0.75f;
+			damager.flinch = 20;
 		this.type = type;
 		if (collider != null) {
 			collider.wallOnly = true;

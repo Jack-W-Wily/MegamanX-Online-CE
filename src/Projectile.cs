@@ -718,6 +718,7 @@ public class Projectile : Actor {
 				if (chr.isPushImmune()) return;
 				float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 				chr.move(new Point(xMoveVel * 0 * modifier, -300));
+				chr.grounded = false;
 			}
 
 		if (isPushProjectile){

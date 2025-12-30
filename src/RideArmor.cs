@@ -71,7 +71,13 @@ public class RideArmor : Actor, IDamagable {
 		spriteFrameToSounds["neutralra_run/6"] = "ridewalk2";
 		spriteFrameToSounds["devilbear_run/2"] = "ridewalk";
 		spriteFrameToSounds["devilbear_run/7"] = "ridewalk2";
-
+		spriteFrameToSounds["raiden_run/2"] = "RaWalkX4";
+		spriteFrameToSounds["raiden_run/6"] = "RAWalk2X4";
+		spriteFrameToSounds["raiden_jump/1"] = "RAJumpX4";
+		spriteFrameToSounds["raiden_dash/1"] = "RADashx4";
+		spriteFrameToSounds["raiden_attack/1"] = "rideX4-1";
+		spriteFrameToSounds["raiden_attack_air/1"] = "rideX4-1";
+		spriteFrameToSounds["raiden_attack_dash/1"] = "rideX4-2";
 		if (ownedByLocalPlayer) {
 			setColorShaders();
 		}
@@ -87,11 +93,11 @@ public class RideArmor : Actor, IDamagable {
 		maxHawkBombCount = 3;
 
 		if (ownedByLocalPlayer && raNum == 2 && owner.character is Vile vile) {
-			if (vile.napalmWeapon.type == 1) {
-				maxHawkBombCount = 2;
-			} else if (vile.napalmWeapon.type == 2) {
-				maxHawkBombCount = 2;
-			} 
+		//	if (vile.napalmWeapon.type == 1) {
+		//		maxHawkBombCount = 2;
+		//	} else if (vile.napalmWeapon.type == 2) {
+				maxHawkBombCount = 999;
+		//	} 
 		}
 		hawkBombCount = maxHawkBombCount;
 
@@ -502,7 +508,7 @@ public class RideArmor : Actor, IDamagable {
 				character is Vile vile &&
 				punchCooldown == 0 &&
 				raNum == 2 &&
-				vile.napalmWeapon.shootCooldown == 0 &&
+				//.napalmWeapon.shootCooldown == 0 &&
 				player.input.isBPressed(player) &&
 				player.input.isHeld(Control.Down, player) &&
 				!rideArmorState.inTransition()
@@ -2314,6 +2320,8 @@ public class InRideArmor : CharState {
 	public Anim? freezeAnim;
 	public bool winTaunt;
 	public float innerCooldown;
+
+	
 	public InRideArmor(string transitionSprite = "") : base("ra_idle", "", "", transitionSprite) {
 	}
 
@@ -2370,8 +2378,9 @@ public class InRideArmor : CharState {
 				sprite = "ra_idle";
 		}
 
-		if (character is Vile vile && player.input.isPressed(Control.WeaponRight, player)) {
+		if (character is Vile vile && player.input.isPressed(Control.WeaponRight, player) && innerCooldown == 0) {
 				tossGrenade(vile);
+				innerCooldown = 0.7f;
 		}	
 		
 
@@ -2403,10 +2412,7 @@ public class InRideArmor : CharState {
 	}
 
 	public void tossGrenade(Vile vile) {
-		Projectile? grenade = null;
-		if (vile.napalmWeapon.shootCooldown > 0) {
-			return;
-		}
+		Projectile? grenade = null;	
 		if (character.sprite.name.Contains("mk5")) {
 			sprite = "ra_bomb";
 			character.changeSpriteFromName("ra_bomb", true);

@@ -235,7 +235,11 @@ public class BumptyBoomGranadeLaunch : CharState {
 			var poi = character.getFirstPOI();
 			if (!once && poi != null) {
 				once = true;
-				var proj = new BumptyBoomProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				var proj = 	new PeaceOutRollerProj(
+						character.getCenterPos().addxy(20*character.xDir,0), character.xDir, 1, vile, player, 
+						character.player.getNextActorNetId(), rpc: true
+					);
+				//new BumptyBoomProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 				proj.vel = new Point(character.xDir * 200, -200);
 			}
 
@@ -267,10 +271,12 @@ public class BumptyBoomProj : Projectile {
 	public BumptyBoomProj(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 150, 2, player, "napalm_grenade", 0, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.NapalmGrenade;
-	
+		damager.damage = 2;
+		damager.flinch = 30;
+		maxTime = 2;
+
 		this.vel = new Point(speed * xDir, -200);
 		useGravity = true;
-		collider.wallOnly = true;
 		fadeSound = "explosion";
 		fadeSprite = "explosion";
 		shouldShieldBlock = false;
@@ -284,7 +290,6 @@ public class BumptyBoomProj : Projectile {
 	}
 
 	public override void onHitWall(CollideData other) {
-		xDir *= -1;
 		explode();
 	}
 

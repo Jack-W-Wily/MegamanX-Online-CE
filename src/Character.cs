@@ -3746,7 +3746,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		// Tough Guy.
-		if (this is BaseSigma || isToughGuyHyperMode()) {
+		if (this is BaseSigma && OverDrive || isToughGuyHyperMode()) {
 			if (flinchFrames >= Global.superFlinch) {
 				flinchFrames = Global.halfFlinch;
 			} else {

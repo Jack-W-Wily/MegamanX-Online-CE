@@ -179,6 +179,7 @@ public class FlamethrowerWildHorseKick : Projectile {
 		damager.damage = 1;
 		damager.hitCooldown = 6;
 		maxTime = 0.3f;
+		damager.flinch = Global.defFlinch;
 		destroyOnHit = true;
 		destroyOnHitWall = true;
 		this.groundedVariant = groundedVariant;
@@ -223,6 +224,7 @@ public class FlamethrowerDragonsWrath : Projectile {
 		damager.damage = 1;
 		damager.hitCooldown = 6;
 		maxTime = 0.4f;
+		damager.flinch = Global.defFlinch;
 		destroyOnHit = true;
 		destroyOnHitWall = true;
 		this.groundedVariant = groundedVariant;
@@ -270,6 +272,7 @@ public class FlamethrowerSeaDragonRage : Projectile {
 		damager.damage = 1;
 		damager.hitCooldown = 6;
 		maxTime = 0.25f;
+		damager.flinch = Global.defFlinch;
 		destroyOnHit = true;
 		destroyOnHitWall = true;
 		this.groundedVariant = groundedVariant;

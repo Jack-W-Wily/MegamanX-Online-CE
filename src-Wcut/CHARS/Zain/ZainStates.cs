@@ -515,6 +515,7 @@ public class ZainShinGroundStab : CharState {
 		airMove = true;
 		superArmor = true;
 		enterSound = "dbzpunchwave_1";
+		canSpecialCancel = true;
 	}
 
 	public override void update()
@@ -709,6 +710,8 @@ public class ZainShinProjSwingState : CharState {
 				character.frameIndex = 2;
 		}
 
+	
+
 		if (character.frameIndex >= 4 && !fired) {
 			fired = true;
 			character.playSound("dbzpunchwave_2", forcePlay: false, sendRpc: true);
@@ -766,6 +769,82 @@ public class ZainProjSwingState : CharState {
 		airMove = true;
 		useDashJumpSpeed = true;
 		bonusAttackCtrl = true;
+		canSpecialCancel = true;
+	}
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (player.input.isHeld(Control.Up, player)) {
+			character.changeSpriteFromName("uppercut_slash", true);
+		}
+	}
+
+	public override void update() {
+		base.update();
+
+
+
+		if (player.input.isAPressed(player) && character.frameIndex >= 6) {
+			 character.changeState(new ZainProjSwingState2(character.grounded,false), true);
+		}
+
+		if (character.frameIndex >= 4 && !fired) {
+			fired = true;
+			character.playSound("dbzpunchwave_2", forcePlay: false, sendRpc: true);
+
+			if (shootProj) {
+				character.playSound("flashysnd_1", forcePlay: false, sendRpc: true);
+
+				new ZainSaberProj(
+					new ZSaber(), character.pos.addxy(30 * character.xDir, -20),
+					character.xDir, player, player.getNextActorNetId(), rpc: true
+				);
+			}
+		} 
+
+		if (character.isAnimOver()) {
+			if (character.grounded) character.changeState(new Idle(), true);
+			else character.changeState(new Fall(), true);
+		} else {
+			if ((character.grounded || character.canAirJump()) &&
+				player.input.isPressed(Control.Jump, player)
+			) {
+				if (!character.grounded) {
+					character.dashedInAir++;
+				}
+				character.vel.y = -character.getJumpPower();
+				sprite = "projswing_air";
+				defaultSprite = sprite;
+				character.changeSpriteFromName(sprite, false);
+			}
+		}
+	}
+}
+
+
+
+
+
+public class ZainProjSwingState2 : CharState {
+	bool fired;
+	bool grounded;
+	bool shootProj;
+	bool once;
+
+	bool once1;
+	public ZainProjSwingState2(
+		bool grounded, bool shootProj
+	) : base(
+		grounded ? "slash" : "projswing_air", "", "", ""
+	) {
+		this.grounded = grounded;
+		landSprite = "slash";
+		this.shootProj = shootProj;
+		airMove = true;
+		useDashJumpSpeed = true;
+		bonusAttackCtrl = true;
+		canSpecialCancel = true;
 	}
 
 
@@ -815,6 +894,7 @@ public class ZainProjSwingState : CharState {
 
 
 
+
 public class ZainKokuSlash : CharState {
 	bool fired;
 	bool grounded;
@@ -835,7 +915,7 @@ public class ZainKokuSlash : CharState {
 		}
 		airMove = true;
 		useDashJumpSpeed = true;
-		
+		canSpecialCancel = true;
 	}
 
 
@@ -921,6 +1001,7 @@ public class ZainGrab : CharState {
 	airMove = true;
 	superArmor = true;
 	enterSound = "punch1";
+	spcCancel = true;
 	}
 
 	public override void update()
@@ -983,6 +1064,7 @@ public class ZainGroundStab : CharState {
 		airMove = true;
 		superArmor = true;
 		enterSound = "dbzpunchwave_1";
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -1034,6 +1116,7 @@ public class ZainGrabStab : CharState {
 	public ZainGrabStab(string transitionSprite = "")
 		: base("stabgrab", "", "", transitionSprite) {
 		airMove = true;
+		spcCancel = true;
 		superArmor = true;
 	}
 
@@ -1091,6 +1174,7 @@ public class ZainJab : CharState {
 		: base("jab", "", "", transitionSprite)
 	{
 	airMove = true;
+	spcCancel = true;
 	superArmor = true;
 }
 
@@ -1142,6 +1226,7 @@ public class ZainAirDunk : CharState {
 	{
 	airMove = true;
 	superArmor = true;
+	spcCancel = true;
 }
 
 	public override void update()
@@ -1207,6 +1292,7 @@ public class ZainGrabStabEnd : CharState {
 	{
 	airMove = true;
 	superArmor = true;
+	spcCancel = true;
 	}
 
 	public override void update()
@@ -1279,6 +1365,7 @@ public class ZainGrabSlash : CharState {
 	airMove = true;
 	superArmor = true;
 	enterSound = "dbzpunchwave_1";
+	spcCancel = true;
 	}
 
 	public override void update()

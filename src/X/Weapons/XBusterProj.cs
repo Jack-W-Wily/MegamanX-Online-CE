@@ -200,6 +200,7 @@ public class Buster4GigaProj: Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 1;
+		reflectable = true;
 		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
@@ -230,6 +231,7 @@ public class Buster4Giga2Proj: Projectile {
 		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
+		reflectable = true;
 		fadeSprite = "buster4_x2_fade";
 		hitSound = "htsnd_common_x4";
 		maxTime = 0.5f;
@@ -295,6 +297,7 @@ public class Buster4MaxProj: Projectile {
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		maxTime = 0.85f;
+		reflectable = true;
 		projId = (int)ProjIds.Buster4Max;
 		hitSound = "htsnd_common_x4";
 		vel.x = 0;
@@ -334,6 +337,7 @@ public class Buster4Proj : Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 4;
+		reflectable = true;
 		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 60;
 		fadeSprite = "buster4_fade";
@@ -437,6 +441,7 @@ public class BusterPlasmaProj : Projectile {
 		damager.hitCooldown = 15;
 		vel = new Point(400 * xDir, 0);
 		maxTime = 0.5f;
+		reflectable = true;
 		projId = (int)ProjIds.BusterX3Plasma;
 		fadeSprite = "buster4_x3_muzzle";
 		hitSound = "htsnd_common_x4";

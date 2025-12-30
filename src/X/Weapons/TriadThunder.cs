@@ -72,7 +72,7 @@ public class TriadThunderProj : Projectile {
 		weapon = TriadThunder.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
-		damager.flinch = Global.miniFlinch;
+		damager.flinch = 20;
 		projId = (int)ProjIds.TriadThunder;
 		character = player.character;
 		if (ownedByLocalPlayer) {
@@ -264,7 +264,7 @@ public class TriadThunderBeamPiece : Projectile {
 		weapon = TriadThunder.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 30;
-		damager.flinch = Global.miniFlinch;
+			damager.flinch = 20;
 		this.type = type;
 		this.yDir = yDir;
 		maxTime = 0.125f;

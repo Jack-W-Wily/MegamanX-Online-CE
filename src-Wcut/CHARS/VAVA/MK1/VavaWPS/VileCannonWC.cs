@@ -351,7 +351,7 @@ public class VileCannonProj : Projectile {
 			fadeSprite = "vile_mk2_proj_fade";
 			fadeOnAutoDestroy = true;
 			damager.damage = 3;
-			damager.flinch = Global.halfFlinch;
+			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.FrontRunner;
 		} else if (type == (int)VileCannonType.FatBoy) {
 			weapon = FatBoy.netWeapon;

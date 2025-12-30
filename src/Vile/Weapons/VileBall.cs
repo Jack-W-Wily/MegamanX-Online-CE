@@ -226,6 +226,7 @@ public class VileBombProj : Projectile {
 		}
 		projId = (int)ProjIds.VileBomb;
 		destroyOnHit = true;
+		damager.flinch = Global.defFlinch;
 		useGravity = true;
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -273,6 +274,7 @@ public class VileBombSplitProj : Projectile {
 	) {
 		weapon = ExplosiveRound.netWeapon;
 		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 12;
 	    maxTime = 0.3f;
 		projId = (int)ProjIds.VileBombSplit;
@@ -303,7 +305,7 @@ public class PeaceOutRollerProj : Projectile {
 	) {
 		weapon = PeaceOutRoller.netWeapon;
 		damager.damage = 3f;
-		damager.flinch = Global.miniFlinch;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
 		this.type = type;
 		if (type == 0) {
@@ -360,7 +362,7 @@ public class PeaceOutRollerSplitProj : Projectile {
 	) {
 		weapon = PeaceOutRoller.netWeapon;
 		damager.damage = 3f;
-		damager.flinch = Global.miniFlinch;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
 	    maxTime = 0.4f;
 		projId = (int)ProjIds.PeaceOutRollerSplit;

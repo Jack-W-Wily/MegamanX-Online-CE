@@ -1168,8 +1168,6 @@ public class VavaBurensen6 : CharState {
 	public override void onExit(CharState newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		victim?.releaseGrab(character);
-		victim?.changeToIdleOrFall();
 	}
 }
 

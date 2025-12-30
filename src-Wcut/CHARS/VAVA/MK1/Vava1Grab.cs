@@ -234,14 +234,14 @@ public class VileStomped : CharState {
 
 
 
-			if (grabber.sprite.name.Contains("idle") ||
+			if ((grabber.sprite.name.Contains("idle") ||
 			grabber.sprite.name.Contains("crouch") ||
 			grabber.sprite.name.Contains("run") ||
 			grabber.sprite.name.Contains("fall") ||
 			grabber.sprite.name.Contains("jump") ||
 			grabber.sprite.name.Contains("hurt") ||
-			grabber.sprite.name.Contains("grabbed")
-
+			grabber.sprite.name.Contains("grabbed")) &&
+			character.player.input.isPressed(Control.Jump, player)
 			) {
 				character.changeToIdleOrFall();
 			}

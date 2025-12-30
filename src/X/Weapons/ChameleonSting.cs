@@ -65,7 +65,8 @@ public class StingProj : Projectile {
 		pos, xDir, owner, "sting_start", netId, player
 	) {
 		damager.damage = 2;
-		damager.hitCooldown = 0.25f;
+		damager.flinch = 20;
+		damager.hitCooldown = 0;
 		vel = new Point(300 * xDir, 0);
 		weapon = ChameleonSting.netWeapon;
 		projId = (int)ProjIds.Sting;

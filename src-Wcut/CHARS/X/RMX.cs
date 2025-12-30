@@ -298,6 +298,8 @@ public class RockmanX : MegamanX {
 		Punch,
 	
 		GrabKickLV1,
+
+		RisingFires,
 		GrabKickLV2,
 
 	}
@@ -312,6 +314,8 @@ public class RockmanX : MegamanX {
 		return (int)(sprite.name switch {
 			"rmx_block"   => MeleeIds.Blocking, 
 			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"rmx_risingfire_charged" or "rmx_dropkick" => MeleeIds.RisingFires,
+			
 			"rmx_shoryuken" => MeleeIds.Shoryuken,
 			"rmx_punch_1" => MeleeIds.Punch1,
 			"rmx_grab_start" => MeleeIds.Grab,
@@ -376,6 +380,12 @@ public class RockmanX : MegamanX {
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
+
+				(int)MeleeIds.RisingFires => new GenericMeleeProj(
+				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
+				2, Global.defFlinch, 30, addToLevel: addToLevel, isJuggleProjectile : true
+			),
+			
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				2, Global.halfFlinch, 30, addToLevel: addToLevel

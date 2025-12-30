@@ -215,7 +215,9 @@ public class JoinMenuP2P : IMainMenu {
 					}, new MainMenu())
 				);
 			return;
-		} else if (Global.checksum != serverdata.gameChecksum) {
+		} 
+		
+		/*else if (Global.checksum != serverdata.gameChecksum) {
 			exit(
 				new ErrorMenu(new string[] {
 					"Client and server have different",
@@ -225,7 +227,9 @@ public class JoinMenuP2P : IMainMenu {
 					new MainMenu())
 				);
 			return;
-		} else if (!string.IsNullOrEmpty(serverdata.customMapChecksum)) {
+		}*/
+		
+		 else if (!string.IsNullOrEmpty(serverdata.customMapChecksum)) {
 			var myLevelChecksum = LevelData.getChecksumFromName(serverdata.level);
 			if (string.IsNullOrEmpty(myLevelChecksum)) {
 				string customMapUrl = serverdata.customMapUrl;

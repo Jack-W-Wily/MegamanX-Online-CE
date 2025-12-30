@@ -15,7 +15,7 @@ public class RisingFire : Weapon {
 		weaponSlotIndex = (int)SlotIndex.RFire;
 		killFeedIndex = 184;
 		type = index;
-		displayName = "Rising Fire";
+		displayName = "Dragon Install";
 		weaknessIndex = (int)WeaponIds.DoubleCyclone;
 		//hasCustomAnim = true;
 		damage = "2+1-1/2+1-1";
@@ -27,11 +27,19 @@ public class RisingFire : Weapon {
 
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];
-
-		if (chargeLevel < 3f) {
-			character.changeState(new RisingFireState(), true);	
-		} else {
+		var player = character.player;
+		if (chargeLevel > 2) {
 			character.changeState(new RisingFireChargedState(), true);
+		}
+		else if (player.input.isHeld(Control.Up , player)) {
+			character.changeState(new RisingFireState(), true);	
+		} else if (player.input.isHeld(Control.Down , player)) {
+			if (character.grounded) {
+			character.vel.y = -character.getJumpPower() * 0.5f;
+			}
+			character.changeState(new DragoonDiveKick(), true);
+		} else {
+			character.changeState(new DragoonHadoukenX(), true);
 		}
 	}
 }
@@ -267,15 +275,126 @@ public class RisingFireProjChargedStart : Projectile {
 }
 
 
+
+
+public class DragoonHadoukenX : CharState {
+	bool fired = false;
+
+
+	public DragoonHadoukenX() : base("hadouken", "", "", "") {
+	superArmor = true;
+		spcCancel = true;
+	}
+
+	public override void update() {
+		base.update();
+
+      if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+
+			Weapon weapon = new HadoukenWeapon(player);
+	
+			new FlameHadouken(character.pos.addxy(10,-18), character.xDir,character, player, player.getNextActorNetId(), true);
+			
+			character.playSound("speedBurner", sendRpc: true);
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopCharge();
+	}
+
+	public override void onExit(CharState newState) {
+	base.onExit(newState);
+	}
+}
+
+
+
+
+
+
+public class FlameHadouken : Projectile {
+	float groundSpawnTime;
+	float airSpawnTime;
+	int groundSpawns;
+	public FlameHadouken(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "haduken_flame", netId, player	
+	) {
+		weapon = SpeedBurner.netWeapon;
+		damager.damage = 3;
+		damager.flinch = 30;
+		vel = new Point(275 * xDir, 0);
+		maxTime = 0.6f;
+		projId = (int)ProjIds.FlameHadouken;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FlameHadouken(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (sprite.name == "speedburner_start") {
+			if (isAnimOver()) {
+				changeSprite("speedburner_proj", true);
+			}
+		}
+		Helpers.decrementTime(ref groundSpawnTime);
+		Helpers.decrementTime(ref airSpawnTime);
+
+		if (airSpawnTime == 0) {
+			var anim = new Anim(
+				pos.addxy(Helpers.randomRange(-10, 10),
+				Helpers.randomRange(-10, 10)), "speedburner_dust", xDir, null, true
+			);
+			anim.vel.x = 50 * xDir;
+			anim.vel.y = 10;
+			airSpawnTime = 0.05f;
+		}
+		if (!ownedByLocalPlayer) {
+			return;
+		}
+		CollideData? hit = Global.level.raycast(pos, pos.addxy(0, 18), [typeof(Wall)]);
+
+		if (hit != null && groundSpawnTime == 0) {
+			Point spawnPos = pos.addxy((groundSpawns * -15 + 10) * xDir, 0);
+			spawnPos.y = hit.hitData.hitPoint?.y - 1 ?? pos.y;
+			new SpeedBurnerProjGround(
+				spawnPos, xDir, this, damager.owner, damager.owner.getNextActorNetId(), rpc: true
+			);
+			groundSpawns++;
+
+			groundSpawnTime = 0.075f;
+		}
+	}
+}
+
+
 public class RisingFireProjCharged : Projectile {
 	public RisingFireProjCharged(
 		Weapon weapon, Point pos, int xDir, 
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 2, player, "risingfire_proj_charged", 
-		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer
 	) {
 		maxTime = 0.6f;
+		damager.flinch = 30;
+		isJuggleProjectile = true;
+		isShield = true;
 		projId = (int)ProjIds.RisingFireCharged;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;

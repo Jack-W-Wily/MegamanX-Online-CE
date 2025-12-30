@@ -592,7 +592,7 @@ public class VAVA2GrabState : CharState {
 
 public class VileAirRaid : CharState {
 	public Character? victim;
-	public BanzaiBeetleProj Banzai;
+	public Projectile Banzai;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
@@ -669,27 +669,28 @@ public class VileAirRaid : CharState {
 
 			if ( player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Special1, player)) {
-			character.changeSpriteFromName("banzai_launch", true);	
-				character.playSound("vileMissile", true);
-				sprite = "banzai_launch";
+			character.changeSpriteFromName("cannon_air", true);	
+				character.playSound("buster", true);
+				sprite = "cannon_air";
 		}
 
-		if (character.sprite.name.Contains("banzai")
+		if (character.sprite.name.Contains("cannon_air")
 		&& character.frameIndex == 4){	
+			Point shootVel = (character as VAVA1).getVileShootVel(true);
 			if (Banzai == null){
-			Banzai=	new BanzaiBeetleProj(new VileMK2Grab(), 
-			character.pos, character.xDir, player, 
-			player.getNextActorNetId(), true);
+			Banzai=	new StunShotProj(
+							character.pos, character.xDir, MathF.Round(shootVel.byteAngle), character,
+								player, player.getNextActorNetId(), rpc: true
+								);
 			}
 		}
 
 
-		if (character.sprite.name.Contains("air_bomb") && character.isAnimOver()){
-			character.changeToIdleOrFall();
-		}
+	
 
 		if (player.input.isPressed(Control.Jump, player)) {
 			character.changeToIdleOrFall();
+			character.vel.y = -character.getJumpPower();
 			return;
 		}
 

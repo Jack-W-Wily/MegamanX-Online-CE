@@ -67,7 +67,7 @@ public class SpinningBladeProj : Projectile {
 		damager.damage = 2;
 		vel = new Point(250 * xDir, 0);
 		maxTime = 2f;
-		damager.flinch = 10;
+		damager.flinch = 20;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
 		fadeSound = "explosionX3";

@@ -296,6 +296,8 @@ public class XAnother : MegamanX {
 		DashGrab,
 		ParryBlock,
 		Punch,
+
+		RisingFires,
 	
 		GrabKickLV1,
 		GrabKickLV2,
@@ -331,7 +333,8 @@ public class XAnother : MegamanX {
 			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
 			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
 			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
-
+			"rmx_risingfire_charged" or "rmx_dropkick" => MeleeIds.RisingFires,
+			
 
 			"rmx_grab_foward"   => MeleeIds.GrabKickLV1, 
 			"rmx_light_kick"  => MeleeIds.GrabKickLV2, 
@@ -376,6 +379,10 @@ public class XAnother : MegamanX {
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
+			(int)MeleeIds.RisingFires => new GenericMeleeProj(
+				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
+				2, Global.defFlinch, 30, addToLevel: addToLevel, isJuggleProjectile : true
+			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				2, Global.halfFlinch, 30, addToLevel: addToLevel
@@ -417,8 +424,8 @@ public class XAnother : MegamanX {
 				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
-				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel
+				HyperNovaStrike.netWeapon, projPos, ProjIds.ForceGrabState, player,
+				1, 0, 5, addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.GrabKickLV1 => new GenericMeleeProj(

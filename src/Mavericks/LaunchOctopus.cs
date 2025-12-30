@@ -699,7 +699,7 @@ public class LaunchODrainState : OctopusMState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		maverick.useGravity = true;
-		victim?.releaseGrab(maverick);
+	//	victim?.releaseGrab(maverick);
 		var whirlpoolCooldown = maverick.stateCooldowns[typeof(LaunchOWhirlpoolState)];
 		whirlpoolCooldown.cooldown = whirlpoolCooldown.maxCooldown;
 	}

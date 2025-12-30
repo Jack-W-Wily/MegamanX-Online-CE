@@ -795,6 +795,8 @@ public enum ProjIds {
 	// Dynamo
 	DynamoBlockSlash,
 
+
+
 	HydroStormProj,
 	// VAVA (WCUT)
 	
@@ -848,6 +850,8 @@ public enum ProjIds {
 	// X another
 	SiceSlide,
 
+	FlameHadouken,
+
 	// GBD stuff
 
 	GBDKick,
@@ -871,6 +875,7 @@ public enum ProjIds {
 
 	// Extras
 	BlockableLaunch,
+
 
 	BlockableWeak,
 

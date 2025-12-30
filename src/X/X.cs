@@ -282,8 +282,14 @@ public class MegamanX : Character {
 
 		if (OverDrive) {
 		hasUltimateArmor = true;
+		if (!weapons.Any(w => w is HyperNovaStrike)) {
+			weapons.Add(new HyperNovaStrike());
+		}
 		} else {
 		hasUltimateArmor = false;	
+		if (weapons.Any(w => w is HyperNovaStrike)) {
+		player.weapons.RemoveAll(w => w is HyperNovaStrike);
+		}
 		}
 	}
 	// General update.
@@ -387,7 +393,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool attackCtrl() {
-		if (player.input.isPressed(Control.Special1, player) && helmetArmor == ArmorId.Giga &&
+		if (player.input.isPressed(Control.Special2, player) && helmetArmor == ArmorId.Giga &&
 			itemTracer.shootCooldown == 0
 		) {
 			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
@@ -441,7 +447,7 @@ public class MegamanX : Character {
 		Point inputDir = player.input.getInputDir(player);
 		int oldSlot, newSlot;
 		if (Options.main.gigaCrushSpecial &&
-			player.input.isBPressed(player) &&
+			 player.input.isPressed(Control.Special2, player) &&
 			player.input.isHeld(Control.Down, player) &&
 			weapons.Any(w => w is GigaCrush)
 		) {
@@ -452,7 +458,7 @@ public class MegamanX : Character {
 			player.changeWeaponSlot(oldSlot);
 			return true;
 		} else if (Options.main.novaStrikeSpecial &&
-			  player.input.isPressed(Control.Special1, player) &&
+			  player.input.isPressed(Control.Special2, player) &&
 			  weapons.Any(w => w is HyperNovaStrike) &&
 			  !inputDir.isZero()
 		  ) {

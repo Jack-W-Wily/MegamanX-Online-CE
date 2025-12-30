@@ -107,7 +107,7 @@ public class RocketPunchProjWC : Projectile {
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
 		minTime = 0.15f;
 		maxReverseTime = 0.3f;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.defFlinch;
 
 		if (weapon.type == (int)RocketPunchType.SpoiledBrat) {
 			damager.damage = 0.5f;
@@ -156,7 +156,7 @@ public class RocketPunchProjWC : Projectile {
 
 		if (ownedByLocalPlayer && !reversed && reflectCount == 0 &&
 			(type == (int)RocketPunchType.InfinityGig || damager.owner?.character is Vile vile2
-			&& vile2.phase2) && type != (int)RocketPunchType.EgotisticalPill
+			&& (vile2.phase2 || vile2.OverDrive)) && type != (int)RocketPunchType.EgotisticalPill
 		) {
 			if (target == null && owner.character != null) {
 				var targets = Global.level.getTargets(owner.character.pos, damager.owner.alliance, true);

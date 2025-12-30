@@ -165,13 +165,13 @@ public class Iris : Character {
 			}
 
 			if ( player.input.isHeld(Control.Up, player) &&
-			player.input.isPressed(Control.WeaponLeft, player) && player.superAmmo > 15)
+			player.input.isPressed(Control.Special2, player) && player.superAmmo > 15)
 			{	
 			changeState(new RAIrisKuenzan(), true);
 			player.superAmmo -= 16;
 			}
 			if (!player.input.isHeld(Control.Up, player) &&
-			player.input.isPressed(Control.WeaponLeft, player) && player.superAmmo > 15)
+			player.input.isPressed(Control.Special2, player) && player.superAmmo > 15)
 			{	
 			changeState(new RAIrisSlashStateReverse(), true);
 			player.superAmmo -= 16;
@@ -187,8 +187,11 @@ public class Iris : Character {
 	public override void update() {
 		base.update();
 
+		if (Metamorphosis) {
+			overDriveTimer = 12;
+		}
 		// Perifericos
-		if (!isInDamageSprite() && !Metamorphosis) {
+		if (!isInDamageSprite()) {
 
 			if (iriscannon == null && player.health > 0
 			 && !usedcannonONce &&
@@ -225,7 +228,7 @@ public class Iris : Character {
 			}
 		}
 
-		if (player.input.isPressed(Control.Special2, player) && linkedRideArmor == null && player.currency > 2) {
+		if (!Metamorphosis && player.input.isPressed(Control.Special2, player) && linkedRideArmor == null && player.currency > 2) {
 			int raIndex = 7;
 			player.currency -= 3;
 			linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
@@ -233,13 +236,13 @@ public class Iris : Character {
 
 		}
 
-		if (player.input.isPressed(Control.Special2, player) && linkedRideArmor != null) {
+		if (player.input.isPressed(Control.Special2, player) && linkedRideArmor != null && !Metamorphosis) {
 				changeState(new CallDownMech(linkedRideArmor, true), true);
 
 		}
 		
 
-		if (Metamorphosis && CannonSlashCD == 0) {
+		if (Metamorphosis && IrisGeneralizedCrystalCD == 0) {
 			if (charState is IrisSpawnBeam beamState) {
 				beamState.beam = true;
 			}
@@ -248,8 +251,9 @@ public class Iris : Character {
 			}
 			if (charState is IrisCrystalCharge beamState3) {
 				beamState3.beam = true;
+				IrisGeneralizedCrystalCD = 2;
 			}
-			CannonSlashCD = 2;
+			
 		}
 
 

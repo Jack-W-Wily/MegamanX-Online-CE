@@ -515,6 +515,7 @@ public class SplashHitProj : Projectile {
 		shouldVortexSuck = false;
 		destroyOnHit = false;
 		maxTime = 1.5f;
+		isJuggleProjectile = true;
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

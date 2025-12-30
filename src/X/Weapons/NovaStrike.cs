@@ -10,7 +10,7 @@ public class HyperNovaStrike : Weapon {
 	public HyperNovaStrike() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
 		shootSounds = new string[] { "", "", "", "" };
-		fireRate = 90;
+		fireRate = 50;
 		switchCooldown = 15;
 		index = (int)WeaponIds.NovaStrike;
 		weaponBarBaseIndex = 42;
@@ -65,7 +65,7 @@ public class NovaStrikeState : CharState {
 	int upOrDown;
 	int leftOrRight;
 	Anim? Nova;
-	public NovaStrikeState(Point inputDir) : base("nova_strike") {
+	public NovaStrikeState(Point inputDir) : base("nova_strike_start") {
 		pushImmune = true;
 		invincible = true;
 		normalCtrl = false;
@@ -87,31 +87,16 @@ public class NovaStrikeState : CharState {
 				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
 			}
 		}
-		if (Nova != null) {
-			Nova.incPos(character.deltaPos);
-			if (character.xDir == 1) {
-				if (upOrDown == 1) {
-					Nova.angle = 90;
-				} else if (upOrDown == -1) {
-					Nova.angle = 270;
-				}
-			} else if (character.xDir == -1) {
-				if (upOrDown == 1) {
-					Nova.angle = 270;
-				} else if (upOrDown == -1) {
-					Nova.angle = 90;
-				}
-			}
+		
+		if (character.player.input.isHeld(Control.Up, character.player)) {
+				character.changeState(new NovaStrikeStateUpEX(), true);
+			} else if (character.player.input.isHeld(Control.Down, character.player)) {
+				character.changeState(new NovaStrikeStateDownEX(), true);
+			} else {
+				character.changeState(new NovaStrikeStateEX(), true);
 		}
-		if (character.frameIndex >= 4) {
-			if (!character.tryMove(new Point(character.xDir * 350 * leftOrRight, 350 * upOrDown), out _) ||
-				character.flag != null || stateTime > 0.6f
-			) {
-				character.changeToIdleOrFall();
-				return;
-			}
-		}
-		else if (character.isAnimOver()) {
+		
+		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}

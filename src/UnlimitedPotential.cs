@@ -7,7 +7,7 @@ namespace MMXOnline;
 
 
 public class RcxState : CharState {
-	public RagingChargeX mmx = null!;
+	public Character mmx = null!;
 
 	public RcxState(
 		string sprite, string shootSprite = "", string attackSprite = "",
@@ -20,7 +20,7 @@ public class RcxState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		mmx = player.character as RagingChargeX ?? throw new NullReferenceException();
+		mmx = player.character;// as RagingChargeX ?? throw new NullReferenceException();
 	}
 }
 

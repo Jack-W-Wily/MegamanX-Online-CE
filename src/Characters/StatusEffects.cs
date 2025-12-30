@@ -66,7 +66,7 @@ public class Hurt : CharState {
 		base.update();
 		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime * Global.speedMul, hurtDir);
-			if (character is not BaseSigma && !character.isToughGuyHyperMode()) //Tough guy
+			if (!character.isToughGuyHyperMode()) //Tough guy
 				character.move(new Point(hurtSpeed * 60f, 0));
 		}
 

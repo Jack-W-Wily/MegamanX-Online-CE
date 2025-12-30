@@ -797,7 +797,9 @@ public class GameMode {
 					drawGigaWeaponCooldown(175, Ccooldown, xStart, yStart, isKillFeed: true, xStart, yStart);
 				}
 			}
-			if (drawPlayer.character is Vile vilePilot &&
+		
+		
+		/*	if (drawPlayer.character is Vile vilePilot &&
 				vilePilot.rideArmor != null &&
 				vilePilot.rideArmor == vilePilot.linkedRideArmor
 				&& vilePilot.rideArmor.raNum == 2
@@ -812,7 +814,7 @@ public class GameMode {
 				Fonts.drawText(
 					FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
 				);
-			}
+			}*/
 			#endregion
 			#region Axl
 			if (level.mainPlayer.character is Axl axl) {
