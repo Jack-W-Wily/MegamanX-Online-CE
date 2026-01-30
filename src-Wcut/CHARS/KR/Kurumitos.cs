@@ -191,9 +191,7 @@ public static CharSelection[] selections => [
 			changeState(new BlockWCUT(), true);
 		
 		}
-		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
-			changeState(new WcutGenericDodgeF(), true);	
-		}
+		
 		// This is Where hypermode actiavtion happens
 		if (player.input.isPressed(Control.Special2, player)
 		&& player.currency > 4
@@ -212,13 +210,19 @@ public static CharSelection[] selections => [
 	// AttackCtrl: is for you to add moves to your character that he can only perform
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
+		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
 
 		if (player.input.isAPressed(player)) {
 			if (grounded) { // For grounded only moves always add a if (grounded) flag
 				if (player.input.isLeftOrRightHeld(player)) {
 					changeState(new KurumitoFowardKick(), true);
-				} else {
+				} else if (player.input.isHeld(Control.Up, player)){
 					changeState(new KurumitoStandingKick(), true);
+				} else {
+						changeState(new VAVAJab1(), true);
+							
 				}
 			}
 			if (!grounded) { // For grounded only moves always add a if (!grounded) flag

@@ -1083,6 +1083,11 @@ public class Damager {
 				character.changeState(new LaunchedState(owner.character));
 			}
 
+			if (projId == (int)ProjIds.TriggerOldFLinch) {
+
+				character?.grounded = false;;
+			}
+
 
 			if (projId == (int)ProjIds.BlockableWeak && !character.isBlocking()) {
 

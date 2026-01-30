@@ -49,10 +49,7 @@ public class Zain : Character {
 			changeState(new BlockWCUT(), true);
 			return true;
 		}
-		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
-			changeState(new WcutGenericDodgeF(), true);	
-		}
-
+	
 		if (player.input.isPressed(Control.Taunt, player) && downPressedTimes > 3 && player.currency > 0  )
 		{
 		Mugen = true;
@@ -61,6 +58,11 @@ public class Zain : Character {
 	}
 
 	public override bool attackCtrl() {
+
+			if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
+			changeState(new WcutGenericDodgeF(), true);	
+		}
+
 
 		if ( canDash() &&
 			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {

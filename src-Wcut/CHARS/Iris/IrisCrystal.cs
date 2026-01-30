@@ -95,9 +95,8 @@ public float angleDist = 0;
 
 	public override void onDestroy() {
 		base.onDestroy();
-		if (pickup != null) {
-			pickup.useGravity = true;
-			pickup.collider.isTrigger = false;
+		if (owner.character is Iris irs && irs != null) {
+		irs.irisCrystal = null;
 		}
 	}
 

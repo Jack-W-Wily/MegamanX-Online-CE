@@ -25,7 +25,7 @@ public class VAVAJab1 : CharState {
 			character.changeToIdleOrFall();
 		}
 
-		if (character.frameIndex > 3) {
+		if (character.frameIndex > 1) {
 			if (player.input.isAPressed(player)) {
 				character.changeState(new VAVAJab2(), true);
 		}

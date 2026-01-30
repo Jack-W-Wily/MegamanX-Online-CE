@@ -777,6 +777,8 @@ public enum ProjIds {
 
 	GenericWCUTGrabProjID,
 
+	TriggerOldFLinch,
+
 	ForceGrabState,
 
 	// Mavericks stuff wcut
@@ -976,10 +978,18 @@ public enum ProjIds {
 	DesmumeProj2,
 	DesmumeProj3,
 	DesmumeProj4,
+
+
+	GBDAim,
+
+
 	// EnemyRPCs (PROJIDS)
 	HGM2RPC,
 	EnemyWheeler,
 	MissileElecSpark,
+
+
+
 
 	// Special damage types.
 	SelfDmg = 30000,

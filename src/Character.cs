@@ -1452,17 +1452,17 @@ public partial class Character : Actor, IDamagable {
 			}
 
 			if (!canPickupFlag()) {
-				if (Global.isHost || Global.serverClient == null) {
+			//	if (Global.isHost || Global.serverClient == null) {
 					dropFlag();
-				}
+			//	}
 			} else if (dropFlagUnlocked && dropFlagCooldown == 0 && player.input.isHeld(Control.Dash, player)) {
 				dropFlagProgress += Global.spf;
 				if (dropFlagProgress > 1) {
 					dropFlagProgress = 0;
 					dropFlagCooldown = 1;
-					if (Global.isHost || Global.serverClient == null) {
+				//	if (Global.isHost || Global.serverClient == null) {
 						dropFlag();
-					}
+				//	}
 					RPC.actorToggle.sendRpc(netId, RPCActorToggleType.DropFlagManual);
 				}
 			} else {
