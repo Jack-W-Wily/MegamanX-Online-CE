@@ -39,7 +39,7 @@ public class RumblingBang : VileNapalm {
 		hitcooldown = "0.5";
 		effect = "None.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 	//	vile.changeState(new VileNapalmAttacks(this), true);
@@ -65,7 +65,7 @@ public class FireGrenade : VileNapalm {
 		hitcooldown = "1/0.5";
 		effect = "Fire DOT: 0.5/1";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 	//	vile.changeState(new VileNapalmAttacks(this), true);
@@ -93,7 +93,7 @@ public class SplashHit : VileNapalm {
 		hitcooldown = "0.5";
 		effect = "Pushes towards it.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 	//	vile.changeState(new VileNapalmAttacks(this), true);

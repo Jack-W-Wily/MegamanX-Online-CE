@@ -78,8 +78,30 @@ public class CharSelection {
 	public string sprite;
 	public int frameIndex;
 	public Point offset = new Point(0, 45);
+	public Point offset1v1 = new Point(0, 28);
 
 	public static int sigmaIndex => Options.main?.sigmaLoadout?.sigmaForm ?? 0;
+	public static string sigmaNames => Options.main?.sigmaLoadout?.sigmaForm switch
+	{
+		0 => "Commander Sigma",
+		1 => "Neo Sigma",
+		2 => "Dopple Sigma",
+		_ => "Error"
+	};
+	public static string sigmaSprites => Options.main?.sigmaLoadout?.sigmaForm switch
+	{
+		0 => "sigma_warp_in",
+		1 => "sigma2_warp_in",
+		2 => "sigma3_warp_in",
+		_ => "sigma_warp_in"
+	};
+	public static Point sigmaOffSet => Options.main?.sigmaLoadout?.sigmaForm switch
+	{
+		0 => new Point(4, 44),
+		1 => new Point(0, 45),
+		2 => new Point(0, 45),
+		_ => new Point(0, 44),
+	};
 
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
@@ -125,7 +147,6 @@ public class CharSelection {
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 		
 	];
-
 	public static CharSelection[] selections1v1 => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "menu_mmx", 0),
 		new CharSelection("Zero (WCUT)", (int)CharIds.ZeroMID, 1, 0, "menu_szero", 0),
@@ -141,7 +162,10 @@ public class CharSelection {
 			offset = new Point(0, 22)
 		},
 		new CharSelection("Buster Zero", 6, 1, 0, "zero_shoot", 0) {
-			offset = new Point(-4, 22)
+			offset1v1 = new Point(0, 45)
+		},
+		new CharSelection("Vile", 2, 1, 0, "menu_vile", 0) {
+			offset1v1 = new Point(0, 23),
 		},
 		new CharSelection("C.Penguin", 210, 1, 0, "chillp_idle", 0),
 		new CharSelection("S.Mandrill", 212, 1, 1, "sparkm_idle", 0),
@@ -173,7 +197,6 @@ public class CharSelection {
 		*/
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "vava_idle", 0),
 	];
-
 	public CharSelection(
 		string name, int mappedCharNum, int mappedCharArmor,
 		int mappedCharMaverick, string sprite, int frameIndex
@@ -356,11 +379,19 @@ public class SelectCharacterMenu : IMainMenu {
 		string sprite = charSelection.sprite;
 		int frameIndex = charSelection.frameIndex;
 		float yOff = sprite.EndsWith("_idle") ? (Global.sprites[sprite].frames[0].rect.h() * 0.5f) : 0;
-		Global.sprites[sprite].drawToHUD(
+		if (is1v1) {
+			Global.sprites[sprite].drawToHUD(
+			frameIndex,
+			charPosX1 + charSelection.offset1v1.x,
+			charPosY1 + yOff + charSelection.offset1v1.y
+			);
+		} else {
+			Global.sprites[sprite].drawToHUD(
 			frameIndex,
 			charPosX1 + charSelection.offset.x,
 			charPosY1 + yOff + charSelection.offset.y
-		);
+			);
+		}
 
 		// Draw text
 

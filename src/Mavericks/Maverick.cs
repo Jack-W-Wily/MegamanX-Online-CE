@@ -166,6 +166,7 @@ public class Maverick : Actor, IDamagable {
 	public float oilTime;
 	public float virusTime;
 	public float slowdownTime;
+	public float lastAssignedDist;
 
 	public bool maverickCanControl() {
 		if (this is StingChameleon sc && sc.isCloakTransition()) {
@@ -189,9 +190,8 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public Maverick(
-		Player player, Point pos, Point destPos, int xDir,
-		ushort? netId, bool ownedByLocalPlayer,
-		MaverickState? overrideState = null
+		Player player, Point pos, int xDir, ushort? netId,
+		bool ownedByLocalPlayer, MaverickState? overrideState = null
 	) : base(
 		"", pos, netId, ownedByLocalPlayer, true
 	) {
@@ -228,7 +228,7 @@ public class Maverick : Actor, IDamagable {
 		state = new MLimboState();
 		state.maverick = this;
 		if (ownedByLocalPlayer) {
-			changeState(overrideState ?? new MEnter(destPos));
+			changeState(overrideState ?? new MEnter());
 		}
 		_input = new Input(true);
 
@@ -490,6 +490,8 @@ public class Maverick : Actor, IDamagable {
 		}
 		if (aiBehavior != MaverickAIBehavior.Control) {
 			aiUpdate();
+		} else {
+			lastAssignedDist = 0;
 		}
 		updateCtrl();
 	}
@@ -555,7 +557,7 @@ public class Maverick : Actor, IDamagable {
 				changeState(new MTaunt());
 				return true;
 			}
-			if (input.isPressed(Control.Jump, player)) {
+			if (input.isPressed(Control.Jump, player) && state is not MJumpStart) {
 				changeState(new MJumpStart());
 				return true;
 			}
@@ -746,7 +748,7 @@ public class Maverick : Actor, IDamagable {
 				Character chr = player.character;
 				float dist = chr.pos.x - pos.x;
 				float assignedDist = 40;
-
+				
 				int j = 0;
 				for (int i = 0; i < player.mavericks.Count; i++) {
 					if (player.mavericks[i] == this) {
@@ -758,6 +760,10 @@ public class Maverick : Actor, IDamagable {
 				}
 				if (!grounded) {
 					assignedDist = 4;
+				}
+				lastAssignedDist = assignedDist;
+				if (state is MRun) {
+					assignedDist -= 2;
 				}
 				int walkDir = dist < 0 ? -1 : 1;
 				bool doWalk = MathF.Abs(dist) > assignedDist && chr.grounded;

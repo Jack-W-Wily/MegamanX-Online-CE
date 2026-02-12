@@ -5,8 +5,8 @@ using System.Linq;
 namespace MMXOnline;
 
 // Vile weapon systen.
-// This controls all sub weapons is a free from way.
-// Originally created for HDM form Vile nicknamed "Lego Vile",
+// This controls all sub weapons is a free form way.
+// Originally created for HDM for Vile and nicknamed "Lego Vile",
 // but helps lot for regular XOD Vile too.
 public class VileWeaponSystem : Weapon {
 	// Unlike HDM, XOD Vile splits ground and air so we use 2 systems.
@@ -21,6 +21,15 @@ public class VileWeaponSystem : Weapon {
 	// Some things we need to quick-acces.
 	public Weapon chargeWeapon;
 	public Weapon rideWeapon;
+	public Weapon rideGrenade;
+	// We have an input buffer here.
+	// So it's easier to combo in non stream weapons.
+	public Dictionary<string, float> bufferedInputs = new() {
+		{Control.Shoot, 0},
+		{Control.Special1, 0},
+		{Control.WeaponRight, 0},
+	};
+	public float bufferTime = 12;
 
 	// Creation function.
 	public VileWeaponSystem(
@@ -48,6 +57,9 @@ public class VileWeaponSystem : Weapon {
 			airAltWps, airShootWps, airSpecialWps,
 			extraWeapons
 		];
+		Weapon?[] groundArray = [..altWps, ..shootWps, ..specialWps];
+		Weapon?[] airArray = [..airAltWps,..airShootWps,..airSpecialWps];
+
 
 		// Populate unique weapon list.
 		int i = 0;
@@ -55,8 +67,8 @@ public class VileWeaponSystem : Weapon {
 			foreach (Weapon? weapon in weaponArray) {
 				if (weapon != null) {
 					uniqueWeapons.Add(weapon);
-					if (i <= 2) { uniqueGroundWeapons.Add(weapon); }
-					if (i >= 3 && i <= 5) { uniqueAirWeapons.Add(weapon); }
+					if (groundArray.Contains(weapon)) { uniqueGroundWeapons.Add(weapon); }
+					if (airArray.Contains(weapon)) { uniqueAirWeapons.Add(weapon); }
 				}
 			}
 		}
@@ -67,6 +79,7 @@ public class VileWeaponSystem : Weapon {
 		// Fixed slot weapons.
 		chargeWeapon = extraWeapons[0];
 		rideWeapon = extraWeapons[1];
+		rideGrenade = extraWeapons[1];
 
 		// Generic weapon stuff.
 		index = (int)WeaponIds.VileWeaponSystem;
@@ -84,11 +97,19 @@ public class VileWeaponSystem : Weapon {
 	}
 
 	// Call update function of each one.
-	public override void update() {
+	public override void charLinkedUpdate(Character chara, bool isAlwaysOn) {
 		foreach (Weapon weapon in weaponList) {
 			weapon.update();
 		}
-		base.update();
+		foreach (var kvp in bufferedInputs) {
+			if (chara.player.input.isPressed(kvp.Key, chara.player)) {
+				bufferedInputs[kvp.Key] = bufferTime;
+			} else {
+				bufferedInputs[kvp.Key] -= Global.gameSpeed;
+				if (bufferedInputs[kvp.Key] < 0) { bufferedInputs[kvp.Key] = 0; }
+			}
+		}
+		base.charLinkedUpdate(chara, isAlwaysOn);
 	}
 
 	public void setAllWeaponsToCooldown(float cooldown) {
@@ -106,16 +127,35 @@ public class VileWeaponSystem : Weapon {
 	public bool shootLogic(Vile vile) {
 		vile.usedAmmoLastFrame = false;
 		var tartgetSlot = vile.grounded ? slots : airSlots;
+		// We set a preliminary key order.
+		string[] keys = [Control.Shoot, Control.Special1, Control.WeaponRight];
+		bool[] helds = new bool[3];
+		// We check if is pressed, if so we set it to max buffer time.
+		for (int i = 0; i < keys.Length; i++) {
+			helds[i] = vile.player.input.isHeld(keys[i], vile.player) || bufferedInputs[keys[i]] > 0;
+			if (helds[i]) {
+				bufferedInputs[keys[i]] = bufferTime;
+			}
+		}
 
-		if (vile.player.input.isHeld(Control.Shoot, vile.player)) {
-			if (tartgetSlot.shoot.weaponSystemShoot(vile, Control.Shoot)) { return true; }
+		if (helds[0]) {
+			if (tartgetSlot.shoot.weaponSystemShoot(vile, keys[0])) {
+				bufferedInputs[keys[0]] = 0;
+				return true;
+			}
 		}
-		if (vile.player.input.isHeld(Control.Special1, vile.player) && !vile.isCharging()) {
-			vile.stopCharge();
-			if (tartgetSlot.special.weaponSystemShoot(vile, Control.Special1)) { return true; }
+		if (helds[1] && !vile.isCharging()) {
+			if (tartgetSlot.special.weaponSystemShoot(vile, keys[1])) {
+				bufferedInputs[keys[1]] = 0;
+				vile.stopCharge();
+				return true;
+			}
 		}
-		if (vile.player.input.isHeld(Control.WeaponRight, vile.player)) {
-			if (tartgetSlot.alt.weaponSystemShoot(vile, Control.WeaponRight)) { return true; }
+		if (helds[2]) {
+			if (tartgetSlot.alt.weaponSystemShoot(vile, keys[2])) {
+				bufferedInputs[keys[2]] = 0;
+				return true;
+			}
 		}
 		return false;
 	}
@@ -123,7 +163,7 @@ public class VileWeaponSystem : Weapon {
 	public void extraWeaponShoot(Vile vile) {
 		foreach (Weapon weapon in extraWeapons) {
 			if (weapon.customShootCondition(vile)) {
-				weapon.vileShoot(0, vile);
+				weapon.vileShoot(vile);
 			}
 		}
 	}
@@ -135,15 +175,16 @@ public class VileWeaponSystem : Weapon {
 
 		// Get all off-cooldown ones.
 		Weapon[] offCooldownWeapons = targetWeapons.Where(
-			w => w.shootCooldown == 0 && w.getAmmoUsage(0) >= ammoLeft
+			w => w.shootCooldown <= 0 && w.getAmmoUsage(0) <= ammoLeft
 		).ToArray();
 
 		// If list is emtpty. Return.
-		if (offCooldownWeapons.Length > 0) {
+		if (offCooldownWeapons.Length == 0) {
 			return false;
 		}
-		Weapon target = offCooldownWeapons[Helpers.randomRange(0, offCooldownWeapons.Length - 1)];
-		target.vileShoot(0, vile);
+		int targetWeapon = Helpers.randomRange(0, offCooldownWeapons.Length - 1);
+		Weapon target = offCooldownWeapons[targetWeapon];
+		target.vileShoot(vile);
 
 		return true;
 	}
@@ -195,7 +236,7 @@ public class VileWeaponSystemSub {
 			targetWeapon.canShoot(0, vile.player) &&
 			checkShootAble(vile, targetWeapon, button)
 		) {
-			targetWeapon.vileShoot(0, vile);
+			targetWeapon.vileShoot(vile);
 			return true;
 		}
 		return false;
@@ -203,10 +244,12 @@ public class VileWeaponSystemSub {
 
 	// Esentially. A IsStream check.
 	public bool checkShootAble(Character character, Weapon weapon, string button) {
-		if (weapon.isStream) {
-			return character.player.input.isHeld(button, character.player);
-		} else {
-			return character.player.input.isPressed(button, character.player);
+		if (weapon.isStream && character.player.input.isHeld(button, character.player)) {
+			return true;
 		}
+		return (
+			character.player.input.isPressed(button, character.player) ||
+			parentSystem.bufferedInputs[button] > 0
+		);
 	}
 }

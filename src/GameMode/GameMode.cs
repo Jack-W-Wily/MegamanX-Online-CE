@@ -809,7 +809,7 @@ public class GameMode {
 				if (napalmNum < 0) napalmNum = 0;
 				if (napalmNum > 2) napalmNum = 0;
 				Global.sprites["hud_hawk_bombs"].drawToHUD(
-					napalmNum, x, y, alpha: vilePilot.napalmWeapon.shootCooldown == 0 ? 1 : 0.5f
+					napalmNum, x, y, alpha: vilePilot.weaponSystem.rideGrenade.shootCooldown == 0 ? 1 : 0.5f
 				);
 				Fonts.drawText(
 					FontType.Grey, "x" + vilePilot.rideArmor.hawkBombCount.ToString(), x + 10, y - 4
@@ -1016,9 +1016,11 @@ public class GameMode {
 				FontType.BlueMenu, hudErrorMsg,
 				Global.halfScreenW, 50, Alignment.Center
 			);
-		} else if (mainPlayer?.character is KaiserSigma) {
+		} else if (mainPlayer?.character is KaiserSigma kaiser) {
 			string msg = "";
-			if (KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) msg += "[DASH]: Relocate";
+			if (kaiser.isVirus && KaiserSigma.canKaiserSpawn(mainPlayer.character, out _)) {
+				msg += "[DASH]: Relocate";
+			}
 			if (msg != "") {
 				Fonts.drawText(
 					FontType.BlueMenu, Helpers.controlText(msg),

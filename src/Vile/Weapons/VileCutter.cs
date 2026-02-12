@@ -36,7 +36,7 @@ public class QuickHomesick : VileCutter {
 		hitcooldown = "0.5";
 		effect = "Can carry items.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new CutterAttacks(this), true);
@@ -68,7 +68,7 @@ public class ParasiteSword : VileCutter {
 		hitcooldown = "0.5";
 		effect = "Won't Destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new CutterAttacks(this), true);
@@ -100,7 +100,7 @@ public class MaroonedTomahawk : VileCutter {
 		hitcooldown = "0.33";
 		effect = "Won't Destroy on hit.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		vile.changeState(new CutterAttacks(this), true);
@@ -126,17 +126,16 @@ public class NoneCutter : VileCutter {
 		killFeedIndex = 126;
 	}
 }
+
 #region States
 public class CutterAttacks : VileState {
 	public bool shot;
 	public int shootFrame = 0;
-	public bool lockAir => Options.main.lockInAirCutter;
 	public VileCutter weapon;
+
 	public CutterAttacks(VileCutter weapon) : base("idle_shoot") {
 		useDashJumpSpeed = true;
-		airMove = true;
-		canJump = true;
-		canStopJump = true;
+		useGravity = false;
 		airSprite = "cannon_air";
 		landSprite = "idle_shoot";
 		this.weapon = weapon;
@@ -151,6 +150,7 @@ public class CutterAttacks : VileState {
 			vile.setVileShootTime(weapon);
 			vile.playSound("frontrunner", sendRpc: true);
 		}
+
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -159,23 +159,15 @@ public class CutterAttacks : VileState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.turnToInput(player.input, player);
+
 		if (!character.grounded) {
 			sprite = "cannon_air";
 			character.changeSpriteFromName(sprite, true);
-			if (lockAir) {
-                character.useGravity = false;
-				character.stopMoving();
-				character.vel = new Point();
-				airMove = false;
-            }
 		}
-	}
-	public override void onExit(CharState? newState) {
-		base.onExit(newState);
-		character.useGravity = true;
 	}
 }
 #endregion
+
 #region Projectiles
 public class VileParasiteSword : Projectile {
 	float soundCooldown;

@@ -612,7 +612,9 @@ public class Zero : Character {
 		int yDir = player.input.getYDir(player);
 		// Giga attacks.
 		if (yDir == 1 && specialPressed) {
-			if (gigaAttack.shootCooldown <= 0 && gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)) {
+			if (flag == null && gigaAttack.shootCooldown <= 0 &&
+				gigaAttack.ammo >= gigaAttack.getAmmoUsage(0)
+			) {
 				gigaAttack.shoot(this, []);
 				return true;
 			}
@@ -709,11 +711,7 @@ public class Zero : Character {
 			if (charState is WallSlide wallSlide) {
 				changeState(new ZeroMeleeWall(wallSlide.wallDir, wallSlide.wallCollider), true);
 			} else {
-				if (Options.main.swapAirAttacks == false) {
-					changeState(new ZeroAirSlashState(), true);
-				} else if (kuuenzanCooldown <= 0) {
-					changeState(new ZeroRollingSlashtate(), true);
-				}
+				changeState(new ZeroAirSlashState(), true);
 			}
 			return true;
 		}
@@ -1266,7 +1264,7 @@ public class Zero : Character {
 		ComboAttacks(target);
 		WildDance(target);
 		if (charState.attackCtrl && !player.isDead && sprite.name != null && !isWildDance && !isInvulnerable() &&
-		 	aiAttackCooldown <= 0 && isFacingTarget && charState is not SwordBlock or ZeroGigaAttack or RekkohaState) {
+		 	aiAttackCooldown <= 0 && isFacingTarget && charState is not SwordBlock and not ZeroGigaAttack and not RekkohaState) {
 			int ZSattack = Helpers.randomRange(0, 11);
 			if (!(sprite.name == "zarzo_attack" || sprite.name == "zarzo_attack3" || sprite.name == "zarzo_attack2")) {
 				switch (ZSattack) {

@@ -446,7 +446,7 @@ public partial class Actor : GameObject {
 		}
 	}
 
-	
+	public bool useAngleOnFade;
 	public float angle {
 		get {
 			return _byteAngle * 1.40625f;
@@ -666,7 +666,7 @@ public partial class Actor : GameObject {
 	}
 
 	public virtual void physicsUpdate() {
-		Character chr = this as Character;
+		Character? chr = this as Character;
 
 		bool wading = isWading();
 		bool underwater = isUnderwater();
@@ -1417,7 +1417,12 @@ public partial class Actor : GameObject {
 			var anim = new Anim(getCenterPos(), spriteName, xDir, null, true);
 			// TODO: Fix this. WTF GM19.
 			if (angleSet) {
-				anim.byteAngle = byteAngle;
+				if (useAngleOnFade) {
+					anim.byteAngle = byteAngle;
+				}
+				else if (byteAngle > 64 && byteAngle < 256 - 64) {
+					anim.xDir *= -1;
+				}
 			}
 
 			anim.xScale = xScale;

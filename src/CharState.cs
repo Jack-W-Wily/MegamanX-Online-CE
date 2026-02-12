@@ -184,9 +184,6 @@ public class CharState {
 				return false;
 			}
 		}
-		if (character.charState is WarpOut && this is not WarpIn) {
-			return false;
-		}
 		return true;
 	}
 
@@ -670,6 +667,7 @@ public class WarpOut : CharState {
 
 	public WarpOut(bool is1v1MaverickStart = false) : base("warp_beam") {
 		this.is1v1MaverickStart = is1v1MaverickStart;
+		useGravity = false;
 	}
 
 	public override void update() {
@@ -687,7 +685,7 @@ public class WarpOut : CharState {
 
 		warpAnim.incPos(0, -16 * character.speedMul);
 
-		if (character.pos.y <= destY) {
+		if (warpAnim.pos.y <= destY) {
 			warpAnim.destroySelf();
 			warpAnim = null;
 		}
@@ -701,7 +699,10 @@ public class WarpOut : CharState {
 		destY = character.pos.y - yOffset;
 		startY = character.pos.y;
 		if (!is1v1MaverickStart) {
-			warpAnim = new Anim(character.pos, character.getSprite("warp_beam"), character.xDir, player.getNextActorNetId(), false, sendRpc: true);
+			warpAnim = new Anim(
+				character.pos, character.getSprite("warp_beam"),
+				character.xDir, player.getNextActorNetId(), false, sendRpc: true
+			);
 			warpAnim.splashable = false;
 		}
 	}

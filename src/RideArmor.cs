@@ -49,8 +49,10 @@ public class RideArmor : Actor, IDamagable {
 	public static Weapon netWeapon = new Weapon(WeaponIds.MechGenericWeapon, 0);
 
 	public RideArmor(
-		Player owner, Point pos, int raNum, int neutralId, ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
-	) : base("", pos, netId, ownedByLocalPlayer, true
+		Player owner, Point pos, int raNum, int neutralId,
+		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
+	) : base(
+		"", pos, netId, ownedByLocalPlayer, true
 	) {
 		netOwner = owner;
 		setRaNum(raNum);
@@ -281,7 +283,7 @@ public class RideArmor : Actor, IDamagable {
 				vile.increaseCharge();
 			}
 			if (vile.getChargeLevel() >= 3 && !vile.chargeButtonHeld()) {
-				vile.laserWeapon.vileShoot(WeaponIds.VileLaser, vile);
+				vile.weaponSystem.chargeWeapon.vileShoot(vile);
 			}
 		}
 	}
@@ -502,7 +504,7 @@ public class RideArmor : Actor, IDamagable {
 					attackSprite = "hawk_attack_air_down";
 				}
 				changeSprite(attackSprite, false);
-			} else if ( rideArmorState != null && player != null &&
+			} else if (rideArmorState != null && player != null &&
 				hawkBombCount > 0 &&
 				canAttack() &&
 				character is Vile vile &&
