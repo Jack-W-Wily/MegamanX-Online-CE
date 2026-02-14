@@ -988,7 +988,9 @@ public enum ProjIds {
 	EnemyWheeler,
 	MissileElecSpark,
 
+	// X1 Zero
 
+	RedBuster,
 
 
 	// Special damage types.

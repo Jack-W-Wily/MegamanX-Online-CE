@@ -156,7 +156,7 @@ public class VAVA2 : Vile {
 		flamethrowerWeapon = loadout.flamethrower switch {
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
-			3 => new NoneFlamethrower(),
+			//3 => new NoneFlamethrower(),
 			_ => new WildHorseKick()
 		};
 		downSpWeapon = loadout.downSpWeapon switch {
@@ -584,7 +584,7 @@ public float CrimsonphantomCD;
 
 		}
 		if (WeaponRightHeld && VileMode == 0) {
-			vulcanWeapon.vileShoot(0, this);
+			vulcanWeapon.vileShootOld(0, this);
 		}
 
 
@@ -656,7 +656,7 @@ public float CrimsonphantomCD;
 				player.vileAmmo -= 8;
 			}
 			if (HeldDown && AirSplashHitCD == 0 && VileMode == 1) {
-				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+				flamethrowerWeapon.vileShootOld(WeaponIds.VileFlamethrower, this);
 			}
 			return true;
 		}
@@ -700,7 +700,7 @@ public float CrimsonphantomCD;
 	
 		}
 		if (VileMode == 0 && (grounded || charState is AirDash)) {
-			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+			missileWeapon.vileShootOld(WeaponIds.ElectricShock, this);
 			missileWeapon.shootCooldown = 0;
 		}
 
@@ -741,7 +741,7 @@ public float CrimsonphantomCD;
 				}
 				if (stunShotPressed && !HeldDown) {
 					//	if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-					missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+					missileWeapon.vileShootOld(WeaponIds.ElectricShock, this);
 					//		}
 				}
 				if (goliathShotPressed) {
@@ -795,7 +795,7 @@ public float CrimsonphantomCD;
 	public override void shoot(int chargeLevel) {
 		if (chargeLevel == 1) {
 			cannonWeapon.type = (int)VileCannonType.FrontRunner;
-			cannonWeapon.vileShoot(0, this);
+			cannonWeapon.vileShootOld(0, this);
 			player.vileAmmo -= 10;
 		}
 		if (chargeLevel == 2) {
@@ -828,7 +828,7 @@ public float CrimsonphantomCD;
 			
 		}
 		if (chargeLevel == 4 && (isVileMK5 || isVavaV)) {
-			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+			laserWeapon.vileShootOld(WeaponIds.VileLaser, this);
 		}
 	}
 	public override bool chargeButtonHeld() {

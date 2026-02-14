@@ -261,10 +261,10 @@ public class Vile : Character {
 			}
 			if (shootHeld && cannonWeapon.type > -1) {
 				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
-					cannonWeapon.vileShoot(0, this);
+					cannonWeapon.vileShootOld(0, this);
 			}
 			if (WeaponRightHeld && vulcanWeapon.type > -3) {
-				vulcanWeapon.vileShoot(0, this);
+				vulcanWeapon.vileShootOld(0, this);
 			}
 			}
 		return base.attackCtrl();
@@ -280,14 +280,14 @@ public class Vile : Character {
 		bool leftorRightHeld = player.input.getXDir(player) != 0;
 		bool downHeld = player.input.getYDir(player) == 1;
 		if (downHeld) {
-			downSpWeapon.vileShoot(WeaponIds.Napalm, this);
+			downSpWeapon.vileShootOld(WeaponIds.Napalm, this);
 			return true;
 		}
 		if (leftorRightHeld) {
-			rocketPunchWeapon.vileShoot(0, this);
+			rocketPunchWeapon.vileShootOld(0, this);
 			return true;
 		}
-		missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+		missileWeapon.vileShootOld(WeaponIds.ElectricShock, this);
 		return true;
 	}
 
@@ -300,10 +300,10 @@ public class Vile : Character {
 		}
 		bool heldDown = player.input.getYDir(player) == 1;
 		if (heldDown) {
-			downAirSpWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+			downAirSpWeapon.vileShootOld(WeaponIds.VileFlamethrower, this);
 			return true;
 		}
-		airSpWeapon.vileShoot(WeaponIds.VileBomb, this);
+		airSpWeapon.vileShootOld(WeaponIds.VileBomb, this);
 		return true;
 	}
 
@@ -369,7 +369,7 @@ public class Vile : Character {
 	}
 	public virtual void shoot(int chargeLevel) {
 		if (chargeLevel >= 3) {
-			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+			laserWeapon.vileShootOld(WeaponIds.VileLaser, this);
 		}
 		if (chargeLevel == 4 && isVileMK5) {
 			changeState(new HexaInvoluteState(), true);

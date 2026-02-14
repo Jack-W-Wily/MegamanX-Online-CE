@@ -58,6 +58,7 @@ public enum CharIds {
 	Doppler,
 	HighMax,
 	GBD,
+	XAnother,
 	BossKuwanger,
 	BossPenguin,
 	BossMammoth,
@@ -104,8 +105,11 @@ public class CharSelection {
 	};
 
 	public static CharSelection[] selections => [
-		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
-		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_x", 0){offset = new Point(0, 20)},
+		new CharSelection("XAnother", (int)CharIds.XAnother, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (Early)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (MID)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (END)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		new CharSelection("Axl", (int)CharIds.AxlWC, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
@@ -114,18 +118,18 @@ public class CharSelection {
 		new CharSelection("Sigma", (int)CharIds.Sigma, 1, 0, "smenu_sigma", 0){offset = new Point(0, 20)},
 		new CharSelection("Dragoon", (int)CharIds.Dragoon, 1, 0, "smenu_dragoon", 0){offset = new Point(0, 20)},
 		new CharSelection("High Max", (int)CharIds.HighMax, 1, 0, "smenu_highmax", 0){offset = new Point(0, 20)},
-		new CharSelection("Green Biker Dude", (int)CharIds.GBD, 1, 0, "smenu_gbd", 0){offset = new Point(0, 20)},
-
+		
 	];
 
 
 	public static CharSelection[] selectionsVavaUnlocked => [
-		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
-		new CharSelection("Zero", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
+		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_x", 0){offset = new Point(0, 20)},
+		new CharSelection("X Another", (int)CharIds.XAnother, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, 1, 0, "smenu_zero", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (MID)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (END)", (int)CharIds.ZeroEND, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		new CharSelection("Axl", (int)CharIds.AxlWC, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
-		new CharSelection("Axl?", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
-	//	new CharSelection("Vile", 2, 1, 0, "menu_vile", 0),
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
 		new CharSelection("Iris", (int)CharIds.Iris, 1, 0, "smenu_iris", 0){offset = new Point(0, 20)},
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, 1, 0, "smenu_dynamo", 0){offset = new Point(0, 20)},
@@ -143,7 +147,8 @@ public class CharSelection {
 		"smenu_kr",       // Sprite name to show in the menu, for this example I choose the idle
 		 0               // Frame that the sprite will be stuck in
 		 ){offset = new Point(0, 20)},              // Make sure to end the whole thing with a "," ion the end
-		
+		new CharSelection("Axl?", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero Another (MID)", (int)CharIds.BusterZero, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 		
 	];

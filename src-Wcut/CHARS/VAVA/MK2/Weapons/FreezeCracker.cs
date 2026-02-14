@@ -17,7 +17,7 @@ public class FreezeCrackerV : Weapon {
 
 	}
 
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShootOld(WeaponIds weaponInput, Vile vile) {
 		
 			Point shootPos = vile.getShootPos();
 			int xDir = vile.getShootXDir();

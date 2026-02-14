@@ -121,7 +121,7 @@ public class RockmanX : MegamanX {
 
 		if (player.input.isR2Pressed(player) && player.input.isHeld(Control.Up, player) && canSummonZero) {
 			if (helperZero == null) {
-				helperZero = new FakeZero(player, pos, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+				helperZero = new FakeZero(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 				player.superAmmo -= 32;
 			}
 		}
@@ -169,7 +169,7 @@ public class RockmanX : MegamanX {
 		base.update();
 
 		if (!helperzeroOnce && helperZero == null && Global.level.levelData.name == "redandblue_vs_purple_1v1") {
-			helperZero = new FakeZero(player, pos, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
+			helperZero = new FakeZero(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 			helperzeroOnce = true;
 		}
 

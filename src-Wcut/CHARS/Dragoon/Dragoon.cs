@@ -77,28 +77,49 @@ public override bool normalCtrl() {
 		
 		if (hadokenCheck) {
 			changeState(new DragoonHadoukenCrouch(), true);	
+			if (OverDrive){
 			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+			}
 		}
 		if (hadokenCheck2) {
 			changeState(new DragoonHadouken(), true);
-			charState.invincible = true;	
+			if (OverDrive){
+			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+			}
 		}
 		if (shoryukenCheck) {
 			changeState(new DragoonRising(), true);	
+			if (OverDrive){
 			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+			}
 		}
 		if (shoryukenCheck2) {
 			changeState(new DragoonShoryuken(isUnderwater()), true);	
+			if (OverDrive){
 			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+			}
 		}
 		if (senpukiakuCheck) {
 			changeState(new DragoonSenpukiaku(), true);	
+			if (OverDrive){
 			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+			}
 		}
 
 
 		if (player.input.isL2Held(player) && player.input.isAPressed(player) ){
 		changeState(new GlobalParryState(), true);
+		
 		}
 	
 	

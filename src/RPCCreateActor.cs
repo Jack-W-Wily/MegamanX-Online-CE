@@ -227,31 +227,31 @@ public class RPCCreateActor : RPC {
 				new RideChaser(player, pos, 0, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.GreenDog:
-				new GreenDog(player, pos, pos, xDir, netProjByte, false);
+				new GreenDog(player, pos,  xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MetClassic:
-				new MetClassic(player, pos, pos, xDir, netProjByte, false);
+				new MetClassic(player, pos,  xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.HogumerEasy:
-				new HogumerEasy(player, pos, pos, xDir, netProjByte, false);
+				new HogumerEasy(player, pos,  xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MissileElecBlue:
-				new MissileElecBlue(player, pos, pos, xDir, netProjByte, false);
+				new MissileElecBlue(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MissileElecRed:
-				new MissileElecRed(player, pos, pos, xDir, netProjByte, false);
+				new MissileElecRed(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MissileElecGreen:
-				new MissileElecGreen(player, pos, pos, xDir, netProjByte, false);
+				new MissileElecGreen(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MissileElecPurple:
-				new MissileElecPurple(player, pos, pos, xDir, netProjByte, false);
+				new MissileElecPurple(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.MissileElecBlack:
-				new MissileElecBlack(player, pos, pos, xDir, netProjByte, false);
+				new MissileElecBlack(player, pos, xDir, netProjByte, false);
 				break;
 			case (int)NetActorCreateId.AbelhudoIrregular:
-				new AbelhudoIrregular(player, pos, pos, xDir, netProjByte, false);
+				new AbelhudoIrregular(player, pos, xDir, netProjByte, false);
 				break;
 		}
 	}

@@ -56,6 +56,25 @@ public abstract class PZeroGenericMeleeState : PZeroState {
 	}
 }
 
+
+
+public class PZeroPunchRun : PZeroGenericMeleeState {
+	public PZeroPunchRun() : base("run_attack") {
+		sound = "punch1";
+		projId = (int)ProjIds.PZeroPunch;
+		soundFrame = 1;
+		comboFrame = 3;
+	}
+
+	public override bool altCtrlUpdate(bool[] ctrls) {
+		if (zero.shootPressTime > 0 || player.isAI) {
+			zero.changeState(new PZeroPunch1(), true);
+			return true;
+		}
+		return false;
+	}
+}
+
 public class PZeroPunch1 : PZeroGenericMeleeState {
 	public PZeroPunch1() : base("punch") {
 		sound = "punch1";
@@ -145,7 +164,7 @@ public class PZeroSpinKick : PZeroGenericMeleeState {
 			character.changeToIdleOrFall();
 			return;
 		}
-		character.moveXY(character.getDashSpeed() * character.xDir, 0);
+		character.move(new Point(character.xDir * 250, 0));
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -812,3 +831,172 @@ public class PZeroTaunt : CharState {
 		}
 	}
 }
+
+
+
+
+
+
+
+public class ZX1AkaBuster : CharState {
+	bool shot = false;
+	RedBuster? proj;
+	float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public ZX1AkaBuster(string transitionSprite = "") : base("air_buster", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+
+		if (!shot && character.sprite.frameIndex == 3) {
+			shoot();
+		}
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		} else {
+			character.changeSpriteFromName("aka_buster", true);
+			sprite = "aka_buster";
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("buster3", sendRpc: true);
+		character.frameIndex = 3;
+		character.frameTime = 0;
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		if (character.grounded){
+		proj = new RedBuster(character.getShootPos(), character.xDir,0, character, player, player.getNextActorNetId(), true);
+		} else {
+		proj = new RedBuster(character.getShootPos(), character.xDir,1, character, player, player.getNextActorNetId(), true);
+		}
+	}
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+
+}
+
+
+
+
+
+public class ZX1GrabStart : CharState {
+
+
+	private float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public ZX1GrabStart(string transitionSprite = "")
+		: base("grab_start", "", "", transitionSprite) {
+		airMove = true;
+	}
+
+	public override void update() {
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+public class ZX1BurnKnuckle : CharState {
+	
+
+	public ZX1BurnKnuckle() : base("burnknuckle", "", "", "") {
+		superArmor = true;
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex > 2  && character.frameIndex <11){
+		character.move(new Point(character.xDir * 350, 0));
+		}
+	    if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+}
+}
+

@@ -144,7 +144,6 @@ public class VAVA1 : Vile {
 		flamethrowerWeapon = loadout.flamethrower switch {
 			1 => new SeaDragonRage(),
 			2 => new DragonsWrath(),
-			3 => new NoneFlamethrower(),
 			_ => new WildHorseKick()
 		};
 		downSpWeapon = loadout.downSpWeapon switch {
@@ -530,7 +529,7 @@ public class VAVA1 : Vile {
 					}
           		} else if (getChargeLevel() == 0) {
 
-				vulcanWeapon.vileShoot(0, this);
+				vulcanWeapon.vileShootOld(0, this);
 				}
 			}
 

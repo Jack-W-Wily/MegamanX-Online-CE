@@ -97,6 +97,12 @@ public class PunchyZero : Character {
 		if (isAwakened) {
 			updateAwakenedAura();
 		}
+
+		if (OverDrive) {
+			isBlack = true;
+		} else {
+			isBlack = false;
+		}
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
@@ -201,6 +207,21 @@ public class PunchyZero : Character {
 		} else {
 			chargeLogic(shoot);
 		}
+
+
+		
+			Supers();
+		
+	}
+
+
+	public bool Supers() {
+		if (!player.input.isHeld(Control.Down, player)
+		&& player.input.isR2Pressed(player) && player.superAmmo > 15) {
+			player.superAmmo -= 16;
+			changeState(new ZX1AkaBuster(), true);
+		}
+		return !isInDamageSprite();
 	}
 
 	public override bool canCharge() {
@@ -272,8 +293,8 @@ public class PunchyZero : Character {
 		if (currencyUse > 0) {
 			if (freeBusterShots > 0) {
 				freeBusterShots--;
-			} else if (player.currency > 0) {
-				player.currency--;
+			} else if (player.superAmmo > 6) {
+				player.superAmmo -= 6;
 			}
 		}
 	}
@@ -356,6 +377,20 @@ public class PunchyZero : Character {
 	}
 
 	public override bool normalCtrl() {
+
+
+		// Guard!
+		if (
+				player.input.isL2Held(player)
+			)
+		{
+
+			changeState(new BlockWCUT(), true);
+			return true;
+		} 
+
+
+
 		// Hypermode activation.
 		int cost = Player.zeroHyperCost;
 		if (isAwakened) {
@@ -387,6 +422,8 @@ public class PunchyZero : Character {
 	}
 
 	public override bool attackCtrl() {
+
+		
 		if (donutsPending != 0) {
 			return false;
 		}
@@ -459,11 +496,26 @@ public class PunchyZero : Character {
 				changeState(new PZeroShoryuken(), true);
 				return true;
 			}
+			if (yDir == 1) {
+				changeState(new ZX1BurnKnuckle(), true);
+				return true;
+			}
+			if (player.input.isL2Held(player)) {
+				changeState(new ZX1GrabStart(), true);
+				return true;
+			}
 			if (grounded && isDashing) {
 				slideVel = xDir * getDashSpeed() * 0.8f;
 			}
+
+			if (charState is Run) {
+				slideVel = xDir * getDashSpeed();
+			changeState(new PZeroPunchRun(), true);
+			
+			} else {
 			changeState(new PZeroPunch1(), true);
 			return true;
+			}
 		}
 		if (specialPressTime > 0) {
 			return groundSpcAttacks();
@@ -490,13 +542,7 @@ public class PunchyZero : Character {
 			return true;
 		}
 		if (yDir == 1) {
-			if (flag == null ||
-				gigaAttack.shootCooldown > 0 ||
-				gigaAttack.ammo < gigaAttack.getAmmoUsage(0)
-			) {
-				return false;
-			}
-			gigaAttack.shoot(this, []);
+			changeState(new ClaudioGroundPunchState());	
 			return true;
 		}
 		if (isDashing) {
@@ -511,10 +557,10 @@ public class PunchyZero : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		if (Global.sprites.ContainsKey("pzero_" + spriteName)) {
-			return "pzero_" + spriteName;
+		if (Global.sprites.ContainsKey("zerox1_" + spriteName)) {
+			return "zerox1_" + spriteName;
 		}
-		return "zarzo_" + spriteName;
+		return "zerox1_" + spriteName;
 	}
 
 	public override bool isToughGuyHyperMode() {
@@ -586,50 +632,62 @@ public class PunchyZero : Character {
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zarzo_punch" => MeleeIds.Punch,
-			"zarzo_punch2" => MeleeIds.Punch2,
-			"zero_spinkick" => MeleeIds.Spin,
-			"zero_kick_air" => MeleeIds.AirKick,
-			"zarzo_parry_start" => MeleeIds.Parry,
-			"zarzo_parry" => MeleeIds.ParryAttack,
-			"zero_shoryuken" => MeleeIds.Uppercut,
-			"zero_megapunch" => MeleeIds.StrongPunch,
-			"zarzo_dropkick" => MeleeIds.DropKick,
-			"zarzo_projswing" or "zarzo_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zerox1_grab_start" => MeleeIds.Grab,
+			"zerox1_burnknuckle" or "zerox1_groundpound" => MeleeIds.BurnKnuckle,
+			"zerox1_punch" => MeleeIds.Punch,
+			"zerox1_punch2" or "zerox1_run_attack" => MeleeIds.Punch2,
+			"zerox1_spinkick" => MeleeIds.Spin,
+			"zerox1_kick_air" => MeleeIds.AirKick,
+			"zerox1_parry_start" => MeleeIds.Parry,
+			"zerox1_parry" => MeleeIds.ParryAttack,
+			"zerox1_shoryuken" => MeleeIds.Uppercut,
+			"zerox1_megapunch" => MeleeIds.StrongPunch,
+			"zerox1_dropkick" => MeleeIds.DropKick,
+			"zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
 	}
 
 	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
+			(int)MeleeIds.Block => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
+				0, 0, 1,
+				addToLevel: addToLevel, isDeflectShield : true
+
+			),
+			(int)MeleeIds.Grab => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.GenericWCUTGrabProjID, player, 2, 0, 10,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
+			),
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
-				2, 0, 15,
+				2, Global.halfFlinch, 15,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 15,
-				addToLevel: addToLevel
+				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.defFlinch, 10,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 15,
-				addToLevel: addToLevel
+				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3,  Global.halfFlinch, 10,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
 				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
-				MegaPunchWeapon.staticWeapon, projPos, ProjIds.PZeroYoudantotsu, player, 6, Global.defFlinch,
-				addToLevel: addToLevel
+				MegaPunchWeapon.staticWeapon, projPos, ProjIds.BurensenEND, player, 6, 0,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
 				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Parry => new GenericMeleeProj(
 				parryWeapon, projPos, ProjIds.PZeroParryStart, player, 0, 0, 0,
@@ -637,12 +695,18 @@ public class PunchyZero : Character {
 			),
 			(int)MeleeIds.ParryAttack => (new GenericMeleeProj(
 				parryWeapon, projPos, ProjIds.PZeroParryAttack, player, 4, Global.defFlinch,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
+			) {
+				netcodeOverride = NetcodeModel.FavorDefender
+			}),
+			(int)MeleeIds.BurnKnuckle => (new GenericMeleeProj(
+				parryWeapon, projPos, ProjIds.HeavyPush, player, 3, 0,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
 			}),
 			(int)MeleeIds.AwakenedAura => (new GenericMeleeProj(
-				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 2, 0,
+				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player, 0, 0,
 				addToLevel: addToLevel
 			) {
 				netcodeOverride = NetcodeModel.FavorDefender
@@ -652,6 +716,7 @@ public class PunchyZero : Character {
 				3, Global.defFlinch, isReflectShield: true,
 				addToLevel: addToLevel
 			),
+			
 			_ => null
 		};
 		return proj;
@@ -700,6 +765,8 @@ public class PunchyZero : Character {
 
 	public enum MeleeIds {
 		None = -1,
+		Block,
+		Grab,
 		Punch,
 		Punch2,
 		Spin,
@@ -710,6 +777,8 @@ public class PunchyZero : Character {
 		Parry,
 		ParryAttack,
 		SaberSwing,
+
+		BurnKnuckle,
 		AwakenedAura
 	}
 
@@ -742,9 +811,9 @@ public class PunchyZero : Character {
 
 	public override float getRunSpeed() {
 		float runSpeed = Physics.WalkSpeed;
-		if (isBlack) {
+		
 			runSpeed *= 1.15f;
-		}
+		
 		return runSpeed * getRunDebuffs();
 	}
 

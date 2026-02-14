@@ -3634,12 +3634,20 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer?.ownedByLocalPlayer == true)
 				if (killer.character is Axl axl && killer.copyShotDamageEvents.Any(c => c.character == this)) {
-					axl.addDNACore(this);
+				//	axl.addDNACore(this);
+				Global.level.gameMode.setHUDErrorMessage(
+						axl.player, $"Disabled feature , 5HP bonus"
+					);
+					axl.addHealth(5);
 				}
 
 			if (assister?.ownedByLocalPlayer == true) {
 				if (assister.character is Axl axl && assister.copyShotDamageEvents.Any(c => c.character == this)) {
-					axl.addDNACore(this);
+				//	axl.addDNACore(this);
+				Global.level.gameMode.setHUDErrorMessage(
+						axl.player, $"Disabled feature , 5HP bonus"
+					);
+					axl.addHealth(5);
 				}
 			}
 

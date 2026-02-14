@@ -469,7 +469,7 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is BusterZero or Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
+			if (owner.character is PunchyZero or BusterZero or Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
 
 				if (owner.character.charState.canSpecialCancel) {
 					owner.character.charState.spcCancel = true;
@@ -712,6 +712,11 @@ public class Damager {
 				}
             }
 
+
+
+		
+
+
 			if (!character.isFlinchImmune() &&
 				!character.isInvulnerable(false, true) &&
 				!isDot(projId) && (
@@ -730,6 +735,7 @@ public class Damager {
 				if (flinchCooldown == 0) {
 					flinchCooldown = 60;
 				}
+				character.playSound("weakness");
 				//damage = MathF.Ceiling(damage * 1.5f);
 			}
 			// Disallow flinch stack for non-BZ.
@@ -855,7 +861,16 @@ public class Damager {
 				}
 				
 
-				
+				if (owner?.character is PunchyZero zx1 && zx1 != null) {
+				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					zx1.changeState(new ClaudioGroundPunchState());
+					},0.15f));
+					character?.changeState(new RMXGrabbed(zx1));
+				}
+				}
+
+
 				if (owner?.character is Dragoon drgn && drgn != null) {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 					drgn.changeState(new DragoonGrab());

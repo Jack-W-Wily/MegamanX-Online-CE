@@ -47,6 +47,7 @@ public class GBD : Character {
 
 		}
 
+
 		return base.normalCtrl();
 	}
 
@@ -56,7 +57,7 @@ public class GBD : Character {
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
 			changeState(new WcutGenericDodgeF(), true);	
 		}
-
+		if (!isBike){
 		if (player.input.isAPressed(player)) {
 			if (player.input.isHeld(Control.Down, player)) {
 			changeState(new VAVAUpperCutPunch(), true);	
@@ -78,7 +79,9 @@ public class GBD : Character {
 		}
 
 
-		
+		} else{
+			bikeAttacks();
+		}
 
 
 		return base.attackCtrl();
@@ -143,14 +146,31 @@ public class GBD : Character {
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref trailTime);
-		if (OverDrive && vel.x != 0){
+
+
+		if (player.input.isPressed(Control.Special2, player)) {
+			if (!isBike && player.superAmmo > 15) {
+			isBike = true;
+			} else {
+				isBike = false;
+			}
+		}
+		if (isBike){
 			
 			if (trailTime <= 0) {
-			trailTime = 0.04f;
+			if (OverDrive){
+			trailTime = 0.05f;
 			new FStagTrailProj(
 			 	pos, xDir,
 				this ,player, player.getNextActorNetId(), rpc: true
 			);
+			} else {
+				trailTime = 0.5f;
+				player.superAmmo -= 1;
+					if (player.superAmmo <= 0) {
+					isBike = false;
+					}
+				}
 			}
 		}
 		if ((sprite.name.Contains("pipe") || sprite.name.Contains("gun")

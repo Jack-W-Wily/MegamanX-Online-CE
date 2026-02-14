@@ -149,12 +149,13 @@ public class FakeZeroRockProj : Projectile {
 		pos, xDir, owner, "fakezero_rock", netId, altPlayer
 	) {
 		weapon = FakeZero.getWeapon();
-		damager.damage = 3;
+		damager.damage = 2;
 		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 6;
 		projId = (int)ProjIds.FakeZeroGroundPunch;
 		maxTime = 1.25f;
 		useGravity = true;
+		destroyOnHit = false;
 		vel = new Point(0, -500);
 
 		if (sendRpc) {

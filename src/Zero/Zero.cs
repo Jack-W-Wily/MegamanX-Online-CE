@@ -144,17 +144,35 @@ public class Zero : Character {
 		}
 	}
 
-	public override void update() {
-		// Hypermode effects.
-		
-		if (player.blackZarzo) {
+
+	public virtual void updateMID() {
+	if (player.blackZarzo) {
 			isBlack = true;
 		} else {
 			isBlack = false;
-		}
-			if (charState is AirDash && isViral) {
+	}
+	if (charState is AirDash && isViral) {
 			changeState(new FSplasherState(), true);
+	}
+	}
+
+	public virtual void updateEnd() {
+	if (!OverDrive){
+		awakenedPhase = 0;
+		isBlack = false;
+	}
+
+	}
+	public override void update() {
+		// Hypermode effects.
+		
+		if (this is ZeroEND) {
+		 updateEnd();	
 		}
+		if (this is ZeroMID) {
+		updateMID();
+		}
+		
 
 
 		if (isAwakened) {
@@ -1011,7 +1029,7 @@ public class Zero : Character {
 			),
 			(int)MeleeIds.AwakenedAura => new GenericMeleeProj(
 				awakenedAuraWeapon, projPos, ProjIds.AwakenedAura, player,
-				2, 0, 30,
+				0, 0, 30,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -1024,10 +1042,10 @@ public class Zero : Character {
 			Dictionary<int, Func<Projectile>> retProjs = new() {
 				[(int)ProjIds.AwakenedAura] = () => {
 					playSound("awakenedaura", forcePlay: true, sendRpc: true);
-					float damage = 2;
+					float damage = 0;
 					int flinch = 0;
 					if (isGenmuZero) {
-						damage = 4;
+						damage = 0;
 						flinch = Global.defFlinch;
 					}
 					Projectile proj = new GenericMeleeProj(

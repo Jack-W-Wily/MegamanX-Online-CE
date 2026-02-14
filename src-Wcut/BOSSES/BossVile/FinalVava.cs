@@ -229,7 +229,7 @@ public class FinalVava : Vile {
 					player.vileAmmo -= 5;
 				}
 			} else {
-				vulcanWeapon.vileShoot(0, this);
+				vulcanWeapon.vileShootOld(0, this);
 			}
 		}
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)

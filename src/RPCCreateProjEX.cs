@@ -200,6 +200,7 @@ public partial class RPCCreateProj : RPC {
 
 		//Punchy Zero
 		{ (int)ProjIds.PZeroHadangeki, PZeroHadangeki.rpcInvoke },
+		{ (int)ProjIds.RedBuster, RedBuster.rpcInvoke },
 
 		// Buster Zero
 		{ (int)ProjIds.DZBuster, DZBusterProj.rpcInvoke },

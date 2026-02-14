@@ -198,11 +198,11 @@ public class DNACore : AxlWeapon {
 			axl.weapons.RemoveAt(character.player.weaponSlot);
 		}
 		character.player.preTransformedChar = character.player.character;
-		if (charNum == (int)CharIds.Dragoon) {
-        character.player.startAtransDragoonMain(this, character.player.getNextATransNetId());
-        } else {
-		character.player.startAtransMain(this, character.player.getNextATransNetId());
-		}
+		
+		//character.player.startAtransMain(this, character.player.getNextATransNetId());
+		Global.level.gameMode.setHUDErrorMessage(
+						character.player, $"Disabled feature {Global.nameCoins}"
+					);
 		character.playSound("transform", sendRpc: true);
 		character.undisguiseTime = 6;
 	}

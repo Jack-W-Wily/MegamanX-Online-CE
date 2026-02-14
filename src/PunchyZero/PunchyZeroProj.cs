@@ -79,3 +79,37 @@ public class PZeroHadangeki : Projectile {
 	}
 
 }
+
+
+
+
+public class RedBuster : Projectile {
+	public RedBuster(
+		Point pos, int xDir, int type , Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "zerox1_buster_proj", netId, player	
+	) {
+		weapon = XBuster.netWeapon;
+		damager.damage = 8;
+		damager.flinch = 50;
+		vel = new Point(350 * xDir, 0);
+		fadeOnAutoDestroy = true;
+		fadeSprite = "buster3_fade";
+		hitSound = "htsnd_common_x4";
+		reflectable = false;
+		if (type == 1){
+		vel.y = 150;
+		}
+		maxTime = 2f;
+		projId = (int)ProjIds.RedBuster;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new RedBuster(
+			args.pos, args.xDir, args.extraData[0],  args.owner, args.player, args.netId
+		);
+	}
+}

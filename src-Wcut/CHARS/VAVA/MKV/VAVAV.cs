@@ -521,7 +521,7 @@ public class VAVAV : Vile {
 
 		}
 		if (WeaponRightHeld && VileMode == 0) {
-			vulcanWeapon.vileShoot(0, this);
+			vulcanWeapon.vileShootOld(0, this);
 		}
 
 
@@ -582,7 +582,7 @@ public class VAVAV : Vile {
 
 			
 			if (HeldDown && AirSplashHitCD == 0 && VileMode == 1) {
-				flamethrowerWeapon.vileShoot(WeaponIds.VileFlamethrower, this);
+				flamethrowerWeapon.vileShootOld(WeaponIds.VileFlamethrower, this);
 			}
 			return true;
 		}
@@ -613,11 +613,11 @@ public class VAVAV : Vile {
 		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
 		&& VileMode == 1 && (grounded || charState is AirDash)) {
 
-			cutterWeapon.vileShoot(WeaponIds.VileCutter, this);
+			cutterWeapon.vileShootOld(WeaponIds.VileCutter, this);
 		}
 		if (cutterWeapon.shootCooldown < cutterWeapon.fireRate * 0.75f
 		&& VileMode == 0 && (grounded || charState is AirDash)) {
-			missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+			missileWeapon.vileShootOld(WeaponIds.ElectricShock, this);
 		}
 
 		return false;
@@ -658,7 +658,7 @@ public class VAVAV : Vile {
 				}
 				if (stunShotPressed && !HeldDown) {
 					//	if (tryUseVileAmmo(missileWeapon.vileAmmo)) {
-					missileWeapon.vileShoot(WeaponIds.ElectricShock, this);
+					missileWeapon.vileShootOld(WeaponIds.ElectricShock, this);
 					//		}
 				}
 				if (goliathShotPressed) {
@@ -712,7 +712,7 @@ public class VAVAV : Vile {
 		}
 
 		if (chargeLevel == 3) {
-			laserWeapon.vileShoot(WeaponIds.VileLaser, this);
+			laserWeapon.vileShootOld(WeaponIds.VileLaser, this);
 		}
 		if (chargeLevel == 4 ) {
 			if (player.input.isHeld(Control.Down, player)) {

@@ -1402,16 +1402,11 @@ public class MegamanX : Character {
             }
 		}
 		if (this is XAnother) {	
-           	if (index == 0 && !hasUltimateArmor) {
+           	if (index == 0) {
 		
-            index = 40;   
-            
-		}
-		if (index == 0 && hasUltimateArmor) {
-		
-            index = 40;   
-            
-		}    
+           index = 40;   
+           } 
+		 
 		}
 
 		palette = player.xPaletteShader;

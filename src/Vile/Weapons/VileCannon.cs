@@ -49,7 +49,7 @@ public class FrontRunner : VileCannon {
 		vileWeight = 2;
 		effect = "None.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShootOld(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
@@ -93,7 +93,7 @@ public class FatBoy : VileCannon {
 		vileWeight = 3;
 		effect = "None.";
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShootOld(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
@@ -143,7 +143,7 @@ public class LongShotGizmo : VileCannon {
 		// Aim to were you are facing in if wall or stair.
 		vile.xDir = vile.getShootXDir();
 		// Always drop off no matter what.
-		vile.changeState(new VileGizmoState(this), true);
+		//vile.changeState(new VileGizmoState(this), true);
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -186,7 +186,7 @@ public class TridentLine : VileCannon {
 		vileWeight = 0; // TODO: definir
 		effect = ""; // TODO: definir
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShootOld(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
@@ -227,7 +227,7 @@ public class BigBoy : VileCannon {
 		vileWeight = 0; // TODO
 		effect = ""; // TODO
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShootOld(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
@@ -268,7 +268,7 @@ public class FireMourain : VileCannon {
 		vileWeight = 0; // TODO
 		effect = ""; // TODO
 	}
-	public override void vileShoot(WeaponIds weaponInput, Vile vile) {
+	public override void vileShootOld(WeaponIds weaponInput, Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
@@ -322,13 +322,13 @@ public class CannonAttack : VileState {
 			shot = true;
 			weapon.shoot(vile, []);
 		}
-		shootTime += Global.speedMul;
+		//shootTime += Global.speedMul;
 		if (weapon is LongShotGizmo) {
-			if (shootTime == 6) {
-				shootTime = 0;
+		//	if (shootTime == 6) {
+		//		shootTime = 0;
 				loopNum++;
 				weapon.shoot(vile, []);
-			}
+		//	}
 			if (loopNum >= 4) {
 				character.changeToIdleOrFall();
 			}

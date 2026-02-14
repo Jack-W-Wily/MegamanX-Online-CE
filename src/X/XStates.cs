@@ -308,7 +308,7 @@ public class GigaAirDash : CharState {
 	}
 }
 
-public class UpDash : XState {
+public class UpDash : CharState {
 	public float dashTime = 0;
 	public string initialDashButton;
 

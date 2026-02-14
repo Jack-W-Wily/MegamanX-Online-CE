@@ -535,8 +535,10 @@ public class ClaudioGroundPunchState : CharState {
 			float x = character.pos.x;
 			float y = character.pos.y;
 			if (character.bonusHealth == 0) {
+				if (character is BossClaudio){
 				new TriadThunderProjCharged(new Point(x, y), -1, 0, character, player, player.getNextActorNetId(), rpc: true);
 				new TriadThunderProjCharged(new Point(x, y), 1, 0, character, player, player.getNextActorNetId(), rpc: true);
+				}
 				new TriadThunderQuake(new Point(x, y), 1, character, player, player.getNextActorNetId(), rpc: true);
 			}
 			character.shakeCamera(sendRpc: true);

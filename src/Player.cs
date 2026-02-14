@@ -1436,44 +1436,29 @@ public partial class Player {
 				);
 			}
 		} else if (charNum == (int)CharIds.RockmanX) {
-			if (input.isR2Held(this) && !X3ZeroOncePermatch && canX3Zero) {
-				charNum = (int)CharIds.BusterZero;
-				newChar = new BusterZero(
-				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer,
-				isWarpIn: isWarpIn, heartTanks: htCount
-			);
-				X3ZeroOncePermatch = true;
-			} else if (input.isHeld(Control.Taunt, this)) {
-				newChar = new XAnother(
-				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer,
-				isWarpIn: isWarpIn, heartTanks: htCount
-				);
-			}
 			
-			
-			else {
 				newChar = new RockmanX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
-			}
+			
 		} else if (charNum == (int)CharIds.ZeroMID) {
-			if (input.isR2Held(this)) {
-				newChar = new ZeroEND(
-					this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer,
-				heartTanks: htCount
-			);
-			} else {
+		
 				newChar = new ZeroMID(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				heartTanks: htCount
 			);
-			}
+			
+		} else if (charNum == (int)CharIds.ZeroEND) {
+		
+				newChar = new ZeroEND(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				heartTanks: htCount
+			);
+			
 		} else if (charNum == (int)CharIds.Zain) {
 
 			newChar = new Zain(
@@ -3001,7 +2986,7 @@ public partial class Player {
 		if (character is not RockmanX ) {
 			return false;
 		}
-		return true;
+		return false;
 	}
 
 
@@ -3305,6 +3290,7 @@ public partial class Player {
 			character?.visible = true;
 			character?.changePos(newPos);
 		}
+		character?.bonusHealth = 0;
 		character?.applyDamage(Damager.forceKillDamage, this, character, null, null);
 		
 		foreach (Maverick maverick in mavericks) {

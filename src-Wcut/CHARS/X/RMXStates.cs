@@ -156,6 +156,9 @@ public class RMXDoubleKickShoot : CharState {
 		if (!character.grounded) {
 			character.stopMoving();
 			pushBackSpeed = 100;
+		} else {
+			character.changeSpriteFromName("shoot_charged", true);
+			sprite = "shoot_charged";
 		}
 	}
 
