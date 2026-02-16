@@ -309,7 +309,7 @@ public class Zero : Character {
 	public override bool canCharge() {
 		return (!isInvulnerable
 			(charState.attackCtrl || getChargeLevel() > 0) &&
-			(player.currency > 0 || freeBusterShots > 0) &&
+			(player.superAmmo > 0 || freeBusterShots > 0) &&
 			donutsPending == 0
 		);
 	}

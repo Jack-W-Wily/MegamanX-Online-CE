@@ -1895,6 +1895,23 @@ public partial class Level {
 					break;
 				}
 			}
+
+			foreach (var cch in darkHoldDProjs) {
+				var chr = go as Character;
+				//if (chr != null && chr.player.alliance == cch.owner.alliance) continue;
+				if (chr != null ) continue;
+
+				var proj = go as Projectile;
+				
+				if (cch.pos.distanceTo(actor.getCenterPos()) < DarkHoldDProj.radius) {
+					
+						slowAmount = 0.01f;
+					
+					
+					isSlown = true;
+				return true;
+				}
+			}
 		}
 
 

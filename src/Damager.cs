@@ -785,10 +785,23 @@ public class Damager {
 				flinch = 0;
 			}
 
+			if (character.isAttacking() && 
+			(projId == (int)ProjIds.LightningWeb
+			|| projId == (int)ProjIds.LightningWebCharged
+			|| projId == (int)ProjIds.LightningWebChargedProj
+			)) {
+				damage = 0;
+				flinch = 0;
+				character?.paralize();
+			}
+
 			// Counter system (WCUT)
 			if (character.isAttacking() &&
 				!character.isFlinchImmune() &&
 				flinch >= 0 &&
+				projId != (int)ProjIds.LightningWeb &&
+				projId != (int)ProjIds.LightningWebCharged &&
+				projId != (int)ProjIds.LightningWebChargedProj &&
 				projId != (int)ProjIds.MaverickContactDamage &&
 				projId != (int)ProjIds.HexaInvolute &&
 				projId != (int)ProjIds.AwakenedAura &&
@@ -869,10 +882,8 @@ public class Damager {
 
 				if (owner?.character is PunchyZero zx1 && zx1 != null) {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
-					
-					zx1.changeState(new PZeroYoudantotsu());
-					
-					character?.changeState(new RMXGrabbed(zx1));
+					owner.character.changeState(new ZeroGrabEX());
+					character.changeState(new RMXGrabbed(zx1));
 				}
 				}
 

@@ -633,7 +633,7 @@ public class PunchyZero : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"zerox1_grab_start" => MeleeIds.Grab,
-			"zerox1_burnknuckle" or "zerox1_groundpound" => MeleeIds.BurnKnuckle,
+			"zerox1_burnknuckle" or "zerox1_groundpound" or "zerox1_grab_ex"=> MeleeIds.BurnKnuckle,
 			"zerox1_punch" => MeleeIds.Punch,
 			"zerox1_punch2" or "zerox1_run_attack" => MeleeIds.Punch2,
 			"zerox1_spinkick" => MeleeIds.Spin,
@@ -651,11 +651,11 @@ public class PunchyZero : Character {
 	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
 			(int)MeleeIds.Block => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
-				0, 0, 1,
-				addToLevel: addToLevel, isDeflectShield : true
-
-			),
+				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
+				addToLevel: addToLevel
+			) {
+				highPiority = true
+			},
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.GenericWCUTGrabProjID, player, 2, 0, 10,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
@@ -777,7 +777,7 @@ public class PunchyZero : Character {
 		Parry,
 		ParryAttack,
 		SaberSwing,
-
+		GrabEX,
 		BurnKnuckle,
 		AwakenedAura
 	}

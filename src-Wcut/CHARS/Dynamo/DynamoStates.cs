@@ -1280,109 +1280,92 @@ public class DynamoBeam : Projectile {
 
 
 public class DarkHoldDProj : Projectile {
-	public float radius = 10;
-	public float attackRadius => (radius + 15);
+	
 	public ShaderWrapper? screenShader;
 	float timeInFrames;
+
+	public const int radius = 220;
+	//public float drawRadius = 120;
+	//public float drawAlpha = 64;
+
+	public float soundTime;
+
+	public Actor? rootProj;
 
 	public DarkHoldDProj(
 		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 0, player, "empty", 0, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 3f;
+		maxTime = 0.1f;
 		vel = new Point();
 		projId = (int)ProjIds.DarkHoldD;
 		setIndestructableProperties();
 		Global.level.darkHoldDProjs.Add(this);
 		if (Options.main.enablePostProcessing) {
-			screenShader = player.timeSlowShader;
-			updateShader();
+			screenShader = owner.nightmareZeroShader;
 		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
 	}
 
+	
 	public override void update() {
 		base.update();
-		updateShader();
-		timeInFrames++;
+		var screenCoords = new Point(pos.x - Global.level.camX, pos.y - Global.level.camY);
+		var normalizedCoords = new Point(screenCoords.x / Global.viewScreenW, 1 - screenCoords.y / Global.viewScreenH);
 
-		if (timeInFrames < 150) {
-			foreach (var gameObject in Global.level.getGameObjectArray()) {
-				if (gameObject != this && gameObject is Actor actor && actor.locallyControlled && inRange(actor)) {
-					// For characters.
-				
-					// For projectiles
-					if (actor is Projectile && actor.timeStopTime <= 0) {
-						if (actor is BCrabSummonBubbleProj or BCrabSummonCrabProj &&
-							(actor as IDamagable)?.canBeDamaged(damager.owner.alliance, damager.owner.id, null) != true
-						) {
-							continue;
-						}
-						actor.timeStopTime = 160 - timeInFrames;
-					}
-				}
-			}
+		//if (isSnails) {
+		Helpers.decrementFrames(ref soundTime);
+		if (soundTime == 0) {
+			playSound("csnailSlowLoop");
+			soundTime = 65;
 		}
-		if (timeInFrames <= 30) {
-			radius += (1f/60f) * 400;
-		}
-		if (timeInFrames >= 150 && radius > 0) {
-			radius -= (1f/60f) * 800;
-			if (radius <= 0) {
-				radius = 0;
-			}
-		}
-	}
+		//} Why only snail gets the cool sound???
 
-	public bool inRange(Actor actor) {
-		return (actor.getCenterPos().distanceTo(pos) <= attackRadius);
-	}
-
-	public void updateShader() {
 		if (screenShader != null) {
-			var screenCoords = new Point(
-				pos.x - Global.level.camX,
-				pos.y - Global.level.camY
-			);
-			var normalizedCoords = new Point(
-				screenCoords.x / Global.viewScreenW,
-				1 - screenCoords.y / Global.viewScreenH
-			);
-			float ratio = Global.screenW / (float)Global.screenH;
-			float normalizedRadius = (radius / Global.screenH);
-
-			screenShader.SetUniform("ratio", ratio);
 			screenShader.SetUniform("x", normalizedCoords.x);
 			screenShader.SetUniform("y", normalizedCoords.y);
-			if (Global.viewSize == 2) {
-				screenShader.SetUniform("r", normalizedRadius * 0.5f);
-			} else {
-				screenShader.SetUniform("r", normalizedRadius);
-			}
+			screenShader.SetUniform("t", Global.time);
+		//	screenShader.SetUniform("r", 0.5f * (drawRadius / (120f / Global.viewSize)));
 		}
-	}
 
-	public override void render(float x, float y) {
-		base.render(x, y);
 		if (screenShader == null) {
-			var col = new Color(255, 251, 239, (byte)(164 - 164 * (time / maxTime)));
-			var col2 = new Color(255, 219, 74, (byte)(224 - 224 * (time / maxTime)));
-			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, true, col, 1, zIndex + 1, true);
-			DrawWrappers.DrawCircle(pos.x + x, pos.y + y, radius, false, col2, 3, zIndex + 1, true, col2);
+		//	drawRadius = 120 + 0.5f * MathF.Sin(Global.time * 10);
+		//	drawAlpha = 64f + 32f * MathF.Sin(Global.time * 10);
 		}
-
+		time += Global.spf;
+		if (time > maxTime) {
+			destroySelf(disableRpc: true);
+		}
+		if (ownedByLocalPlayer && rootProj != null) {
+			changePos(rootProj.pos);
+		}
 	}
 
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.darkHoldDProjs.Remove(this);
 	}
+
+	public override void render(float x, float y) {
+		base.render(x, y);
+
+		Color fillColor = new Color(99, 82, 247, 32);
+		Color outlineColor = new Color(66, 49, 247, 32);
+		Color lineColor = new Color(208, 200, 240, 128);
+		if (owner.alliance != Global.level.mainPlayer.alliance) {
+			Level level = Global.level;
+			if (level != null && level.gameMode?.isTeamMode == true) {
+				fillColor = new Color(247, 82, 99, 32);
+				outlineColor = new Color(247, 49, 66, 32);
+			}
+		}
+		
+		
+	}
 }
-
-
 
 
 
