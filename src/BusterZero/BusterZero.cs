@@ -153,6 +153,16 @@ public class BusterZero : Character {
 		}
 
 
+
+		if (grounded && player.superAmmo >= player.superMaxAmmo &&
+		downPressedTimes >= 15 && player.input.isAHeld(player)) {
+			changeState(new ZeroNuclear(), true);
+
+			downPressedTimes = 0;
+			player.superAmmo -= 32;
+			return true;
+		}
+
 		if (grounded && player.superAmmo >= player.superMaxAmmo &&
 		downPressedTimes >= 2 && player.input.isR2Held(player)) {
 			changeState(new GenmureiStateZB(), true);
@@ -303,7 +313,7 @@ public class BusterZero : Character {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zarzo_projswing" or "zarzo_projswing_air" or "zero_wall_slide_attack" => MeleeIds.SaberSwing,
+			"zarzo_projswing" or "zarzo_projswing_air" or "zero_wall_slide_attack" or "zarzo_nuclear" => MeleeIds.SaberSwing,
 			"zarzo_grab_start" => MeleeIds.Grab,
 			"zarzo_grab_ex" => MeleeIds.GrabEX,
 			"zarzo_grab_ex_end" => MeleeIds.GrabEnd,

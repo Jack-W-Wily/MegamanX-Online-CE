@@ -746,6 +746,7 @@ public class GameMode {
 			}
 			#endregion
 			#region Vile
+			/*
 			if (drawPlayer.character is Vile vava && 
 			vava is not VAVA1 and not 
 			VAVA2 and not 
@@ -757,6 +758,7 @@ public class GameMode {
 			) {
 				int xStart = (int)Global.halfScreenW / 17;
 				int yStart = 160;
+				/*
 				//This looks so bad LOL
 				if (vava.cannonWeapon.shootCooldown > 0) {
 					float Ccooldown = 1 - Helpers.progress(vava.cannonWeapon.shootCooldown, vava.cannonWeapon.fireRate);

@@ -558,7 +558,7 @@ public class VAVAV : Vile {
 				return true;
 			}
 			//if (rocketPunchWeapon.type > -1) {
-			//	rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+			//	rocketPunchWeapon?.vileShoot(WeaponIds.RocketPunch, this);
 			//}
 			return true;
 		}

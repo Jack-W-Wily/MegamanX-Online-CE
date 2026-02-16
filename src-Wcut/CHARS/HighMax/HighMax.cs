@@ -46,9 +46,7 @@ public class HighMax : Character {
 			return true;
 		}
 
-		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
-			changeState(new ZeroGrabStart(), forceChange: true);
-		}
+		
 
 
 
@@ -66,7 +64,12 @@ public class HighMax : Character {
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
 		bool dashPressed = player.input.isPressed(Control.Dash, player);
-		if (shootPressed && !player.input.isHeld(Control.Down, player)
+
+
+		if (player.input.isL2Held(player) && player.input.isAPressed(player)) {
+			changeState(new ZeroGrabStart(), forceChange: true);
+		}
+		if (!player.input.isL2Held(player) &&  shootPressed && !player.input.isHeld(Control.Down, player)
 		 && !player.input.isHeld(Control.Up, player)) {
 
 			changeState(new HighMaxIdlePunch1(), true);
@@ -103,7 +106,7 @@ public class HighMax : Character {
 				playSound("warpIn", sendRpc: true);
 					new HighmaxWallStart(new VileMK2Grab(), pos, xDir, player, player.getNextActorNetId(), true);
 					new HighmaxWallStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
-               	wallCooldown = 4;
+               	wallCooldown = 6;
 				}
 				 } else {
 				if (ZetsubouCooldown == 0) {
@@ -169,6 +172,8 @@ public class HighMax : Character {
 		if (charState is ZeroGrabEX) {
             charState.invincible = true;
         }
+
+
 		//KillingSpreeThemes
 		//	if (KillingSpree == 3){
 		//			if (musicSource == null) {
@@ -184,9 +189,9 @@ public class HighMax : Character {
 			return;
 		}
 		// Blocking
-		if (player.input.isL2Held(player) &&
+		if (player.input.isL2Held(player) && !isInDamageSprite() &&
 			!isAttacking() && grounded && !player.input.isHeld(Control.Shoot, player) &&
-			charState is not BlockWCUT
+			charState is not BlockWCUT and not ZeroGrabStart and not ZeroGrabEX
 		) {
 			changeState(new BlockWCUT(), true);
 
@@ -378,7 +383,7 @@ public class HighMax : Character {
 		}
 		if (sprite.name.EndsWith("dash_punch_charge")) {
 			return new GenericMeleeProj(new RCXPunch(), 
-			centerPoint, ProjIds.ForceGrabState, player, 1f, 0, 20f, null, isShield: true,
+			centerPoint, ProjIds.ForceGrabState, player, 0f, 0, 20f, null, isShield: true,
 			 isDeflectShield: true, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_grab2"
 			 );
 		}

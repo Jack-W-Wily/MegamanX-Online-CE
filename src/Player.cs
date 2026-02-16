@@ -1386,6 +1386,16 @@ public partial class Player {
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 		}
+		 else if (spawnCharNum == (int)CharIds.EnemySpawnerChar) {
+			
+			loadout.sigmaLoadout.commandMode = 0;
+
+			newChar = new EnemySpawnerChar(
+					this, pos.x, pos.y, xDir,
+					false, charNetId, ownedByLocalPlayer,
+					isWarpIn: isWarpIn, heartTanks: htCount
+				);
+			}
 		  // Kaiser Sigma (Hypermode)
 		  else if (spawnCharNum == (int)CharIds.KaiserSigma) {
 			newChar = new KaiserSigma(
@@ -1443,7 +1453,15 @@ public partial class Player {
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 			
-		} else if (charNum == (int)CharIds.ZeroMID) {
+		} else if (charNum == (int)CharIds.XAnother) {
+			
+				newChar = new XAnother(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount
+			);
+			
+		}else if (charNum == (int)CharIds.ZeroMID) {
 		
 				newChar = new ZeroMID(
 				this, pos.x, pos.y, xDir,
@@ -2127,7 +2145,18 @@ public partial class Player {
 				true, dnaNetId, true, isWarpIn: false,
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
-		} else if (charNum == (int)CharIds.Kurumitos) {
+		} else if (spawnCharNum == (int)CharIds.EnemySpawnerChar) {
+			
+				retChar = new EnemySpawnerChar(
+					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
+					true, dnaNetId, true, isWarpIn: false,
+					loadout: atLoadout.sigmaLoadout.clone(),
+					heartTanks: oldChar.heartTanks, isATrans: true
+				);
+		}
+		
+		
+		 else if (charNum == (int)CharIds.Kurumitos) {
 			retChar = new Kurumitos(
 					this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, true, isWarpIn: false,
@@ -3507,6 +3536,7 @@ public partial class Player {
 	}
 
 	public void addKill() {
+		if (character is not EnemySpawnerChar){
 		if (Global.serverClient == null) {
 			kills++;
 		} else if (Global.canControlKillscore) {
@@ -3517,7 +3547,11 @@ public partial class Player {
 			charNumToKills[realCharNum]++;
 			RPC.updatePlayer.sendRpc(id, kills, deaths);
 		}
+
+		}
 	}
+
+
 
 
 	public void UnlockVAVA() {

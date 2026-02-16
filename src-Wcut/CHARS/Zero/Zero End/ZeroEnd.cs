@@ -343,7 +343,7 @@ public class ZeroEND : Zero {
 		
 	}
 
-	public virtual void shootb(int chargeLevel) {
+	public override void shootb(int chargeLevel) {
 		
 			
 			string shootSprite = getSprite(charState.shootSpriteEx);
@@ -409,6 +409,7 @@ public class ZeroEND : Zero {
 			}
 			if (chargeLevel >= 1) {
 				stopCharge();
+				gigaAttack.ammo -=6;
 			}
 		
 	}
@@ -600,7 +601,10 @@ public class ZeroEND : Zero {
 			if (isAwakened) {
 				changeState(new GenmureiState(), true);
 			} else if (isBlack) {
-				changeState(new ZeroNuclear(), true);
+				playSound("dynamoting", forcePlay: false, sendRpc: true);
+			changeState(new Idle());
+			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
+
 			}
 			else {
 				changeState(new DarkHoldShootState(new DarkHoldWeapon()), true);

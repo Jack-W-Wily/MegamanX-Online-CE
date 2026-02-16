@@ -16,7 +16,6 @@ public class ZeroGrabStart : CharState {
 
 	public ZeroGrabStart(string transitionSprite = "")
 		: base("grab_start", "", "", transitionSprite) {
-		airMove = true;
 	}
 
 	public override void update() {

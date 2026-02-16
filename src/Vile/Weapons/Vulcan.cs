@@ -351,10 +351,10 @@ public class Vulcan : Weapon {
 	public void shootVulcan(Vile vile) {
 		Player player = vile.player;
 		if (vile.vulcanWeapon.type == (int)VulcanType.NoneMissile) {
-			vile.missileWeapon.vileShoot(WeaponIds.ElectricShock, vile);		
+			vile.missileWeapon?.vileShoot(WeaponIds.ElectricShock, vile);		
 			vile.setVileShootTime(this);
 		} else if (vile.vulcanWeapon.type == (int)VulcanType.NoneCutter) {
-			vile.cutterWeapon.vileShoot(WeaponIds.VileCutter, vile);		
+			vile.cutterWeapon?.vileShoot(WeaponIds.VileCutter, vile);		
 			vile.setVileShootTime(this);
 		} else {
 			if (shootCooldown <= 0) {

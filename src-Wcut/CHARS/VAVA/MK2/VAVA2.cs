@@ -401,12 +401,12 @@ public class VAVA2 : Vile {
 
 
 
-			if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
-				  player.input.isR2Pressed(player) && player.superAmmo >= player.superMaxAmmo
-			) {
-			changeState(new Vilemk2Mijo(), true);
-			player.superAmmo = 0;
-			}
+			//if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
+			//	  player.input.isR2Pressed(player) && player.superAmmo >= player.superMaxAmmo
+			//) {
+			//changeState(new Vilemk2Mijo(), true);
+			//player.superAmmo = 0;
+			//}
 
 
 		if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
@@ -621,7 +621,7 @@ public float CrimsonphantomCD;
 				return true;
 			}
 			//if (rocketPunchWeapon.type > -1) {
-			//	rocketPunchWeapon.vileShoot(WeaponIds.RocketPunch, this);
+			//	rocketPunchWeapon?.vileShoot(WeaponIds.RocketPunch, this);
 			//}
 			return true;
 		}

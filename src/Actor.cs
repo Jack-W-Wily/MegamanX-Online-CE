@@ -1510,6 +1510,9 @@ public partial class Actor : GameObject {
 		if (soundKey == "") {
 			return null;
 		}
+		if (this is Character chr && chr is EnemySpawnerChar) {
+			return null;
+		}
 		soundKey = soundKey.ToLowerInvariant();
 		if (!Global.soundBuffers.ContainsKey(soundKey)) {
 			throw new Exception($"Attempted playing missing sound with name \"{soundKey}\"");

@@ -1250,7 +1250,13 @@ public partial class Character : Actor, IDamagable {
 		if (player.superAmmo > player.superMaxAmmo){
 			player.superAmmo = player.superMaxAmmo;
 		}
-
+		// Flag shenanigans
+		if (flag != null){
+			if (vel.x > 90) {
+				vel.x = 90;
+				useGravity = true;
+			}
+		}
 
 		// Wcut Burst System
 

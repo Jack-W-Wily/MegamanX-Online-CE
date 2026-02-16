@@ -974,7 +974,7 @@ public class Maverick : Actor, IDamagable {
 				int flinch = 20;
 				Projectile proj = new GenericMeleeProj(
 					weapon, centerPoint, ProjIds.MaverickContactDamage,
-					player, damage, flinch,
+					player, damage, flinch, 120,
 					addToLevel: true
 				);
 				proj.globalCollider = globalCollider.clone();

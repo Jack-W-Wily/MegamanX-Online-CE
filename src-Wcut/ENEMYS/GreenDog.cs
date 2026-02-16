@@ -36,19 +36,24 @@ public class GreenDog : Maverick {
 
 
 
-		public override void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
+	
+	
+	public override void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
-			killer.addKill();
+			if (Helpers.randomRange(0,5) == 0) {
+				new SmallHealthPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			} else if (Helpers.randomRange(0,5) == 1) {
+				new LargeHealthPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			} else if (Helpers.randomRange(0,5) == 2) {
+				new SmallAmmoPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			}  else if (Helpers.randomRange(0,5) == 3) {
+				new LargeAmmoPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			}    else if (Helpers.randomRange(0,5) == 4) {
+				
+			}  	else {
 			killer.awardCurrency();
+			}
 		}
-
-		if (assister != null && assister != player) {
-			assister.addAssist();
-			assister.addKill();
-			assister.awardCurrency();
-			awardXWeapon(killer);
-		}
-
 	}
 
 	
@@ -109,9 +114,9 @@ public class GreenDog : Maverick {
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		if (enemyDist > 50) {
-			return [new VelGPounceStartState()];
-		}
+		//if (enemyDist > 50) {
+		//	return [new VelGPounceStartState()];
+		//}
 		return [
 			getShootState2(),
 			getShootState(),

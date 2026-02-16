@@ -37,19 +37,23 @@ public class MissileElecBlack : Maverick {
 	public bool healthvalueOnce = false;
 
 
+	
 	public override void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
-			killer.addKill();
+			if (Helpers.randomRange(0,5) == 0) {
+				new SmallHealthPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			} else if (Helpers.randomRange(0,5) == 1) {
+				new LargeHealthPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			} else if (Helpers.randomRange(0,5) == 2) {
+				new SmallAmmoPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			}  else if (Helpers.randomRange(0,5) == 3) {
+				new LargeAmmoPickup(Global.level.mainPlayer, pos, Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+			}    else if (Helpers.randomRange(0,5) == 4) {
+				
+			}  	else {
 			killer.awardCurrency();
+			}
 		}
-
-		if (assister != null && assister != player) {
-			assister.addAssist();
-			assister.addKill();
-			assister.awardCurrency();
-			awardXWeapon(killer);
-		}
-
 	}
 	
 

@@ -780,10 +780,16 @@ public class Damager {
 			bool countered = false;
 
 
+			if (character.isAttacking() && projId == (int)ProjIds.MaverickContactDamage) {
+				damage = 0;
+				flinch = 0;
+			}
+
 			// Counter system (WCUT)
 			if (character.isAttacking() &&
 				!character.isFlinchImmune() &&
 				flinch >= 0 &&
+				projId != (int)ProjIds.MaverickContactDamage &&
 				projId != (int)ProjIds.HexaInvolute &&
 				projId != (int)ProjIds.AwakenedAura &&
 				projId != (int)ProjIds.Burn &&
@@ -863,9 +869,9 @@ public class Damager {
 
 				if (owner?.character is PunchyZero zx1 && zx1 != null) {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
-					Global.level.delayedActions.Add(new DelayedAction(() => {
-					zx1.changeState(new ClaudioGroundPunchState());
-					},0.15f));
+					
+					zx1.changeState(new PZeroYoudantotsu());
+					
 					character?.changeState(new RMXGrabbed(zx1));
 				}
 				}

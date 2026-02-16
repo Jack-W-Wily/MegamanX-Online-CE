@@ -799,6 +799,7 @@ public class PunchyZero : Character {
 
 	public override void addAmmo(float amount) {
 		gigaAttack.addAmmoHeal(amount);
+		player.superAmmo += (amount);
 	}
 
 	public override void addPercentAmmo(float amount) {

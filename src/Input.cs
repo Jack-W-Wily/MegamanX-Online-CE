@@ -739,14 +739,14 @@ public class Input {
 	}
 
 	public bool isR2Pressed(Player player) {
-		if (Options.main.DisableR2Shortcut){
+		if (Options.main.DisableR2Shortcut || player.isAI){
 		return isPressed(Control.R2, player);
 		} 
 		return (isPressed(Control.Shoot, player) && isPressed(Control.Special1, player)) || isPressed(Control.R2, player);
 	}
 
 	public bool isR2Held(Player player) {
-		if (Options.main.DisableR2Shortcut){
+		if (Options.main.DisableR2Shortcut || player.isAI){
 		return isHeld(Control.R2, player);
 		} 
 		return (isHeld(Control.Shoot, player) && isHeld(Control.Special1, player)) || isHeld(Control.R2, player);

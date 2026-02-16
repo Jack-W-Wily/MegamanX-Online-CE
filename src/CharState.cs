@@ -573,6 +573,8 @@ public class WarpIdle : CharState {
 			);
 		} else {
 			fullHP = true;
+			normalCtrl = true;
+			attackCtrl = true;
 		}
 		if (Global.level.mainPlayer.character == character) {
 			character.playSound("heal", forcePlay: true);

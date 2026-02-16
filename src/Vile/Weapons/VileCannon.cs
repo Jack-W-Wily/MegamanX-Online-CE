@@ -872,7 +872,7 @@ public class CannonAttack : CharState {
 
 		if (vile.isShootingGizmo) {
 			if (vile.cannonWeapon.shootCooldown == 0) {
-				vile.cannonWeapon.vileShoot(0, vile);
+				vile.cannonWeapon?.vileShoot(0, vile);
 			}
 			if (vile.energy.ammo <= 0) {
 				vile.isShootingGizmo = false;

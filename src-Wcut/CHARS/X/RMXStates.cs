@@ -157,8 +157,8 @@ public class RMXDoubleKickShoot : CharState {
 			character.stopMoving();
 			pushBackSpeed = 100;
 		} else {
-			character.changeSpriteFromName("shoot_charged", true);
-			sprite = "shoot_charged";
+			character.changeSpriteFromName("double_kick_shot_grounded", true);
+			sprite = "double_kick_shot_grounded";
 		}
 	}
 
@@ -167,8 +167,8 @@ public class RMXDoubleKickShoot : CharState {
 		character.playSound("buster3", sendRpc: true);
 		character.frameIndex = 3;
 		character.frameTime = 0;
-		var poi = character.sprite.getCurrentFrame().POIs[0];
-		poi.x *= character.xDir;
+	//	var poi = character.sprite.getCurrentFrame().POIs[0];
+	//	poi.x *= character.xDir;
 		proj = new Buster3GigaProjMelee(character.getShootPos(), character.xDir, character, player, player.getNextActorNetId(), true);
 	}
 
@@ -234,7 +234,7 @@ public class RMXPunch : CharState {
 		base.onEnter(oldState);
 		if (!character.grounded) {
 			character.stopMoving();
-			pushBackSpeed = 100;
+			pushBackSpeed = 50;
 		}
 	}
 
@@ -299,7 +299,7 @@ public class RMXPunch2 : CharState {
 		base.onEnter(oldState);
 		if (!character.grounded) {
 			character.stopMoving();
-			pushBackSpeed = 100;
+			pushBackSpeed = 50;
 		}
 	}
 

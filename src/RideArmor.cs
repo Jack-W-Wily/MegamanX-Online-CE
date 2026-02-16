@@ -283,7 +283,7 @@ public class RideArmor : Actor, IDamagable {
 				vile.increaseCharge();
 			}
 			if (vile.getChargeLevel() >= 3 && !vile.chargeButtonHeld()) {
-				vile.weaponSystem.chargeWeapon.vileShoot(vile);
+				vile.weaponSystem.chargeWeapon?.vileShoot(vile);
 			}
 		}
 	}

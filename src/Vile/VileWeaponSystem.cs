@@ -163,7 +163,7 @@ public class VileWeaponSystem : Weapon {
 	public void extraWeaponShoot(Vile vile) {
 		foreach (Weapon weapon in extraWeapons) {
 			if (weapon.customShootCondition(vile)) {
-				weapon.vileShoot(vile);
+				weapon?.vileShoot(vile);
 			}
 		}
 	}
@@ -184,7 +184,7 @@ public class VileWeaponSystem : Weapon {
 		}
 		int targetWeapon = Helpers.randomRange(0, offCooldownWeapons.Length - 1);
 		Weapon target = offCooldownWeapons[targetWeapon];
-		target.vileShoot(vile);
+		target?.vileShoot(vile);
 
 		return true;
 	}
@@ -236,7 +236,7 @@ public class VileWeaponSystemSub {
 			targetWeapon.canShoot(0, vile.player) &&
 			checkShootAble(vile, targetWeapon, button)
 		) {
-			targetWeapon.vileShoot(vile);
+			targetWeapon?.vileShoot(vile);
 			return true;
 		}
 		return false;

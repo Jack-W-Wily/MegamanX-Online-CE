@@ -502,13 +502,7 @@ public class DesmumeSpam2 : CharState {
 		if (stateTime > 7 || projCount > 20) {
             character.changeToIdleOrFall();
         }
-		if (character.isAnimOver() || stateTime > 10) {
-			if (character.grounded) {
-				character.changeState(new Idle());
-			} else {
-				character.changeState(new HighMaxHover());
-			}
-		}
+		
 	}
 
 	public override void onEnter(CharState oldState) {

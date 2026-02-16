@@ -103,7 +103,7 @@ public class RedBuster : Projectile {
 		maxTime = 2f;
 		projId = (int)ProjIds.RedBuster;
 		if (rpc) {
-			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)type);
 		}
 	}
 

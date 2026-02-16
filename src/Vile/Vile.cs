@@ -85,7 +85,7 @@ public class Vile : Character {
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
-		mk2VileOverride = true;
+		mk2VileOverride = false;
 		charId = CharIds.Vile;
 		if (isWarpIn) {
 			if (mk5VileOverride) {
@@ -260,11 +260,11 @@ public class Vile : Character {
 				}
 			}
 			if (shootHeld && cannonWeapon.type > -1) {
-				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
-					cannonWeapon.vileShootOld(0, this);
+				//if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
+					cannonWeapon?.vileShoot(this);
 			}
 			if (WeaponRightHeld && vulcanWeapon.type > -3) {
-				vulcanWeapon.vileShootOld(0, this);
+				vulcanWeapon?.vileShoot(this);
 			}
 			}
 		return base.attackCtrl();
@@ -280,14 +280,14 @@ public class Vile : Character {
 		bool leftorRightHeld = player.input.getXDir(player) != 0;
 		bool downHeld = player.input.getYDir(player) == 1;
 		if (downHeld) {
-			downSpWeapon.vileShootOld(WeaponIds.Napalm, this);
+			downSpWeapon?.vileShoot(this);
 			return true;
 		}
 		if (leftorRightHeld) {
-			rocketPunchWeapon.vileShootOld(0, this);
+			rocketPunchWeapon?.vileShoot(this);
 			return true;
 		}
-		missileWeapon.vileShootOld(WeaponIds.ElectricShock, this);
+		missileWeapon?.vileShoot(this);
 		return true;
 	}
 
@@ -300,10 +300,10 @@ public class Vile : Character {
 		}
 		bool heldDown = player.input.getYDir(player) == 1;
 		if (heldDown) {
-			downAirSpWeapon.vileShootOld(WeaponIds.VileFlamethrower, this);
+			downAirSpWeapon?.vileShoot(this);
 			return true;
 		}
-		airSpWeapon.vileShootOld(WeaponIds.VileBomb, this);
+		airSpWeapon?.vileShoot(this);
 		return true;
 	}
 
@@ -338,7 +338,7 @@ public class Vile : Character {
 				}
 				Weapon rideWeapon = weaponSystem.rideWeapon;
 				if (stunShotPressed && !HeldDown && rideWeapon.shootCooldown <= 0) {
-					rideWeapon.vileShoot(this);
+					rideWeapon?.vileShoot(this);
 				}
 				if (goliathShotPressed) {
 					if (goliath && !rideArmor.isAttacking() && mechBusterCooldown <= 0) {
@@ -369,13 +369,13 @@ public class Vile : Character {
 	}
 	public virtual void shoot(int chargeLevel) {
 		if (chargeLevel >= 3) {
-			laserWeapon.vileShootOld(WeaponIds.VileLaser, this);
+			laserWeapon?.vileShoot(this);
 		}
 		if (chargeLevel == 4 && isVileMK5) {
 			changeState(new HexaInvoluteState(), true);
 		}
 		else if (chargeLevel >= 3) {
-			weaponSystem.chargeWeapon.vileShoot(this);
+			weaponSystem.chargeWeapon?.vileShoot(this);
 		}
 	}
 

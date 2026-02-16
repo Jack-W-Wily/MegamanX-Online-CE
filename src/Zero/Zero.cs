@@ -434,6 +434,7 @@ public class Zero : Character {
 		}
 		if (chargeLevel >= 1) {
 			stopCharge();
+			gigaAttack.ammo -=6;
 		}
 
 	}

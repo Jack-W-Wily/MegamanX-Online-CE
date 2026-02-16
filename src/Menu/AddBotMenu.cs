@@ -50,7 +50,7 @@ public class AddBotMenu : IMainMenu {
 				int id = 0;
 				int charNum = botCharNum;
 				int alliance = botTeamNum;
-				if (charNum == -1) charNum = Helpers.randomRange(0, 4);
+				if (charNum == -1) charNum = Helpers.randomRange(0, 5);
 				if (alliance == -1) {
 					if (Global.level.gameMode.isTeamMode) {
 						alliance = Server.getMatchInitAutobalanceTeam(Global.level.players, Global.level.teamNum);
@@ -93,7 +93,7 @@ public class AddBotMenu : IMainMenu {
 		else if (botCharNum == 2) botCharStr = "Vile";
 		else if (botCharNum == 3) botCharStr = "Axl";
 		else if (botCharNum == 4) botCharStr = "Sigma";
-
+		else if (botCharNum == 5) botCharStr = "AddStageEnemies";
 		Fonts.drawText(
 			FontType.Blue, "Character: " + botCharStr,
 			optionPoses[0].x, optionPoses[0].y, Alignment.Center, selected: selectArrowPosY == 0
