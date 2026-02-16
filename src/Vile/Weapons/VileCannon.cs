@@ -628,7 +628,7 @@ public class LongshotGizmoProj : Projectile {
 
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new LongshotGizmoProj(
-			args.pos, args.byteAngle, args.extraData[0], args.owner, args.netId, altPlayer: args.player
+			args.pos, args.byteAngle, args.owner, args.netId, altPlayer: args.player
 		);
 	}
 }

@@ -201,7 +201,7 @@ public class Vile : Character {
 
 		Helpers.decrementFrames(ref calldownMechCooldown);
 		Helpers.decrementFrames(ref mechBusterCooldown);
-		Helpers.decrementFrames(ref aiAttackCooldown);
+		//Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref vulcanLingerTime);
 		Helpers.decrementFrames(ref deadCooldown);
 		Helpers.decrementFrames(ref missileCannonCooldown);
@@ -1061,7 +1061,7 @@ public class Vile : Character {
 
 	
 	
-	public float aiAttackCooldown;
+	//public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {
 		int vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x * xDir < target?.pos.x * xDir);
