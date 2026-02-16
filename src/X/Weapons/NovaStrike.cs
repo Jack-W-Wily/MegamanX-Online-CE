@@ -126,6 +126,8 @@ public class NovaStrikeStateEX : CharState {
 		pushImmune = true;
 		invincible = true;
 		useDashJumpSpeed = true;
+		normalCtrl = false;
+		attackCtrl = false;
 	}
 
 	public override void update() {
@@ -170,6 +172,8 @@ public class NovaStrikeStateUpEX : CharState {
 		pushImmune = true;
 		invincible = true;
 		useDashJumpSpeed = true;
+		normalCtrl = false;
+		attackCtrl = false;
 	}
 
 	public override void update() {
@@ -214,6 +218,8 @@ public class NovaStrikeStateDownEX : CharState {
 		pushImmune = true;
 		invincible = true;
 		useDashJumpSpeed = true;
+		normalCtrl = false;
+		attackCtrl = false;
 	}
 
 	public override void update() {

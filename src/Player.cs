@@ -1409,7 +1409,7 @@ public partial class Player {
 			newChar = new RagingChargeX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
-				isWarpIn: isWarpIn, heartTanks: htCount
+				isWarpIn: isWarpIn, heartTanks: character?.getMaxHealth()
 			);
 		}
 

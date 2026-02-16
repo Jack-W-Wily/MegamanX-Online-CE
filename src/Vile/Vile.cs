@@ -74,6 +74,10 @@ public class Vile : Character {
 	public const float maxdeadCooldown = 60;
 	public float[] chargeTimeEx = new float[3];
 	public VileWeaponSystem weaponSystem;
+	public float missileCannonCooldown; 
+	
+	// When firing missile, you can't shoot cannon until it reaches 0
+	public float aiAttackCooldown;
 
 	public Vile(
 		Player player, float x, float y, int xDir,
@@ -200,6 +204,7 @@ public class Vile : Character {
 		Helpers.decrementFrames(ref aiAttackCooldown);
 		Helpers.decrementFrames(ref vulcanLingerTime);
 		Helpers.decrementFrames(ref deadCooldown);
+		Helpers.decrementFrames(ref missileCannonCooldown);
 		addWeaponHealAmmo();
 
 		if ((grounded || charState is LadderClimb or LadderEnd or WallSlide) && vileHoverTime > 0) {

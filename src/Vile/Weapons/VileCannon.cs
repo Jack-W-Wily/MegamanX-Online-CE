@@ -23,12 +23,11 @@ public class VileCannon : Weapon {
 		weaponSlotIndex = 43;
 		isStream = true;
 	}
-
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
 			return;
 		}
-		if (!vile.charState.attackCtrl) {
+		if (vile.charState is Crouch) {
 			shoot(vile, []);
 			return;
 		}
@@ -135,7 +134,6 @@ public class LongShotGizmo : VileCannon {
 		vileWeight = 4;
 		effect = "Burst of 5 shots.";
 	}
-
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0 || vile.energy.ammo < vileAmmoUsage) {
 			return;
@@ -145,7 +143,6 @@ public class LongShotGizmo : VileCannon {
 		// Always drop off no matter what.
 		//vile.changeState(new VileGizmoState(this), true);
 	}
-
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vile) { return; }
 		Point shootVel = vile.getVileShootVel(true);
@@ -154,7 +151,7 @@ public class LongShotGizmo : VileCannon {
 			shootVel.x *= -1;
 		}
 		new LongshotGizmoProj(
-			shootPos, MathF.Round(shootVel.byteAngle), 0, vile,
+			shootPos, MathF.Round(shootVel.byteAngle), vile,
 			vile.player.getNextActorNetId(), sendRpc: true
 		);
 
@@ -303,6 +300,7 @@ public class CannonAttack : VileState {
 	public VileCannon weapon;
 	public int loopNum;
 	public bool lockAir => Options.main.lockInAirCannon;
+	public float shootTime;
 	
 	public CannonAttack(VileCannon weapon) : base("idle_shoot") {
 		useDashJumpSpeed = true;
@@ -317,6 +315,11 @@ public class CannonAttack : VileState {
 	public override void update() {
 		base.update();
 		character.turnToInput(player.input, player);
+
+		if (vile.energy.ammo < weapon.vileAmmoUsage && !lockAir && !character.grounded && character.isAnimOver()) {
+			character.changeToCrouchOrFall();
+			return;
+		}
 
 		if (character.frameIndex >= shootFrame && !shot) {
 			shot = true;
@@ -602,7 +605,7 @@ public class FatBoyProj : Projectile {
 
 public class LongshotGizmoProj : Projectile {
 	public LongshotGizmoProj(
-		Point pos, float byteAngle, int type, Actor owner, ushort? netId,
+		Point pos, float byteAngle, Actor owner, ushort? netId,
 		bool sendRpc = false, Player? altPlayer = null
 	) : base(
 		pos, 1, owner, "vile_mk2_lg_proj", netId, altPlayer
@@ -614,17 +617,12 @@ public class LongshotGizmoProj : Projectile {
 		damager.damage = 1;
 		damager.flinch = 30;
 		projId = (int)ProjIds.LongshotGizmo;
-		maxTime = 35 / 60f;
+		maxTime = 30 / 60f;
 		byteAngle = Helpers.to256(byteAngle);
 		this.byteAngle = byteAngle;
 		vel = 5 * 60 * Point.createFromByteAngle(byteAngle);
-
-		if (type == 1) {
-			damager.damage = 2;
-		}
-
 		if (sendRpc) {
-			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle, (byte)type);
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
 
