@@ -367,6 +367,11 @@ public class Damager {
 				character.addVirusTime(owner, 0.2f);
 			}
 
+
+			if (owner.character is XKai xkai && xkai.OverDrive && xkai.player.XKaiUnlockVirus) {
+				character.addVirusTime(owner, 2f);
+			}
+
 			
 
 			if ((owner.character as PunchyZero)?.isViral == true) {

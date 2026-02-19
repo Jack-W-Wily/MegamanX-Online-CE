@@ -57,7 +57,7 @@ public class WheelGator : Maverick {
 			if (state is MIdle or MRun or MLand) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
-						changeState(new WheelGUpBiteState());
+						changeState(new WheelGSlashState());
 					} else {
 						if (damageEaten > 0) {
 							changeState(new WheelGSpitState(damageEaten));
@@ -69,9 +69,22 @@ public class WheelGator : Maverick {
 				} else if (input.isPressed(Control.Special1, player)) {
 					changeState(new WheelGShootState());
 				} else if (input.isPressed(Control.Dash, player)) {
+					if (input.isHeld(Control.Down, player)) {
+						changeState(new WheelgEnterGround());
+					} else {
+					changeState(new WheelGSpinState());
+					}
+				}
+			} else if (state is MJump || state is MFall or WheelGSlashState) {
+			if (input.isPressed(Control.Shoot, player)) {
+					if (input.isHeld(Control.Up, player)) {
+						changeState(new WheelGUpBiteState());
+					} 
+				} else if (input.isPressed(Control.Special1, player)) {
+					changeState(new WheelGShootState());
+				} else if (input.isPressed(Control.Dash, player)) {
 					changeState(new WheelGSpinState());
 				}
-			} else if (state is MJump || state is MFall) {
 			}
 		}
 	}
@@ -106,14 +119,18 @@ public class WheelGator : Maverick {
 		Fall,
 		Grab,
 
+		FallSpin,
+		WheelGSlash,
+
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"wheelg_drill_loop" => MeleeIds.Drill,
+			"wheelg_drill_loop" or "wheelg_fall" => MeleeIds.Drill,
 			"wheelg_eat_start" => MeleeIds.Eat,
-			"wheelg_fall" => MeleeIds.Fall,
+			"wheelg_land" => MeleeIds.Fall,
+			"wheelg_slash" => MeleeIds.WheelGSlash,
 			"wheelg_grab_start" => MeleeIds.Grab,
 			_ => MeleeIds.None
 		});
@@ -123,7 +140,7 @@ public class WheelGator : Maverick {
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Drill => new GenericMeleeProj(
-				GatorSpinWeapon, pos, ProjIds.WheelGSpin, player,
+				GatorSpinWeapon, pos, ProjIds.WheelGGrab, player,
 				1, Global.defFlinch, 6, addToLevel: addToLevel
 			),
 			MeleeIds.Eat => new GenericMeleeProj(
@@ -133,6 +150,10 @@ public class WheelGator : Maverick {
 			MeleeIds.Fall => new GenericMeleeProj(
 				GatorFallWeapon, pos, ProjIds.WheelGStomp, player,
 				4, Global.defFlinch, 60, addToLevel: addToLevel
+			),
+			MeleeIds.WheelGSlash => new GenericMeleeProj(
+				GatorFallWeapon, pos, ProjIds.HeavyPush, player,
+				4, 0, 60, addToLevel: addToLevel
 			),
 			MeleeIds.Grab => new GenericMeleeProj(
 				GatorGrabWeapon, pos, ProjIds.WheelGGrab, player,
@@ -409,6 +430,36 @@ public class WheelGBiteState : MaverickState {
 	}
 }
 
+
+
+
+public class WheelGSlashState : MaverickState {
+	int state;
+	public WheelGSlashState() : base("slash") {
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
+		if (maverick.frameIndex == 3 && !once) {
+			maverick.playSound("sigma2slash", sendRpc: true);
+			once = true;
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+}
+
+
+
 public class WheelGEatState : MaverickState {
 	float soundTime;
 	public WheelGEatState() : base("eat_loop") {
@@ -666,3 +717,91 @@ public class WheelGGrabbed : GenericGrabbedState {
 		}
 	}
 }
+
+
+
+
+public class WheelgEnterGround : MaverickState {
+	int state = 0;
+	float shootCooldown;
+	public bool useAi;
+
+	public WheelgEnterGround(bool useAi = false) : base("guard") {
+		enterSound = "tseahorseTeleportOut";
+		this.useAi = useAi;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (state == 0) {
+			if (maverick.frameIndex == maverick.sprite.totalFrameNum - 1) {
+				state = 1;
+				stateTime = 0;
+				maverick.frameIndex = maverick.sprite.totalFrameNum - 1;
+				maverick.frameSpeed = 0;
+			}
+		} else if (state == 1) {
+			bool isSummoner = maverick.controlMode == MaverickModeId.Summoner;
+			bool isStriker = maverick.controlMode == MaverickModeId.Striker;
+			bool isAiOnly = isSummoner || isStriker;
+			float enemyDist = 300;
+
+			Helpers.decrementTime(ref shootCooldown);
+			maverick.frameSpeed = 0;
+			int dir = isAiOnly ? maverick.xDir : input.getXDir(player);
+			maverick.turnToInput(input, player);
+
+			if (isSummoner) {
+				bool back = false;
+				if (maverick.target != null) {
+					enemyDist = MathF.Abs(maverick.target.pos.x - maverick.pos.x);
+					back = maverick.target.pos.x > maverick.pos.x;
+				}
+				if (enemyDist >= 120) {
+					dir = 0;
+				} else if (back) {
+					dir = -1;
+				} else {
+					dir = 1;
+				}
+			}
+
+			if (dir != 0) {
+				var move = new Point(100 * dir, 0);
+				var hitGroundMove = Global.level.checkTerrainCollisionOnce(maverick, dir * 20, 20);
+				if (hitGroundMove == null) {
+				} else {
+					maverick.move(move);
+					maverick.frameSpeed = 1;
+				}
+			}
+
+			if (input.isPressed(Control.Dash, player) ||
+				isSummoner && enemyDist >= 110 ||
+				maverick.ammo <= 0 ||
+				useAi && stateTime > 1
+			) {
+				state = 2;
+				maverick.changeSpriteFromName("rise", true);
+				maverick.playSound("tseahorseTeleportIn", sendRpc: true);
+			}
+		} else if (state == 2 && maverick.isAnimOver()) {
+			maverick.changeState(new WheelGUpBiteState());
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+		maverick.useGravity = true;
+		maverick.angle = 0;
+		if (maverick is ToxicSeahorse seaforce) {
+			seaforce.teleportCooldown = 0.25f;
+		}
+	}
+}
+

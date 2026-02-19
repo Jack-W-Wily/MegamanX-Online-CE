@@ -940,7 +940,7 @@ public class ZeroEND : Zero {
 	}
 
 	public override bool isToughGuyHyperMode() {
-		return isBlack || isGenmuZero;
+		return  isGenmuZero;
 	}
 
 	// Melee projectiles.

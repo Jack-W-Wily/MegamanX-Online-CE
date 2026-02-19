@@ -363,7 +363,16 @@ public class XUPGrabState : CharState {
 
 	public override void update() {
 		base.update();
-		grabTime -= Global.spf;
+		if (character is XKai) {
+			updateXKai();
+		} else {
+			updateX();
+		}
+	}
+
+
+	public void updateX() {
+	grabTime -= Global.spf;
 		leechTime += Global.spf;
 
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
@@ -411,6 +420,146 @@ public class XUPGrabState : CharState {
 
 		if (player.input.isBPressed(player)) {
 			character.changeToIdleOrFall();
+			return;
+		}
+
+		if (grabTime <= 0) {
+			character.changeToIdleOrFall();
+			return;
+		}	
+	}
+
+	public void updateXKai() {
+	
+		grabTime -= Global.spf;
+		leechTime += Global.spf;
+
+
+
+		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
+			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
+			victimWasGrabbedSpriteOnce = true;
+		}
+		if (!victimWasGrabbedSpriteOnce) {
+			timeWaiting += Global.spf;
+			if (timeWaiting > 1) {
+				victimWasGrabbedSpriteOnce = true;
+			}
+			if (character.isDefenderFavored() && player.XKaiUnlockLifesteal) {
+				if (leechTime > 0.33f) {
+					leechTime = 0;
+					character.addHealth(0.2f);
+				}
+				return;
+			}
+		}
+
+		if (character.sprite.name.Contains("unpo_grab")) {
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
+
+			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
+
+			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
+
+			if (!character.grounded && !character.sprite.name.EndsWith("2")) {
+				character.changeSpriteFromName("unpo_grab2", true);
+			}
+		}
+
+		if (leechTime > 0.33f && player.XKaiUnlockLifesteal) {
+			leechTime = 0;
+			character.addHealth(0.2f);
+			var damager = new Damager(player, 0.2f, 0, 0);
+			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
+		}
+
+		if (player.input.isBPressed(player)) {
+			character.changeToIdleOrFall();
+			player.XKaiAbsorbNum ++;
+			player.superAmmo += 8;
+			character.playSound("upParryAbsorb", sendRpc: true);
+			if (victim != null) {
+				if ((victim.sprite.name.Contains("zarzo") || victim.sprite.name.Contains("zero_") )&& !player.XKaiUnlockSaber){
+					player.XKaiUnlockSaber = true;
+					character.addDamageText("Unlocked Saber!", (int)FontType.Red);
+				}if ((victim.sprite.name.Contains("sigma")) && !player.XKaiUnlockVirus){
+					player.XKaiUnlockVirus = true;
+					character.addDamageText("Unlocked Viral Bonus!", (int)FontType.Red);
+				} if ((victim.sprite.name.Contains("vava") || victim.sprite.name.Contains("vile")) && !player.XKaiUnlockLifesteal){
+					player.XKaiUnlockLifesteal = true;
+					character.addDamageText("Unlocked Lifesteal!", (int)FontType.Red);
+				}if ((victim.sprite.name.Contains("zain")) && !player.XKaiParry){
+					player.XKaiParry = true;
+					character.addDamageText("Unlocked Parry!", (int)FontType.Red);
+				}if ((victim.sprite.name.Contains("iris")) && !player.XKaiRideArmor){
+					player.XKaiRideArmor = true;
+					character.addDamageText("Unlocked Ride Move!", (int)FontType.Red);
+				} if ((victim.sprite.name.Contains("highmax")) && !player.XKaiUnlockBarrier){
+					player.XKaiUnlockBarrier = true;
+					character.addDamageText("Unlocked Barrier Bonus!", (int)FontType.Red);
+				} if ((victim.sprite.name.Contains("gbd")) && !player.XKaiSpeedBonus){
+					player.XKaiSpeedBonus = true;
+					character.addDamageText("Unlocked Speed Bonus!", (int)FontType.Red);
+				} if ((victim.sprite.name.Contains("ix")) && !player.XKaiIXGrowthBuff){
+					player.XKaiIXGrowthBuff = true;
+					character.addDamageText("Unlocked Growth Bonus!", (int)FontType.Red);
+				} if ((victim.sprite.name.Contains("dragoon")) && !player.XKaiShotoBonus){
+					player.XKaiShotoBonus = true;
+					character.addDamageText("Unlocked Shoto Moves!", (int)FontType.Red);
+				} if ((victim.sprite.name.Contains("dynamo")) && !player.XKaiTimeStop){
+					player.XKaiTimeStop = true;
+					character.addDamageText("Now Time stops on Overdrive!", (int)FontType.Red);
+				} 
+
+				if (victim is MegamanX mmx) {
+					if (mmx.hasUltimateArmor) {
+					player.XKaiUAXBuffs = true;
+					character.addDamageText("Ultimate Bonus!", (int)FontType.Red);
+						}if (mmx.legArmor == ArmorId.Light && !player.LightBootsKai) {
+						player.LightBootsKai = true;
+						character.addDamageText("Light Boots Bonus!", (int)FontType.Blue);
+						}if (mmx.armArmor == ArmorId.Light && !player.LightArmKai) {
+						player.LightArmKai = true;
+						character.addDamageText("Light Arm Bonus!", (int)FontType.Blue);
+						}if (mmx.chestArmor == ArmorId.Light && !player.LightChestKai) {
+						player.LightChestKai = true;
+						character.addDamageText("Light Chest Bonus!", (int)FontType.Blue);
+						}if (mmx.helmetArmor == ArmorId.Light && !player.LightHeadsKai) {
+						player.LightHeadsKai = true;
+						character.addDamageText("Light Head Bonus!", (int)FontType.Blue);
+							}if (mmx.legArmor == ArmorId.Giga && !player.GigaBootsKai) {
+							player.GigaBootsKai = true;
+							character.addDamageText("Giga Boots Bonus!", (int)FontType.Blue);
+							}if (mmx.armArmor == ArmorId.Giga && !player.GigaArmKai) {
+							player.GigaArmKai = true;
+							character.addDamageText("Giga Arm Bonus!", (int)FontType.Blue);
+							}if (mmx.chestArmor == ArmorId.Giga && !player.GigaChestKai) {
+							player.GigaChestKai = true;
+							character.addDamageText("Giga Chest Bonus!", (int)FontType.Blue);
+							}if (mmx.helmetArmor == ArmorId.Giga && !player.GigaHeadsKai) {
+							player.GigaHeadsKai = true;
+							character.addDamageText("Giga Head Bonus!", (int)FontType.Blue);
+							}if (mmx.legArmor == ArmorId.Max && !player.MaxBootsKai) {
+							player.MaxBootsKai = true;
+							character.addDamageText("Max Boots Bonus!", (int)FontType.Blue);
+								}if (mmx.armArmor == ArmorId.Max && !player.MaxArmKai) {
+								player.MaxArmKai = true;
+								character.addDamageText("Max Arm Bonus!", (int)FontType.Blue);
+								}if (mmx.chestArmor == ArmorId.Max && !player.MaxChestKai) {
+								player.MaxChestKai = true;
+								character.addDamageText("Max Chest Bonus!", (int)FontType.Blue);
+								}if (mmx.helmetArmor == ArmorId.Max && !player.MaxHeadsKai) {
+								player.MaxHeadsKai = true;
+								character.addDamageText("Max Head Bonus!", (int)FontType.Blue);
+								}
+				}
+			}
 			return;
 		}
 

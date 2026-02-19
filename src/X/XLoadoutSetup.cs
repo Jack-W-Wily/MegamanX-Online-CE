@@ -11,6 +11,9 @@ public class XLoadoutSetup {
 	public static List<Weapon> getLoadout(Player player, XLoadout xLoadout) {
 		List<Weapon> weapons = new();
 		// 1v1/Training loadout.
+
+
+
 		bool enableX1Weapons = player.loadout.xLoadout.weapon1 < 9 &&
 		 player.loadout.xLoadout.weapon2 < 9 &&  player.loadout.xLoadout.weapon3 < 9
 		;
@@ -72,7 +75,7 @@ public class XLoadoutSetup {
 			weapons.Add(new TwinSlasher());
 		}
 
-
+	
 		
 			
 

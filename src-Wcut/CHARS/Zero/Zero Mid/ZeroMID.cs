@@ -838,7 +838,7 @@ public class ZeroMID : Zero {
 	}
 
 	public override bool isToughGuyHyperMode() {
-		return isBlack || isGenmuZero;
+		return isGenmuZero;
 	}
 
 	// Melee projectiles.

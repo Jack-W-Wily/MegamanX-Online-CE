@@ -60,6 +60,7 @@ public enum CharIds {
 	HighMax,
 	GBD,
 	XAnother,
+	XKai,
 	BossKuwanger,
 	BossPenguin,
 	BossMammoth,
@@ -151,6 +152,8 @@ public class CharSelection {
 		 ){offset = new Point(0, 20)},              // Make sure to end the whole thing with a "," ion the end
 		new CharSelection("Axl?", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
 		new CharSelection("Zero Another (MID)", (int)CharIds.BusterZero, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
+		new CharSelection("XKai", (int)CharIds.XKai, 1, 0, "smenu_xkai", 0){offset = new Point(0, 20)},
+		
 		//new CharSelection("Rock", 10, 1, 0, "rock_idle", 0),
 		
 	];

@@ -270,6 +270,7 @@ public class MagnaCShurikenProj : Projectile {
 	) {
 		projId = (int)ProjIds.MagnaCShuriken;
 		maxTime = 1f;
+		damager.flinch = 15;
 		vel = velDir.times(maxSpeed);
 		angle = velDir.angle;
 
@@ -339,7 +340,7 @@ public class MagnaCMagnetMineProj : Projectile {
 		float spinAngle, Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, 1, 0, 3, player, "magnac_tail_part",
-		Global.defFlinch, 1f, netProjId, player.ownedByLocalPlayer
+		Global.superFlinch, 1f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.MagnaCMagnetMine;
 		setIndestructableProperties();
@@ -923,7 +924,7 @@ public class MagnaCDrainState : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		victim?.releaseGrab(maverick);
+		victim?.changeState(new LaunchedStateWeak(player.character));
 	}
 }
 
@@ -933,6 +934,8 @@ public class MagnaCDrainGrabbed : GenericGrabbedState {
 		this.grabber = grabber;
 		grabTime = maxGrabTime;
 	}
+
+
 }
 
 public class MagnaCCeilingStartState : MaverickState {

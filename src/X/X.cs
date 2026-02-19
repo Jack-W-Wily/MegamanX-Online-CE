@@ -183,6 +183,25 @@ public class MegamanX : Character {
 		base.preUpdate();
 		Helpers.decrementFrames(ref barrierActiveTime);
 
+
+		if (this is XKai && charState is WarpIn) {
+			weapons.RemoveAll(w => w is not XBuster and not GigaCrush and not HyperCharge);
+			if (player.MaxArmKai){
+				player.addHyperCharge();
+			} else {
+				player.removeHyperCharge();
+			}
+			if (player.GigaChestKai){
+				player.addGigaCrush();
+			} else {
+				player.removeGigaCrush();
+			}
+			if (player.XKaiUAXBuffs){
+				weapons.Add(new HyperNovaStrike());
+			} else {
+				player.removeNovaStrike();
+			}
+		}
 		// Max armor barrier sprite.
 		if (barrierActiveTime > 0) {
 			if (!barrierAnim.isAnimOver()) {
@@ -349,7 +368,9 @@ public class MegamanX : Character {
 		quickArmorUpgrade();
 		fastChipActivation();
 		if (grounded) {
-			if (legArmor == ArmorId.Max &&
+			if ((legArmor == ArmorId.Max 
+				|| player.MaxBootsKai && this is XKai
+				) && 
 				player.input.isPressed(Control.Dash, player) &&
 				player.input.isHeld(Control.Up, player) &&
 				canDash() && ctfFlag == null
@@ -357,7 +378,12 @@ public class MegamanX : Character {
 				changeState(new UpDash(Control.Dash));
 				return true;
 			}
-			if (legArmor == ArmorId.Light && grounded &&
+			if (
+				
+				(legArmor == ArmorId.Light 
+				|| player.LightBootsKai && this is XKai
+				)
+			&& grounded &&
 				player.dashPressed(out string dashControlL) &&
 				canDash()
 			) {
@@ -365,7 +391,9 @@ public class MegamanX : Character {
 				return true;
 			}
 		} else if (!grounded) {
-			if (legArmor == ArmorId.Max &&
+			if ((legArmor == ArmorId.Max 
+				|| player.MaxBootsKai && this is XKai
+				) && 
 				player.input.isPressed(Control.Dash, player) &&
 				player.input.isHeld(Control.Up, player) &&
 				canAirDash() && canDash() && ctfFlag == null
@@ -373,14 +401,19 @@ public class MegamanX : Character {
 				changeState(new UpDash(Control.Dash));
 				return true;
 			}
-			if (legArmor == ArmorId.Giga && !grounded &&
+			if ((legArmor == ArmorId.Giga 
+			
+			|| player.GigaBootsKai && this is XKai
+				) && !grounded &&
 				player.dashPressed(out string dashControlG) &&
 				canAirDash() && canDash()
 			) {
 				changeState(new GigaAirDash(dashControlG), true);
 				return true;
 			}
-			if (!player.isAI && hasUltimateArmor &&
+			if ((!player.isAI && hasUltimateArmor 
+			|| player.XKaiUAXBuffs && this is XKai
+				) && 
 				player.input.isPressed(Control.Jump, player) &&
 				canJump() && !isDashing && canAirDash() && flag == null
 			) {
@@ -393,7 +426,7 @@ public class MegamanX : Character {
 	}
 
 	public override bool attackCtrl() {
-		if (player.input.isPressed(Control.Special2, player) && helmetArmor == ArmorId.Giga &&
+		if (player.input.isPressed(Control.Special2, player) && (helmetArmor == ArmorId.Giga || this is XKai && player.GigaHeadsKai) &&
 			itemTracer.shootCooldown == 0
 		) {
 			itemTracer.shoot(this, [0, hyperHelmetArmor == ArmorId.Giga ? 1 : 0]);
@@ -889,11 +922,11 @@ public class MegamanX : Character {
 	}
 
 	public bool hasHadoukenEquipped() {
-		return !Global.level.is1v1() && fullArmor == ArmorId.Light;
+		return !Global.level.is1v1() && fullArmor == ArmorId.Light || this is XKai && player.XKaiShotoBonus;
 	}
 
 	public bool hasShoryukenEquipped() {
-		return !Global.level.is1v1() && fullArmor == ArmorId.Giga;
+		return !Global.level.is1v1() && fullArmor == ArmorId.Giga || this is XKai && player.XKaiShotoBonus;
 	}
 
 	public bool hasFgMoveEquipped() {
@@ -960,10 +993,10 @@ public class MegamanX : Character {
 			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
 			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+			when (helmetArmor == ArmorId.Light|| player.LightHeadsKai && this is XKai) && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
 			"rmx_up_dash" or "rmx_up_dash_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbuttEX,
+			when (helmetArmor == ArmorId.Light|| player.LightHeadsKai && this is XKai) && stingActiveTime == 0 => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			_ => MeleeIds.None
 		});
@@ -1407,6 +1440,10 @@ public class MegamanX : Character {
            index = 40;   
            } 
 		 
+		}
+
+		if (this is XKai) {		
+           index = 41;    
 		}
 
 		palette = player.xPaletteShader;

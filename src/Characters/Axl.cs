@@ -1861,7 +1861,7 @@ public class Axl : Character {
 	}
 
 	public override bool isToughGuyHyperMode() {
-		return isWhiteAxl();
+		return false;//isWhiteAxl();
 	}
 
 	public override Point getCamCenterPos(bool ignoreZoom = false) {

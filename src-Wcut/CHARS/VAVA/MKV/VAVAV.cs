@@ -1111,18 +1111,19 @@ public class VAVAV : Vile {
 			, addToLevel: true);
 		}
 
-		if (sprite.name.Contains("spring_grab") && VileMode == 1) {
+		if (sprite.name.Contains("spring_grab")) {
+		if (VileMode == 1) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
 				0, 0, 15f, isDeflectShield: true
-			, addToLevel : true);
+			, addToLevel: true);
 		}
-
-		if (sprite.name.Contains("spring_grab") && VileMode == 0) {
+			else {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileMK2Grab2, player,
+				new VileStomp(), centerPoint, ProjIds.VileMK2Grab, player,
 				0, 0, 15f, isDeflectShield: true
 			, addToLevel : true);
+			}
 		}
 
 

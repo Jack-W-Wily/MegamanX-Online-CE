@@ -1014,7 +1014,7 @@ public partial class Player {
 				Global.shouldAiAutoRevive
 			)
 			) {
-				reviveSigma(2, spawnPoint);
+				reviveSigma(1, spawnPoint);
 			}
 		} else if (character is MegamanX) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
@@ -1524,6 +1524,14 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
+		}else if (charNum == (int)CharIds.XKai) {
+			
+				newChar = new XKai(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount
+			);
+			
 		}
 			// Error out if invalid id.
 			else {
@@ -1595,6 +1603,92 @@ public partial class Player {
 	}
 
 
+//XKai Stuff
+
+	public bool XKaiUnlockSaber;
+
+	public bool XKaiUnlockLifesteal;
+
+	public bool XKaiUnlockBarrier;
+
+	public bool XKaiUnlockVirus;
+
+	public bool XKaiRideArmor;
+
+	public bool XKaiTimeStop;
+
+	public bool XKaiParry;
+
+	public bool XKaiSpeedBonus;
+
+	public bool XKaiShotoBonus;
+
+	public int XKaiAbsorbNum = 0;
+
+// XKai Armor Stuff
+
+	public bool LightBootsKai;
+
+	public bool LightArmKai;
+
+	public bool LightHeadsKai;
+
+	public bool LightChestKai;
+
+	public bool GigaBootsKai;
+
+	public bool GigaArmKai;
+
+	public bool GigaHeadsKai;
+
+	public bool GigaChestKai;
+
+	public bool MaxBootsKai;
+
+	public bool MaxArmKai;
+
+	public bool MaxHeadsKai;
+
+	public bool MaxChestKai;
+
+	public bool XKaiUAXBuffs;
+
+	public bool XKaiIXGrowthBuff;
+
+
+
+
+	public void resetAllXKaibuffs() {
+		XKaiAbsorbNum = 0;
+		XKaiUnlockSaber = false;
+		XKaiUnlockLifesteal = false;
+		XKaiUnlockBarrier = false;
+		XKaiUnlockVirus = false;
+		XKaiRideArmor = false;
+		XKaiTimeStop = false;
+		XKaiParry = false;
+		XKaiSpeedBonus = false;
+		XKaiShotoBonus = false;
+		LightBootsKai = false;
+		LightArmKai = false;
+		LightHeadsKai = false;
+		LightChestKai = false;
+		GigaBootsKai = false;
+		GigaArmKai = false;
+		GigaHeadsKai = false;
+		GigaChestKai = false;
+		MaxBootsKai = false;
+		MaxArmKai = false;
+		MaxHeadsKai = false;
+		MaxChestKai = false;
+		XKaiUAXBuffs = false;
+		XKaiIXGrowthBuff = false;
+	}
+
+	
+
+
+	
 
 		public bool canX3Zero => loadout.xLoadout.weapon1 >= 17 &&
 		 loadout.xLoadout.weapon2 >= 17 &&  loadout.xLoadout.weapon3 >= 17
@@ -3189,6 +3283,15 @@ public partial class Player {
 
 
 	public void reviveSigmaNonOwner(int form, Point spawnPoint, ushort sigmaNetId) {
+		if (form == 1) {
+			ViralSigma viralSigma = new ViralSigma(
+				this, spawnPoint.x, spawnPoint.y, character?.xDir ?? 1, true,
+				sigmaNetId, false
+			);
+			character = viralSigma;
+
+			character.changeSprite("viralsigma_enter", true);
+		}
 		if (form >= 2) {
 			KaiserSigma kaiserSigma = new KaiserSigma(
 				this, spawnPoint.x, spawnPoint.y, character?.xDir ?? 1, true,

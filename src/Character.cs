@@ -1236,6 +1236,14 @@ public partial class Character : Actor, IDamagable {
 			}
 			addDamageText("O V E R D R I V E", 0);
 			invulnTime = 1f;
+
+
+			if (this is XKai && player.XKaiTimeStop) {
+			new DarkHoldDProj(new DarkHoldWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			playSound("dynamoting", forcePlay: false, sendRpc: true);
+			changeState(new Idle());
+			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
+			}
 		}
 
 
@@ -3371,16 +3379,16 @@ public partial class Character : Actor, IDamagable {
 				}
 				if (mmx != null) {
 					if (mmx.barrierActiveTime > 0) {
-						if (mmx.hyperChestArmor == ArmorId.Max) {
+						if (mmx.hyperChestArmor == ArmorId.Max || mmx is XKai && player.MaxChestKai) {
 							damageSavings += (originalDamage * 0.5m);
 						} else {
 							damageSavings += (originalDamage * 0.25m);
 						}
 					}
-					if (mmx.chestArmor == ArmorId.Light) {
+					if (mmx.chestArmor == ArmorId.Light || mmx is XKai && player.LightChestKai) {
 						damageSavings += (originalDamage * 0.125m);
 					}
-					if (mmx.chestArmor == ArmorId.Giga) {
+					if (mmx.chestArmor == ArmorId.Giga || mmx is XKai && player.GigaChestKai) {
 						damageSavings += (originalDamage * 0.125m);
 					}
 				}
@@ -3766,9 +3774,9 @@ public partial class Character : Actor, IDamagable {
 		// Tough Guy.
 		if (this is BaseSigma && OverDrive || isToughGuyHyperMode()) {
 			if (flinchFrames >= Global.superFlinch) {
-				flinchFrames = Global.halfFlinch;
+				flinchFrames = Global.defFlinch;
 			} else {
-				flinchFrames = Global.miniFlinch;
+				flinchFrames = Global.halfFlinch;
 			}
 		}
 		if (charState is GenericStun genericStunState) {

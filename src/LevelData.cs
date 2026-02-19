@@ -126,7 +126,7 @@ public class LevelData {
 					"small" => 2,
 					"medium" => 3,
 					"large" => 4,
-					"xl" or "collosal" => 5,
+					"xl" or "collosal" or "full" => 5,
 					_ => -1
 				};
 			}

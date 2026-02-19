@@ -238,7 +238,7 @@ public class VAVA1 : Vile {
 			player.superAmmo = 0;
 			playSound("chingX4");
 		}
-
+/*
 		if (OverDrive && 
 		downPressedTimes >= 2 &&
 		upPressedTimes >= 2 &&
@@ -253,7 +253,7 @@ public class VAVA1 : Vile {
 			leftPressedTimes= 0;
 			rightPressedTimes = 0;
 			playSound("chingX4");
-		}
+		}*/
 
 
 

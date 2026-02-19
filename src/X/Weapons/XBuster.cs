@@ -112,7 +112,9 @@ public class XBuster : Weapon {
 			};
 		}
 
-		if (mmx.hasUltimateArmor && chargeLevel >= 3 && !isStock && mmx.armArmor != ArmorId.Max) {
+		if ((mmx.hasUltimateArmor || mmx is XKai && player.XKaiUAXBuffs
+		)
+		&& chargeLevel >= 3 && !isStock && mmx.armArmor != ArmorId.Max) {
 			new Anim(pos, "buster4_muzzle_flash", xDir, null, true);
 			new BusterPlasmaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			character.playSound("plasmaShot", sendRpc: true);	
@@ -144,9 +146,9 @@ public class XBuster : Weapon {
 		} else if (chargeLevel == 2) {
 			if (mmx.armArmor == ArmorId.Light || mmx.armArmor == ArmorId.None) {
 				new Buster3LightProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
-			} else if (mmx.armArmor == ArmorId.Giga) {
+			} else if (mmx.armArmor == ArmorId.Giga || player.GigaArmKai && mmx is XKai) {
 				new Buster3GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
-			} else if (mmx.armArmor == ArmorId.Max) {
+			} else if (mmx.armArmor == ArmorId.Max  || player.MaxArmKai && mmx is XKai) {
 				new Buster3MaxProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			}
 		} else if (chargeLevel >= 3) {
@@ -156,7 +158,7 @@ public class XBuster : Weapon {
 				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4Giga2Proj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 			}
-			else if (mmx.armArmor == ArmorId.Max) {
+			else if (mmx.armArmor == ArmorId.Max || player.MaxArmKai && mmx is XKai) {
 				mmx.stockedMaxBusterLv += 2;
 				if (!mmx.charState.attackCtrl ||
 					!mmx.charState.normalCtrl ||
@@ -176,7 +178,7 @@ public class XBuster : Weapon {
 					return;
 				}
 			}
-			else if (mmx.armArmor == ArmorId.Giga) {
+			else if (mmx.armArmor == ArmorId.Giga || player.GigaArmKai && mmx is XKai) {
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
