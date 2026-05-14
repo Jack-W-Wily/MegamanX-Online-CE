@@ -661,21 +661,20 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Punch => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch, player,
-				2, Global.halfFlinch, 15,
-				addToLevel: addToLevel
+				meleeWeapon, projPos, ProjIds.PZeroPunch, player,2, 0, 15,
+				addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.defFlinch, 10,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
+				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 15,
+				addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3,  Global.halfFlinch, 10,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
+				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 15,
+				addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
 				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch,
@@ -714,7 +713,7 @@ public class PunchyZero : Character {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
 				saberSwingWeapon, projPos, ProjIds.ZSaberProjSwing, player,
 				3, Global.defFlinch, isReflectShield: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			
 			_ => null

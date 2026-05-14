@@ -1197,8 +1197,8 @@ public class AnimData {
 					}
 				} else if (!Global.renderTextures.ContainsKey(encodeKey)) {
 					Global.renderTextures[encodeKey] = (
-						new RenderTexture((uint)sprWidth, (uint)sprHeight),
-						new RenderTexture((uint)sprWidth, (uint)sprHeight)
+						new RenderTexture(((uint)sprWidth, (uint)sprHeight)),
+						new RenderTexture(((uint)sprWidth, (uint)sprHeight))
 					);
 				}
 			}

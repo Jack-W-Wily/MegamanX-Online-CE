@@ -469,6 +469,7 @@ public class LoadoutData {
 	[ProtoMember(6)] public SigmaLoadout sigmaLoadout = new();
 	[ProtoMember(7)] public PZeroLoadout pzeroLoadout = new();
 	[ProtoMember(8)] public AxlWCLoadout axlWCLoadout = new();
+	[ProtoMember(9)] public BZeroLoadout bzeroLoadout = new();
 
 	public static LoadoutData createRandom(int playerId) {
 		return new LoadoutData() {
@@ -479,6 +480,7 @@ public class LoadoutData {
 			axlLoadout = AxlLoadout.createRandom(),
 			sigmaLoadout = SigmaLoadout.createRandom(),
 			pzeroLoadout = PZeroLoadout.createRandom(),
+			bzeroLoadout = BZeroLoadout.createRandom(),
 		};
 	}
 
@@ -490,7 +492,8 @@ public class LoadoutData {
 			vileLoadout = vileLoadout.clone(),
 			axlLoadout = axlLoadout.clone(),
 			sigmaLoadout = sigmaLoadout.clone(),
-			pzeroLoadout = pzeroLoadout.clone()
+			pzeroLoadout = pzeroLoadout.clone(),
+			bzeroLoadout = bzeroLoadout.clone()
 		};
 	}
 
@@ -503,6 +506,7 @@ public class LoadoutData {
 			axlLoadout = Helpers.cloneProtobuf(Options.main.axlLoadout),
 			sigmaLoadout = Helpers.cloneProtobuf(Options.main.sigmaLoadout),
 			pzeroLoadout = Helpers.cloneProtobuf(Options.main.pzeroLoadout),
+			bzeroLoadout = Helpers.cloneProtobuf(Options.main.bzeroLoadout),
 		};
 	}
 }

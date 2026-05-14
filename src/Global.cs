@@ -10,6 +10,7 @@ using DeviceId.Encoders;
 using DeviceId.Formatters;
 using Newtonsoft.Json;
 using SFML.Graphics;
+using WindowsAPI;
 using static SFML.Window.Keyboard;
 
 namespace MMXOnline;
@@ -23,7 +24,7 @@ public partial class Global {
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
 	// This step could be automated as future improvement in build scripts.
-	private const string assetChecksum = "86B00C17076AD59E94D34BEF561B57112";
+	private const string assetChecksum = "FE0DC72D3A05F57170F14FFCC3EC010E";
 
 	// For forks/mods of the game, add a prefix here so that different forks
 	// don't conflict with each other or the base game
@@ -46,6 +47,8 @@ public partial class Global {
 	public static string nameCoins = "Metals";
 
 	public static bool isLoading;
+
+	public static WinApi OsApi = new();
 
 	public static void promptDebugSettings() {
 		//testDocumentsInDebug = Helpers.showMessageBoxYesNo("Test documents in debug?", "Debug Settings");
@@ -213,79 +216,6 @@ public partial class Global {
 		}
 	}
 
-	public static void cheats() {
-		if (Global.level == null) return;
-
-		//if (!Global.showAIDebug)
-		if (Global.input.isPressed(Key.F1)) {
-			//Global.breakpoint = true;
-			//Global.showAIDebug = true;
-			//Global.level.setMainPlayerSpectate();
-			//Global.level.mainPlayer.character.addInfectedTime(null, 8);
-			//Global.level.otherPlayer.character.addInfectedTime(null, 8);
-			//DevConsole.toggleFTD();
-		}
-		if (Global.input.isPressed(Key.F2)) {
-			Global.showHitboxes = !Global.showHitboxes;
-		}
-		if (Global.input.isPressed(Key.F3)) {
-			Global.showGridHitboxes = !Global.showGridHitboxes;
-			//Global.showAIDebug = !Global.showAIDebug;
-		}
-		if (Global.input.isPressed(Key.F4)) {
-			Global.level.mainPlayer?.forceKill();
-			//Global.level?.mainPlayer?.character?.setHurt(1, Global.defFlinch);
-		}
-		if (Global.input.isPressed(Key.F5)) {
-			Global.showDiagnostics = !Global.showDiagnostics;
-		}
-		if (Global.input.isPressed(Key.F6)) {
-			Global.level.mainPlayer.currency = 100;
-		}
-
-		if (Global.input.isPressed(Key.F7)) {
-			DevConsole.toggleInvulnFrames(10);
-		}
-
-		//if (Global.input.isPressed(Key.F8)) {
-		//DevConsole.changeTeam();
-		//}
-
-		if (Global.input.isPressed(Key.F9)) {
-			if (AI.trainingBehavior == AITrainingBehavior.Default) AI.trainingBehavior = AITrainingBehavior.Idle;
-			else if (AI.trainingBehavior == AITrainingBehavior.Idle) AI.trainingBehavior = AITrainingBehavior.Attack;
-			else if (AI.trainingBehavior == AITrainingBehavior.Attack) AI.trainingBehavior = AITrainingBehavior.Jump;
-			else if (AI.trainingBehavior == AITrainingBehavior.Jump) AI.trainingBehavior = AITrainingBehavior.Default;
-		}
-		if (Global.input.isPressed(Key.F8)) {
-			var aiPlayer = Global.level.players[1];
-			if (aiPlayer?.character != null) {
-				if (Global.level.mainPlayer.input == Global.input) {
-					Global.level.mainPlayer.input = new Input(true);
-					aiPlayer.isAI = false;
-					aiPlayer.character.ai = null;
-					aiPlayer.input = Global.input;
-				} else {
-					Global.level.mainPlayer.input = Global.input;
-					aiPlayer.character.ai = new AI(aiPlayer.character);
-					aiPlayer.isAI = true;
-					aiPlayer.input = new Input(true);
-				}
-			}
-		}
-
-		if (Global.input.isPressed(Key.F11)) {
-			var ms = Global.level.musicSources.FirstOrDefault();
-			if (ms != null) {
-				ms.setNearEndCheat();
-			} else {
-				Global.music.setNearEndCheat();
-			}
-		}
-	}
-
-	// End debug section.
-
 	public static bool hideMouse = false;
 	public static int randomTipIndex = 0;
 	public const int maxUnconnectedMTUSize = 8191;
@@ -360,7 +290,7 @@ public partial class Global {
 			{ "velg_jump", "velg_exit" },
 			{ "velg_die", "velg_hurt" },
 
-			{ "sigma2_viral_enter", "sigma2_viral_possess,sigma2_viral_exit" },
+			{ "viralsigma_enter", "viralsigma_possess, viralsigma_exit, viralsigma_die" },
 
 			{ "wsponge_fall", "wsponge_enter" },
 			{ "wsponge_jump", "wsponge_exit" },

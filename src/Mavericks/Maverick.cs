@@ -313,6 +313,10 @@ public class Maverick : Actor, IDamagable {
 			}
 		}
 	}
+	public void removeAcid() {
+		acidTime = 0;
+		acidHurtCooldown = 0;
+	}
 
 	public void debuffCooldowns() {
 		if (Global.level.mainPlayer.readyTextOver) {
@@ -460,6 +464,10 @@ public class Maverick : Actor, IDamagable {
 					usedSubtank.health--;
 				}
 				health = Helpers.clampMax(health + 1, maxHealth);
+				if (acidTime > 0) {
+					acidTime--;
+					if (acidTime < 0) removeAcid();
+				}
 				if (player == Global.level.mainPlayer || playHealSound) {
 					if (gameMavs == Maverick.GameMavs.X1) {
 						playSound("heal", forcePlay: true, sendRpc: true);

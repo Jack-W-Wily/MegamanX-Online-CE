@@ -121,6 +121,7 @@ public class Options {
 
 	// Punchy Zero
 	public PZeroLoadout pzeroLoadout = new PZeroLoadout();
+	public BZeroLoadout bzeroLoadout = new BZeroLoadout();
 
 	// WCUT STUFF
 

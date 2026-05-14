@@ -88,9 +88,11 @@ public class Fonts {
 
 				var textSprite = new SFML.Graphics.Sprite(
 					bitmapFontTexture, new IntRect(
-						(rx * fontTextureSize) + ((rx + 1) * fontGridSpacing),
-						(ry * fontTextureSize) + ((ry + 1) * fontGridSpacing),
-						fontTextureSize, fontTextureSize
+						(
+							(rx * fontTextureSize) + ((rx + 1) * fontGridSpacing),
+							(ry * fontTextureSize) + ((ry + 1) * fontGridSpacing)
+						),
+						(fontTextureSize, fontTextureSize)
 					)
 				);
 				if (alpha != null) {
@@ -130,7 +132,7 @@ public class Fonts {
 				DrawWrappers.walDrawObjects[depth] = new DrawLayer();
 			}
 			drawLayer = DrawWrappers.walDrawObjects[depth];
-			drawLayer.oneOffs.Add(new DrawableWrapper(null, batchDrawable, color.Value));
+			drawLayer.oneOffs.Add(new DrawableWrapper([], batchDrawable, color.Value));
 		} else {
 			if (!deferred) {
 				DrawWrappers.drawToHUD(batchDrawable);
@@ -160,9 +162,9 @@ public class Fonts {
 					fontWidth = fontSizes[fontStr][charInt];
 					fontSpaceWidth = fontWidth;
 				}
-				if (Char.IsWhiteSpace(letter) ||
+				if (char.IsWhiteSpace(letter) ||
 					pos >= textLines[line].Length - 1 ||
-					Char.IsWhiteSpace(textLines[line][pos + 1])
+					char.IsWhiteSpace(textLines[line][pos + 1])
 				) {
 					tempSize += fontSpaceWidth;
 				} else {

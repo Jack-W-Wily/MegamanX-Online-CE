@@ -143,7 +143,7 @@ public class PopcornDemon : VileMissile {
 		fireRate = 45;
 		displayName = "Popcorn Demon";
 		vileAmmoUsage = 12;
-		description = new string[] { "This missile splits into 3", "and can cause great damage." };
+		description = ["This missile splits into 3", "and can cause great damage."];
 		killFeedIndex = 76;
 		vileWeight = 3;
 		vileWeight = 2;

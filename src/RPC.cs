@@ -961,7 +961,6 @@ public class RPCJoinLateRequest : RPC {
 		var serverPlayer = Helpers.deserialize<ServerPlayer>(arguments);
 
 		Global.level.addPlayer(serverPlayer, true);
-
 		/*
 		foreach (var player in Global.level.players) {
 			player.charNetId = null;
@@ -1123,7 +1122,9 @@ public class RPCSyncGameTime : RPC {
 
 		int time = BitConverter.ToUInt16(new byte[] { arguments[0], arguments[1] }, 0);
 		Global.level.gameMode.remainingTime = time;
-		if (Global.level.gameMode.remainingTime.Value <= 10 && Global.level.gameMode.remainingTime.Value > 0) Global.playSound("text");
+		if (Global.level.gameMode.remainingTime.Value <= 10 && Global.level.gameMode.remainingTime.Value > 0) {
+			Global.playSound("text");
+		}
 		if (arguments.Length >= 4) {
 			int elimTime = BitConverter.ToUInt16(new byte[] { arguments[2], arguments[3] }, 0);
 			Global.level.gameMode.eliminationTime = elimTime;
@@ -1235,6 +1236,8 @@ public class RPCSyncControlPoints : RPC {
 
 
 public class RPCAxlDisguiseJson {
+	public int type;
+	public bool isMain;
 	public int playerId;
 	public ushort dnaNetId;
 	public string targetName;
@@ -1245,10 +1248,14 @@ public class RPCAxlDisguiseJson {
 	public RPCAxlDisguiseJson() { }
 
 	public RPCAxlDisguiseJson(
-		int playerId, string targetName, int charNum,
+		int type, bool isMain,
+		int playerId, string targetName,
+		int charNum,
 		LoadoutData loadout,
 		ushort dnaNetId, byte[]? extraData = null
 	) {
+		this.type = type;
+		this.isMain = isMain;
 		this.playerId = playerId;
 		this.targetName = targetName;
 		this.charNum = charNum;
@@ -1269,16 +1276,16 @@ public class RPCAxlDisguise : RPC {
 			JsonConvert.DeserializeObject<RPCAxlDisguiseJson>(json) ?? throw new NullReferenceException()
 		);
 		var player = Global.level.getPlayerById(axlDisguiseData.playerId);
-		if (player.character == null) {
+		if (player?.character == null) {
 			return;
 		}
-		if (axlDisguiseData.charNum == -1) {
+		if (axlDisguiseData.type == 1) {
 			if (player.character == null) {
 				player.atransLoadout = null;
 			} else {
-				player.revertAtransMain(axlDisguiseData.dnaNetId);
+				player.revertAtransMain(axlDisguiseData);
 			}
-		} else if (axlDisguiseData.charNum == -2) {
+		} else if (axlDisguiseData.type == 2) {
 			player.revertAtransDeath();
 		} else {
 			player.character = player.startAtransNet(player.character, axlDisguiseData);
@@ -2202,7 +2209,8 @@ public class RPCSyncPossessInput : RPC {
 		player.input.possessedControlHeld[Control.Down] = inputHeldArray[3];
 		player.input.possessedControlHeld[Control.Jump] = inputHeldArray[4];
 		player.input.possessedControlHeld[Control.Dash] = inputHeldArray[5];
-		player.input.possessedControlHeld[Control.Taunt] = inputHeldArray[6];
+		player.input.possessedControlHeld[Control.Shoot] = inputHeldArray[6];
+		player.input.possessedControlHeld[Control.Special1] = inputHeldArray[7];
 
 		player.input.possessedControlPressed[Control.Left] = inputPressedArray[0];
 		player.input.possessedControlPressed[Control.Right] = inputPressedArray[1];
@@ -2210,7 +2218,8 @@ public class RPCSyncPossessInput : RPC {
 		player.input.possessedControlPressed[Control.Down] = inputPressedArray[3];
 		player.input.possessedControlPressed[Control.Jump] = inputPressedArray[4];
 		player.input.possessedControlPressed[Control.Dash] = inputPressedArray[5];
-		player.input.possessedControlPressed[Control.Taunt] = inputPressedArray[6];
+		player.input.possessedControlPressed[Control.Shoot] = inputPressedArray[6];
+		player.input.possessedControlPressed[Control.Special1] = inputPressedArray[7];
 	}
 
 	public void sendRpc(int playerId, byte inputHeldByte, byte inputPressedByte) {

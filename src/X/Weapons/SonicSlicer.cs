@@ -96,7 +96,7 @@ public class SonicSlicerProj : Projectile {
 			damager.flinch = 20;
 		this.type = type;
 		if (collider != null) {
-			collider.wallOnly = true;
+			collider?.wallOnly = true;
 		}
 		projId = (int)ProjIds.SonicSlicer;
 		hitSound = "htsnd_slash1";

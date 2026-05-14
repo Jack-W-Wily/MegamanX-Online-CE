@@ -357,6 +357,8 @@ public partial class Character : Actor, IDamagable {
 			return (mw as MaverickWeapon)?.maverick;
 		}
 	}
+	public Actor abstractedActor => rideArmor != null ? rideArmor : this;
+
 	public bool isControllingPuppet() {
 		return currentMaverick?.controlMode == MaverickModeId.Puppeteer;
 	}
@@ -1080,6 +1082,14 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementTime(ref dropFlagCooldown);
 
 		if (Global.level.mainPlayer.readyTextOver) {
+		bool matchOn = true;
+		if (Global.level.gameMode is TeamElimAlt tea) {
+			if (tea.resultTime > 0) {
+				matchOn = false;
+			}
+		}
+		}
+		if (Global.level.mainPlayer.readyTextOver && matchOn) {
 			Helpers.decrementTime(ref invulnTime);
 		}
 
@@ -1190,6 +1200,7 @@ public partial class Character : Actor, IDamagable {
 		else if (player.input.isPressed(Control.Shoot, player)) {
 			mw.summon(player, pos, xDir);
 		}
+
 	}
 
 
@@ -1550,7 +1561,9 @@ public partial class Character : Actor, IDamagable {
 				health = Helpers.clampMax(health + 1, maxHealth);
 				if (acidTime > 0) {
 					acidTime--;
-					if (acidTime < 0) removeAcid();
+					if (acidTime < 0) {
+						removeAcid();
+					}
 				}
 				if (player == Global.level.mainPlayer || playHealSound) {
 					playAltSound("heal", sendRpc: true, altParams: "harmor");
@@ -2149,7 +2162,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual bool isPushImmune() {
 		return (
-			isTrueStatusImmune() || charState.pushImmune == true ||
+			isTrueStatusImmune() || charState.pushImmune ||
 			immuneToKnockback || isClimbingLadder()
 		);
 	}
@@ -2171,11 +2184,11 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isTrueStatusImmune() {
-		return !alive || isInvulnerable(true);
+		return !alive || charState.immortal || charState.immuneToAll || isInvulnerable(true);
 	}
 
 	public virtual bool isNonDamageStatusImmune() {
-		return false;
+		return charState.statusEffectImmune;
 	}
 
 	public virtual bool isToughGuyHyperMode() {
@@ -2185,7 +2198,6 @@ public partial class Character : Actor, IDamagable {
 	public virtual void clenaseDmgDebuffs() {
 		removeBurn();
 		removeAcid();
-		oilTime = 0;
 		parasiteTime = 0;
 		parasiteMashTime = 0;
 		parasiteDamager = null;
@@ -2202,7 +2214,6 @@ public partial class Character : Actor, IDamagable {
 		parasiteDamager = null;
 		// Remove slows.
 		igFreezeProgress = 0;
-		virusTime = 0;
 		slowdownTime = 0;
 		xFlinchPushVel = 0;
 		// Remove stuns & grabs.
@@ -2210,6 +2221,18 @@ public partial class Character : Actor, IDamagable {
 			changeToIdleOrFall();
 			return;
 		}
+	}
+
+	public virtual void clenaseEverithing() {
+		// Remove other stuff.
+		clenaseAllDebuffs();
+		// Remove Dark Hold.
+		if (charState is DarkHoldState) {
+			changeToIdleOrFall();
+			return;
+		}
+		// Remove time effects.
+		virusTime = 0;
 	}
 
 	// If factorHyperMode = true, then invuln frames in a hyper mode won't count as "invulnerable".
@@ -2232,9 +2255,6 @@ public partial class Character : Actor, IDamagable {
 			) {
 				return true;
 			}
-		}
-		if (sprite.name == "sigma2_viral_exit") {
-			return true;
 		}
 		if (ownedByLocalPlayer && charState is WarpOut or WolfSigmaRevive or ViralSigmaRevive or KaiserSigmaRevive) {
 			return true;
@@ -2261,7 +2281,7 @@ public partial class Character : Actor, IDamagable {
 
 	public bool canBeGrabbed() {
 		return (
-			grabInvulnTime == 0 && !isGrabImmune()
+			grabInvulnTime <= 0 && !isGrabImmune()
 		);
 	}
 
@@ -2363,11 +2383,6 @@ public partial class Character : Actor, IDamagable {
 			Math.Max(rightX, headPos.x + headshotRadius),
 			headPos.y + headshotRadius
 		);
-	}
-
-	public Actor abstractedActor() {
-		if (rideArmor != null) return rideArmor;
-		return this;
 	}
 
 	public bool isClimbingLadder() {
@@ -2639,20 +2654,7 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 		currentLabelY = -getLabelOffY();
-		(float x, float y) drawOffset = (x, y);
 
-		if (rideArmorPlatform != null) {
-			var rideArmorPos = rideArmorPlatform.pos;
-			var charPos = getMK5RideArmorPos().addxy(0, 1);
-			drawOffset = (rideArmorPos.x + charPos.x - pos.x, rideArmorPos.y + charPos.y - pos.y);
-		} else if (rideArmor != null) {
-			var rideArmorPos = rideArmor.pos;
-			var charPos = getCharRideArmorPos();
-			drawOffset = (rideArmorPos.x + charPos.x - pos.x, rideArmorPos.y + charPos.y - pos.y);
-		} else if (rideChaser != null) {
-			var rideChaserPos = rideChaser.pos;
-			drawOffset = (rideChaserPos.x - pos.x, rideChaserPos.y - pos.y);
-		}
 		float? savedAlpha = null;
 		if (invulnTime > 0) {
 			savedAlpha = alpha;
@@ -2667,7 +2669,7 @@ public partial class Character : Actor, IDamagable {
 			alpha = savedAlpha.Value;
 		}
 
-		charState?.render(x, y);
+		charState.render(x, y);
 		chargeEffect?.render(getParasitePos().add(new Point(x, y)));
 
 		if (isCrystalized) {
@@ -3251,6 +3253,7 @@ public partial class Character : Actor, IDamagable {
 	public virtual bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
 		if (isInvulnerable()) return false;
 		if (isDeathOrReviveSprite()) return false;
+		if (charState is ViralSigmaPossess) return false;
 		if (Global.level.gameMode.setupTime > 0) return false;
 		if (Global.level.isRace()) {
 			bool isAxlSelfDamage = player.isAxl && damagerAlliance == player.alliance;
@@ -3327,17 +3330,67 @@ public partial class Character : Actor, IDamagable {
 			if (weaponIndex == 20 && damage > 0) inRideArmor.crystalizeTime = 0;   //Dash to destroy crystal
 			inRideArmor.checkCrystalizeTime();
 		}
-
-
-	
-
-			// For fractional damage shenanigans.
-			if (damage % 1 != 0) {
-				decimal decDamage = damage % 1;
-				damage = Math.Floor(damage);
-				// Fully nullyfy decimal using damage savings if posible.
-				if (damageSavings >= decDamage) {
-					damageSavings -= decDamage;
+		// For fractional damage shenanigans.
+		if (damage % 1 != 0) {
+			decimal decDamage = damage % 1;
+			damage = Math.Floor(damage);
+			// Fully nullyfy decimal using damage savings if posible.
+			if (damageSavings >= decDamage) {
+				damageSavings -= decDamage;
+			}
+			// If damage is over one we add it to damagedebt.
+			else if (damage >= 1) {
+				damageDebt += decDamage;
+			}
+			// If is under 1 we just apply it as is.
+			else {
+				damage += decDamage;
+			}
+		}
+		// First we apply debt then savings.
+		// This is done before defense calculation to allow to defend from debt.
+		while (damageDebt >= 1) {
+			damageDebt -= 1;
+			damage += 1;
+		}
+		while (damageSavings >= 1 && damage >= 1) {
+			damageSavings -= 1;
+			damage -= 1;
+		}
+		// Damage increase/reduction section
+		if (!isArmorPiercing && damageSavings < maxHealth) {
+			// Limit calculation damage to our max HP.
+			decimal calcDamage = Math.Min(originalDamage, maxHealth);
+			// Apply savings.
+			if (charState is SwordBlock) {
+				if (this is NeoSigma) {
+					damageSavings += (calcDamage * 0.75m);
+				} else {
+					damageSavings += (calcDamage * 0.5m);
+				}
+			}
+			else if (charState is SigmaAutoBlock) {
+				damageSavings += (calcDamage * 0.25m);
+			}
+			else if (charState is SigmaBlock) {
+				damageSavings += (calcDamage * 0.5m);
+			}
+			// Universal block.
+			else if (charState.specialId == SpecialStateIds.CsJkUBlock) {
+				damageSavings += (calcDamage * 0.5m);
+			}
+			
+			if (acidTime > 0) {
+				decimal extraDamage = 0.25m + (0.25m * ((decimal)acidTime / 8.0m));
+				damageDebt += (calcDamage * extraDamage);
+			}
+			if (mmx != null) {
+				if (mmx.barrierActiveTime > 0) {
+					if (mmx.hyperChestArmor == ArmorId.Max) {
+						damageSavings += (calcDamage * 0.5m);
+					} else {
+						damageSavings += (calcDamage * 0.25m);
+					}
 				}
 				// If damage is over one we add it to damagedebt.
 				else if (damage >= 1) {
@@ -3502,6 +3555,16 @@ public partial class Character : Actor, IDamagable {
 					);
 				}
 			}
+			if (this is BusterZero busterZero && busterZero.gigaAttack != null) {
+				float currentAmmo = busterZero.gigaAttack.ammo;
+				busterZero.gigaAttack.addAmmo(gigaAmmoToAdd, player);
+				if (player.isMainPlayer) {
+					Weapon.gigaAttackSoundLogic(
+						this, currentAmmo, busterZero.gigaAttack.ammo,
+						busterZero.gigaAttack.getAmmoUsage(0), busterZero.gigaAttack.maxAmmo
+					);
+				}
+			}
 			if (this is MegamanX) {
 				var gigaCrush = weapons.FirstOrDefault(w => w is GigaCrush);
 				if (gigaCrush != null) {
@@ -3589,7 +3652,7 @@ public partial class Character : Actor, IDamagable {
 					);
 				}
 			}
-		
+		}
 	}
 
 	public bool isNodamage = true;
@@ -3612,8 +3675,8 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player && killer != Player.stagePlayer) {
 				killer.addKill();
-				if (this.player.isAI && this is BossStag && Global.level.is1v1() && Options.main.C7E1FBE2E00 != 888 && killer.character.isNodamage) {
-					killer.UnlockVAVA();
+				if (killer.possessedTime > 0) {
+					killer.possesser.addKill();
 				}
 				if (Global.level.gameMode is TeamDeathMatch) {
 					if (Global.isHost) {
@@ -4054,8 +4117,8 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public bool canAffordRideArmor() {
-		if (Global.level.is1v1() ) {
+	public virtual bool canAffordRideArmor() {
+		if (Global.level.is1v1()) {
 			return health > Math.Floor(maxHealth / 2);
 		}
 		if (this is VAVAV) {
@@ -4067,7 +4130,7 @@ public partial class Character : Actor, IDamagable {
 		return player.currency >= Vile.callNewMechCost;
 	}
 
-	public void buyRideArmor() {
+	public virtual void buyRideArmor() {
 		if (Global.level.is1v1()) {
 			health -= Math.Floor(maxHealth / 2);
 			return;
@@ -4217,6 +4280,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public void addTransformAnim() {
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		transformAnim = new Anim(
 			pos, "axl_transform", xDir, player.getNextActorNetId(), true, true
 		);

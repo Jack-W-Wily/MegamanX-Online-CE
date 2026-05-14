@@ -14,6 +14,7 @@ public enum ZeroGigaType {
 
 public class RakuhouhaWeapon : Weapon {
 	public static RakuhouhaWeapon netWeapon = new();
+	public float ammoCost = 14;
 
 	public RakuhouhaWeapon() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -38,7 +39,7 @@ public class RakuhouhaWeapon : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return 14;
+		return ammoCost;
 	}
 
 	public static Weapon getWeaponFromIndex(int index) {
@@ -58,6 +59,7 @@ public class RakuhouhaWeapon : Weapon {
 
 public class RekkohaWeapon : Weapon {
 	public static RekkohaWeapon netWeapon = new();
+	public float ammoCost = 28;
 
 	public RekkohaWeapon() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -82,7 +84,7 @@ public class RekkohaWeapon : Weapon {
 	}
 
 	public override float getAmmoUsage(int chargeLevel) {
-		return 28;
+		return ammoCost;
 	}
 
 	public override void shoot(Character character, int[] args) {
@@ -619,13 +621,6 @@ public abstract class ZeroGigaAttack : CharState {
 			character.changeSpriteFromName("giga_end", true);
 		}
 	}
-	
-	/*
-	public override void onEnter(CharState oldState) {
-		character.clenaseDmgDebuffs();
-		base.onEnter(oldState);
-	}
-	*/
 
 	public override void onExit(CharState? newState) {
 		weapon.shootCooldown = weapon.fireRate;
@@ -773,7 +768,7 @@ public class ShinMessenkouState : ZeroGigaAttack {
 		onShoot = shootGiga;
 		effectName = "zero_rakuanim";
 	}
-	
+
 	public void shootGiga() {
 		for (int i = 1; i < 3; i++) {
 			int j = i + 1;
@@ -800,6 +795,11 @@ public class ShinMessenkouState : ZeroGigaAttack {
 			-1, character, player, player.getNextActorNetId(), rpc: true
 		);
 		character.playSound("zeroshinmessenkoubullet");
+	}
+
+	public override void onEnter(CharState oldState) {
+		character.clenaseAllDebuffs();
+		base.onEnter(oldState);
 	}
 }
 
@@ -882,8 +882,8 @@ public class DarkHoldShootState : CharState {
 	}
 
 	public override void onEnter(CharState oldState) {
+		character.clenaseAllDebuffs();
 		base.onEnter(oldState);
-		character.clenaseDmgDebuffs();
 	}
 
 	public override void onExit(CharState? newState) {

@@ -395,6 +395,23 @@ public class Damager {
 					zarzo.gigaAttack.ammo += 1;
 				}
 			}
+			if (owner.character is BusterZero { isViral: true }) {
+				character.addVirusTime(owner, damage);
+			}
+			if (victim is BusterZero { isViral: true }) {
+				if (damagingActor is Projectile proj && proj.ownerActor is Character damagerChara) {
+					damagerChara.addVirusTime(owner, damage / 2f);
+				}
+			}
+			
+
+			// MK2 Grab Fix
+			if (owner.character is Vile vile && !character.isGrabImmune()) {
+				if (vile.sprite.name.Contains("dash_grab") && projId == (int)ProjIds.VileMK2GrabStart){
+					character.changeState(new VileMK2Grabbed(vile), true);
+					vile.changeState(new VileMK2GrabState(character));
+				}
+			}
 
 			
 			if (owner.character is Zain esZain && esZain.health > 0) {
@@ -525,9 +542,7 @@ public class Damager {
 					character.addBurnTime(owner, new FlameBurner(0), 2);
 					break;
 				case (int)ProjIds.QuakeBlazer:
-					if (!character.grounded && Global.customSettings?.quakeBlazerDownwards == true) {
-						character.vel.y += character.getJumpPower();
-					}
+					character.vel.y += Physics.JumpSpeed;
 					character.addBurnTime(owner, DanchienWeapon.staticWeapon, 0.5f);
 					break;
 				case (int)ProjIds.QuakeBlazerFlame:
@@ -1446,13 +1461,10 @@ public class Damager {
 						flinch = 0;
 						damage = 0;
 						maverick.playSound("m10ding");
-						if (owner.ownedByLocalPlayer == true &&
-							owner.character is Zero zero &&
-							!zero.hypermodeActive()
-						) {
-							//What in the..
-							if (damagingActor is Projectile proj1 && proj1.isZSaberClang) {
-								owner.character.changeState(new ZeroClang(-owner.character.xDir));
+						//What in the.
+						if (owner.ownedByLocalPlayer == true) {
+							if (damagingActor is Projectile proj1 && proj1.clashTier == ClashTier.Weak) {
+								proj1.startClash();
 							}
 						}
 					}
@@ -1846,7 +1858,7 @@ public class Damager {
 		}
 		// Can also be overdrive by custom setting.
 		if (Global.level.server?.customMatchSettings?.assistBanlist == false) {
-			return false;		
+			return false;
 		}
 		return (ProjIds)projId switch {
 			ProjIds.Tornado => true,

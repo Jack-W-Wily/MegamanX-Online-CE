@@ -159,7 +159,7 @@ public class NovaStrikeStateEX : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		//character.clenaseDmgDebuffs();
+		character.clenaseDmgDebuffs();
 	}
 
 	public override void onExit(CharState? newState) {
@@ -204,7 +204,7 @@ public class NovaStrikeStateUpEX : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		//character.clenaseDmgDebuffs();
+		character.clenaseDmgDebuffs();
 	}
 
 
@@ -250,7 +250,7 @@ public class NovaStrikeStateDownEX : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		//character.clenaseDmgDebuffs();
+		character.clenaseDmgDebuffs();
 	}
 
 	public override void onExit(CharState? newState) {

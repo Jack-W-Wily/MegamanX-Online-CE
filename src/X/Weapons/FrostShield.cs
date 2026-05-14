@@ -56,7 +56,7 @@ public class FrostShield : Weapon {
 	}
 }
 
-public class FrostShieldProj : Projectile {
+public class FrostShieldProj : Projectile, IDamagable {
 	int state = 0;
 	float stateTime;
 	public Anim exhaust;
@@ -73,9 +73,6 @@ public class FrostShieldProj : Projectile {
 		projId = (int)ProjIds.FrostShield;
 		destroyOnHit = true;
 		exhaust = new Anim(pos, "frostshield_exhaust", xDir, null, false);
-		if (Global.level.server?.customMatchSettings?.frostShieldNerf == false) {
-			isShield = true;
-		}
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -123,6 +120,19 @@ public class FrostShieldProj : Projectile {
 		exhaust?.destroySelf();
 		shatter();
 	}
+
+	public void applyDamage(float damage, Player owner, Actor? actor, int? weaponIndex, int? projId) {
+		// Does not take damage.
+		// This is just there to block non-pierce projectiles.
+		// At least without causing clang aganist melee characters.
+	}
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
+	public bool isInvincible(Player attacker, int? projId) => false;
+	public bool canBeHealed(int healerAlliance) => false;
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = true) { }
+	public bool isPlayableDamagable() => false;
 }
 
 public class FrostShieldProjAir : Projectile {
@@ -136,7 +146,7 @@ public class FrostShieldProjAir : Projectile {
 		projId = (int)ProjIds.FrostShieldAir;
 		useGravity = true;
 		destroyOnHit = false;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		canBeLocal = false; // TODO: Allow local.
 		vel = new Point(-xVel * 0.5f, -150);
 		if (rpc) {
@@ -166,7 +176,7 @@ public class FrostShieldProjAir : Projectile {
 }
 
 public class FrostShieldProjGround : Projectile, IDamagable {
-	float health = 4;
+	float health = 3;
 	
 	public FrostShieldProjGround(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
@@ -180,9 +190,7 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 		maxTime = 5;
 		projId = (int)ProjIds.FrostShieldGround;
 		destroyOnHit = true;
-		if (Global.level.server?.customMatchSettings?.frostShieldNerf == false) {
-			isShield = true;
-		}
+
 		playSound("frostShield");
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -216,23 +224,10 @@ public class FrostShieldProjGround : Projectile, IDamagable {
 		return damagerAlliance != owner.alliance;
 	}
 
-	public bool canBeHealed(int healerAlliance) {
-		return false;
-	}
-
-	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
-	}
-
-	public bool isInvincible(Player attacker, int? projId) {
-		if (projId == null) {
-			return true;
-		}
-		return !Damager.canDamageFrostShield(projId.Value);
-	}
-
-	public bool isPlayableDamagable() {
-		return false;
-	}
+	public bool canBeHealed(int healerAlliance)  => false;
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) { }
+	public bool isInvincible(Player attacker, int? projId) => false;
+	public bool isPlayableDamagable() => false;
 
 	public override void onDestroy() {
 		base.onDestroy();
@@ -333,9 +328,9 @@ public class FrostShieldProjChargedGround : Projectile {
 		shouldVortexSuck = false;
 		character = player.character;
 		useGravity = true;
-		isShield = true;	
+		isShield = true;
 		vel = new Point(xDir * 150, -100);
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		slideAnim = new Anim(pos, "frostshield_charged_slide", xDir, null, false);
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -385,7 +380,7 @@ public class FrostShieldProjPlatform : Projectile {
 		projId = (int)ProjIds.FrostShieldChargedPlatform;
 		setIndestructableProperties();
 		isShield = true;
-		if (collider != null) { collider.wallOnly = true; }
+		collider?.wallOnly = true;
 		grounded = false;
 		canBeGrounded = false;
 		useGravity = false;

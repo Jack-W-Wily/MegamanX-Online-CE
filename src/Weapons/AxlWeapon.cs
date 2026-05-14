@@ -96,7 +96,6 @@ public class AxlWeapon : Weapon {
 		shootCooldown *= (1 + aimBackwardsAmount * 0.25f);
 
 		rechargeAmmoCustomSettingAxl = rechargeAmmoCooldown;
-
 		stealthReveal(character);
 		axl.afterAxlShoot(this);
 		axl.recoilTime = 0.2f;
@@ -140,7 +139,6 @@ public class AxlWeapon : Weapon {
 		altShotCooldown *= (1 + aimBackwardsAmount * 0.25f);
 
 		rechargeAmmoCustomSettingAxl2 = altRechargeAmmoCooldown;
-
 		stealthReveal(character);
 		axl.afterAxlShoot(this);
 		axl.recoilTime = 0.2f;
