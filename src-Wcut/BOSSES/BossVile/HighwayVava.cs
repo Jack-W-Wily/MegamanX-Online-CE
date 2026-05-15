@@ -572,56 +572,56 @@ public class HighwayVAVA : Vile {
 			(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
 				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
-				isDeflectShield: true, isZSaberClang: false, isZSaberEffect: false,
+				isDeflectShield: true, ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.GizmoGrab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GizmoGrab, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: true, isZSaberEffect: false,
+				ShouldClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Grabmk2dash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.VileMK2Grab, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.UpperCut => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
 				 2, 40, 42, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.GodPress => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.ForceGrabState, player,
 				 2, 0, 0, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.KamaeBlock => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 0.25f, 5, 10, isReflectShield: true,
-			isZSaberClang: true, isZSaberEffect: true,
+			ShouldClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
 			(int)MeleeIds.Jab => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 1, 20, 25, isReflectShield: true,
-			isZSaberClang: true, isZSaberEffect: true,
+			ShouldClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
 			(int)MeleeIds.Jab2 => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab2, player,
 			 1, 26, 20, isReflectShield: true,
-			isZSaberClang: true, isZSaberEffect: true,
+			ShouldClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
 
@@ -629,70 +629,70 @@ public class HighwayVAVA : Vile {
 			(int)MeleeIds.KamaeUnB => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.DeadLiftEX => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				2, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Kote => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				3, 30, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.BurensenStart => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStart, player,
 				2, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.BurensenStomp => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
 				1, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.BurensenEND => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				2, 0, 30, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				4, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.RagingDemon => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.RagingDemon, player,
 				5, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
 				3, 30, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
 				3, 30, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 

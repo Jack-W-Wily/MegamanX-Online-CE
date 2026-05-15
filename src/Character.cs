@@ -1088,11 +1088,11 @@ public partial class Character : Actor, IDamagable {
 				matchOn = false;
 			}
 		}
-		}
+		
 		if (Global.level.mainPlayer.readyTextOver && matchOn) {
 			Helpers.decrementTime(ref invulnTime);
 		}
-
+		}
 		if (inCombatCooldown > 0) {
 			inCombatCooldown -= Global.gameSpeed;
 			inCombatTime += Global.gameSpeed;
@@ -3346,7 +3346,7 @@ public partial class Character : Actor, IDamagable {
 			else {
 				damage += decDamage;
 			}
-		}
+		
 		// First we apply debt then savings.
 		// This is done before defense calculation to allow to defend from debt.
 		while (damageDebt >= 1) {
@@ -3357,6 +3357,7 @@ public partial class Character : Actor, IDamagable {
 			damageSavings -= 1;
 			damage -= 1;
 		}
+		
 		// Damage increase/reduction section
 		if (!isArmorPiercing && damageSavings < maxHealth) {
 			// Limit calculation damage to our max HP.
@@ -3400,6 +3401,8 @@ public partial class Character : Actor, IDamagable {
 				else {
 					damage += decDamage;
 				}
+			}
+			}
 			}
 			// First we apply debt then savings.
 			// This is done before defense calculation to allow to defend from debt.
@@ -3614,7 +3617,7 @@ public partial class Character : Actor, IDamagable {
 			if (this is NeoSigma neoSigma) {
 				neoSigma.gigaAttack.addAmmo(gigaAmmoToAdd, player);
 			}
-		}
+		
 
 			if ((damage > 0 || originalDamage > 0 ||
 				Damager.alwaysAssist(projId)) && attacker != null && weaponIndex != null

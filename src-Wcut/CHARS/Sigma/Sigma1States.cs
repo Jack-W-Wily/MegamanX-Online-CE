@@ -115,8 +115,8 @@ public class SigmaSlashStateAirWC : CmdSigmaStateWC {
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(24, -22);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), 3, 13, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 2,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -183,8 +183,8 @@ public class SigmaSlashStateDashWC : CmdSigmaStateWC {
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(26, -22);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), 4, 26, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 2,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 		if (character.isAnimOver()) {
@@ -411,8 +411,8 @@ public class SigmaWallDashStateWC : CmdSigmaStateWC {
 			character.changeSpriteFromName("wall_dash_attack", true);
 			Point off = new Point(30, -20);
 			new SigmaSlashProj(
-				character.pos.addxy(off.x * character.xDir, off.y), character.xDir,
-				sigma, player, player.getNextActorNetId(), damage: 4, rpc: true
+				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 2,
+				sigma, player.getNextActorNetId(), sendRpc: true
 			);
 		}
 	}

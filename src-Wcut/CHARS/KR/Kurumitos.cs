@@ -408,10 +408,10 @@ public static CharSelection[] selections => [
 				hitCooldown: 0, // how many frames until that hitbox can be effective again
 								// Ideally you shorten this if you want it to multihit
 				isShield: false,// non piercing projectiles are destroyed on contact and can clang things 
-								// with the "isZSaberClang" propety On
+								// with the "ShouldClang" propety On
 				isReflectShield: false, // Projectiles are sent the opposite way when in contact and can clang
 				isDeflectShield: true,// projectiles are sent up in the air when in contact and can clang stuff
-				isZSaberClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
+				ShouldClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
 				isZSaberEffect: false,// adds the Zsaber slashing effect
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
 			),
@@ -421,7 +421,7 @@ public static CharSelection[] selections => [
 			(int)MeleeIds.AirDunk => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
 				 2, Global.defFlinch, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
@@ -429,7 +429,7 @@ public static CharSelection[] selections => [
 			(int)MeleeIds.StandingKick => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				 2, Global.halfFlinch,5, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
@@ -438,46 +438,46 @@ public static CharSelection[] selections => [
 			(int)MeleeIds.Dokugami => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MagnetMine, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Tsuyomi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GravityWell, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Batsuyomi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.ShikiOniaki => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
 				 2, Global.defFlinch, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ShikiYamiBarai => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
 				 1, Global.defFlinch,10, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Orochinagi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				isZSaberClang: true, isZSaberEffect: true,
+				ShouldClang: true, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1,0,10, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			_ => null

@@ -491,17 +491,17 @@ public class BusterZero : Character {
 			),
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 0, 0, 40, isReflectShield: true,
-				isZSaberEffect2: false, isZSaberClang: false,
+				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.GrabEX => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 1, 0, 5, isReflectShield: true,
-				isZSaberEffect2: false, isZSaberClang: false,
+				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.GrabEnd => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.HeavyPush, player, 5, 30, 15, isReflectShield: true,
-				isZSaberEffect2: false, isZSaberClang: false,
+				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Block => new GenericMeleeProj(
@@ -523,7 +523,6 @@ public class BusterZero : Character {
 		GrabEX,
 		Grab,
 		
-		SaberSwing
 	}
 
 

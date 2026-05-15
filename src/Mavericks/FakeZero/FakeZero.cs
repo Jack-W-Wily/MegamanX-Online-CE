@@ -330,10 +330,10 @@ public class FakeZero : Maverick {
 				hitCooldown: 0, // how many frames until that hitbox can be effective again
 								// Ideally you shorten this if you want it to multihit
 				isShield: false,// non piercing projectiles are destroyed on contact and can clang things 
-								// with the "isZSaberClang" propety On
+								// with the "ShouldClang" propety On
 				isReflectShield: false, // Projectiles are sent the opposite way when in contact and can clang
 				isDeflectShield: true,// projectiles are sent up in the air when in contact and can clang stuff
-				isZSaberClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
+				ShouldClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
 				isZSaberEffect: false,// adds the Zsaber slashing effect
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
 			),
@@ -342,27 +342,27 @@ public class FakeZero : Maverick {
 			(int)MeleeIds.TrippleSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 3,30,10, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rising => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 2,30,10, isReflectShield: false,
-				isZSaberClang: true, isZSaberEffect: false,
+				ShouldClang: true, isZSaberEffect: false,
 				isJuggleProjectile:  true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.TrippleBusterSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 5,20,10, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.HeavyPush, player,
 				 5,0,10, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			_ => null

@@ -263,7 +263,6 @@ public class Vile : Character {
 
 			if (specialPressed) {
 				if (dashGrabSpecial() ||
-					airDownAttacks() ||
 					normalAttacks()
 				) {
 					return true;

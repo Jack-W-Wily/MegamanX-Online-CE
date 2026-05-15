@@ -1487,7 +1487,7 @@ public class Damager {
 							!zero.hypermodeActive()
 						) {
 							//What in the..
-							if (damagingActor is Projectile proj1 && proj1.isZSaberClang) {
+							if (damagingActor is Projectile proj1 && proj1.ShouldClang) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
 						}
@@ -1907,9 +1907,7 @@ public class Damager {
 		if (CrackedWall.canDamageCrackedWall(projId, null) != 0) {
 			return true;
 		}
-		if (Global.level.server.customMatchSettings?.frostShieldNerf != false) {
-			return true;
-		}
+		
 		return projId switch {
 			(int)ProjIds.FireWave => true,
 			(int)ProjIds.FireWaveCharged => true,

@@ -44,7 +44,6 @@ public class CharState {
 
 	public bool superArmor2;
 	public bool immuneToWind;
-	public int accuracy;
 	public bool isGrabbedState;
 	public bool immuneToAll;
 	public bool invulnerable;
@@ -1619,14 +1618,14 @@ public class Die : CharState {
 		if (!character.ownedByLocalPlayer) {
 			return;
 		}
-		if (character is Vile or BaseSigma || character.ShouldExplode) {
+		if (character is Vile vile || character is BaseSigma || character.ShouldExplode) {
 			if (stateTime >= 1 && !once) {
 				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
 				once = true;
 				character.visible = false;
 				player.explodeDieStart();
-				if (sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
+				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
 					foreach (var weapon in new List<Weapon>(character.weapons)) {
 						if (weapon is MaverickWeapon mw && mw.maverick != null) {
 							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
@@ -1673,7 +1672,7 @@ public class Die : CharState {
 				int randX = Helpers.randomRange(-radius, radius);
 				int randY = Helpers.randomRange(-radius, radius);
 				var randomPos = character.getCenterPos().addxy(randX, randY);
-				if (character is Vile vile && vile.isVileMK2 ||
+				if (character is Vile vile1 && vile1.isVileMK2 ||
 				character is Doppma or KaiserSigma or BossClaudio or Zain
 				or BossStag or Kurumitos
 				
@@ -1686,7 +1685,7 @@ public class Die : CharState {
 					new Anim(randomPos, "explosionx2", 1, player.getNextActorNetId(), true, sendRpc: true);
 					character.playSound("explosionX2", sendRpc: true);
 				} 
-				if (character is Vile vile1 && (vile1.isVileMK1 || vile1.isVileMK5) || 
+				if (character is Vile vile2 && (vile2.isVileMK1 || vile2.isVileMK5) || 
 				character is CmdSigma or WolfSigma or HighMax or Dynamo or Sigma1) {
 					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);	
 					character.playSound("explosion", sendRpc: true);	

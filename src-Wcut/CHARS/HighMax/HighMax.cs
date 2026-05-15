@@ -336,67 +336,67 @@ public class HighMax : Character {
 		if (hitbox.flag == (int)HitboxFlag.Hitbox) {
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, isZSaberClang: false, addToLevel: true
+				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, ShouldClang: false, addToLevel: true
 			);
 		}
 
 		if (  sprite.name.Contains("grab") && !sprite.name.Contains("ex") )
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.ForceGrabState,
-			player, 0f, 0, 20, isZSaberClang : true ,addToLevel: true, hitSound : "kofhtsnd_grab1"
+			player, 0f, 0, 20, ShouldClang : true ,addToLevel: true, hitSound : "kofhtsnd_grab1"
 			);
 		}
 
 		 if (  sprite.name.Contains("grab") && sprite.name.Contains("ex") )
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.BurensenEND,
-			player, 3f, 0, 20, isZSaberClang : false ,addToLevel: true, hitSound : "swordswipeGG"
+			player, 3f, 0, 20, ShouldClang : false ,addToLevel: true, hitSound : "swordswipeGG"
 			);
 		}
 
 
 		if (sprite.name.Contains("idle_punch")) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint, 
-			ProjIds.MechFrogGroundPound, player, 3f, 20, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp1"
+			ProjIds.MechFrogGroundPound, player, 3f, 20, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp1"
 			);
 		}
 	//	if (sprite.name.Contains("land")) {
 	//		return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, 
-	//		ProjIds.Rakukojin, player, 2f, 20, 5f, isZSaberClang: true, addToLevel: true
+	//		ProjIds.Rakukojin, player, 2f, 20, 5f, ShouldClang: true, addToLevel: true
 	//		);
 	//	}
 		if (sprite.name.Contains("crouch_punch")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint,
-			 ProjIds.UPPunch, player, 2f, 25, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp2"
+			 ProjIds.UPPunch, player, 2f, 25, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp2"
 			 );
 		}
 		if (sprite.name.Contains("slam_grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, 
-			ProjIds.MechFrogGroundPound, player, 3f, 30, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			ProjIds.MechFrogGroundPound, player, 3f, 30, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
 			);
 		}
 		if (sprite.name.EndsWith("dash_punch")) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint,
 			 ProjIds.HeavyPush, player, 2f, 0, 4f, null, isShield: true, 
-			 isDeflectShield: true, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			 isDeflectShield: true, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
 			 );
 		}
 		if (sprite.name.EndsWith("dash_punch_charge")) {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.ForceGrabState, player, 0f, 0, 20f, null, isShield: true,
-			 isDeflectShield: true, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_grab2"
+			 isDeflectShield: true, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_grab2"
 			 );
 		}
 		if (sprite.name.EndsWith("foward_punch") && charState is not HighMaxSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.HeavyPush, player, 3f, 0, 20f, 
-			null, isShield: true, isDeflectShield: true, isZSaberClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			null, isShield: true, isDeflectShield: true, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_knock1"
 			);
 		}
 		if (sprite.name.EndsWith("foward_punch") && charState is HighMaxSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.BurensenEND, player, 6f, 0, 20f, null, 
-			isShield: true, isDeflectShield: true, isZSaberClang: false, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			isShield: true, isDeflectShield: true, ShouldClang: false, addToLevel: true, hitSound : "kofhtsnd_knock1"
 			);
 		}
 		}

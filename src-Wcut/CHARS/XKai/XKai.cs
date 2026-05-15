@@ -422,7 +422,7 @@ public class XKai : MegamanX {
 					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
-				isZSaberClang: true, isZSaberEffect: false,
+				ShouldClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
@@ -442,7 +442,7 @@ public class XKai : MegamanX {
 				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1, 0, isDeflectShield: true,
-				isZSaberClang: true, isZSaberEffect: false,
+				ShouldClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 

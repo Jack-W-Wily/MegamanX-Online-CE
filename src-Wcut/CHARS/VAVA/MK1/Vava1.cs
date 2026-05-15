@@ -944,7 +944,7 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
 				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
-				isDeflectShield: true, isZSaberClang: false, isZSaberEffect: false,
+				isDeflectShield: true, ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 
 
@@ -954,75 +954,75 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.StompStart => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.VileStomp, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.GizmoGrab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GizmoGrab, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: true, isZSaberEffect: false,
+				ShouldClang: true, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Grabmk2dash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.VileMK2Grab, player,
 				 0, 0, 0, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.UpperCut => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
 				 2, 40, 32, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "htsnd_punch_3", isJuggleProjectile : true
 			),
 			(int)MeleeIds.VavaKneeAttack => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
 				 2, 20, 12, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.GrabNonFlinchAT => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
 				 1, 0, 10, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
 				 2, 40, 42, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, isJuggleProjectile : false
 			),
 			(int)MeleeIds.CannonExecution => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				 2, 0, 42, isReflectShield: false,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			(int)MeleeIds.KamaeBlock => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 0.25f, 5, 10, isReflectShield: true,
-			isZSaberClang: true, isZSaberEffect: true,
+			ShouldClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel, hitSound : "htsnd_slash1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.Jab => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 1, 26, 15, isReflectShield: true,
-			isZSaberClang: true, isZSaberEffect: true,
+			ShouldClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel, hitSound : "htsnd_punch_1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.Jab2 => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab2, player,
 			 1, 26, 8, isReflectShield: true,
-			isZSaberClang: true, isZSaberEffect: true,
+			ShouldClang: true, isZSaberEffect: true,
 			addToLevel: addToLevel, hitSound : "htsnd_punch_2", isJuggleProjectile : true
 			),
 
@@ -1030,14 +1030,14 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.KamaeUnB => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.DeadLiftEX => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				2, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
@@ -1045,7 +1045,7 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.GoldenRight => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				3, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, hitSound : "dbzclang", isJuggleProjectile : true
 			),
 
@@ -1055,21 +1055,21 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.Kote => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				3, 40, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenStart => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStart, player,
 				2, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenStomp => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
 				1, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : false
 			),
 
@@ -1077,49 +1077,49 @@ public class VAVA1 : Vile {
 			(int)MeleeIds.SpeedDemon => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.HeavyPush, player,
 				2, 0, 30, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenEND => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				2, 0, 30, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				4, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.RagingDemon => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.RagingDemon, player,
 				5, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: false,
+				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
 				3, 30, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
 				3, 30, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.AirRaid => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.VileAirRaidPlusKnock, player,
 				3, 0, 20, isReflectShield: true,
-				isZSaberClang: false, isZSaberEffect: true,
+				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 

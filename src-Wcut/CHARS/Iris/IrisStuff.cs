@@ -957,7 +957,7 @@ public class IrisSlashProj : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
-		isZSaberClang = true;
+		ShouldClang = true;
 		isShield = true;
 		isReflectShield = true;
 		maxTime = 1.5f;
@@ -1011,7 +1011,7 @@ public class IrisStabProj : Projectile {
 		setIndestructableProperties();
 		isShield = true;
 		isReflectShield = true;
-		isZSaberClang = true;
+		ShouldClang = true;
 		maxTime = 1.5f;
 		projId = (int)ProjIds.IrisStabProj;
 		if (player.character != null) {

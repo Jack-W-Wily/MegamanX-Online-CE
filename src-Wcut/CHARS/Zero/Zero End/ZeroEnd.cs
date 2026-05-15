@@ -1061,45 +1061,45 @@ public class ZeroEND : Zero {
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 0, 0, 40, isReflectShield: true,
-				isZSaberEffect2: false, isZSaberClang: false,
+				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.GrabEX => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 1, 0, 5, isReflectShield: true,
-				isZSaberEffect2: false, isZSaberClang: false,
+				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.GrabEnd => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.BurensenEND, player, 2, 0, 15, isReflectShield: true,
-				isZSaberEffect2: false, isZSaberClang: false,
+				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
 			// Ground
 			(int)MeleeIds.HuSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber1, player, 0.5f, Global.miniFlinch, 15, isReflectShield: true,
-				isZSaberEffect2: true, isZSaberClang: true,
+				isZSaberEffect2: true, ShouldClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.HaSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber2, player, 0.5f, Global.halfFlinch, 15, isReflectShield: true,
-				isZSaberEffect2B: true, isZSaberClang: true,
+				isZSaberEffect2B: true, ShouldClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.HuhSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaber3, player,
 				0.5f, Global.defFlinch, 5, isReflectShield: true,
-				isZSaberEffect: true, isZSaberClang: true,
+				isZSaberEffect: true, ShouldClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.CrouchSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberCrouch, player, 3, Global.halfFlinch, 15, isReflectShield: true,
-				isZSaberEffect: true, isZSaberClang: true,
+				isZSaberEffect: true, ShouldClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			// Dash
 			(int)MeleeIds.DashSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberDash, player, 2, Global.halfFlinch, 15, isReflectShield: true,
-				isZSaberEffect: true, isZSaberClang: true,
+				isZSaberEffect: true, ShouldClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
@@ -1110,13 +1110,13 @@ public class ZeroEND : Zero {
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 1, Global.miniFlinch, 5, isReflectShield: true,
-				isZSaberEffect: true, isZSaberClang: true,
+				isZSaberEffect: true, ShouldClang: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
 				1, 10, 5, isDeflectShield: true,
-				isZSaberEffect2: true, isZSaberClang: true,
+				isZSaberEffect2: true, ShouldClang: true,
 				addToLevel: addToLevel, isJuggleProjectile : true, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
