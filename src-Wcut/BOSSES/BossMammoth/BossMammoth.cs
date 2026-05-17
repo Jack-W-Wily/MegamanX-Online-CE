@@ -65,7 +65,8 @@ public class BossMammoth : Character {
 		return base.normalCtrl();
 	}
 
-
+	public override CharState getJumpState() => new BossJumpStart();
+	
 	// AttackCtrl: is for you to add moves to your character that he can only perform
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
@@ -242,7 +243,7 @@ public class BossMammoth : Character {
 			(int)MeleeIds.Rising => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 2,30,10, isReflectShield: false,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
 				addToLevel: addToLevel
 			),

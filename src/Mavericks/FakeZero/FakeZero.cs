@@ -219,6 +219,9 @@ public class FakeZero : Maverick {
 		];
 	}
 
+
+
+
 	public override MaverickState[] aiAttackStates() {
 		List<MaverickState> aiStates = [
 			new FakeZeroShootState(2)
@@ -300,8 +303,8 @@ public class FakeZero : Maverick {
 	// IDs are located
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"kr_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
-			"claudio_chargeslash"  => MeleeIds.DashSlash,
+			"claudio_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
+			"claudio_chargeslash" or "zerox1_run_attack" => MeleeIds.DashSlash,
 			"claudio_trippleslash" => MeleeIds.TrippleSlash,
 			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
 			"claudio_dash" => MeleeIds.Rising,
@@ -348,7 +351,7 @@ public class FakeZero : Maverick {
 			(int)MeleeIds.Rising => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 2,30,10, isReflectShield: false,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
 				addToLevel: addToLevel
 			),

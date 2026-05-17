@@ -47,7 +47,7 @@ public class Hurt : CharState {
 				character.changeSpriteFromName("hurt2", true);
 			}
 		}
-		if (!spiked && !character.grounded) {
+		if (!spiked && !character.grounded || character.juggled) {
 			float flichLimitusTime = flinchTime <= 30 ? flinchTime : 30;
 
 			character.vel.y = (-0.125f * (flichLimitusTime - 1)) * 60f;
@@ -85,10 +85,23 @@ public class Hurt : CharState {
 			}
 		}
 
+
+		if ( character.health < 15 && character.isWCUTBoss) {
+				character.invulnTime = 0.5f;
+            
+			character.changeToLandingOrFall(false);
+		}
+
+		if ( stateTime > 4 && character.isWCUTBoss) {
+				character.invulnTime = 0.5f;
+            
+			character.changeToLandingOrFall(false);
+		}
+
 		if (stateFrames >= flinchTime) {
-			if (player.input.isHeld(Control.Jump, player)) {
+			if (player.input.isHeld(Control.Jump, player) ) {
                 character.vel.y = -character.getJumpPower() * 0.5f;
-				character.invulnTime = 0.35f;
+				character.invulnTime = 0.5f;
             }
 			character.changeToLandingOrFall(false);
 		}

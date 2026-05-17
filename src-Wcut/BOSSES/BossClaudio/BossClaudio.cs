@@ -76,10 +76,10 @@ public class BossClaudio : Character {
 		return base.attackCtrl();
 	}
 
-
+	public override CharState getJumpState() => new BossJumpStart();
 	public override void update() {
 		base.update();
-		if (charState is Dash or AirDash) {
+		if (charState is Dash or AirDash && player.health < 10) {
 			charState.specialId = SpecialStateIds.AxlRoll;
 		}
 	
@@ -151,6 +151,8 @@ public class BossClaudio : Character {
 		Rising,
 		FireWave,
 
+		Launcher,
+
 		DashSlash, 
 		TrippleBusterSlash,
 
@@ -168,7 +170,7 @@ public class BossClaudio : Character {
 			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
 			"claudio_dash" => MeleeIds.Rising,
 			"claudio_jump"  or  "claudio_rising" => MeleeIds.Rising,
-			
+			"claudio_ground_punch" or "claudio_dash_end"  => MeleeIds.Launcher,
 
 			_ => MeleeIds.None
 		});
@@ -200,6 +202,12 @@ public class BossClaudio : Character {
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
 			),
 
+			(int)MeleeIds.Launcher => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenEND, player,
+				 3,0,10, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
 
 			(int)MeleeIds.TrippleSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
@@ -208,9 +216,9 @@ public class BossClaudio : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rising => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.X6Saber, player,
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				 2,30,10, isReflectShield: false,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
 				addToLevel: addToLevel
 			),
@@ -491,8 +499,11 @@ public class BossClaudio : Character {
 							break;
 					}
 				}
-
+				if (bonusHealth > 0){
+				aiAttackCooldown = Helpers.randomRange(30, 60);
+				} else {
 				aiAttackCooldown = Helpers.randomRange(0, 30);
+				}
 			}
 
 			
@@ -517,7 +528,7 @@ public class BossClaudio : Character {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
 							changeState(new ClaudioGuardState());	
-								aiDodgeCD = Helpers.randomRange(100, 220);
+								aiDodgeCD = 300;
 							
 						}
 					} 

@@ -734,8 +734,34 @@ public class Damager {
 
 
 
-		
+			// WCUT boss Weakness Section
+			if (character is BossStag && ( projId == (int)ProjIds.BubbleSplash
+			|| projId == (int)ProjIds.BubbleSplashCharged)) {
+			character.bossArmor = 0;
+			character.playSound("weakness");
+			character.BurstCooldown = 10;
+			character.charState.invulnerable = false;
+			flinch = 40;
+			}
 
+			if (character is BossMammoth && ( projId == (int)ProjIds.StormETornado
+			|| projId == (int)ProjIds.Tornado || projId == (int)ProjIds.TornadoCharged)) {
+			character.bossArmor = 0;
+			character.playSound("weakness");
+			character.BurstCooldown = 10;
+			character.charState.invulnerable = false;
+			flinch = 40;
+			}
+
+
+			if (character is FinalVava && ( projId == (int)ProjIds.RollingShield
+			|| projId == (int)ProjIds.RollingShieldCharged || projId == (int)ProjIds.Torpedo)) {
+			character.bossArmor = 0;
+			character.playSound("weakness");
+			character.BurstCooldown = 10;
+			character.charState.invulnerable = false;
+			flinch = 40;
+			}
 
 			if (!character.isFlinchImmune() &&
 				!character.isInvulnerable(false, true) &&
@@ -1172,6 +1198,9 @@ public class Damager {
 					hurtDir = 0;
 				}
 				
+				if (character.bossArmor > 0) {
+					flinch = 0;
+				}
 				// Counter effect.
 				if (flinch > Global.miniFlinch && countered) {
 					character.addDamageText("COUNTER!", (int)FontType.Red);

@@ -13,8 +13,8 @@ public class GenericMeleeProj : Projectile {
 		bool isDeflectShield = false, bool isReflectShield = false,
 		bool addToLevel = false, float? hitCooldownSeconds = null,
 		bool isZSaberEffect = false, bool isZSaberEffect2 = false, bool isZSaberEffect2B = false,
-		ClashTier clashTier = ClashTier.None, bool isJuggleProjectile = false, bool isPushProjectile = false,
-		bool ShouldClang = false, string hitSound = "hit"
+		ClashTier clashTier = ClashTier.None, bool isJuggleProjectile = false,bool isLiftProjectile = false,bool isPushProjectile = false,
+		bool ShouldClang = false, string hitSound = "hit",  string hitspark = "hitspark_1"
 	) : base(
 		weapon, pos, 1, 0, 2, player, "empty", 0, 0.5f, null, player.ownedByLocalPlayer, addToLevel: addToLevel
 	) {
@@ -43,10 +43,12 @@ public class GenericMeleeProj : Projectile {
 		this.isZSaberEffect2 = isZSaberEffect2;
 		this.isZSaberEffect2B = isZSaberEffect2B;
 		this.isJuggleProjectile = isJuggleProjectile;
+		this.isLiftProjectile = isLiftProjectile;
 		this.isPushProjectile = isPushProjectile;
 		this.ShouldClang = ShouldClang;
 		this.hitSound = hitSound;
 		this.clashTier = clashTier;
+		this.hitspark = hitspark;
 		isMelee = true;
 	}
 
@@ -115,12 +117,18 @@ public class GenericMeleeProj : Projectile {
 		Character? grabbedChar = damagable as Character;
 
 
-			if (isJuggleProjectile && damagable is Character chr) {
+			if (damagable is Character chr) {
+				if (isLiftProjectile ) {
 				float modifier = 1;
 				if (chr.isUnderwater()) modifier = 2;
 				if (chr.isPushImmune()) return;
 				float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 				chr.move(new Point(xMoveVel * 0 * modifier, -300));
+				}
+				if (isJuggleProjectile){
+				chr.grounded = false;
+				chr.juggled = true;
+				}
 			}
 			
 		if (projId == (int)ProjIds.QuakeBlazer) {
@@ -166,6 +174,8 @@ public class GenericMeleeProj : Projectile {
 		}
 	}
 
+
+/* No more need for this with the new hitspark system
 	public override DamagerMessage? onDamage(IDamagable? damagable, Player? attacker) {
 		Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0, 0);
 		Collider? hitbox = getGlobalCollider();
@@ -179,20 +189,22 @@ public class GenericMeleeProj : Projectile {
 		string SaberSlashFade = "zsaber_slash_fade";
 		if (ownedByLocalPlayer) {
 			if (isZSaberEffectBool(false, false)) {
-				new Anim(hitPoint.Value, SaberShotFade, xDir,
+				new Anim(hitPoint.Value, hitspark, xDir,
 					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 			}
 			if (isZSaberEffectBool(true, false)) {
-				new Anim(hitPoint.Value, SaberSlashFade, xDir,
+				new Anim(hitPoint.Value, hitspark, xDir,
 					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 			}
 			if (isZSaberEffectBool(false, true)) {
-				new Anim(hitPoint.Value, SaberSlashFade, xDir * -1,
+				new Anim(hitPoint.Value, hitspark, xDir * -1,
 					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 			}
 		}
 		return null;
 	}
+
+	*/
 	public override void onDestroy() {
 		base.onDestroy();
 	}

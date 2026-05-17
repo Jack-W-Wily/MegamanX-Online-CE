@@ -345,7 +345,7 @@ public class Iris : Character {
 		 if (sprite.name.Contains("rising")) {
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint,
 			ProjIds.VirusSlash, player, 3f, 20, 20,
-			ShouldClang: true, addToLevel: true, isJuggleProjectile: true, hitSound : "kofhtsnd_lightning1"
+			clashTier: ClashTier.Weak, addToLevel: true, isJuggleProjectile: true, hitSound : "kofhtsnd_lightning1"
 			);
 		}
 

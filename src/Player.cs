@@ -1245,10 +1245,24 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
+
+		} else if (isAI &&
+		
+		(
+		Global.level.levelData.name == "st_cybermaze_test" 
+		
+		)
+
+		&& charNum >= 0 && isAI) {
+			charNum = (int)CharIds.Vile;
+			newChar = new EnemySpawnerChar(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		
 		} else if (isAI &&
 
 		(Global.level.levelData.name == "highway_1v1" ||
-		Global.level.levelData.name == "st_vava_c1" ||
 		Global.level.levelData.name == "st_x_x1_highway"
 		)
 
@@ -1258,13 +1272,32 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (isAI && Global.level.levelData.name == "zero_vs_x_1v1" && charNum >= 0 && isAI) {
-			charNum = (int)CharIds.Sigma;
+		} else if (isAI && Global.level.levelData.name == "purple_vs_redandblue_1v1" && charNum >= 0 && isAI && this.name == "CPU1") {
+			charNum = (int)CharIds.X;
 			newChar = new RockmanX(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (isAI && Global.level.levelData.name == "centralcomputer_1v1" && charNum >= 0 && isAI) {
+			
+		} else if (isAI && Global.level.levelData.name == "purple_vs_redandblue_1v1" && charNum >= 0 && isAI && this.name != "CPU1") {
+			charNum = (int)CharIds.Zero;
+			newChar = new PunchyZero(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+			
+		} 
+		
+		
+		else if (isAI && Global.level.levelData.name == "zero_vs_x_1v1" && charNum >= 0 && isAI) {
+			charNum = (int)CharIds.X;
+			newChar = new RockmanX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		} else if (isAI &&(Global.level.levelData.name == "cybermaze_1v1" || Global.level.levelData.name == "centralcomputer_1v1" )
+		
+		&& charNum >= 0 && isAI) {
 			charNum = (int)CharIds.BossClaudio;
 			newChar = new BossClaudio(
 				this, pos.x, pos.y, xDir,

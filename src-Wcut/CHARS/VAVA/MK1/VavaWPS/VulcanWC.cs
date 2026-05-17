@@ -136,6 +136,37 @@ public class VavaDistantNeedler : CharState {
 
 
 
+public class VavaBusterSTate : CharState {
+
+
+
+
+	public VavaBusterSTate(string transitionSprite = "")
+		: base("buster_1", "", "", transitionSprite)
+	{
+	airMove = true;
+	normalCtrl = true;	
+	}
+
+	public override void update()
+    {
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
 
 public class ZipZapperProj : Projectile {
     public bool groundedVariant;
@@ -149,7 +180,7 @@ public class ZipZapperProj : Projectile {
         damager.damage = 1;
 		damager.flinch = 1;
         damager.hitCooldown = 6;
-        maxTime = 0.19f;
+        maxTime = 0.2f;
         destroyOnHit = true;
         destroyOnHitWall = true;
         this.groundedVariant = groundedVariant;
@@ -158,7 +189,7 @@ public class ZipZapperProj : Projectile {
         fadeSprite = "flamethrower_dw_fade";
         projId = (int)ProjIds.ZipZapperProj;
         if (!groundedVariant) {
-            vel = new Point(100 * xDir, 0);
+            vel = new Point(350 * xDir, 0);
         } else {
             vel = new Point(350 * xDir, 0);
             maxTime = 0.35f;

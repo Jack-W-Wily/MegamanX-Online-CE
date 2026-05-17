@@ -594,7 +594,7 @@ public class Vava2Goliath : Vile {
 			(int)MeleeIds.GizmoGrab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GizmoGrab, player,
 				 0, 0, 0, isReflectShield: false,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Grabmk2dash => new GenericMeleeProj(
@@ -618,19 +618,19 @@ public class Vava2Goliath : Vile {
 			(int)MeleeIds.KamaeBlock => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 0.25f, 5, 10, isReflectShield: true,
-			ShouldClang: true, isZSaberEffect: true,
+			clashTier: ClashTier.Weak, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
 			(int)MeleeIds.Jab => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 1, 20, 25, isReflectShield: true,
-			ShouldClang: true, isZSaberEffect: true,
+			clashTier: ClashTier.Weak, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
 			(int)MeleeIds.Jab2 => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab2, player,
 			 1, 26, 20, isReflectShield: true,
-			ShouldClang: true, isZSaberEffect: true,
+			clashTier: ClashTier.Weak, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
 

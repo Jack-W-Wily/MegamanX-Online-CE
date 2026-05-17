@@ -236,7 +236,11 @@ public class LevelData {
 		if (is1v1()) {
 			maxPlayers = 4;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
+			if (name == "purple_vs_redandblue_1v1"){
+			supportedGameModesSet.Add(GameMode.TeamElimination);
+			} else {
 			supportedGameModesSet.Add(GameMode.Elimination);
+			}
 		} else {
 			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);
@@ -637,7 +641,7 @@ public class LevelData {
 		{ "training_ce", "training_ce" },
 		{ "vs_zain_1v1", "ZainBoss" },
 
-		{ "jackobelevator_md", "vilecps2" },
+		{ "jackobelevator_md", "vileVTheme_cookieguy" },
 		{ "sigmazone", "virusSigma" },
 		{ "recyclingplant2", "VavaFactory_dracula9chapel" },
 		{ "airport2_md", "MeaningOfTruth" },
@@ -645,11 +649,12 @@ public class LevelData {
 		{ "sigmaruins", "SigmaRuins" },
 		{ "forest3", "StanUp" },
 		{ "junkfactory_1v1", "HellPlant"},
-		{ "redandblue_vs_purple_1v1", "XvsZeroV1_megasfc"},
+		{ "redandblue_vs_purple_1v1", "vilecps2_WizzyWhipitWonderful"},
+		{ "purple_vs_redandblue_1v1", "xvszero_nomelody_oldgsu"},
 		{ "stag_1v1", "VolcanosWrath" },
-
-
-		{ "st_vava_c1", "ihateEverything"},
+		
+		{"cybermaze_1v1", "CannonBall_megasfc"},
+		{ "st_cybermaze_test", "training_vodaz"},
 
 		{ "st_vava_hunterbase1", "VileSelect_MHX_repliroidedofuturo"},
 

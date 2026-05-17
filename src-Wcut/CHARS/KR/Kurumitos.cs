@@ -421,7 +421,7 @@ public static CharSelection[] selections => [
 			(int)MeleeIds.AirDunk => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
 				 2, Global.defFlinch, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
@@ -429,7 +429,7 @@ public static CharSelection[] selections => [
 			(int)MeleeIds.StandingKick => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				 2, Global.halfFlinch,5, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
@@ -438,40 +438,40 @@ public static CharSelection[] selections => [
 			(int)MeleeIds.Dokugami => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MagnetMine, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Tsuyomi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GravityWell, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.Batsuyomi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.ShikiOniaki => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
 				 2, Global.defFlinch, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ShikiYamiBarai => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
 				 1, Global.defFlinch,10, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Orochinagi => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Ryuenjin, player,
 				 2, Global.defFlinch,10, isReflectShield: true,
-				ShouldClang: true, isZSaberEffect: true,
+				clashTier: ClashTier.Weak, isZSaberEffect: true,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Grab => new GenericMeleeProj(

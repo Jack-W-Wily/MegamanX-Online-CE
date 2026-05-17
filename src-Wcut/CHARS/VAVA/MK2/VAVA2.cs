@@ -1160,7 +1160,7 @@ public float CrimsonphantomCD;
 		if (sprite.name.Contains("slashrun")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				2f, 0, 15f, isDeflectShield: true, ShouldClang: true,
+				2f, 0, 15f, isDeflectShield: true, clashTier: ClashTier.Weak,
 				isPushProjectile: true,
 				 isZSaberEffect2: true
 			, addToLevel : true);
@@ -1170,7 +1170,7 @@ public float CrimsonphantomCD;
 		if (sprite.name.Contains("punch") ||sprite.name.Contains("kamae") && sprite.name.Contains("dash") ) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1f, 25, 15f, isDeflectShield: true, ShouldClang: true
+				1f, 25, 15f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 
@@ -1179,7 +1179,7 @@ public float CrimsonphantomCD;
 		if (sprite.name.Contains("kick") && !sprite.name.Contains("kick_3") && !sprite.name.Contains("super")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1, 25, 15f, isDeflectShield: true, ShouldClang: true
+				1, 25, 15f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel: true);
 		}
 		if (sprite.name.EndsWith("superkick_up")
@@ -1201,28 +1201,28 @@ public float CrimsonphantomCD;
 		if (sprite.name.Contains("hyperdash_attack") && !sprite.name.Contains("2")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
-				2, 0, 10f, isDeflectShield: true, ShouldClang: true
+				2, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("hyperdash_attack") && sprite.name.Contains("2")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				0.5f, 0, 10f, isDeflectShield: true, ShouldClang: true
+				0.5f, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 		
 			if (sprite.name.Contains("kote")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				2f, 0, 10f, isDeflectShield: true, ShouldClang: true
+				2f, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("hoticecle")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.Hyouretsuzan2, player,
-				2f, 0, 10f, isDeflectShield: true, ShouldClang: true
+				2f, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 

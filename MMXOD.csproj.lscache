@@ -1,0 +1,685 @@
+version=1
+
+# This file caches language service data to improve the performance of C# Dev Kit.
+# It is not intended for manual editing. It can safely be deleted and will be
+# regenerated automatically. For more information, see https://aka.ms/lscache
+#
+# To control where cache files are stored, use the following VS Code setting:
+#   "dotnet.projectsystem.cacheInProjectFolder": true
+
+[project]
+language=C#
+primary
+lastDtbSucceeded
+
+[properties]
+AssemblyName=MMXOD
+CommandLineArgsForDesignTimeEvaluation=-langversion:14.0 -define:TRACE
+CompilerGeneratedFilesOutputPath=
+MaxSupportedLangVersion=14.0
+ProjectAssetsFile=<PATH>obj/project.assets.json
+RootNamespace=MMXOD
+RunAnalyzers=
+RunAnalyzersDuringLiveAnalysis=
+SolutionPath=<PATH>MegamanX-Online-CE.sln
+TargetFrameworkIdentifier=.NETCoreApp
+TargetPath=<PATH>bin/anycpu/MMXOD.dll
+TargetRefPath=<PATH>obj/Debug/ref/MMXOD.dll
+TemporaryDependencyNodeTargetIdentifier=net10.0-windows
+
+[commandLineArguments]
+/noconfig
+/unsafe-
+/checked-
+/nowarn:1701,1702,1701,1702
+/fullpaths
+/nostdlib+
+/errorreport:prompt
+/warn:10
+/define:TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR_GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
+/highentropyva+
+/nullable:enable
+/features:"InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated"
+/debug+
+/debug:embedded
+/filealign:512
+/optimize-
+/out:obj\Debug\MMXOD.dll
+/refout:obj\Debug\refint\MMXOD.dll
+/target:winexe
+/warnaserror-
+/utf8output
+/win32icon:app.ico
+/deterministic+
+/langversion:14.0
+/warnaserror+:NU1605,SYSLIB0011
+
+[sourceFiles]
+obj/Debug/
+ .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
+ MMXOD.AssemblyInfo.cs
+src-Wcut/BOSSES/BossClaudio/
+ BossClaudio.cs
+ BossClaudioStates.cs
+src-Wcut/BOSSES/BossMammoth/
+ BossMammoth.cs
+ BossMammothStates.cs
+src-Wcut/BOSSES/BossStag/
+ BossStag.cs
+ BossStagStates.cs
+src-Wcut/BOSSES/BossVile/
+ FinalVava.cs
+ HighwayVava.cs
+ MysteriousMaverick.cs
+ Vava2Goliath.cs
+src-Wcut/CHARS/AxlWC/
+ AxlGenericProjs.cs
+ AxlWC.cs
+ AxlWCLoadout.cs
+ AxlWcStates.cs
+ Weapons/
+  AxlBulletsWC.cs
+  AxlWeaponWC.cs
+  BlackArrowWC.cs
+  BlastLauncherWC.cs
+  BoundBlasterWC.cs
+  FlameBurnerWC.cs
+  IceGattlingWC.cs
+  PlasmaGunWC.cs
+  RayGunWC.cs
+  SpiralMagnumWC.cs
+src-Wcut/CHARS/Dragoon/
+ Dragoon.cs
+ DragoonStates.cs
+src-Wcut/CHARS/Dynamo/
+ Dynamo.cs
+ DynamoStates.cs
+src-Wcut/CHARS/GBD/
+ GBD.cs
+ GBDSTates.cs
+src-Wcut/CHARS/HighMax/
+ HighMax.cs
+ HighmaxProjs.cs
+ HighMaxStates.cs
+src-Wcut/CHARS/Iris/
+ Iris.cs
+ IrisCrystal.cs
+ IrisStuff.cs
+src-Wcut/CHARS/KR/
+ KurumaGrab.cs
+ Kurumitos.cs
+ KurumitosProjs.cs
+ KurumitosStates.cs
+src-Wcut/CHARS/Sigma/
+ Sigma1.cs
+ Sigma1States.cs
+src-Wcut/CHARS/VAVA/MK1/
+ Vava1.cs
+ Vava1Grab.cs
+ Vava1Projs.cs
+ Vava1States.cs
+ VavaBossStart.cs
+ VavaBossStates.cs
+ VavaGreySkin.cs
+ VavaHatSkin.cs
+ VavaWPS/
+  RocketPunchWC.cs
+  VileBallWC.cs
+  VileCannonWC.cs
+  VileCutterWC.cs
+  VileFlamethrowerWC.cs
+  VileLaserWC.cs
+  VileMissileWC.cs
+  VulcanWC.cs
+src-Wcut/CHARS/VAVA/MK2/
+ VAVA2.cs
+ VAVA2Enums.cs
+ VAVA2STATES.cs
+ Weapons/
+  FreezeCracker.cs
+  HardKnuckle.cs
+  JunkShield.cs
+  NoiseCrush.cs
+  SlashClaw.cs
+  ThunderBolt.cs
+  WildCoil.cs
+src-Wcut/CHARS/VAVA/MKV/MKVWeapons/
+ HexaInvoluteWC.cs
+ MetalBladeV.cs
+src-Wcut/CHARS/
+ VAVA/MKV/VAVAV.cs
+ WcutEnemySpawnerChar.cs
+ WilyCutGenericCharStates.cs
+ X/
+  RMX.cs
+  RMXGrab.cs
+  RMXProjs.cs
+  RMXStates.cs
+  WEAPONS X4/
+   AimingLaser.cs
+   DoubleCyclone.cs
+   FrostTower.cs
+   GroundHunter.cs
+   LightningWeb.cs
+   RisingFire.cs
+   SoulBody.cs
+   SoulBodyActor.cs
+   TwinSlasher.cs
+  XAnother.cs
+ XKai/XKai.cs
+ Zain/
+  Zain.cs
+  ZainBossStates.cs
+  ZainProjectiles.cs
+  ZainStates.cs
+ Zero/
+  Zero End/ZeroEnd.cs
+  Zero Mid/
+   ZeroMID.cs
+   ZeroMIDStates.cs
+src-Wcut/ENEMYS/
+ AbelhudoIrregular.cs
+ GreenDog.cs
+ HogumerEasy.cs
+ Met.cs
+ MissileElecBlack.cs
+ MissileElecBlue.cs
+ MissileElecGreen.cs
+ MissileElecPurple.cs
+ MissileElecRed.cs
+src-Wcut/SaveData/VileSaveData.cs
+src/
+ Actor.cs
+ ActorCollision.cs
+ AesOperation.cs
+ AI.cs
+ Anim.cs
+ BadWords.cs
+ BanEntry.cs
+ BusterZero/
+  BusterZero.cs
+  BusterZeroLoadout.cs
+  BusterZeroProj.cs
+  BusterZeroStates.cs
+  BusterZeroWeapons.cs
+ Character.cs
+ Characters/
+  Axl.cs
+  Rock.cs
+  StatusEffects.cs
+ CharState.cs
+ CharStates/
+  AxlStates.cs
+  Mistakes.cs
+ ChatEntry.cs
+ Collider.cs
+ Control.cs
+ ControlPoint.cs
+ CustomRPC.cs
+ Damager.cs
+ DevConsole.cs
+ DrawWrappers.cs
+ Effects.cs
+ Enums.cs
+ Extensions.cs
+ Extensions/ArrayExtensions.cs
+ Flag.cs
+ Fonts.cs
+ Frame.cs
+ GameMode/
+  ControlPoints.cs
+  CTF.cs
+  Elimination.cs
+  FFADeathMatch.cs
+  GameMode.cs
+  KingOfTheHill.cs
+  Race.cs
+  TeamDeathMatch.cs
+  TeamElimAlt.cs
+  TeamElimination.cs
+ GameObject.cs
+ Geometry.cs
+ Global.cs
+ GridCoords.cs
+ Helpers.cs
+ HUD.cs
+ IDamager.cs
+ Input.cs
+ ItemSpawner.cs
+ KillFeedEntry.cs
+ LANIPHelper.cs
+ LeaveMatchSignal.cs
+ Level.cs
+ LevelCollision.cs
+ LevelData.cs
+ Line.cs
+ LineShape.cs
+ Loadout.cs
+ Logger.cs
+ LoopingSound.cs
+ MainWindow.cs
+ MatchmakingQuerier.cs
+ MathF.cs
+ Mavericks/
+  ArmoredArmadillo.cs
+  BlastHornet.cs
+  BlizzardBuffalo.cs
+  BoomerangKuwanger.cs
+  BubbleCrab.cs
+  ChillPenguin.cs
+  CrushCrawfish.cs
+  CrystalSnail.cs
+  DrDoppler.cs
+  FakeZero/
+   FakeZero.cs
+   FakeZeroProjs.cs
+   FakeZeroStates.cs
+  FlameMammoth.cs
+  FlameStag.cs
+  GravityBeetle.cs
+  LaunchOctopus.cs
+  MagnaCentipede.cs
+  Maverick.cs
+  MaverickState.cs
+  MaverickTemplate.cs
+  MorphMoth.cs
+  MorphMothCocoon.cs
+  NeonTiger.cs
+  OverdriveOstrich.cs
+  SparkMandrill.cs
+  StingChameleon.cs
+  StormEagle.cs
+  ToxicSeahorse.cs
+  TunnelRhino.cs
+  Velguarder.cs
+  VoltCatfish.cs
+  WheelGator.cs
+  WireSponge.cs
+ Mechaniloid.cs
+ Menu/
+  AddBotMenu.cs
+  ChatHistoryMenu.cs
+  ChatMenu.cs
+  ConfigureCPUMenu.cs
+  ConfirmLeaveMenu.cs
+  ControlMenu.cs
+  CustomMatchSettingsMenu.cs
+  EnterTextMenu.cs
+  ErrorMenu.cs
+  HostMenu.cs
+  IMainMenu.cs
+  InGameMainMenu.cs
+  JoinMenu.cs
+  JoinMenuMK2.cs
+  KickMenu.cs
+  MainMenu.cs
+  MatchOptionsMenu.cs
+  Menu.cs
+  MenuOption.cs
+  OptionsMenu.cs
+  PreControlMenu.cs
+  PreJoinOrHostMenu.cs
+  PreLoadoutMenu.cs
+  PreOptionsMenu.cs
+  SavedMatchSettings.cs
+  SelectAxlWeaponMenu.cs
+  SelectCharacterMenu.cs
+  SelectSigmaWeaponMenu.cs
+  SelectVileArmorMenu.cs
+  SelectVileWeaponMenu.cs
+  SelectWeaponMenu.cs
+  SelectZeroWeaponMenu.cs
+  TextExportMenu.cs
+  UpgradeArmorMenu.cs
+  UpgradeMenu.cs
+  UpgradeZeroMenu.cs
+  WaitMenu.cs
+ MusicWrapper.cs
+ NavMeshNode.cs
+ NeutralEnemy/
+  NeutralEnemy.cs
+  NeutralEnemyStates.cs
+ NodeTransition.cs
+ NoScroll.cs
+ Options.cs
+ OSAPI/
+  NativeApi.cs
+  WinApi.cs
+ ParallaxSprite.cs
+ Particles.cs
+ Physics.cs
+ Pickup.cs
+ Player.cs
+ PlayerWeapons.cs
+ Point.cs
+ Program.cs
+ Projectile.cs
+ ProtobufClasses.cs
+ PunchyZero/
+  PunchyZero.cs
+  PunchyZeroLoadout.cs
+  PunchyZeroProj.cs
+  PunchyZeroStates.cs
+  PunchyZeroWeapons.cs
+ RagingChargeX/
+  RagingChargeX.cs
+  RCXStates.cs
+  RCXWeapons.cs
+ Rect.cs
+ Region.cs
+ RelayServer.cs
+ RenderEffect.cs
+ RideArmor.cs
+ RideChaser.cs
+ RPC.cs
+ RPCCreateActor.cs
+ RPCCreateProj.cs
+ RPCCreateProjEX.cs
+ RPCs/OldRPC.cs
+ RPCUpdateActor.cs
+ Server.cs
+ ServerClient.cs
+ ServerPlayer.cs
+ ShaderWrapper.cs
+ Shape.cs
+ Sigma/
+  CmdSigma.cs
+  CmdSigmaAttacks.cs
+  Doppma.cs
+  DoppmaAttacks.cs
+  KaiserSigma.cs
+  KaiserStates.cs
+  NeoSigma.cs
+  NeoSigmaAttacks.cs
+  Sigma.cs
+  SigmaAmmoBars.cs
+  SigmaStates.cs
+  ViralSigma.cs
+  ViralSigmaStates.cs
+  WolfSigma.cs
+  WolfSigmaStates.cs
+ SoundWrapper.cs
+ SpawnPoint.cs
+ Sprite.cs
+ SubTank.cs
+ Tips.cs
+ UnlimitedPotential.cs
+ VictoryPoint.cs
+ Vile/
+  Vile.cs
+  VileStates.cs
+  VileWeaponSystem.cs
+  Weapons/
+   HexaInvolute.cs
+   Napalm.cs
+   RocketPunch.cs
+   VileBall.cs
+   VileCannon.cs
+   VileCutter.cs
+   VileFlamethrower.cs
+   VileLaser.cs
+   VileMissile.cs
+   VileMK2Grab.cs
+   Vulcan.cs
+ VoteKick.cs
+ Wall.cs
+ Weapons/
+  AssassinBullet.cs
+  AxlBullet.cs
+  AxlBulletProj.cs
+  AxlWeapon.cs
+  BlackArrow.cs
+  BlastLauncher.cs
+  BoundBlaster.cs
+  DNACore.cs
+  FlameBurner.cs
+  GenericMeleeProj.cs
+  IceGattling.cs
+  MaverickWeapons.cs
+  MechWeapons.cs
+  PlasmaGun.cs
+  Raygun.cs
+  SpiralMagnum.cs
+  Weapon.cs
+ X/
+  OldX.cs
+  Weapons/
+   AcidBurst.cs
+   BoomerangCutter.cs
+   BubbleSplash.cs
+   ChameleonSting.cs
+   CrystalHunter.cs
+   ElectricSpark.cs
+   FireWave.cs
+   FrostShield.cs
+   GigaCrush.cs
+   GravityWell.cs
+   Hadoken.cs
+   HomingTorpedo.cs
+   HyperCharge.cs
+   ItemTracer.cs
+   LightHelmet.cs
+   MagnetMine.cs
+   NovaStrike.cs
+   ParasiticBomb.cs
+   RaySplasher.cs
+   RollingShield.cs
+   Shoryuken.cs
+   ShotgunIce.cs
+   SilkShot.cs
+   SonicSlicer.cs
+   SpeedBurner.cs
+   SpinningBlade.cs
+   SpinWheel.cs
+   StormTornado.cs
+   StrikeChain.cs
+   TornadoFang.cs
+   TriadThunder.cs
+   XBuster.cs
+   XBusterProj.cs
+   XZSaber.cs
+  X.cs
+  XLoadoutSetup.cs
+  XStates.cs
+  XWeakness.cs
+ Zero/
+  Zero.cs
+  ZeroAirSpecials.cs
+  ZeroAttackStates.cs
+  ZeroDownthrust.cs
+  ZeroGigaAttacks.cs
+  ZeroGroundSpecials.cs
+  ZeroProjectiles.cs
+  ZeroRising.cs
+  ZeroStates.cs
+  ZeroWeapons.cs
+srcnew/
+ IniLoader.cs
+ newEnums.cs
+
+[metadataReferences]
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.0/ref/net10.0/
+ Microsoft.CSharp.dll
+ Microsoft.VisualBasic.Core.dll
+ Microsoft.VisualBasic.dll
+ Microsoft.Win32.Primitives.dll
+ Microsoft.Win32.Registry.dll
+ mscorlib.dll
+ netstandard.dll
+ System.AppContext.dll
+ System.Buffers.dll
+ System.Collections.Concurrent.dll
+ System.Collections.dll
+ System.Collections.Immutable.dll
+ System.Collections.NonGeneric.dll
+ System.Collections.Specialized.dll
+ System.ComponentModel.Annotations.dll
+ System.ComponentModel.DataAnnotations.dll
+ System.ComponentModel.dll
+ System.ComponentModel.EventBasedAsync.dll
+ System.ComponentModel.Primitives.dll
+ System.ComponentModel.TypeConverter.dll
+ System.Configuration.dll
+ System.Console.dll
+ System.Core.dll
+ System.Data.Common.dll
+ System.Data.DataSetExtensions.dll
+ System.Data.dll
+ System.Diagnostics.Contracts.dll
+ System.Diagnostics.Debug.dll
+ System.Diagnostics.DiagnosticSource.dll
+ System.Diagnostics.FileVersionInfo.dll
+ System.Diagnostics.Process.dll
+ System.Diagnostics.StackTrace.dll
+ System.Diagnostics.TextWriterTraceListener.dll
+ System.Diagnostics.Tools.dll
+ System.Diagnostics.TraceSource.dll
+ System.Diagnostics.Tracing.dll
+ System.dll
+ System.Drawing.dll
+ System.Drawing.Primitives.dll
+ System.Dynamic.Runtime.dll
+ System.Formats.Asn1.dll
+ System.Formats.Tar.dll
+ System.Globalization.Calendars.dll
+ System.Globalization.dll
+ System.Globalization.Extensions.dll
+ System.IO.Compression.Brotli.dll
+ System.IO.Compression.dll
+ System.IO.Compression.FileSystem.dll
+ System.IO.Compression.ZipFile.dll
+ System.IO.dll
+ System.IO.FileSystem.AccessControl.dll
+ System.IO.FileSystem.dll
+ System.IO.FileSystem.DriveInfo.dll
+ System.IO.FileSystem.Primitives.dll
+ System.IO.FileSystem.Watcher.dll
+ System.IO.IsolatedStorage.dll
+ System.IO.MemoryMappedFiles.dll
+ System.IO.Pipelines.dll
+ System.IO.Pipes.AccessControl.dll
+ System.IO.Pipes.dll
+ System.IO.UnmanagedMemoryStream.dll
+ System.Linq.AsyncEnumerable.dll
+ System.Linq.dll
+ System.Linq.Expressions.dll
+ System.Linq.Parallel.dll
+ System.Linq.Queryable.dll
+ System.Memory.dll
+ System.Net.dll
+ System.Net.Http.dll
+ System.Net.Http.Json.dll
+ System.Net.HttpListener.dll
+ System.Net.Mail.dll
+ System.Net.NameResolution.dll
+ System.Net.NetworkInformation.dll
+ System.Net.Ping.dll
+ System.Net.Primitives.dll
+ System.Net.Quic.dll
+ System.Net.Requests.dll
+ System.Net.Security.dll
+ System.Net.ServerSentEvents.dll
+ System.Net.ServicePoint.dll
+ System.Net.Sockets.dll
+ System.Net.WebClient.dll
+ System.Net.WebHeaderCollection.dll
+ System.Net.WebProxy.dll
+ System.Net.WebSockets.Client.dll
+ System.Net.WebSockets.dll
+ System.Numerics.dll
+ System.Numerics.Vectors.dll
+ System.ObjectModel.dll
+ System.Reflection.DispatchProxy.dll
+ System.Reflection.dll
+ System.Reflection.Emit.dll
+ System.Reflection.Emit.ILGeneration.dll
+ System.Reflection.Emit.Lightweight.dll
+ System.Reflection.Extensions.dll
+ System.Reflection.Metadata.dll
+ System.Reflection.Primitives.dll
+ System.Reflection.TypeExtensions.dll
+ System.Resources.Reader.dll
+ System.Resources.ResourceManager.dll
+ System.Resources.Writer.dll
+ System.Runtime.CompilerServices.Unsafe.dll
+ System.Runtime.CompilerServices.VisualC.dll
+ System.Runtime.dll
+ System.Runtime.Extensions.dll
+ System.Runtime.Handles.dll
+ System.Runtime.InteropServices.dll
+ System.Runtime.InteropServices.JavaScript.dll
+ System.Runtime.InteropServices.RuntimeInformation.dll
+ System.Runtime.Intrinsics.dll
+ System.Runtime.Loader.dll
+ System.Runtime.Numerics.dll
+ System.Runtime.Serialization.dll
+ System.Runtime.Serialization.Formatters.dll
+ System.Runtime.Serialization.Json.dll
+ System.Runtime.Serialization.Primitives.dll
+ System.Runtime.Serialization.Xml.dll
+ System.Security.AccessControl.dll
+ System.Security.Claims.dll
+ System.Security.Cryptography.Algorithms.dll
+ System.Security.Cryptography.Cng.dll
+ System.Security.Cryptography.Csp.dll
+ System.Security.Cryptography.dll
+ System.Security.Cryptography.Encoding.dll
+ System.Security.Cryptography.OpenSsl.dll
+ System.Security.Cryptography.Primitives.dll
+ System.Security.Cryptography.X509Certificates.dll
+ System.Security.dll
+ System.Security.Principal.dll
+ System.Security.Principal.Windows.dll
+ System.Security.SecureString.dll
+ System.ServiceModel.Web.dll
+ System.ServiceProcess.dll
+ System.Text.Encoding.CodePages.dll
+ System.Text.Encoding.dll
+ System.Text.Encoding.Extensions.dll
+ System.Text.Encodings.Web.dll
+ System.Text.Json.dll
+ System.Text.RegularExpressions.dll
+ System.Threading.AccessControl.dll
+ System.Threading.Channels.dll
+ System.Threading.dll
+ System.Threading.Overlapped.dll
+ System.Threading.Tasks.Dataflow.dll
+ System.Threading.Tasks.dll
+ System.Threading.Tasks.Extensions.dll
+ System.Threading.Tasks.Parallel.dll
+ System.Threading.Thread.dll
+ System.Threading.ThreadPool.dll
+ System.Threading.Timer.dll
+ System.Transactions.dll
+ System.Transactions.Local.dll
+ System.ValueTuple.dll
+ System.Web.dll
+ System.Web.HttpUtility.dll
+ System.Windows.dll
+ System.Xml.dll
+ System.Xml.Linq.dll
+ System.Xml.ReaderWriter.dll
+ System.Xml.Serialization.dll
+ System.Xml.XDocument.dll
+ System.Xml.XmlDocument.dll
+ System.Xml.XmlSerializer.dll
+ System.Xml.XPath.dll
+ System.Xml.XPath.XDocument.dll
+ WindowsBase.dll
+
+[analyzerReferences]
+<DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.0/analyzers/dotnet/cs/
+ Microsoft.Interop.ComInterfaceGenerator.dll
+ Microsoft.Interop.JavaScript.JSImportGenerator.dll
+ Microsoft.Interop.LibraryImportGenerator.dll
+ Microsoft.Interop.SourceGeneration.dll
+ System.Text.Json.SourceGeneration.dll
+ System.Text.RegularExpressions.Generator.dll
+<DOTNET>/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/
+ Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
+ Microsoft.CodeAnalysis.NetAnalyzers.dll
+
+[analyzerConfigFiles]
+.editorconfig
+<DOTNET>/sdk/10.0.100/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_10_default.globalconfig
+obj/Debug/MMXOD.GeneratedMSBuildEditorConfig.editorconfig

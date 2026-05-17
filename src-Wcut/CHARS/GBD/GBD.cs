@@ -366,43 +366,43 @@ public class GBD : Character {
 			);
 		}
 		if (sprite.name.Contains("pipe_slash_3")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 
 		if (sprite.name.Contains("uppercut")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.TriggerOldFLinch, player, 2f, 30,8, ShouldClang: true, addToLevel: true, isJuggleProjectile: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.TriggerOldFLinch, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true, isJuggleProjectile: true);
 		}
 
 		if (sprite.name.Contains("jab")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 1f, 14,5, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 1f, 14,5, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 
 		if (sprite.name.Contains("tonfa_f")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 2f, 30,8, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 		if (sprite.name.Contains("tonfa_charged_f")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BurensenEND, player, 4f, 0, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BurensenEND, player, 4f, 0, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 
 		if (sprite.name.Contains("tonfa_u")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.TriggerOldFLinch, player, 2f, 30,8, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.TriggerOldFLinch, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 		if (sprite.name.Contains("tonfa_charged_u")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BlockableLaunch, player, 4f, 0, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BlockableLaunch, player, 4f, 0, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 		if (sprite.name.Contains("tonfa_overhead")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 
 
 		if (sprite.name.Contains("land")) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 		if (sprite.name.Contains("kick")) {
 			if (isDashing) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 4f, 20, 5f, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 4f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true);
 			}
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 2f, 20, 5f, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 2f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true);
 			
 		}
 		if (sprite.name.Contains("grab")) {
@@ -410,16 +410,16 @@ public class GBD : Character {
 		}
 		if (sprite.name.Contains("pipe_slash_2")) {
 			if (isDashing) {
-				return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, ShouldClang: true, addToLevel: true);
+				return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, clashTier: ClashTier.Weak, addToLevel: true);
 			}
-				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, ShouldClang: true, addToLevel: true);
+				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true);
 		
 		}
 		if (sprite.name.EndsWith("pipe_slash")) {
 			if (isDashing) {
-				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 4f, null, isShield: true, isDeflectShield: true, ShouldClang: true, addToLevel: true);
+				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true);
 			}
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, ShouldClang: true, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 		return proj;
 	}

@@ -621,7 +621,7 @@ public class WarpIdle : CharState {
 
 		}
 
-		if (Global.level.levelData.name == "st_vava_c1" && player.isAI) {
+		if (Global.level.levelData.name == "st_cybermaze_test" && player.isAI) {
 			getTestStageEnemies();
 
 		}
@@ -668,7 +668,7 @@ public class WarpIdle : CharState {
 		new MetClassic(player, new Point(1080, 124), 1, player.getNextActorNetId(), true, sendRpc: true);
 		new GreenDog(player, new Point(2612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
 		new HogumerEasy(player, new Point(2612, 166), 1, player.getNextActorNetId(), true, sendRpc: true);
-		new FakeZero(player, new Point(3612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
+		new AbelhudoIrregular(player, new Point(3612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
 
 	}
 

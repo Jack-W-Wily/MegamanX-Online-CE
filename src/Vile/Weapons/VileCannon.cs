@@ -328,7 +328,7 @@ public class CannonAttack : VileState {
 		//shootTime += Global.speedMul;
 		if (weapon is LongShotGizmo) {
 		//	if (shootTime == 6) {
-		//		shootTime = 0;
+			shootTime = 0;
 				loopNum++;
 				weapon.shoot(vile, []);
 		//	}

@@ -168,7 +168,8 @@ public class RockmanX : MegamanX {
 	public override void update() {
 		base.update();
 
-		if (!helperzeroOnce && helperZero == null && Global.level.levelData.name == "redandblue_vs_purple_1v1") {
+		if (!helperzeroOnce && helperZero == null && 
+			Global.level.levelData.name == "redandblue_vs_purple_1v1") {
 			helperZero = new FakeZero(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 			helperzeroOnce = true;
 		}
@@ -182,11 +183,27 @@ public class RockmanX : MegamanX {
 			becomeragingcharge = true;
 			changeState(new XReviveStart(), true);
 		}
+
+
+		if (charState is not WarpIn and not WarpIdle && bonusHealth == 0 && health < 4 
+		&& Global.level.levelData.name == "purple_vs_redandblue_1v1" && !becomeragingcharge) {
+			stopMoving();
+			becomeragingcharge = true;
+			changeState(new XReviveStart(), true);
+		}
+
+
 		// For Cooldowns and other stuff that has deepleeting time
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref DodgeCD);
 
-
+		if (Global.level.levelData.name == "purple_vs_redandblue_1v1") {
+			
+			legArmor = ArmorId.Light;
+			chestArmor = ArmorId.Light;
+			helmetArmor =  ArmorId.Light;
+			armArmor =  ArmorId.Light;
+		}
 		if (Global.level.levelData.name == "zero_vs_x_1v1") {
 			hasUltimateArmor = true;
 			if (bonusHealth == 0) {
@@ -352,7 +369,7 @@ public class RockmanX : MegamanX {
 					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
@@ -372,7 +389,7 @@ public class RockmanX : MegamanX {
 				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1, 0, isDeflectShield: true,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
 

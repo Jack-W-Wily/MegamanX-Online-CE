@@ -224,7 +224,6 @@ public class FakeZeroMeleeState : FakeZeroMState {
 
 	public FakeZeroMeleeState(bool isAiAttack = false) : base("run_attack") {
 		this.isAiAttack = isAiAttack;
-		enterSound = "zerosaberx3";
 		normalCtrl = true;
 		canReloadAmmo = true;
 		useGravity = false;
@@ -241,7 +240,7 @@ public class FakeZeroMeleeState : FakeZeroMState {
 			projVisible.changePos(zero.getFirstPOIOrDefault(1));
 		}
 		maverick.moveXY(zero.xDir * dashSpeed, 0);
-		if (stateFrame >= 20) {
+		if (stateFrame >= 40) {
 			if (player.input.getXDir(player) != 0) {
 				maverick.changeState(new MRun());
 				return;
@@ -254,6 +253,8 @@ public class FakeZeroMeleeState : FakeZeroMState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
+
+		if (!zero.isX1Zero ){
 		projVisible = new Anim(
 			maverick.getFirstPOIOrDefault(1), "fakezero_run_sword", maverick.xDir,
 			player.getNextActorNetId(), false, sendRpc: true
@@ -262,6 +263,9 @@ public class FakeZeroMeleeState : FakeZeroMState {
 			maverick.getFirstPOIOrDefault(1), maverick.xDir,
 			zero, player.getNextActorNetId(), sendRpc: true
 		);
+		
+		maverick.playSound("zerosaberx3");
+		}
 		maverick.playSound("dashX2");
 		float runSpeed = zero.getRunSpeed() / 60f * 1.25f;
 		if (runSpeed > dashSpeed) {

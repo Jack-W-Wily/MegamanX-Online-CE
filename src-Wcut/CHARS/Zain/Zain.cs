@@ -321,33 +321,33 @@ public class Zain : Character {
 		if (sprite.name.Contains("spinslash")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.ZSaberRollingSlash, player,
 				1, 10, 5f, isDeflectShield: true,
-				ShouldClang: true
+				clashTier: ClashTier.Weak
 			, addToLevel: true);
 		}
 		if (sprite.name.Contains("super_slash")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 4f, 60, 15f, ShouldClang: true, addToLevel: true, hitSound : "clangGG"
+			 ProjIds.ZSaber3, player, 4f, 60, 15f, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "clangGG"
 			 );
 		}
 		if (sprite.name.Contains("projswing_air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 4f, 30, 15f, ShouldClang: true, addToLevel: true, hitSound : "clangGG"
+			 ProjIds.ZSaber3, player, 4f, 30, 15f, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "clangGG"
 			 );
 		}
 		if (sprite.name.Contains("jab")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.UPPunch, player, 2f, 10, 15f, ShouldClang: true, addToLevel: true, hitSound : "kofhtsnd_clamp1"
+			 ProjIds.UPPunch, player, 2f, 10, 15f, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp1"
 			 );
 		}
 		if (sprite.name.Contains("parry_start")) {
 			return new GenericMeleeProj(new SilkShot(), centerPoint,
-			 ProjIds.ForceGrabState, player, 1f, 0, 15f, ShouldClang: true, hitSound : "kofhtsnd_grab2"
+			 ProjIds.ForceGrabState, player, 1f, 0, 15f, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_grab2"
 			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("parry_dash")) {
 			return new GenericMeleeProj(new SilkShot(), centerPoint,
-			 ProjIds.ForceGrabState, player, 1f, 0, 15f, ShouldClang: true
+			 ProjIds.ForceGrabState, player, 1f, 0, 15f, clashTier: ClashTier.Weak
 			 , addToLevel: true, hitSound : "kofhtsnd_grab2"
 			 );
 		}
@@ -361,13 +361,13 @@ public class Zain : Character {
 
 		if (sprite.name.Contains("slash") && !sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber2, player, 3f, 20, 15f, ShouldClang: true
+			 ProjIds.ZSaber2, player, 3f, 20, 15f, clashTier: ClashTier.Weak
 			 , addToLevel: true, hitSound : "clangGG"
 			 );
 		}
 		if (sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber1, player, 3f, 20, 15f, ShouldClang: true
+			 ProjIds.ZSaber1, player, 3f, 20, 15f, clashTier: ClashTier.Weak
 			, addToLevel: true, hitSound : "clang2GG"
 			);
 		}
@@ -382,13 +382,13 @@ public class Zain : Character {
 
 		if (sprite.name.Contains("grab") && sprite.name.Contains("2")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f, ShouldClang: true, hitSound : "kofhtsnd_grab1"
+			 ProjIds.MechFrogStompShockwave, player, 1f, 0, 15f, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_grab1"
 			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("groundstab")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber3, player, 3f, 20, 15f, ShouldClang: true
+			 ProjIds.ZSaber3, player, 3f, 20, 15f, clashTier: ClashTier.Weak
 			, addToLevel: true, hitSound : "clangGG"
 			);
 		}
@@ -396,20 +396,20 @@ public class Zain : Character {
 
 		if (sprite.name.Contains("stabgrab_end")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.HeavyPush, player, 4f, 30, 15f, ShouldClang: true, hitSound : "clangGG"
+			 ProjIds.HeavyPush, player, 4f, 30, 15f, clashTier: ClashTier.Weak, hitSound : "clangGG"
 			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("air_dunk")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, ShouldClang: true, hitSound : "kofhtsnd_clamp2"
+			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_clamp2"
 			 , addToLevel: true);
 		}
 
 
 		if (sprite.name.Contains("projswing") && !sprite.name.Contains("air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, ShouldClang: true, hitSound : "clang3GG"
+			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, clashTier: ClashTier.Weak, hitSound : "clang3GG"
 			 , addToLevel: true);
 		}
 		if (sprite.name.Contains("parry")) {

@@ -31,6 +31,8 @@ public partial class Character : Actor, IDamagable {
 
 	public decimal bonusHealth = 0;
 
+	public decimal bossArmor = 0;
+
 	// Player linked data.
 	public Player player;
 	public int currency;
@@ -216,6 +218,8 @@ public partial class Character : Actor, IDamagable {
 
 	// For Wcut Bosses
 	public bool isWCUTBoss = false;
+
+	public float bossArmorRegen;
 
 	//>>>>>>>>>>>>>>>>>
 
@@ -980,9 +984,21 @@ public partial class Character : Actor, IDamagable {
 		}
 
 		if (other.gameObject is KillZone killZone && !isInvulnerable(true)) {
+			
+			if (killZone.kName == "enterCyberMazeClaudio") {
+				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					enterBossClaudio();
+				}, 1));
+                
+            }
+
 
 			if (killZone.kName == "enterHunterBase2") {
-                enterVavaHunterBase2();
+				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					 enterVavaHunterBase2();
+				}, 1));
             } else 
 			if (killZone.kName.Contains("Door")) {
                changeState(new PassDoor(), true);
@@ -1218,6 +1234,8 @@ public partial class Character : Actor, IDamagable {
 
 	public bool ActivateHEXA;
 
+	public float textCD;
+
 	public override void update() {
 
 
@@ -1307,9 +1325,37 @@ public partial class Character : Actor, IDamagable {
 			OverDrive = false;
 		}
 
+		// For Bosses WCUT
 
-
-
+		// Boss Ungrabable while armored
+		if (bossArmor > 0) {
+			if (charState is GenericGrabbedState) {
+				changeState(new Idle(), true);
+				new MechFrogStompShockwave(new XBuster(),
+				pos.addxy(6 * xDir, 0f), xDir, player,
+				player.getNextActorNetId(), rpc: true);
+				playSound("crash", true);
+				addDamageText("B U R S T ! ! !", 1);
+			}
+		}
+		if (bossArmor == 0 && !isWarpIn() && isWCUTBoss && BurstCooldown == 0) {
+			if (textCD == 0){
+			addDamageText("!!!", 1);
+			textCD = 5;
+			}
+			BurstCooldown = 5;
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+					 bossArmor = 2;
+				}, 4));
+		}
+		if (isWCUTBoss && !isInDamageSprite() && BurstCooldown == 0) {
+			if (bossArmorRegen == 0 && bossArmor < 5) {
+				bossArmor += 1;
+				bossArmorRegen = 1;
+			}
+		}
+		Helpers.decrementTime(ref textCD);
+		Helpers.decrementTime(ref bossArmorRegen);
 		Helpers.decrementTime(ref overDriveTimer);
 		Helpers.decrementTime(ref BurstCooldown);
 		Helpers.decrementTime(ref GenericDodgeCD);
@@ -3212,10 +3258,15 @@ public partial class Character : Actor, IDamagable {
 	public virtual int getMaxHealth() {
 		if (Global.level.is1v1() && player.isAI) {
 			if ( player.isSigma){
+			
 			return Player.getModifiedHealth(60);
-			}
+			} 
 			if ( !player.isSigma){
+			if (Global.level.levelData.name == "purple_vs_redandblue_1v1") {
+				return Player.getModifiedHealth(32);	
+				} else {
 			return Player.getModifiedHealth(50);
+				}
 			}
 			return Player.getModifiedHealth(20);
 		}
@@ -3493,6 +3544,10 @@ public partial class Character : Actor, IDamagable {
 			// Heals are not really applied here.
 			if (damage < 0) { damage = 0; }
 		// For Bonus Health
+		if (bossArmor > 0) {
+		bossArmor -= damage;
+		
+		} else {
 		if (bonusHealth > 0) {
 			bonusHealth -= damage;
 			isNodamage = false;
@@ -3501,7 +3556,7 @@ public partial class Character : Actor, IDamagable {
 			health -= damage;
 			isNodamage = false; 
 			}
-			
+		}	
 			// Clamp to 0. We do not want to go into the negatives here.
 		if (health < 0) {
 			health = 0;
@@ -3833,6 +3888,8 @@ public partial class Character : Actor, IDamagable {
 
 	public HitStop hitstops;
 
+
+	public bool juggled;
 	public void setHurt(int dir, int flinchFrames, bool spiked) {
 		if (!ownedByLocalPlayer) {
 			return;
@@ -4558,14 +4615,14 @@ public partial class Character : Actor, IDamagable {
 
 
 		public void enterVavaStage() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_c1").Value;
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
 		int spawnAsX = (int)CharIds.VAVA1;
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "st_vava_c1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "st_vava_c1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
-		int botCount = selectedLevel.name == "st_vava_c1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
-		bool disableVehicles = selectedLevel.name == "st_vava_c1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
 		var localServer = new Server(
 			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
 			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
@@ -4624,6 +4681,32 @@ public partial class Character : Actor, IDamagable {
 		var localServer = new Server(
 			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
 			gameMode, 9999, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+	
+		public void enterBossClaudio() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "cybermaze_1v1").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.VAVA1;
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = 1;// selectedLevel.name == "cybermaze_1v1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
 			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
 			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
 			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,

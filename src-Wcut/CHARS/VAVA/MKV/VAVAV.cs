@@ -1048,7 +1048,7 @@ public class VAVAV : Vile {
 		if (sprite.name.Contains("slashrun")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				2f,30, 15, isDeflectShield: true, ShouldClang: true,
+				2f,30, 15, isDeflectShield: true, clashTier: ClashTier.Weak,
 				isPushProjectile: true,
 				 isZSaberEffect2: true
 			, addToLevel : true);
@@ -1058,13 +1058,13 @@ public class VAVAV : Vile {
 		if (sprite.name.Contains("punch")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1f, 25, 15f, isDeflectShield: true, ShouldClang: true
+				1f, 25, 15f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 		if (sprite.name.Contains("kick") && !sprite.name.Contains("kick_3") && !sprite.name.Contains("super")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				1, 25, 15f, isDeflectShield: true, ShouldClang: true
+				1, 25, 15f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 		if (sprite.name.EndsWith("superkick_up")
@@ -1086,14 +1086,14 @@ public class VAVAV : Vile {
 		if (sprite.name.Contains("hyperdash_attack") && !sprite.name.Contains("b")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.HeavyPush, player,
-				2, 0, 10f, isDeflectShield: true, ShouldClang: true
+				2, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 
 		if (sprite.name.Contains("hyperdash_attack") && sprite.name.Contains("b")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.ForceGrabState, player,
-				0.5f, 0, 10f, isDeflectShield: true, ShouldClang: true
+				0.5f, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
 			, addToLevel : true);
 		}
 		

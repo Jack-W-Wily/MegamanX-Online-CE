@@ -1431,15 +1431,15 @@ public class Axl : Character {
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,
-			 2, Global.halfFlinch, addToLevel: addToLevel, ShouldClang: true
+			 2, Global.halfFlinch, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			MeleeIds.RainStorm => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.ForceGrabState, player,
-			 2, 0, addToLevel: addToLevel, ShouldClang: true
+			 2, 0, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			MeleeIds.OcelotSpin => new GenericMeleeProj(
 				ShotgunIce.netWeapon, pos, ProjIds.ZSaber1, player,
-				1, Global.halfFlinch, 4, ShouldClang: true, isJuggleProjectile: true,
+				1, Global.halfFlinch, 4, clashTier: ClashTier.Weak, isJuggleProjectile: true,
 				addToLevel: addToLevel
 			),
 			MeleeIds.TailShot => new GenericMeleeProj(

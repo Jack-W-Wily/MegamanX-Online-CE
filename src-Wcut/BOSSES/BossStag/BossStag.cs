@@ -67,7 +67,8 @@ public class BossStag : Character {
 		return base.normalCtrl();
 	}
 
-
+	public override CharState getJumpState() => new BossJumpStart();
+	
 	// AttackCtrl: is for you to add moves to your character that he can only perform
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
@@ -232,7 +233,7 @@ public class BossStag : Character {
 			(int)MeleeIds.Rising => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 2,30,10, isReflectShield: false,
-				ShouldClang: true, isZSaberEffect: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
 				addToLevel: addToLevel
 			),
@@ -472,7 +473,7 @@ public class BossStag : Character {
 						changeState(new BFStagGrabState(true));
 						break;
 					case 2 when isFacingTarget:
-						changeState(new BFStagDashState(0.5f));
+						changeState(new BFStagDashChargeState());
 						break;
 					case 3 when isFacingTarget:
 						changeState(new BFStagDashChargeState());
@@ -488,12 +489,12 @@ public class BossStag : Character {
 						changeState(new BFStagShoot(true));
 						break;
 					case 7 when isFacingTarget:
-						changeState(new BFStagDashState(0.8f));
+						changeState(new BFStagDashChargeState());
 						break;
 				}
 			}
 			if (bonusHealth > 0) {
-				aiAttackCooldown = Helpers.randomRange(20, 60);
+				aiAttackCooldown = Helpers.randomRange(30, 60);
 			} else {
 				aiAttackCooldown = Helpers.randomRange(0, 30);
 			}

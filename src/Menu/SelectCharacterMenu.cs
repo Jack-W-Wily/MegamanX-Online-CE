@@ -110,9 +110,9 @@ public class CharSelection {
 	public static CharSelection[] selections => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_x", 0){offset = new Point(0, 20)},
 		new CharSelection("XAnother", (int)CharIds.XAnother, 1, 0, "smenu_xanother", 0){offset = new Point(0, 20)},
-		new CharSelection("Zero (Early)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, 1, 0, "smenu_zero", 0){offset = new Point(0, 20)},
 		new CharSelection("Zero (MID)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
-		new CharSelection("Zero (END)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_3", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero (END)", (int)CharIds.ZeroEND, 1, 0, "smenu_zero_3", 0){offset = new Point(0, 20)},
 		new CharSelection("Axl", (int)CharIds.AxlWC, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},

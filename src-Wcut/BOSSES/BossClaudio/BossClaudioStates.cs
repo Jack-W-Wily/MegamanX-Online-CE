@@ -15,22 +15,72 @@ public class ClaudioBossDash : CharState {
 	public ClaudioBossDash() : base("dash") {
 		immuneToWind = true;
 		enterSound = "GDash";
-		specialId = SpecialStateIds.AxlRoll;
 	}
 
 	public override void update() {
 		base.update();
-
-		character.move(new Point(character.xDir * 350, 0));
-
-
-		if (stateTime > 0.2f) {
-			character.changeState(new ClaudioGroundPunchState(), true);
-			return;
+		if (!character.sprite.name.Contains("end")) {
+		character.move(new Point(character.xDir * 300, 0));
 		}
+		if (stateTime  > 0.3f) {
+		if (!character.sprite.name.Contains("end")) {
+			sprite = "dash_end";
+			character.changeSpriteFromName("dash_end", true);
+			if (character.bonusHealth <= 0) {
+					character.frameSpeed = 2;
+				}
+			} 
+		}
+		if (character.isAnimOver()) {
+			character.changeState(new ClaudioGroundPunchState(), true);
+		}
+		
 
 
 	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+public class ClaudioBossDashNoPound : CharState {
+
+
+	public ClaudioBossDashNoPound() : base("dash") {
+		immuneToWind = true;
+		enterSound = "GDash";
+		
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.sprite.name.Contains("end")) {
+		character.move(new Point(character.xDir * 300, 0));
+		}
+		if (stateTime  > 0.3f) {
+		if (!character.sprite.name.Contains("end")) {
+			sprite = "dash_end";
+			character.changeSpriteFromName("dash_end", true);
+			} 
+		}
+		if (character.isAnimOver()) {
+			character.changeState(new ClaudioGroundPunchState(), true);
+		}
+	}
+		
+
+
+	
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -46,22 +96,113 @@ public class ClaudioBossDash : CharState {
 
 
 
+public class BossJumpStart : CharState {
+
+
+	public BossJumpStart() : base("jump_start") {
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+		
+		if (character.isAnimOver()) {
+		
+			character.changeState(new BossJump(), true);
+			character.vel.y = -character.getJumpPower();
+			
+		}	
+		
+		
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+
+public class BossJump : CharState {
+
+	bool dropDown;
+	public BossJump() : base("jump") {
+		enterSound = "land";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded && stateTime > 0.05f) {
+			exitOnLanding = true;
+		}
+		if (!character.grounded) {
+		if (!player.isAI && !character.player.input.isAHeld(player) && !dropDown && character.frameIndex < 8) {
+			dropDown = true;
+			character.vel.y = 0;
+			character.frameIndex = 8;
+		}
+		if (player.isAI && stateTime == Helpers.randomRange(0,2) && !dropDown) {
+			dropDown = true;
+			character.vel.y = 0;
+			character.frameIndex = 8;
+		}
+		
+			character.move(new Point(character.xDir * 200, 0));
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		specialId = SpecialStateIds.None;
+	}
+}
+
+
 
 public class ClaudioTrppleSlash : CharState {
 
 
-	public ClaudioTrppleSlash() : base("trippleslash") {
+	public ClaudioTrppleSlash() : base("trippleslash_prepare") {
 
 	}
 
 	public override void update() {
 		base.update();
 		if (character.isAnimOver()) {
+
+			if (character.sprite.name.Contains("prepare")) {
+			sprite = "trippleslash";
+			character.changeSpriteFromName("trippleslash", true);
+			} else {
 			character.changeToIdleOrFall();
+			}
 		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		if (character.bonusHealth <0) {
+			sprite = "trippleslash";
+			character.changeSpriteFromName("trippleslash", true);
+		}
 	}
 	public override void onExit(CharState newState) {
 		base.onExit(newState);

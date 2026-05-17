@@ -867,7 +867,7 @@ public class ForceGrabbed : GenericGrabbedState {
 
 		if (player.input.isPressed(Control.Jump, player)) {
             Teched = true;
-			if (techTimer < 0.2f && techTimer >0.4f ){
+			if (techTimer < 0.1f && techTimer >0.4f ){
 			character.playSound("error", true);
 				Global.level.gameMode.setHUDErrorMessage(
 					player, "Tech Fail.",
@@ -876,12 +876,7 @@ public class ForceGrabbed : GenericGrabbedState {
 			}
         }
 
-		if (techTimer > 0.2f && techTimer < 0.4f ){
-			Global.level.gameMode.setHUDErrorMessage(
-					player, "PRESS JUMP TO TECH.",
-					playSound: false, resetCooldown: true
-				);
-			}
+		
 
 		trySnapToGrabPoint(true);
 		if (!grabber.sprite.name.Contains("gbd_b")) {

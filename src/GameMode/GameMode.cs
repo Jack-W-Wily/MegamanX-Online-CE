@@ -506,7 +506,7 @@ public class GameMode {
 					}
 				} else {
 					if (Global.input.isPressedMenu(Control.MenuPause)) {
-						if (Global.level.levelData.name is "st_vava_c1") {
+						if (Global.level.levelData.name is "st_cybermaze_test") {
 							enterVavaHunterBase();
                         }
 						else {
@@ -1041,6 +1041,12 @@ public class GameMode {
 		if (!Menu.inControlMenu && level.mainPlayer.input.isHeldMenu(Control.Scoreboard)) {
 			drawingScoreboard = true;
 			drawScoreboard();
+		}
+		//Draw Tech warning
+		if (level.mainPlayer.character?.charState is ForceGrabbed gstate) {
+			if (gstate.techTimer > 0.1f && gstate.techTimer < 0.4f ){
+			DrawWrappers.DrawTextureHUD(Global.textures["techwarning"], 0, 0);
+		}
 		}
 
 		if (level.isAfkWarn()) {

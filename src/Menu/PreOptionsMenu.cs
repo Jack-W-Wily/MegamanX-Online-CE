@@ -334,14 +334,14 @@ public class PreCPUMenu : IMainMenu {
 	}
 
 	public void enterVavaStage() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_c1").Value;
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
 		int spawnAsX = (int)CharIds.VAVA1;
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "st_vava_c1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "st_vava_c1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
-		int botCount = selectedLevel.name == "st_vava_c1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
-		bool disableVehicles = selectedLevel.name == "st_vava_c1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
 		var localServer = new Server(
 			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
 			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,

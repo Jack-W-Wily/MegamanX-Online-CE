@@ -29,6 +29,13 @@ public class EnemySpawnerChar : BaseSigma {
 
 	}
 	
+
+	public override bool isSoftLocked() {
+		if (	Global.level.levelData.name == "st_cybermaze_test" ) return true;
+		
+		return false;
+	}
+
 	public override bool canAirJump() {
 		return true;
 	}
@@ -39,6 +46,13 @@ public class EnemySpawnerChar : BaseSigma {
 
 	public override void update() {
 		base.update();
+		if (	Global.level.levelData.name == "st_cybermaze_test") {
+			vel.x = 0;
+			if (charState is Idle){
+			changeState(new BossWait());
+			}
+			vel.y = 0;
+		}
 		player.weapons.RemoveAll(w => w is not AbsorbWeapon);
 		if (!ownedByLocalPlayer) {
 			return;

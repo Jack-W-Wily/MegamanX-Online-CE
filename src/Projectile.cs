@@ -14,6 +14,8 @@ public class Projectile : Actor {
 	public string fadeSound = "";
 
 	public string hitSound = "hit";
+
+	public string hitspark = "hitspark_1";
 	public float time = 0;
 	public float maxTime = float.MaxValue;
 	public bool fadeOnAutoDestroy;
@@ -43,6 +45,8 @@ public class Projectile : Actor {
 	// Wcut Stuff
 
 	public bool isJuggleProjectile;
+
+	public bool isLiftProjectile;
 	public bool destroyOnDMG;
 	public bool isPushProjectile;
 	public bool ShouldClang;
@@ -119,6 +123,7 @@ public class Projectile : Actor {
 			}
 		}
 		this.ownerPlayer = player;
+		
 		canBeLocal = true;
 	}
 
@@ -747,17 +752,28 @@ public class Projectile : Actor {
 
 	public SoundWrapper HTSND; 
 
+
+	
+	
+
 	public virtual void onHitDamagable(IDamagable damagable) {
+		
 
-
-			if (isJuggleProjectile && damagable is Character chr) {
+			if (damagable is Character chr) {
+				if (isLiftProjectile ) {
 				float modifier = 1;
 				if (chr.isUnderwater()) modifier = 2;
 				if (chr.isPushImmune()) return;
 				float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
 				chr.move(new Point(xMoveVel * 0 * modifier, -300));
+				}
+				if (isJuggleProjectile){
 				chr.grounded = false;
+				chr.juggled = true;
+				}
 			}
+
+			
 
 		if (isPushProjectile){
 
@@ -783,6 +799,19 @@ public class Projectile : Actor {
 	// in damager method with caveat that this causes issues
 	// where the actor isn't created yet leading to point blank shots under lag not running this
 	public virtual DamagerMessage? onDamage(IDamagable damagable, Player attacker) {
+		Point? hitPoint = (damagable as Actor)?.getCenterPos() ?? new Point(0, 0);
+		Collider? hitbox = getGlobalCollider();
+		Collider? collider = (damagable as Actor)?.collider;
+		if (hitbox?.shape != null && collider?.shape != null) {
+			var hitboxCenter = hitbox.shape.getRect().center();
+			var hitCenter = collider.shape.getRect().center();
+			hitPoint = new Point((hitboxCenter.x + hitCenter.x) * 0.5f, (hitboxCenter.y + hitCenter.y) * 0.5f);
+		}
+		
+		if (ownedByLocalPlayer) {
+				new Anim(hitPoint.Value, hitspark, xDir,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
+		}
 		return null;
 	}
 
