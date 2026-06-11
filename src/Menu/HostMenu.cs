@@ -944,7 +944,7 @@ public class HostMenu : IMainMenu {
 			}*/
 
 			if (isLAN && !isOffline) {
-				localIPAddress = LANIPHelper.GetLocalIPAddress();
+				localIPAddress = LANIPHelper.GetLanIPAddress();
 				if (string.IsNullOrEmpty(localIPAddress)) {
 					errorMessage = "Couldn't get LAN IP address.";
 					return;
