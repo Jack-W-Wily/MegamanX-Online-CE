@@ -314,6 +314,10 @@ public class MegamanX : Character {
 	// General update.
 	public override void update() {
 		base.update();
+
+		if (!isInDamageSprite()) {
+			shotokanMoves();
+		}
 		if (this is XAnother) {
 			updateXAnother();
 		}
@@ -459,9 +463,7 @@ public class MegamanX : Character {
 			shoot(1, currentWeapon ?? specialBuster, true);
 			return true;
 		}
-		if (shotokanMoves()) {
-			return true;
-		}
+		
 		if (currentWeapon != null && canShoot() && (
 				player.input.isAPressed(player) && !isCharging() ||
 				currentWeapon.isStream && getChargeLevel() < 2 &&
@@ -524,7 +526,7 @@ public class MegamanX : Character {
 			player.superAmmo -= 32;
 			return true;
 		}
-		if (inputCheckS && canUseFgMove() && grounded && player.superAmmo >= player.superMaxAmmo
+		if (inputCheckS && canUseFgMove() && grounded && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
 		//	shoryukenCooldownTime == 0
 		) {

@@ -989,7 +989,7 @@ public partial class Character : Actor, IDamagable {
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.delayedActions.Add(new DelayedAction(() => {
 					enterBossClaudio();
-				}, 1));
+				}, 0));
                 
             }
 
@@ -1349,7 +1349,7 @@ public partial class Character : Actor, IDamagable {
 				}, 4));
 		}
 		if (isWCUTBoss && !isInDamageSprite() && BurstCooldown == 0) {
-			if (bossArmorRegen == 0 && bossArmor < 5) {
+			if (bossArmorRegen == 0 && bossArmor < 3) {
 				bossArmor += 1;
 				bossArmorRegen = 1;
 			}
@@ -4617,7 +4617,19 @@ public partial class Character : Actor, IDamagable {
 		public void enterVavaStage() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.VAVA1;
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
 		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
 		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
@@ -4644,7 +4656,19 @@ public partial class Character : Actor, IDamagable {
 		public void enterVavaHunterBase() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_hunterbase1").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.VAVA1;
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
 		if (selectedLevel.name == "st_vava_hunterbase1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
 		string gameMode = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
@@ -4672,7 +4696,19 @@ public partial class Character : Actor, IDamagable {
 		public void enterVavaHunterBase2() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "hunterbase2").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.VAVA1;
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
 		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartTrainingGameMode)) me.alliance = Global.quickStartTeam;
 		string gameMode = selectedLevel.name == "hunterbase2" ? Global.quickStartTrainingGameMode : Global.quickStartGameMode;
@@ -4698,7 +4734,19 @@ public partial class Character : Actor, IDamagable {
 		public void enterBossClaudio() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "cybermaze_1v1").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.VAVA1;
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
 		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
 		string gameMode = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartStoryMode : Global.quickStartGameMode;

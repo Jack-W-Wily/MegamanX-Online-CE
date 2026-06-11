@@ -48,8 +48,12 @@ public float angleDist = 0;
 	public float maxAngleDist = 180;
 	public float soundCooldown;
 	public float yPos;
+
+	public bool reversed;
 	public float initTime;
 	public Anim? anim;
+
+	public float posTimer;
 
 
 	public NewIrisCrystal(
@@ -187,15 +191,45 @@ public float angleDist = 0;
 			state = 0;
 		}
 		if (state == 0) {
-		time += Global.spf;
-		if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
-		if (time > 2) time = 0;
-		float x = 20 * MathF.Sin(time * 5);
-		yPos = -15 * time;
-		Point newPos = owner.character.pos.addxy(x, yPos);
-		changePos(newPos);
+			xPosTimer += Global.spf;
+
+			if (xPosTimer > 0.5f) {
+				if (!zposTop) {
+				zIndex = owner.character.zIndex - 3;
+				zposTop = true;
+				} else {
+				zIndex = owner.character.zIndex + 3;
+				zposTop = false;
+				}
+				xPosTimer = 0;
+			}
+			if (!reversed){
+			posTimer += Global.spf;
+			if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
+			if (posTimer > 2){
+			
+			reversed = true;
+			}
+			float x = 20 * MathF.Sin(posTimer * 5);
+			yPos = -15 * posTimer;
+			Point newPos = owner.character.pos.addxy(x, yPos);
+			changePos(newPos);
+			} else {
+			posTimer -= Global.spf;
+			if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
+			if (posTimer <= 0){
+			reversed = false;
+			}
+			float x = 20 * MathF.Sin(posTimer * 5);
+			yPos = -15 * posTimer;
+			Point newPos = owner.character.pos.addxy(x, yPos);
+			changePos(newPos);	
+			}
 		}
 	}
+
+	public float xPosTimer;
+	public bool zposTop = false;
 }
 
 

@@ -34,7 +34,7 @@ public class RockmanX : MegamanX {
 		charId = CharIds.RockmanX;
 
 		// For special conditions stuff
-		if (charState is WarpIn) player.superAmmo = 0;
+		//if (charState is WarpIn) player.superAmmo = 0;
 
 	}
 
@@ -428,8 +428,8 @@ public class RockmanX : MegamanX {
 				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
-				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
-				2, Global.defFlinch, 10, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				ShoryukenWeapon.netWeapon, projPos, ProjIds.ForceGrabState, player,
+				2, 0, 2, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,

@@ -25,6 +25,7 @@ public class Shoryuken : CharState {
 	public Shoryuken(bool isUnderwater) : base("shoryuken") {
 		this.isUnderwater = isUnderwater;
 		superArmor = true;
+		canGainMeter = false;
 	}
 
 	public override void update() {

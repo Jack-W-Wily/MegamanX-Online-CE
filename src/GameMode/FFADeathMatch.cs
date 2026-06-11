@@ -81,6 +81,20 @@ public class FFADeathMatch : GameMode {
 
 		drawTimeIfSet(25);
 	}
+	bool playDesperationThemeEvent1;
+	bool playDesperationThemeEvent2;
+	public override void update() {
+		base.update();
+		List<Player> playerList = GameMode.getOrderedPlayerList();
+		if (Global.level.server.playTo >= 10 && playerList[0].kills >= Global.level.server.playTo - 5 && !playDesperationThemeEvent1) {
+			Global.changeMusic("Xvs8Generals_BossX1");
+			playDesperationThemeEvent1 = true;
+		}
+		if (Global.level.server.playTo >= 10 && playerList[0].kills >= Global.level.server.playTo - 2 && !playDesperationThemeEvent2) {
+			playDesperationThemeEvent2 = true;
+			Global.changeMusic("Xvs8Generals_RAGEMODE");
+		}
+	}
 
 	public override void drawScoreboard() {
 		base.drawScoreboard();

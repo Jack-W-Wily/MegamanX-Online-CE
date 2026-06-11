@@ -355,9 +355,9 @@ public class TriadThunderQuake : Projectile {
 		pos, xDir, owner, "triadthunder_charged_quake", netId, player
 	) {
 		weapon = TriadThunder.netWeapon;
-		damager.damage = 3;
+		damager.damage = 0;
 		damager.hitCooldown = 30;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		useGravity = false;
 		projId = (int)ProjIds.TriadThunderQuake;
 		maxTime = 0.25f;

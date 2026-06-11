@@ -927,6 +927,9 @@ public partial class Level {
 		string musicKey = levelData.getMusicKey(players);
 		Global.changeMusic(musicKey);
 
+
+		
+
 		if (isHost) {
 			Global.serverClient?.rpc(RPC.updateStarted);
 		}
@@ -945,8 +948,14 @@ public partial class Level {
 
 
 	
+	public void startDesperationTheme1 (){
+		Global.changeMusic("Xvs8Generals_BossX1");
+	}
+	public void startDesperationTheme2 (){
+		Global.changeMusic("Xvs8Generals_RAGEMODE");
+	}
 
-
+	
 	public void changeCameraScale(float scale) {
 		if (server.fixedCamera) {
 			scale *= 2;

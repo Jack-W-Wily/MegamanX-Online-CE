@@ -286,11 +286,8 @@ public class PreCPUMenu : IMainMenu {
 					enterTraining();
 					break;
 				case 2:
-					if (Options.main.preferredCharacter == 2){
 					enterVavaStage();
-					} else {
-                    enterXStage();
-                    }
+					
 					break;
 			}
 		}
@@ -336,7 +333,19 @@ public class PreCPUMenu : IMainMenu {
 	public void enterVavaStage() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.VAVA1;
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
 		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
 		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
 		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
@@ -344,7 +353,7 @@ public class PreCPUMenu : IMainMenu {
 		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
 		var localServer = new Server(
 			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, true, false,
 			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
 			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
 			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
@@ -417,7 +426,7 @@ public class PreCPUMenu : IMainMenu {
 			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
 		}
 		if (selectY == 2) {
-			Fonts.drawText(menuFont, "Game's Story mode \n" + Name + "\nA Fresh Start",
+			Fonts.drawText(menuFont, "Singleplayer Test \n" + Name + "\nTesting Purposes",
 			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
 		}
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.screenW / 2, Global.screenH - 9, Alignment.Center);

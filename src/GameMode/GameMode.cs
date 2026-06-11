@@ -252,6 +252,11 @@ public class GameMode {
 	public virtual void update() {
 		Helpers.decrementTime(ref hudErrorMsgTime);
 
+
+
+		
+
+
 		if (Global.isHost) {
 			if (finalZoneTime != null && finalZoneTime.Value <= 0) {
 				if (virusStarted < 3) {
@@ -506,12 +511,9 @@ public class GameMode {
 					}
 				} else {
 					if (Global.input.isPressedMenu(Control.MenuPause)) {
-						if (Global.level.levelData.name is "st_cybermaze_test") {
-							enterVavaHunterBase();
-                        }
-						else {
+					
 						Global.leaveMatchSignal = new LeaveMatchSignal(LeaveMatchScenario.MatchOver, null, null);
-						}
+					
 					}
 				}
 			}
@@ -521,30 +523,6 @@ public class GameMode {
 
 
 
-
-		public void enterVavaHunterBase() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_hunterbase1").Value;
-		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.VAVA1;
-		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "st_vava_hunterbase1" && GameMode.isStringTeamMode(Global.quickStartTrainingGameMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartTrainingGameMode : Global.quickStartGameMode;
-		int botCount = 0;
-		bool disableVehicles = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
-		var localServer = new Server(
-			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, 9999, botCount, selectedLevel.maxPlayers, 0, false, false,
-			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
-			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
-			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-			Global.quickStartDisableHtSt, disableVehicles,
-			2
-		);
-		localServer.players = new List<ServerPlayer>() { me };
-		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
-		Global.level.teamNum = localServer.teamNum;
-		Global.level.startLevel(localServer, false);
-	}
 
 
 
@@ -1472,12 +1450,12 @@ public class GameMode {
 	}
 
 	public void draw1v1TopHUD() {
-		draw1v1PlayerTopHUD(hudTopLeftPlayer, HUDHealthPosition.TopLeft);
-		draw1v1PlayerTopHUD(hudTopRightPlayer, HUDHealthPosition.TopRight);
-		draw1v1PlayerTopHUD(hudLeftPlayer, HUDHealthPosition.Left);
-		draw1v1PlayerTopHUD(hudRightPlayer, HUDHealthPosition.Right);
-		draw1v1PlayerTopHUD(hudBotLeftPlayer, HUDHealthPosition.BotLeft);
-		draw1v1PlayerTopHUD(hudBotRightPlayer, HUDHealthPosition.BotRight);
+//		draw1v1PlayerTopHUD(hudTopLeftPlayer, HUDHealthPosition.TopLeft);
+//		draw1v1PlayerTopHUD(hudTopRightPlayer, HUDHealthPosition.TopRight);
+//		draw1v1PlayerTopHUD(hudLeftPlayer, HUDHealthPosition.Left);
+//		draw1v1PlayerTopHUD(hudRightPlayer, HUDHealthPosition.Right);
+//		draw1v1PlayerTopHUD(hudBotLeftPlayer, HUDHealthPosition.BotLeft);
+//		draw1v1PlayerTopHUD(hudBotRightPlayer, HUDHealthPosition.BotRight);
 
 		if (remainingTime != null) {
 			var timespan = new TimeSpan(0, 0, MathInt.Ceiling(remainingTime.Value));

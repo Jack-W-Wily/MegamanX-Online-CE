@@ -16,7 +16,7 @@ using static SFML.Window.Keyboard;
 namespace MMXOnline;
 
 public partial class Global {
-	public static decimal version = 20m;
+	public static decimal version = 19.12m;
 	public static string versionName = "0.0";
 	public static string subVersionName = "WILY CUT 98 BETA";
 	public static string subVersionShortName = "WC98 0.6";
@@ -531,10 +531,10 @@ public partial class Global {
 	public const int maxServers = 5;
 	public static int tickRate = 1;
 
-	public static readonly int superFlinch = 45;
-	public static readonly int defFlinch = 35;
-	public static readonly int halfFlinch = 20;
-	public static readonly int miniFlinch = 12;
+	public static readonly int superFlinch = 35;
+	public static readonly int defFlinch = 24;
+	public static readonly int halfFlinch = 12;
+	public static readonly int miniFlinch = 6;
 
 	public static DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
@@ -623,7 +623,15 @@ public partial class Global {
 								region.name = region.name.Substring(0, 10);
 							}
 						}
-						_regions = new List<Region>() { region };
+						//_regions = new List<Region>() { region };
+						_regions = new List<Region>
+						{
+							region,
+							new Region("East US", "52.242.124.168"),
+							new Region("West US", "104.210.60.214"),
+							new Region("Brazil", "26.250.70.225")
+						};
+						
 					} else {
 						return new List<Region>();
 					}

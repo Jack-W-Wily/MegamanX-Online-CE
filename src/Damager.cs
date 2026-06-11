@@ -1275,6 +1275,19 @@ public class Damager {
 		}
 		// Maverick section
 		else if (victim is Maverick maverick) {
+
+			// Enable Wcut Combos on Mavericks
+			if (owner.character != null) {
+
+				if (owner.character.charState.canSpecialCancel) {
+					owner.character.charState.spcCancel = true;
+				}
+				if (owner.superAmmo != owner.superMaxAmmo) {
+						if (owner.character.charState.canGainMeter){
+					owner.superAmmo += 1;
+					}
+				}
+			}
 			// Beast killer damage buff.
 			if (projId == (int)ProjIds.BeastKiller || projId == (int)ProjIds.AncientGun) {
 				damage *= 1.25f;
