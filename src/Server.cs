@@ -417,7 +417,7 @@ public class Server {
 			}
 			if (isLAN) {
 				// This will get our LAN IP. Not our internet IP.
-				ip = LANIPHelper.GetLocalIPAddress();
+				ip = LANIPHelper.GetLanIPAddress();
 			}
 			if (isP2P && uniqueID != 0) {
 				// If we are a P2P server we cannot use a public IP as the masterserver handles that.

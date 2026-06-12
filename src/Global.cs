@@ -586,7 +586,7 @@ public partial class Global {
 				if (debug && useLocalIp) {
 					_regions = new List<Region>()
 					{
-						new Region("LAN", LANIPHelper.GetLocalIPAddress()),
+						new Region("LAN", LANIPHelper.GetLanIPAddress()),
 					};
 				} else {
 					string text = Global.defaultRegionJson;
