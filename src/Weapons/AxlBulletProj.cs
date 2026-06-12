@@ -10,6 +10,7 @@ public class AxlBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
+		isLiftProjectile = true;
 	}
 
 	public override void onHitWall(CollideData other) {
@@ -29,7 +30,7 @@ public class MettaurCrashProj : Projectile {
 		maxTime = 0.3f;
 		reflectable = true;
 		destroyOnHit = false;
-
+		isLiftProjectile = true;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -59,7 +60,7 @@ public class BeastKillerProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-
+		isLiftProjectile = true;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -82,7 +83,7 @@ public class MachineBulletProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-
+		isLiftProjectile = true;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -105,7 +106,7 @@ public class RevolverBarrelProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.22f;
 		reflectable = true;
-
+		isLiftProjectile = true;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -144,7 +145,7 @@ public class AncientGunProj : Projectile {
 		vel.y = bulletDir.y * speed;
 		maxTime = 0.3f;
 		destroyOnHit = false;
-
+		isLiftProjectile = true;
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}
@@ -181,6 +182,8 @@ public class CopyShotProj : Projectile {
 
 		reflectable = true;
 		maxTime = 0.5f;
+		isLiftProjectile = true;
+		damager.flinch = Global.miniFlinch;
 
 		/*
 		if (player?.character?.isWhiteAxl() == true)
@@ -195,6 +198,7 @@ public class CopyShotProj : Projectile {
 			maxTime /= 1.5f;
 			xScale = 1f;
 			yScale = 1f;
+			damager.flinch = Global.halfFlinch;
 		}
 		if (chargeLevel >= 3) {
 			damager.damage = 4;
@@ -202,6 +206,7 @@ public class CopyShotProj : Projectile {
 			maxTime /= 2f;
 			xScale = 1.25f;
 			yScale = 1.25f;
+			damager.flinch = Global.defFlinch;
 		}
 		/*
 		if (chargeLevel == 4)

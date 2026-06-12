@@ -76,7 +76,7 @@ public class AxlBullet : AxlWeapon {
 }
 public class DoubleBullet : AxlWeapon {
 	public DoubleBullet() : base(0) {
-		sprite = "axl_arm_pistol";
+		sprite = "axl_arm_doublebullet";
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		shootSounds = new string[] { "axlBullet", "axlBullet", "axlBullet", "axlBulletCharged" };

@@ -206,6 +206,8 @@ public partial class Character : Actor, IDamagable {
 
 	// Input Stuff (WCUT)
 	public float inputdecreasedCD;
+
+	public int anyDirPressTimes = 0;
 	public int downPressedTimes = 0;
 	public int upPressedTimes = 0;
 	public int leftPressedTimes = 0;
@@ -1406,18 +1408,22 @@ public partial class Character : Actor, IDamagable {
 
 		if (player.input.isPressed(Control.Down, player)) {
 			downPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Up, player)) {
 			upPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Left, player)) {
 			leftPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Right, player)) {
 			rightPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 
@@ -1429,6 +1435,7 @@ public partial class Character : Actor, IDamagable {
 			shootPressedTimes = 0;
 			specialPressedTimes = 0;
 			wRightPressedTimes = 0;
+			anyDirPressTimes = 0;
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -3890,6 +3897,8 @@ public partial class Character : Actor, IDamagable {
 
 
 	public bool juggled;
+
+	public bool tripping;
 	public void setHurt(int dir, int flinchFrames, bool spiked) {
 		if (!ownedByLocalPlayer) {
 			return;
@@ -4425,7 +4434,59 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public virtual void aiAttack(Actor? target) { }
+	public virtual void aiAttack(Actor? target) {
+		
+		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
+			return;
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 40;
+		
+		
+		int AIAttack = Helpers.randomRange(0, 9);
+		if (aiAttackCooldown == 0 ){
+		switch (AIAttack) {
+			case 1 :
+				player.press(Control.Shoot);
+										
+				break;
+			
+			case 2 :
+				player.press(Control.Special1);
+			break;
+			case 3:
+				player.press(Control.R2);
+			break;
+			case 4 :
+				player.press(Control.L2);
+			break;
+			case 5:
+				player.press(Control.Shoot);
+			break;
+			case 6:
+				player.press(Control.Special2);
+			break;
+			case 7:
+				player.press(Control.WeaponLeft);
+			break;
+			case 8:
+				player.press(Control.WeaponRight);
+			break;
+			
+			default:
+				player.press(Control.Shoot);
+				
+				break;
+			
+				
+			}
+			aiAttackCooldown = Helpers.randomRange(20,60);
+		}
+
+
+	}
+
+	
 
 	public virtual void aiDodge(Actor? target) { }
 

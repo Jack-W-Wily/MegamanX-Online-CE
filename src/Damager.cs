@@ -491,10 +491,11 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is PunchyZero or BusterZero or Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
+			if (owner.character != null) {
 
 				if (owner.character.charState.canSpecialCancel) {
 					owner.character.charState.spcCancel = true;
+					owner.character.aiAttackCooldown = 0;
 				}
 				if (owner.superAmmo != owner.superMaxAmmo) {
 						if (owner.character.charState.canGainMeter){
@@ -921,8 +922,8 @@ public class Damager {
 				}
 
 				if (projId == (int)ProjIds.newUpGrab) {
-					owner?.character.changeState(new XUPGrabState(character));
-					character?.changeState(new UPGrabbed(owner.character));
+					owner.character.changeState(new XUPGrabState(character));
+					character.changeState(new UPGrabbed(owner.character));
 				}
 				
 
@@ -1067,7 +1068,7 @@ public class Damager {
 
 					if ( projId == (int)ProjIds.VileAirRaidPlusKnock) {
 							
-							character.changeState(new LaunchedState(owner.character), true);
+							character.changeState(new LaunchedStateWeak(owner.character), true);
 							
                     }
 				}

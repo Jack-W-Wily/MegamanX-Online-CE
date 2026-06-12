@@ -447,7 +447,7 @@ public class Axl : Character {
 			player.superAmmo += 1;
 			}
         }
-		whiteAxlTime = 10;
+		
 		if (stealthActive) addRenderEffect(RenderEffectType.StealthModeBlue);
 		else removeRenderEffect(RenderEffectType.StealthModeBlue);
 
@@ -456,7 +456,7 @@ public class Axl : Character {
 				if (player.superAmmo > 5) {
             if (!isInDamageSprite() ) {
 				
-                if (player.input.isPressed(Control.Taunt, player)) {
+                if (player.input.isR2Pressed(player) && player.input.isL2Held(player)) {
                     if (Helpers.randomRange(0, 1 ) == 0) {
                         changeState(new ZainParryShinStartState(), true);
                     } else {
@@ -602,16 +602,15 @@ public class Axl : Character {
 			axl.changeState(new RisingBarrageWA(), true);
 			return true;
 		}
-		if (specialPressed && inputDir.y == -1) {
-			if (axl.grounded) {
-				axl.changeState(new TailShotWA(), true);
-			} else {
-				axl.changeState(new AxlRainDropWA(), true);
-			}
-			return true;
-		}
+		if (specialPressed ) {
+			
+				changeState(new TailShotWA(), true);
+				return true;
+
+			} 
+			
 		if (specialPressed && axl.grounded && inputDir.y == 1 && axl.charState is not OcelotSpin) {
-			axl.changeState(new OcelotSpin(), true);
+			changeState(new OcelotSpin(), true);
 			return true;
 		}
 		//if (specialPressed && ammo > 0) {
@@ -1220,7 +1219,8 @@ public class Axl : Character {
 			}
 		}
 		if (!Options.main.useMouseAim) {
-			if (axlWeapon != null && (currentWeapon is AssassinBulletChar || player.input.isCursorLocked(player))) {
+			if (axlWeapon != null && (//currentWeapon is AssassinBulletChar || 
+			player.input.isCursorLocked(player))) {
 				Point bulletPos = getAxlBulletPos();
 				float radius = 120;
 				float ang = getShootAngle();
@@ -1295,12 +1295,14 @@ public class Axl : Character {
 		}
 		gunArmOrigin = getAxlGunArmOrigin();
 
+		/*
 		if (axlWeapon is DoubleBullet) {
 			var armPos = getDoubleBulletArmPos();
 			if (shouldDraw()) {
 				pistol2Sprite.draw(0, gunArmOrigin.x + armPos.x * axlXDir, gunArmOrigin.y + armPos.y, axlXDir, 1, getRenderEffectSet(), 1, 1, 1, this.zIndex + 100, angle: angle, shaders: getShaders(), actor: this);
 			}
 		}
+		*/
 
 		if (shouldDraw()) {
 			int frameIndex = 0;
@@ -1560,11 +1562,11 @@ public class Axl : Character {
 
 		Point gunArmOrigin = getAxlGunArmOrigin();
 
-		var doubleBullet = currentWeapon as DoubleBullet;
-		if (doubleBullet != null && doubleBullet.isSecondShot) {
-			Point dbArmPos = getDoubleBulletArmPos();
-			gunArmOrigin = gunArmOrigin.addxy(dbArmPos.x * getAxlXDir(), dbArmPos.y);
-		}
+//		var doubleBullet = currentWeapon as DoubleBullet;
+//		if (doubleBullet != null && doubleBullet.isSecondShot) {
+			//Point dbArmPos = getDoubleBulletArmPos();
+			//gunArmOrigin = gunArmOrigin.addxy(dbArmPos.x * getAxlXDir(), dbArmPos.y);
+//		}
 
 		Sprite sprite = getAxlArmSprite();
 		float angle = getShootAngle(ignoreXDir: true) + sprite.animData.frames[0].POIs[poiIndex].angle * axlXDir;

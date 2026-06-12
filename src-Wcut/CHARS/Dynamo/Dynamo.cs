@@ -225,19 +225,8 @@ public class Dynamo : Character {
 
 		if (player.superAmmo > 15 && player.input.isHeld(Control.Up, player)
 		&& player.input.isPressed(Control.Special2, player) && !isInDamageSprite()) {
-			player.superAmmo -= 16;
-			new DarkHoldDProj(new DarkHoldWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
-			playSound("dynamoting", forcePlay: false, sendRpc: true);
-			changeState(new Idle());
-			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
-
-			if (OverDrive) {
-				new DarkHoldProj(
-			pos.addxy(0, -20), xDir, this,
-			player, player.getNextActorNetId(), rpc: true
-		);
-				playSound("darkhold");
-			}
+			
+			initiateDynamoTimeStop();
 		}
 
 
@@ -283,6 +272,23 @@ public class Dynamo : Character {
 		}
 
 
+	}
+
+
+	public void initiateDynamoTimeStop() {
+			player.superAmmo -= 16;
+			new DarkHoldDProj(new DarkHoldWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			playSound("dynamoting", forcePlay: false, sendRpc: true);
+			changeState(new Idle());
+			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
+
+			if (OverDrive) {
+				new DarkHoldProj(
+			pos.addxy(0, -20), xDir, this,
+			player, player.getNextActorNetId(), rpc: true
+			);
+				playSound("darkhold");
+			}
 	}
 
 
@@ -429,5 +435,76 @@ public class Dynamo : Character {
 
 		
 	}
+
+
+
+		
+
+	public override void aiAttack(Actor? target) {
+		base.aiAttack(target);
+		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
+			return;
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 40;
+		aiAttackCooldown = Helpers.randomRange(20,60);
+		int dynamoattack = Helpers.randomRange(0, 9);
+		if (aiAttackCooldown == 0){
+		switch (dynamoattack) {
+			case 1 when grounded && isTargetInAir && isTargetClose:
+				changeState(new DynamoUpperCut(), true);
+										
+				break;
+			
+			case 2 when isTargetClose:
+				changeState(new DynamoBladeSlash(), true);
+			break;
+			case 3 when !isTargetClose:
+				changeState(new DynamoBladeDash(), true);
+			break;
+			case 4 when !isTargetClose:
+				player.press(Control.WeaponLeft);
+			break;
+			case 5 when isTargetClose && !grounded:
+				changeState(new DynamoAirShotState(), true);
+			break;
+			case 6 when !isTargetClose:
+				changeState(new DynamoCross(), true);
+			break;
+			case 7 when isTargetClose:
+				changeState(new DynamoAxe(), true);
+			break;
+			case 8 when !isTargetClose:
+				changeState(new DynamoSlide(), true);
+			break;
+			case 9 when isTargetClose:
+				changeState(new DynamoDaggerLV2(), true);
+			break;
+			default:
+				player.press(Control.Shoot);
+				if (isTargetClose) { aiAttackCooldown = 0; }
+				break;
+			
+			}
+		}
+	}
+	public override void aiDodge(Actor? target) {
+		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {
+			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
+				if (player.superAmmo >= 16) {
+					initiateDynamoTimeStop();
+				} else if (grounded) {
+					
+					changeState(new BlockWCUT(), true);
+				}
+			}
+		}
+		base.aiDodge(target);
+	}
+
 }
+
+
+
+
 

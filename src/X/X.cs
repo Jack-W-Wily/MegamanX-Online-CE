@@ -1732,7 +1732,7 @@ public class MegamanX : Character {
 				) {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
-							changeState(new BossGuard());
+							changeState(new WarpDodge(pos));
 							aiDodgeCD = Helpers.randomRange(100, 220);
 
 						}

@@ -88,6 +88,14 @@ public class BaseSigma : Character {
 		return base.isSoftLocked();
 	}
 
+
+	public bool isPuppeteer = false;
+	public	bool isTruePuppeter = true;
+	public	bool isTrueStriker = true;
+	public bool isTrueSummoner = true;
+	public bool canIssueAttack = false;
+	public bool canIssueOrders = false;
+
 	public override void preUpdate() {
 		base.preUpdate();
 
@@ -124,12 +132,9 @@ public class BaseSigma : Character {
 			}
 		}
 
-		bool isPuppeteer = false;
-		bool isTruePuppeter = true;
-		bool isTrueStriker = true;
-		bool isTrueSummoner = true;
-		bool canIssueAttack = false;
-		bool canIssueOrders = false;
+		
+		
+		/*
 		if (!player.isAI) {
 			foreach (Weapon weapon in weapons) {
 				if (weapon is not MaverickWeapon mw) {
@@ -162,7 +167,7 @@ public class BaseSigma : Character {
 					}
 				}
 			}
-		}
+		}*/
 		if (weapons.Count > 3 || isATrans || !weapons.Any(w => w is SigmaMenuWeapon)) {
 			isTruePuppeter = false;
 			isTrueStriker = false;
@@ -454,8 +459,64 @@ public class BaseSigma : Character {
 		}
 	}
 
+
+	public float sigmaStyleCooldown;
 	public override void update() {
 		base.update();
+
+
+		// Sigma Style Switcher
+
+		Helpers.decrementFrames(ref sigmaStyleCooldown);
+		if (player.input.isPressed(Control.Special2,player) && currentMaverick == null && player.weapon is SigmaMenuWeapon && sigmaStyleCooldown == 0) {
+			sigmaStyleCooldown = 10;
+			foreach (Weapon weapon in weapons) {
+				if (weapon is MaverickWeapon mw) {
+					if (mw.maverick == null) {
+					   if (player.input.isHeld(Control.Up, player)) {
+						mw.trueControlMode = MaverickModeId.TagTeam;
+						mw.controlMode = MaverickModeId.TagTeam;
+						isTruePuppeter = false;
+						isTrueStriker = false;
+						isTrueSummoner = false;
+						isPuppeteer = false;
+						player.loadout.sigmaLoadout.commandMode = (int)MaverickModeId.TagTeam;
+						
+						addDamageText("Tag Team!", (int)FontType.Red);	
+						} else  if (player.input.isHeld(Control.Down, player)) {
+							mw.trueControlMode = MaverickModeId.Summoner;
+							mw.controlMode = MaverickModeId.Summoner;
+							player.loadout.sigmaLoadout.commandMode = (int)MaverickModeId.Summoner;
+							canIssueAttack = true;
+							canIssueOrders = true;
+							isTruePuppeter = false;
+							isTrueStriker = false;
+							isPuppeteer = false;
+							addDamageText("Summoner!", (int)FontType.Green);	
+						} else if (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player)) {
+							mw.trueControlMode = MaverickModeId.Striker;	
+							mw.controlMode = MaverickModeId.Striker;
+							player.loadout.sigmaLoadout.commandMode = (int)MaverickModeId.Striker;
+							isTruePuppeter = false;
+							isPuppeteer = false;
+							addDamageText("Striker!", (int)FontType.Blue);												
+						} else {
+							mw.trueControlMode = MaverickModeId.Puppeteer;
+							mw.controlMode = MaverickModeId.Puppeteer;
+							player.loadout.sigmaLoadout.commandMode = (int)MaverickModeId.Puppeteer;
+							addDamageText("Puppeteer!", (int)FontType.Purple);
+							canIssueOrders = true;
+							isPuppeteer = true;
+							isTrueStriker = false;
+							isTrueSummoner = false;
+							isTruePuppeter = true;
+						}
+						player.syncLoadout();
+						playSound("menuX3", sendRpc: true);
+					}
+				}
+			}
+		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}

@@ -138,6 +138,8 @@ public class GBeetleBallProj : Projectile {
 	int size;
 	const float moveSpeed = 200;
 	bool isSecond;
+
+	public GravityWellProj explosion;
 	public GBeetleBallProj(
 		Point pos, int xDir, bool isSecond, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
@@ -165,6 +167,21 @@ public class GBeetleBallProj : Projectile {
 		return new GBeetleBallProj(
 			args.pos, args.xDir, args.extraData[0] == 1, args.owner, args.player, args.netId
 		);
+	}
+
+	public override void update() {
+		base.update();
+		if (owner.character != null) {
+			
+			if (owner.input.isR2Pressed(owner)) {
+				explosion =new GravityWellProj(pos, xDir, owner.character, owner, owner.getNextActorNetId(), true);
+				destroySelf();
+			}
+		}
+
+		if (explosion != null && explosion.state == 0) {
+			explosion.startState1();
+		}
 	}
 
 	public void increaseSize() {
@@ -207,6 +224,19 @@ public class GBeetleBallProj : Projectile {
 			playSound("gbeetleProjBounce", sendRpc: false);
 			increaseSize();
 		}
+	}
+
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (!damagable.isPlayableDamagable()) { return; }
+		var actor = damagable.actor();
+		if (actor is Character chr && (chr.isPushImmune() || chr.isSlowImmune() || chr.isFlinchImmune())) return;
+
+		float mag = 100;
+		if (!actor.grounded) actor.vel.y = 0;
+		Point velVector = actor.getCenterPos().directionToNorm(pos).times(mag);
+		actor.move(velVector, true);
 	}
 }
 
@@ -498,10 +528,7 @@ public class GBeetleGravityWellProj : Projectile {
 		base.onHitDamagable(damagable);
 		if (!damagable.isPlayableDamagable()) { return; }
 		var actor = damagable.actor();
-		Character? chr = actor as Character;
-		if (chr != null && !chr.isPushImmune()) return;
-		if (actor is not Character && actor is not RideArmor && actor is not Maverick) return;
-		if (chr != null && (chr.charState is DeadLiftGrabbed || chr.charState is BeetleGrabbedState)) return;
+		if (actor is Character chr && (chr.isPushImmune() || chr.isSlowImmune() || chr.isFlinchImmune())) return;
 
 		float mag = 100;
 		if (!actor.grounded) actor.vel.y = 0;
@@ -566,7 +593,7 @@ public class GBeetleGravityWellState : BeetleMState {
 
 			if (isHoldStateOver(1f, 3f, 3f, Control.Special1)) {
 				maverick.changeSpriteFromName("blackhole", true);
-				chargeTime = (int)stateTime;
+				chargeTime = (int)stateTime * 2;
 				state = 1;
 			}
 		} else if (state == 1) {

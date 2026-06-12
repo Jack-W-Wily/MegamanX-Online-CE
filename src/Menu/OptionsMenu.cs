@@ -1133,6 +1133,7 @@ public class OptionsMenu : IMainMenu {
 		} 
 		
 		else if (charNum == 3) {
+			
 		/*	menuOptions = new List<MenuOption>() {
 				// Axl Use Mouse Aim
 				new MenuOption(
@@ -1365,6 +1366,29 @@ public class OptionsMenu : IMainMenu {
 						);
 					},
 					"If no, you wont move while shooting."
+				),
+				// Axl Lock On
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.lockOnSound = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.lockOnSound = true;
+						}
+					},
+					(Point pos, int index) => {
+						//ToDo: Add an actual option for the sound.
+						Fonts.drawText(
+							optionFontText, "Auto aim:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.lockOnSound),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Enable/disable auto-aim-\n(For Directional aim mode only.)"
 				),
 				new MenuOption(
 					30, startY,

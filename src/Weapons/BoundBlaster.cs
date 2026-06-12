@@ -18,7 +18,7 @@ public class BoundBlaster : AxlWeapon {
 		flashSprite = "axl_pistol_flash";
 		chargedFlashSprite = "axl_pistol_flash_charged";
 		altFireCooldown = 120;
-
+		
 		if (altFire == 1) {
 			altRechargeAmmoCooldown = 120;
 			shootSounds[3] = "boundBlaster";
@@ -94,6 +94,7 @@ public class BoundBlasterProj : Projectile {
 			maxTime = 3f;
 			isWaProj = true;
 		}
+		isLiftProjectile = true;
 		projId = (int)ProjIds.BoundBlaster;
 		updateAngle();
 

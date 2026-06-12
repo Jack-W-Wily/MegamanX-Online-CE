@@ -145,7 +145,6 @@ public class OcelotSpin : CharState {
 
 	public OcelotSpin() : base("ocelotspin") {
 		exitOnAirborne = true;
-		normalCtrl = true;
 	}
 
 	public override void update() {

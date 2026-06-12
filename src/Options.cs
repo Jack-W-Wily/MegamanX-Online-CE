@@ -102,7 +102,7 @@ public class Options {
 	public bool aimAnalog = false;
 	public float aimSensitivity = 0.5f;
 	public int axlAimMode = 0;
-	public bool lockOnSound = false;
+	public bool lockOnSound = true;
 	public bool backwardsAimInvert = false;
 	public bool axlSeparateAimDownAndCrouch = false;
 	public bool moveInDiagAim = true;

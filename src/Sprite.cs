@@ -320,6 +320,17 @@ public class Sprite {
 			drawXSaber = true;
 		}
 
+		if (Global.level.mainPlayer.character is Axl && Global.level.mainPlayer.input.isHeld(Control.AimUp,Global.level.mainPlayer)
+		&& animData.isAxlSprite) {
+			bitmap = Global.textures["axl_aim_up"];
+			
+		}
+		if (Global.level.mainPlayer.character is Axl && Global.level.mainPlayer.input.isHeld(Control.AimDown,Global.level.mainPlayer)
+		&& animData.isAxlSprite) {
+			bitmap = Global.textures["axl_aim_down"];
+			
+		}
+
 		if (armors != null && animData.isXSprite && !Options.main.fastShaders && !Options.main.disableShaders) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*

@@ -369,6 +369,7 @@ public class VAVA1 : Vile {
 					} else {
 						if (player.vileAmmo >= 4) {
 							changeState(new SpoiledBratPunch(), true);
+
 						}
 					}
 				}
@@ -378,8 +379,9 @@ public class VAVA1 : Vile {
 
 		if (player.input.isBPressed(player)) {
 			if (grounded) {
-				if (player.input.isHeld(Control.Up, player)) {
+				if (player.input.isHeld(Control.Up, player) && player.vileAmmo >= 6) {
 					changeState(new WildHorseKickState(), true);
+					player.vileAmmo -= 6;
 				} else if (player.input.isHeld(Control.Down, player)) {
 					if (downPressedTimes >= 2) {
 						if (player.vileAmmo >= 15) {
@@ -490,7 +492,7 @@ public class VAVA1 : Vile {
 			} else if (charState is Crouch) {
 				changeState(new VavaZipZapper(), true);
 			} else {
-				if (getChargeLevel() == 1) {
+				if (getChargeLevel() == 1 && player.vileAmmo >= 15) {
                 	int input = player.input.getYDir(player);
 					new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
 					playSound("buster2", sendRpc: true);
@@ -500,7 +502,7 @@ public class VAVA1 : Vile {
 					}
 					stopCharge();
 					player.vileAmmo -= 15;
-            	} else if (getChargeLevel() == 1) {
+            	} else if (getChargeLevel() == 1 && player.vileAmmo >= 15) {
               	  new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 					playSound("thunder_bolt", sendRpc: true);
 					player.vileAmmo -= 15;
@@ -509,7 +511,7 @@ public class VAVA1 : Vile {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-          		} else if (getChargeLevel() == 2) {
+          		} else if (getChargeLevel() == 2 && player.vileAmmo >= 15) {
              	if (player.input.isLeftOrRightHeld(player)) {
 					playSound("noise_crush_charged");
 					new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
@@ -517,11 +519,12 @@ public class VAVA1 : Vile {
 					new NoiseCrushVChargedProj(this, getShootPos().addxy(12 * -xDir, 0), xDir, 1, player.getNextActorNetId(), true);
 					new NoiseCrushVChargedProj(this, getShootPos().addxy(18 * -xDir, 0), xDir, 2, player.getNextActorNetId(), true);
 					new NoiseCrushVChargedProj(this, getShootPos().addxy(24 * -xDir, 0), xDir, 3, player.getNextActorNetId(), true);
+					player.vileAmmo -= 15;
 					if (grounded) {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-				} else {
+				} else if (player.vileAmmo >= 15){
 					new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 				playSound("thunder_bolt", sendRpc: true);
 				player.vileAmmo -= 15;
@@ -531,7 +534,7 @@ public class VAVA1 : Vile {
 				}
 				changeSpriteFromName("buster_1", true);
 				stopCharge();
-          		} else if (getChargeLevel() >= 3) {
+          		} else if (getChargeLevel() >= 3 && player.vileAmmo >= 15) {
             		for (int i = 0; i < 3; i++) {
 					new JunkShieldMagnet(
 					getCenterPos(), xDir, this,
