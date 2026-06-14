@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using SFML.Graphics;
 namespace MMXOnline;
 
 
@@ -264,6 +269,9 @@ public class SigmaBallShootWC : CmdSigmaStateWC {
 		}
 	}
 }
+
+
+
 
 
 
@@ -543,9 +551,19 @@ public class SigmaGrabEX : CharState {
 	airMove = true;
 	}
 
+	float leechTime = 1;
+
+	bool UsedGrabFinisherOnce;
+
 	public override void update()
-	{
-	
+	{	
+		leechTime += Global.spf;
+		if (character.OverDrive) {
+			if (leechTime > 0.5f) {
+				leechTime = 0;
+				character.addHealth(1f);
+			}
+		}
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -555,6 +573,13 @@ public class SigmaGrabEX : CharState {
 				character.move(new Point(-30 * character.xDir, 0));
 			}
 			character.useGravity = true;
+		}
+
+
+		if (player.input.isBPressed(player) && !UsedGrabFinisherOnce) {
+			UsedGrabFinisherOnce = true;
+			sprite = "grab_kick";
+			character.changeSpriteFromNameIfDifferent("grab_kick", true);
 		}
 
 		base.update();
@@ -587,7 +612,7 @@ public class VirusSlash1 : CharState {
 	bool fired = false;
 
 
-	public VirusSlash1() : base("slash_1", "", "", "") {
+	public VirusSlash1() : base("slash_1 _virus", "", "", "") {
 		superArmor = true;
 	}
 
@@ -621,7 +646,7 @@ public class VirusSlash2 : CharState {
 	bool fired = false;
 	public RekkohaEffect? effect;
 
-	public VirusSlash2() : base("slash_2", "", "", "") {
+	public VirusSlash2() : base("slash_2 _virus", "", "", "") {
 	superArmor = true;
 	}
 
@@ -666,7 +691,7 @@ public class VirusSlash3 : CharState {
 	bool fired = false;
 	
 
-	public VirusSlash3() : base("slash_3", "", "", "") {
+	public VirusSlash3() : base("slash_3 _virus", "", "", "") {
 	superArmor = true;
 	}
 
@@ -706,6 +731,133 @@ public class VirusSlash3 : CharState {
 }
 
 
+
+
+
+
+
+
+
+
+
+public class HeavySlash1 : CharState {
+	bool fired = false;
+
+
+	public HeavySlash1() : base("slash_1", "", "", "") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+		character.playSound("genmureix5", sendRpc: true);
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash, player)) {
+			character.move(new Point(slideVel, 0));
+
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class HeavySlash2 : CharState {
+	bool fired = false;
+	public RekkohaEffect? effect;
+
+	public HeavySlash2() : base("slash_2", "", "", "") {
+	superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded){
+			if (player.input.isHeld(Control.Down,player)
+			&& player.input.isLeftOrRightHeld(player)
+			&&  character.frameIndex > 2){
+	
+			character.changeState(new HeavySlash3(), true);
+			
+			}
+		}
+
+		if (character.isAnimOver() || !player.input.isAHeld(player) && character.frameIndex > 4) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			character.playSound("genmureix5", sendRpc: true);
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash,player)){
+			character.move(new Point( slideVel, 0));
+			
+		}
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
+
+
+public class HeavySlash3 : CharState {
+	bool fired = false;
+	
+
+	public HeavySlash3() : base("slash_3", "", "", "") {
+	superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded){
+			if (player.input.isHeld(Control.Up,player)
+			&& player.input.isLeftOrRightHeld(player)
+			&& character.frameIndex > 4){
+				
+			character.changeState(new HeavySlash1(), true);
+		
+			}
+		}
+
+		
+		if (character.isAnimOver() || !player.input.isAHeld(player) && character.frameIndex > 4 )  {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.playSound("genmureix5", sendRpc: true);
+		float slideVel = character.xDir * character.getDashSpeed();
+		if (player.input.isHeld(Control.Dash,player)){
+			character.move(new Point( slideVel, 0));
+			
+		}
+	
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+	}
+}
 
 
 
@@ -838,4 +990,6 @@ public class SigmaSkull : Projectile, IDamagable {
 		return false;
 	}
 }
+
+
 

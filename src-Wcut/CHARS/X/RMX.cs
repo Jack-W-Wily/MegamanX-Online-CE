@@ -528,7 +528,7 @@ public class RockmanX : MegamanX {
 			shaders.AddRange(baseShaders);
 			return shaders;
 		}
-		if (index >= (int)WeaponIds.GigaCrush) {
+		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
 			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {

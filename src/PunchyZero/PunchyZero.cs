@@ -77,6 +77,13 @@ public class PunchyZero : Character {
 		};
 		hyperMode = loadout.hyperMode;
 		altSoundId = AltSoundIds.X3;
+
+		spriteFrameToSounds["zerox1_run/5"] = "run2";
+		spriteFrameToSounds["zerox1_run/11"] = "run2";
+
+		spriteFrameToSounds["zerox1_burnknuckle/3"] = "Mantis - Dash2";
+		
+
 	}
 
 	public override CharState getAirJumpState() => new Jump() { sprite = "kuuenbu" };
@@ -88,9 +95,9 @@ public class PunchyZero : Character {
 	}
 	public override CharState getTauntState() {
 		if (isAwakened && tauntCooldown <= 0) {
-			return new PAwakenedTaunt();
+			return new Taunt();
 		}
-		return new PZeroTaunt();
+		return new Taunt();
 	}
 
 	public override void update() {
@@ -98,11 +105,7 @@ public class PunchyZero : Character {
 			updateAwakenedAura();
 		}
 
-		if (OverDrive) {
-			isBlack = true;
-		} else {
-			isBlack = false;
-		}
+		
 		if (!Global.level.isHyper1v1()) {
 			if (isBlack) {
 				if (musicSource == null) {
@@ -293,8 +296,8 @@ public class PunchyZero : Character {
 		if (currencyUse > 0) {
 			if (freeBusterShots > 0) {
 				freeBusterShots--;
-			} else if (player.superAmmo > 6) {
-				player.superAmmo -= 6;
+			} else if (player.superAmmo > 2 * chargeLevel) {
+				player.superAmmo -= 2 * chargeLevel;
 			}
 		}
 	}
@@ -493,7 +496,7 @@ public class PunchyZero : Character {
 		}
 		if (shootPressTime > 0) {
 			if (yDir == -1) {
-				changeState(new PZeroShoryuken(), true);
+				changeState(new PZeroLaunchPunch(), true);
 				return true;
 			}
 			if (yDir == 1) {
@@ -525,8 +528,12 @@ public class PunchyZero : Character {
 
 	public bool airAttacks() {
 		int yDir = player.input.getYDir(player);
-		if (diveKickCooldown == 0 && (shootPressTime > 0 || specialPressTime > 0) && yDir == 1) {
+		if (diveKickCooldown == 0 && ( specialPressTime > 0) && yDir == 1) {
 			changeState(new PZeroDiveKickState(), true);
+			return true;
+		}
+		if ((shootPressTime > 0) && yDir == 1) {
+			changeState(new PZeroDiveKickState2(), true);
 			return true;
 		}
 		if (shootPressTime > 0) {
@@ -632,10 +639,12 @@ public class PunchyZero : Character {
 
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
+			"zerox1_block" => MeleeIds.Block,
 			"zerox1_grab_start" => MeleeIds.Grab,
 			"zerox1_burnknuckle" or "zerox1_groundpound" or "zerox1_grab_ex"=> MeleeIds.BurnKnuckle,
 			"zerox1_punch" => MeleeIds.Punch,
 			"zerox1_punch2" or "zerox1_run_attack" => MeleeIds.Punch2,
+			"zerox1_launch_punch" => MeleeIds.Uppercut2,
 			"zerox1_spinkick" => MeleeIds.Spin,
 			"zerox1_kick_air" => MeleeIds.AirKick,
 			"zerox1_parry_start" => MeleeIds.Parry,
@@ -643,6 +652,7 @@ public class PunchyZero : Character {
 			"zerox1_shoryuken" => MeleeIds.Uppercut,
 			"zerox1_megapunch" => MeleeIds.StrongPunch,
 			"zerox1_dropkick" => MeleeIds.DropKick,
+			"zerox1_dropkick_quick" => MeleeIds.DropKickBounce,
 			"zerox1_projswing" or "zerox1_projswing_air" or "zerox1_wall_slide_attack" => MeleeIds.SaberSwing,
 			_ => MeleeIds.None
 		});
@@ -661,24 +671,28 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Punch => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch, player,2, 0, 15,
-				addToLevel: addToLevel, clashTier: ClashTier.Weak
+				meleeWeapon, projPos, ProjIds.PZeroPunch, player,2, Global.halfFlinch, 15,
+				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 15,
-				addToLevel: addToLevel, clashTier: ClashTier.Weak
+				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch2"
+			),
+			(int)MeleeIds.Uppercut2 => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.PZeroShoryuken, player, 2,Global.defFlinch, 10,
+				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch2", isLiftProjectile: true
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, 0, 15,
-				addToLevel: addToLevel, clashTier: ClashTier.Weak
+				meleeWeapon, projPos, ProjIds.PZeroAirKick, player, 3, Global.halfFlinch, 15,
+				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch1", isLiftProjectile: true
 			),
 			(int)MeleeIds.Uppercut => new GenericMeleeProj(
-				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.PZeroShoryuken, player, 4, Global.defFlinch,
-				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
+				ZeroShoryukenWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 4, 0,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1",clashTier: ClashTier.Strong, isLiftProjectile: true
 			),
 			(int)MeleeIds.StrongPunch => new GenericMeleeProj(
 				MegaPunchWeapon.staticWeapon, projPos, ProjIds.BurensenEND, player, 6, 0,
@@ -686,6 +700,10 @@ public class PunchyZero : Character {
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
 				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
+			),
+			(int)MeleeIds.DropKickBounce => new GenericMeleeProj(
+				DropKickWeapon.staticWeapon, projPos, ProjIds.GBDKick, player, 2, Global.halfFlinch,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Parry => new GenericMeleeProj(
@@ -772,12 +790,15 @@ public class PunchyZero : Character {
 		StrongPunch,
 		AirKick,
 		Uppercut,
+		Uppercut2,
 		DropKick,
+		DropKickBounce,
 		Parry,
 		ParryAttack,
 		SaberSwing,
 		GrabEX,
 		BurnKnuckle,
+
 		AwakenedAura
 	}
 

@@ -763,6 +763,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canShoot() {
+		if (this is Axl && charState is BlockWCUT) {
+			return false;
+		}
 		return charState.attackCtrl;
 	}
 
@@ -3251,14 +3254,16 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual int baselineMaxHealth() {
 		if (player.isHighMax) return 36; 
-		if (player.isSigma) return 34; 
+		if (player.isSigma) return 30; 
 		if (player.isZain) return 34; 
-		if (player.isZMID) return 32;
-		if (player.isVile) {
-			if (this is VAVAV) return 20; 
-			if (this is VAVA2) return 22; 
-			return 24; 
-		} 
+		if (player.isZMID) return 30;
+		if (player.isVile) return 20; 
+		if (player.isAxl) return 24;
+		if (player.isX){
+			if (this is XAnother) return 28;
+			return 26;
+		}
+		
 		return 28;
 	}
 
@@ -4436,55 +4441,11 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void aiAttack(Actor? target) {
 		
-		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
-			return;
-		}
-		bool isTargetInAir = pos.y < target?.pos.y - 20;
-		bool isTargetClose = pos.x < target?.pos.x - 40;
-		
-		
-		int AIAttack = Helpers.randomRange(0, 9);
-		if (aiAttackCooldown == 0 ){
-		switch (AIAttack) {
-			case 1 :
-				player.press(Control.Shoot);
-										
-				break;
-			
-			case 2 :
-				player.press(Control.Special1);
-			break;
-			case 3:
-				player.press(Control.R2);
-			break;
-			case 4 :
-				player.press(Control.L2);
-			break;
-			case 5:
-				player.press(Control.Shoot);
-			break;
-			case 6:
-				player.press(Control.Special2);
-			break;
-			case 7:
-				player.press(Control.WeaponLeft);
-			break;
-			case 8:
-				player.press(Control.WeaponRight);
-			break;
-			
-			default:
-				player.press(Control.Shoot);
-				
-				break;
-			
-				
-			}
-			aiAttackCooldown = Helpers.randomRange(20,60);
-		}
 
 
 	}
+
+
 
 	
 

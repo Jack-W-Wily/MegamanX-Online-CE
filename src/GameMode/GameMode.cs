@@ -1736,7 +1736,7 @@ public class GameMode {
 
 		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
 			// Draw HP
-			if (!isMech && twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
+			if (!isMaverick && !isMech && twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
 				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
 			} else if (i < curHP) {
 				if (curHP > 10){

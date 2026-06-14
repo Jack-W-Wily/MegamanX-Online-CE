@@ -890,7 +890,7 @@ public class AxlWC : Character {
 			MeleeIds.TailShot => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.FireWave, player,
 				3, Global.defFlinch, isJuggleProjectile: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isLiftProjectile : true
 			),
 			MeleeIds.String1 => new GenericMeleeProj(
 				FireWave.netWeapon, pos, ProjIds.ShotgunIce, player,

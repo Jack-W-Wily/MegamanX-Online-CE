@@ -625,6 +625,24 @@ public class VAVA1 : Vile {
 	
 	public override void update() {
 		base.update();
+
+
+		if (charState is SpoiledBratPunch or InfinityGigAttack or GoGetterRightAttack) {
+			if (player.input.isR2Pressed(player) 
+			){
+				foreach (var otherPlayer in Global.level.players) {
+					if (otherPlayer.character == null) continue;
+					if (otherPlayer == player) continue;
+					if (otherPlayer == parasiteDamager?.owner) continue;
+					if (otherPlayer.character.isInvulnerable()) continue;
+					if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+					if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+					Character target = otherPlayer.character;
+					changeState(new GizmoDashHoming(target));
+					break;
+				}
+			}
+		}
 		// DisrespectFactor
 
 		
@@ -1044,7 +1062,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.KamaeUnB => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
-				3, 0, 20, isReflectShield: true,
+				2, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
@@ -1069,7 +1087,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.Kote => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
-				3, 40, 20, isReflectShield: true,
+				2, 40, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
 			),
@@ -1105,7 +1123,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
-				4, 0, 20, isReflectShield: true,
+				2, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
 			),
@@ -1119,21 +1137,21 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
-				3, 30, 20, isReflectShield: true,
+				2, 30, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true
+				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true, isLiftProjectile : true
 			),
 
 			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
-				3, 30, 20, isReflectShield: true,
+				2, 30, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.AirRaid => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.VileAirRaidPlusKnock, player,
-				3, 0, 20, isReflectShield: true,
+				1, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
@@ -1229,6 +1247,7 @@ public class VAVA1 : Vile {
 			}
 		} else if (chargeLevel == 1) {
 			if (!player.input.isL2Held(player)) {
+			player.loadout.vileLoadout.cannon = (int)VileCannonType.FrontRunner;
 			cannonWeapon.type = (int)VileCannonType.FrontRunner;
 			cannonWeapon.vavaShoot(0, this);
 			} else {
@@ -1240,6 +1259,7 @@ public class VAVA1 : Vile {
 			stopCharge();
 		} else if (chargeLevel == 2) {
 			if (!player.input.isL2Held(player)) {
+			player.loadout.vileLoadout.cannon = (int)VileCannonType.FatBoy;
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
 			cannonWeapon.vavaShoot(0, this);
 			} else {
@@ -1260,6 +1280,7 @@ public class VAVA1 : Vile {
 			}
 			stopCharge();
 		} else if (chargeLevel == 3) {
+			player.loadout.vileLoadout.cannon = (int)VileCannonType.FatBoy;
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
 			cannonWeapon.vavaShoot(0, this);
 			stopCharge();
@@ -1276,6 +1297,7 @@ public class VAVA1 : Vile {
 		if (chargeLevel >= 1) {
 			stopCharge();
 		}
+		player.syncLoadout();
 	}
 
 

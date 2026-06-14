@@ -516,6 +516,53 @@ public class Vava1GizmoDash : CharState {
 
 
 
+public class GizmoDashHoming : CharState {
+	
+	bool isDone;
+	Character otherChar;
+	float moveAmount;
+	float maxMoveAmount;
+	public GizmoDashHoming(Character otherChar) : 
+	base("gizmo_dash_grab"
+	) {
+		
+		this.otherChar = otherChar;
+	}
+
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.grounded = false;
+		character.vel.y = 0;
+		maxMoveAmount = character.getCenterPos().distanceTo(otherChar.getCenterPos()) * 1.5f;
+	}
+
+	public override void onExit(CharState newState) {
+		base.onExit(newState);
+		player.character.useGravity = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+
+		Point amount = character.getCenterPos().directionToNorm(otherChar.getCenterPos()).times(250);
+
+		character.move(amount);
+
+		moveAmount += amount.magnitude * Global.spf;
+		if (moveAmount > maxMoveAmount) {
+			character.changeToIdleOrFall();
+			return;
+		}
+	}
+}
+
+
+
 
 public class VavaGizmoGrabState : CharState {
 
@@ -557,14 +604,7 @@ public class VavaGizmoGrabState : CharState {
 			character.changeSpriteFromNameIfDifferent("violentcrusher_grab", true);
 		}
 
-		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
-			character.changeToIdleOrFall();
-			return;
-		}
-
-		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
-			victimWasGrabbedSpriteOnce = true;
-		}
+		
 		if (!victimWasGrabbedSpriteOnce) {
 			timeWaiting += Global.spf;
 			if (timeWaiting > 1) {

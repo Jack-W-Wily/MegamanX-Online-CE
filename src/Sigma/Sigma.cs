@@ -63,11 +63,43 @@ public class BaseSigma : Character {
 		if (intialCharState.GetType() != charState.GetType()) {
 			changeState(intialCharState);
 		}
+
+		if (!player.isAI) {
+			foreach (Weapon weapon in weapons) {
+				if (weapon is not MaverickWeapon mw) {
+					continue;
+				}
+				switch (mw.controlMode) {
+					case MaverickModeId.Summoner: {
+						canIssueAttack = true;
+						canIssueOrders = true;
+						isTruePuppeter = false;
+						isTrueStriker = false;
+						break;
+					}
+					case MaverickModeId.Puppeteer: {
+						canIssueOrders = true;
+						isPuppeteer = true;
+						isTrueStriker = false;
+						isTrueSummoner = false;
+						break;
+					}
+					case MaverickModeId.TagTeam: {
+						isTruePuppeter = false;
+						isTrueStriker = false;
+						isTrueSummoner = false;
+						break;
+					}
+					case MaverickModeId.Striker: {
+						isTruePuppeter = false;
+						break;
+					}
+				}
+			}
+		}
 	}
 
-	public override int baselineMaxHealth() {
-		return 34;
-	}
+	
 
 	public Collider getSigmaHeadCollider() {
 		var rect = new Rect(0, 0, 14, 20);
@@ -430,7 +462,7 @@ public class BaseSigma : Character {
 		}
 
 		if (tagTeamSwapProgress > 0) {
-			tagTeamSwapProgress -= speedMul;
+			tagTeamSwapProgress -= speedMul * 5;
 			if (tagTeamSwapProgress <= 0) {
 				tagTeamSwapProgress = 0;
 				if (tagTeamSwapCase == 0) {
@@ -468,7 +500,7 @@ public class BaseSigma : Character {
 		// Sigma Style Switcher
 
 		Helpers.decrementFrames(ref sigmaStyleCooldown);
-		if (player.input.isPressed(Control.Special2,player) && currentMaverick == null && player.weapon is SigmaMenuWeapon && sigmaStyleCooldown == 0) {
+		if (player.input.isPressed(Control.Special2,player) && currentMaverick == null && player.weapon is SigmaMenuWeapon && sigmaStyleCooldown == 0 && charState is not CallDownMaverick && charState is not IssueGlobalCommand && charState is not WarpOut ) {
 			sigmaStyleCooldown = 10;
 			foreach (Weapon weapon in weapons) {
 				if (weapon is MaverickWeapon mw) {

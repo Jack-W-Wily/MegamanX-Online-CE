@@ -197,10 +197,18 @@ public class Dynamo : Character {
 
 
 
+	public override int baselineMaxHealth() {
+
+		return 25;
+	}
+
+
 	public override void update() {
 		base.update();
-
-
+		var subtanks = player.subtanks;
+		if (charState is Taunt && subtanks.Count > 0 && health < maxHealth) {
+						subtanks[1 - 1].use(this);			
+		}
 		// Hypermode music.
 		if (OverDrive) {
 			if (musicSource == null) {
@@ -333,7 +341,7 @@ public class Dynamo : Character {
 		if (sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new StrikeChain(), centerPoint,
 			 ProjIds.ZSaber3, player, 2f, 15, 10f, clashTier: ClashTier.Weak, hitSound : "htsnd_slash_deep3"
-			, hitspark: "hitspark_slashx4_2" , isJuggleProjectile: true, addToLevel: true);
+			, hitspark: "hitspark_slashx4_2" , isJuggleProjectile: true, addToLevel: true, isLiftProjectile : true);
 		}
 
 		if (sprite.name.Contains("slide_jump")) {
@@ -449,7 +457,7 @@ public class Dynamo : Character {
 		bool isTargetClose = pos.x < target?.pos.x - 40;
 		aiAttackCooldown = Helpers.randomRange(20,60);
 		int dynamoattack = Helpers.randomRange(0, 9);
-		if (aiAttackCooldown == 0){
+		
 		switch (dynamoattack) {
 			case 1 when grounded && isTargetInAir && isTargetClose:
 				changeState(new DynamoUpperCut(), true);
@@ -486,7 +494,7 @@ public class Dynamo : Character {
 				break;
 			
 			}
-		}
+		
 	}
 	public override void aiDodge(Actor? target) {
 		foreach (GameObject gameObject in getCloseActors(32, true, false, false)) {

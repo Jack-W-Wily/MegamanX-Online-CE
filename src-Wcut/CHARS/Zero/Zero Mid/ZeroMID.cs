@@ -1003,19 +1003,19 @@ public class ZeroMID : Zero {
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
 				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.defFlinch, 15,
 				isZSaberEffect: true,
-				addToLevel: addToLevel, hitSound : "htsnd_slash3"
+				addToLevel: addToLevel, hitSound : "htsnd_slash3", isJuggleProjectile : true
 			),
 			// Air
 			(int)MeleeIds.AirSlash => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ZSaberAir, player, 1, Global.halfFlinch, 5, isReflectShield: true,
 				hitspark: "zsaber_slash_fade", clashTier: ClashTier.Weak,
-				addToLevel: addToLevel, hitSound : "htsnd_slash1"
+				addToLevel: addToLevel, hitSound : "htsnd_slash1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.RollingSlash =>  new GenericMeleeProj(
 				KuuenzanWeapon.staticWeapon, projPos, ProjIds.ZSaberRollingSlash, player,
 				1, 10, 5, isDeflectShield: true,
 				hitspark: "zsaber_slash_fade", clashTier: ClashTier.Weak,
-				addToLevel: addToLevel, isJuggleProjectile : true, hitSound : "htsnd_slash1"
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound : "htsnd_slash1", isLiftProjectile : true
 			),
 			(int)MeleeIds.Hyoroga => new GenericMeleeProj(
 				HyorogaWeapon.staticWeapon, projPos, ProjIds.HyorogaSwing, player, 4, Global.superFlinch, 15,
@@ -1045,12 +1045,12 @@ public class ZeroMID : Zero {
 			),
 			(int)MeleeIds.Denjin => new GenericMeleeProj(
 				DenjinWeapon.staticWeapon, projPos, ProjIds.Denjin, player, 1, 30, 6,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true, isLiftProjectile : true
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
 				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 30,
 				isZSaberEffect: true,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true, isLiftProjectile : true
 			),
 			// Down specials
 			(int)MeleeIds.Hyouretsuzan => new GenericMeleeProj(

@@ -769,7 +769,7 @@ public class ZainProjSwingState : CharState {
 		airMove = true;
 		useDashJumpSpeed = true;
 		bonusAttackCtrl = true;
-		canSpecialCancel = true;
+		//canSpecialCancel = true;
 	}
 
 
@@ -844,7 +844,7 @@ public class ZainProjSwingState2 : CharState {
 		airMove = true;
 		useDashJumpSpeed = true;
 		bonusAttackCtrl = true;
-		canSpecialCancel = true;
+		//canSpecialCancel = true;
 	}
 
 

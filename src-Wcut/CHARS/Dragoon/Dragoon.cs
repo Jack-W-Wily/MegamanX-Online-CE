@@ -335,7 +335,7 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("shoryuken") && charState is DragoonRising)
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 1f, 30, 12, ShouldClang : true, isJuggleProjectile : true, addToLevel: true, hitSound : "kofhtsnd_punch4"
+			 ProjIds.FireWave, player, 1f, 30, 12, ShouldClang : true, isJuggleProjectile : true, addToLevel: true, hitSound : "kofhtsnd_punch4", isLiftProjectile : true
 			);
 		}
 
@@ -359,7 +359,7 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("shoryuken") && charState is not DragoonRising )
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 35, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true, hitSound : "kofhtsnd_punch4"
+			 ProjIds.FireWave, player, 2, 35, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true, hitSound : "kofhtsnd_punch4", isLiftProjectile : true
 			);
 		}
 		
@@ -373,7 +373,7 @@ public override bool attackCtrl() {
 
 		if (  sprite.name.Contains("uppercut"))
 		{
-			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableWeak, player, 
+			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableWeakLaunch, player, 
 			2f, 0, 10f, null, isShield: true, isDeflectShield: true , addToLevel: true, hitSound : "kofhtsnd_megapunch1"
 			);
 		}
@@ -421,6 +421,61 @@ public override bool attackCtrl() {
 		//	}
 			return "magmadragoon_" + spriteName;
 	}
+
+
+	public override void aiAttack(Actor? target) {
+		
+		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
+			return;
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 40;
+		
+		
+		int AIAttack = Helpers.randomRange(0, 9);
+		if (aiAttackCooldown == 0 ){
+		switch (AIAttack) {
+			case 1 :
+				player.press(Control.Shoot);
+										
+				break;
+			
+			case 2 :
+				player.press(Control.Special1);
+			break;
+			case 3:
+				player.press(Control.R2);
+			break;
+			case 4 :
+				player.press(Control.L2);
+			break;
+			case 5:
+				player.press(Control.Shoot);
+			break;
+			case 6:
+				player.press(Control.Special2);
+			break;
+			case 7:
+				player.press(Control.WeaponLeft);
+			break;
+			case 8:
+				player.press(Control.WeaponRight);
+			break;
+			
+			default:
+				player.press(Control.Shoot);
+				
+				break;
+			
+				
+			}
+			aiAttackCooldown = Helpers.randomRange(20,60);
+		}
+
+
+	}
+
+
 }
 
 

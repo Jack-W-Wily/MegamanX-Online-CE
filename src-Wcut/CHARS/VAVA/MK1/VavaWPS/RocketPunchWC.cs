@@ -140,7 +140,9 @@ public class RocketPunchProjWC : Projectile {
 
 	public override void update() {
 		base.update();
-
+		if (type == 1) {
+			damager.damage = 0.5f;
+		}
 		if (time > 2) 	destroySelf("explosion", "explosion");
 			
 		if (ownedByLocalPlayer && !ownerExists) {

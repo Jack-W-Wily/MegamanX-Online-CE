@@ -23,7 +23,7 @@ public class ZXSaber : Weapon {
 		if (chargeLevel >= 3) {
 			character.changeState(new XMaxWaveSaberState(), true);
 		} else {
-			character.changeState(new X6SaberState(character.grounded), true);
+			character.changeState(new X6SaberState2(character.grounded), true);
 		}
 	}
 }
@@ -123,6 +123,37 @@ public class X6SaberState : CharState {
 		}
 	}
 }
+
+
+
+public class X6SaberState2 : CharState {
+	bool fired;
+	bool grounded;
+	public X6SaberState2(bool grounded) : base(grounded ? "beam_saber2" : "beam_saber_air2") {
+		this.grounded = grounded;
+		airSprite = "beam_saber_air2";
+		landSprite = "beam_saber2";
+		airMove = true;
+		useDashJumpSpeed = true;
+		canStopJump = true;
+		exitOnLanding = !grounded;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+		int frameSound = 1;
+		if (character.frameIndex >= frameSound && !fired) {
+			fired = true;
+			character.playSound("raijingeki");
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+}
+
+
 
 public class XSaberCrouchState : CharState {
 	bool fired;

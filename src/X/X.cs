@@ -1421,7 +1421,7 @@ public class MegamanX : Character {
 			shaders.AddRange(baseShaders);
 			return shaders;
 		}
-		if (index >= (int)WeaponIds.GigaCrush) {
+		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
 			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {

@@ -453,6 +453,62 @@ public class GBD : Character {
 		return shaders;
 	}
 
+
+
+	public override void aiAttack(Actor? target) {
+		
+		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
+			return;
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 40;
+		
+		
+		int AIAttack = Helpers.randomRange(0, 9);
+		if (aiAttackCooldown == 0 ){
+		switch (AIAttack) {
+			case 1 :
+				player.press(Control.Shoot);
+										
+				break;
+			
+			case 2 :
+				player.press(Control.Special1);
+			break;
+			case 3:
+				player.press(Control.R2);
+			break;
+			case 4 :
+				player.press(Control.L2);
+			break;
+			case 5:
+				player.press(Control.Shoot);
+			break;
+			case 6:
+				player.press(Control.Special2);
+			break;
+			case 7:
+				player.press(Control.WeaponLeft);
+			break;
+			case 8:
+				player.press(Control.WeaponRight);
+			break;
+			
+			default:
+				player.press(Control.Shoot);
+				
+				break;
+			
+				
+			}
+			aiAttackCooldown = Helpers.randomRange(20,60);
+		}
+
+
+	}
+
+
+
 }
 
 
@@ -616,6 +672,10 @@ public float angleDist = 0;
 		changePos(newPos);
 		}
 	}
+
+	
+
+	
 }
 
 

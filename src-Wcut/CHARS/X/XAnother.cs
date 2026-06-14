@@ -508,8 +508,8 @@ public class XAnother : MegamanX {
 			shaders.AddRange(baseShaders);
 			return shaders;
 		}
-		if (index >= (int)WeaponIds.GigaCrush) {
-			index = 40;
+		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
+			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
 			index = player.weapons[player.hyperChargeSlot].index;

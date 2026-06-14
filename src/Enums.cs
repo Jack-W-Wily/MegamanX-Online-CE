@@ -883,7 +883,7 @@ public enum ProjIds {
 	BlockableLaunch,
 
 
-	BlockableWeak,
+	BlockableWeakLaunch,
 
 		RollingShieldCharged2,
 
@@ -1008,6 +1008,7 @@ public enum ProjIds {
 	// Close to the int16 max value.
 	// Do not add things bellow this.
 	SelfDestruct = 32700,
+	SigmaEyeLaser = 32701,
 }
 
 
