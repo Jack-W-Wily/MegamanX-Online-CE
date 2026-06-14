@@ -598,7 +598,7 @@ public class VileAirRaid : CharState {
 	float timeWaiting;
 	public VileAirRaid(Character? victim) : base("air_raid", "", "", "") {
 		this.victim = victim;
-		grabTime = 3;
+		grabTime = 1.5f;
 	}
 
 	public override void update() {
@@ -638,7 +638,7 @@ public class VileAirRaid : CharState {
 			&& player.input.isPressed(Control.Shoot, player)) {
 
 		
-			 if (Helpers.randomRange(0,3) == 1 ){
+			if (Helpers.randomRange(0,3) == 1 ){
 			character.changeSpriteFromName("punch_2", true);
 			sprite = "punch_2";
 			
@@ -667,24 +667,13 @@ public class VileAirRaid : CharState {
 		}
 
 
-			if ( player.input.isHeld(Control.Down, player) 
-			&& player.input.isPressed(Control.Special1, player)) {
+			if (player.input.isPressed(Control.R2, player)) {
 			character.changeSpriteFromName("cannon_air", true);	
 				character.playSound("buster", true);
 				sprite = "cannon_air";
 		}
 
-		if (character.sprite.name.Contains("cannon_air")
-		&& character.frameIndex == 4){	
-			Point shootVel = (character as VAVA1).getVileShootVel(true);
-			if (Banzai == null){
-			Banzai=	new StunShotProj(
-							character.pos, character.xDir, MathF.Round(shootVel.byteAngle), character,
-								player, player.getNextActorNetId(), rpc: true
-								);
-			}
-		}
-
+		
 
 	
 

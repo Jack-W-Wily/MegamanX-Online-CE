@@ -147,7 +147,7 @@ public class FakeZero : Maverick {
 				changeState(new FakeZeroGuardState());
 				return true;
 			}
-		}
+			}
 		}
 
 		if (isClaudio){
@@ -353,7 +353,7 @@ public class FakeZero : Maverick {
 				 2,30,10, isReflectShield: false,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, isLiftProjectile : true
 			),
 			(int)MeleeIds.TrippleBusterSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,

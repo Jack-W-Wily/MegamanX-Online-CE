@@ -605,11 +605,13 @@ public class MegamanX : Character {
 		} else {
 			weapon.shootCooldown = 10;
 		}
+		/*
 		if (weapon.switchCooldown < weapon.shootCooldown) {
 			shootCooldown = weapon.switchCooldown;
 		} else {
 			shootCooldown = weapon.shootCooldown;
 		}
+		*/
 		// Add ammo.
 		weapon.addAmmo(-weapon.getAmmoUsageEX(chargeLevel, this), player);
 		// Play sound if any.
@@ -1421,7 +1423,7 @@ public class MegamanX : Character {
 			shaders.AddRange(baseShaders);
 			return shaders;
 		}
-		if (index >= (int)WeaponIds.GigaCrush) {
+		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
 			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
@@ -1732,7 +1734,7 @@ public class MegamanX : Character {
 				) {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
-							changeState(new BossGuard());
+							changeState(new WarpDodge(pos));
 							aiDodgeCD = Helpers.randomRange(100, 220);
 
 						}

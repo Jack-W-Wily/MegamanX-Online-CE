@@ -302,6 +302,8 @@ public class XAnother : MegamanX {
 		GrabKickLV1,
 		GrabKickLV2,
 
+		LightBootKick,
+
 	}
 
 
@@ -326,7 +328,11 @@ public class XAnother : MegamanX {
 			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
 			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+			when hasUltimateArmor && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+
+
+			"rmx_fall" or "rmx_fall_shoot" or "rmx_wall_slide"  when hasUltimateArmor && stingActiveTime == 0  
+			&& player.input.isPressed(Control.Jump,player) => MeleeIds.LightBootKick,
 			// Light Helmet when it up-dashes.
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
@@ -425,7 +431,12 @@ public class XAnother : MegamanX {
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				1, 0, 5, addToLevel: addToLevel
+				2, 0, 5, addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.LightBootKick => new GenericMeleeProj(
+				LhHeadbutt.netWeapon, projPos, ProjIds.GBDKick, player,
+				1, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.GrabKickLV1 => new GenericMeleeProj(
@@ -508,8 +519,8 @@ public class XAnother : MegamanX {
 			shaders.AddRange(baseShaders);
 			return shaders;
 		}
-		if (index >= (int)WeaponIds.GigaCrush) {
-			index = 40;
+		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
+			index = 0;
 		}
 		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
 			index = player.weapons[player.hyperChargeSlot].index;

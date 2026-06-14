@@ -58,7 +58,7 @@ public class FFADeathMatch : GameMode {
 				loseMessage2 = loseMessage2
 			};
 		}
-		string drawMessage = remainingTime <= 0 ? "Stalemate!" : "Draw!";
+		string drawMessage = remainingTime <= 0 ? "Stalemate!" : "Game Over!";
 		matchOverResponse = new RPCMatchOverResponse() {
 			winningAlliances = [nullAlliance],
 			winMessage = drawMessage,

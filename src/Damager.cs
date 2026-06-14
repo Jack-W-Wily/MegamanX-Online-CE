@@ -98,7 +98,7 @@ public class Damager {
 				newFlinch = 0;
 				weakness = false;
 			}
-
+			/*
 			if (chr is Axl && newFlinch > 0) {
 				if (newFlinch < Global.halfFlinch) {
 					newFlinch = Global.halfFlinch;
@@ -109,7 +109,7 @@ public class Damager {
 				}
 			}
 			// Tough Guy.
-			else if (chr is BaseSigma && !chr.isATrans || chr.isToughGuyHyperMode()) {
+			else */if (chr.isToughGuyHyperMode()) {
 				if (newFlinch >= Global.superFlinch) {
 					newFlinch = Global.halfFlinch;
 				} else if (newFlinch > Global.miniFlinch) {
@@ -491,10 +491,11 @@ public class Damager {
 				}
 			}
 
-			if (owner.character is PunchyZero or BusterZero or Iris or RockmanX or Dynamo or Dragoon or HighMax or AxlWC) {
+			if (owner.character != null) {
 
 				if (owner.character.charState.canSpecialCancel) {
 					owner.character.charState.spcCancel = true;
+					owner.character.aiAttackCooldown = 0;
 				}
 				if (owner.superAmmo != owner.superMaxAmmo) {
 						if (owner.character.charState.canGainMeter){
@@ -921,8 +922,8 @@ public class Damager {
 				}
 
 				if (projId == (int)ProjIds.newUpGrab) {
-					owner?.character.changeState(new XUPGrabState(character));
-					character?.changeState(new UPGrabbed(owner.character));
+					owner.character.changeState(new XUPGrabState(character));
+					character.changeState(new UPGrabbed(owner.character));
 				}
 				
 
@@ -1020,8 +1021,8 @@ public class Damager {
 				if (projId == (int)ProjIds.GBDKick || projId == (int)ProjIds.SiceSlide) {
 
 					owner.character.isDashing = true;
-					owner.character.vel.y = -owner.character.getJumpPower();
-					owner.character.changeState(new WallKick(), true);
+					
+					owner.character.changeState(new JumpKick(), true);
 				}
 				// ZeroFinal
 				if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart) {
@@ -1067,7 +1068,7 @@ public class Damager {
 
 					if ( projId == (int)ProjIds.VileAirRaidPlusKnock) {
 							
-							character.changeState(new LaunchedState(owner.character), true);
+							character.changeState(new LaunchedStateWeak(owner.character), true);
 							
                     }
 				}
@@ -1167,7 +1168,7 @@ public class Damager {
 			}
 
 
-			if (projId == (int)ProjIds.BlockableWeak && !character.isBlocking()) {
+			if (projId == (int)ProjIds.BlockableWeakLaunch && !character.isBlocking()) {
 
 				character.changeState(new LaunchedStateWeak(owner.character));
 			}
@@ -1512,7 +1513,17 @@ public class Damager {
 					}
 				} 
 
-
+				// For WCUT Block to work
+			if ((maverick.sprite.name.Contains("block") || maverick.state is MGuard) && damage > 0 && !isArmorPiercing(projId)) {
+				if (!hitFromBehind(maverick, damagingActor, owner, projId)) {
+					damage--;
+					flinch = 0;
+					if (damage < 3) {
+						damage = 0;
+						maverick.playSound("m10ding");
+					}
+				}
+			}
 				// Kuwanger Parry
 				if (maverick.sprite.name == "boomerk_guard" && damage > 0 && !isArmorPiercing(projId)) {
 					if (hitFromFront(maverick, damagingActor, owner, projId)) {

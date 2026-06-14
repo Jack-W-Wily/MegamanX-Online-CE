@@ -20,6 +20,7 @@ public class BlackArrow : AxlWeapon {
 		rechargeAmmoCooldown = 120;
 		altRechargeAmmoCooldown = 150;
 		sprite = "axl_arm_blackarrow";
+		
 		if (altFire == 1) {
 			altRechargeAmmoCooldown = 240;
 		}

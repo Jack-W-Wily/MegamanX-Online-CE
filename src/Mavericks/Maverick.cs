@@ -103,7 +103,7 @@ public class Maverick : Actor, IDamagable {
 	// Other vars.
 	public float width;
 	public float height;
-	public const float maxWidth = 26;
+	public const float maxWidth = 32;
 	public MaverickState state;
 	public Player player;
 	public bool changedStateInFrame;
@@ -612,6 +612,18 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public virtual bool attackCtrl() {
+		if (grounded) {
+			bool holdGuard;
+			if (useChargeJump) {
+				holdGuard = input.isHeld(Control.Down, player);
+			} else {
+				holdGuard = input.isHeld(Control.Up, player);
+			}
+			if (holdGuard &&state is not MGuard) {
+				changeState(new MGuard());
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -1517,7 +1529,7 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool isInvincible(Player attacker, int? projId) {
-		return  state.invincible || player.character.overDriveTimer > 0 || sprite.name == "armoreda_charge" || sprite.name.Contains("_shell") || sprite.name.EndsWith("eat_loop");
+		return  state.invincible || player.character.overDriveTimer > 0 &&  controlMode != MaverickModeId.TagTeam || sprite.name == "armoreda_charge" || sprite.name.Contains("_shell") || sprite.name.EndsWith("eat_loop");
 	}
 
 	public bool canBeHealed(int healerAlliance) {

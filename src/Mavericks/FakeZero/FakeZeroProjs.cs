@@ -155,7 +155,7 @@ public class FakeZeroRockProj : Projectile {
 		projId = (int)ProjIds.FakeZeroGroundPunch;
 		maxTime = 1.25f;
 		useGravity = true;
-		destroyOnHit = false;
+		destroyOnHit = true;
 		vel = new Point(0, -500);
 
 		if (sendRpc) {

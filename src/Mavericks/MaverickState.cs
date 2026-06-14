@@ -1467,3 +1467,44 @@ public class MShoot : MaverickState {
 		base.onExit(newState);
 	}
 }
+
+
+
+public class MGuard : MaverickState {
+	public MGuard() : base("guard") {
+		aiAttackCtrl = true;
+		attackCtrl = true;
+		superArmor = true;
+		canBeCanceled = false;
+	}
+
+	public override void update() {
+		base.update();
+		if (isAI) {
+			if (stateFrame >= 13) {
+				maverick.changeToIdleOrFall();
+			}
+		} else {
+			bool holdGuard;
+			if (maverick.useChargeJump) {
+				holdGuard = input.isHeld(Control.Down, player);
+			} else {
+				holdGuard = input.isHeld(Control.Up, player);
+			}
+			if (!holdGuard) {
+				maverick.changeToIdleOrFall();
+			}
+		}
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		if (!maverick.sprite.name.Contains("guard")) {
+			maverick.changeSpriteFromName("jump_start", true);
+		}
+	}
+
+	public override void onExit(MaverickState newState) {
+		base.onExit(newState);
+	}
+}

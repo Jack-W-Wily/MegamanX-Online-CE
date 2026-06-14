@@ -11,6 +11,11 @@ public class HighMax : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.HighMax;
+		spriteFrameToSounds["highmax_crouch_punch/1"] = "ggsweep_1";
+		spriteFrameToSounds["highmax_idle_punch1/1"] = "Yeti - Uppercut";
+		spriteFrameToSounds["highmax_foward_punch/1"] = "ggsweep_4";
+		spriteFrameToSounds["highmax_dash_punch/1"] = "ggsweep_4";
+		spriteFrameToSounds["highmax_grab_ex/1"] = "Manowar - Warning";
 	}
 
 
@@ -350,14 +355,14 @@ public class HighMax : Character {
 		 if (  sprite.name.Contains("grab") && sprite.name.Contains("ex") )
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.BurensenEND,
-			player, 3f, 0, 20, ShouldClang : false ,addToLevel: true, hitSound : "swordswipeGG"
+			player, 3f, 0, 20, ShouldClang : false ,addToLevel: true, hitSound : "swordswipeGG",  hitspark: "highmax_punch_spark"
 			);
 		}
 
 
 		if (sprite.name.Contains("idle_punch")) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint, 
-			ProjIds.MechFrogGroundPound, player, 3f, 20, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp1"
+			ProjIds.MechFrogGroundPound, player, 3f, 20, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp1",  hitspark: "highmax_punch_spark"
 			);
 		}
 	//	if (sprite.name.Contains("land")) {
@@ -367,18 +372,18 @@ public class HighMax : Character {
 	//	}
 		if (sprite.name.Contains("crouch_punch")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint,
-			 ProjIds.UPPunch, player, 2f, 25, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp2"
+			 ProjIds.UPPunch, player, 2f, 25, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp2",  hitspark: "hitspark_big"
 			 );
 		}
 		if (sprite.name.Contains("slam_grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, 
-			ProjIds.MechFrogGroundPound, player, 3f, 30, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			ProjIds.MechFrogGroundPound, player, 3f, 30, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
 			);
 		}
 		if (sprite.name.EndsWith("dash_punch")) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint,
 			 ProjIds.HeavyPush, player, 2f, 0, 4f, null, isShield: true, 
-			 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
 			 );
 		}
 		if (sprite.name.EndsWith("dash_punch_charge")) {
@@ -390,13 +395,13 @@ public class HighMax : Character {
 		if (sprite.name.EndsWith("foward_punch") && charState is not HighMaxSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.HeavyPush, player, 3f, 0, 20f, 
-			null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
 			);
 		}
 		if (sprite.name.EndsWith("foward_punch") && charState is HighMaxSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.BurensenEND, player, 6f, 0, 20f, null, 
-			isShield: true, isDeflectShield: true, ShouldClang: false, addToLevel: true, hitSound : "kofhtsnd_knock1"
+			isShield: true, isDeflectShield: true, ShouldClang: false, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
 			);
 		}
 		}
@@ -427,5 +432,61 @@ public class HighMax : Character {
 		return shaders;
 	}
 
+
+	
+	public override void aiAttack(Actor? target) {
+		
+		if (charState is LadderClimb || !charState.attackCtrl || isInvulnerable()) {
+			return;
+		}
+		bool isTargetInAir = pos.y < target?.pos.y - 20;
+		bool isTargetClose = pos.x < target?.pos.x - 40;
+		
+		
+		int AIAttack = Helpers.randomRange(0, 9);
+		if (aiAttackCooldown == 0 ){
+		switch (AIAttack) {
+			case 1 :
+				player.press(Control.Shoot);
+										
+				break;
+			
+			case 2 :
+				player.press(Control.Special1);
+			break;
+			case 3:
+				player.press(Control.R2);
+			break;
+			case 4 :
+				player.press(Control.L2);
+			break;
+			case 5:
+				player.press(Control.Shoot);
+			break;
+			case 6:
+				player.press(Control.Special2);
+			break;
+			case 7:
+				player.press(Control.WeaponLeft);
+			break;
+			case 8:
+				player.press(Control.WeaponRight);
+			break;
+			
+			default:
+				player.press(Control.Shoot);
+				
+				break;
+			
+				
+			}
+			aiAttackCooldown = Helpers.randomRange(20,60);
+		}
+
+
+	}
+
+
 }
+
 

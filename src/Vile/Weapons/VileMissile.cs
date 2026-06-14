@@ -266,14 +266,14 @@ public class VileMissileProj : Projectile {
 		if (num == (int)VileMissileType.PopcornDemon) {
 			weapon = PopcornDemon.netWeapon;
 			projId = (int)ProjIds.PopcornDemon;
-			damager.damage = 2;
+			damager.damage = 1;
 			damager.hitCooldown = 9;
 			sprite = "missile_pd_proj";
 		}
 		if (num == 3) {
 			weapon = PopcornDemon.netWeapon;
 			projId = (int)ProjIds.PopcornDemonSplit;
-			damager.damage = 2;
+			damager.damage = 1;
 			damager.hitCooldown = 0;
 			sprite = "missile_pd_proj";		
 		}		

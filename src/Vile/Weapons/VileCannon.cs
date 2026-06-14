@@ -125,7 +125,7 @@ public class LongShotGizmo : VileCannon {
 	public LongShotGizmo() : base() {
 		type = (int)VileCannonType.LongshotGizmo;
 		fireRate = 6;
-		damage = "1";
+		damage = "0.5";
 		vileAmmoUsage = 4;
 		ammousage = vileAmmoUsage;
 		displayName = "Longshot Gizmo";
@@ -325,13 +325,13 @@ public class CannonAttack : VileState {
 			shot = true;
 			weapon.shoot(vile, []);
 		}
-		//shootTime += Global.speedMul;
+		shootTime += Global.spf;
 		if (weapon is LongShotGizmo) {
-		//	if (shootTime == 6) {
+			if (shootTime == 0.1f) {
 			shootTime = 0;
 				loopNum++;
 				weapon.shoot(vile, []);
-		//	}
+		}
 			if (loopNum >= 4) {
 				character.changeToIdleOrFall();
 			}
@@ -556,7 +556,7 @@ public class FrontRunnerProj : Projectile {
 		destroyOnHit = true;
 		fadeSprite = "vile_mk2_proj_fade";
 		fadeOnAutoDestroy = true;
-		damager.damage = 3;
+		damager.damage = 2;
 		byteAngle = Helpers.to256(byteAngle);
 		this.byteAngle = byteAngle;
 		vel = 5 * 60 * Point.createFromByteAngle(byteAngle);
@@ -614,7 +614,7 @@ public class LongshotGizmoProj : Projectile {
 		xScale = xDir;
 		fadeSprite = "vile_mk2_lg_proj_fade";
 		fadeOnAutoDestroy = true;
-		damager.damage = 1;
+		damager.damage = 0.5f;
 		damager.flinch = 30;
 		projId = (int)ProjIds.LongshotGizmo;
 		maxTime = 30 / 60f;

@@ -1736,7 +1736,7 @@ public class GameMode {
 
 		for (var i = 0; i < Math.Ceiling(maxHP); i++) {
 			// Draw HP
-			if (!isMech && twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
+			if (!isMaverick && !isMech && twoLayerHealthPlayer > 0 && i < MathF.Ceiling(twoLayerHealthPlayer)) {
 				Global.sprites["hud_bars_generic"].drawToHUD(13, baseX, baseY);
 			} else if (i < curHP) {
 				if (curHP > 10){
@@ -2946,14 +2946,17 @@ public class GameMode {
 			}
 			int frameIndex = 0;
 		if (player.charNum == (int)CharIds.RockmanX) {
+			frameIndex = (int)CharHpBarIndex.X;
+		}
+		if (player.charNum == (int)CharIds.XAnother) {
 			frameIndex = (int)CharHpBarIndex.XAnother;
 		}if (player.charNum == (int)CharIds.PunchyZero) {
 			frameIndex = (int)CharHpBarIndex.ZeroX2;
 		}if (player.charNum == (int)CharIds.BusterZero) {
 			frameIndex = (int)CharHpBarIndex.ZeroX2;
-		}if (player.charNum == (int)CharIds.Zero) {
+		}if (player.charNum == (int)CharIds.ZeroMID) {
 			frameIndex = (int)CharHpBarIndex.ZeroX1;
-		}if (player.charNum == (int)CharIds.Vile) {
+		}if (player.charNum == (int)CharIds.Vile || player.charNum == (int)CharIds.VAVA1) {
 			frameIndex = (int)CharHpBarIndex.Vile;
 		}if (player.charNum == (int)CharIds.AxlWC) {
 			frameIndex = (int)CharHpBarIndex.AxlWC;
@@ -2978,7 +2981,7 @@ public class GameMode {
 			frameIndex = (int)CharHpBarIndex.WhiteAxl;
 		}if (player.charNum == (int)CharIds.Iris) {
 			frameIndex = (int)CharHpBarIndex.Iris;
-		}
+		} 
 
 			Global.sprites[getCharIcon(player)].drawToHUD(frameIndex, col2x + 4, topPlayerY + i * rowH);
 		}
@@ -3443,10 +3446,13 @@ public class GameMode {
 		}
 		return matchOverResponse.winningAlliances.Contains(player.alliance);
 	}
+	
 
+	
 	public void onMatchOver() {
 		if (level.mainPlayer != null && playerWon(level.mainPlayer)) {
-			Global.changeMusic(Global.level.levelData.getWinTheme());
+			Global.changeMusic(Global.level.levelData.getWinTheme2());
+			
 		} else if (level.mainPlayer != null && !playerWon(level.mainPlayer)) {
 			Global.changeMusic(Global.level.levelData.getLooseTheme());
 		}

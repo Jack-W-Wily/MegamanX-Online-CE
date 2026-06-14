@@ -116,7 +116,11 @@ public class BlockWCUT : CharState {
 		if (blockTime == 0) {
 			character.changeState(new BlockBreak(character.xDir), true);
 		}
-		if (!isHoldingGuard) {
+		if (!isHoldingGuard && !player.isAI) {
+			character.changeToIdleOrFall();
+			return;
+		}
+		if (player.isAI && stateTime > 2) {
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -545,14 +549,13 @@ public class LaunchedFowardState : CharState {
 
 	public override void update() {
 		base.update();
-		if (character.downPressedTimes > 10 || character.upPressedTimes > 10 || character.leftPressedTimes > 10
-		|| character.rightPressedTimes > 10) {
+		if (character.anyDirPressTimes > 10) {
             character.changeToIdleOrFall();
         }
 		character.angle += 10;
 		character.move(new Point(character.xDir * 350, 0));
 		if (stateTime > 2f || stateTime > 0.2f && character.grounded) {
-			character.changeToIdleOrFall();
+			character.changeState(new KnockedDown(-character.xDir), true);
 		}
 
 

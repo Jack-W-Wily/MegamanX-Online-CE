@@ -765,7 +765,8 @@ public class Projectile : Actor {
 				if (chr.isUnderwater()) modifier = 2;
 				if (chr.isPushImmune()) return;
 				float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-				chr.move(new Point(xMoveVel * 0 * modifier, -300));
+				//chr.move(new Point(xMoveVel * 0 * modifier, -300));
+				chr.vel.y = -chr.getJumpPower() * 0.2f;
 				}
 				if (isJuggleProjectile){
 				chr.grounded = false;

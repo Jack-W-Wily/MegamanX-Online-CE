@@ -559,7 +559,7 @@ public class LevelData {
 		if (customSize != -1) {
 			return customSize == 5;
 		}
-		if (name is "giantdam" or "gallery") {
+		if (name is "giantdam" or "gallery" or "powercenterfull") {
 			return true;
 		}
 		return name.EndsWith("_collosal") || name.EndsWith("_xl");
@@ -712,6 +712,44 @@ public class LevelData {
 		}
 
 		return "stageClear_X1";
+	}
+
+	public string getWinTheme2() {
+		if (name.Contains("xhunter1") ||
+			name.Contains("deepseabase") ||
+			name.Contains("maverickfactory") ||
+			name.Contains("robotjunkyard") ||
+			name.Contains("volcaniczone") ||
+			name.Contains("dinosaurtank") ||
+			name.Contains("centralcomputer") ||
+			name.Contains("crystalmine") ||
+			name.Contains("desertbase") ||
+			name.Contains("weathercontrol")
+		) {
+			return "weaponGet_X2";
+		}
+		if (name.Contains("hunterbase") ||
+			name.Contains("giantdam") ||
+			name.Contains("weaponsfactory") ||
+			name.Contains("frozentown") ||
+			name.Contains("aircraftcarrier") ||
+			name.Contains("powercenter") ||
+			name.Contains("shipyard") ||
+			name.Contains("quarry") ||
+			name.Contains("safaripark") ||
+			name.Contains("dopplerlab")
+		) {
+			return "weaponGet_X3";
+		}
+		if (isCustomMap) {
+			return Helpers.randomRange(0, 2) switch {
+				1 => "weaponGet_X2",
+				2 => "weaponGet_X3",
+				_ => "weaponGet_X1"
+			};
+		}
+
+		return "weaponGet_X1";
 	}
 
 	public Texture getMapThumbnail() {

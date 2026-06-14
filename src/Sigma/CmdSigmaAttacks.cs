@@ -226,6 +226,7 @@ public class SigmaBallProj : Projectile {
 	) {
 		weapon = SigmaBallWeapon.netWeapon;
 		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 12;
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;

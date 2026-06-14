@@ -434,7 +434,7 @@ public partial class Actor : GameObject {
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);
 		}
 
-		if (chr is Axl) {
+		if (chr is Axl axl && axl.isWhiteAxl()) {
             if (spriteName.StartsWith("axl_") || spriteName.StartsWith("axl_")) {
 			spriteName = spriteName.Replace("axl_", "lm_").Replace("axl_", "lm_");
 			matchingVoice = Helpers.getRandomMatchingVoice(Global.voiceBuffers, spriteName, charNum);

@@ -206,6 +206,8 @@ public partial class Character : Actor, IDamagable {
 
 	// Input Stuff (WCUT)
 	public float inputdecreasedCD;
+
+	public int anyDirPressTimes = 0;
 	public int downPressedTimes = 0;
 	public int upPressedTimes = 0;
 	public int leftPressedTimes = 0;
@@ -761,6 +763,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canShoot() {
+		if (this is Axl && charState is BlockWCUT) {
+			return false;
+		}
 		return charState.attackCtrl;
 	}
 
@@ -1406,18 +1411,22 @@ public partial class Character : Actor, IDamagable {
 
 		if (player.input.isPressed(Control.Down, player)) {
 			downPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Up, player)) {
 			upPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Left, player)) {
 			leftPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 		if (player.input.isPressed(Control.Right, player)) {
 			rightPressedTimes += 1;
+			anyDirPressTimes += 1;
 			inputdecreasedCD = 0.3f;
 		}
 
@@ -1429,6 +1438,7 @@ public partial class Character : Actor, IDamagable {
 			shootPressedTimes = 0;
 			specialPressedTimes = 0;
 			wRightPressedTimes = 0;
+			anyDirPressTimes = 0;
 		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>
 
@@ -3244,14 +3254,16 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual int baselineMaxHealth() {
 		if (player.isHighMax) return 36; 
-		if (player.isSigma) return 34; 
+		if (player.isSigma) return 30; 
 		if (player.isZain) return 34; 
-		if (player.isZMID) return 32;
-		if (player.isVile) {
-			if (this is VAVAV) return 20; 
-			if (this is VAVA2) return 22; 
-			return 24; 
-		} 
+		if (player.isZMID) return 30;
+		if (player.isVile) return 20; 
+		if (player.isAxl) return 24;
+		if (player.isX){
+			if (this is XAnother) return 28;
+			return 26;
+		}
+		
 		return 28;
 	}
 
@@ -3890,6 +3902,8 @@ public partial class Character : Actor, IDamagable {
 
 
 	public bool juggled;
+
+	public bool tripping;
 	public void setHurt(int dir, int flinchFrames, bool spiked) {
 		if (!ownedByLocalPlayer) {
 			return;
@@ -4425,7 +4439,15 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
-	public virtual void aiAttack(Actor? target) { }
+	public virtual void aiAttack(Actor? target) {
+		
+
+
+	}
+
+
+
+	
 
 	public virtual void aiDodge(Actor? target) { }
 

@@ -516,7 +516,7 @@ public class SplashHitProj : Projectile {
 		destroyOnHit = false;
 		maxTime = 1.5f;
 		isJuggleProjectile = true;
-
+		isLiftProjectile = true;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}

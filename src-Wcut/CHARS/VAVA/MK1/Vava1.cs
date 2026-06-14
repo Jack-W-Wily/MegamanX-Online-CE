@@ -369,6 +369,7 @@ public class VAVA1 : Vile {
 					} else {
 						if (player.vileAmmo >= 4) {
 							changeState(new SpoiledBratPunch(), true);
+
 						}
 					}
 				}
@@ -378,8 +379,9 @@ public class VAVA1 : Vile {
 
 		if (player.input.isBPressed(player)) {
 			if (grounded) {
-				if (player.input.isHeld(Control.Up, player)) {
+				if (player.input.isHeld(Control.Up, player) && player.vileAmmo >= 6) {
 					changeState(new WildHorseKickState(), true);
+					player.vileAmmo -= 6;
 				} else if (player.input.isHeld(Control.Down, player)) {
 					if (downPressedTimes >= 2) {
 						if (player.vileAmmo >= 15) {
@@ -490,7 +492,7 @@ public class VAVA1 : Vile {
 			} else if (charState is Crouch) {
 				changeState(new VavaZipZapper(), true);
 			} else {
-				if (getChargeLevel() == 1) {
+				if (getChargeLevel() == 1 && player.vileAmmo >= 15 && OverDrive) {
                 	int input = player.input.getYDir(player);
 					new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
 					playSound("buster2", sendRpc: true);
@@ -500,7 +502,7 @@ public class VAVA1 : Vile {
 					}
 					stopCharge();
 					player.vileAmmo -= 15;
-            	} else if (getChargeLevel() == 1) {
+            	} else if (getChargeLevel() == 1 && player.vileAmmo >= 15 && OverDrive) {
               	  new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 					playSound("thunder_bolt", sendRpc: true);
 					player.vileAmmo -= 15;
@@ -509,7 +511,7 @@ public class VAVA1 : Vile {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-          		} else if (getChargeLevel() == 2) {
+          		} else if (getChargeLevel() == 2 && player.vileAmmo >= 15 && OverDrive) {
              	if (player.input.isLeftOrRightHeld(player)) {
 					playSound("noise_crush_charged");
 					new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
@@ -517,11 +519,12 @@ public class VAVA1 : Vile {
 					new NoiseCrushVChargedProj(this, getShootPos().addxy(12 * -xDir, 0), xDir, 1, player.getNextActorNetId(), true);
 					new NoiseCrushVChargedProj(this, getShootPos().addxy(18 * -xDir, 0), xDir, 2, player.getNextActorNetId(), true);
 					new NoiseCrushVChargedProj(this, getShootPos().addxy(24 * -xDir, 0), xDir, 3, player.getNextActorNetId(), true);
+					player.vileAmmo -= 15;
 					if (grounded) {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-				} else {
+				} else if (player.vileAmmo >= 15 && OverDrive){
 					new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 				playSound("thunder_bolt", sendRpc: true);
 				player.vileAmmo -= 15;
@@ -531,7 +534,7 @@ public class VAVA1 : Vile {
 				}
 				changeSpriteFromName("buster_1", true);
 				stopCharge();
-          		} else if (getChargeLevel() >= 3) {
+          		} else if (getChargeLevel() >= 3 && player.vileAmmo >= 15 && OverDrive) {
             		for (int i = 0; i < 3; i++) {
 					new JunkShieldMagnet(
 					getCenterPos(), xDir, this,
@@ -622,6 +625,24 @@ public class VAVA1 : Vile {
 	
 	public override void update() {
 		base.update();
+
+
+		if (charState is SpoiledBratPunch or InfinityGigAttack or GoGetterRightAttack) {
+			if (player.input.isR2Pressed(player) 
+			){
+				foreach (var otherPlayer in Global.level.players) {
+					if (otherPlayer.character == null) continue;
+					if (otherPlayer == player) continue;
+					if (otherPlayer == parasiteDamager?.owner) continue;
+					if (otherPlayer.character.isInvulnerable()) continue;
+					if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+					if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+					Character target = otherPlayer.character;
+					changeState(new GizmoDashHoming(target));
+					break;
+				}
+			}
+		}
 		// DisrespectFactor
 
 		
@@ -1041,7 +1062,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.KamaeUnB => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
-				3, 0, 20, isReflectShield: true,
+				2, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
@@ -1066,7 +1087,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.Kote => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
-				3, 40, 20, isReflectShield: true,
+				2, 40, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
 			),
@@ -1102,7 +1123,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
-				4, 0, 20, isReflectShield: true,
+				2, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
 			),
@@ -1116,21 +1137,21 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
-				3, 30, 20, isReflectShield: true,
+				2, 30, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true
+				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true, isLiftProjectile : true
 			),
 
 			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
-				3, 30, 20, isReflectShield: true,
+				2, 30, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
 
 			(int)MeleeIds.AirRaid => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.VileAirRaidPlusKnock, player,
-				3, 0, 20, isReflectShield: true,
+				1, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true
 			),
@@ -1226,6 +1247,7 @@ public class VAVA1 : Vile {
 			}
 		} else if (chargeLevel == 1) {
 			if (!player.input.isL2Held(player)) {
+			player.loadout.vileLoadout.cannon = (int)VileCannonType.FrontRunner;
 			cannonWeapon.type = (int)VileCannonType.FrontRunner;
 			cannonWeapon.vavaShoot(0, this);
 			} else {
@@ -1237,6 +1259,7 @@ public class VAVA1 : Vile {
 			stopCharge();
 		} else if (chargeLevel == 2) {
 			if (!player.input.isL2Held(player)) {
+			player.loadout.vileLoadout.cannon = (int)VileCannonType.FatBoy;
 			cannonWeapon.type = (int)VileCannonType.FatBoy;
 			cannonWeapon.vavaShoot(0, this);
 			} else {
@@ -1257,8 +1280,8 @@ public class VAVA1 : Vile {
 			}
 			stopCharge();
 		} else if (chargeLevel == 3) {
-			cannonWeapon.type = (int)VileCannonType.FatBoy;
-			cannonWeapon.vavaShoot(0, this);
+			changeState(new Vava1FatBoy(false, false), true);
+			player.vileAmmo -= 30;
 			stopCharge();
 		} else if (chargeLevel >= 4) {
 				if (player.input.isHeld(Control.Down, player)) {
@@ -1273,6 +1296,7 @@ public class VAVA1 : Vile {
 		if (chargeLevel >= 1) {
 			stopCharge();
 		}
+		player.syncLoadout();
 	}
 
 

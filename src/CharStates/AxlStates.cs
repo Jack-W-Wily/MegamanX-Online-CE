@@ -34,7 +34,7 @@ public class HyperAxlStart : AxlState {
 			for (int i = 0; i < 10; i++) weapon.rechargeAmmo(0.1f);
 		}
 
-		if (character.loopCount > 8) {
+		if (stateTime > 2) {
 			axl.whiteAxlTime = axl.maxHyperAxlTime;
 			RPC.setHyperAxlTime.sendRpc(character.player.id, axl.whiteAxlTime, 1);
 			axl.playSound("ching");
@@ -238,11 +238,11 @@ public class TailShotWA : CharState {
 			shot = true;
 			character.playSound("axlBulletCharged", sendRpc: true);
 
-			if (character.OverDrive) {
-      		 new DynamoBeam(new ElectricSpark(), character.pos.addxy(20 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
-			character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
-			character.shakeCamera(true);
-			}
+		//	if (character.OverDrive) {
+      	//	 new DynamoBeam(new ElectricSpark(), character.pos.addxy(20 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+		//	character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+		//	character.shakeCamera(true);
+		//	}
 			//axl.mainWeapon.addAmmo(-2, player);
 		}
 

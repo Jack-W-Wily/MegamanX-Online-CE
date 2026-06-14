@@ -1425,6 +1425,40 @@ public class WallKick : CharState {
 	}
 }
 
+
+
+public class JumpKick : CharState {
+	public float dashThreshold = 0.2f;
+
+	public JumpKick() : base("wall_kick", "wall_kick_shoot") {
+		accuracy = 5;
+		exitOnLanding = true;
+		useDashJumpSpeed = true;
+		airMove = true;
+		//canStopJump = true;
+		attackCtrl = true;
+		normalCtrl = true;
+		enterSound = "jump";
+		enterSoundArgs = "larmor";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.vel.y > 0) {
+			character.changeState(character.getFallState());
+		}
+		if (!character.isDashing && stateTime < dashThreshold && player.input.isHeld(Control.Dash, player)) {
+			character.dashedInAir++;
+			character.isDashing = true;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -character.getJumpPower();
+	}
+}
+
 public class LadderClimb : CharState {
 	public Ladder ladder;
 	public float snapX;

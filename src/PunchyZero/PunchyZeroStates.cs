@@ -105,9 +105,27 @@ public class PZeroPunch2 : PZeroGenericMeleeState {
 			return zero.groundSpcAttacks();
 		}
 		if (zero.shootPressTime > 0 && player.input.getYDir(player) == -1) {
-			zero.changeState(new PZeroShoryuken(), true);
+			zero.changeState(new PZeroLaunchPunch(), true);
 			return true;
 		}
+		return false;
+	}
+}
+
+
+public class PZeroLaunchPunch : PZeroGenericMeleeState {
+	public PZeroLaunchPunch() : base("launch_punch") {
+		sound = "punch2";
+		projId = (int)ProjIds.PZeroPunch2;
+		soundFrame = 1;
+		comboFrame = 4;
+	}
+
+	public override bool altCtrlUpdate(bool[] ctrls) {
+		if (zero.specialPressTime > 0) {
+			return zero.groundSpcAttacks();
+		}
+		
 		return false;
 	}
 }
@@ -234,6 +252,64 @@ public class PZeroDiveKickState : PZeroState {
 		character.useGravity = true;
 		character.stopMoving();
 		zero.diveKickCooldown = 60;
+	}
+}
+
+
+
+public class PZeroDiveKickState2 : PZeroState {
+	float stuckTime;
+	float diveTime;
+
+	public PZeroDiveKickState2() : base("dropkick_quick") {
+	}
+
+	public override void update() {
+		if (character.frameIndex >= 3 && !once) {
+			character.vel.x = character.xDir * 300;
+			character.vel.y = 450;
+			character.playSound("punch2", sendRpc: true);
+			once = true;
+		}
+		base.update();
+		if (!once) {
+			return;
+		}
+		if (character.vel.y < 100) {
+			character.changeToLandingOrFall();
+			return;
+		}
+		CollideData? hit = Global.level.checkTerrainCollisionOnce(
+			character, character.vel.x * Global.spf, character.vel.y * Global.spf
+		);
+		if (hit?.isSideWallHit() == true) {
+			character.changeState(character.getFallState(), true);
+			return;
+		} else if (hit != null) {
+			stuckTime += Global.speedMul;
+			if (stuckTime >= 6) {
+				character.changeToLandingOrFall();
+				return;
+			}
+		}
+		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
+			character.changeToLandingOrFall();
+			return;
+		}
+		diveTime += Global.spf;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.useGravity = false;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		character.stopMoving();
+		//zero.diveKickCooldown = 60;
 	}
 }
 
