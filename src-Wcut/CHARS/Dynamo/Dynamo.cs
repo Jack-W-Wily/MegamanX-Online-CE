@@ -18,6 +18,7 @@ public class Dynamo : Character {
 		charId = CharIds.Dynamo;
 		spriteFrameToSounds["dynamo_run/4"] = "run2";
 		spriteFrameToSounds["dynamo_run/9"] = "run2";
+		spriteToCollider["slide*"] = getCrouchingCollider();
 	}
 
 	private float ItemThrowCooldown;
@@ -42,21 +43,28 @@ public class Dynamo : Character {
 
 
 	public override bool normalCtrl() {
-
 		if (player.input.isL2Held(player) &&
 			!isAttacking() && grounded &&
-			charState is not BlockWCUT
+			charState is not BlockWCUT and not WcutGenericDodgeF
 		) {
 			changeState(new BlockWCUT(), true);
-			
+			return true;
 		}
 		if (player.input.isL2Held(player) && player.input.isPressed(Control.Dash, player)) {
 			changeState(new WcutGenericDodgeF(), true);
+			return true;
 		}
 		if (player.input.isAPressed(player) &&
-		player.input.isL2Held(player)
+			player.input.isL2Held(player)
 		) {
 			changeState(new DynamoGPChargeState(), true);
+			return true;
+		}
+		int iyDir = player.input.getYDir(player);
+		if (grounded && canDash() && player.input.isPressed(Control.Dash, player) && iyDir == 1) {
+			playSound("dash", sendRpc: true);
+			changeState(new DynamoSlide());
+			return true;
 		}
 
 
@@ -64,132 +72,86 @@ public class Dynamo : Character {
 		&& charState is not Jump && backFlipCount == 0) {
 			changeState(new DynamoBackFlip());
 			backFlipCount = 1;
+			return true;
 		}
-
-		bool hadokenCheck = false;
-		bool shoryukenCheck = false;
-		hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
-		shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
-
-		if (hadokenCheck && SlashCooldown == 0 && upPressedTimes > 0) {
-			changeState(new DynamoBladeDash(), true);
-			SlashCooldown = 0.5f;
-			upPressedTimes = 0;
-		}
-
 		return base.normalCtrl();
 	}
 
 
 	public override bool attackCtrl() {
-
-
-
-		if (player.input.isPressed(Control.Shoot, player) &&
-		!player.input.isHeld(Control.Down, player)) {
-			changeState(new DynamoWhippAttack(), true);
-		}
-		if (player.input.isPressed(Control.Shoot, player) && grounded &&
-		player.input.isHeld(Control.Down, player)) {
-			changeState(new DynamoBladeSlash(), true);
-		}
-		if (player.input.isPressed(Control.Shoot, player) && !grounded &&
-		player.input.isHeld(Control.Down, player)) {
-			changeState(new DynamoBladeSlashAir(), true);
-		}
-
-
-		if (player.input.isPressed(Control.Shoot, player) && downPressedTimes > 0 &&
-		uppercutCount == 0 &&
-		player.input.isHeld(Control.Up, player)) {
-			changeState(new DynamoUpperCut(), true);
-			uppercutCount = 1;
-		}
-
-
-		if ((player.input.isHeld(Control.Left, player)
-		|| player.input.isHeld(Control.Right, player)) &&
-			player.input.isPressed(Control.Special1, player) &&
-		!player.input.isHeld(Control.Down, player) &&
-			!player.input.isHeld(Control.Up, player) && ItemThrowCooldown == 0
-		) {
-			changeState(new DynamoCross(), true);
-			ItemThrowCooldown = 1.2f;
-		}
-
-
-
-		if (
-			player.input.isPressed(Control.Special1, player) &&
-		!player.input.isHeld(Control.Down, player) &&
-			player.input.isHeld(Control.Up, player) && AxeCoolDown == 0
-		) {
-			changeState(new DynamoAxe(), true);
-			AxeCoolDown = 1.2f;
-		}
-
-
-
-		if ((!player.input.isHeld(Control.Left, player)
-		&& !player.input.isHeld(Control.Right, player)) &&
-			player.input.isPressed(Control.Special1, player) &&
-		!player.input.isHeld(Control.Down, player)
-		&& !player.input.isHeld(Control.Up, player)
-		) {
-			changeState(new DynamoBoomerang(), true);
-		}
-
-
-		if (player.input.isPressed(Control.WeaponLeft, player) &&
-		!player.input.isHeld(Control.Down, player) && DaggerCooldown == 0 &&
-			!player.input.isHeld(Control.Up, player)
-		) {
-			changeState(new DynamoDaggerLV1(), true);
-			DaggerCount += 1;
-
-			if (DaggerCount > 5) {
-				DaggerCooldown = 1.5f;
-			}
-		}
-
-		if (player.input.isPressed(Control.WeaponLeft, player) &&
-		!player.input.isHeld(Control.Down, player) &&
-			player.input.isHeld(Control.Up, player) && player.superAmmo > 5
-		) {
-			changeState(new DynamoDaggerLV2(), true);
-			player.superAmmo -= 6;
-
-
-		}
-
-		if (player.input.isR2Pressed(player)) {
-            if (player.input.isHeld(Control.Up, player)) {
-               if (player.superAmmo >= 32) {
-                    player.superAmmo -= 32;
-					changeState(new DynamoHydroStorm(), true);
-			
-                } 
-            }
-        }
-
-
-		if (player.input.isPressed(Control.Special1, player) &&
-		player.input.isHeld(Control.Down, player) &&
-			!player.input.isHeld(Control.Up, player)
-			&& !grounded && airShotCount == 0
-		) {
-			changeState(new DynamoAirShotState(), true);
-			airShotCount = 1;
-		}
-
-		bool hadokenCheck = false;
-		bool shoryukenCheck = false;
-		hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
-		shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		bool hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
+		int iyDir = player.input.getYDir(player);
+		int ixDir = player.input.getXDir(player);
 
 		if (hadokenCheck && SlashCooldown == 0) {
 			changeState(new DynamoBladeDash(), true);
 			SlashCooldown = 1.5f;
+			return true;
+		}
+		if (player.input.isPressed(Control.Shoot, player) && downPressedTimes > 0 &&
+			uppercutCount == 0 && iyDir == -1
+		) {
+			changeState(new DynamoUpperCut(), true);
+			return true;
+		}
+		if (player.input.isPressed(Control.WeaponLeft, player)) {
+			if (iyDir != -1 && DaggerCooldown == 0) {
+				changeState(new DynamoDaggerLV1(), true);
+				DaggerCount += 1;
+				if (DaggerCount > 5) {
+					DaggerCooldown = 1.5f;
+				}
+				return true;
+			}
+			if (iyDir == -1 && player.superAmmo > 5) {
+				changeState(new DynamoDaggerLV2(), true);
+				player.superAmmo -= 6;
+				return true;
+			}
+		}
+		if (player.input.isR2Pressed(player) && iyDir == -1) {
+            if (player.superAmmo >= 32) {
+               player.superAmmo -= 32;
+				changeState(new DynamoHydroStorm(), true);
+				return true;
+            }
+        }
+		if (player.input.isPressed(Control.Special1, player) &&
+			iyDir == 1 && !grounded && airShotCount == 0
+		) {
+			changeState(new DynamoAirShotState(), true);
+			airShotCount = 1;
+			return true;
+		}
+		if (ixDir != 0 && iyDir == 0 && ItemThrowCooldown == 0 &&
+			player.input.isPressed(Control.Special1, player)
+		) {
+			changeState(new DynamoCross(), true);
+			ItemThrowCooldown = 1.2f;
+			return true;
+		}
+		if (player.input.isPressed(Control.Special1, player) && iyDir == -1 && AxeCoolDown == 0) {
+			changeState(new DynamoAxe(), true);
+			AxeCoolDown = 1.2f;
+			return true;
+		}
+		if (ixDir == 0 && (iyDir == 0 || iyDir != -1 && grounded) &&
+			player.input.isPressed(Control.Special1, player)
+		) {
+			changeState(new DynamoBoomerang(), true);
+			return true;
+		}
+		if (player.input.isPressed(Control.Shoot, player) && iyDir == 1) {
+			if (!grounded) {
+				changeState(new DynamoBladeSlashAir(), true);
+				return true;
+			}
+			changeState(new DynamoBladeSlash(), true);
+			return true;
+		}
+		if (player.input.isPressed(Control.Shoot, player) && iyDir != 1) {
+			changeState(new DynamoWhippAttack(), true);
+			return true;
 		}
 
 		return base.attackCtrl();
@@ -211,13 +173,9 @@ public class Dynamo : Character {
 			musicSource = null;
 		}
 
-
-		if (charState is Dash &&
-		player.input.isHeld(Control.Down, player)
-		) {
+		if (charState is Dash && player.input.isHeld(Control.Down, player)) {
 			changeState(new DynamoSlide());
 		}
-
 
 		if (DaggerCooldown == 0) {
 			DaggerCount = 0;

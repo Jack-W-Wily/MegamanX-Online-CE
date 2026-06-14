@@ -598,8 +598,6 @@ public class LaunchedFowardState : CharState {
 
 
 public class WcutGenericDodgeF : CharState {
-
-
 	public WcutGenericDodgeF() : base("dodge_f") {
 		immuneToWind = true;
 		enterSound = "dash";
@@ -608,17 +606,12 @@ public class WcutGenericDodgeF : CharState {
 
 	public override void update() {
 		base.update();
-
 		character.move(new Point(character.xDir * 250, 0));
-
-
 
 		if (stateTime > 0.3f || character.flag != null) {
 			character.changeToIdleOrFall();
 			return;
 		}
-
-
 	}
 
 	public override void onEnter(CharState oldState) {

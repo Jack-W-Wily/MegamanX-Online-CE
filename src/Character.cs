@@ -709,7 +709,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool canCrouch() {
-		if (isSoftLocked() || isDashing) {
+		if (isSoftLocked() || isDashing || isBlocking() || charState.normalLockAlt) {
 			return false;
 		}
 		return true;

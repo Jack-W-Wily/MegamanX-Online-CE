@@ -81,6 +81,7 @@ public class CharState {
 	public bool wiffCancel;
 	public bool[] altCtrls = new bool[1];
 	public bool normalCtrl;
+	public bool normalLockAlt = false;
 	public bool airMove;
 	public bool canJump;
 	public bool canStopJump;

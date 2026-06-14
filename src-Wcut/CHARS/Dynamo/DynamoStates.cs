@@ -15,7 +15,6 @@ public class DynamoWhippAttack : CharState {
 		airSprite = "whipattack_air";
 		useDashJumpSpeed = true;
 		airMove = true;
-		normalCtrl = true;
 	}
 
 	public override void update() {
@@ -248,34 +247,15 @@ public class DynamoCrossProj : Projectile {
 
 }
 
-
-
-
-
-
 public class DynamoAxe : CharState {
-
-	private float partTime;
-
-	private float chargeTime;
-
-	private float specialPressTime;
-	
 	public float pushBackSpeed;
+	DynamoAxeProj? proj;
 
-	DynamoAxeProj proj;
-
-	public DynamoAxe(string transitionSprite = "")
-		: base("throw_cross", "", "", transitionSprite)
-	{
-	airMove = true;
-	
+	public DynamoAxe() : base("throw_cross") {
+		airMove = true;
 	}
 
-	public override void update()
-	{
-	
-
+	public override void update() {
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -287,28 +267,19 @@ public class DynamoAxe : CharState {
 			character.useGravity = true;
 		}
 
-		
-		if (proj == null && character.frameIndex >= 1 && character.ownedByLocalPlayer){
-		character.playSound("throwAxe", forcePlay: false, sendRpc: true);
-		if (character.xDir == 1){
-		proj = 	new DynamoAxeProj(new SonicSlicer(), character.pos, 4, player, player.getNextActorNetId(true), true);
-		} else {
-		proj = 	new DynamoAxeProj(new SonicSlicer(), character.pos, 0, player, player.getNextActorNetId(true), true);
-		
+		if (proj == null && character.frameIndex >= 1 && character.ownedByLocalPlayer) {
+			character.playSound("throwAxe", forcePlay: false, sendRpc: true);
+			proj = 	new DynamoAxeProj(
+				character.pos.addxy(16 * character.xDir, -36), character.xDir,
+				character, player.getNextActorNetId(), sendRpc: true
+			);
 		}
-
-		}
-
 
 		base.update();
-		Helpers.decrementTime(ref specialPressTime);
 	
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-
-
-
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -317,92 +288,60 @@ public class DynamoAxe : CharState {
 			character.stopMoving();
 			pushBackSpeed = 100;
 		}
-	
-		
-	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
 }
 
-
-
-
-
 public class DynamoAxeProj : Projectile {
-	public Point dest;
-	public bool fall;
-	public float turnDir = 1;
-		public float angleDist = 0;
-
+	public float angleDist;
 
 	public DynamoAxeProj(
-		Weapon weapon, Point pos, int num, 
-		Player player, ushort netProjId, bool rpc = false
+		Point pos, int xDir, Actor owner, ushort? netId,
+		bool sendRpc = false, Player? altPlayer = null
 	) : base(
-		weapon, pos, 1, 300, 3, player, "dynamo_axe_proj", 
-		Global.defFlinch, 0.25f, netProjId, player.ownedByLocalPlayer
+		pos, xDir, owner, "dynamo_axe_proj", netId, altPlayer
 	) {
+		weapon = SonicSlicer.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 8;
+		vel = new Point(200 * xDir, -350);
+
 		fadeSprite = "explosion";
-		maxTime = 1;
+		maxTime = 1f;
+		fadeOnAutoDestroy = true;
 		hitSound = "htsnd_slash1";
 		projId = (int)ProjIds.DynamoAxeProj;
 		destroyOnHit = false;
-
-		if (num == 0) dest = pos.addxy(-100, -100);
-		if (num == 1) dest = pos.addxy(-30, -100);
-		if (num == 2) dest = pos.addxy(-0, -100);
-		if (num == 3) dest = pos.addxy(30, -100);
-		if (num == 4) dest = pos.addxy(100, -100);
-
-
-			angle = 0;
-		if (xDir == -1) angle = -180;
-	
-
-
-		vel.x = 0;
 		useGravity = false;
 
-		if (rpc) {
-			rpcCreate(pos, player, netProjId, 1, (byte)num);
+		if (sendRpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
 	}
 
-	public static Projectile rpcInvoke(ProjParameters arg) {
+	public static Projectile rpcInvoke(ProjParameters args) {
 		return new DynamoAxeProj(
-			SonicSlicer.netWeapon, arg.pos, arg.extraData[0], arg.player, arg.netId
+			args.pos, args.xDir, args.owner, args.netId, altPlayer: args.player
 		);
 	}
 
 	public override void update() {
 		base.update();
 
+		angleDist += 16 * speedMul;
+		byteAngle = MathF.Round(xDir * angleDist / 32) * 32;
 
-		if (time > 0.22) {
-			if (angleDist < 180) {
-				var angInc = (-xDir * turnDir) * Global.spf * 300;
-				angle += angInc;
-				angleDist += MathF.Abs(angInc);
-		}	
+		vel.x = Helpers.lerp(vel.x, 0, 1 * Global.spf);
+		if (vel.y < Physics.MaxFallSpeed) {
+			vel.y += Physics.Gravity;
 		}
-		if (!fall) {
-			float x = Helpers.lerp(pos.x, dest.x, Global.spf * 10);
-			changePos(new Point(x, pos.y));
-			vel.y += -40;
-		}
-		if (vel.y <= -375) fall = true;
-		if (vel.y > 100) yDir = -1;
-		if (fall) vel.y += 30;
-		
 	}
 }
-
-
-
 
 public class DynamoBladeSlashAir : CharState {
 	bool fired;
@@ -413,7 +352,6 @@ public class DynamoBladeSlashAir : CharState {
 		useDashJumpSpeed = true;
 		airMove = true;
 		exitOnLanding = true;
-		//normalCtrl = true;
 	}
 
 	public override void update() {
@@ -460,7 +398,6 @@ public class DynamoBladeSlash : CharState {
 		airSprite = "blade_attack";
 		useDashJumpSpeed = true;
 		airMove = true;
-		//normalCtrl = true;
 	}
 
 	public override void update() {
@@ -501,68 +438,43 @@ public class DynamoBladeSlash : CharState {
 
 public class DynamoUpperCut : CharState {
 	bool jumpedYet;
-	float timeInWall;
-	
-	Anim anim;
-	float projTime;
-	
 
-	public DynamoUpperCut() : base("uppercut_slash", "", "") {
+	public DynamoUpperCut() : base("uppercut_slash") {
 		superArmor = true;
-		//airMove = true;
-		normalCtrl = true;
 		useDashJumpSpeed = true;
 	}
 
 	public override void update() {
 		base.update();
 
-		
-
 		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
 			jumpedYet = true;
 			character.dashedInAir++;
 			attackCtrl = true;
+			if (character is Dynamo dynamo) {
+				dynamo.uppercutCount++;
+			}
 			character.vel.y = -character.getJumpPower() * 1.5f;
+			character.playSound("dynamosaber", sendRpc: true);
 		}
-		
-		if (character.sprite.frameIndex >= 2) {
-			character.move(new Point(character.xDir * 50, -120f));
-			
-		} 
-
+		if (jumpedYet) {
+			character.move(new Point(character.xDir * 50, 0));
+		}
 		if (character.isAnimOver()) {
-			character.changeState(new Fall());
+			character.changeToLandingOrFall();
 		}
 	}
-
-	public override void onEnter(CharState oldState) {
-		base.onEnter(oldState);
-	
-	}
-
-	public override void onExit(CharState newState) {
-		if (anim != null) {
-			anim.destroySelf();
-			anim = null;
-		}
-		base.onExit(newState);
 }
-}
-
-
 
 public class DynamoBoomerang : CharState {
 	bool shot = false;
 	DynamoBoomerangProj? proj;
 	float specialPressTime;
-
-		public float pushBackSpeed;
-
+	public float pushBackSpeed;
 
 	public DynamoBoomerang() : base("throw_boomerang") {
-		normalCtrl = true;
 		superArmor = true;
+		normalLockAlt = true;
 	}
 
 	public override void update() {
@@ -574,8 +486,13 @@ public class DynamoBoomerang : CharState {
 			proj.reversed = true;
 		}
 
-		if (!shot && character.sprite.frameIndex == 4) {
+		if (!shot && character.sprite.frameIndex >= 4) {
 			shoot();
+			normalCtrl = true;
+		}
+
+		if (character.sprite.frameIndex >= 6) {
+			attackCtrl = true;
 		}
 
 		if (proj != null) {
@@ -752,8 +669,8 @@ public class DynamoBackFlip : CharState {
 	public DynamoBackFlip(string transitionSprite = "")
 		: base("backflip", "", "", transitionSprite)
 	{
-	normalCtrl = true;
-	attackCtrl = true;
+		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update()
@@ -796,10 +713,9 @@ public class DynamoBackFlip : CharState {
 
 
 public class DynamoSlide : CharState {
-	Anim? proj;
+	public bool soundPlayed;
 
-	public DynamoSlide() : base("slide", "", "", "") {
-		enterSound = "dynamoslide";
+	public DynamoSlide() : base("slide") {
 		immuneToWind = true;
 	}
 
@@ -811,15 +727,17 @@ public class DynamoSlide : CharState {
 		} else {
 			character.move(new Point(character.xDir * 300, 0));
 		}
+		if (!soundPlayed && character.frameIndex >= 1) {
+			character.playSound("dynamoslide", sendRpc: true);
+			soundPlayed = true;
+		}
 
-	  if (stateTime > 0.4f) {
+	 	if (stateTime > 0.4f) {
 			character.changeToIdleOrFall();
 			return;
 		}
-
-
 		if (stateTime > 0.2f && player.input.isPressed(Control.Jump,player)){
-		character.changeState(new DynamoSlideKick());
+			character.changeState(new DynamoSlideKick());
 		}
 	}
 
@@ -836,15 +754,13 @@ public class DynamoSlide : CharState {
 	}
 }
 
-
-
-
 public class DynamoSlideKick : CharState {
-	Anim? proj;
-
-	public DynamoSlideKick() : base("slide_jump", "", "", "") {
+	public DynamoSlideKick() : base("slide_jump") {
 		immuneToWind = true;
 		normalCtrl = true;
+		normalLockAlt = true;
+		landSprite = "slide";
+		airSprite = "slide_jump";
 	}
 
 	public override void update() {
@@ -855,24 +771,15 @@ public class DynamoSlideKick : CharState {
 		} else {
 			character.move(new Point(character.xDir * 300, 0));
 		}
-	  if (character.isAnimOver()) {
+	  	if (stateFrames >= 40) {
 			character.changeToIdleOrFall();
 			return;
 		}
-
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.useGravity = true;
-	
 		character.vel.y = -character.getJumpPower();
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
-		
 	}
 }
 
@@ -1134,41 +1041,34 @@ public class DynamoGPStateLV3 : CharState {
 }
 
 public class DynamoAirShotState : CharState {
-	int bombNum;
-	bool isNapalm;
+	public bool hasShot;
 
-
-	public DynamoAirShotState() : base("buster_air", "", "") {
-	
+	public DynamoAirShotState() : base("buster_air") {
 		useDashJumpSpeed = true;
+		airMove = true;
 	}
 
 	public override void update() {
 		base.update();
-
-		
-			if (stateTime > 0f && bombNum == 0) {
-				bombNum++;
+			if (character.frameIndex >= 1 && !hasShot) {
 				character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
-				new DynamoAirBuster(new XBuster(), character.pos, character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
+				new DynamoAirBuster(
+					new XBuster(), character.pos, character.xDir, player,
+					0, character.player.getNextActorNetId(), rpc: true
+				);
+				hasShot = true;
+				character.vel.y = -200;
 			}
-
 			if (stateTime > 0.25f) {
 				character.changeToIdleOrFall();
 			}
-		
 	}
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel = new Point();
-	
-	}
-
-	public override void onExit(CharState newState) {
-		base.onExit(newState);
-		character.useGravity = true;
+		if (character.vel.y < 0) {
+			character.vel.y = 0;
+		}
 	}
 }
 
@@ -1180,29 +1080,37 @@ public class DynamoAirBuster : Projectile {
 	int type;
 	bool split;
 	public DynamoAirBuster(
-		Weapon weapon, Point pos, int xDir, Player player, int type, ushort netProjId, Point? vel = null, bool rpc = false
+		Weapon weapon, Point pos, int xDir, Player player,
+		int type, ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 75, 3, player, "dynamo_air_buster_proj", Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 75, 3, player, "dynamo_air_buster_proj",
+		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.DynamoAirBuster;
 		maxTime = 1f;
 		if (type == 1){
 			maxTime = 0.6f;
 			changeSprite("dynamo_air_buster_ground", true);
-				projId = (int)ProjIds.DynamoAirBuster2;
+			projId = (int)ProjIds.DynamoAirBuster2;
 		}
 		destroyOnHit = false;
 		this.type = type;
+		canBeLocal = false;
 
-		if (vel != null) this.vel = (Point)vel;
+		if (vel != null) {
+			this.vel = vel.Value;
+		}
 		if (type == 0) {
 			this.vel.y = 50;
 			useGravity = true;
 			gravityModifier = 0.5f;
-		} else {
 		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
+		}
+
+		if (type == 1) {
+			byteAngle = this.vel.byteAngle;
 		}
 	}
 
@@ -1226,17 +1134,12 @@ public class DynamoAirBuster : Projectile {
 			destroySelf(fadeSprite);
 			split = true;
 			playSound("ballPOR", sendRpc: true);
-			new DynamoAirBuster(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2, rpc: true);
-			new DynamoAirBuster(weapon, pos.clone(), xDir, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2.times(-1), rpc: true);
+			new DynamoAirBuster(weapon, pos.clone(), 1, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2, rpc: true);
+			new DynamoAirBuster(weapon, pos.clone(), 1, damager.owner, 1, Global.level.mainPlayer.getNextActorNetId(), normal2.times(-1), rpc: true);
 			destroySelf();
 		}
 	}
 }
-
-
-
-
-
 
 public class DynamoBeam : Projectile {
 	Player player;
@@ -1383,12 +1286,8 @@ public class DynamoDaggerLV1 : CharState {
 
 	DynamoKnifeProj proj;
 
-	public DynamoDaggerLV1(string transitionSprite = "")
-		: base("throw_knife", "", "", transitionSprite)
-	{
-	airMove = true;
-	normalCtrl = true;
-	
+	public DynamoDaggerLV1(string transitionSprite = "") : base("throw_knife", "", "", transitionSprite) {
+		airMove = true;
 	}
 
 	public override void update()
