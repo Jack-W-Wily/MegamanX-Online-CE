@@ -39,7 +39,7 @@ public class XLoadout {
 			weapon3 = 2;
 		}
 
-		if (melee != 0 && melee != 1) { melee = 0; }
+		if (melee < 0 && melee > 2) { melee = 0; }
 	}
 
 	public List<Weapon> getWeaponsFromLoadout(Player player) {
@@ -474,6 +474,7 @@ public class LoadoutData {
 	public static LoadoutData createRandom(int playerId) {
 		return new LoadoutData() {
 			playerId = playerId,
+			
 			xLoadout = XLoadout.createRandom(),
 			zeroLoadout = ZeroLoadout.createRandom(),
 			vileLoadout = VileLoadout.createRandom(),

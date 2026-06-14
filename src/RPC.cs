@@ -247,6 +247,8 @@ public class RPCStartLevelJson {
 
 public class BackloggedSpawns {
 	public int playerId;
+
+	public int skinID;
 	public Point spawnPoint;
 	public int xDir;
 	public ushort charNetId;

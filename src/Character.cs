@@ -953,7 +953,7 @@ public partial class Character : Actor, IDamagable {
 		insideCharacter = false;
 		changedStateInFrame = false;
 		pushedByTornadoInFrame = false;
-		debuffGfx();
+		
 		// Other timers.
 		Helpers.decrementTime(ref limboRACheckCooldown);
 		Helpers.decrementTime(ref dropFlagCooldown);
@@ -1049,7 +1049,12 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 	}
+	
 
+	public Anim? f1;
+	public Anim? f2;
+	public Anim? f3;
+	public Anim? f4;
 	public void debuffGfx() {
 		if (burnTime > 0) {
 			burnEffectTime += Global.speedMul;
@@ -1063,19 +1068,19 @@ public partial class Character : Actor, IDamagable {
 						hiding = true;
 					}
 				}
-				var f1 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+				f1 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
 				if (hiding) f1.setzIndex(zIndex - 100);
 
 				if (burnTime > 2) {
-					var f2 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+					 f2 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
 					if (hiding) f2.setzIndex(zIndex - 100);
 				}
 				if (burnTime > 4) {
-					var f3 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+					 f3 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
 					if (hiding) f3.setzIndex(zIndex - 100);
 				}
 				if (burnTime > 6) {
-					var f4 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
+					 f4 = new Anim(burnPos.addRand(5, 10), "burn_flame", 1, null, true, host: this);
 					if (hiding) f4.setzIndex(zIndex - 100);
 				}
 			}
@@ -1171,6 +1176,8 @@ public partial class Character : Actor, IDamagable {
 					burnHurtCooldown = 0;
 				}
 				burnDamager?.applyDamage(this, false, burnWeapon, this, (int)ProjIds.Burn, overrideDamage: 1f);
+				new Anim(pos.addxy(Helpers.randomRange(-20 , 20), Helpers.randomRange(-35 , -10)), "burn_flame", xDir,
+					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 			}
 			if (burnTime <= 0) {
 				removeBurn();
@@ -1231,7 +1238,7 @@ public partial class Character : Actor, IDamagable {
 
 	public float GenericParryCD;
 
-	public int SkinSlot = 0; 
+	public float SkinSlot = 0; 
 
 	// For  overdrives
 
@@ -1241,9 +1248,11 @@ public partial class Character : Actor, IDamagable {
 
 	public float textCD;
 
+
+
 	public override void update() {
 
-
+			debuffGfx();
 		if (player.input.isPressed(Control.Taunt, player)
 		&& player.input.isHeld(Control.Up, player)
 		&& !isInDamageSprite()
@@ -1319,8 +1328,16 @@ public partial class Character : Actor, IDamagable {
 
 
 
-		if (charState is WarpIn) {
-			SkinSlot = Options.main.SkinSlot;
+		if (!player.isAI) {
+			SkinSlot = player.loadout.xLoadout.melee;
+		} else {
+			if (Global.level.is1v1()) {
+				SkinSlot = 0;
+			} else {
+			if (charState is WarpIn) {
+					SkinSlot = Helpers.randomRange(0,2);
+				}
+			}
 		}
 		// For Overdrive to work (WCUT)
 		if (overDriveTimer > 0) {
@@ -4469,6 +4486,7 @@ public partial class Character : Actor, IDamagable {
 		byte netMaxHP = (byte)Math.Ceiling(maxHealth);
 		byte netAlliance = (byte)player.alliance;
 		byte netCurrency = (byte)player.currency;
+		byte skinNum = (byte)SkinSlot;
 
 		// Bool variables. Packed in a single byte.
 		byte stateFlag = Helpers.boolArrayToByte([
@@ -4486,7 +4504,7 @@ public partial class Character : Actor, IDamagable {
 		customData.Add(netAlliance);
 		customData.Add(netCurrency);
 		customData.Add(stateFlag);
-
+		//customData.Add(skinNum);
 		// Bool mask. Pos 6.
 		// For things not always enabled.
 		// We also edit this later.
@@ -4502,8 +4520,8 @@ public partial class Character : Actor, IDamagable {
 			customData.Add((byte)MathF.Ceiling(acidTime * 20));
 			boolMask[0] = true;
 		}
-		if (burnTime > 0) {
-			customData.Add((byte)MathF.Ceiling(burnTime * 30));
+		if (SkinSlot > 0) {
+			customData.Add((byte)MathF.Ceiling(SkinSlot * 30));
 			boolMask[1] = true;
 		}
 		if (chargeTime > 0) {
@@ -4584,9 +4602,10 @@ public partial class Character : Actor, IDamagable {
 			acidTime = data[pos] / 30f;
 			pos++;
 		}
-		burnTime = 0;
+		// Temporary for priorities
+		SkinSlot = 0;
 		if (boolMask[1]) {
-			burnTime = data[pos] / 30f;
+			SkinSlot = data[pos] / 30f;
 			pos++;
 		}
 		chargeTime = 0;
@@ -4636,6 +4655,10 @@ public partial class Character : Actor, IDamagable {
 		//	vaccineTime = data[pos] / 30f;
 		//	pos++;
 		//}
+
+		
+
+		
 	}
 
 

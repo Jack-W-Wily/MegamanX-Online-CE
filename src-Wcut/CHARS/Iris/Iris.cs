@@ -314,6 +314,8 @@ public class Iris : Character {
 	}
 
 
+	
+
 	public override Projectile getProjFromHitbox(Collider hitbox, Point centerPoint) {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
@@ -391,6 +393,7 @@ public class Iris : Character {
 
 	
 	// For Shaders stuff
+	
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
@@ -400,6 +403,9 @@ public class Iris : Character {
 
 		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
 		}
 
 		if (palette != null) {
@@ -411,6 +417,7 @@ public class Iris : Character {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
 
 
 	public override void aiAttack(Actor? target) {

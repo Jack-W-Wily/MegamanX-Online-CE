@@ -410,7 +410,7 @@ public class HighMax : Character {
 	
 
 	
-	// For Shaders stuff
+	
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
@@ -420,6 +420,9 @@ public class HighMax : Character {
 
 		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
 		}
 
 		if (palette != null) {
@@ -431,6 +434,7 @@ public class HighMax : Character {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
 
 
 	

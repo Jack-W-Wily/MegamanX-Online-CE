@@ -525,73 +525,6 @@ public class RockmanX : MegamanX {
 
 
 
-	
-	public override List<ShaderWrapper> getShaders() {
-		List<ShaderWrapper> baseShaders = base.getShaders();
-		List<ShaderWrapper> shaders = new();
-		ShaderWrapper? palette = null;
-		int index = currentWeapon?.index ?? 0;
-
-		if (stingActiveTime > 0 && stingPaletteIndex != 0) {
-			palette = player.xStingPaletteShader;
-			palette.SetUniform("palette", stingPaletteIndex);
-
-			shaders.Add(palette);
-			shaders.AddRange(baseShaders);
-			return shaders;
-		}
-		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
-			index = 0;
-		}
-		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
-			index = player.weapons[player.hyperChargeSlot].index;
-		}
-		if (hasFullHyperMaxArmor) {
-			index = 37;
-		}
-		if (hasUltimateArmor && index == 0) {
-			if (OverDrive){
-			index = 38;
-			} else {
-            index = 40;   
-            }
-		}
-		palette = player.xPaletteShader;
-
-		palette?.SetUniform("palette", index);
-
-		List<ShaderWrapper?> chargePalletes = getChargeShaders() as List<ShaderWrapper?>;
-		if (chargePalletes.Count > 0) {
-			if (chargePalletes.Count == 1) {
-				if (!hyperChargeActive) {
-					chargePalletes.Add(null);
-				} else if (!chargePalletes.Contains(Player.XYellowC)) {
-					chargePalletes.Add(Player.XYellowC);
-				}
-			}
-			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
-				(chargePalleteTime % (chargePalletes.Count * 2)) / 2f
-			)];
-			if (targetChargePallete != null) {
-				palette = targetChargePallete;
-			}
-		}
-
-		if (charState is SpeedBurnerCharState) {
-			palette = player.speedBurnerOrange;
-			if (Global.isOnFrameCycle(8)) {
-				palette = player.speedBurnerGrey;
-			}
-		}
-		if (palette != null) {
-			shaders.Add(palette);
-		}
-		if (shaders.Count == 0) {
-			return baseShaders;
-		}
-		shaders.AddRange(baseShaders);
-		return shaders;
-	}
 	public List<ShaderWrapper> getChargeShaders() {
 		List<ShaderWrapper> chargePalletes = new();
 		ShaderWrapper? defaultChargePallete = null;
@@ -639,6 +572,85 @@ public class RockmanX : MegamanX {
 		return chargePalletes;
 	}
 
+
+	
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+		int index = currentWeapon?.index ?? 0;
+
+		if (stingActiveTime > 0 && stingPaletteIndex != 0) {
+			palette = player.xStingPaletteShader;
+			palette.SetUniform("palette", stingPaletteIndex);
+
+			shaders.Add(palette);
+			shaders.AddRange(baseShaders);
+			return shaders;
+		}
+		if (index >= (int)WeaponIds.GigaCrush || index == (int)WeaponIds.XSaber  ) {
+			index = 0;
+		}
+		if (index == (int)WeaponIds.HyperCharge && ownedByLocalPlayer) {
+			index = weapons[player.hyperChargeSlot].index;
+		}
+		if (hasFullHyperMaxArmor) {
+			index = 37;
+		}
+		
+		
+
+		if (player.skinSlot == 1) {
+			palette = player.xPaletteShader1;
+		if (index == 0) {
+           index = 41;   
+           } 
+		}
+		if (player.skinSlot == 2) {
+			palette = player.xPaletteShader2;
+			if (index == 0) {
+           index = 41;   
+           }
+		}
+		if (player.skinSlot == 0) {
+			palette = player.xPaletteShader;
+		}
+		
+		
+		
+		
+
+
+		palette?.SetUniform("palette", index);
+
+		List<ShaderWrapper?> chargePalletes = getChargeShaders() as List<ShaderWrapper?>;
+		if (chargePalletes.Count > 0) {
+			if (chargePalletes.Count == 1) {
+				chargePalletes.Add(null);
+			}
+			ShaderWrapper? targetChargePallete = chargePalletes[MathInt.Floor(
+				(chargePalleteTime % (chargePalletes.Count * 2)) / 2f
+			)];
+			if (targetChargePallete != null) {
+				palette = targetChargePallete;
+			}
+		}
+
+		if (charState is SpeedBurnerCharState) {
+			palette = player.speedBurnerOrange;
+			if (Global.isOnFrameCycle(8)) {
+				palette = player.speedBurnerGrey;
+			}
+		}
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
 
 
 	public override List<byte> getCustomActorNetData() {

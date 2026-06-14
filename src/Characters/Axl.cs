@@ -1706,6 +1706,8 @@ public class Axl : Character {
 		palette?.SetUniform("palette", paletteNum);
 		palette?.SetUniform("paletteTexture", Global.textures["hyperAxlPalette"]);
 
+
+		
 		if (palette != null) {
 			shaders.Add(palette);
 		}

@@ -1844,8 +1844,10 @@ public class GenericGrabbedState : CharState {
 		character.useGravity = false;
 		character.grounded = false;
 		savedZIndex = character.zIndex;
-		if (!reverseZIndex) character.setzIndex(grabber.zIndex - 100);
-		else character.setzIndex(grabber.zIndex + 100);
+		if (grabber != null){
+			if (!reverseZIndex) character.setzIndex(grabber.zIndex - 100);
+			else character.setzIndex(grabber.zIndex + 100);
+		}
 	}
 
 	public override void onExit(CharState? newState) {

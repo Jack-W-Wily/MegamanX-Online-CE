@@ -1163,6 +1163,13 @@ public class ZeroMID : Zero {
 			palette = ((Global.frameCount % (blinkRate * 2) >= blinkRate) ? null : palette);
 		}
 
+		if (player.skinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
+		}
+
 	
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {

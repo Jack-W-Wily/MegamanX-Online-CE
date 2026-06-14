@@ -810,6 +810,7 @@ public class Projectile : Actor {
 		}
 		
 		if (ownedByLocalPlayer) {
+				
 				new Anim(hitPoint.Value, hitspark, xDir,
 					Global.level.mainPlayer.getNextActorNetId(), true, sendRpc: true);
 		}

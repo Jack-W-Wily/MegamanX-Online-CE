@@ -566,6 +566,34 @@ public class Sigma1 : BaseSigma {
 		base.render(x, y);
 	}
 
+	
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+
+		if (player.skinSlot == 1) {
+			palette = player.nightmareZeroShader2;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.sigmaPal2;
+		}
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
+
+
+		
 
 
 

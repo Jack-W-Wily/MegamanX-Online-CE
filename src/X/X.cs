@@ -1451,8 +1451,22 @@ public class MegamanX : Character {
            index = 41;    
 		}
 
-		palette = player.xPaletteShader;
-
+		if (player.skinSlot == 1) {
+			palette = player.xPaletteShader1;
+		if (index == 0) {
+           index = 41;   
+           } 
+		}
+		if (player.skinSlot == 2) {
+			palette = player.xPaletteShader2;
+			if (index == 0) {
+           index = 41;   
+           }
+		}
+		if (player.skinSlot == 0) {
+			palette = player.xPaletteShader;
+		}
+		
 		palette?.SetUniform("palette", index);
 
 		List<ShaderWrapper?> chargePalletes = getChargeShaders() as List<ShaderWrapper?>;

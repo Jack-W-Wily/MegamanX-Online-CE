@@ -374,7 +374,10 @@ public class Dynamo : Character {
 
 
 		if (player.skinSlot == 1) {
-			palette = player.nightmareZeroShader;
+			palette = player.dynamoPal1;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.dynamoPal2;
 		}
 
 		if (palette != null) {

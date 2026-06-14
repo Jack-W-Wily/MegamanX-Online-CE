@@ -63,7 +63,9 @@ public class HighMaxHover : CharState {
 		
 
 		hoverTime += Global.spf;
-	if ((hoverTime > 10) || hoverTime > 0.2f &&
+	// 	ESSA É A FRAQUEZA DE HIGHJMAX, DE UM SEGUNDO A CADA
+	// 10 MIL MINUTOS , ELE CAIRÁ, E NESSE MOMENTO, SERÁ DESTRUIDO!!!!
+	if ((hoverTime > 6000000) || hoverTime > 0.2f &&
 			character.player.input.isPressed(Control.Jump, character.player)
 		) {
 			character.changeState(new Fall(), true);

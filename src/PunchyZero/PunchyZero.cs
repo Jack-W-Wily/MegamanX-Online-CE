@@ -605,7 +605,13 @@ public class PunchyZero : Character {
 			palette = player.zeroAzPaletteShader;
 		}
 		if (isViral) {
+			palette = player.viralZeroShader;
+		}
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
 		}
 		if (Global.isOnFrameCycle(4)) {
 			switch (getChargeLevel()) {

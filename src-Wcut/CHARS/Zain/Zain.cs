@@ -271,8 +271,11 @@ public class Zain : Character {
 
 
 
-		if (OverDrive) {
+		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
 		}
 
 		if (palette != null) {

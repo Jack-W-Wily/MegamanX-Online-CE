@@ -1563,17 +1563,21 @@ public class VAVA1 : Vile {
 	
 	
 	// For Shaders stuff
+	
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();
 		List<ShaderWrapper> shaders = new();
 		ShaderWrapper? palette = null;
 
 
-		
+
 		if (player.skinSlot == 1) {
 			palette = player.nightmareZeroShader;
 		}
-		
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
+		}
+
 		if (palette != null) {
 			shaders.Add(palette);
 		}
@@ -1583,6 +1587,7 @@ public class VAVA1 : Vile {
 		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
 
 
 	public override void render(float x, float y) {

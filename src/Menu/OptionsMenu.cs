@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Channels;
 using SFML.Graphics;
 using static SFML.Window.Keyboard;
 
@@ -416,7 +417,7 @@ public class OptionsMenu : IMainMenu {
 				new MenuOption(
 					30, startY,
 					() => {
-						Helpers.menuLeftRightInc(ref Options.main.SkinSlot, 0, 2);
+						Helpers.menuLeftRightInc(ref Options.main.xLoadout.melee, 0, 2);
 					},
 					(Point pos, int index) => {
 						// ToDo: Implement "Buster" option for hypercharge like HDM.
@@ -425,7 +426,7 @@ public class OptionsMenu : IMainMenu {
  							pos.x, pos.y, selected: selectedArrowPosY == index
 						);
 						Fonts.drawText(
-							optionFontValue, (Options.main.SkinSlot + 1).ToString(),
+							optionFontValue, (Options.main.xLoadout.melee + 1).ToString(),
 							pos.x + 166, pos.y, selected: selectedArrowPosY == index
 						);
 					},
@@ -1699,6 +1700,7 @@ public class OptionsMenu : IMainMenu {
 				Global.updateRegionPings();
 			}
 		}
+		
 
 		if (isChangingName) {
 			blinkTime += Global.spf;

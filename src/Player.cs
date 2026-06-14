@@ -437,13 +437,22 @@ public partial class Player {
 
 	// Shaders
 	public ShaderWrapper xPaletteShader = Helpers.cloneGenericPaletteShader("paletteTexture");
+	public ShaderWrapper xPaletteShader1 = Helpers.cloneGenericPaletteShader("paletteTexture1");
+	public ShaderWrapper xPaletteShader2 = Helpers.cloneGenericPaletteShader("paletteTexture2");
 	public ShaderWrapper xStingPaletteShader = Helpers.cloneGenericPaletteShader("cStingPalette");
 	public ShaderWrapper invisibleShader = Helpers.cloneShaderSafe("invisible");
 	public ShaderWrapper zeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperZeroPalette");
 	public ShaderWrapper blackBusterZeroPaletteShader = Helpers.cloneGenericPaletteShader("hyperBusterZeroPalette");
-	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("paletteViralZero");
+	public ShaderWrapper nightmareZeroShader = Helpers.cloneNightmareZeroPaletteShader("nightmareTexture2");
+	public ShaderWrapper nightmareZeroShader2 = Helpers.cloneGenericPaletteShader("nightmareTexture");
 
 	public ShaderWrapper viralZeroShader = Helpers.cloneGenericPaletteShader("paletteViralZero");
+
+	public ShaderWrapper dynamoPal0 = Helpers.cloneGenericPaletteShader("dynamoPal0");
+	public ShaderWrapper dynamoPal1 = Helpers.cloneGenericPaletteShader("dynamoPal1");
+	public ShaderWrapper dynamoPal2 = Helpers.cloneGenericPaletteShader("dynamoPal2");
+
+	public ShaderWrapper sigmaPal2 = Helpers.cloneGenericPaletteShader("sigmaPal2");
 	
 	public ShaderWrapper zeroAzPaletteShader = Helpers.cloneGenericPaletteShader("paletteAwakenedZero");
 	public ShaderWrapper axlPaletteShader = Helpers.cloneShaderSafe("hyperaxl");
@@ -512,6 +521,8 @@ public partial class Player {
 	};
 
 	public int hyperChargeSlot;
+
+	public int skinNum;
 	public int xArmor1v1;
 
 	public float superAmmo = 32;
@@ -1200,6 +1211,7 @@ public partial class Player {
 				previousLoadout = loadout;
 				applyLoadoutChange();
 				hyperChargeSlot = Global.level.is1v1() ? 0 : Options.main.hyperChargeSlot;
+				skinNum = Options.main.SkinSlot;
 				currentMaverickCommand = (
 					Options.main.maverickStartFollow ? MaverickAIBehavior.Follow : MaverickAIBehavior.Defend
 				);
