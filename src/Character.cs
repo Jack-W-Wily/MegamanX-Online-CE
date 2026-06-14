@@ -4518,12 +4518,13 @@ public partial class Character : Actor, IDamagable {
 			customData.Add((byte)MathF.Ceiling(oilTime * 30));
 			boolMask[4] = true;
 		}
+		
 		if (virusTime > 0) {
 			customData.Add((byte)MathF.Ceiling(virusTime * 30));
 			boolMask[5] = true;
 		}
-		if (vaccineTime > 0) {
-			customData.Add((byte)MathF.Ceiling(vaccineTime * 30));
+		if (overDriveTimer > 0) {
+			customData.Add((byte)MathF.Ceiling(overDriveTimer * 30));
 			boolMask[6] = true;
 		}
 	
@@ -4537,6 +4538,10 @@ public partial class Character : Actor, IDamagable {
 			}
 			boolMask[7] = true;
 		}
+		//if (vaccineTime > 0) {
+		//	customData.Add((byte)MathF.Ceiling(vaccineTime * 30));
+		//	boolMask[8] = true;
+		//}
 	  
 		// Add the final value of the bool mask.
 		customData[boolMaskPos] = Helpers.boolArrayToByte(boolMask);
@@ -4604,9 +4609,9 @@ public partial class Character : Actor, IDamagable {
 			virusTime = data[pos] / 30f;
 			pos++;
 		}
-		vaccineTime = 0;
+		overDriveTimer = 0;
 		if (boolMask[6]) {
-			vaccineTime = data[pos] / 30f;
+			overDriveTimer = data[pos] / 30f;
 			pos++;
 		}
 		if (boolMask[7]) {
@@ -4626,6 +4631,11 @@ public partial class Character : Actor, IDamagable {
 			rideArmor = null;
 			rideChaser = null;
 		}
+		//vaccineTime = 0;
+		//if (boolMask[8]) {
+		//	vaccineTime = data[pos] / 30f;
+		//	pos++;
+		//}
 	}
 
 

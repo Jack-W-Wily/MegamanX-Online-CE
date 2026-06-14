@@ -882,55 +882,64 @@ public class Damager {
 
 			// For Grabs to work (WCUT)
 
-
+			var attacker = owner.character;
 			if (projId == (int)ProjIds.ForceGrabState) {
-				if (owner.character.charState is ZainGrabStab) {
-					owner.character.changeState(new ZainGrabStabEnd());
-				}
-				if (owner.character.charState is ZainParryStartState) {
-					owner.character.changeState(new ZainGrabSlash());
-				}
-				if (owner.character.charState is ZainParryStartState) {
-					owner.character.changeState(new ZainGrabSlash());
-				}
-				if (owner.character.charState is ZainUPParryStartState) {
-					owner.character.changeState(new ZainGrab());
-				}
-				if (owner.character.charState is ZainDashParryState) {
-					owner.character.changeState(new ZainGrab());
-				}
+				if (attacker != null){
+					if (attacker.charState is ZainGrabStab) {
+						
+						attacker.changeState(new ZainGrabStabEnd());
+					}
+					if (attacker.charState is ZainParryStartState) {
+						attacker.changeState(new ZainGrabSlash());
+					}
+					if (attacker.charState is ZainParryStartState) {
+						attacker.changeState(new ZainGrabSlash());
+					}
+					if (attacker.charState is ZainUPParryStartState) {
+						attacker.changeState(new ZainGrab());
+					}
+					if (attacker.charState is ZainDashParryState) {
+						attacker.changeState(new ZainGrab());
+					}
 
-				if (owner.character.charState is IrisGrabStart) {
-					owner.character.changeState(new IrisGrabEX());
-					(owner.character as Iris).GrabVictim = character;
+					if (attacker.charState is IrisGrabStart && attacker is Iris iris) {
+						attacker.changeState(new IrisGrabEX());
+						iris.GrabVictim = character;
+					}
+					if (attacker.charState is SigmaGrabStart) {
+						attacker.changeState(new SigmaGrabEX());
+					}
+					if (attacker.charState is ZeroGrabStart) {
+						attacker.changeState(new ZeroGrabEX());
+					}	
 				}
-				if (owner.character.charState is SigmaGrabStart) {
-					owner.character.changeState(new SigmaGrabEX());
-				}
-				if (owner.character.charState is ZeroGrabStart) {
-					owner.character.changeState(new ZeroGrabEX());
-				}	
-				character?.changeState(new ForceGrabbed(owner.character));
+				character?.changeState(new ForceGrabbed(attacker));
 
 			}
 
 
 			
 				if (projId == (int)ProjIds.VileMK2Grab2) {
-					owner?.character.changeState(new VAVA2GrabState(character));
-					character?.changeState(new ForceGrabbed(owner.character));
+					if (attacker != null){
+					attacker.changeState(new VAVA2GrabState(character));
+					character?.changeState(new ForceGrabbed(attacker));
+					}
 				}
 
 				if (projId == (int)ProjIds.newUpGrab) {
+					if (owner != null && owner.character != null && character != null){
 					owner.character.changeState(new XUPGrabState(character));
 					character.changeState(new UPGrabbed(owner.character));
+					}
 				}
 				
 
 				if (owner?.character is PunchyZero zx1 && zx1 != null) {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
+					if (owner != null && owner.character != null && character != null){
 					owner.character.changeState(new ZeroGrabEX());
 					character.changeState(new RMXGrabbed(zx1));
+					}
 				}
 				}
 
@@ -941,10 +950,12 @@ public class Damager {
 					character?.changeState(new RMXGrabbed(drgn));
 				}
 				if (projId == (int)ProjIds.DragoonSpark) {
-					if (character.sprite.name.Contains("grabbed") || character.isAttacking()){
-					character.changeState(new PushedOver2(drgn.xDir), true);
-					} else {
-						flinch = 10;
+					if (character != null){
+						if (character.sprite.name.Contains("grabbed") || character.isAttacking()){
+						character.changeState(new PushedOver2(drgn.xDir), true);
+						} else {
+							flinch = 10;
+						}
 					}
 				}
 
@@ -960,9 +971,9 @@ public class Damager {
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
-				if (owner?.character is VAVA1 or FinalVava) {
-					character.changeState(new Vava1Grabbed(owner.character));
-					owner.character?.changeState(new Vava1GrabState(character));
+				if (attacker is VAVA1 or FinalVava && character != null) {
+					character.changeState(new Vava1Grabbed(attacker));
+					attacker.changeState(new Vava1GrabState(character));
 				}
 				if (owner?.character is Kurumitos) {
 					character.changeState(new KurumaGrabbed(owner.character));
@@ -1276,6 +1287,15 @@ public class Damager {
 		}
 		// Maverick section
 		else if (victim is Maverick maverick) {
+			// Enable WCUT Grab Compatibility on Mavericks
+
+			if (projId == (int)ProjIds.GizmoGrab) {
+				if (owner?.character is VAVA1 or FinalVava) {
+					maverick.changeState(new MForceGrabbed(owner.character));
+					owner.character?.changeState(new VavaGizmoGrabState(maverick));
+				}
+			}
+
 
 			// Enable Wcut Combos on Mavericks
 			if (owner.character != null) {

@@ -369,7 +369,7 @@ public partial class RPCCreateProj : RPC {
 		{ (int)ProjIds.IrisCrystal, NewIrisCrystal.rpcInvoke },
 		// dynamo
 		{ (int)ProjIds.DynamoIceDagger, DynamoKnifeProj.rpcInvoke },
-
+		{ (int)ProjIds.DynamoAxeProj, DynamoAxeProj.rpcInvoke },
 		// Highmax
 		{ (int)ProjIds.HighmaxHomingProj, HighmaxHomingProj.rpcInvoke },
 		{ (int)ProjIds.HighmaxStunShot, HighmaxStunShot.rpcInvoke },

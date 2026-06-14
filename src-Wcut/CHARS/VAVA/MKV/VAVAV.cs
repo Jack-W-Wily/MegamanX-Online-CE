@@ -1277,27 +1277,6 @@ public class VAVAV : Vile {
 		return pos.addxy(0, -24);
 	}
 
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = base.getCustomActorNetData();
-
-		customData.Add(Helpers.boolArrayToByte([
-			hasFrozenCastle,
-			hasSpeedDevil
-		]));
-
-		return customData;
-	}
-
-	public override void updateCustomActorNetData(byte[] data) {
-		// Update base arguments.
-		base.updateCustomActorNetData(data);
-		data = data[data[0]..];
-
-		// Per-character data.
-		bool[] boolData = Helpers.byteToBoolArray(data[0]);
-		hasFrozenCastle = boolData[0];
-		hasSpeedDevil = boolData[1];
-	}
 
 
 	public override bool isToughGuyHyperMode() {

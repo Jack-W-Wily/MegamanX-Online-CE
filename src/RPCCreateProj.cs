@@ -21,6 +21,7 @@ public partial class RPCCreateProj : RPC {
 		int xDir = 1;
 		float angle = 0;
 		float byteAngle = 0;
+	
 		if (!dataInf[0]) {
 			xDir = arguments[14];
 			xDir -= 1;
@@ -35,6 +36,8 @@ public partial class RPCCreateProj : RPC {
 			owner = Global.level.getActorByNetId(BitConverter.ToUInt16(arguments[15..17], 0), true);
 			extraDataIndex = 17;
 		}
+
+
 		// Extra arguments.
 		byte[] extraData;
 		if (dataInf[2] && arguments.Length >= extraDataIndex + 1) {
@@ -46,7 +49,7 @@ public partial class RPCCreateProj : RPC {
 
 		var player = Global.level.getPlayerById(playerId);
 		if (player == null) return;
-
+		
 		Point pos = new Point(xPos, yPos);
 
 		if (functs.ContainsKey(projId)) {

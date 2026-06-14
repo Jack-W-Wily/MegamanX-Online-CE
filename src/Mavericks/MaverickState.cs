@@ -45,6 +45,9 @@ public class MaverickState {
 	public string landSprite = "";
 	public string airSprite = "";
 	public string fallSprite = "";
+
+	public float grabTime = 4;
+	public bool isGrabbedState;
 	public bool wasGrounded = true;
 
 	public bool once;
@@ -1155,6 +1158,113 @@ public class MHurt : MaverickState {
 		//return maverick is StingChameleon or Velguarder or WireSponge or ChillPenguin;
 	}
 }
+
+
+
+public class MGrabbed : MaverickState {
+	public Actor grabber;
+	public long savedZIndex;
+	public string grabSpriteSuffix;
+	public bool reverseZIndex;
+	public bool freeOnHitWall;
+	public bool lerp;
+	public bool freeOnGrabberLeave;
+	public string additionalGrabSprite;
+	public float notGrabbedTime;
+	public float maxNotGrabbedTime;
+	public bool customUpdate;
+	public MGrabbed(
+		Actor grabber, float maxGrabTime, string grabSpriteSuffix,
+		bool reverseZIndex = false, bool freeOnHitWall = true,
+		bool lerp = true, string additionalGrabSprite = "", float maxNotGrabbedTime = 0.5f
+	) : base(
+		"grabbed"
+	) {
+		this.isGrabbedState = true;
+		this.grabber = grabber;
+		grabTime = maxGrabTime;
+		this.grabSpriteSuffix = grabSpriteSuffix;
+		this.reverseZIndex = reverseZIndex;
+		//Don't use this unless absolutely needed, it causes issues with octopus grab in FTD
+		//this.freeOnHitWall = freeOnHitWall;
+		this.lerp = lerp;
+		this.additionalGrabSprite = additionalGrabSprite;
+		this.maxNotGrabbedTime = maxNotGrabbedTime;
+	}
+
+	public override void update() {
+		base.update();
+		if (!maverick.ownedByLocalPlayer) { return; }
+		if (customUpdate) return;
+
+		if (grabber.sprite.name.EndsWith(grabSpriteSuffix) == true || (
+				!string.IsNullOrEmpty(additionalGrabSprite) &&
+				grabber.sprite.name.EndsWith(additionalGrabSprite) == true
+			)
+		) {
+			bool didNotHitWall = trySnapToGrabPoint(lerp);
+			if (!didNotHitWall && freeOnHitWall) {
+				maverick.changeToIdleOrFall();
+				return;
+			}
+		} else {
+			notGrabbedTime += Global.spf;
+			if (notGrabbedTime > maxNotGrabbedTime) {
+				maverick.changeToIdleOrFall();
+				return;
+			}
+		}
+
+		grabTime -= player.mashValue();
+
+		if (grabTime <= 0) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+
+	public bool trySnapToGrabPoint(bool lerp) {
+		Point grabberGrabPoint = grabber.getFirstPOIOrDefault("g");
+		Point victimGrabOffset = maverick.pos.subtract(maverick.getFirstPOIOrDefault("g", 0));
+
+		Point destPos = grabberGrabPoint.add(victimGrabOffset);
+		if (maverick.pos.distanceTo(destPos) > 25) lerp = true;
+		Point lerpPos = lerp ? Point.lerp(maverick.pos, destPos, 0.25f) : destPos;
+
+		var hit = Global.level.checkTerrainCollisionOnce(maverick, lerpPos.x - maverick.pos.x, lerpPos.y - maverick.pos.y);
+		if (hit?.gameObject is Wall) {
+			return false;
+		}
+
+		maverick.changePos(lerpPos);
+		return true;
+	}
+
+	public override bool canEnter(Maverick character) {
+		if (!base.canEnter(character)) {
+			return false;
+		}
+		return !character.isInvulnerable() && !character.state.invincible;
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		maverick.stopMovingS();
+		//character.stopCharge();
+		maverick.useGravity = false;
+		maverick.grounded = false;
+		savedZIndex = maverick.zIndex;
+		if (!reverseZIndex) maverick.setzIndex(grabber.zIndex - 100);
+		else maverick.setzIndex(grabber.zIndex + 100);
+	}
+
+	public override void onExit(MaverickState? newState) {
+		base.onExit(newState);
+		
+		maverick.useGravity = true;
+		maverick.setzIndex(savedZIndex);
+	}
+}
+
 
 public class MDie : MaverickState {
 	bool isEnvDeath;

@@ -1091,6 +1091,9 @@ public class Maverick : Actor, IDamagable {
 		changeSprite(spriteName, resetFrame);
 	}
 
+
+	
+
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
 		if (this is FakeZero fz && fz.state is FakeZeroGuardState && damage > 0) {
 			ammo += MathF.Ceiling(damage * 1.5f);

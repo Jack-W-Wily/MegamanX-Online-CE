@@ -1238,30 +1238,7 @@ public class FinalVava : Vile {
 	}
 
 
-	
-	public override List<byte> getCustomActorNetData() {
-		List<byte> customData = base.getCustomActorNetData();
 
-		customData.Add(Helpers.boolArrayToByte([
-			hasFrozenCastle,
-			hasSpeedDevil,
-			OverDrive
-		]));
-
-		return customData;
-	}
-
-	public override void updateCustomActorNetData(byte[] data) {
-		// Update base arguments.
-		base.updateCustomActorNetData(data);
-		data = data[data[0]..];
-
-		// Per-character data.
-		bool[] boolData = Helpers.byteToBoolArray(data[0]);
-		hasFrozenCastle = boolData[0];
-		hasSpeedDevil = boolData[1];
-		OverDrive = boolData[2];
-	}
 
 
 

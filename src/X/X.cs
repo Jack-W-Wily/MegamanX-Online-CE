@@ -294,36 +294,36 @@ public class MegamanX : Character {
 
 
 	public virtual void updateXAnother() {
-		helmetArmor = 0;
-		chestArmor = 0;
-		legArmor = 0;
-		armArmor = 0;
+			helmetArmor = 0;
+			chestArmor = 0;
+			legArmor = 0;
+			armArmor = 0;
 
-		if (OverDrive) {
-		hasUltimateArmor = true;
-		if (!weapons.Any(w => w is HyperNovaStrike)) {
-			weapons.Add(new HyperNovaStrike());
-		}
-		} else {
-		hasUltimateArmor = false;	
-		if (weapons.Any(w => w is HyperNovaStrike)) {
-		player.weapons.RemoveAll(w => w is HyperNovaStrike);
-		}
+			if (OverDrive) {
+			hasUltimateArmor = true;
+			if (!weapons.Any(w => w is HyperNovaStrike)) {
+				weapons.Add(new HyperNovaStrike());
+			}
+			} else {
+			hasUltimateArmor = false;	
+			if (weapons.Any(w => w is HyperNovaStrike)) {
+			player.weapons.RemoveAll(w => w is HyperNovaStrike);
+			}
 		}
 	}
 	// General update.
 	public override void update() {
 		base.update();
-
+		if (!ownedByLocalPlayer) {
+			return;
+		}
 		if (!isInDamageSprite()) {
 			shotokanMoves();
 		}
 		if (this is XAnother) {
 			updateXAnother();
 		}
-		if (!ownedByLocalPlayer) {
-			return;
-		}
+		
 		if (player.input.isAPressed(player) ||
 			(specialButtonMode == 0 &&
 			player.input.isBPressed(player))
@@ -1618,7 +1618,7 @@ public class MegamanX : Character {
 		stockedBusterLv = boolData[1] ? 1 : 0;
 		stockedMaxBusterLv = boolData[2] ? 1 : 0;
 		stockedSaber = boolData[3];
-		hyperChargeActive = boolData[4];
+		OverDrive = boolData[4];
 
 		// Hyper Armor Flags.
 		bool[] armorBoolData = Helpers.byteToBoolArray(data[5]);

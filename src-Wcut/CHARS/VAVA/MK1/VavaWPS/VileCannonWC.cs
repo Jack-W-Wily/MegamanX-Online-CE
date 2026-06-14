@@ -669,7 +669,7 @@ public class GizmoDashHoming : CharState {
 public class VavaGizmoGrabState : CharState {
 
     public Vile vile = null!;
-	public Character? victim;
+	public Actor? victim;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
@@ -678,7 +678,7 @@ public class VavaGizmoGrabState : CharState {
 
 	public bool hitONCE = false;
 
-	public VavaGizmoGrabState(Character? victim) : base("gizmo_grab_success") {
+	public VavaGizmoGrabState(Actor? victim) : base("gizmo_grab_success") {
 		this.victim = victim;
 		grabTime = 1;
 	}
@@ -724,8 +724,6 @@ public class VavaGizmoGrabState : CharState {
 		if (leechTime > 0.5f) {
 			leechTime = 0;
 			character.addHealth(0.5f);
-			var damager = new Damager(player, 0.5f, 0, 0);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 		}
 
 		if (stateFrames >= 2 && player.input.isR2Pressed(player)) {
@@ -772,9 +770,16 @@ public class VavaGizmoGrabState : CharState {
 	public override void onExit(CharState? newState) {
         base.onExit(newState);
         if (newState is not VileMK2GrabState && victim != null) {
-            victim.grabInvulnTime = 2;
-            victim.stunInvulnTime = 1;
-            victim?.releaseGrab(character, true);
+			if (victim is Character victimC){
+            victimC.grabInvulnTime = 2;
+            victimC.stunInvulnTime = 1;
+            victimC?.releaseGrab(character, true);
+			} 
+			if (victim is Maverick victimM) {
+				victimM.changeToIdleOrFall();
+			}
         }
     }
 }
+
+

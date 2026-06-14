@@ -216,6 +216,13 @@ public class Vile : Character {
 	public override void update() {
 		base.update();
 
+
+		if (overDriveTimer > 0){
+			ShouldDrawAura = true;
+		} else {
+			ShouldDrawAura = false;
+		}
+
 		if (!ownedByLocalPlayer) return;
 
 		// Update the weapon system.
@@ -848,7 +855,7 @@ public class Vile : Character {
 
 	public override void render(float x, float y) {
 
-		if (visible && OverDrive  ) {
+		if (visible && ShouldDrawAura  ) {
 			// Position to draw the sprite to.
 			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
 			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
@@ -1065,6 +1072,7 @@ public class Vile : Character {
 		customData.Add(Helpers.boolArrayToByte([
 			hasFrozenCastle,
 			hasSpeedDevil,
+			ShouldDrawAura,
 			OverDrive
 		]));
 
@@ -1080,10 +1088,11 @@ public class Vile : Character {
 		bool[] boolData = Helpers.byteToBoolArray(data[0]);
 		hasFrozenCastle = boolData[0];
 		hasSpeedDevil = boolData[1];
-		OverDrive = boolData[2];
+		ShouldDrawAura = boolData[2];
+		OverDrive = boolData[3];
 	}
 
-	
+	public bool ShouldDrawAura;
 	
 	//public float aiAttackCooldown;
 	public override void aiAttack(Actor? target) {

@@ -899,3 +899,68 @@ public class ForceGrabbed : GenericGrabbedState {
 	}
 }
 
+
+
+
+public class MForceGrabbed : MGrabbed {
+	public const float maxGrabTime = 4;
+	public bool Teched;
+	public float techTimer;
+	public MForceGrabbed(Character? grabber) : base(grabber, maxGrabTime, "") {
+	}
+
+
+	public override void update() {
+		techTimer += Global.spf;
+		var character = maverick;
+		if (!Teched && techTimer > 0.2f && techTimer < 0.4f && player.input.isPressed(Control.Jump, player)) {
+            character.changeToIdleOrFall();
+			Teched = true;
+			character.playSound("htsnd_block", true);
+			
+			if (grabber is Character grabberChar) {
+                grabberChar?.changeState(new ZeroClang(grabberChar.xDir), true);
+            }
+					Global.level.gameMode.setHUDErrorMessage(
+					player, "Tech Bonus!!!!",
+					playSound: false, resetCooldown: true
+				);
+        }
+
+		if (player.input.isPressed(Control.Jump, player)) {
+            Teched = true;
+			if (techTimer < 0.1f && techTimer >0.4f ){
+			character.playSound("error", true);
+				Global.level.gameMode.setHUDErrorMessage(
+					player, "Tech Fail.",
+					playSound: false, resetCooldown: true
+				);
+			}
+        }
+
+		
+
+		trySnapToGrabPoint(true);
+		if (!grabber.sprite.name.Contains("gbd_b")) {
+			if (grabber.sprite.name.Contains("idle") ||
+			grabber.sprite.name.Contains("crouch") ||
+			grabber.sprite.name.Contains("run") ||
+			grabber.sprite.name.Contains("fall") ||
+			grabber.sprite.name.Contains("jump") ||
+			grabber.sprite.name.Contains("hurt") ||
+			grabber.sprite.name.Contains("grabbed")
+
+			) {
+				character.changeToIdleOrFall();
+			}
+		} else {
+			if (
+		grabber.sprite.name.Contains("hurt") ||
+		grabber.sprite.name.Contains("grabbed")
+		
+		) {
+			character.changeToIdleOrFall();
+		}
+		}
+	}
+}
