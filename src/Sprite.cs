@@ -545,7 +545,7 @@ public class Sprite {
 
 		
 
-			if (name is "boomerk_dash" or "boomerk_bald_dash" or "sigma1alt_roll" && (animTime > 0 || frameIndex > 0)) {
+			if (name is "boomerk_dash" or "boomerk_bald_dash" or "sigma1alt_roll" or "vulcan_dn_proj" && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
 					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
 					if (trail != null) {

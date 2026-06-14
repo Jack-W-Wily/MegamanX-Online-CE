@@ -492,7 +492,7 @@ public class VAVA1 : Vile {
 			} else if (charState is Crouch) {
 				changeState(new VavaZipZapper(), true);
 			} else {
-				if (getChargeLevel() == 1 && player.vileAmmo >= 15) {
+				if (getChargeLevel() == 1 && player.vileAmmo >= 15 && OverDrive) {
                 	int input = player.input.getYDir(player);
 					new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
 					playSound("buster2", sendRpc: true);
@@ -502,7 +502,7 @@ public class VAVA1 : Vile {
 					}
 					stopCharge();
 					player.vileAmmo -= 15;
-            	} else if (getChargeLevel() == 1 && player.vileAmmo >= 15) {
+            	} else if (getChargeLevel() == 1 && player.vileAmmo >= 15 && OverDrive) {
               	  new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 					playSound("thunder_bolt", sendRpc: true);
 					player.vileAmmo -= 15;
@@ -511,7 +511,7 @@ public class VAVA1 : Vile {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-          		} else if (getChargeLevel() == 2 && player.vileAmmo >= 15) {
+          		} else if (getChargeLevel() == 2 && player.vileAmmo >= 15 && OverDrive) {
              	if (player.input.isLeftOrRightHeld(player)) {
 					playSound("noise_crush_charged");
 					new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
@@ -524,7 +524,7 @@ public class VAVA1 : Vile {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-				} else if (player.vileAmmo >= 15){
+				} else if (player.vileAmmo >= 15 && OverDrive){
 					new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 				playSound("thunder_bolt", sendRpc: true);
 				player.vileAmmo -= 15;
@@ -534,7 +534,7 @@ public class VAVA1 : Vile {
 				}
 				changeSpriteFromName("buster_1", true);
 				stopCharge();
-          		} else if (getChargeLevel() >= 3 && player.vileAmmo >= 15) {
+          		} else if (getChargeLevel() >= 3 && player.vileAmmo >= 15 && OverDrive) {
             		for (int i = 0; i < 3; i++) {
 					new JunkShieldMagnet(
 					getCenterPos(), xDir, this,
@@ -1280,9 +1280,8 @@ public class VAVA1 : Vile {
 			}
 			stopCharge();
 		} else if (chargeLevel == 3) {
-			player.loadout.vileLoadout.cannon = (int)VileCannonType.FatBoy;
-			cannonWeapon.type = (int)VileCannonType.FatBoy;
-			cannonWeapon.vavaShoot(0, this);
+			changeState(new Vava1FatBoy(false, false), true);
+			player.vileAmmo -= 30;
 			stopCharge();
 		} else if (chargeLevel >= 4) {
 				if (player.input.isHeld(Control.Down, player)) {

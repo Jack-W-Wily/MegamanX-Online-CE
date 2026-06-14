@@ -224,12 +224,15 @@ public class RockmanX : MegamanX {
 			}
 		}
 
+		if (legArmor <= ArmorId.Light && charState is AirDash ) {
+			changeToIdleOrFall();
+		}
 
 		if (helmetArmor == ArmorId.Light) {
 			if (charState is Jump && player.input.isHeld(Control.Down, player) && player.superAmmo >= 5) {
 				changeSpriteFromName("headbutt", false);
-
-				  vel.y = -getJumpPower() * 2f;
+				if (grounded)vel.y = -getJumpPower() * 2f;
+				  
 				
 				  if (!charState.once){
 				  player.superAmmo -= 5;
@@ -319,6 +322,8 @@ public class RockmanX : MegamanX {
 		RisingFires,
 		GrabKickLV2,
 
+		LightBootKick,
+
 	}
 
 
@@ -346,6 +351,10 @@ public class RockmanX : MegamanX {
 			// Light  Helmet.
 			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+
+
+			"rmx_fall" or "rmx_fall_shoot" or "rmx_wall_slide"  when legArmor == ArmorId.Light && stingActiveTime == 0  
+			&& player.input.isPressed(Control.Jump,player) => MeleeIds.LightBootKick,
 			// Light Helmet when it up-dashes.
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
@@ -402,7 +411,10 @@ public class RockmanX : MegamanX {
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				2, Global.defFlinch, 30, addToLevel: addToLevel, isJuggleProjectile : true
 			),
-			
+			(int)MeleeIds.LightBootKick => new GenericMeleeProj(
+				LhHeadbutt.netWeapon, projPos, ProjIds.GBDKick, player,
+				1, Global.halfFlinch, 30, addToLevel: addToLevel
+			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
 				2, Global.halfFlinch, 30, addToLevel: addToLevel

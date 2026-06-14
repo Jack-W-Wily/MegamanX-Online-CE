@@ -125,7 +125,7 @@ public class LongShotGizmo : VileCannon {
 	public LongShotGizmo() : base() {
 		type = (int)VileCannonType.LongshotGizmo;
 		fireRate = 6;
-		damage = "1";
+		damage = "0.5";
 		vileAmmoUsage = 4;
 		ammousage = vileAmmoUsage;
 		displayName = "Longshot Gizmo";
@@ -556,7 +556,7 @@ public class FrontRunnerProj : Projectile {
 		destroyOnHit = true;
 		fadeSprite = "vile_mk2_proj_fade";
 		fadeOnAutoDestroy = true;
-		damager.damage = 3;
+		damager.damage = 2;
 		byteAngle = Helpers.to256(byteAngle);
 		this.byteAngle = byteAngle;
 		vel = 5 * 60 * Point.createFromByteAngle(byteAngle);

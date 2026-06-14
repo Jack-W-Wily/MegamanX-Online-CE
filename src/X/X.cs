@@ -605,11 +605,13 @@ public class MegamanX : Character {
 		} else {
 			weapon.shootCooldown = 10;
 		}
+		/*
 		if (weapon.switchCooldown < weapon.shootCooldown) {
 			shootCooldown = weapon.switchCooldown;
 		} else {
 			shootCooldown = weapon.shootCooldown;
 		}
+		*/
 		// Add ammo.
 		weapon.addAmmo(-weapon.getAmmoUsageEX(chargeLevel, this), player);
 		// Play sound if any.

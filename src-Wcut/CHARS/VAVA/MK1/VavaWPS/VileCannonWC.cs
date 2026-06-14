@@ -48,7 +48,7 @@ public class VileCannonWC : Weapon {
 			vileAmmoUsage = 24;
 			ammousage = vileAmmoUsage;
 			displayName = "Fat Boy";
-			projSprite = "vile_mk2_fb_proj";
+			projSprite = "vava_proj_fatboy";
 			fadeSprite = "vile_mk2_fb_proj_fade";
 			killFeedIndex = 90;
 			weaponSlotIndex = 61;
@@ -228,6 +228,8 @@ public class Vava1Stunshot : CharState {
 
 
 
+
+
 public class Vava1FrontRunner : CharState {
 	bool isGizmo;
 	private Vile vile = null!;
@@ -333,6 +335,102 @@ public class Vava1FrontRunner : CharState {
 
 
 
+
+
+public class Vava1FatBoy : CharState {
+	bool isGizmo;
+	private Vile vile = null!;
+	public Vava1FatBoy(bool isGizmo, bool grounded) : base(getSprite(isGizmo, grounded)) {
+		useDashJumpSpeed = true;
+		this.isGizmo = false;
+	}
+
+	public static string getSprite(bool isGizmo, bool grounded) {
+		if (isGizmo) {
+			return grounded ? "idle_gizmo" : "cannon_gizmo_air";
+		}
+		return grounded ? "idle_shoot" : "cannon_air";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (vile.isShootingLongshotGizmo) {
+			if (vile.cannonWeapon.shootCooldown == 0) {
+				vile.cannonWeapon.vavaShoot(0, vile);
+			}
+			if (player.vileAmmo <= 0) {
+				vile.isShootingLongshotGizmo = false;
+			}
+			return;
+		}
+		//groundCodeWithMove();
+
+		if (character.sprite.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public static void shootLogic(Vile vile) {
+		if (vile.sprite.getCurrentFrame().POIs.IsNullOrEmpty()) {
+			return;
+		}
+		Point shootVel = vile.getVileShootVel(true);
+
+		var player = vile.player;
+		vile.playSound("frontrunner", sendRpc: true);
+
+		string muzzleSprite = "cannon_muzzle";
+		muzzleSprite += "_fb";
+	//	if (vile.cannonWeapon.type == (int)VileCannonType.LongshotGizmo) muzzleSprite += "_fb";
+
+		Point shootPos = vile.setCannonAim(new Point(shootVel.x, shootVel.y));
+		if (vile.sprite.name.EndsWith("_grab")) {
+			shootPos = vile.getFirstPOIOrDefault("s");
+		}
+
+		var muzzle = new Anim(
+			shootPos, muzzleSprite, vile.getShootXDir(), player.getNextActorNetId(), true, true, host: vile
+		);
+		muzzle.angle = new Point(shootVel.x, vile.getShootXDir() * shootVel.y).angle;
+		if (vile.getShootXDir() == -1) {
+			shootVel = new Point(shootVel.x * vile.getShootXDir(), shootVel.y);
+		}
+		new VileCannonProj(
+				shootPos, vile.xDir, 1, MathF.Round(shootVel.byteAngle), "vava_proj_fatboy",
+				vile, player, player.getNextActorNetId(), rpc: true
+			);
+	
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		vile = character as Vile ?? throw new NullReferenceException();
+		shootLogic(vile);
+		if (!isGizmo && (player.input.isHeld(Control.Left, player) || player.input.isHeld(Control.Right, player))) {
+			exitOnAirborne = true;
+		} else {
+			exitOnAirborne = false;
+			character.useGravity = false;
+			character.stopMoving();
+		}
+		
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		vile.isShootingLongshotGizmo = false;
+		character.useGravity = true;
+		if (isGizmo) {
+			vile.gizmoCooldown = 0.5f;
+		}
+	}
+}
+
+
+
+
+
 public class VileCannonProj : Projectile {
 	public int type = 0;
 	public VileCannonProj(
@@ -350,29 +448,33 @@ public class VileCannonProj : Projectile {
 			sprite = "vile_mk2_proj";
 			fadeSprite = "vile_mk2_proj_fade";
 			fadeOnAutoDestroy = true;
-			damager.damage = 3;
+			damager.damage = 1.5f;
 			damager.flinch = Global.defFlinch;
+			hitSound = "htsnd_common_x4";
 			projId = (int)ProjIds.FrontRunner;
 		} else if (type == (int)VileCannonType.FatBoy) {
 			weapon = FatBoy.netWeapon;
-			sprite = "vile_mk2_fb_proj";
+			sprite = "vava_proj_fatboy";
 			fadeSprite = "vile_mk2_fb_proj_fade";
 			fadeOnAutoDestroy = true;
-			damager.damage = 4;
+			damager.damage = 3;
 			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.FatBoy;
+			hitSound = "Ridearmor - Shot";
 			maxTime = 0.35f;
 		} else if (type == (int)VileCannonType.LongshotGizmo) {
 			weapon = TridentLine.netWeapon;	
 			sprite = "vile_mk2_lg_proj";
 			fadeSprite = "vile_mk2_lg_proj_fade";
 			fadeOnAutoDestroy = true;	
-			damager.damage = 1;
+			hitSound = "htsnd_lighting";
+			damager.damage = 0.5f;
 			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.LongshotGizmo;
 		} else if (type == (int)VileCannonType.TridentLine) {
 			weapon = TridentLine.netWeapon;	
 			sprite = "vava_proj_trident_line";
+			hitSound = "htsnd_common_x4";
 			fadeSprite = "buster2_fade";
 			fadeOnAutoDestroy = true;	
 			damager.damage = 2;

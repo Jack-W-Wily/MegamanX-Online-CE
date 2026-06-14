@@ -124,9 +124,9 @@ public class Sigma1 : BaseSigma {
 				if (player.input.isBPressed(player) &&
 					flag == null
 				) {
-					//if (charState is LadderClimb) {
+					if (charState is WallSlide) {
 						xDir = -xDir;
-					//}
+					}
 					if (player.input.isHeld(Control.Down, player)) {
 							changeState(new SigmaWallDashStateWC(1, true), true);
 					} else {
