@@ -90,7 +90,7 @@ public class RisingFireState : CharState {
 		character.changeSpriteFromName(sprite, true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -213,7 +213,7 @@ public class RisingFireChargedState : CharState {
 	}
 	
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 			character.useGravity = true;
 		if (proj != null) {
@@ -309,7 +309,7 @@ public class DragoonHadoukenX : CharState {
 		character.stopCharge();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 	base.onExit(newState);
 	}
 }

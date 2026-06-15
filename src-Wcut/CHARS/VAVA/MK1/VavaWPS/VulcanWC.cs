@@ -127,7 +127,7 @@ public class VavaDistantNeedler : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -159,7 +159,7 @@ public class VavaBusterSTate : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }

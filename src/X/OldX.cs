@@ -308,7 +308,7 @@ public partial class MegamanXA : Character {
 			} else {
 				scanPos = getCenterPos().addxy(0, -10);
 			}
-			CollideData hit = Global.level.raycast(
+			CollideData? hit = Global.level.raycast(
 				scanPos, scanPos.addxy(getShootXDir() * 150, 0), new List<Type>() { typeof(Actor) }
 			);
 			if (hit?.gameObject is Character chr &&

@@ -36,7 +36,7 @@ public class ZainSpinningSlashCharge : CharState {
 		character.stopMoving();
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -78,7 +78,7 @@ public class ZainSpinningSlash : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -246,7 +246,7 @@ public class ZainBossJumpStart : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -287,7 +287,7 @@ public class ZainBossJump : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -312,7 +312,7 @@ public class ZainBossJumpLand : CharState {
 		base.onEnter(oldState);
 		character.shakeCamera(sendRpc: true);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}

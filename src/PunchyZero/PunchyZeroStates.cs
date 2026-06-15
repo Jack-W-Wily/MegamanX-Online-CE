@@ -978,7 +978,7 @@ public class ZX1AkaBuster : CharState {
 		proj = new RedBuster(character.getShootPos(), character.xDir,1, character, player, player.getNextActorNetId(), true);
 		}
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -1034,7 +1034,7 @@ public class ZX1GrabStart : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -1070,7 +1070,7 @@ public class ZX1BurnKnuckle : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 }

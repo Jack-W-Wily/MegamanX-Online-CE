@@ -31,7 +31,7 @@ public class GBDSniperState : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -82,7 +82,7 @@ public class GBDUppercut : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -126,7 +126,7 @@ public class GBDTonfaCharge : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -162,7 +162,7 @@ public class GBDTonfaAttackF : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -191,7 +191,7 @@ public class GBDTonfaAttackFCharged : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -236,7 +236,7 @@ public class GBDTonfaAttackU : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -268,7 +268,7 @@ public class GBDTonfaAttackUCharged : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}

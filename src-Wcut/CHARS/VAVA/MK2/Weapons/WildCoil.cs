@@ -88,7 +88,7 @@ public class VavaWindCoil : CharState {
 		character.vel = new Point();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}

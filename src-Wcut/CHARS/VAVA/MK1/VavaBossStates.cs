@@ -38,7 +38,7 @@ public class RagingDemonStart : CharState {
 		character.playSound("ching", true);
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -72,7 +72,7 @@ public class RagingDemonDash : CharState {
 		character.turnToInput(player.input, player);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -193,7 +193,7 @@ public class ExplosiveRoundStateBoss : CharState {
 		character.vel = new Point();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -333,7 +333,7 @@ public class CrimsonPhantomState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -410,7 +410,7 @@ public class InfinityGigAttackBossVer : CharState {
 		shot = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -463,7 +463,7 @@ public class CrimsonPhantomState2 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -492,7 +492,7 @@ public class VavaBurensen1 : CharState {
 			effect = new RekkohaEffect();
 		}
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -550,7 +550,7 @@ public class VavaBurensen2 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	
 	}
@@ -675,7 +675,7 @@ public class VavaBurensen3 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	
 	}
@@ -796,7 +796,7 @@ public class VavaBurensen4 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	
 	}
@@ -919,7 +919,7 @@ public class VavaBurensen4second : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	
 	}
@@ -1042,7 +1042,7 @@ public class VavaBurensen5 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -1165,7 +1165,7 @@ public class VavaBurensen6 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -1285,7 +1285,7 @@ public class VavaBurensen7 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		victim?.releaseGrab(character);
 		character.useGravity = true;
@@ -1432,7 +1432,7 @@ public class VavaBurensen8 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -1577,7 +1577,7 @@ public class VavaBurensen7 : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim?.releaseGrab(character);

@@ -28,7 +28,7 @@ public class Vava1GrabStartState : CharState {
 		base.onEnter(oldState);
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -221,7 +221,7 @@ public class VileStomped : CharState {
 		character.setzIndex(grabber.zIndex - 100);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.grabInvulnTime = 0.5f;
 		character.setzIndex(savedZIndex);

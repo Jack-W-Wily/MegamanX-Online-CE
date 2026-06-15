@@ -170,7 +170,7 @@ public class BossJump : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		specialId = SpecialStateIds.None;
 	}
@@ -204,7 +204,7 @@ public class ClaudioTrppleSlash : CharState {
 			character.changeSpriteFromName("trippleslash", true);
 		}
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -256,7 +256,7 @@ public class ClaudioFWave : CharState {
 		base.onEnter(oldState);
 		
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 
@@ -326,7 +326,7 @@ public class ClaudioShingetsurin : CharState {
 		);
 		character.playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -390,7 +390,7 @@ public class ClaudioShingetsurin2 : CharState {
 		);
 		character.playSound("shingetsurinx5", forcePlay: false, sendRpc: true);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -416,7 +416,7 @@ public class ClaudioDashPrepare : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -453,7 +453,7 @@ public class ClaudioChargedSlash : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -591,7 +591,7 @@ player.getNextActorNetId(), sendRpc: true
 			character.changeState(new Idle());
 		}
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }

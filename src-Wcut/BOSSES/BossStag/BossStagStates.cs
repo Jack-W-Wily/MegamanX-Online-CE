@@ -64,7 +64,7 @@ public class BFStagShoot : BossStagMState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (fireball != null && fireball.vel.isZero()) {
 			fireball.destroySelf();
@@ -104,7 +104,7 @@ public class BFStagDashChargeState : BossStagMState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		proj?.destroySelf();
 	}
@@ -158,7 +158,7 @@ public class BFStagDashState : BossStagMState {
 		);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		proj?.destroySelf();
 		ProjVisible?.destroySelf();
@@ -325,7 +325,7 @@ public class BFStagUppercutState : BossStagMState {
 			player, player.getNextActorNetId(), rpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		BFlameStagger.useGravity = true;
 		proj?.destroySelf();
@@ -404,7 +404,7 @@ public class BFStagOrochinagiCharge : CharState {
 		base.onEnter(oldState);
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.turnToInput(player.input, player);// this allows the char to turn midmove
 	}

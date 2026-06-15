@@ -160,7 +160,7 @@ public class RockmanX : MegamanX {
 		return;
 	}
 
-	public FakeZero helperZero;
+	public FakeZero? helperZero;
 
 	public bool helperzeroOnce = false;
 
@@ -241,10 +241,7 @@ public class RockmanX : MegamanX {
 			}
 		}
 
-		if (sprite.name == "rmx_grab_foward" && legArmor == ArmorId.Light) {
-            sprite.name = "rmx_light_kick";
-			changeSpriteFromName("light_kick", false);
-        }
+		
 
 
 
@@ -324,6 +321,8 @@ public class RockmanX : MegamanX {
 
 		LightBootKick,
 
+		DropDown,
+
 	}
 
 
@@ -365,7 +364,7 @@ public class RockmanX : MegamanX {
 
 			"rmx_grab_foward"   => MeleeIds.GrabKickLV1, 
 			"rmx_light_kick"  => MeleeIds.GrabKickLV2, 
-		
+			"rmx_grab_up" => MeleeIds.DropDown,
 			_ => MeleeIds.None
 		});
 
@@ -389,6 +388,12 @@ public class RockmanX : MegamanX {
 				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
+
+			(int)MeleeIds.DropDown => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.MechFrogGroundPound, player,
+				3, 20, 30, addToLevel: addToLevel, hitSound : "dbzclang"
+			),
+			
 			(int)MeleeIds.DashGrab => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.newUpGrab, player,
 				3, 0, 120, addToLevel: addToLevel
@@ -397,7 +402,7 @@ public class RockmanX : MegamanX {
 			
 				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 1, 0, isDeflectShield: true,
+				 1, 0, 90, isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),

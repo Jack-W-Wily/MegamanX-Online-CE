@@ -1609,7 +1609,17 @@ public partial class Player {
 		}
 			// Error out if invalid id.
 			else {
-			throw new Exception("Error: Non-valid char ID: " + charNum);
+			
+			newChar = new RockmanX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount
+			);
+
+			Global.level.gameMode.setHUDErrorMessage(
+						this, $"rror: Non-valid char ID: " + charNum
+					);
+			//throw new Exception("Error: Non-valid char ID: " + charNum);
 		}
 		
 		// Do this once char has spawned and is not null.

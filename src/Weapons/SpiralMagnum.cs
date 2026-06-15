@@ -266,7 +266,7 @@ public class SpiralMagnumProj : Projectile {
 			/*
 			if (victim == null)
 			{
-				CollideData hit = Global.level.raycast(pos, pos.addxy(velXDist, velYDist), new List<Type>() { typeof(Actor) });
+				CollideData? hit = Global.level.raycast(pos, pos.addxy(velXDist, velYDist), new List<Type>() { typeof(Actor) });
 				IDamagable hitDamagable = hit?.gameObject as IDamagable;
 				if (hitDamagable != null && hitDamagable.canBeDamaged(player.alliance, player.id, projId)) victim = hitDamagable;
 				hitPoint = hit?.hitData?.hitPoint;

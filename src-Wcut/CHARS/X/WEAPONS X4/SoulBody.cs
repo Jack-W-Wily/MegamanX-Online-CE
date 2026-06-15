@@ -252,7 +252,7 @@ public class ControlClone : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.shootAnimTime = 0;
 		character.useGravity = true;
@@ -299,7 +299,7 @@ public class SoulBodyEX : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.shootAnimTime = 0;
 		character.useGravity = true;
@@ -354,7 +354,7 @@ public class ChargedSoulBodyEX : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.shootAnimTime = 0;
 		character.useGravity = true;

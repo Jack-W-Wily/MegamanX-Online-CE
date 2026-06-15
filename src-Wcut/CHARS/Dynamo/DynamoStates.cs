@@ -119,7 +119,7 @@ public class DynamoCross : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -703,7 +703,7 @@ public class DynamoBackFlip : CharState {
 		character.vel.y = -character.getJumpPower();
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -748,7 +748,7 @@ public class DynamoSlide : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -817,7 +817,7 @@ public class DynamoBladeDash : CharState {
 		character.vel.y = 0;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -867,7 +867,7 @@ public class DynamoGPChargeState : CharState {
 		character.stopMoving();
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -906,7 +906,7 @@ public class DynamoGPState : CharState {
 		character.stopMoving();
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -948,7 +948,7 @@ public class DynamoGPStateLV1 : CharState {
 		character.stopMoving();
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -990,7 +990,7 @@ public class DynamoGPStateLV2 : CharState {
 		character.stopMoving();
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -1035,7 +1035,7 @@ public class DynamoGPStateLV3 : CharState {
 		character.stopMoving();
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }

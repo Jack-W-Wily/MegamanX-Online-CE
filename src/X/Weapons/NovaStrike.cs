@@ -62,8 +62,8 @@ public class HyperNovaStrike : Weapon {
 }
 
 public class NovaStrikeState : CharState {
-	int upOrDown;
-	int leftOrRight;
+	public int upOrDown;
+	public int leftOrRight;
 	Anim? Nova;
 	public NovaStrikeState(Point inputDir) : base("nova_strike_start") {
 		pushImmune = true;

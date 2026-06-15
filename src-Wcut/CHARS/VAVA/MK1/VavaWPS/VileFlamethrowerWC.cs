@@ -217,7 +217,7 @@ public class GreenEyedLampState : CharState {
 		character.vel = new Point();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -317,7 +317,7 @@ public class BurningDriveState : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}

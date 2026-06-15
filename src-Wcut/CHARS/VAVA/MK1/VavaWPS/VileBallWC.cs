@@ -5,10 +5,7 @@ namespace MMXOnline;
 
 
 public class ExplosiveRoundState : CharState {
-	int bombNum;
-	bool isNapalm;
-
-	Character vile;
+	public int bombNum;
 
 	public ExplosiveRoundState() : base("air_bomb_attack", "", "") {
 		useDashJumpSpeed = true;
@@ -28,7 +25,7 @@ public class ExplosiveRoundState : CharState {
 			if (stateTime > 0f && bombNum == 0) {
 				bombNum++;
 				new VileBombProj(
-				character.pos, (int)inputDir.x, 0, vile, player,
+				character.pos, (int)inputDir.x, 0, character, player,
 				character.player.getNextActorNetId(), rpc: true);
 			}
 		if (stateTime > 0.23f && bombNum == 1) {
@@ -37,7 +34,7 @@ public class ExplosiveRoundState : CharState {
 
 			bombNum++;
 			new VileBombProj(
-			character.pos, (int)inputDir.x, 0, vile, player,
+			character.pos, (int)inputDir.x, 0, character, player,
 				character.player.getNextActorNetId(), rpc: true);
 		}
 		if (stateTime > 0.45f && bombNum == 2) {
@@ -45,7 +42,7 @@ public class ExplosiveRoundState : CharState {
 
 			bombNum++;
 			new VileBombProj(
-			character.pos, (int)inputDir.x, 0, vile, player,
+			character.pos, (int)inputDir.x, 0, character, player,
 			character.player.getNextActorNetId(), rpc: true);
 		}
 
@@ -61,7 +58,7 @@ public class ExplosiveRoundState : CharState {
 		character.vel = new Point();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -70,9 +67,9 @@ public class ExplosiveRoundState : CharState {
 
 
 public class PeaceOutRollerAttack : CharState {
-	int bombNum;
-	bool isNapalm;
-	Character vile;
+	public int bombNum;
+	
+	
 
 	public PeaceOutRollerAttack() : base("air_bomb_attack", "", "") {
 	
@@ -86,7 +83,7 @@ public class PeaceOutRollerAttack : CharState {
 			if (stateTime > 0f && bombNum == 0) {
 				bombNum++;
 					new PeaceOutRollerProj(
-						character.getCenterPos().addxy(20*character.xDir,0), character.xDir, 1, vile, player, 
+						character.getCenterPos().addxy(20*character.xDir,0), character.xDir, 1, character, player, 
 						character.player.getNextActorNetId(), rpc: true
 					);
 				}
@@ -103,7 +100,7 @@ public class PeaceOutRollerAttack : CharState {
 		character.vel = new Point();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -111,10 +108,10 @@ public class PeaceOutRollerAttack : CharState {
 
 
 public class SpreadShotKnee : CharState {
-	int bombNum;
-	Character vile;
+	public int bombNum;
+	
 
-	public SpreadShotKnee( ) : base("air_bomb_attack", "", "") {
+	public SpreadShotKnee() : base("air_bomb_attack", "", "") {
 	
 		useDashJumpSpeed = true;
 	}
@@ -132,7 +129,7 @@ public class SpreadShotKnee : CharState {
 			if (stateTime > i * 0.1f && bombNum == i) {
 				bombNum++;
 				new StunShotProj2(
-					character.pos, character.xDir, i + 1, 0, vile,
+					character.pos, character.xDir, i + 1, 0, character,
 					character.player, character.player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -151,7 +148,7 @@ public class SpreadShotKnee : CharState {
 		character.vel = new Point();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -163,14 +160,10 @@ public class SpreadShotKnee : CharState {
 
 
 public class SplashHitState : CharState {
-	bool shot;
+	public bool shot;
 	
-	float shootTime;
-	int shootCount;
 
-		Vile vile = null!;
-	Point counterAttackPos;
-
+	
 
 	public SplashHitState(string transitionSprite = "") :
 		base(getSprite(), "", "", transitionSprite) {
@@ -190,11 +183,9 @@ public class SplashHitState : CharState {
 		
 			if (!shot && character.sprite.frameIndex == 4) {
 				shot = true;
-				//vile.setVileShootTime(vile.vileNapalmWeapon);
+
 				var poi = character.sprite.getCurrentFrame().POIs[0];
 				poi.x *= character.xDir;
-
-				
 					proj = new SplashHitProj(
 			character.pos, character.xDir, character, character.player,
 			character.player.getNextActorNetId(), rpc: true
@@ -212,7 +203,7 @@ public class SplashHitState : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -257,7 +248,7 @@ public class BumptyBoomGranadeLaunch : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -350,7 +341,7 @@ public class RumblingBangLaunch : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -394,7 +385,7 @@ public class AirSplashHitGranadeLaunch : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -453,7 +444,7 @@ public class TerriotiralPowState : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		if (proj != null) {
 			proj.vel = new Point(character.xDir * 0, 0);
@@ -511,7 +502,7 @@ public class AirFireNadeLaunch : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -559,7 +550,7 @@ public class SwordBouqueteLaunch : CharState {
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}

@@ -93,7 +93,7 @@ public class DragoonPunchState : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (!character.grounded) {
@@ -158,7 +158,7 @@ public class DragoonLowPunchState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -216,7 +216,7 @@ public class DragoonPunchState2 : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -274,7 +274,7 @@ public class DragoonGrab : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -330,7 +330,7 @@ public class DragoonKickState : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -373,7 +373,7 @@ public class DragoonHadouken : CharState {
 		character.stopCharge();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 	base.onExit(newState);
 	}
 }
@@ -413,7 +413,7 @@ public class DragoonHadoukenCrouch : CharState {
 		character.stopCharge();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 	base.onExit(newState);
 	}
 }
@@ -520,7 +520,7 @@ public class DragoonSpitFire : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -612,7 +612,7 @@ public class DragoonRising : CharState {
 	}
 	
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 			character.useGravity = true;
 		if (proj != null) {
@@ -711,7 +711,7 @@ public class DragoonShoryuken : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		if (anim != null) {
 			anim.destroySelf();
 			anim = null;
@@ -759,7 +759,7 @@ public class DragoonSpinkick : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 }
@@ -790,7 +790,7 @@ public class DragoonUppercut : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -827,7 +827,7 @@ public class DragoonSenpukiaku : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 }
@@ -863,7 +863,7 @@ public class RagingDemon : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 }
@@ -897,7 +897,7 @@ public class DragoonDiveKick : CharState {
 			character.changeToLandingOrFall();
 			return;
 		}
-		CollideData hit = Global.level.checkTerrainCollisionOnce(
+		CollideData? hit = Global.level.checkTerrainCollisionOnce(
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
 		if (hit?.isSideWallHit() == true) {
@@ -925,7 +925,7 @@ public class DragoonDiveKick : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		if (character.grounded) {

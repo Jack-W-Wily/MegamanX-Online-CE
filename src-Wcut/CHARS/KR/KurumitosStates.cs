@@ -24,7 +24,7 @@ public class KurumitoStandingKick : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -49,7 +49,7 @@ public class KurumitoFowardKick : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -79,7 +79,7 @@ public class KurumitosOrochinagiCharge : CharState {
 		base.onEnter(oldState);
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.turnToInput(player.input, player);// this allows the char to turn midmove
 	}
@@ -217,7 +217,7 @@ public class KurumitosShikiYamiBaraiLv1 : CharState {
 		base.onEnter(oldState);
 		kr = character as Kurumitos ?? throw new NullReferenceException();
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		
 	}
@@ -267,7 +267,7 @@ public class KurumitosShikiYamiBaraiLv2 : CharState {
 		kr = character as Kurumitos ?? throw new NullReferenceException();
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -296,7 +296,7 @@ public class KurumitosAirDunk : CharState {
 		base.onEnter(oldState);
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}

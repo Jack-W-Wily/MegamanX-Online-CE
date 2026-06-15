@@ -298,7 +298,7 @@ public class IrisHoverState : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -351,7 +351,7 @@ public class RAIrisSlashState : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -406,7 +406,7 @@ public class RAIrisSlashStateRising : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -460,7 +460,7 @@ public class RAIrisSlashStateReverse: CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -510,7 +510,7 @@ public class RAIrisKuenzan : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 }

@@ -1814,7 +1814,9 @@ public class GenericGrabbedState : CharState {
 	}
 
 	public bool trySnapToGrabPoint(bool lerp) {
+		if (grabber != null) {
 		Point grabberGrabPoint = grabber.getFirstPOIOrDefault("g");
+		
 		Point victimGrabOffset = character.pos.subtract(character.getFirstPOIOrDefault("g", 0));
 
 		Point destPos = grabberGrabPoint.add(victimGrabOffset);
@@ -1825,8 +1827,9 @@ public class GenericGrabbedState : CharState {
 		if (hit?.gameObject is Wall) {
 			return false;
 		}
-
+		
 		character.changePos(lerpPos);
+		}
 		return true;
 	}
 

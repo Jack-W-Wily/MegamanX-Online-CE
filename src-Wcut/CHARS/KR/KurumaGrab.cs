@@ -27,7 +27,7 @@ public class KurumitoGrabStartState : CharState {
 		base.onEnter(oldState);
 
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}

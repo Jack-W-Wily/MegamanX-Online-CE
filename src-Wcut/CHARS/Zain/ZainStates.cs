@@ -63,7 +63,7 @@ public class ZainUPParryMeleeState : CharState {
 		//character.frameIndex = 2;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	//	if (character is RagingChargeX mmx) {
 	//		mmx.parryCooldown = mmx.maxParryCooldown;
@@ -157,7 +157,7 @@ public class ZainUPParryStartState : CharState {
 	//	mmx = character as RagingChargeX;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -207,7 +207,7 @@ public class ZainUPParryMeleeStateBuxa : CharState {
 		//character.frameIndex = 2;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	//	if (character is MegamanX mmx) {
 	//		mmx.parryCooldown = mmx.maxParryCooldown;
@@ -277,7 +277,7 @@ public class ZainUPParryProjState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		absorbAnim?.destroySelf();
 			character.unpoAbsorbedProj = null;		
@@ -333,7 +333,7 @@ public class ZainParryStartState : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		
 		//character.parryCooldown = character.maxParryCooldown;
@@ -389,7 +389,7 @@ public class ZainParryMeleeState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -470,7 +470,7 @@ public class ZainDashParryState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 
@@ -600,7 +600,7 @@ public class ZainParryShinStartState : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		
 		//character.parryCooldown = character.maxParryCooldown;
@@ -667,7 +667,7 @@ public class ZainParryShinMeleeState : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -1042,7 +1042,7 @@ public class ZainGrab : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -1158,7 +1158,7 @@ public class ZainGrabStab : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -1205,7 +1205,7 @@ public class ZainJab : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -1268,7 +1268,7 @@ public class ZainAirDunk : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -1342,7 +1342,7 @@ public class ZainGrabStabEnd : CharState {
 		}		
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.xDir *= -1;
@@ -1405,7 +1405,7 @@ public class ZainGrabSlash : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }

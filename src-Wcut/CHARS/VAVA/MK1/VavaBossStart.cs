@@ -39,17 +39,16 @@ public class VB1 : CharState {
 		character.playSound("ching", true);
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
 
 public class VB2 : CharState {
-	float trailTime;
+	
 	float chargeTime;
 
-	Character? target;
-
+	
 
 	public VB2(float chargeTime) : base("ragingdemon_dash", "") {
 		this.chargeTime = chargeTime;
@@ -73,7 +72,7 @@ public class VB2 : CharState {
 		character.turnToInput(player.input, player);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -88,8 +87,7 @@ public class RagingDemonSuccess : CharState {
 
 	float timein = 0;
 
-	public bool victimWasGrabbedSpriteOnce;
-	float timeWaiting;
+	
 	public RagingDemonSuccess(Character? victim) : base("ragingdemon_land", "", "", "") {
 		this.victim = victim;
 		grabTime = 8;
@@ -101,13 +99,15 @@ public class RagingDemonSuccess : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 		timein += Global.spf;
-
+		if (victim != null){
 
 		
 				victim.changeState(new VileStomped(character));
 				var damager = new Damager(player, 1f, 0, 0);
 				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.UPPunch);
-		
+		} else {
+			character.changeToIdleOrFall();
+		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 			return;
@@ -119,7 +119,7 @@ public class RagingDemonSuccess : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim?.releaseGrab(character);

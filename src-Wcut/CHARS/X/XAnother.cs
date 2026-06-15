@@ -303,7 +303,7 @@ public class XAnother : MegamanX {
 		GrabKickLV2,
 
 		LightBootKick,
-
+		DropDown,
 	}
 
 
@@ -344,7 +344,7 @@ public class XAnother : MegamanX {
 
 			"rmx_grab_foward"   => MeleeIds.GrabKickLV1, 
 			"rmx_light_kick"  => MeleeIds.GrabKickLV2, 
-		
+			"rmx_grab_up" => MeleeIds.DropDown,	
 			_ => MeleeIds.None
 		});
 
@@ -359,6 +359,11 @@ public class XAnother : MegamanX {
 				 0, 0, isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.DropDown => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.MechFrogGroundPound, player,
+				3, 20, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,
@@ -376,7 +381,7 @@ public class XAnother : MegamanX {
 			
 				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 1, 0, isDeflectShield: true,
+				 1, 0, 90,isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),

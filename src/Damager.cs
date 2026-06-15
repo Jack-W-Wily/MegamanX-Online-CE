@@ -942,7 +942,7 @@ public class Damager {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 					if (owner != null && owner.character != null && character != null){
 					owner.character.changeState(new ZeroGrabEX());
-					character.changeState(new RMXGrabbed(zx1));
+					character.changeState(new ForceGrabbed(zx1));
 					}
 				}
 				}
@@ -951,7 +951,7 @@ public class Damager {
 				if (owner?.character is Dragoon drgn && drgn != null) {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 					drgn.changeState(new DragoonGrab());
-					character?.changeState(new RMXGrabbed(drgn));
+					character?.changeState(new ForceGrabbed(drgn));
 				}
 				if (projId == (int)ProjIds.DragoonSpark) {
 					if (character != null){
@@ -971,7 +971,7 @@ public class Damager {
 
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 				if (owner?.character is RockmanX rx && rx != null) {
-					character?.changeState(new RMXGrabbed(rx));
+					character?.changeState(new ForceGrabbed(rx));
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
@@ -980,14 +980,14 @@ public class Damager {
 					attacker.changeState(new Vava1GrabState(character));
 				}
 				if (owner?.character is Kurumitos) {
-					character.changeState(new KurumaGrabbed(owner.character));
+					character?.changeState(new ForceGrabbed(owner.character));
 					owner.character?.changeState(new KurumaGrabState(character));
 				}
 			}
 
 			if (projId == (int)ProjIds.GizmoGrab) {
 				if (owner?.character is VAVA1 or FinalVava) {
-					character.changeState(new ForceGrabbed(owner.character));
+					character?.changeState(new ForceGrabbed(owner.character));
 					owner.character?.changeState(new VavaGizmoGrabState(character));
 				}
 			}

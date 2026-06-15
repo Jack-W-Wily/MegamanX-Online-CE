@@ -33,7 +33,7 @@ public class HyperAxlWcStart : CharState {
 		axl.fillHealthToMax();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		axl.useGravity = true;
 		if (axl != null) {
@@ -92,7 +92,7 @@ public class HoverAxlWC : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		hoverExhaust.destroySelf();
 		if (sound != null && !sound.deleted) {
@@ -132,7 +132,7 @@ public class DodgeRollAxlWC : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		axl.dodgeRollCooldown = Axl.maxDodgeRollCooldown * 60;
 	}
@@ -606,7 +606,7 @@ public class EvasionBarrage : CharState {
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -667,7 +667,7 @@ public class RisingBarrage : CharState {
 		axl = character as AxlWC ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -866,7 +866,7 @@ public class AxlAirRaid : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim?.releaseGrab(character);

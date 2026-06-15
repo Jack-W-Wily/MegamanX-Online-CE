@@ -100,7 +100,7 @@ public class RMXDoubleKick : CharState {
 		character.vel.y = -character.getJumpPower() * 0.75f;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -172,7 +172,7 @@ public class RMXDoubleKickShoot : CharState {
 		proj = new Buster3GigaProjMelee(character.getShootPos(), character.xDir, character, player, player.getNextActorNetId(), true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -244,7 +244,7 @@ public class RMXPunch : CharState {
 	}
 
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -309,7 +309,7 @@ public class RMXPunch2 : CharState {
 	}
 
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}

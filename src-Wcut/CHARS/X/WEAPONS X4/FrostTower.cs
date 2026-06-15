@@ -189,7 +189,7 @@ public class FrostTowerSemiChargedState : CharState {
 		spawnPos = character.getCenterPos().addxy(0, -96);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		//MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 		//mmx.shootCooldown = 60;
@@ -249,7 +249,7 @@ public class FrostTowerChargedState : CharState {
 		spawnPos = character.getCenterPos().addxy(0, -96);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		//MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 		//mmx.shootCooldown = 60;
@@ -548,7 +548,7 @@ public class FrostTowerRainState : CharState
 		character.vel = default(Point);
 	}
 
-	public override void onExit(CharState newState)
+	public override void onExit(CharState? newState)
 	{
 		base.onExit(newState);
 		character.useGravity = true;

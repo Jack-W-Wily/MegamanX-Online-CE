@@ -455,7 +455,7 @@ public class SigDodge : CharState {
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 
@@ -531,7 +531,7 @@ public class SigmaGrabStart : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -599,7 +599,7 @@ public class SigmaGrabEX : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -609,7 +609,7 @@ public class SigmaGrabEX : CharState {
 
 
 public class VirusSlash1 : CharState {
-	bool fired = false;
+	
 
 
 	public VirusSlash1() : base("slash_1 _virus", "", "", "") {
@@ -638,7 +638,7 @@ public class VirusSlash1 : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -689,7 +689,7 @@ public class VirusSlash2 : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -733,7 +733,7 @@ public class VirusSlash3 : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -776,7 +776,7 @@ public class HeavySlash1 : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -818,7 +818,7 @@ public class HeavySlash2 : CharState {
 		}
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -862,7 +862,7 @@ public class HeavySlash3 : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }

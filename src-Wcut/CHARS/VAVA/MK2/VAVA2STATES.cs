@@ -43,7 +43,7 @@ public class VavaVSlashRun : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -79,7 +79,7 @@ public class VileDodge : CharState {
 		else if (player.input.isHeld(Control.Right, player)) initialDashDir = 1;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		
 	}
@@ -132,8 +132,6 @@ public class VileDodge : CharState {
 public class VileStationaryHover : CharState {
 
 	
-	Vile vile = null!;
-	
 	public VileStationaryHover() : base("hover", "") {
 		attackCtrl = false;
 		normalCtrl = true;
@@ -158,7 +156,7 @@ public class VileStationaryHover : CharState {
 		character.useGravity = false;
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.stopMoving();
 		character.useGravity = true;
@@ -192,7 +190,7 @@ public class VileChainGrabState : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -221,7 +219,7 @@ public class VileKick1 : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -253,7 +251,7 @@ public class VileSuperKickState : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -282,7 +280,7 @@ public class VilePunch1 : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -312,7 +310,7 @@ public class VilePunch2 : CharState {
 	
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -363,7 +361,7 @@ public class VileResistDeath : CharState {
 		player.health = 1;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -566,7 +564,7 @@ public class VAVA2GrabState : CharState {
 	}	
 	
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.angle = 0;
 	
@@ -694,7 +692,7 @@ public class VileAirRaid : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 
@@ -829,7 +827,7 @@ public class VileStompState : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim.grabInvulnTime = 0.5f;

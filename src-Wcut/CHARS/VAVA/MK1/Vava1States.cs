@@ -34,7 +34,7 @@ public class VAVAJab1 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -60,7 +60,7 @@ public class VAVAJab2 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -87,7 +87,7 @@ public class VAVAUpperCutPunch : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -114,7 +114,7 @@ public class VavaKneeAttack : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -177,7 +177,7 @@ public class VAVAKamae : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -209,7 +209,7 @@ public class VKamaeHotIcecle : CharState {
 			
 		}
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		specialId = SpecialStateIds.None;
 	}
@@ -238,7 +238,7 @@ public class VKamaeUnblockableStart : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -279,7 +279,7 @@ public class VUnblockable : CharState {
 		base.onEnter(oldState);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		specialId = SpecialStateIds.None;
 	}
@@ -305,7 +305,7 @@ public class VUnblockableLand : CharState {
 		base.onEnter(oldState);
 		character.shakeCamera(sendRpc: true);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -489,7 +489,7 @@ public class VileDashChargeState : CharState {
 		character.playSound("vilehyperdashstart", true);
 }
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -528,7 +528,7 @@ public class VileDashState : CharState {
 		character.stopMoving();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 	}
 }
@@ -557,7 +557,7 @@ public class VileDashStateEnd : CharState {
 		}
 		character.shakeCamera(sendRpc: true);
 	}
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 
 	}
@@ -761,7 +761,7 @@ public class VavaTomahawk : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }

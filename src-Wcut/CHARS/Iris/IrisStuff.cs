@@ -64,7 +64,7 @@ public class IrisCrystalBashState : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -125,7 +125,7 @@ public class IrisCrystalRisingBash : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
     }
@@ -178,7 +178,7 @@ public class IrisBash3 : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -231,7 +231,7 @@ public class IrisGrabStart : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -282,7 +282,7 @@ public class IrisGrabEX : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 		}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		(character as Iris).GrabVictim = null;
@@ -313,7 +313,7 @@ public class IrisCrystalCharge : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 
@@ -378,7 +378,7 @@ public class IrisSpawnBeam : CharState
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState)
+	public override void onExit(CharState? newState)
 	{
 		base.onExit(newState);
 		character.useGravity = true;
@@ -802,7 +802,7 @@ public class IrisSpawnIce : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -876,7 +876,7 @@ public class IrisSpawnFire : CharState {
 
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -910,7 +910,7 @@ public class IrisDiveKick : CharState {
 			character.changeToLandingOrFall();
 			return;
 		}
-		CollideData hit = Global.level.checkTerrainCollisionOnce(
+		CollideData? hit = Global.level.checkTerrainCollisionOnce(
 			character, character.vel.x * Global.spf, character.vel.y * Global.spf
 		);
 		if (hit?.isSideWallHit() == true) {
@@ -936,7 +936,7 @@ public class IrisDiveKick : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		character.stopMoving();

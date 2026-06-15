@@ -580,7 +580,7 @@ public class EvasionBarrageWA : CharState {
 		axl = character as Axl ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -640,7 +640,7 @@ public class RisingBarrageWA : CharState {
 		axl = character as Axl ?? throw new NullReferenceException();
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -839,7 +839,7 @@ public class AxlAirRaidWA : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim?.releaseGrab(character);

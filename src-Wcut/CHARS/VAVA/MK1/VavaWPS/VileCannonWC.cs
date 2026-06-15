@@ -641,7 +641,7 @@ public class GizmoDashHoming : CharState {
 		maxMoveAmount = character.getCenterPos().distanceTo(otherChar.getCenterPos()) * 1.5f;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		player.character.useGravity = true;
 	}

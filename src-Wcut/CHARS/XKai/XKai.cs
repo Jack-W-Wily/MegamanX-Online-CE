@@ -441,7 +441,7 @@ public class XKai : MegamanX {
 			
 				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 1, 0, isDeflectShield: true,
+				 1, 0, 90, isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),

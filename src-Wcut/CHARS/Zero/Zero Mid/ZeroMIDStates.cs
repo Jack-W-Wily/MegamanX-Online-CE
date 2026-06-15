@@ -50,7 +50,7 @@ public class ZeroGrabStart : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -111,7 +111,7 @@ public class ZeroGrabEX : CharState {
 		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -155,7 +155,7 @@ public class ZeroFinalStart : CharState {
 		character.vel.y = 0;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 	}
@@ -253,7 +253,7 @@ public class ZeroFinalEnd : CharState {
 		character.useGravity = false;
 	}
 
-	public override void onExit(CharState newState) {
+	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim.grabInvulnTime = 0.5f;
