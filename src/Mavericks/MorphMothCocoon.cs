@@ -152,7 +152,7 @@ public class MorphMothCocoon : Maverick {
 			return;
 		}
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isPressed(Control.Special1, player)) {
 					changeState(new MorphMCThreadState());
 				} else if (input.isPressed(Control.Dash, player) || input.isPressed(Control.Shoot, player)) {

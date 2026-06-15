@@ -1009,6 +1009,9 @@ public enum ProjIds {
 	// Do not add things bellow this.
 	SelfDestruct = 32700,
 	SigmaEyeLaser = 32701,
+	HolyWaterPart = 32702,
+	HolyWaterProj = 32703,
+	IrisSlashProj2 = 32704,
 }
 
 

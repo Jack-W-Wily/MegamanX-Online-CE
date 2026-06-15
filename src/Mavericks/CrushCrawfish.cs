@@ -39,7 +39,7 @@ public class CrushCrawfish : Maverick {
 		base.update();
 		subtractTargetDistance = 50;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new CrushCShootArmState());
 				} else if (input.isPressed(Control.Special1, player)) {

@@ -388,11 +388,13 @@ public class DesmumeSpam : CharState {
 				poi.Value, -1, character,
 				player, player.getNextActorNetId(), 0, rpc: true
 				);
+				projCount += 1;
 			}
 			if (Helpers.randomRange(0, 2) == 1 && supercooldown == 0) {
 				supercooldown = 0.3f;
 				character.playSound("buster4");
 				new DesmumeProj1(new XBuster(), poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				projCount += 1;
 			}
 			if (Helpers.randomRange(0, 2) == 2 && supercooldown == 0) {
 				supercooldown = 0.3f;
@@ -401,8 +403,9 @@ public class DesmumeSpam : CharState {
 						poi.Value, character.xDir, character,
 				player, player.getNextActorNetId(), 0, rpc: true
 				);
+				projCount += 1;
 			}
-			projCount += 1;
+			
 		}
 
 		if (stateTime > 7 || projCount >= 20) {
@@ -679,7 +682,7 @@ public class HighMaxCrouchPunch1 : CharState {
 		base.update();
 		Helpers.decrementTime(ref specialPressTime);
 		if (stateTime > 0.5f) {
-			character.changeToIdleOrFall();
+			character.changeToCrouchOrFall();
 		}
 
 		if (character.isAnimOver()) {

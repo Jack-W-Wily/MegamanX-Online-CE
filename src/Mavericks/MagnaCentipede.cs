@@ -113,7 +113,7 @@ public class MagnaCentipede : Maverick {
 			}
 		}
 
-		if (state is MIdle or MRun or MLand) {
+		if (state is MIdle or MRun or MLand or MGuard) {
 			shootHeldLastFrame = input.isHeld(Control.Shoot, player);
 			if (shootHeldLastFrame) {
 				shootHeldTime += Global.spf;

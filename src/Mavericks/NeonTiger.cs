@@ -44,7 +44,7 @@ public class NeonTiger : Maverick {
 		Helpers.decrementFrames(ref dashAICooldown);
 		subtractTargetDistance = 60;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isHeld(Control.Special1, player)) {
 					changeState(new NeonTShootState());
 				} else if (input.isPressed(Control.Dash, player)) {

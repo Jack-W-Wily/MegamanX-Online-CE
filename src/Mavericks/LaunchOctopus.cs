@@ -57,7 +57,7 @@ public class LaunchOctopus : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (shootPressed()) {
 					if (ammo > 0) {
 						changeState(new LaunchOShoot(grounded));

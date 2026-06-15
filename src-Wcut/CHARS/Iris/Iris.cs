@@ -32,6 +32,8 @@ public class Iris : Character {
 
 	public float CannonSlashCD;
 
+	public float CannonSlashCD2;
+
 	public float CannonStabCD;
 
 
@@ -207,12 +209,24 @@ public class Iris : Character {
 			if (CannonSlashCD == 0f &&
 			 player.input.isPressed(Control.WeaponLeft, player)
 			 && !player.input.isHeld(Control.Up, player)
+			 && !player.input.isHeld(Control.Down, player)
 			  && !player.input.isHeld(Control.Left, player)
 			   && !player.input.isHeld(Control.Right, player)) {
 
 				playSound("distortion_a", true);
 				CannonSlashCD = 1.5f;
 				new IrisSlashProj(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+			}
+
+			if (CannonSlashCD2 == 0f &&
+			 player.input.isPressed(Control.WeaponLeft, player)
+			 && player.input.isHeld(Control.Down, player)
+			  && !player.input.isHeld(Control.Left, player)
+			   && !player.input.isHeld(Control.Right, player)) {
+
+				playSound("distortion_a", true);
+				CannonSlashCD2 = 1.5f;
+				new IrisSlashProj2(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 
 			if (CannonStabCD == 0f &&
@@ -259,6 +273,7 @@ public class Iris : Character {
 
 		// Cooldowns
 		Helpers.decrementTime(ref CannonSlashCD);
+		Helpers.decrementTime(ref CannonSlashCD2);
 		Helpers.decrementTime(ref CannonStabCD);
 		Helpers.decrementTime(ref IrisGeneralizedCrystalCD);
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>

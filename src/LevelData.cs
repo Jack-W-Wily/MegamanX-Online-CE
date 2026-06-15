@@ -594,7 +594,7 @@ public class LevelData {
 		{ "tower", "boomerangKuwanger" },
 		// X2 stuff.
 		{ "centralcomputer", "magnetCentipede" },
-		{ "centralcomputer2", "magnetCentipede-OldGsU" },
+		{ "centralcomputer2", "neoSigma" },
 		{ "crystalmine", "crystalSnail" },
 		{ "crystalmine2", "crystalSnail" },
 		{ "deepseabase", "bubbleCrab" },
@@ -610,9 +610,9 @@ public class LevelData {
 		// X3 stuff.
 		{ "aircraftcarrier", "AirCraft" },
 		{ "dopplerlab", "dopplerLab" },
-		{ "protoDopplerB", "psx_dopplerLab" },
-		{ "protoDopplerC", "psx_dopplerLab2" },
-		{ "protoDopplerD", "psx_dopplerLab2" },
+		{ "protoDopplerB", "dopplerLab" },
+		{ "protoDopplerC", "dopplerLab" },
+		{ "protoDopplerD", "doppleSigma" },
 		{ "frozentown", "blizzardBuffalo" },
 		{ "giantdam", "toxicSeahorse" },
 		{ "giantdam2", "toxicSeahorse_carlonassar" },

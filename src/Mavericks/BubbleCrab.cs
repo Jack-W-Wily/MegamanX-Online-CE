@@ -83,7 +83,7 @@ public class BubbleCrab : Maverick {
 
 		bool floating = false;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new BCrabShootState());
 				} else if (input.isPressed(Control.Special1, player)) {

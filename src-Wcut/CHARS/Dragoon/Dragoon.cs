@@ -2,6 +2,7 @@ namespace MMXOnline;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using SFML.Graphics;
+using System.Collections.Generic;
 
 public class Dragoon : Character {
 	public Dragoon(
@@ -34,6 +35,31 @@ public class Dragoon : Character {
 
 
 	
+
+	// For Shaders stuff
+	public override List<ShaderWrapper> getShaders() {
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
+
+
+
+		if (player.skinSlot == 1) {
+			palette = player.nightmareZeroShader;
+		}
+		if (player.skinSlot == 2) {
+			palette = player.nightmareZeroShader2;
+		}
+
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
+		return shaders;
+	}
 
 public override bool normalCtrl() {
 	

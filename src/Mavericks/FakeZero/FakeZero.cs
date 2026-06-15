@@ -213,8 +213,8 @@ public class FakeZero : Maverick {
 
 	public override MaverickState[] strikerStates() {
 		return [
-			new FakeZeroShootState(2),
-			new FakeZeroC1State(),
+			new FakeZeroShootState(),
+			new ClaudioChargedSlashMaverick(),
 			new FakeZeroGroundPunchState(),
 		];
 	}
@@ -231,13 +231,15 @@ public class FakeZero : Maverick {
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		
+			aiStates.Add(new ClaudioTrippleBusterMaverick());
 			aiStates.Add(new FakeZeroC2State());
 			aiStates.Add(new FakeZeroC1State());
 
 	
 		if (enemyDist <= 70) {
 			aiStates.Add(new FakeZeroGroundPunchState());
+			aiStates.Add(new ClaudioChargedSlashMaverick());
+			aiStates.Add(new ClaudioTrppleSlashMaverick());
 		} else {
 			aiStates.Add(new FakeZeroMeleeState(true));
 		}

@@ -104,7 +104,7 @@ public float angleDist = 0;
 		}
 	}
 
-
+	SoundWrapper? snd;
 	public override void update() {
 		base.update();
 
@@ -114,13 +114,16 @@ public float angleDist = 0;
 			destroySelf();
 			return;
 		}
-
+		
 		if (owner.character.charState is IrisCrystalRisingBash || 
 		owner.character.charState is IrisCrystalCharge &&
 		owner.input.isHeld(Control.Up, owner) && owner.input.isAPressed(owner)){
 			state = 1;
 		}
 		if (state == 1){
+		if (owner.input.isAPressed(owner)){
+			playSound("dynamoslash", sendRpc: true);
+		}
 			if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
 			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);

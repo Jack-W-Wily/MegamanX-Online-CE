@@ -44,7 +44,7 @@ public class TunnelRhino : Maverick {
 	public override void update() {
 		base.update();
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(new TunnelRShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {

@@ -608,6 +608,10 @@ public class Damager {
 					character.addIgFreezeProgress(1);
 					flinch = 0;
 					break;
+				case (int)ProjIds.HolyWaterPart:
+					character.addIgFreezeProgress(1);
+					flinch = 0;
+					break;
 				case (int)VAVA2ProjIds.FreezeCrackerV:
 					character.addIgFreezeProgress(4);
 					flinch = 0;

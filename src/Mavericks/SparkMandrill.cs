@@ -52,7 +52,7 @@ public class SparkMandrill : Maverick {
 		//rechargeAmmo(8);
 		subtractTargetDistance = 70;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (specialPressed()) {
 					//if (ammo >= 32)
 					{

@@ -37,6 +37,8 @@ public class Dynamo : Character {
 
 	private float AxeCoolDown;
 
+	private float waterCooldown;
+
 	private float DaggerCooldown;
 
 
@@ -95,11 +97,16 @@ public class Dynamo : Character {
 			return true;
 		}
 		if (player.input.isPressed(Control.WeaponLeft, player)) {
-			if (iyDir != -1 && DaggerCooldown == 0) {
+			if (iyDir != -1 && DaggerCooldown == 0 ) {
 				changeState(new DynamoDaggerLV1(), true);
 				DaggerCount += 1;
 				if (DaggerCount > 5) {
 					DaggerCooldown = 1.5f;
+
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					DaggerCount = 0;
+					}, 1.5f));
+					
 				}
 				return true;
 			}
@@ -133,6 +140,11 @@ public class Dynamo : Character {
 		if (player.input.isPressed(Control.Special1, player) && iyDir == -1 && AxeCoolDown == 0) {
 			changeState(new DynamoAxe(), true);
 			AxeCoolDown = 1.2f;
+			return true;
+		}
+		if (player.input.isPressed(Control.Special1, player) && iyDir == 1 && waterCooldown == 0) {
+			changeState(new DynamoWater(), true);
+			waterCooldown = 2f;
 			return true;
 		}
 		if (ixDir == 0 && (iyDir == 0 || iyDir != -1 && grounded) &&
@@ -185,9 +197,7 @@ public class Dynamo : Character {
 			changeState(new DynamoSlide());
 		}
 
-		if (DaggerCooldown == 0) {
-			DaggerCount = 0;
-		}
+		
 
 		if (player.superAmmo > 15 && player.input.isHeld(Control.Up, player)
 		&& player.input.isPressed(Control.Special2, player) && !isInDamageSprite()) {
@@ -203,7 +213,7 @@ public class Dynamo : Character {
 		Helpers.decrementTime(ref ItemThrowCooldown);
 		Helpers.decrementTime(ref SlashCooldown);
 		Helpers.decrementTime(ref AxeCoolDown);
-
+		Helpers.decrementTime(ref waterCooldown);
 
 
 		if (grounded || charState is Idle or WallSlide) {

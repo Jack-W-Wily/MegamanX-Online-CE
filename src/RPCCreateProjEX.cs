@@ -370,6 +370,8 @@ public partial class RPCCreateProj : RPC {
 		// dynamo
 		{ (int)ProjIds.DynamoIceDagger, DynamoKnifeProj.rpcInvoke },
 		{ (int)ProjIds.DynamoAxeProj, DynamoAxeProj.rpcInvoke },
+		{ (int)ProjIds.HolyWaterProj, HolyWaterProj.rpcInvoke },
+		{ (int)ProjIds.HolyWaterPart, HolyWaterPart.rpcInvoke },
 		// Highmax
 		{ (int)ProjIds.HighmaxHomingProj, HighmaxHomingProj.rpcInvoke },
 		{ (int)ProjIds.HighmaxStunShot, HighmaxStunShot.rpcInvoke },

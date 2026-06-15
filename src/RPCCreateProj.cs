@@ -797,6 +797,9 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.IrisSlashProj:
 			proj = new IrisSlashProj(new IrisCrystal(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.IrisSlashProj2:
+			proj = new IrisSlashProj2(new IrisCrystal(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.IrisStabProj:
 			proj = new IrisStabProj(new IrisCrystal(), pos, xDir, player, netProjByte);
 				break;

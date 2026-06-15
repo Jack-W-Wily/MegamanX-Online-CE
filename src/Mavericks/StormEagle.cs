@@ -52,7 +52,7 @@ public class StormEagle : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (shootPressed() && ammo > 5) {
 					changeState(getShootState());
 					ammo -= 6;

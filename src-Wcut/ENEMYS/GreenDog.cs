@@ -69,7 +69,7 @@ public class GreenDog : Maverick {
 			health = 10;
 		}
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (shootPressed()) {
 					changeState(getShootState());
 				} else if (specialPressed()) {

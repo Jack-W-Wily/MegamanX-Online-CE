@@ -54,7 +54,7 @@ public class WheelGator : Maverick {
 		if (!ownedByLocalPlayer) return;
 
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isPressed(Control.Shoot, player)) {
 					if (input.isHeld(Control.Up, player)) {
 						changeState(new WheelGSlashState());

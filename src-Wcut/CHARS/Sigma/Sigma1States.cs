@@ -623,6 +623,8 @@ public class VirusSlash1 : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
+
+		
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -665,6 +667,12 @@ public class VirusSlash2 : CharState {
 
 		if (character.isAnimOver() || !player.input.isR2Held(player) && character.frameIndex > 4) {
 			character.changeState(new VirusSlash3(), true);
+		}
+
+		if (character.frameIndex < 7) {
+			invincible = true;
+		} else {
+			invincible = false;
 		}
 	}
 

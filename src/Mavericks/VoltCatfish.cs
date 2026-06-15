@@ -60,7 +60,7 @@ public class VoltCatfish : Maverick {
 		base.update();
 		subtractTargetDistance = 60;
 		if (aiBehavior == MaverickAIBehavior.Control) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (input.isPressed(Control.Shoot, player)) {
 					changeState(getShootState(false));
 				} else if (input.isPressed(Control.Special1, player)) {

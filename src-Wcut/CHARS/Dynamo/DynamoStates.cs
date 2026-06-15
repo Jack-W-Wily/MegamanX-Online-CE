@@ -1309,6 +1309,7 @@ public class DynamoDaggerLV1 : CharState {
 		if (proj == null && character.frameIndex >= 1 && character.ownedByLocalPlayer){
 		character.playSound("throwAxe", forcePlay: false, sendRpc: true);
 		proj = new DynamoKnifeProj(new  ShotgunIce(), character.getShootPos(), character.xDir, player, 0, player.getNextActorNetId(), rpc: true);
+		normalCtrl = true;
 		}
 
 		base.update();
@@ -1601,4 +1602,229 @@ public class HydroStormProj : Projectile {
 
 
 	
+}
+
+
+
+
+
+public class DynamoWater : CharState {
+	public float pushBackSpeed;
+	HolyWaterProj? proj;
+
+	public DynamoWater() : base("throw_cross") {
+		airMove = true;
+	}
+
+	public override void update() {
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (proj == null && character.frameIndex >= 1 && character.ownedByLocalPlayer) {
+			character.playSound("spinkick", forcePlay: false, sendRpc: true);
+			proj = 	new HolyWaterProj(
+				character.pos.addxy(16 * character.xDir, -36), character.xDir, character, character.player,
+				character.player.getNextActorNetId(), rpc: true
+			);
+		}
+
+		base.update();
+	
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+public class HolyWaterProj : Projectile {
+	bool exploded;
+	public HolyWaterProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "dynamo_water_granade", netId, player
+	) {
+		weapon = RumblingBang.netWeapon;
+		projId = (int)ProjIds.HolyWaterProj;
+		damager.damage = 2;
+		damager.hitCooldown = 12;
+		vel = new Point(150 * xDir, -200);
+		useGravity = true;
+		collider?.wallOnly = true;
+		fadeSound = "explosionX3";
+		fadeSprite = "explosion";
+		shouldShieldBlock = false;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new HolyWaterProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+	public override void update() {
+		base.update();
+		if (grounded) {
+			explode();
+		}
+	}
+
+	public override void onHitWall(CollideData other) {
+		xDir *= -1;
+		explode();
+	}
+
+	public override void onHitDamagable(IDamagable damagable) {
+		base.onHitDamagable(damagable);
+		if (ownedByLocalPlayer) explode();
+	}
+
+	public void explode() {
+		if (exploded) return;
+		exploded = true;
+		if (ownedByLocalPlayer) {
+			int[] distances = [-30, 30, -10, 10];
+			foreach (int distance in distances) {
+				new HolyWaterPart(
+					pos, xDir, this, owner,
+					owner.getNextActorNetId(),
+					distance * xDir, rpc: true
+				);
+			}
+		}
+		destroySelf();
+	}
+}
+
+public class HolyWaterPart : Projectile {
+	float xDist;
+	float maxXDist;
+	float timeOffset;
+	float timeOffset2;
+	int secondOffset;
+	float napalmPeriod = 0.5f;
+	float napalmPeriod2 = 0.2f;
+	int firstDir = 1;
+	int secondDir = 1;
+
+	public HolyWaterPart(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, int xDist, bool rpc = false
+	) : base(
+		pos, xDir, owner, "dynamo_water_proj", netId, player
+	) {
+		weapon = RumblingBang.netWeapon;
+		damager.damage = 1;
+		damager.hitCooldown = 30;
+		projId = (int)ProjIds.HolyWaterPart;
+		vel.y = -40;
+		useGravity = true;
+		collider?.wallOnly = true;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		gravityModifier = 0.25f;
+		frameIndex = Helpers.randomRange(0, sprite.totalFrameNum - 1);
+		secondOffset = Helpers.randomRange(0, sprite.totalFrameNum - 1);
+		timeOffset = Helpers.randomRange(0, 50) / 2;
+		timeOffset2 = Helpers.randomRange(0, 50) / 2;
+		if (Helpers.randomRange(0, 1) == 1) {
+			firstDir = -1;
+		}
+		if (Helpers.randomRange(0, 1) == 1) {
+			secondDir = -1;
+		}
+		maxXDist = xDist;
+		maxTime = 4;
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir, (byte)xDist);
+		}
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new VileNapalmPartProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId, args.extraData[0]
+		);
+	}
+
+	public override void update() {
+		base.update();
+
+		if (useGravity && isUnderwater()) {
+			destroySelf(disableRpc: true);
+			return;
+		}
+		if (xDist < MathF.Abs(maxXDist)) {
+			float dist = maxXDist / 20 * Global.speedMul;
+			xDist += MathF.Abs(dist);
+			move(new Point(dist, 0), useDeltaTime: false);
+			if (xDist > MathF.Abs(maxXDist)) {
+				xDist = MathF.Abs(maxXDist);
+			}
+		} else if (grounded && useGravity) {
+			useGravity = false;
+			isStatic = true;
+		}
+	}
+
+	public override void render(float x, float y) {
+		if (!shouldRender(x, y)) {
+			return;
+		}
+		float drawX = MathF.Round(pos.x + x);
+		float drawY = MathF.Round(pos.y + y) + 1;
+		float napalmTime = (time + timeOffset) % napalmPeriod;
+		float napalmTime2 = (time + timeOffset2) % napalmPeriod2;
+		float separation = 6 * (xDist / MathF.Abs(maxXDist));
+
+		float alpha = MathF.Abs(1 - 2 * (napalmTime / napalmPeriod));
+		float alpha2 = MathF.Abs(1 - 2 * (napalmTime2 / napalmPeriod2));
+		for (int i = -1; i <= 1; i += 2) {
+			int frameToDraw = frameIndex;
+			if (i == -1) {
+				frameToDraw = (frameIndex + secondOffset) % sprite.totalFrameNum;
+			}
+			sprite.draw(
+				frameToDraw, drawX + i * separation * xDir, drawY, firstDir, yDir,
+				getRenderEffectSet(),
+				alpha,
+				2 - alpha,
+				2 - alpha,
+				zIndex - 100,
+				getShaders(), 0,
+				actor: this, useFrameOffsets: true
+			);
+			sprite.draw(
+				frameToDraw, drawX + i * separation * xDir, drawY, secondDir, yDir,
+				getRenderEffectSet(),
+				1 - alpha,
+				1 + alpha2 / 2,
+				1 + alpha2 / 2,
+				zIndex - 100,
+				getShaders(), 0,
+				actor: this, useFrameOffsets: true
+			);
+		}
+		renderHitboxes();
+	}
 }

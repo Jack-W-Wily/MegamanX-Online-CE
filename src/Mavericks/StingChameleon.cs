@@ -88,7 +88,7 @@ public class StingChameleon : Maverick {
 		}
 
 		if (aiBehavior == MaverickAIBehavior.Control && !isCloakTransition()) {
-			if (state is MIdle or MRun or MLand) {
+			if (state is MIdle or MRun or MLand or MGuard) {
 				if (shootPressed() && !isInvisible) {
 					var inputDir = input.getInputDir(player);
 					int type = 0;

@@ -96,12 +96,10 @@ public class Zain : Character {
 
 	public override bool spcCancel() {
 		if (player.dashPressed(out string dashControl)) {
-			if (grounded) {
+			if (grounded && charState is ZainGrabStabEnd) {
 				changeState(new Dash(dashControl), true);
-			} else {
-				changeState(new AirDash(dashControl), true);
-			}
-				return true;
+			} 
+			return true;
 		}
 
 

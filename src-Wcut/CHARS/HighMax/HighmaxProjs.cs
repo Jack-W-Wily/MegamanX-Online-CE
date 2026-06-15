@@ -201,6 +201,7 @@ public class DesmumeProj1 : Projectile {
 		fadeSound = "explosion";
 		fadeSprite = "explosion";
 		hitSound = "kofhtsnd_lightning1";
+		destroyOnHit = false;
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
 		}

@@ -388,7 +388,7 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			15 => "Magna Centipede",
 			9 => "Crystal Snail",
 			13 => "Overdrive Ostrich",
-			17 => "Claudia?",
+			17 => "Claudio?",
 			25 => "Blizzard Buffalo",
 			18 => "Toxic Seahorse",
 			24 => "Tunnel Rhino",

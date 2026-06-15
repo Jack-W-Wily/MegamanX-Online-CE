@@ -117,7 +117,7 @@ public class ArmoredArmadillo : Maverick {
                 }
 			}
 		} else {
-			if (state is MIdle or MRun or MLand or MShoot && collider != null) {
+			if (state is MIdle or MRun or MLand or MGuard or MShoot && collider != null) {
 				bool shouldGuard = false;
 				Rect rect = collider.shape.getRect();
 				if (xDir == -1) {

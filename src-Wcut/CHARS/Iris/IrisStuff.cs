@@ -56,7 +56,7 @@ public class IrisCrystalBashState : CharState {
 	//	new Anim(character.pos,"iris_crystal_bash", character.xDir, player.getNextActorNetId(),true, sendRpc: true	);
 
 
-		character.playSound("dynamoslash", sendRpc: true);
+		character.playSound("punch2", sendRpc: true);
 		if (!character.grounded) {
 			character.stopMoving();
 			pushBackSpeed = 100;
@@ -117,7 +117,7 @@ public class IrisCrystalRisingBash : CharState {
 	//	new Anim(character.pos,"iris_crystal_bash_up", character.xDir, player.getNextActorNetId(), true, sendRpc: true	);
 
 
-		character.playSound("dynamoslash", sendRpc: true);
+		character.playSound("punch1", sendRpc: true);
 		if (!character.grounded) {
 			character.stopMoving();
 			pushBackSpeed = 100;
@@ -994,6 +994,55 @@ public class IrisSlashProj : Projectile {
 }
 
 
+
+
+public class IrisSlashProj2 : Projectile {
+
+	bool sound;
+	public IrisSlashProj2(
+		Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 10, 3, player, "iris_cannon_slash_2", 25, 0.5f, netProjId, player.ownedByLocalPlayer
+	) {
+		reflectable = false;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		setIndestructableProperties();
+		ShouldClang = true;
+		isShield = true;
+		isReflectShield = true;
+		maxTime = 1.5f;
+
+		projId = (int)ProjIds.IrisSlashProj2;
+		if (player.character != null) {
+			ownerActor = player.character;
+		}
+
+		if (rpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+		destroyOnDMG = true;
+	}
+
+
+		public override void update(){
+	base.update();
+
+		if (sprite.frameIndex >= 7 && !sound){
+		playSound("rideX4-1", sendRpc: true);
+		sound = true;
+		}
+	}
+
+	public override void postUpdate() {
+		base.postUpdate();
+		if (owner?.character != null) {
+			incPos(owner.character.deltaPos);
+		}
+	}
+
+	
+}
 
 
 

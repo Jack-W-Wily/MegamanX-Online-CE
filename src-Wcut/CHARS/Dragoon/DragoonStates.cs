@@ -59,6 +59,7 @@ public class DragoonPunchState : CharState {
 	{
 	airMove = true;
 	spcCancel = true;
+	enterSound = "punch2";
 	}
 
 	public override void update()
@@ -118,6 +119,7 @@ public class DragoonLowPunchState : CharState {
 	{
 	airMove = true;
 		spcCancel = true;
+		enterSound = "punch1";
 	}
 
 	public override void update()
@@ -179,6 +181,7 @@ public class DragoonPunchState2 : CharState {
 	{
 	airMove = true;
 	spcCancel = true;
+	enterSound = "punch1";
 	}
 
 	public override void update()
@@ -236,6 +239,7 @@ public class DragoonGrab : CharState {
 	{
 	airMove = true;
 	superArmor = true;
+	
 	}
 
 	public override void update()
@@ -291,7 +295,7 @@ public class DragoonKickState : CharState {
 		: base("kick1", "", "", transitionSprite)
 	{
 	airMove = true;
-	normalCtrl = true;
+	enterSound = "spinkick";
 	}
 
 	public override void update()
@@ -429,6 +433,7 @@ public class DragoonRisingFire : CharState {
 	public DragoonRisingFire( ) : base("risingfire", "", "", "") {
 		
 		invincible = true;
+		enterSound = "dropkick";
 	}
 
 	public override void update() {
@@ -478,6 +483,7 @@ public class DragoonSpitFire : CharState {
 	public DragoonSpitFire( ) : base("spit", "", "", "") {
 		
 		invincible = true;
+		enterSound = "Rooster - FireCharge";
 	}
 
 	public override void update() {
@@ -532,6 +538,7 @@ public class DragoonRising : CharState {
     public DragoonRising() : base("shoryuken") {
 		//superArmor = true;
 		useDashJumpSpeed = true;
+		enterSound = "Rooster - FireCharge2";
 	}
 
 	public override void update() {
@@ -645,6 +652,7 @@ public class DragoonShoryuken : CharState {
 	public DragoonShoryuken(bool isUnderwater) : base("shoryuken", "", "") {
 		this.isUnderwater = isUnderwater;
 		superArmor = true;
+		enterSound = "Rooster - FireCharge2";
 	}
 
 	public override void update() {
