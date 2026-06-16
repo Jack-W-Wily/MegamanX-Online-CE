@@ -696,7 +696,7 @@ public class VileAirRaid : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 
-		victim?.releaseGrab(character);
+		 
 	}
 }
 
@@ -831,7 +831,7 @@ public class VileStompState : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim.grabInvulnTime = 0.5f;
-		victim?.releaseGrab(character);
+		 
 	}
 }
 

@@ -779,12 +779,12 @@ public class AxlSpinKickWA : CharState {
 
 public class AxlAirRaidWA : CharState {
 	public Axl axl = null!;
-	public Character victim;
+	public Actor? victim;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
 	float leechTime = 1;
 
-	public AxlAirRaidWA(Character victim) : base("air_raid") {
+	public AxlAirRaidWA(Actor? victim) : base("air_raid") {
 		this.victim = victim;
 		grabTime = 3;
 	}
@@ -842,8 +842,13 @@ public class AxlAirRaidWA : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		victim?.releaseGrab(character);
-	}
+			if (victim is Character vtc){
+				vtc?.releaseGrab(character);
+			} 
+			if ( victim is Maverick vtm) {
+				vtm?.releaseGrab(character);
+			}
+		}
 }
 
 

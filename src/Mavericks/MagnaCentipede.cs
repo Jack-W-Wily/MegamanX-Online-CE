@@ -871,7 +871,7 @@ public class MagnaCMagnetPullState : CentipedeMState {
 }
 
 public class MagnaCDrainState : MaverickState {
-	Character victim;
+	Actor? victim;
 	float soundTime = 1;
 	float leechTime = 0.5f;
 	public bool victimWasGrabbedSpriteOnce;
@@ -908,7 +908,9 @@ public class MagnaCDrainState : MaverickState {
 		if (leechTime > 0.5f) {
 			leechTime = 0;
 			var damager = new Damager(player, 0, 0, 0);
-			damager.applyDamage(victim, false, maverick.weapon, maverick, (int)ProjIds.MagnaCTail);
+			if (victim is Character vtc){
+			damager.applyDamage(vtc, false, maverick.weapon, maverick, (int)ProjIds.MagnaCTail);
+			}
 		}
 
 		soundTime += Global.spf;
@@ -924,7 +926,9 @@ public class MagnaCDrainState : MaverickState {
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		victim?.changeState(new LaunchedStateWeak(player.character));
+		if (victim is Character vtc){
+		vtc?.changeState(new LaunchedStateWeak(player.character));
+		}
 	}
 }
 

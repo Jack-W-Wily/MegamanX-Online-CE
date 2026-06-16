@@ -637,7 +637,7 @@ public class LaunchOWhirlpoolState : OctopusMState {
 }
 
 public class LaunchODrainState : OctopusMState {
-	Character victim;
+	Actor? victim;
 	float soundTime = 1;
 	float leechTime = 0.5f;
 	public bool victimWasGrabbedSpriteOnce;
@@ -677,7 +677,9 @@ public class LaunchODrainState : OctopusMState {
 			leechTime = 0;
 			maverick.addHealth(2, true);
 			var damager = new Damager(player, 2, 0, 0);
-			damager.applyDamage(victim, false, new LaunchODrainWeapon(), maverick, (int)ProjIds.LaunchODrain);
+			if (victim is Character vic){
+			damager.applyDamage(vic, false, new LaunchODrainWeapon(), maverick, (int)ProjIds.LaunchODrain);
+			}
 		}
 
 		soundTime += Global.spf;

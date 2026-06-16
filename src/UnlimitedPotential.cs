@@ -578,7 +578,7 @@ public class XUPGrabState : CharState {
 		character.useGravity = true;
 		//character.grabCooldown = 1;
 		victim.grabInvulnTime = 2;
-		victim?.releaseGrab(character);
+		 
 	}
 }
 

@@ -1616,7 +1616,7 @@ public class RPCCommandGrabPlayer : RPC {
 	}
 
 	public void maverickGrabCode(
-		Maverick grabber, Character victimChar,
+		Maverick grabber, Character  victimChar,
 		CharState grabbedState, bool isDefenderFavored, MaverickState? optionalGrabberState = null
 	) {
 		if (grabber == null || victimChar == null) return;

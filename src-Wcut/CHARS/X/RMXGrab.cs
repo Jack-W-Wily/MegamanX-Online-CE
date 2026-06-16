@@ -37,7 +37,7 @@ public class RMXGrabStartState : CharState {
 
 
 public class RMXGrabState : CharState {
-	public Character? victim;
+	public Actor? victim;
 	public float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 
@@ -47,13 +47,15 @@ public class RMXGrabState : CharState {
 
 	public bool unstick;
 
-	public RMXGrabState(Character? victim) : base("grab") {
+	public RMXGrabState(Actor? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = 1;
 	}
 
 	public override void update() {
 		base.update();
+		var victimC = victim as Character;
+		var victimM = victim as Maverick;
 		if (victim != null){
 			grabTime -= Global.spf;
 			leechTime += Global.spf;
@@ -76,7 +78,7 @@ public class RMXGrabState : CharState {
 				//	return;
 			}
 
-			if (victim == null || victim.health <= 0) {
+			if (victim == null) {
 				character.changeToIdleOrFall();
 			}
 
@@ -126,8 +128,9 @@ public class RMXGrabState : CharState {
 				if (leechTime > 0.3f) {
 					leechTime = 0;
 					var damager = new Damager(player, 1, 0, 60);
-
-					damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
+					
+					if (victimC != null)damager.applyDamage(victimC, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
+					if (victimM != null)damager.applyDamage(victimM, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 				}
 			}
 			
@@ -180,6 +183,9 @@ public class RMXGrabState : CharState {
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
+
+		var victimC = victim as Character;
+		var victimM = victim as Maverick;
 		mmx = character as RockmanX;
 		if (character is Vile vile) {
 			vile.grabCooldown = 1;
@@ -189,9 +195,10 @@ public class RMXGrabState : CharState {
 		!character.sprite.name.Contains("up") &&
 		 !character.sprite.name.Contains("down")&&
 		 !character.sprite.name.Contains("foward")	) {
-			victim.grabInvulnTime = 2;
-			victim.stunInvulnTime = 1;
-			victim?.releaseGrab(character, true);
+			victimC?.grabInvulnTime = 2;
+			victimC?.stunInvulnTime = 1;
+			victimC?.releaseGrab(character);
+			victimM?.releaseGrab(character);
 		}
 	}
 }

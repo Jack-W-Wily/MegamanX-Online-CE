@@ -1291,6 +1291,11 @@ public class Damager {
 		}
 		// Maverick section
 		else if (victim is Maverick maverick) {
+
+
+			if (damage > 1 || flinch > 0) {
+				victim.playSound(hitSound);
+			} 
 			// Enable WCUT Grab Compatibility on Mavericks
 
 			if (projId == (int)ProjIds.GizmoGrab) {
@@ -1300,7 +1305,40 @@ public class Damager {
 				}
 			}
 
+			var attacker = owner.character;
+			if (projId == (int)ProjIds.ForceGrabState) {
+				if (attacker != null){
+					if (attacker.charState is ZainGrabStab) {
+						
+						attacker.changeState(new ZainGrabStabEnd());
+					}
+					if (attacker.charState is ZainParryStartState) {
+						attacker.changeState(new ZainGrabSlash());
+					}
+					if (attacker.charState is ZainParryStartState) {
+						attacker.changeState(new ZainGrabSlash());
+					}
+					if (attacker.charState is ZainUPParryStartState) {
+						attacker.changeState(new ZainGrab());
+					}
+					if (attacker.charState is ZainDashParryState) {
+						attacker.changeState(new ZainGrab());
+					}
 
+					if (attacker.charState is IrisGrabStart && attacker is Iris iris) {
+						attacker.changeState(new IrisGrabEX());
+						iris.GrabVictim = maverick;
+					}
+					if (attacker.charState is SigmaGrabStart) {
+						attacker.changeState(new SigmaGrabEX());
+					}
+					if (attacker.charState is ZeroGrabStart) {
+						attacker.changeState(new ZeroGrabEX());
+					}	
+				}
+				maverick?.changeState(new MForceGrabbed(attacker));
+
+			}
 			// Enable Wcut Combos on Mavericks
 			if (owner.character != null) {
 

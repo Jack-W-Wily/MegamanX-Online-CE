@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.VisualBasic;
 namespace MMXOnline;
 
 public class FlameStag : Maverick {
@@ -533,11 +534,11 @@ public class FStagUppercutState : StagMState {
 	float yDist;
 	int state;
 	public Anim? ProjVisible;
-	public Character victim;
+	public Actor? victim;
 	float topDelay;
 	int upHitCount;
 	int downHitCount;
-	public FStagUppercutState(Character victim) : base("updash") {
+	public FStagUppercutState(Actor? victim) : base("updash") {
 		this.victim = victim;
 		enterSound = "fstagUppercut";
 	}
@@ -603,7 +604,7 @@ public class FStagUppercutState : StagMState {
 		}
 	}
 
-	public Character? getVictim() {
+	public Actor? getVictim() {
 		if (victim == null) return null;
 		if (!victim.sprite.name.EndsWith("_grabbed")) {
 			return null;
@@ -613,11 +614,13 @@ public class FStagUppercutState : StagMState {
 
 	public void crashAndDamage(bool isCeiling) {
 		if (getVictim() != null) {
-			flameStagger.uppercutWeapon.applyDamage(
-				victim, false, flameStagger, (int)ProjIds.FStagUppercut,
-				overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch,
-				sendRpc: true
-			);
+			if (victim is Character vtc){
+				flameStagger.uppercutWeapon.applyDamage(
+					vtc, false, flameStagger, (int)ProjIds.FStagUppercut,
+					overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch,
+					sendRpc: true
+				);
+			}
 		}
 		maverick.playSound("crash", sendRpc: true);
 		maverick.shakeCamera(sendRpc: true);
@@ -644,13 +647,19 @@ public class FStagUppercutState : StagMState {
 			player, player.getNextActorNetId(), rpc: true);
 	}
 
+	
+
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
+		var victimC = victim as Character;
+		var victimM = victim as Maverick;
 		flameStagger.useGravity = true;
 		proj?.destroySelf();
 		ProjVisible?.destroySelf();
 		if (getVictim() != null) {
-			victim.releaseGrab(maverick);
+			
+			victimC?.releaseGrab(maverick);
+			victimM?.releaseGrab(maverick);
 		}
 	}
 }

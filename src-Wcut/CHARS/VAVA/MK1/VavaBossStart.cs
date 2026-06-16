@@ -122,7 +122,7 @@ public class RagingDemonSuccess : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		victim?.releaseGrab(character);
+		 
 	}
 }
 

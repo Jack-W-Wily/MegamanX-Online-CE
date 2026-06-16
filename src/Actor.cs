@@ -935,6 +935,14 @@ public partial class Actor : GameObject {
 		movedUpOnFrame = false;
 	}
 
+
+	public Point? getHeadPos() {
+		if (currentFrame?.headPos == null) return null;
+		return pos.addxy(currentFrame.headPos.Value.x * xDir, currentFrame.headPos.Value.y - 2);
+	}
+
+
+
 	public float getTopY() {
 		var collider = this.standartCollider;
 

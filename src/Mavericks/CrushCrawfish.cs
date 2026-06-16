@@ -363,7 +363,7 @@ public class CrushCDashState : CrawfishMState {
 }
 
 public class CrushCGrabState : CrawfishMState {
-	Character victim;
+	Actor? victim;
 	float hurtTime;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
@@ -372,42 +372,50 @@ public class CrushCGrabState : CrawfishMState {
 	}
 	public override void update() {
 		base.update();
-		if (!victimWasGrabbedSpriteOnce) {
-			maverick.frameSpeed = 0;
-		} else {
-			maverick.frameSpeed = 1;
-			if (maverick.frameIndex > 0) {
-				Helpers.decrementTime(ref hurtTime);
-				if (hurtTime == 0) {
-					hurtTime = 0.16666f;
-					scissorsShrimper.meleeWeapon.applyDamage(victim, false, maverick, (int)ProjIds.CrushCGrabAttack);
+		if (victim != null){
+			if (!victimWasGrabbedSpriteOnce) {
+				maverick.frameSpeed = 0;
+			} else {
+				maverick.frameSpeed = 1;
+				if (maverick.frameIndex > 0) {
+					Helpers.decrementTime(ref hurtTime);
+					if (hurtTime == 0) {
+						hurtTime = 0.16666f;
+						var victimC = victim as Character;
+						var victimM = victim as Maverick;
+						if (victimC != null)	scissorsShrimper.meleeWeapon.applyDamage(victimC, false, maverick, (int)ProjIds.CrushCGrabAttack);
+						if (victimM != null)	scissorsShrimper.meleeWeapon.applyDamage(victimM, false, maverick, (int)ProjIds.CrushCGrabAttack);
+					}
 				}
 			}
-		}
 
-		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
-			maverick.changeToIdleOrFall();
-			return;
-		}
+			if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
+				maverick.changeToIdleOrFall();
+				return;
+			}
 
-		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
-			victimWasGrabbedSpriteOnce = true;
-		}
-		if (!victimWasGrabbedSpriteOnce) {
-			timeWaiting += Global.spf;
-			if (timeWaiting > 1) {
+			if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
 				victimWasGrabbedSpriteOnce = true;
 			}
-		}
+			if (!victimWasGrabbedSpriteOnce) {
+				timeWaiting += Global.spf;
+				if (timeWaiting > 1) {
+					victimWasGrabbedSpriteOnce = true;
+				}
+			}
 
-		if (stateTime > CrushCGrabbed.maxGrabTime) {
-			maverick.changeToIdleOrFall();
+			if (stateTime > CrushCGrabbed.maxGrabTime) {
+				maverick.changeToIdleOrFall();
+			}
 		}
 	}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
-		victim?.releaseGrab(maverick);
+		var victimC = victim as Character;
+		var victimM = victim as Maverick;
+		victimC?.releaseGrab(maverick);
+		victimM?.releaseGrab(maverick);
 	}
 }
 

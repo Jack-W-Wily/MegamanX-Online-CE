@@ -214,11 +214,11 @@ public class BFStagUppercutState : BossStagMState {
 	float yDist;
 	int state;
 	public Anim? ProjVisible;
-	public Character victim;
+	public Actor? victim;
 	float topDelay;
 	int upHitCount;
 	int downHitCount;
-	public BFStagUppercutState(Character victim) : base("updash") {
+	public BFStagUppercutState(Actor? victim) : base("updash") {
 		this.victim = victim;
 		enterSound = "fstagUppercut";
 	}
@@ -284,7 +284,7 @@ public class BFStagUppercutState : BossStagMState {
 		}
 	}
 
-	public Character? getVictim() {
+	public Actor? getVictim() {
 		if (victim == null) return null;
 		if (!victim.sprite.name.EndsWith("_grabbed")) {
 			return null;
@@ -294,11 +294,13 @@ public class BFStagUppercutState : BossStagMState {
 
 	public void crashAndDamage(bool isCeiling) {
 		if (getVictim() != null) {
-			BFlameStagger.uppercutWeapon.applyDamage(
-				victim, false, BFlameStagger, (int)ProjIds.FStagUppercut,
-				overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch,
-				sendRpc: true
-			);
+			if (victim is Character vtc){
+				BFlameStagger.uppercutWeapon.applyDamage(
+					vtc, false, BFlameStagger, (int)ProjIds.FStagUppercut,
+					overrideDamage: isCeiling ? 3 : 5, overrideFlinch: isCeiling ? 0 : Global.defFlinch,
+					sendRpc: true
+				);
+			}
 		}
 		character.playSound("crash", sendRpc: true);
 		character.shakeCamera(sendRpc: true);
@@ -330,9 +332,7 @@ public class BFStagUppercutState : BossStagMState {
 		BFlameStagger.useGravity = true;
 		proj?.destroySelf();
 		ProjVisible?.destroySelf();
-		if (getVictim() != null) {
-			victim.releaseGrab(character);
-		}
+		
 	}
 }
 

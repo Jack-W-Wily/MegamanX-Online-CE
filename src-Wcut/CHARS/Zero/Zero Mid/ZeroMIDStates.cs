@@ -257,7 +257,7 @@ public class ZeroFinalEnd : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		victim.grabInvulnTime = 0.5f;
-		victim?.releaseGrab(character);
+		 
 	}
 }
 

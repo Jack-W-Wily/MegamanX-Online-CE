@@ -504,7 +504,7 @@ public partial class Level {
 					new BackwallZone(instanceName, points, (bool?)instance.properties.isExclusion ?? false)
 				);
 			} else if (objectName == "Gate") {
-				if (isRace()) {
+				if (isRace()  || isFullMap() ) {
 					var gate = new Gate(instanceName, points);
 
 					if (instance?.properties?.unclimbable != null && instance.properties.unclimbable == true) {
@@ -577,7 +577,7 @@ public partial class Level {
 				var properties = instance.properties;
 				var sp = new SpawnPoint(instanceName, pos, xDir, -1);
 				if (properties?.raceStartSpawn == true) {
-					if (isRace()) {
+					if (isRace()  || isFullMap() ) {
 						spawnPoints.Add(sp);
 						raceStartSpawnPoints.Add(sp);
 					}
@@ -810,7 +810,7 @@ public partial class Level {
 			}
 		}
 
-		if (isTraining() && isRace()) {
+		if (isTraining() && isRace() ) {
 			var actor = new VictoryPoint(new Point(151, 177));
 			actor.name = "Victory Point1";
 			goal = actor;
@@ -2629,7 +2629,7 @@ public partial class Level {
 			if (sp != null) return sp;
 		}
 
-		if (isRace()) {
+		if (isRace()  || isFullMap() ) {
 			if (player.lastDeathPos != null) {
 				var pos = player.lastDeathPos.Value;
 				var orderedSpawnPoints = spawnPoints.OrderBy(s => s.pos.distanceTo(pos)).ToList();
@@ -2687,7 +2687,7 @@ public partial class Level {
 			var sp = spawnPoints.FirstOrDefault(s => s.name == Global.overrideSpawnPoint);
 			if (sp != null) return sp;
 		}
-		if (isRace()) {
+		if (isRace() || isFullMap()  ) {
 			return raceStartSpawnPoints[player.getSpawnIndex(raceStartSpawnPoints.Count)];
 		}
 		if (is1v1()) {
@@ -2720,6 +2720,12 @@ public partial class Level {
 	public bool isRace() {
 		return gameMode is Race;
 	}
+
+
+	public bool isFullMap() {
+		return levelData.isStoryMode();
+	}
+
 
 	public ControlPoint getCurrentControlPoint() {
 		foreach (var controlPoint in controlPoints) {

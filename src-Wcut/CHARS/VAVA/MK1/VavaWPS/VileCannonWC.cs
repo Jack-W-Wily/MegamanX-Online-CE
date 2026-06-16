@@ -770,7 +770,7 @@ public class VavaGizmoGrabState : CharState {
 	public override void onExit(CharState? newState) {
         base.onExit(newState);
         if (newState is not VileMK2GrabState && victim != null) {
-			if (victim is Character victimC){
+			if (victim is Character  victimC){
             victimC.grabInvulnTime = 2;
             victimC.stunInvulnTime = 1;
             victimC?.releaseGrab(character, true);

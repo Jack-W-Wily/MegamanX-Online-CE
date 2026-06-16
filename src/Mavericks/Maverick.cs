@@ -374,6 +374,11 @@ public class Maverick : Actor, IDamagable {
 		Helpers.decrementFrames(ref virusTime);
 		Helpers.decrementFrames(ref oilTime);
 	}
+	
+
+	public void releaseGrab(Actor grabber, bool sendRpc = false) {
+		changeToIdleOrFall();
+	}
 
 	public override void preUpdate() {
 		base.preUpdate();
