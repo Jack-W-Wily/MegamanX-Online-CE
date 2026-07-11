@@ -293,6 +293,23 @@ label:
 		}
 	}
 
+	public void addStockBuster() {
+		if (!weapons.Any(w => w is RagingChargeBuster)) {
+			weapons.Insert(0, new RagingChargeBuster());
+		}
+		weapons.RemoveAll(w => w is XBuster);
+	}
+
+	public void removeStockBuster() {
+		if (weapon is RagingChargeBuster) {
+			weaponSlot = 0;
+		}
+		weapons.RemoveAll(w => w is RagingChargeBuster);
+		if (!weapons.Any(w => w is XBuster)) {
+			weapons.Insert(0, new XBuster());
+		}
+	}
+
 	public void removeNovaStrike() {
 		if (weapon is HyperNovaStrike) {
 			weaponSlot = 0;

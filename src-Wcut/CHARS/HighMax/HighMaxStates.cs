@@ -5,11 +5,12 @@ namespace MMXOnline;
 
 public class HighMaxHover : CharState {
 	float hoverTime;
-	
-	public HighMaxHover() : base("hover", "hover", "hover", "hover") {
+	public bool playSounds;
+	public HighMaxHover(bool playSound ) : base("hover", "hover", "hover", "hover") {
 		exitOnLanding = true;
 		airMove = true;
 		attackCtrl = true;
+		playSounds = playSound;
 		normalCtrl = true;
 	}
 
@@ -76,6 +77,10 @@ public class HighMaxHover : CharState {
 		base.onEnter(oldState);
 	character.useGravity = false;
 	character.vel = new Point();
+
+	if (playSounds) {
+		character.playSound("highmaxHover");
+		}
 
 	}
 
@@ -178,7 +183,7 @@ public class HighmaxShoot1 : CharState {
 			if (character.grounded) {
 				character.changeState(new Idle());
 			} else {
-				character.changeState(new HighMaxHover());
+				character.changeState(new HighMaxHover(false));
 			}
 		}
 	}
@@ -284,7 +289,7 @@ public class HighmaxShoot2 : CharState {
 			if (character.grounded) {
 				character.changeState(new Idle());
 			} else {
-				character.changeState(new HighMaxHover());
+				character.changeState(new HighMaxHover(false));
 			}
 		}
 	}
@@ -419,7 +424,7 @@ public class DesmumeSpam : CharState {
 			if (character.grounded) {
 				character.changeState(new Idle());
 			} else {
-				character.changeState(new HighMaxHover());
+				character.changeState(new HighMaxHover(false));
 			}
 		}
 	}
@@ -581,7 +586,7 @@ public class DesmumeState : CharState {
 			if (character.grounded) {
 				character.changeState(new Idle());
 			} else {
-				character.changeState(new HighMaxHover());
+				character.changeState(new HighMaxHover(false));
 			}
 		}
 	}

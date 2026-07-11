@@ -312,8 +312,25 @@ public class MegamanX : Character {
 		}
 	}
 	// General update.
+
+
+	public RagingChargeBuster ragingBuster;
 	public override void update() {
 		base.update();
+		
+
+		if (armArmor == ArmorId.Force) {	
+			if (isCharging()) {
+				if (player.weapon is RagingChargeBuster stockShot)
+				stockShot.addAmmo(stockShot.getAmmoUsage(0) * 1.075f * Global.spf, player);
+			}
+		} else {
+			player.removeStockBuster();
+		}
+
+		if (charState is Taunt) {
+			fastChipActive(false, false, false, false);
+		}
 		if (!ownedByLocalPlayer) {
 			return;
 		}
@@ -349,6 +366,23 @@ public class MegamanX : Character {
         } else {
              altGrabAnimLight = false;
         }
+
+
+
+		// Golden Armor Ressurection
+
+		if (fullArmor == ArmorId.Max && !hasFullHyperMaxArmor && charState is Die && OverDrive && player.currency >= Player.goldenArmorCost) {
+			player.currency -= Player.goldenArmorCost;
+			hyperChestActive = true;
+			hyperArmActive = true;
+			hyperLegActive = true;
+			hyperHelmetActive = true;
+			health = 2;
+			alive = true;
+			changeState(new XReviveStart(), true);
+			Global.playSound("ching");
+			
+		}
 	}
 
 	public bool altGrabAnimLight;
@@ -369,8 +403,11 @@ public class MegamanX : Character {
 	
 
 	public override bool normalCtrl() {
-		quickArmorUpgrade();
+		//quickArmorUpgrade();
+
+		if (OverDrive){
 		fastChipActivation();
+		}
 		if (grounded) {
 			if ((legArmor == ArmorId.Max 
 				|| player.MaxBootsKai && this is XKai
@@ -416,7 +453,7 @@ public class MegamanX : Character {
 				return true;
 			}
 			if ((!player.isAI && hasUltimateArmor 
-			|| player.XKaiUAXBuffs && this is XKai
+			|| player.XKaiUAXBuffs && this is XKai || legArmor == ArmorId.Force
 				) && 
 				player.input.isPressed(Control.Jump, player) &&
 				canJump() && !isDashing && canAirDash() && flag == null
@@ -516,7 +553,7 @@ public class MegamanX : Character {
 		if (hasShoryukenEquipped()) {
 			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
-		if (inputCheckH && canUseFgMove() && grounded && player.superAmmo >= player.superMaxAmmo
+		if (inputCheckH && canUseFgMove() && player.superAmmo >= player.superMaxAmmo
 		//	player.hadoukenAmmo >= player.fgMoveMaxAmmo &&
 		//	hadoukenCooldownTime == 0
 		) {
@@ -526,7 +563,7 @@ public class MegamanX : Character {
 			player.superAmmo -= 32;
 			return true;
 		}
-		if (inputCheckS && canUseFgMove() && grounded && player.superAmmo >= 32
+		if (inputCheckS && canUseFgMove() && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
 		//	shoryukenCooldownTime == 0
 		) {
@@ -536,6 +573,27 @@ public class MegamanX : Character {
 			player.superAmmo -= 32;
 			return true;
 		}
+
+		if (player.input.checkShoryuken(player, xDir, Control.Shoot) && armArmor == ArmorId.Force && player.superAmmo >= 16
+		
+		) {
+		
+			changeState(new RMXPlasmaShotState(), true);
+			player.superAmmo -= 16;
+			return true;
+		}
+
+		if (player.input.checkShoryuken(player, xDir, Control.Dash) && chestArmor == ArmorId.Force && player.superAmmo >= 16
+		
+		) {
+		
+			changeState(new NovaStrikeStateForce(), true);
+			player.superAmmo -= 16;
+			return true;
+		}
+
+
+		
 		return false;
 	}
 
@@ -671,7 +729,7 @@ public class MegamanX : Character {
 	public void fastChipActivation() {
 		if (charState is not Die && fullArmor == ArmorId.Max &&
 			!hasFullHyperMaxArmor && !hasUltimateArmor &&
-			player.input.isBPressed(player)
+			player.input.isR2Pressed(player)
 		) {
 			if (player.input.isHeld(Control.Down, player)) {
 				fastChipActive(false, false, false, true);
@@ -825,6 +883,7 @@ public class MegamanX : Character {
 			chargeTime += speedMul * 1.5f;
 			return;
 		}
+		
 		chargeTime += speedMul;
 	}
 
@@ -832,6 +891,7 @@ public class MegamanX : Character {
 		if (specialButtonMode == 0 && player.input.isBHeld(player)) {
 			return true;
 		}
+		
 		return player.input.isAHeld(player);
 	}
 

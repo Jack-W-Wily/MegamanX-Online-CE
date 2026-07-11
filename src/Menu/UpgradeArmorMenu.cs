@@ -952,45 +952,96 @@ public class SNESArmorHandler : IMenuHandler {
 			price = MegamanX.bootsArmorCost.ToString(),
 		};
 		#endregion
-		#region HyperChip
+		#region ForceArmor
 		menu[(4, 1)] = new ArmorLoadoutSkill {
 			name = "Helmet",
-			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperHelmetActive, //Kill me
-			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
-			canLock = player => player.character is MegamanX mmx && mmx.hyperHelmetActive,
-			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperHelmetActive = true; },
-			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperHelmetActive = false; },
-			description = "ENHANCEMENT CHIP\nSlowly regenerate Health after not taking DMG.",
-			price = "0",
+			isUnlocked = player => player.helmetArmorNum == (int)ArmorId.Force,
+			canUnlock = player => player.helmetArmorNum != (int)ArmorId.Force && player.currency >= MegamanX.headArmorCost || player.headArmorsPurchased[3] == true,
+			canLock = player => player.helmetArmorNum == (int)ArmorId.Force,
+			unlock = (player) => {
+				setHelmet(player, (int)ArmorId.Force);
+				player.helmetArmorNum = (int)ArmorId.Force;
+				if (player.headArmorsPurchased[3] == false)
+					player.currency -= MegamanX.headArmorCost;
+				player.headArmorsPurchased[3] = true;
+			},
+			lockit = (player) => {
+				setHelmet(player, (int)ArmorId.None);
+				player.helmetArmorNum = (int)ArmorId.None;
+				if (player.headArmorsPurchased[3] == false)
+					player.currency += MegamanX.headArmorCost;
+				player.helmetArmorNum = (int)ArmorId.None;
+			},
+			description = "Reduces Ammo costs by 50%.",
+			price = MegamanX.headArmorCost.ToString(),
 		};
 		menu[(4, 2)] = new ArmorLoadoutSkill {
 			name = "Body",
-			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperChestActive,
-			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
-			canLock = player => player.character is MegamanX mmx  && mmx.hyperChestActive,
-			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperChestActive = true; },
-			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperChestActive = false; },
-			description = "ENHANCEMENT CHIP\nForcefield Defense: 50%",
-			price = "0",
+			isUnlocked = player => player.bodyArmorNum == (int)ArmorId.Force,
+			canUnlock = player => player.bodyArmorNum != (int)ArmorId.Force && player.currency >= MegamanX.chestArmorCost || player.bodyArmorsPurchased[3] == true,
+			canLock = player => player.bodyArmorNum == (int)ArmorId.Force,
+			unlock = (player) => {
+				setBody(player, (int)ArmorId.Force);
+				player.bodyArmorNum = (int)ArmorId.Force;
+				if (player.bodyArmorsPurchased[3] == false)
+					player.currency -= MegamanX.chestArmorCost;
+				player.bodyArmorsPurchased[3] = true;
+				player.removeGigaCrush();
+			},
+			lockit = (player) => {
+				setBody(player, (int)ArmorId.None);
+				player.bodyArmorNum = (int)ArmorId.None;
+				if (player.bodyArmorsPurchased[3] == false)
+					player.currency += MegamanX.chestArmorCost;
+				player.bodyArmorNum = (int)ArmorId.None;
+			},
+			description = "Unlocks NovaStrike",
+			price = MegamanX.chestArmorCost.ToString(),
 		};
 		menu[(4, 3)] = new ArmorLoadoutSkill {
 			name = "Arm",
-			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperArmActive,
-			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
-			canLock = player => player.character is MegamanX mmx && mmx.hyperArmActive,
-			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperArmActive = true; },
-			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperArmActive = false; },
-			description = "ENHANCEMENT CHIP\nReduce ammo usage by half.",
-			price = "0",
+			isUnlocked = player => player.armArmorNum == (int)ArmorId.Force,
+			canUnlock = player => player.armArmorNum != (int)ArmorId.Force && player.currency >= MegamanX.armArmorCost || player.armArmorsPurchased[3] == true,
+			canLock = player => player.armArmorNum == (int)ArmorId.Force,
+			unlock = (player) => {
+				setArm(player, (int)ArmorId.Force);
+				player.armArmorNum = (int)ArmorId.Force;
+				if (player.armArmorsPurchased[3] == false)
+					player.currency -= MegamanX.armArmorCost;
+				player.addStockBuster();
+				player.armArmorsPurchased[3] = true;
+			},
+			lockit = (player) => {
+				setArm(player, (int)ArmorId.None);
+				player.armArmorNum = (int)ArmorId.None;
+				if (player.armArmorsPurchased[3] == false)
+					player.currency += MegamanX.armArmorCost;
+				player.armArmorNum = (int)ArmorId.None;
+				player.removeStockBuster();
+			},
+			description = "Grants the Stock Buster.\nGrants the PlasmaShot.",
+			price = MegamanX.armArmorCost.ToString(),
 		};
 		menu[(4, 4)] = new ArmorLoadoutSkill {
-			name = "Boots",
-			isUnlocked = player => player.character is MegamanX mmx && mmx.hyperLegActive,
-			canUnlock = player => player.character is MegamanX mmx && player.hasAllX3Armor() && !mmx.hasAnyHyperArmor,
-			canLock = player => player.character is MegamanX mmx && mmx.hyperLegActive,
-			unlock = (player) => { if (player.character is MegamanX mmx) mmx.hyperLegActive = true; },
-			lockit = (player) => { if (player.character is MegamanX mmx) mmx.hyperLegActive = false; },
-			description = "ENHANCEMENT CHIP\nDash Twice in the air",
+				name = "Boots",
+			isUnlocked = player => player.legArmorNum == (int)ArmorId.Force,
+			canUnlock = player => player.legArmorNum != (int)ArmorId.Force && player.currency >= MegamanX.bootsArmorCost || player.bootsArmorsPurchased[3] == true,
+			canLock = player => player.legArmorNum == (int)ArmorId.Force,
+			unlock = (player) => {
+				setLegs(player, (int)ArmorId.Force);
+				player.legArmorNum = (int)ArmorId.Force;
+				if (player.bootsArmorsPurchased[3] == false)
+					player.currency -= MegamanX.bootsArmorCost;
+				player.bootsArmorsPurchased[3] = true;
+			},
+			lockit = (player) => {
+				setLegs(player, (int)ArmorId.None);
+				player.legArmorNum = (int)ArmorId.None;
+				if (player.bootsArmorsPurchased[3] == false)
+					player.currency += MegamanX.bootsArmorCost;
+				player.legArmorNum = (int)ArmorId.None;
+			},
+			description = "Grants an Air Dash and Hover.",
 			price = MegamanX.bootsArmorCost.ToString(),
 		};
 		#endregion

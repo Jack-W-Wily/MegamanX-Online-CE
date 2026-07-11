@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace MMXOnline;
 
@@ -25,6 +26,10 @@ public class XHover : CharState {
 	public SoundWrapper? sound;
 	float hoverTime;
 	int startXDir;
+
+	Anim? hoverExhaust;
+
+
 	public XHover() : base("hover", "hover_shoot") {
 		airMove = true;
 		attackCtrl = true;
@@ -32,11 +37,22 @@ public class XHover : CharState {
 		useGravity = false;
 	}
 
+
+	
+
 	public override void update() {
 		base.update();
 
 		character.xDir = startXDir;
 		Point inputDir = player.input.getInputDir(player);
+			Point prevPos = character.pos;
+
+
+		if (hoverExhaust != null) {
+			hoverExhaust.changePos(exhaustPos());
+			hoverExhaust.xDir = character.xDir;
+		}
+
 
 		if (inputDir.x == character.xDir) {
 			if (!sprite.StartsWith("hover_forward")) {
@@ -85,6 +101,14 @@ public class XHover : CharState {
 		}
 	}
 
+	
+	public Point exhaustPos() {
+		if (character.currentFrame.POIs.Length == 0) return character.pos;
+		Point exhaustPOI = character.currentFrame.POIs.Last();
+		return character.pos.addxy(exhaustPOI.x * character.xDir, exhaustPOI.y);
+	}
+
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMoving();
@@ -99,6 +123,7 @@ public class XHover : CharState {
 		if (sound != null && !sound.deleted) {
 			sound.sound?.Stop();
 		}
+		hoverExhaust?.destroySelf();
 		RPC.stopSound.sendRpc("uahover", character.netId);
 	}
 }
@@ -520,10 +545,11 @@ public class X3ChargeShot : XState {
 						shootPos, "buster4_x3_muzzle", shootDir,
 						player.getNextActorNetId(), true, sendRpc: true
 					);
-					new Buster4MaxProj(
-						shootPos, shootDir,
-						mmx, player, player.getNextActorNetId(), true
-					);
+
+					new BusterX3Proj1(
+					XBuster.netWeapon, character.getShootPos(), character.getShootXDir(), 
+					0, player, player.getNextActorNetId(), rpc: true);
+					
 					if (!(player.weapon is HyperCharge)) {
 						character.playSound("buster3X3", sendRpc: true);
 					}
@@ -539,22 +565,10 @@ public class X3ChargeShot : XState {
 			} else {
 				character.playSound("buster3X3", sendRpc: true);
 				float xDir = character.getShootXDir();
-				new BusterX3Proj2(
-					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0, mmx,
-					player, player.getNextActorNetId(), rpc: true
-				);
-				new BusterX3Proj2(
-					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1, mmx,
-					player, player.getNextActorNetId(), rpc: true
-				);
-				new BusterX3Proj2(
-					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2, mmx,
-					player, player.getNextActorNetId(), rpc: true
-				);
-				new BusterX3Proj2(
-					character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3, mmx,
-					player, player.getNextActorNetId(), rpc: true
-				);
+				new Buster3MaxProj(
+						character.getShootPos(), character.getShootXDir(),
+						mmx, player, player.getNextActorNetId(), true
+					);
 			}
 			mmx.stockedTime = 0;
 			if (mmx.stockedMaxBusterLv >= 1) {

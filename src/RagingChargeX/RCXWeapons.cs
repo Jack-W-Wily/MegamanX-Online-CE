@@ -13,7 +13,7 @@ public class RagingChargeBuster : Weapon {
 		weaponBarIndex = 59;
 		weaponSlotIndex = 121;
 		shootSounds = new string[] { "stockBuster", "stockBuster", "stockBuster", "stockBuster", "stockBuster" };
-		fireRate = 20;
+		fireRate = 1;
 		canHealAmmo = true;
 		drawAmmo = true;
 		drawCooldown = true;

@@ -121,6 +121,71 @@ public class NovaStrikeState : CharState {
 
 }
 
+
+
+public class NovaStrikeStateForce : CharState {
+	public int upOrDown;
+	public int leftOrRight;
+	
+	public NovaStrikeStateForce( ) : base("nova_force") {
+		pushImmune = true;
+		invincible = true;
+		normalCtrl = false;
+		attackCtrl = false;
+		useGravity = false;
+
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!once && character.frameIndex >= 4) {
+			once = true;
+			if (Helpers.randomRange(0, 10) < 10) {
+				character.playSound("novaStrikeX4", forcePlay: false, sendRpc: true);
+			} else {
+				character.playSound("novaStrikeX6", forcePlay: false, sendRpc: true);
+			}
+		}
+		if (character.frameIndex <= 2) {
+			character.move(new Point(125 * character.xDir, -95));
+			character.unstickFromGround();
+		}
+		if (character.frameIndex >= 4) {
+			character.move(new Point(350 * character.xDir, 0));
+		}
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			character.changeToIdleOrFall();
+		}
+		if (stateTime > 2) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		character.stopCharge();
+	
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+		
+	}
+
+	public RekkohaEffect? effect;
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.yDir = 1;
+		character.visible = true;
+		
+	}
+
+}
+
+
 public class NovaStrikeStateEX : CharState {
 	public NovaStrikeStateEX() : base("nova_strike") {
 		pushImmune = true;

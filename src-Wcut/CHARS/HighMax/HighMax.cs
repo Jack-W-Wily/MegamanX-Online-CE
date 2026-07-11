@@ -47,7 +47,10 @@ public class HighMax : Character {
 		if (!grounded && charState.stateTime > 0.005f &&
 		player.input.isPressed(Control.Jump, player) && dashedInAir == 0
 		) {
-			changeState(new HighMaxHover(), true);
+			
+			changeState(new HighMaxHover(true), true);
+			
+			
 			return true;
 		}
 

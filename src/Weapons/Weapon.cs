@@ -317,6 +317,7 @@ public class Weapon {
 
 	// ToDo: Remove default values from this.
 	public virtual float getAmmoUsage(int chargeLevel) {
+		
 		if (chargeLevel >= 3) return 8;
 		else return 1;
 	}
@@ -347,6 +348,9 @@ public class Weapon {
 
 	public void addAmmo(float amount, Player player) {
 		if (player.character is MegamanX mmx && mmx.hyperArmArmor == ArmorId.Max && amount < 0) amount *= 0.5f;
+		if (player.character is MegamanX mmx2 && mmx2.helmetArmor == ArmorId.Force && amount < 0
+		&& this is not RagingChargeBuster) amount *= 0.5f;
+		
 		ammo += amount;
 		ammo = Helpers.clamp(ammo, 0, maxAmmo);
 		onAmmoChange(amount);

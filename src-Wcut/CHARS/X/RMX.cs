@@ -323,6 +323,8 @@ public class RockmanX : MegamanX {
 
 		DropDown,
 
+		NovaStrikeForce,
+
 	}
 
 
@@ -330,7 +332,7 @@ public class RockmanX : MegamanX {
 	// IDs are located
 	public override int getHitboxMeleeId(Collider hitbox) {
 		if (sprite.name.Contains("cross_")) {
-			return (int)MeleeIds.GrabKickLV2;
+			return (int)MeleeIds.GrabKickLV1;
 		}
 		return (int)(sprite.name switch {
 			"rmx_block"   => MeleeIds.Blocking, 
@@ -347,6 +349,7 @@ public class RockmanX : MegamanX {
 			"rmx_double_kick" when frameIndex > 5 => MeleeIds.DoubleKick2,
 			"rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
 			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_nova_force" => MeleeIds.NovaStrikeForce,
 			// Light  Helmet.
 			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
 			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
@@ -463,6 +466,11 @@ public class RockmanX : MegamanX {
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
+			),
+			
+			(int)MeleeIds.NovaStrikeForce => new GenericMeleeProj(
+				HyperNovaStrike.netWeapon, projPos, ProjIds.BurensenEND, player,
+				12, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 
 			(int)MeleeIds.GrabKickLV1 => new GenericMeleeProj(

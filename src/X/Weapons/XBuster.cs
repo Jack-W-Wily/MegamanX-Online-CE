@@ -130,7 +130,7 @@ public class XBuster : Weapon {
 					pos, "buster4_x3_muzzle", xDir,
 					player.getNextActorNetId(), true, sendRpc: true
 				);
-				new Buster4MaxProj(
+				new Buster3MaxProj(
 					pos, xDir, mmx, player, player.getNextActorNetId(), true
 				);
 			} else {
@@ -168,7 +168,7 @@ public class XBuster : Weapon {
 						pos, "buster4_x3_muzzle", xDir, player.getNextActorNetId(),
 						true, sendRpc: true
 					);
-					new Buster4MaxProj(
+					new Buster3MaxProj(
 						pos, xDir, mmx, player,
 						player.getNextActorNetId(), true
 					);
@@ -195,19 +195,19 @@ public class XBuster : Weapon {
 	public static void createX3SpreadShot(Character character, int xDir) {
 		Player player = character.player;
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
-		new BusterX3Proj2(
+		new BusterX3Proj2OLD(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 0, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
-		new BusterX3Proj2(
+		new BusterX3Proj2OLD(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 1, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
-		new BusterX3Proj2(
+		new BusterX3Proj2OLD(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 2, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);
-		new BusterX3Proj2(
+		new BusterX3Proj2OLD(
 			character.getShootPos().addxy(6 * xDir, -2), character.getShootXDir(), 3, mmx,
 			player, player.getNextActorNetId(), rpc: true
 		);

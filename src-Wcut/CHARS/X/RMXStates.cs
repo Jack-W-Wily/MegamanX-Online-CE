@@ -184,6 +184,87 @@ public class RMXDoubleKickShoot : CharState {
 
 
 
+public class RMXPlasmaShotState : CharState {
+	bool shot = false;
+	BusterPlasmaProj? proj;
+	float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public RMXPlasmaShotState(string transitionSprite = "") : base("double_kick_shoot", "", "", transitionSprite) {
+	}
+
+	public override void update() {
+		base.update();
+
+		Helpers.decrementTime(ref specialPressTime);
+
+
+		if (!shot && character.sprite.frameIndex == 3) {
+			shoot();
+		}
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		} else {
+			character.changeSpriteFromName("double_kick_shot_grounded", true);
+			sprite = "double_kick_shot_grounded";
+		}
+
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+
+	public void shoot() {
+		shot = true;
+		character.playSound("buster3", sendRpc: true);
+		character.frameIndex = 3;
+		character.frameTime = 0;
+	//	var poi = character.sprite.getCurrentFrame().POIs[0];
+	//	poi.x *= character.xDir;
+		proj =  new BusterPlasmaProj(character.getShootPos(), character.xDir, character, player, player.getNextActorNetId(), true);
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		
+	}
+
+	
+
+	public RekkohaEffect? effect;
+
+}
+
+
+
+
+
 public class RMXPunch : CharState {
 	bool shot = false;
 
