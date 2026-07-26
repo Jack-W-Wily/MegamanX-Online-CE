@@ -53,6 +53,7 @@ public class Buster2Proj : Projectile {
 		fadeSprite = "buster2_fade";
 		reflectable = true;
 		maxTime = 0.5f;
+		damager.flinch = Global.halfFlinch;
 		hitSound = "htsnd_common_x4";
 		projId = (int)ProjIds.Buster2;
 		fadeOnAutoDestroy = true;
@@ -75,7 +76,7 @@ public class Buster3LightProj : Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 3;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
@@ -104,7 +105,7 @@ public class Buster3GigaProj : Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 3;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
@@ -133,7 +134,7 @@ public class Buster3GigaProjMelee : Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 3;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
@@ -164,7 +165,7 @@ public class Buster3MaxProj : Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 3;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
@@ -235,7 +236,7 @@ public class Buster4GigaProj: Projectile {
 		weapon = XBuster.netWeapon;
 		damager.damage = 1;
 		reflectable = true;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
@@ -262,7 +263,7 @@ public class Buster4Giga2Proj: Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 1;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		vel = new Point(350 * xDir, 0);
 		fadeOnAutoDestroy = true;
 		reflectable = true;
@@ -327,7 +328,7 @@ public class Buster4MaxProj: Projectile {
 	) {
 		weapon = XBuster.netWeapon;
 		damager.damage = 4;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		fadeOnAutoDestroy = true;
 		fadeSprite = "buster3_fade";
 		maxTime = 0.85f;
@@ -372,7 +373,7 @@ public class Buster4Proj : Projectile {
 		weapon = XBuster.netWeapon;
 		damager.damage = 4;
 		reflectable = true;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		damager.hitCooldown = 60;
 		fadeSprite = "buster4_fade";
 		this.type = type;
@@ -420,7 +421,7 @@ public class BusterX3Proj1 : Projectile {
 	float line3Y = 2;
 	float partTime;
 		public BusterX3Proj1(Weapon weapon, Point pos, int xDir, int type, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 350, 1, player, "buster4_max_orb2", Global.halfFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 350, 1, player, "buster4_max_orb2", Global.defFlinch, 0f, netProjId, player.ownedByLocalPlayer) {
 		this.type = type;
 		maxDistance = 175;
 		vel.x = 0;

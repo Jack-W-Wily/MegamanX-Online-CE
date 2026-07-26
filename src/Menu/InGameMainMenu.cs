@@ -103,6 +103,15 @@ public class InGameMainMenu : IMainMenu {
 			}
 		} else if (Global.input.isPressedMenu(Control.MenuBack)) {
 			Menu.exit();
+		} else if (Global.input.isPressedMenu(Control.MenuAlt)) {
+			int selectedCharNum = Global.level.mainPlayer.newCharNum;
+			if (selectY == 0) {
+				if (selectedCharNum == (int)CharIds.RockmanX || selectedCharNum == (int)CharIds.XAnother) {
+					Menu.change(new XMovelist(this, true));
+				}
+				} else {
+				Menu.exit();
+			}
 		}
 	}
 

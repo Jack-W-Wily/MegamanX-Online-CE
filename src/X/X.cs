@@ -563,6 +563,15 @@ public class MegamanX : Character {
 			player.superAmmo -= 32;
 			return true;
 		}
+
+		if (inputCheckH && fullArmor == ArmorId.Max && player.superAmmo >= 8
+		
+		) {
+		
+			shoot(3);
+			player.superAmmo -= 8;
+			return true;
+		}
 		if (inputCheckS && canUseFgMove() && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
 		//	shoryukenCooldownTime == 0
