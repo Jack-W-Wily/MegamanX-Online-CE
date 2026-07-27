@@ -1057,7 +1057,7 @@ public class SNESArmorHandler : IMenuHandler {
 	}
 
 	public void renderNoPurchasedArmors(Player player) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 5; i++) {
 			float xStartPos = 34;
 			float[] xPos = [xStartPos + 0, xStartPos + 20, xStartPos + 40, xStartPos + 60];
 			float yPos = 50 + (i * 20);
@@ -1065,29 +1065,7 @@ public class SNESArmorHandler : IMenuHandler {
 			float ySize = 16;
 			Color color = new Color(0, 0, 0, 150);
 
-			if (i == 3) {
-				//Golden Armor.
-				if (player.character is MegamanX mmx) {
-					if (!mmx.hyperHelmetActive) {
-						DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, true, color, 1,
-						ZIndex.HUD, false);
-					}
-					if (!mmx.hyperChestActive) {
-						DrawWrappers.DrawRect(xPos[1], yPos, xPos[1] + xSize, yPos + ySize, true, color, 1,
-						ZIndex.HUD, false);
-					}
-					//Busters.
-					if (!mmx.hyperArmActive) {
-						DrawWrappers.DrawRect(xPos[2], yPos, xPos[2] + xSize, yPos + ySize, true, color, 1,
-						ZIndex.HUD, false);
-					}
-					//Boots.
-					if (!mmx.hyperLegActive) {
-						DrawWrappers.DrawRect(xPos[3], yPos, xPos[3] + xSize, yPos + ySize, true, color, 1,
-						ZIndex.HUD, false);
-					}
-				}
-			} else {
+			
 				//Other armors.
 				//Helmets.
 				if (!player.isHeadArmorPurchased(i + 1)) {
@@ -1110,7 +1088,7 @@ public class SNESArmorHandler : IMenuHandler {
 					ZIndex.HUD, false);
 				}
 			}
-		}
+		
 	}
 
 	public void renderEquippedArmors(Player player) {
@@ -1124,25 +1102,7 @@ public class SNESArmorHandler : IMenuHandler {
 			float ySize = 16;
 			Color color = new Color(0, 224, 0);
 
-			if (i == 3) {
-				//Golden Armor.
-				if (mmx.hyperHelmetActive) {
-					DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, false, color, 1,
-					ZIndex.HUD, false);
-				}
-				if (mmx.hyperChestActive) {
-					DrawWrappers.DrawRect(xPos[1], yPos, xPos[1] + xSize, yPos + ySize, false, color, 1,
-					ZIndex.HUD, false);
-				}
-				if (mmx.hyperArmActive) {
-					DrawWrappers.DrawRect(xPos[2], yPos, xPos[2] + xSize, yPos + ySize, false, color, 1,
-					ZIndex.HUD, false);
-				}
-				if (mmx.hyperLegActive) {
-					DrawWrappers.DrawRect(xPos[3], yPos, xPos[3] + xSize, yPos + ySize, false, color, 1,
-					ZIndex.HUD, false);
-				}
-			} else if (!mmx.hasFullHyperMaxArmor) {
+			 if (!mmx.hasFullHyperMaxArmor) {
 				//Other armors.
 				if ((int)mmx.helmetArmor == i + 1) {
 					DrawWrappers.DrawRect(xPos[0], yPos, xPos[0] + xSize, yPos + ySize, false, color, 1,

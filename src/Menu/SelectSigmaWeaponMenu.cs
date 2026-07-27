@@ -168,10 +168,10 @@ public class SelectSigmaWeaponMenu : IMainMenu {
 			float yPos2 = startY2 + ((i - 2) * 16);
 
 			if (i == 2) {
-				Fonts.drawText(FontType.Blue, "Main Body: ", 40, yPos2, selected: selCursorIndex == i);
-				string form = "Commander Sigma";
-				if (cursors[i].index == 1) { form = "Neo Sigma"; }
-				if (cursors[i].index == 2) { form = "Dopple Sigma"; }
+				Fonts.drawText(FontType.Blue, "Hyper Mode: ", 40, yPos2, selected: selCursorIndex == i);
+				string form = "Wolf SIgma";
+				if (cursors[i].index == 1) { form = "Sigma Virus"; }
+				if (cursors[i].index == 2) { form = "Kaiser SIgma"; }
 				if (cursors[i].index == 3) { form = "Dr. Doppler"; }
 				Fonts.drawText(FontType.Blue, form, startX2 - 6, yPos2, selected: selCursorIndex == i);
 				continue;

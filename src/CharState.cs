@@ -996,6 +996,23 @@ public class Jump : CharState {
 			return;
 		}
 	}
+
+	public Anim? dashSpark;
+	public Anim? dashSpark2;
+	
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			
+
+
+
+		dashSpark = new Anim(
+			character.pos,
+			"jump_sparks", character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		
+	}
 }
 
 public class Fall : CharState {

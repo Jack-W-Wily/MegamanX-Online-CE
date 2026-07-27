@@ -627,7 +627,10 @@ public class SpoiledBratPunch : CharState {
 
 	public override void update() {
 		base.update();
-
+		if (player.vileAmmo <= 0) {
+			character.changeState(new Idle(), true);
+			return;
+		}
 		Helpers.decrementTime(ref specialPressTime);
 		Helpers.decrementTime(ref shootcd);
 

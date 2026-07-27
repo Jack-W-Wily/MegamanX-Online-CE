@@ -847,7 +847,7 @@ public class Damager {
 			}
 
 			// Counter system (WCUT)
-			if (character.isAttacking() &&
+			if (character != null && (character.isAttacking() || Options.main.CPUAlwaysCounterOnTraining && Global.level.isTraining())  &&
 				!character.isFlinchImmune() &&
 				flinch >= 0 &&
 				projId != (int)ProjIds.LightningWeb &&
@@ -1150,6 +1150,9 @@ public class Damager {
 
 			if (projId == (int)ProjIds.BurensenEND && !character.isBlocking()) {
 				character.shakeCamera(sendRpc: true);
+				if (attacker != null) {
+					character.xDir = -attacker.xDir;
+				}
 				character.changeState(new LaunchedFowardState(), true);
 				
 			}

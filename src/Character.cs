@@ -1878,6 +1878,11 @@ public partial class Character : Actor, IDamagable {
 		}
 		// Ground normal states.
 		if (grounded) {
+
+			if (Options.main.CPUAlwaysBlockOnTraining && player.isAI && Global.level.isTraining()) {
+				changeState(new BlockWCUT(), true);
+				return true;
+			}
 			if (flag == null) {
 				if (player.input.isPressed(Control.Left, player) && player.input.checkDoubleTap(Control.Left)) {
 					slideVel = xDir * getDashSpeed();
@@ -2625,8 +2630,28 @@ public partial class Character : Actor, IDamagable {
 		changeToIdleOrFall();
 	}
 
+
+	
+	public Anim? dashSpark;
+	public Anim? dashSpark2;
+
 	public virtual void landingCode(bool useSound = true) {
 		dashedInAir = 0;
+
+		dashSpark = new Anim(
+			pos.addxy(0, 5),
+			"jump_sparks", xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		dashSpark2 = new Anim(
+			pos.addxy(0, 5),
+			"jump_sparks", -xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		
+		dashSpark.yScale = 0.5f;
+		dashSpark2.yScale = 0.5f;
+
 		if (useSound) {
 			playAltSound("land", sendRpc: true, altParams: "larmor");
 		}

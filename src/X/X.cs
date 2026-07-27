@@ -452,13 +452,24 @@ public class MegamanX : Character {
 				changeState(new GigaAirDash(dashControlG), true);
 				return true;
 			}
-			if ((!player.isAI && hasUltimateArmor 
-			|| player.XKaiUAXBuffs && this is XKai || legArmor == ArmorId.Force
+			if ((player.XKaiUAXBuffs && this is XKai || legArmor == ArmorId.Force
 				) && 
 				player.input.isPressed(Control.Jump, player) &&
 				canJump() && !isDashing && canAirDash() && flag == null
 			) {
+				
 				dashedInAir++;
+				
+				changeState(new XHover(), true);
+				return true;
+			}
+
+			if (!player.isAI && hasUltimateArmor 
+			 && 
+				player.input.isPressed(Control.Jump, player) &&
+				canJump() && flag == null
+			) {
+			
 				changeState(new XHover(), true);
 				return true;
 			}
@@ -547,12 +558,17 @@ public class MegamanX : Character {
 	public bool shotokanMoves() {
 		bool inputCheckH = false;
 		bool inputCheckS = false;
+
+		bool inputCheckHC =  player.input.checkHadoken(player, xDir, Control.Shoot);
+
 		if (hasHadoukenEquipped()) {
 			inputCheckH = player.input.checkHadoken(player, xDir, Control.Shoot);
 		}
 		if (hasShoryukenEquipped()) {
 			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
 		}
+
+		
 		if (inputCheckH && canUseFgMove() && player.superAmmo >= player.superMaxAmmo
 		//	player.hadoukenAmmo >= player.fgMoveMaxAmmo &&
 		//	hadoukenCooldownTime == 0
@@ -564,13 +580,13 @@ public class MegamanX : Character {
 			return true;
 		}
 
-		if (inputCheckH && fullArmor == ArmorId.Max && player.superAmmo >= 8
+		if (inputCheckHC && fullArmor == ArmorId.Max && player.superAmmo >= 8
 		
 		) {
-		
-			shoot(3);
+			chargeTime = 3;
+			stockedMaxBusterLv = 2;
 			player.superAmmo -= 8;
-			return true;
+			increaseCharge();
 		}
 		if (inputCheckS && canUseFgMove() && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&

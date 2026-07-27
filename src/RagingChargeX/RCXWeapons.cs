@@ -47,8 +47,8 @@ public class RagingBusterProj : Projectile {
 		Player player, ushort netProjId,
 		bool rpc = false	
 	) : base(
-		weapon, pos, xDir, 350, 3,
-		 player, "buster_unpo", Global.defFlinch, 0.01f, 
+		weapon, pos, xDir, 350, 2,
+		 player, "buster_unpo", Global.halfFlinch, 0.01f, 
 		 netProjId, player.ownedByLocalPlayer
 	) {
 		fadeSprite = "buster3_fade";

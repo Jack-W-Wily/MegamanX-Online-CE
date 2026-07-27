@@ -69,7 +69,7 @@ public class ZeroMovelistEarly : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Fonts.drawText(FontType.Yellow, "X Movelist", Global.screenW * 0.5f, 20, Alignment.Center);
+		Fonts.drawText(FontType.Yellow, "Move List", Global.screenW * 0.5f, 20, Alignment.Center);
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 
@@ -110,13 +110,13 @@ public class ZeroMovelistEarly : IMainMenu {
 
 		if (cursors[0].index == 0) {
 			Fonts.drawText(
-				FontType.Grey, "X Buster", wepTextX, hyperModeYPos,
+				FontType.Grey, "Z Buster", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 0
 			);
 			if (selCursorIndex == 0) {
-				Fonts.drawText(FontType.Green, "A (neutral).",
+				Fonts.drawText(FontType.Green, "Hold A , B or R2.",
 				 Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Chargeable, Press R1/L1.",
+				Fonts.drawText(FontType.DarkPurple, "Chargeable.",
 				 Global.halfScreenW, wsy + 10, Alignment.Center);
 				Fonts.drawText(FontType.DarkPurple, "To Swap Selected Main Weapon.",
 				 Global.halfScreenW, wsy + 18, Alignment.Center);
@@ -128,20 +128,19 @@ public class ZeroMovelistEarly : IMainMenu {
 			);
 			if (selCursorIndex == 0) {
 				
-				Fonts.drawText(FontType.Green, "B (neutral).",
+				Fonts.drawText(FontType.Green, "A (neutral).",
 				 Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Can be Followed Up with B or A.",
+				Fonts.drawText(FontType.DarkPurple, "Can be Followed Up with A.",
 				 Global.halfScreenW, wsy+12,Alignment.Center);
-			
 			} 
 		} else if (cursors[0].index == 2) {
 			Fonts.drawText(
-				FontType.DarkPurple, "Double Kick", wepTextX, hyperModeYPos,
+				FontType.DarkPurple, "Run Punch", wepTextX, hyperModeYPos,
 				selected: selCursorIndex == 0
 			);
 			if (selCursorIndex == 0) {
 				
-				Fonts.drawText(FontType.Green, "Up + B.",
+				Fonts.drawText(FontType.Green, "A (while running).",
 				  Global.halfScreenW, wsy-6,Alignment.Center);
 				Fonts.drawText(FontType.DarkPurple, "Can be followed Up with A.",
 				  Global.halfScreenW, wsy+12,Alignment.Center);
@@ -155,10 +154,23 @@ public class ZeroMovelistEarly : IMainMenu {
 
 				Fonts.drawText(FontType.Green, "Hold L1 Press A.",
 				  Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Can be followed Up with any Direction for Finishers.",
+				Fonts.drawText(FontType.DarkPurple, "Throws Enemies on Hit.",
+				  Global.halfScreenW, wsy+12,Alignment.Center);
+			}
+		} else if (cursors[0].index == 4) {
+			Fonts.drawText(
+				FontType.DarkPurple, "UpperCut", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 0
+			);
+			if (selCursorIndex == 0) {
+
+				Fonts.drawText(FontType.Green, "Hold L2 Press A.",
+				  Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, "Juggles Enemies Upwards.",
 				  Global.halfScreenW, wsy+12,Alignment.Center);
 			}
 		} 
+		
 		
 		#endregion
 
@@ -171,63 +183,62 @@ public class ZeroMovelistEarly : IMainMenu {
 
 		if (cursors[1].index == 0) {
 			Fonts.drawText(
-				FontType.Grey, "Follow-Up Shot", wepTextX, hyperModeYPos2,
+				FontType.Grey, "Mega Punch", wepTextX, hyperModeYPos2,
 				selected: selCursorIndex == 1
 			);
 			if (selCursorIndex == 1) {
-				Fonts.drawText(FontType.Green, "A (Follow Up Only).",
+				Fonts.drawText(FontType.Green, "B (Neutral).",
 				 Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Can be used after Punch or Double Kick.",
+				Fonts.drawText(FontType.DarkPurple, "Unblockable Punch, launches enemies.",
 				 Global.halfScreenW, wsy + 12, Alignment.Center);
 			}
 		} else if (cursors[1].index == 1) {
 			Fonts.drawText(
-				FontType.Red, "Warp Dodge", wepTextX, hyperModeYPos2,
+				FontType.Red, "Burn Knuckle", wepTextX, hyperModeYPos2,
 				selected: selCursorIndex == 1
 			);
 			if (selCursorIndex == 1) {
-				Fonts.drawText(FontType.Green, "Hold L2 Press Dash.",
+				Fonts.drawText(FontType.Green, "Hold Down Press A.",
 				 Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Grants Iframes Start to finish.",
+				Fonts.drawText(FontType.DarkPurple, "Dashes Foward for a tackle punch.",
 				 Global.halfScreenW, wsy+12,Alignment.Center);
 			} 
 		}
 		else if (cursors[1].index == 2) {
 			Fonts.drawText(
-				FontType.DarkPurple, "U.P Grab", wepTextX, hyperModeYPos2,
+				FontType.DarkPurple, "Tamatsusenpukiaku ", wepTextX, hyperModeYPos2,
 				selected: selCursorIndex == 1
 			);
 			if (selCursorIndex == 1) {				
-				Fonts.drawText(FontType.Green, "Press R2 During Dashes",
+				Fonts.drawText(FontType.Green, "Press A During Dashes",
 				  Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Lifesteals, Costs 50% SuperBar.",
+				Fonts.drawText(FontType.DarkPurple, "Main Dash Attack Tool",
 				  Global.halfScreenW, wsy+12,Alignment.Center);
 			}
 		}
 		else if (cursors[1].index == 3) {
 			Fonts.drawText(
-				FontType.DarkPurple, "U.P Parry", wepTextX, hyperModeYPos2,
+				FontType.DarkPurple, "Shoryuken", wepTextX, hyperModeYPos2,
 				selected: selCursorIndex == 1
 			);
 			if (selCursorIndex == 1) {
-				Fonts.drawText(FontType.Green, "Down + R2.",
+				Fonts.drawText(FontType.Green, "Up + B.",
 				  Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Costs 50% Super Bar, Refills Ammo on activation.",
+				Fonts.drawText(FontType.DarkPurple, "Rising Uppercut Move.",
 				  Global.halfScreenW, wsy+10,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Can be followed Up with R2 To Throw Absorbed Projectile.",
-				  Global.halfScreenW, wsy+18,Alignment.Center);
+				
 			} 
 		} else if (cursors[1].index == 4) {
 			Fonts.drawText(
-				FontType.DarkPurple, "U.P Fist", wepTextX, hyperModeYPos2,
+				FontType.DarkPurple, "Starfall", wepTextX, hyperModeYPos2,
 				selected: selCursorIndex == 1
 			);
 			if (selCursorIndex == 1) {
-				Fonts.drawText(FontType.Green, "R2 (Neutral).",
+				Fonts.drawText(FontType.Green, "Down + A or B (midair).",
 				  Global.halfScreenW, wsy-6,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Has Iframes start to finish,",
+				Fonts.drawText(FontType.DarkPurple, "A Version Bounces on Enemies",
 				  Global.halfScreenW, wsy+10,Alignment.Center);
-				Fonts.drawText(FontType.DarkPurple, "Quick Reversal tool Costs 50% Bar.",
+				Fonts.drawText(FontType.DarkPurple, "B Version Goes to the ground and deals more damage.",
 				  Global.halfScreenW, wsy+18,Alignment.Center);
 			}
 		}

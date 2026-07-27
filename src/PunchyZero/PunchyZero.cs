@@ -234,7 +234,7 @@ public class PunchyZero : Character {
 	public override bool chargeButtonHeld() {
 		if (charState.normalCtrl && player.currency > 0 && !player.isMainPlayer &&
 		ai?.aiState.randomlyChargeWeapon == true && getChargeLevel() <= getMaxChargeLevel()) return true;
-		return player.input.isHeld(Control.Shoot, player);
+		return player.input.isAHeld(player) || player.input.isBHeld(player) || player.input.isR2Held(player);
 	}
 
 	public void setShootAnim() {
@@ -681,7 +681,7 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch, 15,
+				meleeWeapon, projPos, ProjIds.PZeroPunch2, player, 2, Global.halfFlinch + 4, 15,
 				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch2"
 			),
 			(int)MeleeIds.Uppercut2 => new GenericMeleeProj(

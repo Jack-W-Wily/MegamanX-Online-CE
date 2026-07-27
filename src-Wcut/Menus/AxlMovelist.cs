@@ -69,7 +69,7 @@ public class AxlMovelist : IMainMenu {
 			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
 		}
 
-		Fonts.drawText(FontType.Yellow, "X Movelist", Global.screenW * 0.5f, 20, Alignment.Center);
+		Fonts.drawText(FontType.Yellow, "Move List", Global.screenW * 0.5f, 20, Alignment.Center);
 		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
 		float botOffY = inGame ? 0 : -2;
 

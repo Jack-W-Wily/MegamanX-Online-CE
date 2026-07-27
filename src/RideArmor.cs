@@ -1051,12 +1051,13 @@ public class RideArmor : Actor, IDamagable {
 
 	public bool isVava1Ride => netOwner.character is VAVA1;
 	public string getRaTypeName() {
-		if (raNum == 1 && !isVava1Ride) {
+		if (raNum == 1 ) {
 			return "kangaroo";
-		} else if (raNum == 2 && !isVava1Ride) return "hawk";
-		else if (raNum == 3 && !isVava1Ride) return "frog";
-		else if (raNum == 4 && !isVava1Ride) return "goliath";
-		else if (raNum == 5 && !isVava1Ride) return "devilbear";
+		} 
+		else if (raNum == 2 ) return "hawk";
+		else if (raNum == 3 ) return "frog";
+		else if (raNum == 4 ) return "goliath";
+		else if (raNum == 5 ) return "devilbear";
 		else if (raNum == 6) return "blackbear2";
 		else if (raNum == 7) return "raiden";
 		else if (raNum == 8) return "eagle";

@@ -176,7 +176,11 @@ public class Projectile : Actor {
 
 	public override void update() {
 		base.update();
-
+		if (owner.character != null && owner.character is XAnother) {
+			if (owner.input.isHeld(Control.Down, owner) && !owner.character.grounded) {
+				useGravity = true;
+			} 
+		}
 		time += Global.spf;
 		moveDistance += deltaPos.magnitude;
 		Helpers.decrementFrames(ref hitSoundCD);

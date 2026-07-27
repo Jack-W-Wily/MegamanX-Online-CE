@@ -627,6 +627,20 @@ public class VAVA1 : Vile {
 		base.update();
 
 
+
+		// blow up ride
+
+		if ( charState is not InRideArmor && linkedRideArmor != null && player.input.isHeld(Control.Down, player)
+		&& player.input.isPressed(Control.Taunt, player)) {
+			linkedRideArmor.explode(shrapnel: true);
+			shakeCamera(sendRpc: true);
+
+			playSound("necroburst", sendRpc: true);
+		}
+		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
 		if (charState is SpoiledBratPunch or InfinityGigAttack or GoGetterRightAttack) {
 			if (player.input.isR2Pressed(player) 
 			){
@@ -773,10 +787,11 @@ public class VAVA1 : Vile {
 		}
 
 		bool isShootingVulcan = vulcanLingerTime <= 0.1;
-		if (isShootingVulcan) {
+		if (player.input.isAPressed(player) || player.input.isBPressed(player) || player.input.isR2Pressed(player)
+		|| player.input.isHeld(Control.WeaponRight, player)) {
 			vileAmmoRechargeCooldown = 0.15f;
 		}
-
+		
 		if (vileAmmoRechargeCooldown > 0) {
 			Helpers.decrementTime(ref vileAmmoRechargeCooldown);
 		} else if (usedAmmoLastFrame) {

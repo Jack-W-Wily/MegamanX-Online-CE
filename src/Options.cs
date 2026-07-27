@@ -18,6 +18,12 @@ public class Options {
 	public bool showSysReqPrompt = true;
 	public bool enableDeveloperConsole;
 	public bool disableChat;
+
+	public bool CPUAlwaysTechOnTraining;
+
+	public bool CPUAlwaysCounterOnTraining;
+
+	public bool CPUAlwaysBlockOnTraining;
 	public int fpsMode = 0;
 	public bool cheatWarningShown;
 	public bool disableDoubleDash;

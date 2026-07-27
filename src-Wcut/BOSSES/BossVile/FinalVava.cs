@@ -499,7 +499,8 @@ public class FinalVava : Vile {
 		}
 
 		bool isShootingVulcan = vulcanLingerTime <= 0.1;
-		if (isShootingVulcan) {
+		if (player.input.isAPressed(player) || player.input.isBPressed(player) || player.input.isR2Pressed(player)
+		|| player.input.isHeld(Control.WeaponRight, player)) {
 			vileAmmoRechargeCooldown = 0.15f;
 		}
 

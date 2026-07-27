@@ -54,6 +54,8 @@ public class XHover : CharState {
 		}
 
 
+		startXDir = character.xDir;
+
 		if (inputDir.x == character.xDir) {
 			if (!sprite.StartsWith("hover_forward")) {
 				sprite = "hover_forward";
@@ -61,21 +63,16 @@ public class XHover : CharState {
 				character.changeSpriteFromName(sprite, true);
 			}
 		} else if (inputDir.x == -character.xDir) {
-			if (player.input.isHeld(Control.Jump, player)) {
+			
+				//character.xDir = -character.xDir;
+				//startXDir = character.xDir;
 				if (!sprite.StartsWith("hover_backward")) {
 					sprite = "hover_backward";
 					shootSprite = sprite + "_shoot";
+					character.getShootXDir();
 					character.changeSpriteFromName(sprite, true);
 				}
-			} else {
-				character.xDir = -character.xDir;
-				startXDir = character.xDir;
-				if (!sprite.StartsWith("hover_forward")) {
-					sprite = "hover_forward";
-					shootSprite = sprite + "_shoot";
-					character.changeSpriteFromName(sprite, true);
-				}
-			}
+			
 		} else {
 			if (sprite != "hover") {
 				sprite = "hover";
@@ -116,6 +113,11 @@ public class XHover : CharState {
 		if (stateTime <= 0.1f) {
 			sound = character.playSound("uahover", forcePlay: false, sendRpc: true);
 		}
+		hoverExhaust = new Anim(
+			exhaustPos(), "hover_exhaust", character.xDir, player.getNextActorNetId(), false, sendRpc: true
+		);
+		hoverExhaust.setzIndex(ZIndex.Character - 1);
+		
 	}
 
 	public override void onExit(CharState? newState) {

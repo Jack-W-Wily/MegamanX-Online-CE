@@ -183,8 +183,13 @@ public class XBuster : Weapon {
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
-			} else {
+			} else if (mmx.armArmor == ArmorId.Light) {
 				shootLightBuster4(mmx, pos, xDir);
+			} else {
+				new Buster4MaxProj(
+						pos, xDir, mmx, player,
+						player.getNextActorNetId(), true
+					);
 			}
 		}
 		if (shootSound != "") {

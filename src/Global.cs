@@ -531,10 +531,10 @@ public partial class Global {
 	public const int maxServers = 5;
 	public static int tickRate = 1;
 
-	public static readonly int superFlinch = 35;
-	public static readonly int defFlinch = 24;
-	public static readonly int halfFlinch = 12;
-	public static readonly int miniFlinch = 6;
+	public static readonly int superFlinch = 40;
+	public static readonly int defFlinch = 30;
+	public static readonly int halfFlinch = 16;
+	public static readonly int miniFlinch = 10;
 
 	public static DateTimeOffset UnixEpoch = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 

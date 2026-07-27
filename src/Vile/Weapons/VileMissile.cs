@@ -126,7 +126,7 @@ public class HumerusCrush : VileMissile {
 		if (vava.isVileMK2 || vava.isVileMK5) {
 			shootPos = vava.getVileMK2StunShotPos();
 		} else {
-			shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+			shootPos = vava.getVileMK2StunShotPos();
 		}
 		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
 		int xDir = character.getShootXDir();
@@ -170,7 +170,7 @@ public class PopcornDemon : VileMissile {
 		if (vava.isVileMK2 || vava.isVileMK5) {
 			shootPos = vava.getVileMK2StunShotPos();
 		} else {
-			shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
+			shootPos = vava.getVileMK2StunShotPos();
 		}
 		if (vava.getShootXDir() == -1) shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
 		int xDir = character.getShootXDir();

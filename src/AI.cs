@@ -223,6 +223,9 @@ public class AI {
 	}
 
 	public virtual void update() {
+
+
+		
 		if (Global.level.isRace() && Global.level.supportsRideChasers && Global.level.levelData.raceOnly) {
 			raceChaserAI();
 			return;

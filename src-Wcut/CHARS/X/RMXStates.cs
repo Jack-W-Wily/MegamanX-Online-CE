@@ -241,7 +241,7 @@ public class RMXPlasmaShotState : CharState {
 
 	public void shoot() {
 		shot = true;
-		character.playSound("buster3", sendRpc: true);
+		character.playSound("plasmaShot", sendRpc: true);	
 		character.frameIndex = 3;
 		character.frameTime = 0;
 	//	var poi = character.sprite.getCurrentFrame().POIs[0];

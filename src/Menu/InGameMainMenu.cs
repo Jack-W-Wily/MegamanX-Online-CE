@@ -109,6 +109,10 @@ public class InGameMainMenu : IMainMenu {
 				if (selectedCharNum == (int)CharIds.RockmanX || selectedCharNum == (int)CharIds.XAnother) {
 					Menu.change(new XMovelist(this, true));
 				}
+				if (selectedCharNum == (int)CharIds.PunchyZero) {
+					Menu.change(new ZeroMovelistEarly(this, true));
+				}
+				
 				} else {
 				Menu.exit();
 			}

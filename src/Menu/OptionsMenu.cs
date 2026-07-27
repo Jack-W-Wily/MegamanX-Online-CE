@@ -456,6 +456,8 @@ public class OptionsMenu : IMainMenu {
 					"Disables ability to dash by quickly\ntapping LEFT or RIGHT twice."
 				),
 
+
+
 				// Kill on loadout change
 				new MenuOption(
 					30, startY,
@@ -555,7 +557,83 @@ public class OptionsMenu : IMainMenu {
 					"Makes some of the energy bars smaller."
 				),
 
+				
+				// Cpu Always Techs on Training Mode
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.CPUAlwaysTechOnTraining = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.CPUAlwaysTechOnTraining = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "CPU Tech out on Training:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.CPUAlwaysTechOnTraining),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Cpu Always Techs on Training Mode."
+				),
+
+
+				
+				// Cpu Always Block on Training Mode
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.CPUAlwaysBlockOnTraining = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.CPUAlwaysBlockOnTraining = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "CPU Block on Training:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.CPUAlwaysBlockOnTraining),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Cpu Always Blocks on Training Mode."
+				),
+
+
+				
+				// Cpu Always Techs on Training Mode
+				new MenuOption(
+					30, startY,
+					() => {
+						if (Global.input.isHeldMenu(Control.MenuLeft)) {
+							Options.main.CPUAlwaysCounterOnTraining = false;
+						} else if (Global.input.isHeldMenu(Control.MenuRight)) {
+							Options.main.CPUAlwaysCounterOnTraining = true;
+						}
+					},
+					(Point pos, int index) => {
+						Fonts.drawText(
+							optionFontText, "Force Counterhit on Training:",
+							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						Fonts.drawText(
+							optionFontValue, Helpers.boolYesNo(Options.main.CPUAlwaysCounterOnTraining),
+							pos.x + 166, pos.y, selected: selectedArrowPosY == index
+						);
+					},
+					"Always Counterhit on Training Mode."
+				),
+
 			};
+
+			
 		} else if (charNum == null) {
 			if (!Global.regionPingTask.IsCompleted) {
 				Global.regionPingTask.Wait();
