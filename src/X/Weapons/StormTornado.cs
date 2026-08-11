@@ -66,6 +66,7 @@ public class TornadoProj : Projectile {
 	) {
 		weapon = isStormE ? StormEagle.netWeapon : StormTornado.netWeapon;
 		damager.damage = 1;
+		damager.flinch = Global.halfFlinch;
 		vel = new Point(400 * xDir, 0);
 		damager.hitCooldown = 15;
 		projId = isStormE ? (int)ProjIds.StormETornado : (int)ProjIds.Tornado;
@@ -175,7 +176,7 @@ public class TornadoProjCharged : Projectile {
 	) {
 		weapon = StormTornado.netWeapon;
 		damager.damage = 2;
-		damager.flinch = Global.defFlinch;
+	
 		vel = new Point(0 * xDir, 0);
 		damager.hitCooldown = 20;
 		projId = (int)ProjIds.TornadoCharged;

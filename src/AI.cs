@@ -469,6 +469,7 @@ public class AI {
 			!inNodeTransition && stuckTime == 0 &&
 			character.charState.normalCtrl &&
 			character.charState is not Dash and not AirDash and not UpDash
+			&& character.canDash()
 		) {
 			if (Helpers.randomRange(0, 75) < 5) {
 				dashTime = Helpers.randomRange(0.3f, 0.5f);

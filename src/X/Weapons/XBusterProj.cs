@@ -193,6 +193,13 @@ public class Buster3MaxProj : Projectile {
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);	
 		var chr = owner.character;
+
+		if (chr?.OverDrive == true) {
+			new MechFrogStompShockwave(new XBuster(),
+				pos, xDir, owner,
+				owner.getNextActorNetId(), rpc: true);
+				playSound("crash", true);
+		}
 		if (other.gameObject is BusterX3Proj1 X3shot && X3shot.ownedByLocalPlayer && !destroyed) {
 			if (!ownedByLocalPlayer) return;
 				Global.level.delayedActions.Add(new DelayedAction(delegate {

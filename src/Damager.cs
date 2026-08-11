@@ -497,9 +497,9 @@ public class Damager {
 					owner.character.charState.spcCancel = true;
 					owner.character.aiAttackCooldown = 0;
 				}
-				if (owner.superAmmo != owner.superMaxAmmo) {
+				if (owner.superAmmo != owner.superMaxAmmo && owner.character is not VAVA1) {
 						if (owner.character.charState.canGainMeter){
-					owner.superAmmo += 1;
+					owner.superAmmo +=  damage / 2f;
 					}
 				}
 			}
@@ -649,6 +649,7 @@ public class Damager {
 					break;
 				case (int)ProjIds.MechFrogStompShockwave:
 				case (int)ProjIds.FlameMStompShockwave:
+				case (int)ProjIds.Shippuuga:
 				case (int)ProjIds.TBreakerProj:
 					//if (character.grounded && character.ownedByLocalPlayer) {
 						character.changeState(
@@ -816,7 +817,7 @@ public class Damager {
 
 
 			// For WCUT Block to work
-			if (character.sprite.name.Contains("block") && damage > 0 && !isArmorPiercing(projId)) {
+			if ((character.sprite.name.Contains("block") || character.sprite.name.Contains("guard")) && damage > 0 && !isArmorPiercing(projId)) {
 				if (!hitFromBehind(character, damagingActor, owner, projId)) {
 					damage--;
 					flinch = 0;
@@ -867,6 +868,7 @@ public class Damager {
 			) {
 				if (
 				projId != (int)ProjIds.MechFrogStompShockwave &&
+				projId != (int)ProjIds.Shippuuga &&
 				projId != (int)ProjIds.ForceGrabState &&
 				projId != (int)ProjIds.BoomerangKDeadLift &&
 				projId != (int)ProjIds.BurensenEND &&
@@ -887,6 +889,12 @@ public class Damager {
 			// For Grabs to work (WCUT)
 
 			var attacker = owner.character;
+
+			if (attacker != null && character is RockmanX or XAnother) {
+				attacker.wasFigthing = (int)CharIds.RockmanX;
+			}
+
+
 			if (projId == (int)ProjIds.ForceGrabState) {
 				if (attacker != null){
 					if (attacker.charState is ZainGrabStab) {
@@ -1106,7 +1114,10 @@ public class Damager {
 					owner.character.changeState(new AxlAirRaid(character), true);
 				}
 				// Vile Blockable Grab
-				if (!character.sprite.name.Contains("block") &&
+				if (!character.sprite.name.Contains("block") && !character.sprite.name.Contains("guard")
+				
+				
+				 &&
 				 projId == (int)ProjIds.VileGrab
 				 && !character.isStatusImmune()) {
 					character.changeState(new VileMK2Grabbed(owner.character), true);
@@ -1135,7 +1146,10 @@ public class Damager {
 						}
 						break;
 					case (int)ProjIds.BurensenStart:
-						owner.character.changeState(new VavaBurensen2(character));
+						Global.level.delayedActions.Add(new DelayedAction(() => {
+					owner.character.changeState(new VavaBurensen2(character));
+						}, 0.2f));
+						
 						character.changeState(new PushedOver2(owner.character.xDir), true);
 						break;
 					case (int)ProjIds.BurensenStomp:
@@ -1175,7 +1189,9 @@ public class Damager {
 				character?.changeState(new ForceGrabbed(owner.character));
 			}
 			
-			if (projId == (int)ProjIds.BlockableLaunch && !character.isBlocking()) {
+			if ((projId == (int)ProjIds.BlockableLaunch
+			|| projId == (int)ProjIds.TornadoCharged
+			) && !character.isBlocking()) {
 
 				character.changeState(new LaunchedState(owner.character));
 			}
@@ -1221,14 +1237,14 @@ public class Damager {
 					flinch = 0;
 				}
 				// Counter effect.
-				if (flinch > Global.miniFlinch && countered) {
-					character.addDamageText("COUNTER!", (int)FontType.Red);
-				}
+				
 				if (flinch > Global.miniFlinch && countered && character.counterCooldown == 0) {
 					character.counterCooldown = 60;
+					character.addDamageText("COUNTER!", (int)FontType.Red);
 					character.shakeCamera();
 					character.playSound("weakness");
 					character.setHurt(hurtDir, flinch, spiked);
+					character.counterHurt = true;
 				}
 
 				// Flinch above 0 and is not weakness

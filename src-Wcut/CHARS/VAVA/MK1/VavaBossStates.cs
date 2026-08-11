@@ -482,6 +482,7 @@ public class VavaBurensen1 : CharState {
 
 	public override void update() {
 		base.update();
+		character.isDashing = true;
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
@@ -491,6 +492,11 @@ public class VavaBurensen1 : CharState {
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
@@ -541,7 +547,7 @@ public class VavaBurensen2 : CharState {
 			
 		}
 			
-		
+		character.isDashing = true;
 		
 	}
 
@@ -601,13 +607,11 @@ public class VavaBurensen3 : CharState {
 			character.changeState(new VavaBurensen4(victim), true);
 			
 		}
-
+		character.isDashing = true;
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				 
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}
@@ -722,13 +726,11 @@ public class VavaBurensen4 : CharState {
 			character.changeState(new VavaBurensen4second(victim), true);
 			
 		}
-
+		character.isDashing = true;
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				 
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}
@@ -845,13 +847,11 @@ public class VavaBurensen4second : CharState {
 			character.changeState(new VavaBurensen5(victim), true);
 			
 		}
-
+		character.isDashing = true;
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				 
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}
@@ -963,32 +963,17 @@ public class VavaBurensen5 : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 		timein += Global.spf;
+
+		if (!character.OverDrive){
 		if (timein > 0.4f) {
-
 			character.changeState(new VavaBurensen6(victim), true);
-
-		}
-
-		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
-			fired = true;
-			character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-			new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-					player.getNextActorNetId(), rpc: true
-			);
-			new GigaCrushPilar(character.pos, ZIndex.Character + 10);
-			character.shakeCamera(true);
-		}
-
-		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
-			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
-			victimWasGrabbedSpriteOnce = true;
-		}
-		if (!victimWasGrabbedSpriteOnce) {
-			timeWaiting += Global.spf;
-			if (timeWaiting > 1) {
-				victimWasGrabbedSpriteOnce = true;
+			}
+		} else {
+			if (timein > 2.4f) {
+			character.changeState(new VavaBurensen6(victim), true);
 			}
 		}
+		character.isDashing = true;
 
 		if (character.sprite.name.Contains("burensen_2")) {
 			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
@@ -1001,8 +986,8 @@ public class VavaBurensen5 : CharState {
 				leechTime = 0;
 				character.addHealth(0.13f);
 				character.shakeCamera(sendRpc: true);
-				var damager = new Damager(player, 2f, 0, 3);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
+//				var damager = new Damager(player, 2f, 0, 3);
+//				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
 			}
 
 		}
@@ -1085,6 +1070,7 @@ public class VavaBurensen6 : CharState {
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 		timein += Global.spf;
+		character.isDashing = true;
 		if (timein > 3f
 		&& victim != null) {
 		
@@ -1095,9 +1081,7 @@ public class VavaBurensen6 : CharState {
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				 
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}
@@ -1163,6 +1147,7 @@ public class VavaBurensen6 : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		
 	}
 
 	public override void onExit(CharState? newState) {
@@ -1215,9 +1200,8 @@ public class VavaBurensen7 : CharState {
 					new Anim(character.pos, "ef_laser_finisher_vava", character.xDir, null, true);
 			
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				/*
+				 */
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}
@@ -1232,6 +1216,7 @@ public class VavaBurensen7 : CharState {
 				victimWasGrabbedSpriteOnce = true;
 			}
 		}
+		character.isDashing = true;
 		
 		if (character.sprite.name.Contains("burensen_2")) {
 			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
@@ -1334,7 +1319,7 @@ public class VavaBurensen8 : CharState {
 			character.changeSpriteFromName("hyperdash_attack", true);
 			
 		}
-			
+		character.isDashing = true;	
 		if (timein > 0.6f && !deadlifted) {
 			character.changeSpriteFromName("deadlift", true);
 			deadlifted = true;
@@ -1362,9 +1347,7 @@ public class VavaBurensen8 : CharState {
 				new Anim(character.pos, "ef_laser_finisher_vava", -character.xDir, null, true);
 			
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				 
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}
@@ -1507,9 +1490,7 @@ public class VavaBurensen7 : CharState {
 		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
 				fired = true;
 				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				new IrisLaserProjUp(victim.pos, character.xDir, character, player,
-						player.getNextActorNetId(), rpc: true
-				);
+				 
 				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
 			character.shakeCamera(true);
 			}

@@ -192,6 +192,7 @@ public class Zain : Character {
 				changeState(new ZainShinProjSwingState(grounded, shootProj: true), forceChange: true);
 
 			}
+			
 			ZainCounters -= 4;
 		}
 

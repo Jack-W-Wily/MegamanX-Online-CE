@@ -62,6 +62,7 @@ public class TorpedoProjX : Projectile, IDamagable {
 		weapon = HomingTorpedo.netWeapon;
 		netcodeOverride = NetcodeModel.FavorDefender;
 		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(150 * xDir, 0);
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
@@ -190,7 +191,7 @@ public class TorpedoProjChargedX : Projectile, IDamagable {
 		weapon = HomingTorpedo.netWeapon;
 		netcodeOverride = NetcodeModel.FavorDefender;
 		damager.damage = 1;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.superFlinch;
 		vel = new Point(150 * xDir, 0);
 		fadeSprite = "explosion";
 		fadeSound = "explosion";

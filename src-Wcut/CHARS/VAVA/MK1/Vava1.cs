@@ -543,8 +543,9 @@ public class VAVA1 : Vile {
 					stopCharge();
 					}
           		} else if (getChargeLevel() == 0) {
-
-				vulcanWeapon?.vileShoot(this);
+					if (charState is not BlockWCUT) {
+					vulcanWeapon?.vileShoot(this);
+					}	
 				}
 			}
 
@@ -910,7 +911,13 @@ public class VAVA1 : Vile {
 		return flag == null;
 	}
 
-	public override string getSprite(string spriteName) {
+		public override string getSprite(string spriteName) {
+
+		if (wasFigthing == (int)CharIds.RockmanX
+		 && Global.sprites.ContainsKey("vavavsx_" + spriteName)) {
+			return "vavavsx_" + spriteName;
+		}
+		
 		return "vava_" + spriteName;
 	}
 
@@ -1010,20 +1017,20 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 0, 0, 0, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound: "kofhtsnd_grab1"
 			),
 
 			(int)MeleeIds.GizmoGrab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GizmoGrab, player,
 				 0, 0, 0, isReflectShield: false,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound: "kofhtsnd_grab1"
 			),
 			(int)MeleeIds.Grabmk2dash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.VileMK2Grab, player,
 				 0, 0, 0, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound: "kofhtsnd_grab1"
 			),
 			(int)MeleeIds.UpperCut => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
@@ -1047,25 +1054,25 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
 				 2, 40, 42, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, isJuggleProjectile : false
+				addToLevel: addToLevel, isJuggleProjectile : false, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.CannonExecution => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				 2, 0, 42, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound: "kofhtsnd_knock1"
 			),
 			(int)MeleeIds.KamaeBlock => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
-			 0.25f, 5, 10, isReflectShield: true,
+			 0.25f, 5, 8, isReflectShield: true,
 			clashTier: ClashTier.Weak, isZSaberEffect: true,
-			addToLevel: addToLevel, hitSound : "htsnd_slash1", isJuggleProjectile : true
+			addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Jab => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
 			 1, 26, 15, isReflectShield: true,
 			clashTier: ClashTier.Weak, isZSaberEffect: true,
-			addToLevel: addToLevel, hitSound : "htsnd_punch_1", isJuggleProjectile : true
+			addToLevel: addToLevel, hitSound : "htsnd_punch_1"
 			),
 			(int)MeleeIds.Jab2 => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab2, player,
@@ -1116,7 +1123,7 @@ public class VAVA1 : Vile {
 
 			(int)MeleeIds.BurensenStomp => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
-				1, 0, 20, isReflectShield: true,
+				1, 0, 5, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : false
 			),
@@ -1161,14 +1168,14 @@ public class VAVA1 : Vile {
 				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
 				2, 30, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true,  hitSound : "htsnd_punch_3"
 			),
 
 			(int)MeleeIds.AirRaid => new GenericMeleeProj(
 				new RyuenjinWeapon(), projPos, ProjIds.VileAirRaidPlusKnock, player,
 				1, 0, 20, isReflectShield: true,
 				ShouldClang: false, isZSaberEffect: true,
-				addToLevel: addToLevel, isJuggleProjectile : true
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound: "htsnd_lighting"
 			),
 
 			_ => null

@@ -11,10 +11,10 @@ namespace MMXOnline;
 public class HitStop : Actor {
 	public float time;
 	public Player owner;
-//	public ShaderWrapper? timeSlowShader;
-	public const int radius = 120;
-	public float drawRadius = 120;
-	public float drawAlpha = 255;
+	public ShaderWrapper? timeSlowShader;
+	public const int radius = 320;
+	public float drawRadius = 320;
+	public float drawAlpha = 100;
 	public bool isSnails;
 	float maxTime = 4;
 	float soundTime;
@@ -28,9 +28,9 @@ public class HitStop : Actor {
 		this.owner = owner;
 		isSnails = overrideTime != null;
 
-	//	if (Options.main.enablePostProcessing) {
-	//		timeSlowShader = owner.timeSlowShader;
-	//	}
+		if (Options.main.enablePostProcessing) {
+			timeSlowShader = owner.catfishChargeShader;
+		}
 
 		Global.level.HitStops.Add(this);
 
@@ -64,7 +64,7 @@ public class HitStop : Actor {
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.HitStops.Remove(this);
-		owner.character.hitstops = null;
+		//owner.character.hitstops = null;
 	}
 
 	

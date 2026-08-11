@@ -1206,7 +1206,11 @@ public class DarkHoldDProj : Projectile {
 		setIndestructableProperties();
 		Global.level.darkHoldDProjs.Add(this);
 		if (Options.main.enablePostProcessing) {
+			if (owner.isDynamo){
 			screenShader = owner.nightmareZeroShader;
+			} else {
+			screenShader = owner.darkHoldScreenShader;	
+			}
 		}
 		if (rpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -1247,6 +1251,28 @@ public class DarkHoldDProj : Projectile {
 		}
 	}
 
+
+	
+	public void updateShader() {
+		if (screenShader != null) {
+			var screenCoords = new Point(
+				pos.x - Global.level.camX,
+				pos.y - Global.level.camY
+			);
+			var normalizedCoords = new Point(
+				screenCoords.x / Global.viewScreenW,
+				1 - screenCoords.y / Global.viewScreenH
+			);
+			float ratio = Global.screenW / (float)Global.screenH;
+			float normalizedRadius = (radius / Global.screenH);
+
+			screenShader.SetUniform("ratio", ratio);
+			screenShader.SetUniform("x", normalizedCoords.x);
+			screenShader.SetUniform("y", normalizedCoords.y);
+			screenShader.SetUniform("r", normalizedRadius / Global.viewSize);
+		}
+	}
+	
 	public override void onDestroy() {
 		base.onDestroy();
 		Global.level.darkHoldDProjs.Remove(this);
@@ -1269,6 +1295,10 @@ public class DarkHoldDProj : Projectile {
 		
 	}
 }
+
+
+
+
 
 
 

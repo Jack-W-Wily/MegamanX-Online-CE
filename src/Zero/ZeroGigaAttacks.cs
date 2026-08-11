@@ -195,8 +195,8 @@ public class RakuhouhaProj : Projectile {
 		pos, xDir, owner, isCFlasher ? "cflasher" : "rakuhouha", netId, player
 	) {
 		weapon = isCFlasher ? Messenkou.netWeapon : RakuhouhaWeapon.netWeapon;
-		damager.damage = 4;
-		damager.hitCooldown = 60;
+		damager.damage = 1;
+		damager.hitCooldown = 0;
 		damager.flinch = Global.defFlinch;
 		byteAngle = byteAngle % 256;
 		this.byteAngle = byteAngle;
@@ -212,9 +212,9 @@ public class RakuhouhaProj : Projectile {
 			fadeSprite = "rakuhouha_fade";
 			projId = (int)ProjIds.Rakuhouha;
 		} else {
-			damager.damage = 2;
-			damager.hitCooldown = 30;
-			damager.flinch = 0;
+			damager.damage = 1;
+			damager.hitCooldown = 4;
+			damager.flinch = 10;
 			destroyOnHit = false;
 			fadeSprite = "buster4_fade";
 			projId = (int)ProjIds.CFlasher;
@@ -230,6 +230,13 @@ public class RakuhouhaProj : Projectile {
 			args.pos, args.extraData[0] == 1, args.byteAngle,
 			args.xDir, args.owner, args.player, args.netId
 		);
+	}
+
+	public override void update() {
+		if (time > 0.2f && !isCFlasher) {
+			damager.damage = 4;
+
+		}
 	}
 }
 
@@ -489,13 +496,13 @@ public class DarkHoldProj : Projectile {
 							continue;
 						}
 						if (chara.canBeDamaged(damager.owner.alliance, damager.owner.id, null)) {
-							chara.addDarkHoldTime(150 - timeInFrames, damager.owner);
-							chara.darkHoldInvulnTime = (150 - timeInFrames) * 60f;
+							chara.addDarkHoldTime(250 - timeInFrames, damager.owner);
+							chara.darkHoldInvulnTime = (250 - timeInFrames) * 60f;
 						}
 						// We freeze the player in the same way we freeze the armor if inside of it.
 						if (chara.charState is InRideArmor or InRideChaser) {
 							if (actor.timeStopTime <= 0) {
-								actor.timeStopTime = 120 - timeInFrames;
+								actor.timeStopTime = 220 - timeInFrames;
 							}
 							continue;
 						}
@@ -651,6 +658,11 @@ public class RakuhouhaState : ZeroGigaAttack {
 	public override void onEnter(CharState oldState) {
 		character.clenaseDmgDebuffs();
 		base.onEnter(oldState);
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 }
 
@@ -868,6 +880,7 @@ public class DarkHoldShootState : CharState {
 		base.update();
 		if (character.frameIndex >= 7 && !shoot) {
 			shoot = true;
+			new DarkHoldDProj(new DarkHoldWeapon(), character.pos, character.xDir, player, player.getNextActorNetId(), rpc: true);
 			new DarkHoldProj(
 				character.pos.addxy(0, -20), character.xDir, character,
 				player, player.getNextActorNetId(), rpc: true
@@ -902,7 +915,7 @@ public class DarkHoldState : CharState {
 	public DarkHoldState(Character character, float time) : base(character.sprite.name) {
 		pushImmune = true;
 		stunTime = time;
-
+		superArmor = true;
 		this.frameIndex = character?.frameIndex ?? 0;
 		if (character is Axl axl) {
 			this.shouldDrawAxlArm = axl.shouldDrawArm();
@@ -937,6 +950,12 @@ public class DarkHoldState : CharState {
 		character.isDarkHoldState = true;
 		invincible = oldState.invincible;
 		specialId = oldState.specialId;
+
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public override void onExit(CharState? newState) {

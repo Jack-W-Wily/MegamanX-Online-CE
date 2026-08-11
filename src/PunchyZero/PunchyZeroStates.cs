@@ -963,6 +963,12 @@ public class ZX1AkaBuster : CharState {
 			character.changeSpriteFromName("aka_buster", true);
 			sprite = "aka_buster";
 		}
+
+			character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+		
 	}
 
 	public void shoot() {

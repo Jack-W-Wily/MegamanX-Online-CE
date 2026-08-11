@@ -450,7 +450,7 @@ public class DragoonRisingFire : CharState {
 		}
 
         if (character.frameIndex >= 6) {
-		    if (projCD > 0.2f){
+		    if (projCD > 0.1f){
                 character.playSound("speedBurner", sendRpc: true);
                 projCD = 0;
             	new RisingFireProj(new RisingFire(), character.pos.addxy(-5,-43), character.xDir, player, player.getNextActorNetId(), true);
@@ -468,6 +468,11 @@ public class DragoonRisingFire : CharState {
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 
@@ -518,6 +523,11 @@ public class DragoonSpitFire : CharState {
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public override void onExit(CharState? newState) {
@@ -777,14 +787,17 @@ public class DragoonUppercut : CharState {
 		enterSound = "punch2";
 	}
 
+	bool shotOnce;
+
 	public override void update() {
 		base.update();
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-		if (player.input.isR2Pressed(player)) {
+		if (player.input.isR2Pressed(player) && !shotOnce) {
 			   character.playSound("speedBurner", sendRpc: true);
             	new RisingFireProj(new RisingFire(), character.pos.addxy(30 * character.xDir,-43), character.xDir, player, player.getNextActorNetId(), true);
+			shotOnce = true;
 		}
 	}
 	public override void onEnter(CharState oldState) {

@@ -203,6 +203,8 @@ public partial class Character : Actor, IDamagable {
 	public float dropFlagCooldown;
 	public bool dropFlagUnlocked;
 
+	// for Rivalries
+	public int wasFigthing;
 
 	// Input Stuff (WCUT)
 	public float inputdecreasedCD;
@@ -1269,6 +1271,8 @@ public partial class Character : Actor, IDamagable {
 			if (health > 10 && bonusHealth == 0) {
 				overDriveTimer = 30;
 			}
+
+
 			if (this is Vile){
 				if (this is VAVAV){
 				changeState(new VavaVOverdriveStart(), true);
@@ -1289,7 +1293,15 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 
+		if (OverDrive && overDriveTimer < 1 && !charState.normalCtrl) {
+			overDriveTimer = 1;
+		}
 
+
+		if (charState.normalCtrl) {
+			counterHurt = false;
+			juggled = false;
+		}
 		if (ActivateHEXA && OverDrive && !isInDamageSprite() && hexa == null) {
             hexa = new HexaInvoluteProj(
 				getCenterPos(),
@@ -3598,10 +3610,12 @@ public partial class Character : Actor, IDamagable {
 			// Heals are not really applied here.
 			if (damage < 0) { damage = 0; }
 		// For Bonus Health
-		if (bossArmor > 0) {
-		bossArmor -= damage;
+	//	if (bossArmor > 0) {
+	//	bossArmor -= damage;
 		
-		} else {
+	//	} else {
+
+			
 		if (bonusHealth > 0) {
 			bonusHealth -= damage;
 			isNodamage = false;
@@ -3610,7 +3624,7 @@ public partial class Character : Actor, IDamagable {
 			health -= damage;
 			isNodamage = false; 
 			}
-		}	
+		//}	
 			// Clamp to 0. We do not want to go into the negatives here.
 		if (health < 0) {
 			health = 0;
@@ -3945,7 +3959,10 @@ public partial class Character : Actor, IDamagable {
 
 	public bool juggled;
 
-	public bool tripping;
+	
+
+	public bool counterHurt;
+
 	public void setHurt(int dir, int flinchFrames, bool spiked) {
 		if (!ownedByLocalPlayer) {
 			return;

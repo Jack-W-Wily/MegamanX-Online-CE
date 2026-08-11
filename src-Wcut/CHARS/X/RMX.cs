@@ -139,6 +139,10 @@ public class RockmanX : MegamanX {
 			}
 			if (!OverDrive) {
 				player.superAmmo -= 16;
+				new GigaCrushBackwall(this.pos, this);
+				new HitStop(pos, player, player.getNextActorNetId(), 
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				playSound("ching", sendRpc: true);
 			}
 		}
 
@@ -313,6 +317,8 @@ public class RockmanX : MegamanX {
 		DashGrab,
 		ParryBlock,
 		Punch,
+
+		UltraPunch,
 	
 		GrabKickLV1,
 
@@ -361,7 +367,8 @@ public class RockmanX : MegamanX {
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
-			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when !OverDrive => MeleeIds.Punch,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when OverDrive => MeleeIds.UltraPunch,
 			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
 
 
@@ -390,6 +397,10 @@ public class RockmanX : MegamanX {
 			(int)MeleeIds.Punch => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
+			),
+			(int)MeleeIds.UltraPunch => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
+				6, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
 
 			(int)MeleeIds.DropDown => new GenericMeleeProj(

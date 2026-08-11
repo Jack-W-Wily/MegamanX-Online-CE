@@ -518,6 +518,15 @@ public class ZainShinGroundStab : CharState {
 		canSpecialCancel = true;
 	}
 
+	
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+	}
+
 	public override void update()
 	{
 	
@@ -702,6 +711,10 @@ public class ZainShinProjSwingState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+			character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public override void update() {

@@ -250,6 +250,8 @@ public partial class Global {
 	public static Dictionary<string, string> spriteAliases = new Dictionary<string, string>()
 	{
 			{ "rmx_run", "rmx_warp_door" },
+
+
 			{ "ra_iris_taunt", "ra_iris_win" },
 
 			{ "chillp_fall", "chillp_enter" },

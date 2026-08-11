@@ -64,6 +64,11 @@ public class BFlameMInfernoRelease : BFMammothMState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.stopMoving();
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public override void update() {
@@ -223,7 +228,7 @@ public class BFlameMAntiAir : BFMammothMState {
 		base.update();
 		if (burningNoumander == null) return;
 
-		if (character.frameIndex == 6 && !once) {
+		if (character.frameIndex == 1 && !once) {
 			once = true;
 			new FlameMFireballProj(
 			burningNoumander.getFirstPOI() ?? burningNoumander.getCenterPos(), character.xDir, player.input.isHeld(Control.Down, player),

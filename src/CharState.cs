@@ -192,7 +192,7 @@ public class CharState {
 	public virtual bool canEnter(Character character) {
 		if (character.charState is InRideArmor &&
 			!(this is Die || this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
-			  this is UPGrabbed || this is WhirlpoolGrabbed || this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))
+			  this is UPGrabbed || this is GenericGrabbedState || this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))
 		) {
 			//if (character.currentWeapon is NecroBurst && character.charState is LaserAttack) return false;
 			return false;

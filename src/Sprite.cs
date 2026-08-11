@@ -705,7 +705,7 @@ public class Sprite {
 					));
 				}
 
-				if (name.Contains("iris") && chara != null) {
+				if ((name.Contains("vava") || name.Contains("iris")) && chara != null) {
 					for (int i = lastFiveTrailDraws.Count - 1; i >= 0; i--) {
 						var trail = lastFiveTrailDraws[i];
 						if (chara.isDashing) {

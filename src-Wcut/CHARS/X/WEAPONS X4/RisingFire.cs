@@ -102,9 +102,9 @@ public class RisingFireProj : Projectile {
 		Player player, ushort netProjId, bool rpc = false
 	) : base(
 		weapon, pos, xDir, 0, 1.5f, player, "risingfire_proj", 
-		20, 0, netProjId, player.ownedByLocalPlayer
+		Global.defFlinch, 0, netProjId, player.ownedByLocalPlayer
 	) {
-		maxTime = 0.6f;
+		maxTime = 4f;
 		projId = (int)ProjIds.RisingFire;
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
@@ -124,8 +124,16 @@ public class RisingFireProj : Projectile {
 
 	public override void update() {
 		base.update();
-
+		
+		var randomSpeedvalue = Helpers.randomRange(0, 10);
 		if (isUnderwater()) destroySelf();
+
+		if (time > 0.5f ) {
+			angle = 130 * xDir;
+			useGravity = true;
+			vel.y += 5;
+			vel.x += randomSpeedvalue * xDir;
+		}
 	}
 }
 

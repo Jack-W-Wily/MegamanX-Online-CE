@@ -67,7 +67,7 @@ public class SpinningBladeProj : Projectile {
 		damager.damage = 2;
 		vel = new Point(250 * xDir, 0);
 		maxTime = 2f;
-		damager.flinch = 20;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.SpinningBlade;
 		fadeSprite = "explosion";
 		fadeSound = "explosionX3";
@@ -149,8 +149,8 @@ public class SpinningBladeProjCharged : Projectile {
 		pos, xDir, owner, "spinningblade_charged", netId, player
 	) {
 		weapon = SpinningBlade.netWeapon;
-		damager.damage = 2;
-		damager.hitCooldown = 30;
+		damager.damage = 1;
+		damager.hitCooldown = 5;
 		damager.flinch = Global.defFlinch;
 		vel = new Point(250 * xDir, 0);
 		projId = (int)ProjIds.SpinningBladeCharged;

@@ -147,23 +147,14 @@ public class BossJump : CharState {
 	public override void update() {
 		base.update();
 
-		if (character.grounded && stateTime > 0.05f) {
+		if (!character.grounded && stateTime > 0.05f) {
 			exitOnLanding = true;
 		}
 		if (!character.grounded) {
-		if (!player.isAI && !character.player.input.isAHeld(player) && !dropDown && character.frameIndex < 8) {
-			dropDown = true;
-			character.vel.y = 0;
-			character.frameIndex = 8;
-		}
-		if (player.isAI && stateTime == Helpers.randomRange(0,2) && !dropDown) {
-			dropDown = true;
-			character.vel.y = 0;
-			character.frameIndex = 8;
-		}
 		
 			character.move(new Point(character.xDir * 200, 0));
 		}
+
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -516,7 +507,7 @@ public class ClaudioGuardState : CharState {
 
 public class BossGuard : CharState {
 	public BossGuard() : base("guard") {
-		invincible = true;
+		//invincible = true;
 
 	}
 

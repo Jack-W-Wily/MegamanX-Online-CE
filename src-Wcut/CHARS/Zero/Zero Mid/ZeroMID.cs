@@ -1001,7 +1001,7 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			(int)MeleeIds.Shippuuga => new GenericMeleeProj(
-				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2, Global.defFlinch, 15,
+				ShippuugaWeapon.staticWeapon, projPos, ProjIds.Shippuuga, player, 2,0, 15,
 				isZSaberEffect: true,
 				addToLevel: addToLevel, hitSound : "htsnd_slash3", isJuggleProjectile : true
 			),

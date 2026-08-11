@@ -199,7 +199,9 @@ public class Dynamo : Character {
 
 		
 
-		if (player.superAmmo > 15 && player.input.isHeld(Control.Up, player)
+		if ((OverDrive && player.superAmmo > 15 || !OverDrive && player.superAmmo > 31)
+		
+		 && player.input.isHeld(Control.Up, player)
 		&& player.input.isPressed(Control.Special2, player) && !isInDamageSprite()) {
 			
 			initiateDynamoTimeStop();
@@ -252,18 +254,16 @@ public class Dynamo : Character {
 
 
 	public void initiateDynamoTimeStop() {
-			player.superAmmo -= 16;
+			
 			new DarkHoldDProj(new DarkHoldWeapon(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			playSound("dynamoting", forcePlay: false, sendRpc: true);
 			changeState(new Idle());
 			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
 
 			if (OverDrive) {
-				new DarkHoldProj(
-			pos.addxy(0, -20), xDir, this,
-			player, player.getNextActorNetId(), rpc: true
-			);
-				playSound("darkhold");
+			player.superAmmo -= 16;
+			} else {
+			player.superAmmo -= 32;
 			}
 	}
 

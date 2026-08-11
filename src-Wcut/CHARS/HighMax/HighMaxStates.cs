@@ -433,6 +433,10 @@ public class DesmumeSpam : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.stopMoving();
+			character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public override void onExit(CharState? newState) {
@@ -519,6 +523,10 @@ public class DesmumeSpam2 : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.stopMoving();
+			character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public override void onExit(CharState? newState) {

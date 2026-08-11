@@ -234,9 +234,10 @@ public class RMXPlasmaShotState : CharState {
 			sprite = "double_kick_shot_grounded";
 		}
 
-		if (player.isMainPlayer) {
-			effect = new RekkohaEffect();
-		}
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 
 	public void shoot() {

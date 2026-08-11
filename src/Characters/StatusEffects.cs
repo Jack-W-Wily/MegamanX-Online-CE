@@ -89,21 +89,21 @@ public class Hurt : CharState {
 		if ( character.health < 15 && character.isWCUTBoss) {
 				character.invulnTime = 0.5f;
             
-			character.changeToLandingOrFall(false);
+			character.changeToIdleOrFall();
 		}
 
 		if ( stateTime > 4 && character.isWCUTBoss) {
 				character.invulnTime = 0.5f;
             
-			character.changeToLandingOrFall(false);
+			character.changeToIdleOrFall();
 		}
 
 		if (stateFrames >= flinchTime) {
 			if (player.input.isHeld(Control.Jump, player) || Options.main.CPUAlwaysTechOnTraining && Global.level.isTraining()) {
                 character.vel.y = -character.getJumpPower() * 0.5f;
-				character.invulnTime = 0.5f;
+				character.invulnTime = 0.8f;
             }
-			character.changeToLandingOrFall(false);
+			character.changeToIdleOrFall();
 		}
 	}
 	public override void onExit(CharState? newState) {
@@ -337,11 +337,42 @@ public class KnockedDown : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		if (character.grounded){
 		character.vel.y = -100;
+		}
+		if (character.counterHurt) {
+			flinchTime = 1f;
+		}
 	}
+
+	bool landOnce;
+
+
+	public Anim? dashSpark;
+	public Anim? dashSpark2;
 
 	public override void update() {
 		base.update();
+
+
+		if (character.grounded && !landOnce && stateTime > 0.1f) {
+			landOnce = true;
+			dashSpark = new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		dashSpark2 = new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", -character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		
+		dashSpark.yScale = 0.5f;
+		dashSpark2.yScale = 0.5f;
+			character.playSound("crashX3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+		}
 		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
 			character.move(new Point(hurtSpeed, 0));
@@ -352,10 +383,13 @@ public class KnockedDown : CharState {
 		}
 
 		if (stateTime >= flinchTime) {
-			character.changeToIdleOrFall();
-			if (player.input.isHeld(Control.Jump, player)) {
+			
+			if (player.input.isHeld(Control.Jump, player) || 
+			player.isAI && Options.main.CPUAlwaysTechOnTraining && Global.level.isTraining() ||
+			player.isAI && !Global.level.isTraining() ) {
                 character.vel.y = -character.getJumpPower() * 0.5f;
 				character.invulnTime = 0.35f;
+				character.changeToIdleOrFall();
             }
 		}
 	}

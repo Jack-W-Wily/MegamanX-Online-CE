@@ -46,6 +46,8 @@ public class Projectile : Actor {
 
 	public bool isJuggleProjectile;
 
+	
+
 	public bool isLiftProjectile;
 	public bool destroyOnDMG;
 	public bool isPushProjectile;

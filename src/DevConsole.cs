@@ -77,6 +77,12 @@ public class DevConsole {
 		}
 		Global.level.mainPlayer.health = int.Parse(args[0]);
 	}
+
+	
+	public static void setPower(string[] args) {
+		
+		Global.level.mainPlayer.superAmmo = int.Parse(args[0]);
+	}
 	public static void selfDMG(string[] args) {
 		Global.level.mainPlayer?.character?.applyDamage
 		(float.Parse(args[0]), Global.level.mainPlayer, null, null, (int)ProjIds.SelfDmg);
@@ -258,6 +264,7 @@ public class DevConsole {
 			}
 		}),
 		new Command("hp", (args) => setHealth(args)),
+		new Command("power", (args) => setPower(args)),
 		new Command("dmg", (args) => selfDMG(args)),
 		new Command("freeze", (args) => Global.level.mainPlayer.character?.freeze()),
 		new Command("hurt", (args) => Global.level.mainPlayer.character?.setHurt(-1, Global.defFlinch, false)),

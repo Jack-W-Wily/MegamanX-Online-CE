@@ -55,6 +55,11 @@ public class HellGaze : CmdSigmaStateWC {
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 }
 
@@ -98,6 +103,12 @@ public class HellGazeEX : CmdSigmaStateWC {
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 	}
 	
 }
@@ -687,6 +698,15 @@ public class VirusSlash2 : CharState {
 		if (player.isMainPlayer) {
 			effect = new RekkohaEffect();
 		}
+
+
+		Global.level.delayedActions.Add(new DelayedAction(() => {
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				}, 0.5f));
+	
 	}
 
 	public override void onExit(CharState? newState) {

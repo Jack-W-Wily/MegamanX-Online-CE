@@ -46,6 +46,7 @@ public class BossMammoth : Character {
 		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));
 	
 		spriteFrameToSounds["flamem_warp_in/2"] = "flamemOilBurn";
+		spriteFrameToSounds["flamem_antiair/2"] = "Rooster - Lowkick2";
 		spriteFrameToSounds["fstag_run/6"] = "run";
 		isWCUTBoss = true;
 	}
@@ -91,10 +92,12 @@ public class BossMammoth : Character {
 
 	public override void update() {
 		base.update();
-
+		
 		if (!isWarpIn() && charState is not WarpIdle  ){
 		if (bonusHealth > 0) {
-				
+		if (charState is Dash) {
+					changeState(new BossJumpStart(), true);
+				}		
 			} else {
 				if (health > 10 && !phase1Theme){
 					phase1Theme = true;
@@ -145,17 +148,55 @@ public class BossMammoth : Character {
 			}
 		}
 		
+
+		if (health < 12) {
+					spawnTime += Global.spf;
+					
+					if (spawnTime >= 0.2f) {
+						spawnTime = 0;
+						
+						int randX = Helpers.randomRange(-radius, radius);
+						int randY = Helpers.randomRange(-radius, radius);
+						var randomPos = pos.addxy(randX, randY);
+						new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);
+
+						//playSound("explosion", sendRpc: true);
+					}
+
+					if (spawnTime >= 0.1f) {
+						
+						
+						int randX = Helpers.randomRange(-radius, radius);
+						int randY = Helpers.randomRange(-radius, radius);
+						var randomPos = pos.addxy(randX, randY);
+						new Anim(randomPos, "dust", 1, player.getNextActorNetId(), true, sendRpc: true);
+
+						
+					}
+
+
+					
+
+				}
+		
 	}
 
+	public int radius = 326;
+	float spawnTime;
+
+	public override bool canDash() {
+		return bonusHealth <= 0;
+	}
 
 	
 
-	public override bool canDash() {
-		return false;
+	public override bool canAirDash() {
+		return bonusHealth <= 0;
 	}
 
+
 	public override bool canWallClimb() {
-		return true;
+		return false;
 	}
 
 	public override string getSprite(string spriteName) {
@@ -190,11 +231,11 @@ public class BossMammoth : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"kr_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
-			"flamem_dash" or "flamem_antiair" => MeleeIds.DashSlash,
+			"flamem_antiair" => MeleeIds.DashSlash,
 			"flamem_fall" => MeleeIds.TrippleSlash,
 			"flamem_inferno_release" => MeleeIds.TrippleBusterSlash,
 			"flamem_jump" => MeleeIds.Rising,
-			"flamem_grab" => MeleeIds.Grab,
+			"flamem_grab" or "flamem_dash" => MeleeIds.Grab,
 			"fstag_orochinagi_start"  or  "fstag_wall_dash" => MeleeIds.Rising,
 			
 
@@ -420,6 +461,15 @@ public class BossMammoth : Character {
 
 	public bool isBoss;
 
+	
+	public override Collider getGlobalCollider() {
+		Rect rect = new Rect(0, 0, 18, BaseSigma.sigmaHeight);
+		if (sprite.name.Contains("_ra_")) {
+			rect.y2 = 20;
+		}
+		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
+	}
+
 
 	public override void landingCode(bool useSound = true) {
 		base.landingCode(useSound);
@@ -465,12 +515,12 @@ public class BossMammoth : Character {
 						changeState(new BFlameMOilState());
 						break;
 					case 5 when isFacingTarget:
-						changeState(new BFlameMGrabStart());
-						slideVel = getDashSpeed() * 2;
+						changeState(new BFlameMAntiAir());
+						//slideVel = getDashSpeed() * 2;
 						break;
 					case 6 when isFacingTarget:
-						changeState(new BFlameMGrabStart());
-						slideVel = getDashSpeed();
+						changeState(new BossJumpStart());
+						//slideVel = getDashSpeed();
 						break;
 					case 7 when isFacingTarget && bonusHealth == 0:
 						changeState(new BFlameMInfernoCharge());
@@ -507,13 +557,13 @@ public class BossMammoth : Character {
 				}
 			}
 			if (bonusHealth > 0) {
-				aiAttackCooldown = Helpers.randomRange(60, 120);
+				aiAttackCooldown = Helpers.randomRange(100, 180);
 			} else {
 				if (health > 10){
-				aiAttackCooldown = Helpers.randomRange(20, 60);
+				aiAttackCooldown = Helpers.randomRange(60, 120);
 				} 
 				if (health < 10){
-				aiAttackCooldown = Helpers.randomRange(0, 30);
+				aiAttackCooldown = Helpers.randomRange(20, 60);
 				}
 			}
 		}

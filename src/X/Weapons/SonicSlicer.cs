@@ -54,7 +54,7 @@ public class SonicSlicerStart : Projectile {
 	) {
 		weapon = SonicSlicer.netWeapon;
 		damager.damage = 1;
-		damager.flinch = 10;
+		damager.flinch = Global.halfFlinch;
 		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.SonicSlicerStart;
 
@@ -93,7 +93,7 @@ public class SonicSlicerProj : Projectile {
 		damager.damage = 2;
 		vel = new Point(200 * xDir, 0);
 		maxTime = 0.75f;
-			damager.flinch = 20;
+			damager.flinch = Global.halfFlinch;
 		this.type = type;
 		if (collider != null) {
 			collider?.wallOnly = true;
@@ -167,7 +167,7 @@ public class SonicSlicerProjCharged : Projectile {
 		weapon = SonicSlicer.netWeapon;
 		damager.damage = 4;
 		damager.hitCooldown = 15;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		vel = new Point(250 * xDir, 0);
 		fadeSprite = "sonicslicer_charged_fade";
 		maxTime = 1;
