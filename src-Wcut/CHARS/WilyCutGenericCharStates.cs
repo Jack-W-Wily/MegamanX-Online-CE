@@ -35,8 +35,13 @@ public class HitStop : Actor {
 		Global.level.HitStops.Add(this);
 
 		if (isSnails) {
+			if (Global.isOffline){
 			maxTime = overrideTime!.Value;
+			} else {
+			maxTime = 0.2f;
+			}
 		}
+		
 
 		netOwner = owner;
 		netActorCreateId = NetActorCreateId.HitStop;

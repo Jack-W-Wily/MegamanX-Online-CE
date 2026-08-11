@@ -1422,6 +1422,18 @@ public partial class Character : Actor, IDamagable {
 		Helpers.decrementFrames(ref genericGrabCooldown);
 		Helpers.decrementFrames(ref genericParryCooldown);
 
+
+		// for characters to gather super ammo when pikcing up power capsules
+		if (weaponHealAmount > 0 && player.health > 0) {
+			weaponHealTime += Global.spf;
+			if (weaponHealTime > 0.05) {
+				weaponHealTime = 0;
+				weaponHealAmount--;
+				player.superAmmo = Helpers.clampMax(player.superAmmo + 1, player.superMaxAmmo);
+				playSound("healX3", forcePlay: true, true);
+
+			}
+		}
 		//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 		// New Presing system (WCUT)
 		Helpers.decrementTime(ref inputdecreasedCD);

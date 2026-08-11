@@ -352,18 +352,13 @@ public class XAnother : MegamanX {
 	}
 
 	// this is where you effectively make the melee hitboxes trigger
-	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
 					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				addToLevel: addToLevel
-			),
-
-			(int)MeleeIds.DropDown => new GenericMeleeProj(
-				RCXPunch.netWeapon, projPos, ProjIds.MechFrogGroundPound, player,
-				3, 20, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,
@@ -373,6 +368,13 @@ public class XAnother : MegamanX {
 				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
+			
+
+			(int)MeleeIds.DropDown => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.MechFrogGroundPound, player,
+				3, 20, 30, addToLevel: addToLevel, hitSound : "dbzclang"
+			),
+			
 			(int)MeleeIds.DashGrab => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.newUpGrab, player,
 				3, 0, 120, addToLevel: addToLevel
@@ -381,18 +383,23 @@ public class XAnother : MegamanX {
 			
 				(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
-				 1, 0, 90,isDeflectShield: true,
+				 1, 0, 90, isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_grab1"
 			),
 
 			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-			(int)MeleeIds.RisingFires => new GenericMeleeProj(
+
+				(int)MeleeIds.RisingFires => new GenericMeleeProj(
 				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
 				2, Global.defFlinch, 30, addToLevel: addToLevel, isJuggleProjectile : true
+			),
+			(int)MeleeIds.LightBootKick => new GenericMeleeProj(
+				LhHeadbutt.netWeapon, projPos, ProjIds.GBDKick, player,
+				1, Global.halfFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
@@ -419,8 +426,8 @@ public class XAnother : MegamanX {
 				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
-				ShoryukenWeapon.netWeapon, projPos, ProjIds.Shoryuken, player,
-				2, Global.defFlinch, 10, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				ShoryukenWeapon.netWeapon, projPos, ProjIds.ForceGrabState, player,
+				2, 0, 2, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
@@ -435,14 +442,11 @@ public class XAnother : MegamanX {
 				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
-				HyperNovaStrike.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 5, addToLevel: addToLevel
+				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
+				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
-
-			(int)MeleeIds.LightBootKick => new GenericMeleeProj(
-				LhHeadbutt.netWeapon, projPos, ProjIds.GBDKick, player,
-				1, Global.halfFlinch, 30, addToLevel: addToLevel
-			),
+			
+			
 
 			(int)MeleeIds.GrabKickLV1 => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.HeavyPush, player,

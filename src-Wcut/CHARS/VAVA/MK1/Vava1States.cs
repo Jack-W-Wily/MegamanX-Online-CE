@@ -30,6 +30,12 @@ public class VAVAJab1 : CharState {
 				character.changeState(new VAVAJab2(), true);
 		}
 		}
+
+		if (character.frameIndex > 1) {
+			if (player.input.isBPressed(player)) {
+				character.changeState(new VavaKneeAttack(), true);
+			}
+		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -55,6 +61,12 @@ public class VAVAJab2 : CharState {
 		base.update();
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
+		}
+		if (character.frameIndex > 1) {
+			if (player.input.isBPressed(player)) {
+				character.slideVel = character.xDir * character.getDashSpeed();
+				character.changeState(new VavaKneeAttack(), true);
+			}
 		}
 	}
 	public override void onEnter(CharState oldState) {
@@ -109,6 +121,12 @@ public class VavaKneeAttack : CharState {
 		base.update();
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
+		}
+
+		if (character.frameIndex > 1) {
+			if (player.input.isAPressed(player) && player.input.isHeld(Control.Down, player)) {
+				character.changeState(new VAVAUpperCutPunch(), true);
+			}
 		}
 	}
 	public override void onEnter(CharState oldState) {

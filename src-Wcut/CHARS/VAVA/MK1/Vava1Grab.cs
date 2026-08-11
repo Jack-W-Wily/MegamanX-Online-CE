@@ -58,11 +58,7 @@ public override void update() {
 		base.update();
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
-		if (character.xDir == -1) {
-			victim.xDir = 1;
-		} else {
-			victim.xDir = -1;
-		}
+		
 		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")
 		) {
 			//	character.changeToIdleOrFall();

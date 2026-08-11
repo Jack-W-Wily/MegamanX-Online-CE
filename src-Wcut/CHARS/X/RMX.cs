@@ -418,7 +418,7 @@ public class RockmanX : MegamanX {
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
 				 1, 0, 90, isDeflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound : "kofhtsnd_grab1"
 			),
 
 			(int)MeleeIds.SpeedBurnerCharged => new GenericMeleeProj(

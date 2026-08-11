@@ -204,12 +204,14 @@ public class VAVA1 : Vile {
 		
 
 		// Dash Cancel
-		if (player.dashPressed(out string dashControl)) {
+		if (player.dashPressed(out string dashControl) && player.vileAmmo > 15) {
 			if (grounded) {
 				changeState(new Dash(dashControl), true);
 			} else {
 				changeState(new AirDash(dashControl), true);
 			}
+			player.vileAmmo -= 16;
+			playSound("distortion_d", sendRpc: true);
 				return true;
 		}
 
@@ -1070,7 +1072,7 @@ public class VAVA1 : Vile {
 			),
 			(int)MeleeIds.Jab => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab1, player,
-			 1, 26, 15, isReflectShield: true,
+			 1, 12, 15, isReflectShield: true,
 			clashTier: ClashTier.Weak, isZSaberEffect: true,
 			addToLevel: addToLevel, hitSound : "htsnd_punch_1"
 			),

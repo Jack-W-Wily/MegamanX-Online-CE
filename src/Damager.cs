@@ -983,6 +983,11 @@ public class Damager {
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
+				if (owner?.character is XAnother rxa && rxa != null) {
+					character?.changeState(new ForceGrabbed(rxa));
+					owner.character.changeState(new RMXGrabState(character));
+				}
+
 				if (attacker is VAVA1 or FinalVava && character != null) {
 					character.changeState(new Vava1Grabbed(attacker));
 					attacker.changeState(new Vava1GrabState(character));

@@ -698,7 +698,7 @@ public class Vava2Goliath : Vile {
 			),
 			(int)MeleeIds.Jab2 => new GenericMeleeProj(
 			new KRMelee(), projPos, ProjIds.VJab2, player,
-			 1, 26, 20, isReflectShield: true,
+			 1, 20, 20, isReflectShield: true,
 			clashTier: ClashTier.Weak, isZSaberEffect: true,
 			addToLevel: addToLevel
 			),
