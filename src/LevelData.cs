@@ -235,12 +235,9 @@ public class LevelData {
 
 		if (is1v1()) {
 			maxPlayers = 4;
-			supportedGameModesSet.Add(GameMode.Deathmatch);
-			if (name == "purple_vs_redandblue_1v1"){
-			supportedGameModesSet.Add(GameMode.TeamElimination);
-			} else {
 			supportedGameModesSet.Add(GameMode.Elimination);
-			}
+			supportedGameModesSet.Add(GameMode.TeamElimination);
+			supportedGameModesSet.Add(GameMode.Deathmatch);
 		} else {
 			maxPlayers = Server.maxPlayerCap;
 			supportedGameModesSet.Add(GameMode.Deathmatch);

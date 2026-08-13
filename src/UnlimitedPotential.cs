@@ -96,6 +96,7 @@ public class XUPParryStartState : CharState {
 	}
 
 	public bool canParry() {
+		
 		return character.frameIndex == 0;
 	}
 

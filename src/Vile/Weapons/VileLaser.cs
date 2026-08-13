@@ -503,11 +503,11 @@ public class StraightNightmareProj : Projectile {
 
 #endregion
 
-public class RisingSpecterState : CharState {
+public class NervousGhostState : CharState {
 	bool shot = false;
 	bool grounded;
 
-	public RisingSpecterState(bool grounded) : base(grounded ? "idle_shoot" : "fall") {
+	public NervousGhostState(bool grounded) : base(grounded ? "idle_shoot" : "fall") {
 		this.grounded = grounded;
 	}
 
@@ -549,6 +549,57 @@ public class RisingSpecterState : CharState {
 		}
 	}
 }
+
+
+
+public class RisingSpecterState : CharState {
+	bool shot = false;
+	bool grounded;
+
+	public RisingSpecterState(bool grounded) : base(grounded ? "kick_3" : "fall") {
+		this.grounded = grounded;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!grounded) {
+			if (!character.grounded) {
+				stateTime = 0;
+				return;
+			} else {
+				character.changeSpriteFromName("kick_3", true);
+				grounded = true;
+				return;
+			}
+		}
+
+		if (!shot && character.frameIndex > 3) {
+			shot = true;
+			if (character is Vile vile) {
+				shoot(vile);
+			}
+		}
+
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public void shoot(Vile vile) {
+		Point shootPos = vile.setCannonAim(new Point(1.5f, -1));
+
+		if (vile.tryUseVileAmmo(28)) {
+			new RisingSpecterProj(
+				character.pos.addxy(10 * character.xDir, -35 ), vile.xDir, vile, vile.player, 
+				vile.player.getNextActorNetId(), rpc: true
+			);
+			vile.playSound("risingSpecter", sendRpc: true);
+			vile.shakeCamera();
+		}
+	}
+}
+
 
 
 

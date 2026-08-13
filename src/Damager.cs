@@ -1031,7 +1031,7 @@ public class Damager {
 			}
 
 
-			if (projId == (int)ProjIds.HeavyPush && owner.character != null) {
+			if ((projId == (int)VAVA2ProjIds.NoiseCrushVCharged || projId == (int)ProjIds.HeavyPush) && owner.character != null) {
 				character.changeState(new PushedOver2(owner.character.xDir), true);
 			}
 
@@ -1499,6 +1499,11 @@ public class Damager {
 			if (!maverick.flinchCooldown.ContainsKey(flinchKey)) {
 				maverick.flinchCooldown[flinchKey] = 0;
 			}
+
+			if (maverick.bossArmor > 0) {
+				flinch = 0;
+				maverick.bossArmor -= 1;
+			}
 			// Weakness flinch.
 			if (weakness) {
 				if (flinch <= 0) {
@@ -1809,6 +1814,10 @@ public class Damager {
 			ProjIds.AcidBurstPoison => true,
 			ProjIds.FlameRoundFlameProj => true,
 			ProjIds.SelfDmg => true,
+			ProjIds.GenericWCUTGrabProjID => true,
+			ProjIds.ForceGrabState => true,
+			ProjIds.VAVA2GRAB => true,
+			ProjIds.UPGrab => true,
 			_ => false
 		};
 	}

@@ -213,7 +213,7 @@ public class FakeZero : Maverick {
 
 	public override MaverickState[] strikerStates() {
 		return [
-			new FakeZeroShootState(),
+			new ClaudioTrippleBusterMaverick(),
 			new ClaudioChargedSlashMaverick(),
 			new FakeZeroGroundPunchState(),
 		];

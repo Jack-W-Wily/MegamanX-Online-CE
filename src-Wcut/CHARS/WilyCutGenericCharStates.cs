@@ -545,6 +545,8 @@ public class LaunchedStateWeak : GenericGrabbedState {
 public class LaunchedFowardState : CharState {
 
 
+	public bool hitonce;
+
 	public LaunchedFowardState() : base("hurt") {
 		superArmor = false;
 		immuneToWind = true;
@@ -559,21 +561,23 @@ public class LaunchedFowardState : CharState {
 		character.move(new Point(character.xDir * 350, 0));
 		if (stateTime > 2f || stateTime > 0.2f && character.grounded) {
 			character.changeState(new KnockedDown(-character.xDir), true);
+			character.angle = 0;
 		}
 
 
 		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
-		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
-		character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+		if (!hitonce &&collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			hitonce = true;
+			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 					character.changeState(
 							new KnockedDown(
 								-character.xDir
 							), true
 						);
+			character.angle = 0;
 			character.playSound("mugenhtsnd_hit3", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
-			
 		} 
 		
 
@@ -968,6 +972,94 @@ public class MForceGrabbed : MGrabbed {
 		) {
 			character.changeToIdleOrFall();
 		}
+		}
+	}
+}
+
+
+
+
+
+
+public class GenericWCUTHomingAttack : MaverickState {
+	
+	bool isDone;
+	Character otherChar;
+	float moveAmount;
+	float maxMoveAmount;
+
+
+	public GenericWCUTHomingAttack(Character otherChar) : 
+	base( "fall"
+	) {
+		
+		this.otherChar = otherChar;
+		normalCtrl = true;
+		attackCtrl = true;
+	}
+
+	public string getSpriteName() {
+		if (maverick is NeonTiger) {
+			return "jump_slash";
+		}
+		if (maverick is ChillPenguin) {
+			return "slide_jump";
+		}
+		if (maverick is ArmoredArmadillo) {
+			return "roll";
+		}
+		if (maverick is Velguarder) {
+			return "pounce";
+		}
+		if (maverick is FakeZero) {
+			return "rising";
+		}
+		return "fall";
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		character.useGravity = false;
+		character.grounded = false;
+		character.vel.y = 0;
+		maxMoveAmount = character.getCenterPos().distanceTo(otherChar.getCenterPos()) * 1.5f;
+		
+		maverick.changeSpriteFromName(getSpriteName(), true);
+		sprite = getSpriteName();
+		MaverickState mState = maverick.getRandomAttackState();
+		if (player.input.isHeld(Control.Down, player)) {
+			
+			maverick.changeState(mState, true);
+		}
+	}
+
+	public override void onExit(MaverickState? newState) {
+		base.onExit(newState);
+		var character = maverick;
+		character.useGravity = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		
+		
+		var character = maverick;
+		Point amount = character.getCenterPos().directionToNorm(otherChar.getCenterPos()).times(250);
+		if (otherChar.pos.x < character.pos.x) {
+			character.xDir = -1;
+		} else {
+			character.xDir = 1;
+		
+		
+		}
+		character.move(amount);
+
+		moveAmount += amount.magnitude * Global.spf;
+		if (moveAmount > maxMoveAmount) {
+			character.changeToIdleOrFall();
+			return;
 		}
 	}
 }

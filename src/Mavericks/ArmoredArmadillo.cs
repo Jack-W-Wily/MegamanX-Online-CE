@@ -269,6 +269,7 @@ public class ArmoredAProj : Projectile {
 	) {
 		weapon = ArmoredAProjWeapon.netWeapon;
 		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 1;
 		vel = new Point(200 * xDir, 0);
 		projId = (int)ProjIds.ArmoredAProj;

@@ -127,7 +127,8 @@ public class CrushCProj : Projectile {
 		pos, xDir, owner, "crushc_proj", netId, player
 	) {
 		weapon = CrushCrawfish.getWeapon();
-		damager.damage = 3;
+		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 1;
 		vel = new Point(200 * xDir, 0);
 		projId = (int)ProjIds.CrushCProj;

@@ -142,11 +142,19 @@ public class VMissiLeStance : CharState {
 				shootPopcorn(vile);
 			}
 
-			if (player.input.isBPressed(player) && player.vileAmmo >= 10) {
+			if (player.input.isBPressed(player) && player.vileAmmo >= 10 && player.input.isLeftOrRightHeld(player)) {
 				player.vileAmmo -= 10;
 				character.frameIndex = 5;
 				character.playSound("vileMissile", true);
 				shootHumerus(vile);
+			}
+
+
+			if (player.input.isBPressed(player) && player.vileAmmo >= 7 && !player.input.isLeftOrRightHeld(player)) {
+				player.vileAmmo -= 7;
+				character.frameIndex = 5;
+				character.playSound("vileMissile", true);
+				new TorpedoProjX(vile.pos.addxy(8 * vile.xDir,-21), character.xDir, vile, player, player.getNextActorNetId(true), rpc: true);
 			}
 
 			if (player.input.isR2Pressed(player) && player.vileAmmo >= 20) {

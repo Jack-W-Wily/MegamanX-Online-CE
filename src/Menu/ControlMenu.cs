@@ -294,24 +294,7 @@ public class ControlMenu : IMainMenu {
 			);
 		}
 		if (charNum != 3) { //Not Axl
-			for (int i = 0; i < 40; i++)
-				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW - 80, Global.halfScreenH - 64 + i * 3);
-			for (int i = 0; i < 40; i++)
-				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW + 80, Global.halfScreenH - 64 + i * 3);
-			for (int i = 0; i < 51; i++)
-				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW - 75 + i * 3, Global.halfScreenH + 58);
-			for (int i = 0; i < 11; i++)
-				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW - 75 + i * 3, Global.halfScreenH - 69);
-			for (int i = 0; i < 11; i++)
-				Global.sprites["optionMode_tubes"].drawToHUD(0, Global.halfScreenW + 45 + i * 3, Global.halfScreenH - 69);
-			Global.sprites["optionMode_tubes"].drawToHUD(5, Global.halfScreenW - 79, Global.halfScreenH + 58);
-			Global.sprites["optionMode_tubes"].drawToHUD(4, Global.halfScreenW + 80, Global.halfScreenH + 58);
-			Global.sprites["optionMode_tubes"].drawToHUD(7, Global.halfScreenW - 79, Global.halfScreenH - 68);
-			Global.sprites["optionMode_tubes"].drawToHUD(6, Global.halfScreenW + 80, Global.halfScreenH - 68);
-			Global.sprites["optionMode_tubes"].drawToHUD(2, Global.halfScreenW + 42, Global.halfScreenH - 69);
-			Global.sprites["optionMode_tubes"].drawToHUD(3, Global.halfScreenW - 42, Global.halfScreenH - 69);
-		} else { //Axl
-			for (int i = 0; i < 56; i++)
+		for (int i = 0; i < 56; i++)
 				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW - 80, Global.halfScreenH - 88 + i * 3);
 			for (int i = 0; i < 56; i++)
 				Global.sprites["optionMode_tubes"].drawToHUD(1, Global.halfScreenW + 80, Global.halfScreenH - 88 + i * 3);
@@ -328,5 +311,6 @@ public class ControlMenu : IMainMenu {
 			Global.sprites["optionMode_tubes"].drawToHUD(2, Global.halfScreenW + 42, Global.halfScreenH - 93);
 			Global.sprites["optionMode_tubes"].drawToHUD(3, Global.halfScreenW - 42, Global.halfScreenH - 94);
 		}
+		
 	}
 }

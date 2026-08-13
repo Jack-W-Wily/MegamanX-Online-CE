@@ -92,6 +92,8 @@ public class Hurt : CharState {
 			character.changeToIdleOrFall();
 		}
 
+
+		
 		if ( stateTime > 4 && character.isWCUTBoss) {
 				character.invulnTime = 0.5f;
             

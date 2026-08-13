@@ -130,10 +130,12 @@ public class SigmaSlashStateAirWC : CmdSigmaStateWC {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(24, -22);
+			if (character.OverDrive){
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 2,
 				sigma, player.getNextActorNetId(), sendRpc: true
 			);
+			}
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -185,6 +187,29 @@ public class SigmaSlashStateGround2WC : CmdSigmaStateWC {
 	}
 }
 
+
+
+
+public class SigmaSlashStateGround3WC : CmdSigmaStateWC {
+	bool fired;
+
+	public SigmaSlashStateGround3WC() : base("uppercut") {
+		airMove = true;
+	}
+
+
+	public override void update() {
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("sigmaSaber", sendRpc: true);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		base.update();
+	}
+}
+
 public class SigmaSlashStateDashWC : CmdSigmaStateWC {
 	bool fired;
 	public SigmaSlashStateDashWC() : base("attack_dash") {
@@ -194,14 +219,16 @@ public class SigmaSlashStateDashWC : CmdSigmaStateWC {
 
 
 	public override void update() {
-		if (character.frameIndex >= 2 && !fired) {
+		if (character.frameIndex >= 2 && !fired  && character.OverDrive) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(26, -22);
+			if (character.OverDrive){
 			new SigmaSlashProj(
 				character.pos.addxy(off.x * character.xDir, off.y), character.xDir, 2,
 				sigma, player.getNextActorNetId(), sendRpc: true
 			);
+			}
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -418,7 +445,7 @@ public class SigmaWallDashStateWC : CmdSigmaStateWC {
 			character.changeState(character.getFallState(), true);
 		}
 		if (player.input.isPressed(Control.Shoot, player) &&
-			!fired && sigma.saberCooldown == 0 && character.invulnTime == 0
+			!fired && sigma.saberCooldown == 0  && character.OverDrive && character.invulnTime == 0
 		) {
 			if (yDir == 0) {
 				character.changeState(new SigmaSlashStateDash());
@@ -587,11 +614,20 @@ public class SigmaGrabEX : CharState {
 		}
 
 
-		if (player.input.isBPressed(player) && !UsedGrabFinisherOnce) {
+		if (player.input.isPressed(Control.Up, player) && !UsedGrabFinisherOnce) {
 			UsedGrabFinisherOnce = true;
 			sprite = "grab_kick";
 			character.changeSpriteFromNameIfDifferent("grab_kick", true);
 		}
+
+		if (player.input.isLeftOrRightHeld(player) && !UsedGrabFinisherOnce) {
+			UsedGrabFinisherOnce = true;
+			sprite = "throw_start";
+			character.turnToInput(player.input, player);
+			character.changeSpriteFromNameIfDifferent("throw_start", true);
+		}
+
+		
 
 		base.update();
 		Helpers.decrementTime(ref specialPressTime);
@@ -705,7 +741,7 @@ public class VirusSlash2 : CharState {
 		new GigaCrushBackwall(character.pos, character);
 		new HitStop(character.pos, player, player.getNextActorNetId(), 
 		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
-				}, 0.5f));
+				}, 0.1f));
 	
 	}
 
@@ -823,7 +859,7 @@ public class HeavySlash2 : CharState {
 			}
 		}
 
-		if (character.isAnimOver() || !player.input.isAHeld(player) && character.frameIndex > 4) {
+		if (character.isAnimOver() || !player.input.isBHeld(player) && character.frameIndex > 4) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -866,7 +902,7 @@ public class HeavySlash3 : CharState {
 		}
 
 		
-		if (character.isAnimOver() || !player.input.isAHeld(player) && character.frameIndex > 4 )  {
+		if (character.isAnimOver() || !player.input.isBHeld(player) && character.frameIndex > 4 )  {
 			character.changeToIdleOrFall();
 		}
 	}

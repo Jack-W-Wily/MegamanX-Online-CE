@@ -170,6 +170,11 @@ public class RollingShieldProjCharged : Projectile {
 			destroySelf();
 			return;
 		}
+
+		if (mmx.sprite.name.Contains("grabbed") || mmx.sprite.name.Contains("die")) {
+			destroySelf();
+			return;
+		}
 		if (isAnimOver() && sprite.name == "rolling_shield_charge_flash") {
 			changeSprite("rolling_shield_charge", true);
 		}

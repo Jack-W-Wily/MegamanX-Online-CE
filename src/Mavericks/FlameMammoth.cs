@@ -200,6 +200,7 @@ public class FlameMFireballProj : Projectile {
 	) {
 		weapon = FlameMFireballWeapon.netWeapon;
 		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 1;
 		vel = new Point(250 * xDir, 0);
 		projId = (int)ProjIds.FlameMFireball;

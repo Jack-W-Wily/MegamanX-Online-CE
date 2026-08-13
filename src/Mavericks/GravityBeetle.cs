@@ -173,7 +173,7 @@ public class GBeetleBallProj : Projectile {
 		base.update();
 		if (owner.character != null) {
 			
-			if (owner.input.isR2Pressed(owner)) {
+			if (owner.weapon is not SigmaMenuWeapon && owner.input.isR2Pressed(owner)) {
 				explosion =new GravityWellProj(pos, xDir, owner.character, owner, owner.getNextActorNetId(), true);
 				destroySelf();
 			}

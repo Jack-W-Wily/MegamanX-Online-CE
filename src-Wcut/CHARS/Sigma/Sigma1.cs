@@ -41,10 +41,82 @@ public class Sigma1 : BaseSigma {
 	public bool isStk;
 	public bool isTag;
 	public bool isSum;
+
+
+	public float maverickHomingAttackCD;
 	
 	public override void update() {
 		base.update();
 
+		Helpers.decrementTime(ref maverickHomingAttackCD);
+
+		// Supers
+
+		if (!isInDamageSprite()) {
+				
+					if (downPressedTimes > 3 && player.input.isL2Pressed(player) && player.superAmmo > 15) {
+						player.superAmmo -= 16;	
+						changeState(new ZainParryShinStartState(), true);
+					}
+					if (player.input.checkShoryuken(player, xDir, Control.Special1) && player.superAmmo > 15) {
+						// Combo Complexo
+						player.superAmmo -= 16;
+						changeState(new VirusSlash2(), true);
+					}
+					if (player.input.checkShoryuken(player, xDir, Control.Shoot) && player.superAmmo > 15) {
+						if (OverDrive) {
+							changeState(new HellGazeEX(), true);
+						} else {
+							changeState(new HellGaze(), true);
+						}
+						player.superAmmo -= 16;
+					}
+				
+		}
+
+
+		foreach (var maverick in player.mavericks) {
+			
+
+	
+			if (maverickHomingAttackCD == 0 && player.input.isR2Pressed(player) 
+			&& player.weapon is SigmaMenuWeapon
+
+
+			
+			&& player.mavericks.Count > 0 && !maverick.isAttacking() ) {
+				MaverickState mState;
+				if (player.input.isHeld(Control.Up, player)) {
+					mState = maverick.strikerStates()[2];
+					maverick.changeState(mState, true);
+				} else if (player.input.isHeld(Control.Down, player)) {
+					mState = maverick.strikerStates()[1];
+					maverick.changeState(mState, true);
+				} else {
+					mState = maverick.strikerStates()[0];
+					maverick.changeState(mState, true);
+					
+				}
+				foreach (var otherPlayer in Global.level.players) {
+					if (otherPlayer.character == null) continue;
+					if (otherPlayer == player) continue;
+					if (otherPlayer == parasiteDamager?.owner) continue;
+					if (otherPlayer.character.isInvulnerable()) continue;
+					if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+					if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+					Character target = otherPlayer.character;
+					if (target.pos.x < 0) {
+						maverick.xDir = -1;
+					} else if (target.pos.x > 0) {
+						
+						maverick.xDir = 1;
+					}
+					break;
+				}
+
+			}
+		}
+		
 		if (player.loadout.sigmaLoadout.commandMode == (int)MaverickModeId.Puppeteer){
 			isPup = true;
 		} else {
@@ -118,7 +190,7 @@ public class Sigma1 : BaseSigma {
 			}
 		}
 		framesSinceLastAttack = Global.level.frameCount - lastAttackFrame;
-		bool lenientAttackPressed = (attackPressed || framesSinceLastAttack < 5);
+		bool lenientAttackPressed = player.input.isAPressed(player);
 
 		if (charState is Dash or AirDash or WallSlide or LadderClimb) {
 				if (player.input.isBPressed(player) &&
@@ -139,25 +211,26 @@ public class Sigma1 : BaseSigma {
 
 
 			if (grounded) {
-				if (player.input.isR2Pressed(player) && player.superAmmo > 15) {
-					player.superAmmo -= 16;
+
+				if (player.input.isL2Held(player)) {
 					if (player.input.isHeld(Control.Down, player)) {
-						
-						changeState(new ZainParryShinStartState(), true);
+					changeState(new GlobalParryState(), true);
+					return true;
 					}
-					else if (player.input.isHeld(Control.Up, player)) {
-						// Combo Complexo
-						changeState(new VirusSlash2(), true);
-					} else {
-						if (OverDrive) {
-							changeState(new HellGazeEX(), true);
-						} else {
-							changeState(new HellGaze(), true);
+					else if (player.input.isAPressed(player)) {
+						changeState(new SigmaGrabStart(), true);
+						
+						return true;
+					}else {
+						if (charState is not BlockWCUT) {
+						changeState(new BlockWCUT(), true);
+						return true;
 						}
 					}
-					return true;
+				
 				}
-			}
+				
+				}
 
 		if (isSum){
 			
@@ -229,7 +302,10 @@ public class Sigma1 : BaseSigma {
 						changeState(new SigmaSlashStateDashWC(), true);
 						return true;
 					}
-					if (player.input.isHeld(Control.Down, player)) {
+					if (player.input.isHeld(Control.Up, player)) {
+						changeState(new SigmaSlashStateGround3WC(), true);
+					} 
+					else if (player.input.isHeld(Control.Down, player)) {
 						changeState(new SigmaSlashStateGround2WC(), true);
 					} else {
 						changeState(new SigmaSlashStateGroundWC(), true);
@@ -242,7 +318,7 @@ public class Sigma1 : BaseSigma {
 			
 				if (player.input.isHeld(Control.Special1, player) && ballWeapon.ammo > 0) {
 					sigmaAmmoRechargeCooldown = 0.5f;
-					changeState(new SigmaGrabStart(), true);
+					changeState(new HeavySlash2(), true);
 					return true;
 				}
 			
@@ -264,14 +340,58 @@ public class Sigma1 : BaseSigma {
 			}
 		}
 		if (isTag) {
-			if (player.input.isAPressed(player) && saberCooldown == 0) {
-				changeState(new HeavySlash2(), true);
-				saberCooldown = 0.5f;
+
+
+
+		// Shoot button attacks.
+		if (lenientAttackPressed ) {
+			if (player.input.isHeld(Control.Up, player) && flag == null && grounded) {
+				
+					changeState(new SigmaUpDownSlashState(true), true);
+				
+				return true;
+			} else if (player.input.isHeld(Control.Down, player)) {
+				
+					changeState(new SigmaUpDownSlashState(false), true);
+				
 				return true;
 			}
-			if (player.input.isBPressed(player)) {
-				changeState(new GlobalParryState(), true);
+			
+
+			if (charState is WallSlide || charState is LadderClimb) {
+				if (charState is LadderClimb) {
+					int inputXDir = player.input.getXDir(player);
+					if (inputXDir != 0) {
+						xDir = inputXDir;
+					}
+				}
+				changeSprite(getSprite(charState.attackSprite), true);
+				playSound("sigma2slash", sendRpc: true);
+				return true;
 			}
+			if (charState is Dash) {
+				slideVel = xDir * getRunSpeed() * 1.65f;
+				changeState(new Sigma2DashSlashState(), true);
+			} else {
+				changeState(new SigmaClawState(charState, !grounded), true);
+			}
+			return true;
+		}
+		if (grounded && player.input.isPressed(Control.Special1, player) &&
+			flag == null && player.superAmmo >= 8
+		) {
+			if (!player.input.isHeld(Control.Up, player))  {
+				player.superAmmo -= 8;
+				changeState(new SigmaElectricBallState(), true);
+				return true;
+			} 
+			if (player.input.isHeld(Control.Up, player) && player.superAmmo >= 16) {
+				player.superAmmo -= 16;
+				changeState(new SigmaElectricBall2StateEX(), true);
+				return true;
+			}
+		}
+
 		}
 
 
@@ -285,7 +405,7 @@ public class Sigma1 : BaseSigma {
 	}
 
 
-
+	
 	public override void chargeLogic(Action<int> shoot) {
 		if (chargeButtonHeld() && flag == null ) {
 			if (canCharge()) {
@@ -396,6 +516,12 @@ public class Sigma1 : BaseSigma {
 	}
 
 	public override string getSprite(string spriteName) {
+		if (isStk && Global.sprites.ContainsKey("sigma_" + spriteName)) {
+			return "sigma_" + spriteName;
+		}
+		if (isTag && Global.sprites.ContainsKey("sigma2_" + spriteName)) {
+			return "sigma2_" + spriteName;
+		}
 		return "sigma1alt_" + spriteName;
 	}
 
@@ -415,6 +541,25 @@ public class Sigma1 : BaseSigma {
 		Sigkick,
 
 		HeavySlash,
+
+		DashSlash,
+
+		KiriOrochi,
+
+		StandingSlash,
+		Uppercut,
+
+		Slash1,
+		Slash2,
+		
+		AirSlash,
+		UpSlash,
+		DownSlash,
+		LadderSlash,
+		WallSlash,
+		Throw,
+		GigaAttackSlash
+
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
@@ -424,11 +569,33 @@ public class Sigma1 : BaseSigma {
 			"sigma1alt_hellgaze" => MeleeIds.HellGaze,
 			"sigma1alt_slash_1 _virus" or "sigma1alt_slash_2 _virus" or "sigma1alt_slash_3 _virus" => MeleeIds.ViralSlash,
 			"sigma1alt_slash_1" or "sigma1alt_slash_2" or "sigma1alt_slash_3" => MeleeIds.HeavySlash,
+			"sigma1alt_attack_dash" => MeleeIds.DashSlash,
 			"sigma1alt_block" => MeleeIds.Guard,
 			"sigma1alt_block_auto" => MeleeIds.AutoGuard,
-			"sigma1alt_ladder_attack" or "sigma1alt_wall_slide_attack" or "sigma1alt_attack" or "sigma1alt_attack_crouch" or "sigma1alt_attack_dash" => MeleeIds.GenericSlash,
+			"sigma1alt_attack" => MeleeIds.StandingSlash,
+			"sigma1alt_ladder_attack" or "sigma1alt_wall_slide_attack"=> MeleeIds.GenericSlash,
+			"sigma1alt_attack_crouch" => MeleeIds.KiriOrochi,
 			"sigma1alt_grab_start" => MeleeIds.Grab,
 			"sigma1alt_grab_kick" => MeleeIds.Sigkick,
+			"sigma1alt_uppercut" => MeleeIds.Uppercut,
+			"sigma1alt_throw_start" => MeleeIds.Throw,
+
+
+			"sigma_attack" or "sigma_attack_air"  => MeleeIds.DashSlash,
+
+
+
+			"sigma2_attack" => MeleeIds.Slash1,
+			"sigma2_attack2" => MeleeIds.Slash2,
+			"sigma2_attack_air" => MeleeIds.AirSlash,
+			"sigma2_attack_dash" => MeleeIds.DashSlash,
+			"sigma2_upslash" => MeleeIds.UpSlash,
+			"sigma2_downslash" => MeleeIds.DownSlash,
+			"sigma2_ladder_attack" => MeleeIds.LadderSlash,
+			"sigma2_wall_slide_attack" => MeleeIds.WallSlash,
+			"sigma2_shoot2" => MeleeIds.GigaAttackSlash,
+
+
 			_ => MeleeIds.None
 		});
 	}
@@ -447,8 +614,24 @@ public class Sigma1 : BaseSigma {
 			) {
 				highPiority = true
 			},
+			MeleeIds.StandingSlash => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 2, Global.defFlinch,
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
+			),
 			MeleeIds.GenericSlash => new GenericMeleeProj(
-				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 2, 20,
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSlash, player, 2, Global.defFlinch,
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
+			),
+			MeleeIds.Uppercut => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.BlockableWeakLaunch, player, 2, 0,
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
+			),
+			MeleeIds.DashSlash => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.HeavyPush, player, 2, 0,
+				addToLevel: addToLevel, hitSound : "htsnd_slash1"
+			),
+			MeleeIds.KiriOrochi => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.Shippuuga, player, 2, 0,
 				addToLevel: addToLevel, hitSound : "htsnd_slash1"
 			),
 			MeleeIds.HellGaze => new GenericMeleeProj(
@@ -474,6 +657,38 @@ public class Sigma1 : BaseSigma {
 			MeleeIds.Sigkick => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.BlockableLaunch, player, 4, 0,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_knock1"
+			),
+
+
+			MeleeIds.Throw => new GenericMeleeProj(
+				SigmaSlashWeapon.netWeapon, pos, ProjIds.BurensenEND, player, 4, 0,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_knock1"
+			),
+
+
+			MeleeIds.Slash1 => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				2, Global.halfFlinch, 12, addToLevel: addToLevel, clashTier: ClashTier.Medium
+			),
+			MeleeIds.Slash2 => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw2, player,
+				2, Global.defFlinch, 30, addToLevel: addToLevel, clashTier: ClashTier.Medium
+			),
+			MeleeIds.AirSlash or MeleeIds.DashSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				3, Global.defFlinch, 22, addToLevel: addToLevel, clashTier: ClashTier.Medium
+			),
+			MeleeIds.UpSlash or MeleeIds.DownSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2UpDownClaw, player,
+				3, Global.superFlinch, 30, addToLevel: addToLevel
+			),
+			MeleeIds.WallSlash or MeleeIds.LadderSlash => new GenericMeleeProj(
+				SigmaClawWeapon.netWeapon, pos, ProjIds.Sigma2Claw, player,
+				3, Global.defFlinch, 15, addToLevel: addToLevel
+			),
+			MeleeIds.GigaAttackSlash => new GenericMeleeProj(
+				new NeoSigmaGigaAttackWeapon(), pos, ProjIds.Sigma2Ball2, player,
+				6, Global.defFlinch, 15, addToLevel: addToLevel
 			),
 			_ => null
 		};

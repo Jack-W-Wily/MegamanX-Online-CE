@@ -191,7 +191,7 @@ public class LaunchOMissile : Projectile, IDamagable {
 	) {
 		weapon = LaunchOMissileWeapon.netWeapon;
 		damager.damage = 2;
-		damager.flinch = 20;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 9;
 		vel = new Point(100 * xDir, 0);
 		projId = (int)ProjIds.LaunchOMissle;

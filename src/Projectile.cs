@@ -408,7 +408,7 @@ public class Projectile : Actor {
 
 	public bool checkClang(Projectile enemy) {
 		// Actors are not null and clash tier is active.
-		if (ownerActor == null || enemy.ownerActor == null || clashTier == 0) {
+		if (ownerActor == null || enemy.ownerActor == null) {
 			return false;
 		}
 		// Cast other actor 
@@ -433,9 +433,9 @@ public class Projectile : Actor {
 		// Enemy tier. Shields are considered weaker than weak.
 		ClashTier enemyTier = enemy.clashTier;
 		// Only Zero clangs aganist shields because screw him I guess.
-		if (enemy.clashTier == 0 && enemy.isShield && ownerActor is Zero or BusterZero) {
-			enemyTier = ClashTier.Shield;
-		}
+		//if (enemy.clashTier == 0 && enemy.isShield && ownerActor is Zero or BusterZero) {
+		//	enemyTier = ClashTier.Shield;
+		//}
 		// Clash tier must be the same or worse than enemy.
 		if (clashTier - 1 > enemyTier) {
 			return false;
@@ -479,16 +479,20 @@ public class Projectile : Actor {
 		}
 
 		// Check if we can clash.
-		if (clashTier > 0 && ownerActor is Character clangChar && !clangChar.isFlinchImmune()) {
+		if (ownerActor is Character clangChar && !clangChar.isFlinchImmune()) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && clangChar.charState is not ZeroClang &&
 				otherProj?.ownerActor != null && otherProj.owner.alliance != owner.alliance
 			 ) {
-				if (otherProj.canClangChar() && checkClang(otherProj)) {
+				if (otherProj.canClangChar() &&  (!clangChar.sprite.name.Contains("guard") && !clangChar.sprite.name.Contains("block")
+					&& !clangChar.sprite.name.Contains("grab"))
+				
+				) {
 					clangedOnce = true;
 					if (otherProj.isShield) {
 						strongClanged = true;
 					}
+					
 					clangChar.changeState(new ZeroClang(-clangChar.xDir), true);
 					clangChar.playSound("m10ding", sendRpc: true);
 					if (Helpers.randomRange(0, 10) == 5) {

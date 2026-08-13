@@ -270,7 +270,7 @@ public class MagnaCShurikenProj : Projectile {
 	) {
 		projId = (int)ProjIds.MagnaCShuriken;
 		maxTime = 1f;
-		damager.flinch = 15;
+		damager.flinch = Global.halfFlinch;
 		vel = velDir.times(maxSpeed);
 		angle = velDir.angle;
 

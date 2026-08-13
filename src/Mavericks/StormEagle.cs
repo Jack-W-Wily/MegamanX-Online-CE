@@ -78,26 +78,34 @@ public class StormEagle : Maverick {
 				}
 			}
 		}
+
+		Helpers.decrementTime(ref tornadoCooldown);
 	}
 
 	public override string getMaverickPrefix() {
 		return "storme";
 	}
 
+	public float tornadoCooldown;
+
+
 	public MaverickState getShootState() {
+		if (tornadoCooldown == 0){
+			tornadoCooldown = 2f;
 		return new MShoot((Point pos, int xDir) => {
 			new TornadoProj(pos, xDir, true, this, player, player.getNextActorNetId(), rpc: true);
 		}, "tornadoNonX");
-
+		}
+		return new MIdle();
 	}
 
 	public override MaverickState[] strikerStates() {
 		return [
 			getShootState(),
 			new StormEEggState(true),
-			new StormEGustState(isStriker: true),
 			new StormEJumpAI(false),
-			//new StormEJumpAI(true)
+			new StormEGustState(isStriker: true),
+			new StormEJumpAI(true),
 		];
 	}
 
@@ -560,12 +568,12 @@ public class StormEJumpAI : SEagleMState {
 
 	public override void update() {
 		base.update();
-		if (stateTime > 24 / 60f && !isTornado) {
+		if (stateTime > 0.3f ) {//&& !isTornado) {
 			maverick.changeState(new StormEDiveState());
 		}
-		if (isTornado && stateTime > 18 / 60f) {
-			maverick.changeState(new StormEAirShootState());
-		}
+		//if (isTornado && stateTime > 18 / 60f) {
+		//	maverick.changeState(new StormEAirShootState());
+		//}
 	}
 
 	public override void onEnter(MaverickState oldState) {

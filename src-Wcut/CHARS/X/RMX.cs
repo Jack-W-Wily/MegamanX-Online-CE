@@ -448,11 +448,11 @@ public class RockmanX : MegamanX {
 			),
 			(int)MeleeIds.Punch1 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.VJab1, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,

@@ -159,7 +159,7 @@ public class BlastHornet : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.Stinger => new GenericMeleeProj(
 				weapon, pos, ProjIds.BHornetSting, player,
-				7, Global.defFlinch, ownerActor: this,
+				7, Global.superFlinch, ownerActor: this,
 				addToLevel: addToLevel
 			),
 			_ => null
@@ -180,6 +180,7 @@ public class BHornetBeeProj : Projectile, IDamagable {
 	) {
 		weapon = BlastHornet.getWeapon();
 		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 60;
 		fadeOnAutoDestroy = true;
 		fadeSprite = "bhornet_particle_explosion";

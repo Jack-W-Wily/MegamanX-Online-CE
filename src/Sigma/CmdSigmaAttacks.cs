@@ -34,7 +34,7 @@ public class SigmaSlashStateGround : CmdSigmaState {
 
 
 	public override void update() {
-		if (character.frameIndex >= 2 && !fired) {
+		if (character.frameIndex >= 2 && !fired  && character.OverDrive) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(30, -20);
@@ -85,7 +85,7 @@ public class SigmaSlashStateDash : CmdSigmaState {
 
 
 	public override void update() {
-		if (character.frameIndex >= 2 && !fired) {
+		if (character.frameIndex >= 2 && !fired && character.OverDrive) {
 			fired = true;
 			character.playSound("sigmaSaber", sendRpc: true);
 			Point off = new Point(26, -22);
@@ -159,8 +159,8 @@ public class SigmaSlashProj : Projectile {
 		pos, xDir, owner, "sigma_proj_slash", netId, altPlayer
 	) {
 		weapon = SigmaSlashWeapon.netWeapon;
-		damager.damage = 4;
-		damager.flinch = Global.defFlinch;
+		damager.damage = 2;
+		//damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 30;
 		clashTier = ClashTier.Strong;
 		if (type == 1) {

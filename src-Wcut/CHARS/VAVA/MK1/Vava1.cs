@@ -17,7 +17,7 @@ public class VAVA1 : Vile {
 	public float grabCooldown = 1;
 	public bool vulcanActive;
 	public float vulcanLingerTime;
-	public const int callNewMechCost = 5;
+	public const int callNewMechCost = 3;
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public int buckshotDanceNum;
@@ -97,6 +97,9 @@ public class VAVA1 : Vile {
 
 		spriteFrameToSounds["vava_run/4"] = "vileWalk";
 		spriteFrameToSounds["vava_run/8"] = "vileWalk";
+		spriteFrameToSounds["vava_missile_stance/4"] = "super_adaptor_punch";
+		spriteFrameToSounds["vava_air_bomb_attack/4"] = "fireNappalmMK2";
+		spriteFrameToSounds["vava_crouch_nade/2"] = "fireNappalmMK2";
 		chargeSound = new LoopingSound("charge_start_vile", "charge_loop_vile", this);
 
 

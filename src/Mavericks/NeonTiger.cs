@@ -134,11 +134,11 @@ public class NeonTiger : Maverick {
 		return (MeleeIds)id switch {
 			MeleeIds.Slash => new GenericMeleeProj(
 				weapon, pos, ProjIds.NeonTClaw, player,
-				2, 0, 12, addToLevel: addToLevel
+				2, Global.halfFlinch, 12, addToLevel: addToLevel
 			),
 			MeleeIds.Slash2 => new GenericMeleeProj(
 				weapon, pos, ProjIds.NeonTClaw2, player,
-				2, Global.halfFlinch, 15, addToLevel: addToLevel
+				2, Global.defFlinch, 15, addToLevel: addToLevel
 			),
 			MeleeIds.JumpSlash => new GenericMeleeProj(
 				weapon, pos, ProjIds.NeonTClawAir, player,
@@ -150,7 +150,7 @@ public class NeonTiger : Maverick {
 			),
 			MeleeIds.WallSlash => new GenericMeleeProj(
 				weapon, pos, ProjIds.NeonTClawWall, player,
-				3, 0, 15, addToLevel: addToLevel
+				3, Global.defFlinch, 15, addToLevel: addToLevel
 			),
 			_ => null
 		};
@@ -171,6 +171,7 @@ public class NeonTRaySplasherProj : Projectile {
 		weapon = NeonTiger.getWeapon();
 		damager.damage = 2;
 		damager.hitCooldown = 1;
+		damager.flinch = Global.halfFlinch;
 		this.type = type;
 		projId = (int)ProjIds.NeonTRaySplasher;
 		maxTime = 0.8f;

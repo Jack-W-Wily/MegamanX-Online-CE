@@ -220,8 +220,9 @@ public class ChillPIceProj : Projectile {
 		pos, xDir, owner, "chillp_proj_ice", netProjId, player
 	) {
 		weapon = ChillPIceShotWeapon.netWeapon;
-		damager.damage = 3;
+		damager.damage = 2;
 		damager.hitCooldown = 1;
+		damager.flinch = Global.halfFlinch;
 		vel = new Point(250 * xDir, 0);
 		projId = (int)ProjIds.ChillPIceShot;
 		maxTime = 0.75f;

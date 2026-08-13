@@ -50,9 +50,9 @@ public class GigaCrushProj : Projectile {
 		pos, xDir, owner, "empty", netId, player
 	) {
 		weapon = GigaCrush.netWeapon;
-		damager.damage = 12;
+		damager.damage = 20;
 		damager.hitCooldown = 30;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		maxActiveTime = 0.4f;
 		vel = new Point();
 		projId = (int)ProjIds.GigaCrush;
@@ -162,6 +162,7 @@ public class GigaCrushCharState : CharState {
 	public GigaCrushCharState() : base("gigacrush") {
 		invincible = true;
 		immortal = true;
+		canGainMeter = false;
 	}
 
 	public override void update() {

@@ -15,7 +15,7 @@ public class SigmaClawState : CharState {
 	CharState prevCharState;
 	float slideVel;
 	bool isAir;
-	public NeoSigma neoSigma = null!;
+	public Character neoSigma = null!;
 
 	public SigmaClawState(CharState prevCharState, bool isAir) : base("attack") {
 		this.prevCharState = prevCharState;
@@ -61,7 +61,7 @@ public class SigmaClawState : CharState {
 			once = true;
 			sprite = "attack2";
 			defaultSprite = sprite;
-			neoSigma.normalAttackCooldown = neoSigma.sigmaSaberMaxCooldown;
+		//	neoSigma.normalAttackCooldown = neoSigma.sigmaSaberMaxCooldown;
 			character.changeSpriteFromName(sprite, true);
 			character.playSound("sigma2slash", sendRpc: true);
 			return;
@@ -74,7 +74,7 @@ public class SigmaClawState : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
+		neoSigma = character;
 		if (oldState is Dash) {
 			slideVel = character.xDir * character.getDashSpeed();
 		}
@@ -109,6 +109,7 @@ public class SigmaElectricBallProj : Projectile {
 	) {
 		weapon = SigmaElectricBallWeapon.netWeapon;
 		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
 		damager.hitCooldown = 12;
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;
@@ -130,7 +131,7 @@ public class SigmaElectricBallProj : Projectile {
 
 public class SigmaElectricBallState : CharState {
 	bool fired;
-	public NeoSigma neoSigma = null!;
+	public Character neoSigma = null!;
 	public SigmaElectricBallState() : base("shoot") {
 		enterSound = "sigma2shoot";
 		invincible = true;
@@ -157,7 +158,7 @@ public class SigmaElectricBallState : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.clenaseDmgDebuffs();
-		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
+		neoSigma = character;
 	}
 }
 
@@ -190,7 +191,7 @@ public class SigmaElectricBall2Proj : Projectile {
 	) {
 		weapon = NeoSigmaGigaAttackWeapon.netWeapon;
 		damager.damage = 6;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		damager.hitCooldown = 16;
 		projId = (int)ProjIds.Sigma2Ball2;
 		destroyOnHit = false;
@@ -209,7 +210,7 @@ public class SigmaElectricBall2Proj : Projectile {
 public class SigmaElectricBall2StateEX : CharState {
 	public bool fired, soundFired;
 	public SigmaElectricBall2Proj? SigmaBalls;
-	public NeoSigma neoSigma = null!;
+	public Character neoSigma = null!;
 	public SigmaElectricBall2StateEX() : base("shoot2") {
 		invincible = true;
 	}
@@ -237,7 +238,7 @@ public class SigmaElectricBall2StateEX : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.clenaseAllDebuffs();
-		neoSigma = character as NeoSigma ?? throw new NullReferenceException();
+		neoSigma = character;
 	}
 }
 
@@ -332,7 +333,7 @@ public class SigmaUpDownSlashState : CharState {
 	}
 }
 public class Sigma2DashSlashState : CharState {
-	public NeoSigma neoSigma = null!;
+	public Character neoSigma = null!;
 	public Sigma2DashSlashState() : base("attack_dash") {
 		enterSound = "sigma2slash";
 	}

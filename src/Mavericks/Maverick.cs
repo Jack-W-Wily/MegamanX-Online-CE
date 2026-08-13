@@ -222,7 +222,7 @@ public class Maverick : Actor, IDamagable {
 			if (zIndex == ZIndex.Character) zIndex = ZIndex.Character - 100;
 		}
 		useFrameProjs = true;
-		maxHealth = player.getMaverickMaxHp(controlMode);
+		maxHealth = 42;//player.getMaverickMaxHp(controlMode);
 		health = maxHealth;
 		splashable = true;
 		state = new MLimboState();
@@ -261,6 +261,15 @@ public class Maverick : Actor, IDamagable {
 			if (ammo > 32) ammo = 32;
 		}
 	}
+
+
+	public decimal bossArmor = 0;
+
+	public float bossArmorRegen;
+
+	public float textCD;
+
+	public float BurstCooldown;
 
 
 	public void drainAmmo(float amountPerSecond) {
@@ -418,12 +427,49 @@ public class Maverick : Actor, IDamagable {
 		}
 	}
 
+
+	
+
+	
+	public virtual bool isInDamageSprite() {
+		return sprite.name.Contains("hurt")
+		|| sprite.name.Contains("frozen")
+		|| sprite.name.Contains("lose")
+		|| sprite.name.Contains("knocked")
+		|| sprite.name.Contains("grabbed")
+		|| sprite.name.Contains("stunned")
+		|| sprite.name.Contains("pushed")
+		|| sprite.name.Contains("die");
+	}
+
 	public override void update() {
 		base.update();
 
 		if (!ownedByLocalPlayer) {
 			return;
 		}
+
+
+		
+		if (bossArmor == 0 && BurstCooldown == 0) {
+			if (textCD == 0){
+			addDamageText("!!!", 1);
+			textCD = 5;
+			}
+			BurstCooldown = 5;
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+					 bossArmor = 2;
+				}, 4));
+		}
+		if (!isInDamageSprite() && BurstCooldown == 0) {
+			if (bossArmorRegen == 0 && bossArmor < 3) {
+				bossArmor += 1;
+				bossArmorRegen = 1;
+			}
+		}
+		Helpers.decrementTime(ref textCD);
+		Helpers.decrementTime(ref bossArmorRegen);
+		Helpers.decrementTime(ref BurstCooldown);
 
 		if (grounded) {
 			lastGroundedPos = pos;
@@ -962,7 +1008,17 @@ public class Maverick : Actor, IDamagable {
 	}
 
 	public bool isAttacking() {
-		return sprite.name.Contains("attack");
+		return state is StormEJumpAI || sprite.name.Contains("attack") || sprite.name.Contains("shoot") || sprite.name.Contains("special")
+		|| sprite.name.Contains("charge") || sprite.name.Contains("dash") 
+		|| sprite.name.Contains("strike") || sprite.name.Contains("claw") || sprite.name.Contains("tail")
+		|| sprite.name.Contains("grab") || sprite.name.Contains("punch") || sprite.name.Contains("kick")
+		|| sprite.name.Contains("swing") || sprite.name.Contains("stab") || sprite.name.Contains("slash")
+		|| sprite.name.Contains("spin") || sprite.name.Contains("burst") || sprite.name.Contains("flame")
+		|| sprite.name.Contains("wave") || sprite.name.Contains("bomb") || sprite.name.Contains("cannon")
+		|| sprite.name.Contains("missile") || sprite.name.Contains("laser") || sprite.name.Contains("beam")
+		|| sprite.name.Contains("tripple") || sprite.name.Contains("saber") || sprite.name.Contains("huhahu")
+		|| sprite.name.Contains("uppercut") || sprite.name.Contains("whip") || sprite.name.Contains("hammer")
+		|| sprite.name.Contains("drill") || sprite.name.Contains("saw") || sprite.name.Contains("sting");
 	}
 
 	public bool shouldDealColisionDmg = false;

@@ -124,10 +124,15 @@ public float angleDist = 0;
 		if (owner.input.isAPressed(owner)){
 			playSound("dynamoslash", sendRpc: true);
 		}
-			if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
+		if (sprite.name != "iris_crystal_bash_up" && sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash_up", true);
 			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);
 			}
+		}
+
+		if (sprite.name.Contains("iris_crystal_bash" ) && isAnimOver()) {
+			state = 4;
+			if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
 		}
 
 		if (owner.character.charState is IrisCrystalBashState  || 
@@ -136,14 +141,14 @@ public float angleDist = 0;
 			state = 2;		
 		}
 		if (state == 2){
-			if (sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
+			if (sprite.name != "iris_crystal_bash" && sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
 			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);
 			}
 		}
 
 		
-		if (owner.character.charState is IrisCrystalCharge ) state = 4;
+		if (owner.character.charState is IrisCrystalCharge || owner.input.isR2Held(owner)) state = 4;
 		if (state == 4) {
 
 		if (owner.input.isHeld(Control.Up, owner)) {
@@ -190,7 +195,8 @@ public float angleDist = 0;
 		&& owner.character.charState is not IrisSpawnIce
 		&& owner.character.charState is not IrisGrabEX
 		&& owner.character.charState is not IrisSpawnFire
-		&& owner.character.charState is not IrisCrystalCharge) {
+		&& owner.character.charState is not IrisCrystalCharge 
+		&& !owner.input.isR2Held(owner)) {
 			state = 0;
 		}
 		if (state == 0) {

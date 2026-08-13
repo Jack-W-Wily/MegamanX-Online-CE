@@ -203,6 +203,7 @@ public class FStagFireballProj : Projectile {
 	) {
 		weapon = FlameStag.getWeapon();
 		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 1;
 		this.type = type;
 		projId = (int)ProjIds.FStagFireball;

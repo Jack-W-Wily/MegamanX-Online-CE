@@ -51,6 +51,7 @@ public class Iris : Character {
 	}
 
 	
+	public bool summonedRidearmorOnce;
 
 
 	public override bool normalCtrl() {
@@ -202,7 +203,7 @@ public class Iris : Character {
 			 && ownedByLocalPlayer && !Global.level.gameMode.isOver) {
 				usedcannonONce = true;
 				playSound("distortion_a", true);
-				new IrisCannon(new IrisCrystal(), pos.addxy(-30, -30), xDir, player, player.getNextActorNetId(), 4, 35, rpc: true);
+				new IrisCannon(new IrisCrystal(), irisCrystal.pos.addxy(-30, -30), xDir, player, player.getNextActorNetId(), 4, 35, rpc: true);
 			}
 
 
@@ -215,7 +216,7 @@ public class Iris : Character {
 
 				playSound("distortion_a", true);
 				CannonSlashCD = 1.5f;
-				new IrisSlashProj(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				new IrisSlashProj(new IrisCrystal(), irisCrystal.pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 
 			if (CannonSlashCD2 == 0f &&
@@ -226,7 +227,7 @@ public class Iris : Character {
 
 				playSound("distortion_a", true);
 				CannonSlashCD2 = 1.5f;
-				new IrisSlashProj2(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				new IrisSlashProj2(new IrisCrystal(),  irisCrystal.pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 
 			if (CannonStabCD == 0f &&
@@ -238,14 +239,18 @@ public class Iris : Character {
 		  ) {
 				CannonStabCD = 1.25f;
 				playSound("distortion_a", true);
-				new IrisStabProj(new IrisCrystal(), pos, xDir, player, player.getNextActorNetId(), rpc: true);
+				new IrisStabProj(new IrisCrystal(), irisCrystal.pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			}
 		}
 
-		if (!Metamorphosis && player.input.isPressed(Control.Special2, player) && linkedRideArmor == null && player.currency > 2) {
+		if (!summonedRidearmorOnce 
+		&& !Metamorphosis 
+		&& player.input.isPressed(Control.Special2, player) 
+		&& linkedRideArmor == null && player.currency > 5) {
 			int raIndex = 7;
-			player.currency -= 3;
+			player.currency -= 5;
 			linkedRideArmor = new RideArmor(player, pos, raIndex, 0, player.getNextActorNetId(), true, sendRpc: true);
+			summonedRidearmorOnce = true;
 			changeState(new CallDownMech(linkedRideArmor, true), true);
 
 		}
