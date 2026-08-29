@@ -375,7 +375,11 @@ public class XUPGrabState : CharState {
 	grabTime -= Global.spf;
 		leechTime += Global.spf;
 
-		if (victimWasGrabbedSpriteOnce && !victim.sprite.name.EndsWith("_grabbed")) {
+
+		if (character is VAVAV && victim != null) {
+			character.xDir = -victim.xDir;
+		}
+		if (victimWasGrabbedSpriteOnce &&   victim != null && !victim.sprite.name.EndsWith("_grabbed") ) {
 			character.changeToIdleOrFall();
 			return;
 		}
@@ -414,8 +418,8 @@ public class XUPGrabState : CharState {
 		if (leechTime > 0.33f) {
 			leechTime = 0;
 			character.addHealth(1);
-			var damager = new Damager(player, 1, 0, 0);
-			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
+			//var damager = new Damager(player, 1, 0, 0);
+			//damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
 		}
 
 		if (player.input.isBPressed(player)) {
@@ -430,7 +434,7 @@ public class XUPGrabState : CharState {
 	}
 
 	public void updateXKai() {
-	
+		
 		grabTime -= Global.spf;
 		leechTime += Global.spf;
 
@@ -475,8 +479,8 @@ public class XUPGrabState : CharState {
 		if (leechTime > 0.33f && player.XKaiUnlockLifesteal) {
 			leechTime = 0;
 			character.addHealth(0.2f);
-			var damager = new Damager(player, 0.2f, 0, 0);
-			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
+//			var damager = new Damager(player, 0.2f, 0, 0);
+//			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
 		}
 
 		if (player.input.isBPressed(player)) {
@@ -618,6 +622,97 @@ public class UPGrabbed : CharState {
 			character.changeToIdleOrFall();
 		}
 	}
+}
+
+
+
+
+public class GrabDrag : CharState {
+	public const float maxGrabTime = 4;
+	public Character? grabber;
+	public long savedZIndex;
+	public GrabDrag(Character? grabber) : base("knocked_down") {
+		this.grabber = grabber;
+	}
+
+	public override bool canEnter(Character character) {
+		if (!base.canEnter(character)) return false;
+		return !character.isInvulnerable() && !character.charState.invincible;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMovingS();
+		character.stopCharge();
+		savedZIndex = character.zIndex;
+		character.setzIndex(grabber.zIndex - 100);
+	}
+
+	
+	public bool hitonce;
+
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		
+		character.setzIndex(savedZIndex);
+	}
+
+	float smokeTime;
+
+	bool firstHit;
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref smokeTime);
+
+		if (smokeTime == 0 && character.grounded){
+			if (!firstHit) {
+				firstHit = true;
+				character.playSound("ggsweep_5");
+				character.shakeCamera(sendRpc: true);
+				character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+			}
+		new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true);
+		smokeTime = 0.1f;
+		}
+
+
+	//	grabTime -= player.mashValue();
+		if (grabTime <= 0) {
+			character.changeToIdleOrFall();
+		}
+
+		character.move(new Point(character.xDir * -150, 0));
+		if (stateTime > 2f && character.grounded) {
+			character.changeState(new KnockedDown(-character.xDir), true);
+			if (grabber != null){
+			grabber.changeToIdleOrFall();
+			}
+			
+		}
+
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, -character.xDir, 0);
+		if (!hitonce &&collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			hitonce = true;
+			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+					character.changeState(
+							new KnockedDown(
+								-character.xDir
+							), true
+						);
+			if (grabber != null){
+			grabber.changeToIdleOrFall();
+			}
+			character.playSound("mugenhtsnd_hit3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
+		} 
+
+	}	
 }
 
 public class XReviveStart : CharState {

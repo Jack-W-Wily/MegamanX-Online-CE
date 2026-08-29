@@ -46,7 +46,7 @@ public class Dynamo : Character {
 
 	public override bool normalCtrl() {
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() &&
 			charState is not BlockWCUT and not WcutGenericDodgeF
 		) {
 			changeState(new BlockWCUT(), true);
@@ -472,7 +472,7 @@ public class Dynamo : Character {
 			if (gameObject is Projectile proj && proj.damager.owner.alliance != player.alliance) {
 				if (player.superAmmo >= 16) {
 					initiateDynamoTimeStop();
-				} else if (grounded) {
+				} else {
 					
 					changeState(new BlockWCUT(), true);
 				}

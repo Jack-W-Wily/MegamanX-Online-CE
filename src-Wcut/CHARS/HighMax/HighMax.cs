@@ -20,6 +20,12 @@ public class HighMax : Character {
 
 
 	public float IdlePunchCooldown;
+
+	public float IdlePunchCooldown2;
+
+	public float IdlePunchCooldown3;
+
+	public float IdlePunchCooldown4;
 	public float shootCooldown;
 
 	public float ZetsubouCooldown;
@@ -71,6 +77,7 @@ public class HighMax : Character {
 		bool WLPressed = player.input.isPressed(Control.WeaponLeft, player);
 		bool shootPressed = player.input.isPressed(Control.Shoot, player);
 		bool specialPressed = player.input.isPressed(Control.Special1, player);
+		bool r2Pressed = player.input.isR2Pressed(player);
 		bool dashPressed = player.input.isPressed(Control.Dash, player);
 
 
@@ -95,7 +102,7 @@ public class HighMax : Character {
 
 		}
 
-		if (shootPressed && player.input.isHeld(Control.Up, player)) {
+		if (specialPressed && player.input.isHeld(Control.Up, player)) {
 			if (IdlePunchCooldown == 0) {
 
 				changeState(new HighMaxMegaPunch(), true);
@@ -106,7 +113,18 @@ public class HighMax : Character {
 			}
 		}
 
-		if (specialPressed) {
+		if (specialPressed && player.input.isHeld(Control.Down, player)) {
+			if (IdlePunchCooldown2 == 0) {
+
+				changeState(new HighMaxGroundPound(), true);
+				IdlePunchCooldown2 = 1f;
+				return true;
+
+
+			}
+		}
+
+		if (r2Pressed) {
 			
 
 				if (player.input.isHeld(Control.Down, player)) {
@@ -198,7 +216,7 @@ public class HighMax : Character {
 		}
 		// Blocking
 		if (player.input.isL2Held(player) && !isInDamageSprite() &&
-			!isAttacking() && grounded && !player.input.isHeld(Control.Shoot, player) &&
+			!isAttacking() && !player.input.isHeld(Control.Shoot, player) &&
 			charState is not BlockWCUT and not ZeroGrabStart and not ZeroGrabEX
 		) {
 			changeState(new BlockWCUT(), true);
@@ -209,6 +227,9 @@ public class HighMax : Character {
 		}
 		// Cooldowns.
 		Helpers.decrementTime(ref IdlePunchCooldown);
+		Helpers.decrementTime(ref IdlePunchCooldown2);
+		Helpers.decrementTime(ref IdlePunchCooldown3);
+		Helpers.decrementTime(ref IdlePunchCooldown4);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
 		Helpers.decrementTime(ref shootCooldown);
 		Helpers.decrementTime(ref ZetsubouCooldown);
@@ -399,6 +420,13 @@ public class HighMax : Character {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.HeavyPush, player, 3f, 0, 20f, 
 			null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
+			);
+		}
+
+		if (sprite.name.EndsWith("desmume")) {
+			return new GenericMeleeProj(new RCXPunch(), 
+			centerPoint, ProjIds.HeavyPush, player, 1f, 0, 20f, 
+			null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "htsnd_lighting",  hitspark: "highmax_punch_spark"
 			);
 		}
 		if (sprite.name.EndsWith("foward_punch") && charState is HighMaxSuperPunchState) {

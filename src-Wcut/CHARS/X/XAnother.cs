@@ -45,7 +45,7 @@ public class XAnother : MegamanX {
 	public override bool normalCtrl() {
 
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() &&
 			charState is not BlockWCUT
 		) {
 			changeState(new BlockWCUT(), true);
@@ -357,8 +357,8 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
-				clashTier: ClashTier.Weak, isZSaberEffect: false,
-				addToLevel: addToLevel
+				 isZSaberEffect: false,
+				addToLevel: addToLevel, hitspark : "empty"
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,

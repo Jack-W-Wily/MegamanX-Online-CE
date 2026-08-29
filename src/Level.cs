@@ -955,6 +955,10 @@ public partial class Level {
 		Global.changeMusic("Xvs8Generals_RAGEMODE");
 	}
 
+	public void StartBossMusicX8 (){
+		Global.changeMusic("Boss_x8_carlonassar");
+	}
+
 	
 	public void changeCameraScale(float scale) {
 		if (server.fixedCamera) {

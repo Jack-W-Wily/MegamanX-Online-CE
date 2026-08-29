@@ -259,13 +259,13 @@ public class DesmumeProj2 : Projectile {
 	public override void update() {
 		base.update();
 
-		if (ownedByLocalPlayer && owner.input.isPressed(Control.Special1, owner) && owner.input.isHeld(Control.Down, owner)) {
+		if (ownedByLocalPlayer && owner.input.isPressed(Control.R2, owner) && owner.input.isHeld(Control.Down, owner)) {
 			new DesmumeProj4(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
 			destroySelf();
 		}
 		var hit = Global.level.checkCollisionActorOnce(this, vel.x * Global.spf, 0, null);
 		if (hit?.gameObject is Wall && hit?.hitData?.normal != null && !(hit.hitData.normal.Value.isAngled()) 
-		|| owner.input.isPressed(Control.Special1, owner) && owner.input.isHeld(Control.Up, owner)) {
+		|| owner.input.isPressed(Control.R2, owner) && owner.input.isHeld(Control.Up, owner)) {
 			if (ownedByLocalPlayer) {
 				new DesmumeProj3(weapon, pos, xDir, owner, owner.getNextActorNetId(), rpc: true);
 			}

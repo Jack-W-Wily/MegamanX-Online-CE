@@ -186,7 +186,7 @@ public static CharSelection[] selections => [
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isL2Held(player) && grounded
+		if (player.input.isL2Held(player)
 		&& charState is not BlockWCUT){
 			changeState(new BlockWCUT(), true);
 		

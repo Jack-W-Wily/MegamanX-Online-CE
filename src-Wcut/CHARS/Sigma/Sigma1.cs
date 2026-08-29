@@ -604,13 +604,13 @@ public class Sigma1 : BaseSigma {
 		return (MeleeIds)id switch {
 			MeleeIds.Guard => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
+				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel, hitspark : "empty"
 			) {
 				highPiority = true
 			},
 			MeleeIds.AutoGuard => new GenericMeleeProj(
 				SigmaSlashWeapon.netWeapon, pos, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel
+				0, 0, 0, isDeflectShield: true, addToLevel: addToLevel, hitspark : "empty"
 			) {
 				highPiority = true
 			},

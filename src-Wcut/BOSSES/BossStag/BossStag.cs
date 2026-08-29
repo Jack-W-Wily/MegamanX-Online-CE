@@ -58,7 +58,7 @@ public class BossStag : Character {
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isL2Held(player) && grounded){
+		if (player.input.isL2Held(player)){
 			changeState(new BlockWCUT(), true);
 		
 		}
@@ -80,8 +80,26 @@ public class BossStag : Character {
 	}
 
 
+
+
+	
+	public bool phase1Theme;
+
+	public bool phase2Theme;
+	public bool phase3Theme;
+
+
+
 	public override void update() {
 		base.update();
+
+
+		if (health > 10 && !phase1Theme && bonusHealth < 1){
+					phase1Theme = true;
+				Global.level.StartBossMusicX8();
+				//addMusicSource("Xvs8Generals_BossX1", getCenterPos(), true);
+		} 
+
 
 		if (isUnderwater()) {
 			antler.visible = false;
@@ -216,6 +234,7 @@ public class BossStag : Character {
 				ShouldClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
 				isZSaberEffect: false,// adds the Zsaber slashing effect
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
+				, hitspark : "empty"
 			),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
@@ -415,7 +434,7 @@ public class BossStag : Character {
 		Helpers.decrementFrames(ref AIHellBarrageCD);
 		bool isTargetInAir = pos.y > target?.pos.y - 20;
 		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
-		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
+		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 220;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (Global.level.is1v1()) {
 			isBoss = true;
@@ -430,7 +449,7 @@ public class BossStag : Character {
 			changeState(new BFStagWallDashState());
 		}
 
-			if (charState is WallKick) {
+		if (charState is WallKick) {
 			changeState(new BFStagWallDashState2());
 		}
 		
@@ -494,9 +513,9 @@ public class BossStag : Character {
 				}
 			}
 			if (bonusHealth > 0) {
-				aiAttackCooldown = Helpers.randomRange(30, 60);
+				aiAttackCooldown = Helpers.randomRange(60, 120);
 			} else {
-				aiAttackCooldown = Helpers.randomRange(0, 30);
+				aiAttackCooldown = Helpers.randomRange(30, 60);
 			}
 		}
 

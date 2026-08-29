@@ -1670,12 +1670,40 @@ public class Die : CharState {
 		if (!character.ownedByLocalPlayer) {
 			return;
 		}
-		if (character is Vile vile || character is BaseSigma || character.ShouldExplode) {
+		if (character.ShouldExplode) {
 			if (stateTime >= 1 && !once) {
 				player.respawnTime = player.getRespawnTime();
 				player.randomTip = Tips.getRandomTip(player.charNum);
+				//character.visible = false;
 				once = true;
-				character.visible = false;
+				player.explodeDieStart();
+				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
+					foreach (var weapon in new List<Weapon>(character.weapons)) {
+						if (weapon is MaverickWeapon mw && mw.maverick != null) {
+							mw.maverick.changeState(new MExit(mw.maverick.pos, true), true);
+						}
+					}
+				}
+			}
+			if (stateTime >= 2.5f && !character.isWCUTBoss) {
+				
+				destroyRideArmor();
+				player.explodeDieEnd();
+				player.destroyCharacter(character, true);
+			}
+			if (stateTime >= 6.5f && character.isWCUTBoss) {
+				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
+				destroyRideArmor();
+				player.explodeDieEnd();
+				player.destroyCharacter(character, true);
+			}
+		}
+		else if (character is Vile vile || character is BaseSigma ) {
+			if (stateTime >= 1 && !once) {
+				player.respawnTime = player.getRespawnTime();
+				player.randomTip = Tips.getRandomTip(player.charNum);
+				//character.visible = false;
+				once = true;
 				player.explodeDieStart();
 				if (character is BaseSigma sigma && sigma.loadout.commandMode != (int)MaverickModeId.TagTeam) {
 					foreach (var weapon in new List<Weapon>(character.weapons)) {
@@ -1686,6 +1714,7 @@ public class Die : CharState {
 				}
 			}
 			if (stateTime >= 2.5f) {
+				
 				destroyRideArmor();
 				player.explodeDieEnd();
 				player.destroyCharacter(character, true);
@@ -1741,6 +1770,9 @@ public class Die : CharState {
 				character is CmdSigma or WolfSigma or HighMax or Dynamo or Sigma1) {
 					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);	
 					character.playSound("explosion", sendRpc: true);	
+				}
+				if (character.ShouldExplode) {
+					new Anim(randomPos, "explosion", 1, player.getNextActorNetId(), true, sendRpc: true);	
 				}
 			}
 		}

@@ -313,7 +313,7 @@ public class MegamanX : Character {
 	}
 	// General update.
 
-
+	public float specialHeld;
 	public RagingChargeBuster ragingBuster;
 	public override void update() {
 		base.update();
@@ -356,6 +356,13 @@ public class MegamanX : Character {
 		if (!weapons.Contains(specialBuster)) {
 			specialBuster.update();
 		}
+
+
+		if (player.input.isR2Held(player)) {
+			specialHeld = 0.2f;
+		}
+		Helpers.decrementTime(ref specialHeld);
+		isSpecialButtonCharge = specialHeld > 0;
 
 		// Charge and release charge logic.
 		chargeLogic(shootCharge);
@@ -523,6 +530,20 @@ public class MegamanX : Character {
 				return true;
 			}
 		}
+
+
+		if (currentWeapon != null && canShoot() && (
+				player.input.isR2Pressed(player) && !isCharging() ||
+				currentWeapon.isStream && getChargeLevel() < 2 &&
+				player.input.isR2Held(player)
+			)
+		) {
+			if (currentWeapon.shootCooldown <= 0) {
+				shoot(0, specialBuster, false);
+				return true;
+			}
+		}
+
 		return base.attackCtrl();
 	}
 
@@ -586,7 +607,6 @@ public class MegamanX : Character {
 			chargeTime = 3;
 			stockedMaxBusterLv = 2;
 			player.superAmmo -= 8;
-			increaseCharge();
 		}
 		if (inputCheckS && canUseFgMove() && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
@@ -913,7 +933,10 @@ public class MegamanX : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (specialButtonMode == 0 && player.input.isBHeld(player)) {
+		if ( player.input.isBHeld(player)) {
+			return true;
+		}
+		if (player.input.isR2Held(player)) {
 			return true;
 		}
 		

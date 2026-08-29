@@ -251,7 +251,7 @@ public class GameMode {
 
 	public virtual void update() {
 		Helpers.decrementTime(ref hudErrorMsgTime);
-
+		TimeUpdate();
 
 
 		
@@ -594,7 +594,33 @@ public class GameMode {
 		}
 	}
 
+
+	public float Time;
+	public float Time2;
+	public bool Confirm = false;
+	public bool Confirm2 = true;
+
+
+
+	public bool firstTime;
+	public void TimeUpdate() {
+		if (!firstTime) {
+			Time2 = 1; 
+			//Confirm = true; 
+			firstTime = true;
+		}
+		//if (Confirm == true) Time = Global.spf * 2;
+		//if (Confirm2 == false)
+		Time2 -= Global.spf * 0.2f;
+		if (Time2 <= 0) {
+			Confirm2 = false;
+			Time2 = 0;
+		}
+	}
+
+
 	public virtual void render() {
+		
 		if (level.mainPlayer == null) return;
 
 		if (DevConsole.showConsole) {
@@ -1176,6 +1202,13 @@ public class GameMode {
 			}
 		}
 		*/
+
+
+
+		if (Options.main.blackFade) {
+			
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}
 	}
 
 	public void setHUDErrorMessage(
@@ -1768,7 +1801,14 @@ public class GameMode {
 		bool allowSmall = true
 	) {
 		baseY += 25;
-		Global.sprites["hud_weapon_base"].drawToHUD(baseIndex, baseX, baseY);
+
+		if (Global.level.mainPlayer.isX) {
+		
+		Global.sprites["hud_bars_wp_base_on_x"].drawToHUD(baseIndex, baseX, baseY);
+		} else {
+		Global.sprites["hud_weapon_base"].drawToHUD(baseIndex, baseX, baseY);	
+		}
+		
 		baseY -= 16;
 
 		// Puppeteer small energy bars.
@@ -1880,7 +1920,11 @@ public class GameMode {
 		}
 		ammoDisplayMultiplier /= weapon.ammoDisplayScale;
 		baseY += 25;
+		if (player.isX) {
+		Global.sprites["hud_bars_wp_base_on_x"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY +1);	
+		} else {
 		Global.sprites["hud_weapon_base"].drawToHUD(weapon.weaponBarBaseIndex, baseX, baseY);
+		}
 		baseY -= 16;
 
 		for (var i = 0; i < MathF.Ceiling(weapon.maxAmmo * ammoDisplayMultiplier); i++) {
@@ -1897,10 +1941,11 @@ public class GameMode {
 					(weapon is HyperCharge hb && !hb.canShootIncludeCooldown(level.mainPlayer))) {
 					spriteIndex = grayAmmoIndex;
 				}
-				if (spriteIndex >= Global.sprites["hud_weapon_full"].frames.Length) {
+				if (spriteIndex >= Global.sprites["hud_bars_wp_x"].frames.Length) {
 					spriteIndex = 0;
 				}
-				Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);
+				//Global.sprites["hud_weapon_full"].drawToHUD(spriteIndex, baseX, baseY);
+				Global.sprites["hud_bars_wp_x"].drawToHUD(spriteIndex, baseX + 2, baseY);
 			} else {
 				Global.sprites["hud_health_empty"].drawToHUD(0, baseX, baseY);
 			}

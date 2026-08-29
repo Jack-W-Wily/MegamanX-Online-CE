@@ -57,7 +57,7 @@ public class BossMammoth : Character {
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isL2Held(player) && grounded){
+		if (player.input.isL2Held(player)){
 			changeState(new BlockWCUT(), true);
 		
 		}
@@ -101,12 +101,14 @@ public class BossMammoth : Character {
 			} else {
 				if (health > 10 && !phase1Theme){
 					phase1Theme = true;
-				addMusicSource("Xvs8Generals_BossX1", getCenterPos(), true);
+				Global.level.startDesperationTheme1();
+				//addMusicSource("Xvs8Generals_BossX1", getCenterPos(), true);
 				} 
 				if (health < 10 && !phase2Theme){
 					phase2Theme = true;
 					iframesTime = 600;
-				addMusicSource("Xvs8Generals_RAGEMODE", getCenterPos(), true);
+				Global.level.startDesperationTheme2();
+				//addMusicSource("Xvs8Generals_RAGEMODE", getCenterPos(), true);
 				}
 		}
 		}
@@ -267,6 +269,7 @@ public class BossMammoth : Character {
 				ShouldClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
 				isZSaberEffect: false,// adds the Zsaber slashing effect
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
+				, hitspark : "empty"
 			),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(

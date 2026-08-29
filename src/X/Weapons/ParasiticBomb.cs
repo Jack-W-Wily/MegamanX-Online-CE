@@ -71,6 +71,8 @@ public class ParasiticBombProj : Projectile {
 	) {
 		weapon = ParasiticBomb.netWeapon;
 		vel = new Point(200 * xDir, 0);
+		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		maxTime = 0.6f;
 		projId = (int)ProjIds.ParasiticBomb;
 		destroyOnHit = true;
@@ -174,7 +176,7 @@ public class BeeSwarm {
 	public List<BeeCursorAnim> beeCursors = new List<BeeCursorAnim>();
 	int currentIndex;
 	float currentTime = 0f;
-	const float beeCooldown = 1f;
+	const float beeCooldown = 0.5f;
 
 	public BeeSwarm(MegamanX mmx) {
 		this.mmx = mmx;

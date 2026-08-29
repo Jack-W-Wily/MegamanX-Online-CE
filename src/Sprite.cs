@@ -331,6 +331,24 @@ public class Sprite {
 			
 		}
 
+		if (actor is BossStag fstag  && fstag.bonusHealth <= 0
+		&& animData.isFStagSPrite ) {
+			bitmap = Global.textures["FlameStagB"];
+			
+		}
+
+		if (actor is Projectile fstagproj  && fstagproj.owner.character is BossStag bossTag && bossTag.bonusHealth <= 0
+		&& animData.isFStagSPrite ) {
+			bitmap = Global.textures["FlameStagB"];
+			
+		}
+
+		if (actor is Anim fstagAnim  && fstagAnim.host is BossStag bossTag2 && bossTag2.bonusHealth <= 0
+		&& animData.isFStagSPrite ) {
+			bitmap = Global.textures["FlameStagB"];
+			
+		}
+
 		if (armors != null && animData.isXSprite && !Options.main.fastShaders && !Options.main.disableShaders) {
 			bool isShootSprite = needsX3BusterCorrection();
 			/*
@@ -1066,6 +1084,10 @@ public class AnimData {
 	public bool RXSprite2;
 	public bool RXSprite3;
 	public bool isAxlSprite;
+
+
+
+	public bool isFStagSPrite;
 	
 
 	public bool isVavaMk1SpriteBasics;
@@ -1126,6 +1148,10 @@ public class AnimData {
 		}
 		if (textureName == "axl") {
 			isAxlSprite = true;
+		}
+
+		if (textureName == "FlameStag") {
+			isFStagSPrite = true;
 		}
 		this.textureName = textureName;
 

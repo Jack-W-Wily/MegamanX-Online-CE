@@ -114,6 +114,7 @@ public class CharSelection {
 		new CharSelection("Zero (MID)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		//new CharSelection("Zero (END)", (int)CharIds.ZeroEND, 1, 0, "smenu_zero_3", 0){offset = new Point(0, 20)},
 		new CharSelection("Axl", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
+		
 		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
 		new CharSelection("Iris", (int)CharIds.Iris, 1, 0, "smenu_iris", 0){offset = new Point(0, 20)},
@@ -279,12 +280,44 @@ public class SelectCharacterMenu : IMainMenu {
 		}
 	}
 
+
+
+
+	public void TimeUpdate() {
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) Confirm = true;
+		if (Confirm == true) Time += Global.spf * 2;
+		if (Confirm2 == false) Time2 -= Global.spf * 2;
+		if (Time2 <= 0) {
+			Confirm2 = false;
+			Time2 = 0;
+		}
+	}
+
+public float Time;
+	public float Time2;
+	public bool Confirm = false;
+	public bool Confirm2 = true;
 	public Player mainPlayer { get { return Global.level.mainPlayer; } }
 
+
+	public float Delay;
+
+	public bool PressedConfirm;
 	public void update() {
-		if (Global.input.isPressedMenu(Control.MenuConfirm) || (Global.quickStartOnline && !isInGame)) {
+
+		TimeUpdate();
+		if (Global.input.isPressedMenu(Control.MenuConfirm) && !PressedConfirm) {
+			PressedConfirm = true;
+			Global.playSound("ching");
+		}
+		if (PressedConfirm || (Global.quickStartOnline && !isInGame)) {
+			
+			Delay += Global.spf * 2;
+			if (Delay >= 1 ){
 			if (!isInGame && Global.quickStartOnline) {
+				
 				playerData.charNum = Global.quickStartOnlineClientCharNum;
+				
 			}
 			if (isInGame && !isInGameEndSelect) {
 				if (!Options.main.killOnCharChange && !Global.level.mainPlayer.isDead) {
@@ -299,6 +332,7 @@ public class SelectCharacterMenu : IMainMenu {
 
 			completeAction.Invoke();
 			return;
+			}
 		}
 
 		Helpers.menuLeftRightInc(
@@ -341,6 +375,9 @@ public class SelectCharacterMenu : IMainMenu {
 	}
 
 	public void render() {
+
+		
+
 		if (!charSelections.InRange(playerData.uiSelectedCharIndex)) {
 			playerData.uiSelectedCharIndex = 0;
 		}
@@ -474,6 +511,11 @@ public class SelectCharacterMenu : IMainMenu {
 					Global.screenW * 0.5f, 190, Alignment.Center
 				);
 			}
+		}
+
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
 		}
 	}
 }

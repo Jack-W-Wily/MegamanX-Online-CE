@@ -45,7 +45,7 @@ public class RockmanX : MegamanX {
 	public override bool normalCtrl() {
 
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() &&
 			charState is not BlockWCUT
 		) {
 			changeState(new BlockWCUT(), true);
@@ -117,33 +117,53 @@ public class RockmanX : MegamanX {
 		}
 
 
+
+		
 	
 
-		if (player.input.isR2Pressed(player) && player.input.isHeld(Control.Up, player) && canSummonZero) {
+		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Down, player) 
+		&& canSummonZero) {
 			if (helperZero == null) {
 				helperZero = new FakeZero(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 				player.superAmmo -= 32;
 			}
 		}
+
+		
 		bool canUseSupers = player.superAmmo >= 16 || OverDrive;
 
-		if (player.input.isR2Pressed(player) && !player.input.isHeld(Control.Up, player) && canUseSupers) {
+		if (canUseSupers) {
 
-			if (player.input.isHeld(Control.Down, player)) {
+			if (player.input.isL2Held(player) && downPressedTimes >= 2) {
 				enterParry();
-			} else if (charState is Dash or AirDash) {
-				charState.isGrabbing = true;
-				changeSpriteFromName("unpo_grab_dash", true);
-			} else {
-				changeState(new XUPPunchState(grounded), true);
-			}
-			if (!OverDrive) {
+				if (!OverDrive) {
 				player.superAmmo -= 16;
 				new GigaCrushBackwall(this.pos, this);
 				new HitStop(pos, player, player.getNextActorNetId(), 
 				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 				playSound("ching", sendRpc: true);
+				}
+			} else if (charState is Dash or AirDash && upPressedTimes >= 2) {
+				charState.isGrabbing = true;
+				changeSpriteFromName("unpo_grab_dash", true);
+				if (!OverDrive) {
+				player.superAmmo -= 16;
+				new GigaCrushBackwall(this.pos, this);
+				new HitStop(pos, player, player.getNextActorNetId(), 
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				playSound("ching", sendRpc: true);
+				}
+			} else if (downPressedTimes >= 2 && player.input.isR2Pressed(player)) {
+				changeState(new XUPPunchState(grounded), true);
+				if (!OverDrive) {
+				player.superAmmo -= 16;
+				new GigaCrushBackwall(this.pos, this);
+				new HitStop(pos, player, player.getNextActorNetId(), 
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				playSound("ching", sendRpc: true);
+				}
 			}
+			
 		}
 
 
@@ -387,8 +407,8 @@ public class RockmanX : MegamanX {
 					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
-				clashTier: ClashTier.Weak, isZSaberEffect: false,
-				addToLevel: addToLevel
+				 isZSaberEffect: false,
+				addToLevel: addToLevel, hitspark : "empty"
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,

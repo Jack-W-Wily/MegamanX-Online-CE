@@ -191,6 +191,7 @@ public class BubbleSplashProjCharged : Projectile {
 	) {
 		weapon = BubbleSplash.netWeapon;
 		damager.damage = 1;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(75 * xDir, 0);
 		useGravity = false;
 		fadeSprite = "bubblesplash_pop";

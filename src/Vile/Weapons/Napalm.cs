@@ -133,6 +133,7 @@ public class VileNapalmGrenadeProj : Projectile {
 		collider?.wallOnly = true;
 		fadeSound = "explosionX3";
 		fadeSprite = "explosion";
+		damager.flinch = Global.defFlinch;
 		shouldShieldBlock = false;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
@@ -303,6 +304,7 @@ public class MK2NapalmGrenadeProj : Projectile {
 		collider?.wallOnly = true;
 		fadeSound = "explosionX3";
 		fadeSprite = "explosion";
+		damager.flinch = Global.defFlinch;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -459,6 +461,7 @@ public class SplashHitGrenadeProj : Projectile {
 		weapon = SplashHit.netWeapon;
 		damager.damage = 2;
 		damager.hitCooldown = 12;
+		damager.flinch = Global.defFlinch;
 		projId = (int)ProjIds.SplashHitGrenade;
 		vel = new Point(150 * xDir, -200);
 		fadeSound = "explosionX3";
@@ -515,7 +518,7 @@ public class SplashHitProj : Projectile {
 		shouldVortexSuck = false;
 		destroyOnHit = false;
 		maxTime = 1.5f;
-		isJuggleProjectile = true;
+		isLiftProjectile = true;;
 		isLiftProjectile = true;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);

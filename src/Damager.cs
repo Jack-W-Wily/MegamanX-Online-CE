@@ -452,32 +452,7 @@ public class Damager {
 				
 			}
 			
-			if (owner.character is VAVA2 vava2 && vava2.health > 0) {
-				if (vava2.OverDrive) {
-					owner.character.addHealth(0.5f);
-				}
-
-				if (owner.superAmmo != owner.superMaxAmmo) {
-						if (owner.character.charState.canGainMeter){
-					owner.superAmmo += 1;
-					}
-				}
-
-			}
-
-			if (owner.character is VAVAV vavav && vavav.health > 0) {
-
-				if (owner.superAmmo != owner.superMaxAmmo && projId != (int)ProjIds.HexaInvolute
-				
-				&& projId != (int)ProjIds.HexaInvolute2 && projId != (int)ProjIds.HexaInvoluteProjWC
-				) {
-						if (owner.character.charState.canGainMeter){
-					owner.superAmmo += 1;
-					}
-				}
-				
-				
-			}
+			
 			
 			if (owner.character is Sigma1 sig1 && sig1.health > 0) {
 
@@ -507,6 +482,12 @@ public class Damager {
 			if (character.DamageScaling > 1.5f) {
                 damage *= 0.5f;
             }
+
+			if (owner.character is BossStag bossStag && bossStag.bonusHealth < 1 && projId > 0) {
+				
+					character.addIgFreezeProgress(3);
+					
+			}
 
 			switch (projId) {
 				//burn [to the ground] section
@@ -739,6 +720,11 @@ public class Damager {
             }
 
 
+			if (character.bossArmor > 0) {
+				flinch = 0;
+				character.bossArmor -= 1;
+			}
+
 
 			// WCUT boss Weakness Section
 			if (character is BossStag && ( projId == (int)ProjIds.BubbleSplash
@@ -894,7 +880,9 @@ public class Damager {
 				attacker.wasFigthing = (int)CharIds.RockmanX;
 			}
 
-
+			if (projId == (int)ProjIds.ForceAutoFlinch) {
+			flinch = Global.defFlinch;
+			}
 			if (projId == (int)ProjIds.ForceGrabState) {
 				if (attacker != null){
 					if (attacker.charState is ZainGrabStab) {
@@ -938,10 +926,17 @@ public class Damager {
 					}
 				}
 
-				if (projId == (int)ProjIds.newUpGrab) {
+				if (projId == (int)ProjIds.newUpGrab ) {
 					if (owner != null && owner.character != null && character != null){
+					if (owner.character is not Vile){
 					owner.character.changeState(new XUPGrabState(character));
 					character.changeState(new UPGrabbed(owner.character));
+					} else {
+						if (character.charState is not GrabDrag){
+						owner.character.changeState(new XUPGrabState(character));
+						character.changeState(new GrabDrag(owner.character));
+						}
+					}
 					}
 				}
 				
@@ -999,10 +994,10 @@ public class Damager {
 			}
 
 			if (projId == (int)ProjIds.GizmoGrab) {
-				if (owner?.character is VAVA1 or FinalVava) {
+				//if (owner?.character is VAVA1 or FinalVava) {
 					character?.changeState(new ForceGrabbed(owner.character));
 					owner.character?.changeState(new VavaGizmoGrabState(character));
-				}
+				//}
 			}
 
 			// Boss Instakill Inmmunities
@@ -1364,6 +1359,12 @@ public class Damager {
 
 			}
 			// Enable Wcut Combos on Mavericks
+
+			if(owner.character?.charState is GreenEyedLampState) {
+				owner.character.charState.normalCtrl = true;
+				owner.character.charState.attackCtrl = true;
+				owner.character.charState.useGravity = true;
+			}
 			if (owner.character != null) {
 
 				if (owner.character.charState.canSpecialCancel) {
@@ -1811,6 +1812,7 @@ public class Damager {
 		}
 		return (ProjIds)projId switch {
 			ProjIds.Burn => true,
+			ProjIds.HexaInvolute => true,
 			ProjIds.AcidBurstPoison => true,
 			ProjIds.FlameRoundFlameProj => true,
 			ProjIds.SelfDmg => true,

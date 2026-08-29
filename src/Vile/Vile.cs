@@ -276,7 +276,7 @@ public class Vile : Character {
 				}
 			}
 			if (shootHeld && cannonWeapon.type > -1) {
-				//if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
+				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
 					cannonWeapon?.vileShoot(this);
 			}
 			if (WeaponRightHeld && vulcanWeapon.type > -3) {

@@ -618,10 +618,11 @@ public class HighMaxIdlePunch1 : CharState {
 
 	private float specialPressTime;
 
+
 	public float pushBackSpeed;
 
 	public HighMaxIdlePunch1(string transitionSprite = "")
-		: base("idle_punch1", "", "", transitionSprite) {
+		: base("idle_punch_charge", "", "", transitionSprite) {
 
 	}
 
@@ -637,18 +638,31 @@ public class HighMaxIdlePunch1 : CharState {
 			}
 			character.useGravity = true;
 		}
+		if (character.sprite.name.Contains("charge")) {
+			superArmor = true;
+		} else {
+			superArmor = false;
+		}
+		if (!player.input.isHeld(Control.Shoot, player) && !once) {
+			once = true;
+			if (stateTime > 0.5f) {
+				character.changeSpriteFromName("idle_punch1", true);
+				sprite = "idle_punch1";
+			} else {
+				character.changeSpriteFromName("idle_punch2", true);
+				sprite = "idle_punch2";
+			}
+		}
 
 		base.update();
 		Helpers.decrementTime(ref specialPressTime);
-		if (stateTime > 0.5f) {
+		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 		if (player.input.isHeld(Control.Down, player) && player.input.isPressed(Control.Shoot, player)) {
 			character.changeState(new HighMaxCrouchPunch1());
 		}
-		if (character.isAnimOver()) {
-			return;
-		}
+	
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -667,19 +681,36 @@ public class HighMaxIdlePunch1 : CharState {
 
 
 
-public class HighMaxCrouchPunch1 : CharState {
+public class HighMaxGroundPound : CharState {
 
 
-	private float specialPressTime;
 
 	public float pushBackSpeed;
 
-	public HighMaxCrouchPunch1(string transitionSprite = "")
-		: base("crouch_punch", "", "", transitionSprite) {
 
+	bool fired;
+	public HighMaxGroundPound (string transitionSprite = "")
+		: base("ground_pound", "", "", transitionSprite) {
+		airMove = true;
+		superArmor = true;
+		enterSound = "dbzpunchwave_1";
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
+
+		base.update();
+
+
+		if (character.frameIndex >= 3 && !fired) {
+			fired = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+		}
+
 
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
@@ -692,6 +723,38 @@ public class HighMaxCrouchPunch1 : CharState {
 			character.useGravity = true;
 		}
 
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+
+
+}
+
+
+
+
+public class HighMaxCrouchPunch1 : CharState {
+
+
+	private float specialPressTime;
+
+	public float pushBackSpeed;
+
+	public HighMaxCrouchPunch1(string transitionSprite = "")
+		: base("crouch_punch", "", "", transitionSprite) {
+			
+			attackCtrl = true;
+
+	}
+
+	public override void update() {
+
+		
 		base.update();
 		Helpers.decrementTime(ref specialPressTime);
 		if (stateTime > 0.5f) {
@@ -705,10 +768,7 @@ public class HighMaxCrouchPunch1 : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (!character.grounded) {
-			character.stopMoving();
-			pushBackSpeed = 100;
-		}
+	
 	}
 
 	public override void onExit(CharState? newState) {

@@ -506,7 +506,7 @@ public class BusterZero : Character {
 			),
 			(int)MeleeIds.Block => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.SwordBlock, player, 0, 0, 0, isDeflectShield: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitspark : "empty"
 			) {
 				highPiority = true
 			},

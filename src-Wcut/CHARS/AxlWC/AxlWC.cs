@@ -599,7 +599,7 @@ public class AxlWC : Character {
 		}
 		// Block.
 	
-		if (grounded && player.input.isL2Held(player)&&
+		if (player.input.isL2Held(player)&&
 			charState is not BlockWCUT and not Dash and not OcelotSpin && axlWeapon?.autoFire == false
 		) {
 			changeState(new BlockWCUT(), true);;
@@ -872,7 +872,7 @@ public class AxlWC : Character {
 			MeleeIds.Block => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitspark : "empty"
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,

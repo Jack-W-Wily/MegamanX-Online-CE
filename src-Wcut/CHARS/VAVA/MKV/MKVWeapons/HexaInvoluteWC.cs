@@ -4,6 +4,86 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+
+
+
+
+
+public class OvosFritosStart : CharState {
+
+
+	public OvosFritosStart() : base("jump_start") {
+		immuneToWind = true;
+	}
+
+	public override void update() {
+		base.update();
+		
+		if (character.isAnimOver()) {
+		
+			character.changeState(new OvosFritos(), true);
+			character.vel.y = -character.getJumpPower();
+			
+		}	
+		
+		
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
+
+public class OvosFritos : CharState {
+
+	bool dropDown;
+	public OvosFritos() : base("ovos_fritos") {
+		enterSound = "fstagUppercut";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!character.grounded && stateTime > 0.05f) {
+			exitOnLanding = true;
+		}
+		if (!character.grounded) {
+		
+			character.move(new Point(character.xDir * 100, 0));
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		specialId = SpecialStateIds.None;
+	}
+}
+
+
+
+
 public class HexaInvoluteWeaponWC : Weapon {
 	public HexaInvoluteWeaponWC() {
 		index = (int)WeaponIds.HexaInvolute;

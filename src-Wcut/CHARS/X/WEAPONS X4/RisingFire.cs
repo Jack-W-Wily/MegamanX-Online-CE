@@ -401,7 +401,7 @@ public class RisingFireProjCharged : Projectile {
 	) {
 		maxTime = 0.6f;
 		damager.flinch = 30;
-		isJuggleProjectile = true;
+		isLiftProjectile = true;;
 		isShield = true;
 		projId = (int)ProjIds.RisingFireCharged;
 		shouldShieldBlock = false;

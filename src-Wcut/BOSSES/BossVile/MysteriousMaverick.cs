@@ -97,7 +97,7 @@ public class MysteriousMaverick : Vile {
 
 
 	public override bool normalCtrl() {
-		if (player.input.isL2Held(player) && grounded) {
+		if (player.input.isL2Held(player)) {
 			changeState(new BlockWCUT(), true);
 
 		}
@@ -577,7 +577,7 @@ public class MysteriousMaverick : Vile {
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
 				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
 				isDeflectShield: true, ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel),
+				addToLevel: addToLevel, hitspark : "empty"),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
@@ -1450,7 +1450,7 @@ public class MysteriousMaverick : Vile {
 							}
 						}
 					} else {
-						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
+						if (!(proj.projId == (int)ProjIds.SwordBlock)
 								&& aiBlocktime <= 0) {
 							turnToInput(player.input, player);
 							changeState(new BlockWCUT(), true);;

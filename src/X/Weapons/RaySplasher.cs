@@ -9,8 +9,8 @@ public class RaySplasher : Weapon {
 	public static RaySplasher netWeapon = new RaySplasher();
 
 	public RaySplasher() : base() {
-		displayName = "Ray Splasher";
-		shootSounds = ["raySplasher", "raySplasher", "raySplasher", "warpIn"];
+		displayName = "Ray Claw";
+		shootSounds = ["Mantis - Cut1", "raySplasher", "raySplasher", "warpIn"];
 		fireRate = 80;
 		index = (int)WeaponIds.RaySplasher;
 		type = index;
@@ -29,12 +29,25 @@ public class RaySplasher : Weapon {
 	public override void shoot(Character character, int[] args) {
 		int chargeLevel = args[0];
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
-
-		if (chargeLevel < 3) {
+		if (chargeLevel == 0) {
+			new RayClaw(new RaySplasher(), mmx.getShootPos(), 
+			mmx.xDir, mmx.player, mmx.player.getNextActorNetId()
+			, 2, 20, true);
+		}
+		else if (chargeLevel < 3 && chargeLevel > 0) {
 			mmx.shootingRaySplasher = this;
-		} else {
+			new RayClaw(new RaySplasher(), mmx.getShootPos(), 
+			mmx.xDir, mmx.player, mmx.player.getNextActorNetId()
+			, 2, 20, true);
+		} else if (chargeLevel >=3) {
 			if (character.ownedByLocalPlayer) {
 				character.changeState(new RaySplasherChargedState(), true);
+				new RayClaw(new RaySplasher(), mmx.pos.addxy(0, - 35), 
+				-mmx.xDir, mmx.player, mmx.player.getNextActorNetId()
+				, 2, 20, true);
+				new RayClaw(new RaySplasher(), mmx.pos.addxy(0, - 35), 
+				mmx.xDir, mmx.player, mmx.player.getNextActorNetId()
+				, 2, 20, true);
 			}
 		}
 	}
@@ -86,6 +99,7 @@ public class RaySplasherProj : Projectile {
 		weapon = RaySplasher.netWeapon;
 		damager.damage = 0.336f;
 		damager.hitCooldown = 6;
+		damager.flinch = Global.miniFlinch;
 		vel = new Point(600 * xDir, 0);
 		maxTime = 0.25f;
 		projId = (int)ProjIds.RaySplasher;
@@ -145,7 +159,7 @@ public class RayClaw : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
-		isJuggleProjectile = true;
+		isLiftProjectile = true;;
 		isShield = true;
 		isReflectShield = true;
 		maxTime = 0.3f;

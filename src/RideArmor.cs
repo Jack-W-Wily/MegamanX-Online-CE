@@ -2321,6 +2321,12 @@ public class InRideArmor : CharState {
 	public bool winTaunt;
 	public float innerCooldown;
 
+	bool first = false;
+	bool seccond = false;
+	bool third = false;
+	bool fourth = false;
+
+
 	
 	public InRideArmor(string transitionSprite = "") : base("ra_idle", "", "", transitionSprite) {
 	}
@@ -2372,6 +2378,7 @@ public class InRideArmor : CharState {
 		}
 		 if (character.sprite.name.Contains("ra_bomb") &&
 				character.sprite.name.Contains("ra_taunt") &&
+				character.sprite.name.Contains("gizmo") &&
 				character.sprite.name.Contains("ra_show") &&
 		 character.sprite.isAnimOver()) {
 				character.changeSpriteFromName("ra_idle", true);
@@ -2382,6 +2389,55 @@ public class InRideArmor : CharState {
 				tossGrenade(vile);
 				innerCooldown = 0.7f;
 		}	
+
+		if (character is Vile && player.input.isR2Pressed(player)) {
+		sprite = "cannon_gizmo_air";
+		character.changeSpriteFromName("cannon_gizmo_air", true);
+
+		}
+		if (character.sprite.name.Contains("gizmo")){
+			var poi = character.getFirstPOI();	
+		accuracy = 0;
+		Point prevPos = character.pos;
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
+		}
+		if (poi != null) {
+			if (!first && character.sprite.frameIndex > 2) {
+				new HighmaxStunShot(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				first = true;
+				character.playSound("boundBlaster");
+			}
+			if (!seccond && character.sprite.frameIndex > 4) {
+				new HighmaxStunShot(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				seccond = true;
+				character.playSound("boundBlaster");
+			}
+			if (!third && character.sprite.frameIndex > 6) {
+				new HighmaxStunShot(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				third = true;
+				character.playSound("boundBlaster");
+			}
+			if (!fourth && character.sprite.frameIndex > 8) {
+				new HighmaxStunShot(
+					poi.Value, character.xDir, character,
+					player, player.getNextActorNetId(), 0, rpc: true
+					);
+				fourth = true;
+				character.playSound("boundBlaster");
+			}
+		}
+		}
 		
 
 		if (!isHiding) {
@@ -2399,6 +2455,11 @@ public class InRideArmor : CharState {
 				character.sprite.name.Contains("ra_attack")
 			) {
 				character.changeSpriteFromName("ra_idle", true);
+				first = false;
+				seccond = false;
+				third = false;
+				fourth = false;
+
 			}
 		} 
 
@@ -2438,46 +2499,9 @@ public class InRideArmor : CharState {
 				character.player, character.player.getNextActorNetId(), rpc: true
 			);
 		}
-		/*
-		else if (player.vileNapalmWeapon.type == (int)NapalmType.NoneBall)
-		{
-			if (player.vileBallWeapon.type == (int)VileBallType.ExplosiveRound)
-			{
-				if (player.vileBallWeapon.shootTime == 0) character.setVileShootTime(player.vileBallWeapon);
-				else return;
-				grenade = new VileBombProj(player.vileBallWeapon, character.pos.addxy(0, -3), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
-				grenade.maxTime = 1f;
-			}
-			else if (player.vileBallWeapon.type == (int)VileBallType.SpreadShot)
-			{
-				if (player.vileBallWeapon.shootTime == 0) character.setVileShootTime(player.vileBallWeapon);
-				else return;
-				Point vel = Point.createFromAngle(-45).times(150);
-				if (character.xDir == -1) vel.x *= -1;
-				new StunShotProj(player.vileBallWeapon, character.pos.addxy(0, -3), character.xDir, 1, character.player, character.player.getNextActorNetId(), vel, rpc: true);
-				Global.level.delayedActions.Add(new DelayedAction(() =>
-				{
-					Point vel = Point.createFromAngle(-22.5f).times(150);
-					if (character.xDir == -1) vel.x *= -1;
-					new StunShotProj(player.vileBallWeapon, character.pos.addxy(0, -3), character.xDir, 1, character.player, character.player.getNextActorNetId(), vel, rpc: true);
-				}, 0.15f));
-				Global.level.delayedActions.Add(new DelayedAction(() =>
-				{
-					Point vel = Point.createFromAngle(0).times(150);
-					if (character.xDir == -1) vel.x *= -1;
-					new StunShotProj(player.vileBallWeapon, character.pos.addxy(0, -3), character.xDir, 1, character.player, character.player.getNextActorNetId(), vel, rpc: true);
-				}, 0.3f));
-			}
-			else if (player.vileBallWeapon.type == (int)VileBallType.PeaceOutRoller)
-			{
-				if (player.vileBallWeapon.shootTime == 0) character.setVileShootTime(player.vileBallWeapon);
-				else return;
-				grenade = new PeaceOutRollerProj(player.vileBallWeapon, character.pos.addxy(0, -3), character.xDir, player, 0, character.player.getNextActorNetId(), rpc: true);
-				grenade.maxTime = 1;
-				grenade.gravityModifier = 1;
-			}
-		}
-		*/
+		
+
+
 
 		if (grenade != null) {
 			grenade.vel.x = 75 * (character.xDir);

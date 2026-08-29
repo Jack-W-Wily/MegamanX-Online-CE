@@ -205,7 +205,7 @@ public class GreenEyedLampState : CharState {
 		
 			
 
-			if (stateTime > 0.25f) {
+			if (character.isAnimOver()) {
 				character.changeToIdleOrFall();
 			}
 		

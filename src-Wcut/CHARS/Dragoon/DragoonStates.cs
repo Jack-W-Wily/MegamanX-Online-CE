@@ -19,7 +19,7 @@ public class DragoonSpark : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
-		isJuggleProjectile = true;
+		isLiftProjectile = true;;
 		isLiftProjectile = true;
 		isShield = true;
 		isReflectShield = true;
@@ -50,7 +50,7 @@ public class DragoonPunchState : CharState {
 
 
 	
-	public float pushBackSpeed;
+	
 
 
 
@@ -62,6 +62,9 @@ public class DragoonPunchState : CharState {
 	enterSound = "punch2";
 	}
 
+
+
+	public float pushBackSpeed;
 	public override void update()
 	{
 	

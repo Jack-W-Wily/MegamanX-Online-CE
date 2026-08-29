@@ -245,6 +245,8 @@ public class PreOptionsMenuCharacter : IMainMenu {
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.halfScreenW, 198, Alignment.Center);
 	}
 }
+
+
 public class PreCPUMenu : IMainMenu {
 	public int selArrowPosY;
 	public Point optionPos1 = new Point(Global.halfScreenW, 70);
@@ -286,7 +288,8 @@ public class PreCPUMenu : IMainMenu {
 					enterTraining();
 					break;
 				case 2:
-					enterVavaStage();
+					Menu.change(new PreCPUMenu2(this, false));
+					
 					
 					break;
 			}
@@ -330,7 +333,7 @@ public class PreCPUMenu : IMainMenu {
 		Global.level.startLevel(localServer, false);
 	}
 
-	public void enterVavaStage() {
+	public void enterTestState() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
 		int spawnAsX = (int)CharIds.RockmanX;
@@ -368,7 +371,7 @@ public class PreCPUMenu : IMainMenu {
 
 
 
-		public void enterXStage() {
+		public void newGameStage() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_x_x1_highway").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
 		int spawnAsX = (int)CharIds.RockmanX;
@@ -427,6 +430,259 @@ public class PreCPUMenu : IMainMenu {
 		}
 		if (selectY == 2) {
 			Fonts.drawText(menuFont, "Singleplayer Test \n" + Name + "\nTesting Purposes",
+			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
+		}
+		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.screenW / 2, Global.screenH - 9, Alignment.Center);
+		if (Options.main.blackFade) {
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time);
+			DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, Time2);
+		}
+	}
+}
+
+
+
+
+
+
+
+
+public class PreCPUMenu2 : IMainMenu {
+	public int selArrowPosY;
+	public Point optionPos1 = new Point(Global.halfScreenW, 70);
+	public PreCPUMenu prevMenu;
+	public int selectY;
+	public bool inGame;
+	public float startX = Global.halfScreenW;
+	public int[] optionPos = new int[3];
+	public int lineH = 24;
+	public int[] cursorHandler = {
+		(int)Global.halfScreenW - 50,
+		(int)Global.halfScreenW - 70,
+		(int)Global.halfScreenW - 90,
+	};
+	public int[] cursorHandler2 = {
+		(int)Global.halfScreenW + 50,
+		(int)Global.halfScreenW + 70,
+		(int)Global.halfScreenW + 90,
+	};
+	public float Time = 1, Time2;
+	public bool Confirm = false, Confirm2 = false;
+	public PreCPUMenu2(PreCPUMenu prevMenu, bool inGame) {
+		this.prevMenu = prevMenu;
+		this.inGame = inGame;
+		for (int i = 0; i < optionPos.Length; i++) {
+			optionPos[i] = 95 + lineH * i;
+		}
+
+	}
+
+	public void update() {
+		Helpers.menuUpDown(ref selectY, 0, 2);
+		if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+			switch (selectY) {
+				case 0:
+					newGameStage();
+					break;
+				case 1:
+					LoadGame();
+					break;
+				case 2:
+					enterTestState();	
+					break;
+			}
+		}
+		if (Options.main.blackFade) {
+			TimeUpdate();
+			if (Time2 >= 1) {
+				Menu.change(prevMenu);
+				prevMenu.Time = 0;
+				prevMenu.Time2 = 1;
+				prevMenu.Confirm = false;
+				prevMenu.Confirm2 = false;
+			}
+		} else {
+			if (Global.input.isPressedMenu(Control.MenuBack))
+				Menu.change(prevMenu);
+		}
+	}
+
+	public void enterTraining() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "training").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "training" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "training" ? Global.quickStartGameMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "training" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "training" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 9999, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+	public void enterTestState() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, true, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
+		public void newGameStage() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_x_x1_highway").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_x_x1_highway" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_x_x1_highway" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_x_x1_highway" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_x_x1_highway" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, true, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
+
+	
+
+	
+		public void LoadGame() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_hunterbase1").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_vava_hunterbase1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = 0;//selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
+	public void TimeUpdate() {
+		if (Confirm == false) Time -= Global.spf * 2;
+		if (Time <= 0) {
+			Confirm = true;
+			Time = 0;
+		}
+		if (Global.input.isPressedMenu(Control.MenuBack)) Confirm2 = true;
+		if (Confirm2 == true) Time2 += Global.spf * 2;
+	}
+	public void render() {
+		DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0);
+		FontType menuFont = FontType.DarkBlue;
+		if (Global.flFrameCount % 60 < 30) {
+			for (int i = 0; i < 2; i++) {
+				if (selectY == i) {
+					Fonts.drawText(FontType.Blue, "<", cursorHandler[i], optionPos[i], Alignment.Center, selected: selectY == i,
+					selectedFont: inGame ? FontType.Orange : FontType.DarkOrange);
+					Fonts.drawText(FontType.Blue, ">", cursorHandler2[i] - 1, optionPos[i], Alignment.Center, selected: selectY == i,
+					selectedFont: inGame ? FontType.Orange : FontType.DarkOrange);
+					
+				}
+			}
+		}
+		string Name = "New Game";
+		Fonts.drawText(menuFont, Name, startX, optionPos[0], Alignment.Center, selected: selectY == 0);
+		Fonts.drawText(menuFont, "Load Game", startX, optionPos[1], Alignment.Center, selected: selectY == 1);
+		Fonts.drawText(menuFont, "Enter Test Stage", startX, optionPos[2], Alignment.Center, selected: selectY == 2);
+		
+		if (selectY == 1) {
+			Fonts.drawText(menuFont, "Start a New Game \n" + Name + "\n",
+			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
+		}
+		if (selectY == 2) {
+			Fonts.drawText(menuFont, "Continue Your \n" + Name + "\nProgress",
 			 startX, optionPos[1] + 40, Alignment.Center, selected: selectY == 1, selectedFont: menuFont, alpha: 100);
 		}
 		Fonts.drawTextEX(FontType.Grey, "[OK]: Choose, [BACK]: Back", Global.screenW / 2, Global.screenH - 9, Alignment.Center);

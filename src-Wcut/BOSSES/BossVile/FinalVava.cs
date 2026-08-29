@@ -108,7 +108,7 @@ public class FinalVava : Vile {
 
 
 	public override bool normalCtrl() {
-		if (player.input.isL2Held(player) && grounded) {
+		if (player.input.isL2Held(player)) {
 			changeState(new BlockWCUT(), true);
 
 		}
@@ -201,6 +201,8 @@ public class FinalVava : Vile {
 			changeState(new Vava1GizmoDash(), true);	
 			return true;
 		}
+
+		
 
 		if (player.vileAmmo >= 15 && canDash() &&
 			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
@@ -674,7 +676,8 @@ public class FinalVava : Vile {
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
 				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
 				isDeflectShield: true, ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel),
+				addToLevel: addToLevel, hitspark : "empty"
+				),
 
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
@@ -1494,7 +1497,11 @@ public class FinalVava : Vile {
 				}
 
 
-				aiAttackCooldown = Helpers.randomRange(0, 30);
+				if (bonusHealth > 0) {
+				aiAttackCooldown = Helpers.randomRange(60, 120);
+				} else {
+					aiAttackCooldown = Helpers.randomRange(30, 60);
+				}
 			}
 
 			if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
@@ -1546,7 +1553,7 @@ public class FinalVava : Vile {
 							}
 						}
 					} else {
-						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
+						if (!(proj.projId == (int)ProjIds.SwordBlock)
 								&& aiBlocktime <= 0) {
 							turnToInput(player.input, player);
 							changeState(new BlockWCUT(), true);;

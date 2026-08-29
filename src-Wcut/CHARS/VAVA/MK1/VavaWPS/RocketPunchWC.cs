@@ -158,7 +158,7 @@ public class RocketPunchProjWC : Projectile {
 
 		if (ownedByLocalPlayer && !reversed && reflectCount == 0 &&
 			(type == (int)RocketPunchType.InfinityGig || damager.owner?.character is Vile vile2
-			&& (vile2.phase2 || vile2.OverDrive)) && type != (int)RocketPunchType.EgotisticalPill
+			&& (vile2.phase2 || vile2.OverDrive || vile2.sprite.name.Contains("mk5"))) && type != (int)RocketPunchType.EgotisticalPill
 		) {
 			if (target == null && owner.character != null) {
 				var targets = Global.level.getTargets(owner.character.pos, damager.owner.alliance, true);

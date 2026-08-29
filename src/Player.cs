@@ -461,6 +461,8 @@ public partial class Player {
 	public ShaderWrapper sigmaShieldShader = Helpers.cloneGenericPaletteShader("paletteSigma3Shield");
 	public ShaderWrapper acidShader = Helpers.cloneShaderSafe("acid");
 	public ShaderWrapper oilShader = Helpers.cloneShaderSafe("oil");
+
+	public ShaderWrapper blueOilShader = Helpers.cloneShaderSafe("blueOil");
 	public ShaderWrapper igShader = Helpers.cloneShaderSafe("igIce");
 	public ShaderWrapper mvIgShader = Helpers.cloneShaderSafe("igIce");
 	public ShaderWrapper infectedShader = Helpers.cloneShaderSafe("infected");
@@ -1376,16 +1378,16 @@ public partial class Player {
 		  else if (spawnCharNum == (int)CharIds.Vile) {
 			bool mk2VileOverride = Global.level.isHyperMatch();
 
-			//newChar = new Vile(
-			//	this, pos.x, pos.y, xDir, false, charNetId,
-			//	ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
-			//	isWarpIn: isWarpIn, heartTanks: htCount
-			//);
-				newChar = new VAVA1(
-					this, pos.x, pos.y, xDir, false, charNetId,
-			ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
+			newChar = new Vile(
+				this, pos.x, pos.y, xDir, false, charNetId,
+				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
 				isWarpIn: isWarpIn, heartTanks: htCount
-				);
+			);
+			//	newChar = new VAVA1(
+			//		this, pos.x, pos.y, xDir, false, charNetId,
+			//ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
+			//	isWarpIn: isWarpIn, heartTanks: htCount
+			//	);
 		}
 		  // GM19 Axl.
 		  else if (spawnCharNum == (int)CharIds.Axl) {
@@ -1501,12 +1503,12 @@ public partial class Player {
 		  else if (charNum == (int)CharIds.VAVA1) {
 			///*  I'm temporarily disabling VAVAmk2 and MKV for they need ajustments
 
-			if (Options.main.SkinSlot == 1 && Options.main.C7E1FBE2E00 == 888) {
+			if (loadout.vileLoadout.cannon == 1 ) {
 				newChar = new VAVA2(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
 				);
-			} else if (Options.main.SkinSlot == 2 && Options.main.C7E1FBE2E00 == 888) {
+			} else if (loadout.vileLoadout.cannon == 2) {
 				newChar = new VAVAV(
 					this, pos.x, pos.y, xDir,
 					false, charNetId, ownedByLocalPlayer, isWarpIn: isWarpIn
@@ -1572,6 +1574,7 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
+
 		} else if (charNum == (int)CharIds.AxlWC) {
 			newChar = new AxlWC(
 				this, pos.x, pos.y, xDir,

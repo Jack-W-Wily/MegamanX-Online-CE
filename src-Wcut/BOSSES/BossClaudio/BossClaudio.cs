@@ -56,7 +56,7 @@ public class BossClaudio : Character {
 	// He isn't Softlocked in a motion be it an attack or a Damage State
 	public override bool normalCtrl() {
 
-		if (player.input.isL2Held(player) && grounded){
+		if (player.input.isL2Held(player)){
 			changeState(new BlockWCUT(), true);
 		
 		}
@@ -220,7 +220,7 @@ public class BossClaudio : Character {
 				 2,30,10, isReflectShield: false,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitspark : "empty"
 			),
 			(int)MeleeIds.TrippleBusterSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,

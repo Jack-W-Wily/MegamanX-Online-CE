@@ -101,7 +101,7 @@ public class StrikeChainHooked : CharState {
 		flinch ? "hurt" : "fall", flinch ? "" : "fall_shoot", flinch ? "" : "fall_attack"
 	) {
 		this.scp = scp;
-		this.flinch = flinch;
+		this.flinch = true;
 		isGrabbedState = true;
 		lastScpPos = scp.pos;
 		isWireSponge = scp is WSpongeSideChainProj;
@@ -123,6 +123,7 @@ public class StrikeChainHooked : CharState {
 		base.onEnter(oldState);
 		character.useGravity = false;
 		character.vel.y = 0;
+		flinch = true;
 		if (player.character is Vile vile) {
 			vile.rideArmorPlatform = null;
 		}
@@ -132,12 +133,13 @@ public class StrikeChainHooked : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+			
 		character.isStrikeChainState = false;
 	}
 
 	public override void update() {
 		base.update();
-
+		flinch = true;
 		Character? scpChar = scp.damager?.owner?.character;
 		if (scp is StrikeChainProj && scpChar != null && !isWireSponge) {
 			if (scpChar.getShootXDir() == 1 && character.pos.x < scpChar.pos.x + 15) {
@@ -147,12 +149,19 @@ public class StrikeChainHooked : CharState {
 			}
 		}
 
-		if (scp.destroyed || stateTime >= 5) {
+		if (scp.destroyed || stateTime >= 4) {
 			character.useGravity = true;
 			stunTime += Global.spf;
-			if (!flinch || stunTime > 0.375f) {
+			if (!flinch || stunTime >0.15f
+			) {
 				isDone = true;
-				character.changeToLandingOrFall();
+				if (character.charState is not GrabDrag){
+				character.changeState(
+							new HurtByEnemy(
+								character.xDir
+							), true
+						);
+				}
 				return;
 			}
 		} else if (scpChar != null) {
@@ -202,6 +211,11 @@ public class StrikeChainProj : Projectile {
 		maxTime = 4;
 		startDir = xDir;
 		//xScale = 1;
+
+
+		if (owner is VAVAV) {
+			changeSprite("vava_strikechain_proj", true);
+		}
 
 		//Set character and player
 		mmx = player.character;
@@ -398,16 +412,23 @@ public class StrikeChainProj : Projectile {
 			pos.x, pos.y, mmx.getShootPos().x, mmx.getShootPos().y,
 			new Color(206, 123, 239, 255), 4, ZIndex.Character - 2
 		);
-
+		
 		for (int i = 0; i < maxI; i++) {
 			xOff = (length - (pieceSize * i)) * Helpers.cosb(byteAngle);
 			yOff = (length - (pieceSize * i)) * Helpers.sinb(byteAngle);
-			
+			if (ownerActor is VAVAV){	
+			Global.sprites["vava_strike_chain"].draw(
+				chainFrame, pos.x - xOff, pos.y - yOff, 
+				xDir, yDir, getRenderEffectSet(), 1, 1, 1, 
+				ZIndex.Character - 1, angle: byteAngle * 1.40625f
+			);
+			} else {
 			Global.sprites["strikechain_chain"].draw(
 				chainFrame, pos.x - xOff, pos.y - yOff, 
 				xDir, yDir, getRenderEffectSet(), 1, 1, 1, 
 				ZIndex.Character - 1, angle: byteAngle * 1.40625f
 			);
+			}
 		}
 	}
 }

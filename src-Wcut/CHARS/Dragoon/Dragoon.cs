@@ -64,7 +64,7 @@ public class Dragoon : Character {
 public override bool normalCtrl() {
 	
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() &&
 			charState is not BlockWCUT
 		) {
 			changeState(new BlockWCUT(), true);
@@ -309,7 +309,8 @@ public override bool attackCtrl() {
 		
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, addToLevel: true
+				new SonicSlicer(), centerPoint, ProjIds.SigmaSwordBlock, player, 
+				0, 0, 0, isDeflectShield: true, addToLevel: true, hitspark : "empty"
 			);
 		}
 

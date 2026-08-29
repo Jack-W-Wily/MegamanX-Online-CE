@@ -228,7 +228,7 @@ public class AxlFlashKickProj : Projectile {
 		shouldShieldBlock = false;
 		setIndestructableProperties();
 		ShouldClang = true;
-		isJuggleProjectile = true;
+		isLiftProjectile = true;;
 		isDeflectShield = true;
 		maxTime = 0.1f;
 		projId = (int)ProjIds.AxlFlashKickProj;

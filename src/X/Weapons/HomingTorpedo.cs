@@ -78,6 +78,10 @@ public class TorpedoProjX : Projectile, IDamagable {
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
+
+		if (owner is VAVAV) {
+			changeSprite("missile_vavav", true);
+		}
 		canBeLocal = false;
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {

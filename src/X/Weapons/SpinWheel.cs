@@ -65,7 +65,8 @@ public class SpinWheelProj : Projectile {
 	) {
 		weapon = SpinWheel.netWeapon;
 		damager.damage = 1;
-		damager.hitCooldown = 12;
+		damager.flinch = Global.miniFlinch;
+		damager.hitCooldown = 9;
 		vel = new Point(0 * xDir, 0);
 		destroyOnHit = false;
 		projId = (int)ProjIds.SpinWheel;

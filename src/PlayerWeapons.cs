@@ -197,7 +197,16 @@ public partial class Player {
 
 	public void weaponLeft() {
 		int ws = weaponSlot - 1;
-label:
+label:	
+
+		if (input.isHeld(Control.Up, this)) {
+			ws = weaponSlot - 2;
+		}
+		else if (input.isHeld(Control.Down, this)) {
+			ws = weaponSlot - 3;
+		} else {
+		ws = weaponSlot - 1;
+		}
 		if (ws < 0) {
 			ws = weapons.Count - 1;
 		}
@@ -213,6 +222,18 @@ label:
 	public void weaponRight() {
 		int ws = weaponSlot + 1;
 label:
+
+
+		if (input.isHeld(Control.Up, this)) {
+			ws = weaponSlot + 2;
+		}
+		else if (input.isHeld(Control.Down, this)) {
+			ws = weaponSlot + 3;
+		} else {
+		ws = weaponSlot + 1;
+		}
+
+
 		int max = weapons.Count;
 		if (ws >= max) {
 			ws = 0;

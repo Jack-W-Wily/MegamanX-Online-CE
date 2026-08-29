@@ -69,6 +69,7 @@ public class BoomerangProj : Projectile {
 	) {
 		weapon = BoomerangCutter.netWeapon;
 		damager.damage = 2;
+		damager.flinch = Global.miniFlinch;
 		vel = new Point(250 * xDir, 0);
 		projId = (int)ProjIds.Boomerang;
 		customAngleRendering = true;
@@ -186,7 +187,7 @@ public class BoomerangProjCharged : Projectile {
 		weapon = BoomerangCutter.netWeapon;
 		damager.damage = 2;
 		damager.flinch = Global.defFlinch;
-		damager.hitCooldown = 30;
+		damager.hitCooldown = 15;
 		vel = new Point(240 * xDir, 0);
 		projId = (int)ProjIds.BoomerangCharged;
 		maxTime = 1.2f;

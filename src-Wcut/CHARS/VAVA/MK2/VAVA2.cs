@@ -763,7 +763,7 @@ public float CrimsonphantomCD;
 		}
 
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() &&
 			charState is not BlockWCUT
 		) {
 			
@@ -1192,7 +1192,7 @@ public float CrimsonphantomCD;
 		if (sprite.name.EndsWith("superkick")
 		) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileSuperKick, player,
+				new VileStomp(), centerPoint, ProjIds.BurensenEND, player,
 				2, 0, 15f, isDeflectShield: true
 			, addToLevel : true);
 		}
@@ -1254,9 +1254,9 @@ public float CrimsonphantomCD;
 				0, 0, 15f, isDeflectShield: true
 			, addToLevel: true);
 		}
-			else {
+		if (VileMode == 0) {
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileMK2Grab, player,
+				new VileStomp(), centerPoint, ProjIds.GizmoGrab, player,
 				0, 0, 15f, isDeflectShield: true
 			, addToLevel : true);
 			}

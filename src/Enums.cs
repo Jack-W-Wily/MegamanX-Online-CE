@@ -788,6 +788,8 @@ public enum ProjIds {
 
 	ForceGrabState,
 
+	ForceAutoFlinch,
+
 	// Mavericks stuff wcut
 
 	MammothGrab,
@@ -1053,7 +1055,7 @@ public enum SlotIndex {
 	TFang,
 	HyperCharge,
 	//X4
-	LWeb,
+	LWeb = 123,
 	FTower,
 	SBody,
 	RFire,

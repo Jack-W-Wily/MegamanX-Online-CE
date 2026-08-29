@@ -166,7 +166,7 @@ public class Vava2Goliath : Vile {
 
 
 	public override bool normalCtrl() {
-		if (player.input.isL2Held(player) && grounded) {
+		if (player.input.isL2Held(player)) {
 			changeState(new BlockWCUT(), true);
 
 		}
@@ -1516,7 +1516,11 @@ public class Vava2Goliath : Vile {
 					}
 				}
 
-				aiAttackCooldown = Helpers.randomRange(0, 30);
+				if (bonusHealth > 0) {
+				aiAttackCooldown = Helpers.randomRange(60, 120);
+				} else {
+					aiAttackCooldown = Helpers.randomRange(30, 60);
+				}
 			}
 
 			if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
@@ -1568,7 +1572,7 @@ public class Vava2Goliath : Vile {
 							}
 						}
 					} else {
-						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
+						if (!(proj.projId == (int)ProjIds.SwordBlock)
 								&& aiBlocktime <= 0) {
 							turnToInput(player.input, player);
 							changeState(new BlockWCUT(), true);;

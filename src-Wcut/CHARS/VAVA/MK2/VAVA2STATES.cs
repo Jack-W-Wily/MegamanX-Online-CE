@@ -456,7 +456,7 @@ public class VAVA2GrabState : CharState {
 					if (!violentcrusherspawn){
 					character.shakeCamera(sendRpc: true);
 					character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
-					new DynamoBeam(new ElectricSpark(), victim.pos.addxy(20 * victim.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+					new DynamoBeam(new ElectricSpark(), victim.pos.addxy(0 * victim.xDir,50), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
 					character.playSound("crash", true, true);
 					violentcrusherspawn = true;
 					}
@@ -470,15 +470,12 @@ public class VAVA2GrabState : CharState {
 				
 				if (player.input.isHeld(Control.Jump, player) || player.isAI && AIExecution == 2) {
 				
-				Point moveAmount2 = new Point(character.xDir * 50, -100);
+				Point moveAmount2 = new Point(character.xDir * 50, -50);
 				Point moveAmount = new Point(character.xDir * 50, 100);
 				if (!player.input.isHeld(Control.Down, player)){
 					character.move(moveAmount2);
 					character.useGravity = false;
-				} else {
-					character.move(moveAmount);
-					character.useGravity = true;
-				}
+				} 
 				
 				} else { character.useGravity = true; }
 				if ((base.player.input.isHeld("jump", base.player) || player.isAI && AIExecution == 2 )
@@ -517,8 +514,8 @@ public class VAVA2GrabState : CharState {
 		if (leechTime > 0.4f) {
 			leechTime = 0;
 			character.addHealth(0.5f);
-			var damager = new Damager(player, 1, 0, 0.1f);
-			damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
+			//var damager = new Damager(player, 1, 0, 0.1f);
+			//damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 		}
 
 		if (stateFrames >= 2 && player.input.isPressed(Control.Special1, player)) {
@@ -527,17 +524,7 @@ public class VAVA2GrabState : CharState {
 		}
 
 
-		if (player.input.isHeld(Control.Jump, player) && player.input.isHeld(Control.Down, player)){
-		if (!violentcrusherspawn && character.grounded){
-			
-			character.angle = 180;
-			character.shakeCamera(sendRpc: true);
-			character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
-			new DynamoBeam(new ElectricSpark(), victim.pos.addxy(20 * victim.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
-			character.playSound("crash", true, true);
-			violentcrusherspawn = true;
-			}
-		}
+		
 
 
 		if (player.input.isHeld(Control.Down, player) 

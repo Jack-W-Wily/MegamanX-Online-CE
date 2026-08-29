@@ -70,6 +70,7 @@ public class FrostShieldProj : Projectile, IDamagable {
 		damager.damage = 2;
 		vel = new Point(3 * xDir, 0);
 		maxTime = 3;
+		damager.flinch = Global.halfFlinch;
 		projId = (int)ProjIds.FrostShield;
 		destroyOnHit = true;
 		exhaust = new Anim(pos, "frostshield_exhaust", xDir, null, false);

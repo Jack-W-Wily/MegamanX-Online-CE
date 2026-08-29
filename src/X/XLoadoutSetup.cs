@@ -33,7 +33,7 @@ public class XLoadoutSetup {
 		
 		weapons.Add(new XBuster());
 
-		if (enableX1Weapons) {
+		if (enableX1Weapons && Options.main.novaStrikeFloor) {
 			weapons.Add(new HomingTorpedo());
 			weapons.Add(new ChameleonSting());
 			weapons.Add(new RollingShield());
@@ -43,7 +43,7 @@ public class XLoadoutSetup {
 			weapons.Add(new BoomerangCutter());
 			weapons.Add(new ShotgunIce());
 		}
-		if (enableX2Weapons) {
+		if (enableX2Weapons && Options.main.novaStrikeFloor) {
 			weapons.Add(new CrystalHunter());
 			weapons.Add(new BubbleSplash());
 			weapons.Add(new SilkShot());
@@ -53,7 +53,7 @@ public class XLoadoutSetup {
 			weapons.Add(new MagnetMine());
 			weapons.Add(new SpeedBurner());
 		}
-		if (enableX3Weapons) {
+		if (enableX3Weapons && Options.main.novaStrikeFloor) {
 			weapons.Add(new AcidBurst());
 			weapons.Add(new ParasiticBomb());
 			weapons.Add(new TriadThunder());
@@ -64,7 +64,7 @@ public class XLoadoutSetup {
 			weapons.Add(new TornadoFang());
 		}
 
-			if (enableX4Weapons) {
+			if (enableX4Weapons && Options.main.novaStrikeFloor) {
 			weapons.Add(new DoubleCyclone());
 			weapons.Add(new SoulBody());
 			weapons.Add(new FrostTower());

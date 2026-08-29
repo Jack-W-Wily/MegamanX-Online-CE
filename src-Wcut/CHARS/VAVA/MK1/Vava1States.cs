@@ -81,6 +81,70 @@ public class VAVAJab2 : CharState {
 
 
 
+
+public class VavaVstrikeChain : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public VavaVstrikeChain(string transitionSprite = "")
+		: base("strike_chain", "", "", transitionSprite)
+	{
+	airMove = true;
+	}
+
+	public override void update()
+	{
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+	//	new Anim(character.pos,"iris_crystal_bash", character.xDir, player.getNextActorNetId(),true, sendRpc: true	);
+
+
+		character.playSound("punch2", sendRpc: true);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		} else {
+			character.changeSpriteFromName("strike_chain_grounded", true);
+			sprite = "strike_chain_grounded";
+		}
+		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
+		}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
 public class VAVAUpperCutPunch : CharState {
 
 
@@ -214,18 +278,37 @@ public class VKamaeHotIcecle : CharState {
 		canSpecialCancel = true;
 	}
 
-	public override void update() {
+	
+	public float pushBackSpeed;
+	public override void update()
+	{
+	
 		base.update();
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
+
+
+
 	}
+
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		if (character.sprite.name.Contains("mk2")) {
-			character.vel.y = -character.getJumpPower() * 1.25f;
-			
-		}
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}		
 	}
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);

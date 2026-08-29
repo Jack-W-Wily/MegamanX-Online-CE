@@ -43,7 +43,7 @@ public class Zain : Character {
 	public override bool normalCtrl() {
 
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded &&
+			!isAttacking() &&
 			charState is not BlockWCUT
 		) {
 			changeState(new BlockWCUT(), true);
@@ -289,7 +289,7 @@ public class Zain : Character {
 
 
 	public override bool isToughGuyHyperMode() {
-		return isAttacking();
+		return OverDrive && isAttacking();
 	}
 
 	public override void addAmmo(float amount) {
@@ -363,13 +363,13 @@ public class Zain : Character {
 
 		if (sprite.name.Contains("slash") && !sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber2, player, 3f, 20, 15f, clashTier: ClashTier.Weak
+			 ProjIds.ZSaber2, player, 3f, 20, 15f, clashTier: ClashTier.Strong
 			 , addToLevel: true, hitSound : "clangGG"
 			 );
 		}
 		if (sprite.name.Contains("uppercut")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.ZSaber1, player, 3f, 20, 15f, clashTier: ClashTier.Weak
+			 ProjIds.ZSaber1, player, 3f, 20, 15f, clashTier: ClashTier.Strong
 			, addToLevel: true, hitSound : "clang2GG"
 			);
 		}
@@ -398,20 +398,20 @@ public class Zain : Character {
 
 		if (sprite.name.Contains("stabgrab_end")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.HeavyPush, player, 4f, 30, 15f, clashTier: ClashTier.Weak, hitSound : "clangGG"
+			 ProjIds.HeavyPush, player, 4f, 30, 15f, clashTier: ClashTier.Strong, hitSound : "clangGG"
 			 , addToLevel: true);
 		}
 
 		if (sprite.name.Contains("air_dunk")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_clamp2"
+			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, clashTier: ClashTier.Strong, hitSound : "kofhtsnd_clamp2"
 			 , addToLevel: true);
 		}
 
 
 		if (sprite.name.Contains("projswing") && !sprite.name.Contains("air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, clashTier: ClashTier.Weak, hitSound : "clang3GG"
+			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, clashTier: ClashTier.Strong, hitSound : "clang3GG"
 			 , addToLevel: true);
 		}
 		if (sprite.name.Contains("parry")) {
@@ -568,7 +568,7 @@ public class Zain : Character {
 				}
 			}
 
-			aiAttackCooldown = Helpers.randomRange(0, 20);
+			aiAttackCooldown = Helpers.randomRange(0, 60);
 		}
 
 
@@ -597,10 +597,10 @@ public class Zain : Character {
 								changeState(new ZainUPParryStartState(), true);
 							} else if (Helpers.randomRange(0, 2) == 2) {
 								changeState(new ZainParryStartState(), true);
-							} else {
+							} else if (health < 30) {
 								changeState(new ZainParryShinStartState(), true);
 							}
-							aiDodgeCD = Helpers.randomRange(0, 30);
+							aiDodgeCD = Helpers.randomRange(60, 120);
 
 						}
 					}

@@ -623,7 +623,7 @@ public class Axl : Character {
 
 	public override bool normalCtrl() {
 
-		if (grounded && player.input.isL2Held(player)&&
+		if (player.input.isL2Held(player)&&
 			charState is not BlockWCUT and not Dash and not OcelotSpin
 		) {
 			changeState(new BlockWCUT(), true);;
@@ -1431,7 +1431,7 @@ public class Axl : Character {
 			MeleeIds.Block => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.SigmaSwordBlock, player,
 				0, 0, 0, isDeflectShield: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitspark : "empty"
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,

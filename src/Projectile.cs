@@ -178,11 +178,9 @@ public class Projectile : Actor {
 
 	public override void update() {
 		base.update();
-		if (owner.character != null && owner.character is XAnother) {
-			if (owner.input.isHeld(Control.Down, owner) && !owner.character.grounded) {
-				useGravity = true;
-			} 
-		}
+
+
+		
 		time += Global.spf;
 		moveDistance += deltaPos.magnitude;
 		Helpers.decrementFrames(ref hitSoundCD);
@@ -451,7 +449,7 @@ public class Projectile : Actor {
 	}
 
 	public bool canClangChar() {
-		return clashTier > 0 || isShield || isDeflectShield || isReflectShield;
+		return isShield || isDeflectShield || isReflectShield;
 	}
 
 	public bool canBeParried() {
@@ -478,16 +476,15 @@ public class Projectile : Actor {
 			}
 		}
 
+
+
 		// Check if we can clash.
-		if (ownerActor is Character clangChar && !clangChar.isFlinchImmune()) {
+		if (clashTier > 0 && ownerActor is Character clangChar && !clangChar.isFlinchImmune()) {
 			// Case 1: hitting a clangable projectile.
 			if (ownedByLocalPlayer && clangChar.charState is not ZeroClang &&
 				otherProj?.ownerActor != null && otherProj.owner.alliance != owner.alliance
 			 ) {
-				if (otherProj.canClangChar() &&  (!clangChar.sprite.name.Contains("guard") && !clangChar.sprite.name.Contains("block")
-					&& !clangChar.sprite.name.Contains("grab"))
-				
-				) {
+				if (otherProj.canClangChar()) {
 					clangedOnce = true;
 					if (otherProj.isShield) {
 						strongClanged = true;

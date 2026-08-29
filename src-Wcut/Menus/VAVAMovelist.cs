@@ -5,6 +5,161 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+
+public class VavaMenu : IMainMenu {
+	public WeaponCursor[] cursors;
+	public int selCursorIndex;
+	public bool inGame;
+	public string error = "";
+
+
+	public IMainMenu prevMenu;
+
+	public VavaMenu(IMainMenu prevMenu, bool inGame) {
+		this.prevMenu = prevMenu;
+		this.inGame = inGame;
+
+		cursors = new WeaponCursor[] {
+			new WeaponCursor(Options.main.vileLoadout.cannon),
+			
+		};
+	}
+
+	public int maxCatCount = 3;
+	public void update() {
+		if (!string.IsNullOrEmpty(error)) {
+			if (Global.input.isPressedMenu(Control.MenuConfirm)) {
+				error = "";
+			}
+			return;
+		}
+
+		
+
+		if (selCursorIndex == 0) {
+			maxCatCount = 2;
+		} 
+		
+
+		
+
+		Helpers.menuLeftRightInc(ref cursors[selCursorIndex].index, 0, maxCatCount - 1, wrap: true, playSound: true);
+		Helpers.menuUpDown(ref selCursorIndex, 0, cursors.Length - 1);
+
+		bool backPressed = Global.input.isPressedMenu(Control.MenuBack);
+		bool selectPressed = Global.input.isPressedMenu(Control.MenuConfirm) || (backPressed && !inGame);
+		if (backPressed) {
+			Menu.change(prevMenu);
+		}
+	}
+
+	public void render() {
+		if (!inGame) {
+			DrawWrappers.DrawTextureHUD(Global.textures["loadoutbackground"], 0, 0);
+		} else {
+			DrawWrappers.DrawTextureHUD(Global.textures["pausemenuload"], 0, 0);
+		}
+
+		Fonts.drawText(FontType.Yellow, "Vava Weapon Menu", Global.screenW * 0.5f, 20, Alignment.Center);
+		var outlineColor = inGame ? Color.White : Helpers.LoadoutBorderColor;
+		float botOffY = inGame ? 0 : -2;
+
+		int startY = 40;
+		int startX = 30;
+		int wepH = 15;
+
+		float wepPosX = 195;
+		float wepTextX = 187;
+
+		Global.sprites["cursor"].drawToHUD(0, startX, startY + (selCursorIndex * wepH) - 2);
+		Color color;
+		float alpha;
+		
+		color = Color.White;
+		alpha = 1f;
+
+		float hyperModeYPos = startY - 6 + (wepH * 0);
+		
+
+		int wsy = 167;
+		DrawWrappers.DrawRect(
+			22, wsy-12, Global.screenW - 22, wsy + 28, true, new Color(0, 0, 0, 100), 1,
+			ZIndex.HUD, false, outlineColor: outlineColor
+		);
+
+
+		#region Normals
+		Fonts.drawText(
+			FontType.Blue, "Form:", 40, hyperModeYPos,
+			selected: selCursorIndex == 0
+		);
+
+		if (cursors[0].index == 0) {
+			Fonts.drawText(
+				FontType.Grey, "MK1", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 0
+			);
+			if (selCursorIndex == 0) {
+				Fonts.drawText(FontType.Green, "MMX1",
+				 Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, "Vile's Original Body.",
+				 Global.halfScreenW, wsy + 10, Alignment.Center);
+				
+			} 
+		} else if (cursors[0].index == 1) {
+			Fonts.drawText(
+				FontType.Red, "MK2", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 0
+			);
+			if (selCursorIndex == 0) {
+				
+				Fonts.drawText(FontType.Green, "MMX3",
+				 Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, "Ressurected by Dr Doppler",
+				 Global.halfScreenW, wsy+12,Alignment.Center);
+			
+			} 
+		} else if (cursors[0].index == 2) {
+			Fonts.drawText(
+				FontType.DarkPurple, "MKV", wepTextX, hyperModeYPos,
+				selected: selCursorIndex == 0
+			);
+			if (selCursorIndex == 0) {
+				
+				Fonts.drawText(FontType.Green, "MMX8",
+				  Global.halfScreenW, wsy-6,Alignment.Center);
+				Fonts.drawText(FontType.DarkPurple, "Unknown ",
+				  Global.halfScreenW, wsy+12,Alignment.Center);
+			} 
+		} 
+		#endregion
+
+
+
+
+
+		if (!string.IsNullOrEmpty(error)) {
+			float top = Global.screenH * 0.4f;
+			DrawWrappers.DrawRect(
+				17, 17, Global.screenW - 17, Global.screenH - 17, true,
+				new Color(0, 0, 0, 224), 0, ZIndex.HUD, false
+			);
+			Fonts.drawText(FontType.Red, "ERROR", Global.screenW / 2, top - 20, alignment: Alignment.Center);
+			Fonts.drawText(FontType.RedishOrange, error, Global.screenW / 2, top, alignment: Alignment.Center);
+			Fonts.drawTextEX(
+				FontType.Grey, Helpers.controlText("Press [OK] to continue"),
+				Global.screenW / 2, 20 + top, alignment: Alignment.Center
+			);
+		}
+	}
+}
+
+
+
+
+
+
 public class VavaMovelist : IMainMenu {
 	public WeaponCursor[] cursors;
 	public int selCursorIndex;

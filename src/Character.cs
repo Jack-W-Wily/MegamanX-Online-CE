@@ -1004,7 +1004,7 @@ public partial class Character : Actor, IDamagable {
 			if (killZone.kName == "enterHunterBase2") {
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.delayedActions.Add(new DelayedAction(() => {
-					 enterVavaHunterBase2();
+					 enterHunterBase();
 				}, 1));
             } else 
 			if (killZone.kName.Contains("Door")) {
@@ -1025,9 +1025,9 @@ public partial class Character : Actor, IDamagable {
 			character.player.alliance != player.alliance
 		) {
 			Damager.applyDamage(
-				player, 3, 60, Global.defFlinch, character, false,
+				player, 3, 60, 0, character, false,
 				(int)WeaponIds.CrystalHunter, 20, this,
-				(int)ProjIds.CrystalHunterDash
+				(int)ProjIds.MechFrogStompShockwave
 			);
 		}
 		// Move zone movement.
@@ -1403,21 +1403,16 @@ public partial class Character : Actor, IDamagable {
 		
 		Helpers.decrementTime(ref DamageScalingCD);
 
-		if (DamageScalingCD == 0) {
+		if (!isInDamageSprite()) {
 			Helpers.decrementTime(ref DamageScaling);
 		}
 
-/* Too Buggy will fix later   - W
-		if (sprite.name.Contains("hurt")
-		|| sprite.name.Contains("frozen")
-		|| sprite.name.Contains("knocked")
-		|| sprite.name.Contains("grabbed")
-		|| sprite.name.Contains("lose")
-		|| sprite.name.Contains("stunned")) {
-			DamageScaling += Global.spf * 2;
+
+		if (isInDamageSprite()) {
+			DamageScaling += Global.spf;
 			DamageScalingCD = 0.5f;
 		}
-*/		
+		
 		
 		Helpers.decrementFrames(ref genericGrabCooldown);
 		Helpers.decrementFrames(ref genericParryCooldown);
@@ -4127,7 +4122,7 @@ public partial class Character : Actor, IDamagable {
 			parasiteMashTime += mashValue;
 		}
 		if (isDebuffImmune() || isStunImmune()) {
-			removeParasite(true, false);
+		//	removeParasite(true, false);
 		} else if (parasiteMashTime > 5) {
 			removeParasite(true, false);
 		} else if (parasiteTime > 2 && charState is not ParasiteCarry) {
@@ -4723,7 +4718,7 @@ public partial class Character : Actor, IDamagable {
 
 
 
-		public void enterVavaStage() {
+		public void enterTestState() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
 		int spawnAsX = (int)CharIds.RockmanX;
@@ -4802,7 +4797,7 @@ public partial class Character : Actor, IDamagable {
 
 	
 	
-		public void enterVavaHunterBase2() {
+		public void enterHunterBase() {
 		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "hunterbase2").Value;
 		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
 		int spawnAsX = (int)CharIds.RockmanX;

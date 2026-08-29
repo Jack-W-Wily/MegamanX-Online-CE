@@ -450,27 +450,29 @@ public class Maverick : Actor, IDamagable {
 		}
 
 
-		
-		if (bossArmor == 0 && BurstCooldown == 0) {
-			if (textCD == 0){
-			addDamageText("!!!", 1);
-			textCD = 5;
+		if (armorClass >= ArmorClass.Heavy){
+			if (bossArmor == 0 && BurstCooldown == 0) {
+				if (textCD == 0){
+				addDamageText("!!!", 1);
+				textCD = 5;
+				}
+				BurstCooldown = 5;
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+						bossArmor = 2;
+					}, 4));
 			}
-			BurstCooldown = 5;
-			Global.level.delayedActions.Add(new DelayedAction(() => {
-					 bossArmor = 2;
-				}, 4));
-		}
-		if (!isInDamageSprite() && BurstCooldown == 0) {
-			if (bossArmorRegen == 0 && bossArmor < 3) {
-				bossArmor += 1;
-				bossArmorRegen = 1;
+			
+			if (!isInDamageSprite() && BurstCooldown == 0) {
+				if (bossArmorRegen == 0 && bossArmor < 3) {
+					bossArmor += 1;
+					bossArmorRegen = 1;
+				}
 			}
 		}
 		Helpers.decrementTime(ref textCD);
 		Helpers.decrementTime(ref bossArmorRegen);
 		Helpers.decrementTime(ref BurstCooldown);
-
+		
 		if (grounded) {
 			lastGroundedPos = pos;
 			if (canFly && flyBar < maxFlyBar) {

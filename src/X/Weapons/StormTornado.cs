@@ -66,13 +66,12 @@ public class TornadoProj : Projectile {
 	) {
 		weapon = isStormE ? StormEagle.netWeapon : StormTornado.netWeapon;
 		damager.damage = 1;
-		damager.flinch = Global.halfFlinch;
+		damager.flinch = Global.miniFlinch;
 		vel = new Point(400 * xDir, 0);
-		damager.hitCooldown = 15;
+		damager.hitCooldown = 9;
 		projId = isStormE ? (int)ProjIds.StormETornado : (int)ProjIds.Tornado;
 		if (isStormE) {
 			blowModifier = 1;
-			damager.hitCooldown = 30;
 		}
 		maxTime = 2;
 		sprite.visible = false;
@@ -175,10 +174,10 @@ public class TornadoProjCharged : Projectile {
 		pos, xDir, owner, "tornado_charge", netId, player	
 	) {
 		weapon = StormTornado.netWeapon;
-		damager.damage = 2;
+		damager.damage = 4;
 	
 		vel = new Point(0 * xDir, 0);
-		damager.hitCooldown = 20;
+		damager.hitCooldown = 600;
 		projId = (int)ProjIds.TornadoCharged;
 		sprite.visible = false;
 		spriteStart = new Sprite("tornado_charge");

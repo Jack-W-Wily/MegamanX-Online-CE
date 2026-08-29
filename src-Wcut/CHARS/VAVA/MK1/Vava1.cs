@@ -187,7 +187,7 @@ public class VAVA1 : Vile {
 
 
 	public override bool normalCtrl() {
-		if (player.input.isL2Held(player) && grounded) {
+		if (player.input.isL2Held(player)) {
 			changeState(new BlockWCUT(), true);
 
 		}
@@ -1005,7 +1005,7 @@ public class VAVA1 : Vile {
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
 				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
 				isDeflectShield: true, ShouldClang: false, isZSaberEffect: false,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitspark : "empty"
 
 
 				),
@@ -1826,7 +1826,7 @@ public class VAVA1 : Vile {
 					}
 				}
 
-				aiAttackCooldown = Helpers.randomRange(0, 30);
+				aiAttackCooldown = Helpers.randomRange(10, 60);
 			}
 
 			if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {
@@ -1878,7 +1878,7 @@ public class VAVA1 : Vile {
 							}
 						}
 					} else {
-						if (!(proj.projId == (int)ProjIds.SwordBlock) && grounded
+						if (!(proj.projId == (int)ProjIds.SwordBlock)
 								&& aiBlocktime <= 0) {
 							turnToInput(player.input, player);
 							changeState(new BlockWCUT(), true);;

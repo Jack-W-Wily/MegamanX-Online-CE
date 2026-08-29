@@ -102,7 +102,7 @@ public class BlockWCUT : CharState {
 
 
 	public BlockWCUT() : base("block") {
-		exitOnAirborne = true;
+	//	exitOnAirborne = true;
 		attackCtrl = true;
 		normalCtrl = true;
 		immuneToWind = true;
@@ -349,7 +349,7 @@ public class HurtByEnemy : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.vel.y = -100;
-		character.invulnTime = 0.3f;
+		//character.invulnTime = 0.3f;
 	}
 
 	public override void update() {
@@ -365,7 +365,7 @@ public class HurtByEnemy : CharState {
 
 		if (stateTime >= flinchTime) {
 			character.changeToIdleOrFall();
-			character.invulnTime = 0.2f;
+			//character.invulnTime = 0.2f;
 		}
 	}
 }
@@ -524,7 +524,7 @@ public class LaunchedStateWeak : GenericGrabbedState {
 
 		if (launched) {
 			launchTime += Global.spf;
-			if (launchTime > 0.13f) {
+			if (launchTime > 0.3f) {
 				character.changeToIdleOrFall();
 				return;
 			}
@@ -534,7 +534,7 @@ public class LaunchedStateWeak : GenericGrabbedState {
 		if (!launched) {
 			launched = true;
 			character.unstickFromGround();
-			character.vel.y = -400;
+			character.vel.y = -100;
 		}
 	}
 }
@@ -886,7 +886,6 @@ public class ForceGrabbed : GenericGrabbedState {
 			if (!grabber.sprite.name.Contains("gbd_b")) {
 				if (grabber.sprite.name.Contains("idle") ||
 				grabber.sprite.name.Contains("crouch") ||
-				grabber.sprite.name.Contains("run") ||
 				grabber.sprite.name.Contains("fall") ||
 				grabber.sprite.name.Contains("jump") ||
 				grabber.sprite.name.Contains("hurt") ||

@@ -62,8 +62,15 @@ public class CrystalHunterProj : Projectile {
 		damager.damage = 0;
 		damager.hitCooldown = 0;
 		damager.flinch = 0;
-		vel = new Point(250 * xDir, 0);
-		maxTime = 0.6f;
+
+		if (player.input.isHeld(Control.Up,player)){
+		vel = new Point(250 * xDir, -100);
+		} else if (player.input.isHeld(Control.Down, player)) {
+		vel = new Point(250 * xDir, 100);
+		} else {
+		vel = new Point(250 * xDir, 0);	
+		}
+		maxTime = 1f;
 		useGravity = true;
 		destroyOnHit = true;
 		reflectable = true;

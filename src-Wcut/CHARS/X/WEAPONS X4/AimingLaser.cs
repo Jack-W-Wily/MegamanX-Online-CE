@@ -691,7 +691,7 @@ public class AimingLaserBlade : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
-		isJuggleProjectile = true;
+		isLiftProjectile = true;;
 		isShield = true;
 		isReflectShield = true;
 		maxTime = 0.3f;

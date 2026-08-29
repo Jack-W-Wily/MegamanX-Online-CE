@@ -478,6 +478,8 @@ public class ZainDashParryState : CharState {
 		if (damagingActor is not Projectile) {
 			return false;
 		}
+
+
 		if (player.isVile)return character.frameIndex < 5;
 	//	if (player.isDragoon)return character.frameIndex < 5;
 		
@@ -496,6 +498,11 @@ public class ZainDashParryState : CharState {
 			character.playSound("GDash");
 		}
 
+
+		
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 
 		
 		}
@@ -1089,6 +1096,9 @@ public class ZainGroundStab : CharState {
 			fired = true;
 			character.shakeCamera(sendRpc: true);
 			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
 		}
 
 

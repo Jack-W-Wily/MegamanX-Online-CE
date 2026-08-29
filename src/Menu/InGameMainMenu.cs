@@ -65,7 +65,9 @@ public class InGameMainMenu : IMainMenu {
 					Menu.change(new SelectVileWeaponMenu(this, true));
 				} else if (selectedCharNum == 1) {
 					Menu.change(new SelectZeroWeaponMenu(this, true));
-				} else {
+				} else if (selectedCharNum == (int)CharIds.VAVA1) {
+					Menu.change(new SelectVileWeaponMenu(this, true));
+				}else {
 					Menu.change(new SelectWeaponMenu(this, true));
 				}
 			} else if (selectY == 1) {

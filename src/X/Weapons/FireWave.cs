@@ -63,13 +63,14 @@ public class FireWaveProj : Projectile {
 	) {
 		weapon = FireWave.netWeapon;
 		damager.damage = 1;
+		damager.flinch = Global.halfFlinch;
 		damager.hitCooldown = 12;
 		vel = new Point(400 * xDir, 0);
 		projId = (int)ProjIds.FireWave;
 		fadeSprite = "fire_wave_fade";
 		maxTime = 0.1f;
-		destroyOnHit = false;
-
+		//destroyOnHit = false;
+		reflectable = true;
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
 		}
@@ -90,6 +91,7 @@ public class FireWaveProjChargedStart : Projectile {
 	) {
 		weapon = FireWave.netWeapon;
 		damager.damage = 2;
+		damager.flinch = Global.superFlinch;
 		damager.hitCooldown = 13;
 		vel = new Point(150 * xDir, 0);
 		projId = (int)ProjIds.FireWaveChargedStart;
@@ -154,7 +156,8 @@ public class FireWaveProjCharged : Projectile {
 	) {
 		weapon = FireWave.netWeapon;
 		damager.damage = 1;
-		damager.hitCooldown = 19;
+		damager.hitCooldown = 12;
+		damager.flinch = Global.defFlinch;
 		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.FireWaveCharged;
 		spriteMid = new Sprite("fire_wave_charge");

@@ -40,7 +40,7 @@ public class GBD : Character {
 		
 		// Blocking
 		if (player.input.isL2Held(player) &&
-			!isAttacking() && grounded && !player.input.isHeld(Control.Shoot, player) &&
+			!isAttacking() && !player.input.isHeld(Control.Shoot, player) &&
 			charState is not BlockWCUT
 		) {
 			changeState(new BlockWCUT(), true);
@@ -362,7 +362,8 @@ public class GBD : Character {
 		Projectile proj = null;
 		if (sprite.name.Contains("_block")) {
 			return new GenericMeleeProj(
-				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0, 0, isDeflectShield: true, ShouldClang: false, addToLevel: true
+				new XBuster(), centerPoint, ProjIds.SigmaSwordBlock, player, 0, 0,
+				 0, isDeflectShield: true, ShouldClang: false, addToLevel: true, hitspark : "empty"
 			);
 		}
 		if (sprite.name.Contains("pipe_slash_3")) {
