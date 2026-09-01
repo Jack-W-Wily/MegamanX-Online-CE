@@ -92,57 +92,7 @@ public override bool normalCtrl() {
 			
 		}
 		
-		bool hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
-		bool hadokenCheck2 = player.input.checkHadoken(player, xDir, Control.Special1);
-		bool shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
-		bool shoryukenCheck2 = player.input.checkShoryuken(player, xDir, Control.Special1);
-		bool senpukiakuCheck = player.input.checkHadoken(player, xDir, Control.WeaponRight);
-		
-
-		
-		
-		if (hadokenCheck) {
-			changeState(new DragoonHadoukenCrouch(), true);	
-			if (OverDrive){
-			charState.invincible = true;
-			} else {
-				iframesTime = 8;
-			}
-		}
-		if (hadokenCheck2) {
-			changeState(new DragoonHadouken(), true);
-			if (OverDrive){
-			charState.invincible = true;
-			} else {
-				iframesTime = 8;
-			}
-		}
-		if (shoryukenCheck) {
-			changeState(new DragoonRising(), true);	
-			if (OverDrive){
-			charState.invincible = true;
-			} else {
-				iframesTime = 8;
-			}
-		}
-		if (shoryukenCheck2) {
-			changeState(new DragoonShoryuken(isUnderwater()), true);	
-			if (OverDrive){
-			charState.invincible = true;
-			} else {
-				iframesTime = 8;
-			}
-		}
-		if (senpukiakuCheck) {
-			changeState(new DragoonSenpukiaku(), true);	
-			if (OverDrive){
-			charState.invincible = true;
-			} else {
-				iframesTime = 8;
-			}
-		}
-
-
+	
 		if (player.input.isL2Held(player) && player.input.isAPressed(player) ){
 		changeState(new GlobalParryState(), true);
 		
@@ -185,8 +135,6 @@ public override bool attackCtrl() {
 		}
 
 
-
-
 		if (player.input.isR2Pressed(player)) {
             if (player.input.isHeld(Control.Up, player) && AirShoryuken == 0) {
             AirShoryuken = 1;
@@ -210,6 +158,8 @@ public override bool attackCtrl() {
             }
         }
 
+		
+
 
 
 		return base.attackCtrl();
@@ -222,8 +172,33 @@ public override bool attackCtrl() {
 
 	public override bool spcCancel() {
 
+
+		if (player.input.isR2Pressed(player)) {
+            if (player.input.isHeld(Control.Up, player) && AirShoryuken == 0) {
+            AirShoryuken = 1;
+			 if (player.input.isLeftOrRightHeld(player)) {
+                changeState(new DragoonRising(), true);	
+          	 	} else {
+                changeState(new DragoonShoryukenWeak(isUnderwater()), true);
+                }
+				
+            } else if (player.input.isHeld(Control.Down, player)) {
+            changeState(new DragoonHadoukenCrouch(), true);	    
+            } else {
+                if (player.input.isLeftOrRightHeld(player)) {
+					if (airSpinkick ==0){
+                changeState(new DragoonSpinkick(), true);	
+				airSpinkick = 1;
+					}
+          	 	} else {
+                changeState(new DragoonHadouken(), true);	
+                }
+            }
+        }
+
+
 		// JumpCancel
-		if (player.input.isPressed(Control.Jump, player) && canJump()) {
+		if (player.input.isPressed(Control.Jump, player) && canJump() && grounded) {
 				vel.y = -getJumpPower();
 				isDashing = true;
 				changeState(getJumpState());
@@ -245,7 +220,74 @@ public override bool attackCtrl() {
 	public override void update(){
 		base.update();
 
+		if (!isInDamageSprite() && !charState.invincible && charState is not
+		DragoonRising and not DragoonShoryuken  and not DragoonHadouken  and not DragoonHadoukenCrouch 
+		 and not DragoonSpinkick  and not DragoonSpitFire  and not DragoonRisingFire  and not DragoonUppercut
+		   and not DragoonDiveKick
+		   
+		&& player.superAmmo > 8) {
+				bool hadokenCheck = player.input.checkHadoken(player, xDir, Control.Shoot);
+		bool hadokenCheck2 = player.input.checkHadoken(player, xDir, Control.Special1);
+		bool shoryukenCheck = player.input.checkShoryuken(player, xDir, Control.Shoot);
+		bool shoryukenCheck2 = player.input.checkShoryuken(player, xDir, Control.Special1);
+		bool senpukiakuCheck = player.input.checkHadoken(player, xDir, Control.WeaponRight);
+		
 
+		
+		
+		if (hadokenCheck) {
+			changeState(new DragoonHadoukenCrouch(), true);	
+			if (OverDrive){
+			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+				player.superAmmo -= 9;
+			}
+			
+		}
+		if (hadokenCheck2) {
+			changeState(new DragoonHadouken(), true);
+			if (OverDrive){
+			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+				player.superAmmo -= 9;
+			}
+			
+		}
+		if (shoryukenCheck) {
+			changeState(new DragoonRising(), true);	
+			if (OverDrive){
+			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+				player.superAmmo -= 9;
+			}
+			
+		}
+		if (shoryukenCheck2) {
+			changeState(new DragoonShoryuken(isUnderwater()), true);	
+			if (OverDrive){
+			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+				player.superAmmo -= 9;
+			}
+			
+		}
+		if (senpukiakuCheck) {
+			changeState(new DragoonSenpukiaku(), true);	
+			if (OverDrive){
+			charState.invincible = true;
+			} else {
+				iframesTime = 8;
+				player.superAmmo -= 9;
+			}
+			
+		}
+
+
+		}
 		if (grounded || charState is WallSlide or WallKick or InRideArmor) {
 			airSpinkick = 0;
 			AirShoryuken = 0;
@@ -317,14 +359,14 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("parry_start"))
 			{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.GenericWCUTGrabProjID, player, 1, 0, 5, addToLevel: true, hitSound : "kofhtsnd_grab1"
+			 ProjIds.GenericWCUTGrabProjID, player, 1, 0, 150, addToLevel: true, hitSound : "kofhtsnd_grab1"
 			);
 		}
 
 		if (sprite.name.Contains("grab"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.HeavyPush, player, 1, 0, 30, addToLevel: true, hitSound : "GDash"
+			 ProjIds.DragoonGrabConfirm, player, 1, 0, 30, addToLevel: true, hitSound : "GDash"
 			);
 		}
 
@@ -332,44 +374,52 @@ public override bool attackCtrl() {
 			if (sprite.name.Contains("punch") && !sprite.name.Contains("2") && !sprite.name.Contains("air"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.UPPunch, player, 1, 9, 10, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch1"
+			 ProjIds.UPPunch, player, 1, 15, 10, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch1"
 			);
 		}
 			if (sprite.name.Contains("punch") && !sprite.name.Contains("2") && sprite.name.Contains("air"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.UPPunch, player, 1.5f, 18, 10, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch1"
+			 ProjIds.UPPunch, player, 1.5f, 25, 10, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch1"
 			);
 		}
 			if (sprite.name.Contains("punch") && sprite.name.Contains("2"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 3, 20, 15, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch2"
+			 ProjIds.FireWave, player, 3, 30, 15, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch2"
 			);
 		}
 			if (sprite.name.Contains("kick") && !sprite.name.Contains("spin")  && !sprite.name.Contains("drop"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 15, 8, ShouldClang : true, addToLevel: true
+			 ProjIds.FireWave, player, 2, 20, 8, ShouldClang : true, addToLevel: true
 			);
 		}
 			if (sprite.name.Contains("kick") && sprite.name.Contains("spin"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 20, 8, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch3"
+			 ProjIds.FireWave, player, 2, 35, 8, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch3"
 			);
 		}
 			if (sprite.name.Contains("kick") && sprite.name.Contains("drop"))
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.ForceGrabState, player, 1, 0, 8, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch4"
+			 ProjIds.ForceGrabState, player, 1, 0, 80, ShouldClang : true, addToLevel: true, hitSound : "kofhtsnd_punch4"
 			);
 		}
-			if (sprite.name.Contains("shoryuken") && charState is DragoonRising)
+			if (sprite.name.Contains("shoryuken") && charState is DragoonRising && !sprite.name.Contains("finisher") )
 		{
 			return new GenericMeleeProj(new FireWave(), centerPoint,
 			 ProjIds.FireWave, player, 1f, 30, 12, ShouldClang : true, isJuggleProjectile : true, addToLevel: true, hitSound : "kofhtsnd_punch4", isLiftProjectile : true
 			);
+		}
+
+
+
+		if (sprite.name.Contains("air_dunk")) {
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
+			 ProjIds.MechFrogGroundPound, player, 2f, 30, 15f, clashTier: ClashTier.Strong, hitSound : "kofhtsnd_clamp2"
+			 , addToLevel: true);
 		}
 
 
@@ -389,10 +439,22 @@ public override bool attackCtrl() {
 		}
 
 
-			if (sprite.name.Contains("shoryuken") && charState is not DragoonRising )
+		
+
+
+			if (sprite.name.Contains("shoryuken") && charState is not DragoonRising && !sprite.name.Contains("finisher") )
 		{
+
 			return new GenericMeleeProj(new FireWave(), centerPoint,
-			 ProjIds.FireWave, player, 2, 35, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true, hitSound : "kofhtsnd_punch4", isLiftProjectile : true
+			 ProjIds.ForceGrabState, player, 2, 0, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true, hitSound : "kofhtsnd_punch4", isLiftProjectile : true
+			);
+		}
+
+			if (sprite.name.Contains("shoryuken") && charState is not DragoonRising && sprite.name.Contains("finisher") )
+		{
+
+			return new GenericMeleeProj(new FireWave(), centerPoint,
+			 ProjIds.DropSlide, player, 2, 0, 6, ShouldClang : true, isJuggleProjectile : true , addToLevel: true, hitSound : "kofhtsnd_punch4", isLiftProjectile : true
 			);
 		}
 		
@@ -406,7 +468,7 @@ public override bool attackCtrl() {
 
 		if (  sprite.name.Contains("uppercut"))
 		{
-			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableWeakLaunch, player, 
+			return new GenericMeleeProj(new FireWave(), centerPoint, ProjIds.BlockableMediumLaunch, player, 
 			2f, 0, 10f, null, isShield: true, isDeflectShield: true , addToLevel: true, hitSound : "kofhtsnd_megapunch1"
 			);
 		}

@@ -313,6 +313,7 @@ public class Damager {
 				case (int)ProjIds.ElectricShock:
 				case (int)ProjIds.MK2StunShot:
 				case (int)ProjIds.HighmaxStunShot:
+				case (int)VAVA2ProjIds.ThunderBolt:
 				case (int)ProjIds.MorphMPowder:
 					preCharacter?.paralize();
 					break;
@@ -392,7 +393,7 @@ public class Damager {
 				}
 			
 				if (owner.superAmmo != owner.superMaxAmmo) {
-					zarzo.gigaAttack.ammo += 1;
+					zarzo.addAmmo(1);
 				}
 			}
 			if (owner.character is BusterZero { isViral: true }) {
@@ -472,7 +473,7 @@ public class Damager {
 					owner.character.charState.spcCancel = true;
 					owner.character.aiAttackCooldown = 0;
 				}
-				if (owner.superAmmo != owner.superMaxAmmo && owner.character is not VAVA1) {
+				if (owner.superAmmo != owner.superMaxAmmo && owner.character is not Vile and not Sigma1 and not VAVA1 ) {
 						if (owner.character.charState.canGainMeter){
 					owner.superAmmo +=  damage / 2f;
 					}
@@ -482,6 +483,16 @@ public class Damager {
 			if (character.DamageScaling > 1.5f) {
                 damage *= 0.5f;
             }
+
+			if (!character.sprite.name.Contains("block")) {		
+					if (projId == (int)ProjIds.Shippuuga) {
+						character.changeState(
+							new KnockedDown(
+								character.pos.x < damagingActor?.pos.x ? -1 : 1
+							), true
+						);
+					}
+			}
 
 			if (owner.character is BossStag bossStag && bossStag.bonusHealth < 1 && projId > 0) {
 				
@@ -630,7 +641,6 @@ public class Damager {
 					break;
 				case (int)ProjIds.MechFrogStompShockwave:
 				case (int)ProjIds.FlameMStompShockwave:
-				case (int)ProjIds.Shippuuga:
 				case (int)ProjIds.TBreakerProj:
 					//if (character.grounded && character.ownedByLocalPlayer) {
 						character.changeState(
@@ -804,6 +814,10 @@ public class Damager {
 
 			// For WCUT Block to work
 			if ((character.sprite.name.Contains("block") || character.sprite.name.Contains("guard")) && damage > 0 && !isArmorPiercing(projId)) {
+				if (owner.character != null && damagingActor is Projectile proj1 && (proj1.ShouldClang || proj1.clashTier > 0)) {
+						owner.character.changeState(new ZeroClang(-owner.character.xDir));
+				}
+				
 				if (!hitFromBehind(character, damagingActor, owner, projId)) {
 					damage--;
 					flinch = 0;
@@ -939,6 +953,16 @@ public class Damager {
 					}
 					}
 				}
+
+				if (projId == (int)ProjIds.DropSlide ) {
+					if (owner != null && owner.character != null && character != null){
+					
+						if (character.charState is not GrabDrag){
+						
+						character.changeState(new GrabDrag(owner.character));
+						}
+					}
+				}
 				
 
 				if (owner?.character is PunchyZero zx1 && zx1 != null) {
@@ -958,11 +982,7 @@ public class Damager {
 				}
 				if (projId == (int)ProjIds.DragoonSpark) {
 					if (character != null){
-						if (character.sprite.name.Contains("grabbed") || character.isAttacking()){
 						character.changeState(new PushedOver2(drgn.xDir), true);
-						} else {
-							flinch = 10;
-						}
 					}
 				}
 
@@ -1031,12 +1051,21 @@ public class Damager {
 			}
 
 			if (projId == (int)ProjIds.RagingDemon) {
+				if (owner != null && owner.character != null && character != null) {
 				owner.character.changeState(new RagingDemonSuccess(character), true);
 				character.changeState(new Vava1Grabbed(owner.character), true);
+				}
+			}
+
+			if (projId == (int)ProjIds.DragoonGrabConfirm) {
+				if (owner != null && owner.character != null && character != null) {
+					
+				character.changeState(new DragoonGrabbed(owner.character, owner.character.xDir), true);
+				}
 			}
 			
 			
-			if (owner.health > 0) {
+			if (owner != null && owner.health > 0) {
 
 
 				// GBD stuff
@@ -1048,7 +1077,7 @@ public class Damager {
 					owner.character.changeState(new JumpKick(), true);
 				}
 				// ZeroFinal
-				if (owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart) {
+				if (owner != null &&  owner.character != null && owner.character.charState is ZeroFinalStart && projId == (int)ProjIds.VileAirRaidStart) {
 					owner.character.changeState(new ZeroFinalEnd(character), true);
 				}
 
@@ -1129,7 +1158,7 @@ public class Damager {
 
 
 
-			if (owner?.character is VAVA1 or FinalVava) {
+			if (owner?.character is Vile) {
 				switch (projId) {
 					case (int)ProjIds.GenericWCUTGrabProjID:
 						if (owner.character.charState is not Vava1GrabState) {
@@ -1191,6 +1220,7 @@ public class Damager {
 			
 			if ((projId == (int)ProjIds.BlockableLaunch
 			|| projId == (int)ProjIds.TornadoCharged
+			|| projId == (int)ProjIds.RisingSpecter
 			) && !character.isBlocking()) {
 
 				character.changeState(new LaunchedState(owner.character));
@@ -1202,14 +1232,19 @@ public class Damager {
 			}
 
 
-			if (projId == (int)ProjIds.BlockableWeakLaunch && !character.isBlocking()) {
+			if (character != null && attacker != null &&  projId == (int)ProjIds.BlockableWeakLaunch && !character.isBlocking()) {
 
-				character.changeState(new LaunchedStateWeak(owner.character));
+				character.changeState(new LaunchedStateWeak(attacker));
+			}
+
+			if (character != null && attacker != null &&  projId == (int)ProjIds.BlockableMediumLaunch && !character.isBlocking()) {
+
+				character.changeState(new LaunchedStateMedium(attacker));
 			}
 
 
 			
-			if ((character as Vile)?.isVileMK2 == true && damage > 0 && !isArmorPiercing(projId)) {
+			if (character != null && character.sprite.name.Contains("mk2") && damage > 0 && !isArmorPiercing(projId)) {
 				if (hitFromBehind(character, damagingActor, owner, projId)) {
 					damage--;
 
@@ -1632,7 +1667,7 @@ public class Damager {
 							!zero.hypermodeActive()
 						) {
 							//What in the..
-							if (damagingActor is Projectile proj1 && proj1.ShouldClang) {
+							if (damagingActor is Projectile proj1 && (proj1.ShouldClang || proj1.clashTier > 0)) {
 								owner.character.changeState(new ZeroClang(-owner.character.xDir));
 							}
 						}

@@ -26,7 +26,7 @@ public class ArrowSlashProj : Projectile {
 		projId = (int)VAVA2ProjIds.SlashClawV;
 		fadeSprite = "vilemk2_proj_slash_2";
 		damager.damage = 2;
-		damager.flinch = 20;
+		damager.flinch = 40;
 
 		if (rpc) {
 			rpcCreate(pos, owner, ownerPlayer, netProjId, xDir);

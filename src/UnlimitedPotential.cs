@@ -582,7 +582,12 @@ public class XUPGrabState : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		//character.grabCooldown = 1;
+		if (victim != null){
 		victim.grabInvulnTime = 2;
+
+			var damager = new Damager(player, 2, 40, 0);
+			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
+		}
 		 
 	}
 }

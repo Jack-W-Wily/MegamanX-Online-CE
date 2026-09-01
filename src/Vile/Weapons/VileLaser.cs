@@ -190,11 +190,49 @@ public class LaserAttack : VileState {
 }
 #endregion
 #region Projectiles
+
+
+
 public class RisingSpecterProj : Projectile {
 	public Point destPos;
 	public float sinDampTime = 1;
 	public Anim muzzle;
 	public RisingSpecterProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "rising_specter_proj", netId, player
+	) {
+		//isLiftProjectile = true;;
+		weapon = RisingSpecter.netWeapon;
+		damager.damage = 12;
+		damager.flinch = 0;
+		damager.hitCooldown = 60;
+		maxTime = 0.5f;
+		destroyOnHit = false;
+		shouldShieldBlock = false;
+		vel = new Point();
+		projId = (int)ProjIds.RisingSpecter;
+		shouldVortexSuck = false;
+	
+
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+	}
+
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new RisingSpecterProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+
+}
+
+public class RisingSpecterProjOLD : Projectile {
+	public Point destPos;
+	public float sinDampTime = 1;
+	public Anim muzzle;
+	public RisingSpecterProjOLD(
 		Point pos, int xDir, Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
 		pos, xDir, owner, "empty", netId, player
@@ -541,7 +579,7 @@ public class NervousGhostState : CharState {
 		Point shootPos = vile.setCannonAim(new Point(1.5f, -1));
 
 		if (vile.tryUseVileAmmo(28)) {
-			new RisingSpecterProj(
+			new RisingSpecterProjOLD(
 				character.pos.addxy(10 * character.xDir, -35 ), vile.xDir, vile, vile.player, 
 				vile.player.getNextActorNetId(), rpc: true
 			);
@@ -563,16 +601,12 @@ public class RisingSpecterState : CharState {
 	public override void update() {
 		base.update();
 
-		if (!grounded) {
-			if (!character.grounded) {
-				stateTime = 0;
-				return;
-			} else {
+		
 				character.changeSpriteFromName("kick_3", true);
-				grounded = true;
-				return;
-			}
-		}
+
+				
+			
+	
 
 		if (!shot && character.frameIndex > 3) {
 			shot = true;
@@ -591,7 +625,7 @@ public class RisingSpecterState : CharState {
 
 		if (vile.tryUseVileAmmo(28)) {
 			new RisingSpecterProj(
-				character.pos.addxy(10 * character.xDir, -35 ), vile.xDir, vile, vile.player, 
+				character.pos, vile.xDir, vile, vile.player, 
 				vile.player.getNextActorNetId(), rpc: true
 			);
 			vile.playSound("risingSpecter", sendRpc: true);

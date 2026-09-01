@@ -664,6 +664,8 @@ public class ClaudioGroundPunchState : CharState {
 		
 		if (character.frameIndex == 3 && !once) {
 			character.playSound("crashX2", forcePlay: false, sendRpc: true);
+
+
 			float x = character.pos.x;
 			float y = character.pos.y;
 			if (character.bonusHealth == 0) {
@@ -672,6 +674,16 @@ public class ClaudioGroundPunchState : CharState {
 				new TriadThunderProjCharged(new Point(x, y), 1, 0, character, player, player.getNextActorNetId(), rpc: true);
 				}
 				new TriadThunderQuake(new Point(x, y), 1, character, player, player.getNextActorNetId(), rpc: true);
+			}
+
+
+			if (character.OverDrive) {
+				
+				character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
 			}
 			character.shakeCamera(sendRpc: true);
 			once = true;

@@ -213,17 +213,19 @@ public class StrikeChainProj : Projectile {
 		//xScale = 1;
 
 
-		if (owner is VAVAV) {
+		if (owner is VAVAV && owner != null) {
 			changeSprite("vava_strikechain_proj", true);
 		}
 
 		//Set character and player
+		if (player.character != null){
 		mmx = player.character;
-		mmx.strikeChainProj = this;
+		}
+		mmx?.strikeChainProj = this;
 		this.player = player;
 
 		//Reduce range if carrying a flag.
-		if (mmx.flag != null) maxDist /= 2;
+		if (mmx?.flag != null) maxDist /= 2;
 
 		//Set angle and speed.
 		this.upOrDown = upOrDown;

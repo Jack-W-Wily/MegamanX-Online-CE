@@ -1278,7 +1278,8 @@ public class MDie : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-		maverick.useGravity = false;
+		maverick.useGravity = false
+		;
 		maverick.stopMovingS();
 		maverick.globalCollider = null;
 		deathPos = maverick.pos;
@@ -1306,6 +1307,10 @@ public class MDie : MaverickState {
 
 		if (isEnvDeath) {
 			maverick.lastGroundedPos = null;
+		} 
+
+		if (!maverick.dismantleTypeDeath) {
+		maverick.playSound("maverickDie", sendRpc: true);
 		}
 	}
 

@@ -312,12 +312,7 @@ public class VAVAV : Vile {
 		if (PressA && charState is VileChainGrabState && frameIndex > 2) {
 			changeState(new VilePunch1(), true);
 		}
-		if (VileMode == 1) {
-			if (shoryukenS && HyperDashCooldown == 0) {
-				changeState(new SplashHitState(), true);
-				HyperDashCooldown = 1.5f;
-			}
-		}
+		
 
 
 	
@@ -533,41 +528,23 @@ public class VAVAV : Vile {
 	}
 
 
-
-	public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32){
+public bool Supers() {
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32
+		
+		){
 			changeState(new VavaBurensen1(), true);	
 			player.superAmmo = 0;
 			playSound("chingX4");
 		}
-/*
-		if (OverDrive && 
-		downPressedTimes >= 2 &&
-		upPressedTimes >= 2 &&
-		leftPressedTimes >= 2 &&
-		rightPressedTimes >= 2 &&
-		player.input.isR2Held(player) &&
-		player.superAmmo >= 32){
-			changeState(new VavaVOverdriveStart(), true);	
+
+		if (player.input.checkShoryuken(player, xDir, Control.R2) && player.superAmmo >= 32) {
+			changeState(new RisingSpecterStart());
 			player.superAmmo = 0;
-			downPressedTimes = 0;
-			upPressedTimes= 0;
-			leftPressedTimes= 0;
-			rightPressedTimes = 0;
-			playSound("chingX4");
-		}*/
+		}
+		
 
 
-
-		return !sprite.name.Contains("hurt") ||
-		!sprite.name.Contains("frozen") ||
-		!sprite.name.Contains("grabbed") || 
-		!sprite.name.Contains("knocked") || 
-		!sprite.name.Contains("launched") || 
-		!sprite.name.Contains("thrown") || 
-		!sprite.name.Contains("die") || 
-		!sprite.name.Contains("lose") ||
-		!sprite.name.Contains("stunned");
+		return !isInDamageSprite();
 	}
 
 
@@ -1046,7 +1023,7 @@ public float CannonCD;
 				if (player.input.isHeld(Control.Down, player)) {
 				changeState(new NecroBurstAttack(grounded), true);
 			} else if (player.input.isHeld(Control.Up, player)) {
-				changeState(new RisingSpecterState(grounded), true);
+				changeState(new NervousGhostState(grounded), true);
 			} else if (player.input.isLeftOrRightHeld(player)) {
 				changeState(new StraightNightmareAttack(grounded), true);
 			}
@@ -1308,7 +1285,7 @@ public float CannonCD;
 			vel = new Point(1, 0.5f);
 		}
 
-		if (charState is RisingSpecterState) {
+		if (charState is NervousGhostState) {
 			vel = new Point(1, -0.75f);
 		}
 
@@ -1354,8 +1331,14 @@ public float CannonCD;
 			, addToLevel : true);
 		}
 
+			if (sprite.name.Contains("drop_kick")) {
+			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.DropSlide, player, 1, 0, 0
+			, addToLevel : true);
+		}
+
+
 		if (sprite.name.Contains("burensen_2")) {
-			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.BurensenStomp, player, 0, 0, 0
+			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.BurensenStomp, player, 1, 0, 0
 			, addToLevel : true);
 		}
 
@@ -1383,8 +1366,10 @@ public float CannonCD;
 
 
 		if (sprite.name.Contains("burensen_1")) {
-			proj = new GenericMeleeProj(new MechFrogStompWeapon(),
-			centerPoint, ProjIds.BurensenStart, player, 3, 0, 10, addToLevel : true);
+			proj = new GenericMeleeProj(	new KRMelee(), centerPoint, ProjIds.BurensenStart, player,
+				2, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: true, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true);
 		}
 
 		if (sprite.name.Contains("dash_grab")) {
@@ -1421,7 +1406,7 @@ public float CannonCD;
 		if (sprite.name.Contains("block") && !sprite.name.Contains("kamae")) {
 			proj = new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
-				0, 0, 0, isDeflectShield: true
+				0, 0, 0, isDeflectShield: true, isShield: true
 			, addToLevel : true);
 		}
 
@@ -1470,7 +1455,7 @@ public float CannonCD;
 				2, 0, 15f, isDeflectShield: true, clashTier: ClashTier.Weak, hitSound : "htsnd_slash_deep3"
 			, addToLevel : true);
 		}
-		if (sprite.name.Contains("kick") && !sprite.name.Contains("kick_3") && !sprite.name.Contains("super")) {
+		if (sprite.name.Contains("kick")  && !sprite.name.Contains("drop") && !sprite.name.Contains("kick_3") && !sprite.name.Contains("super")) {
 			return new GenericMeleeProj(
 				new VileStomp(), centerPoint, ProjIds.SigmaSwordBlock, player,
 				1, 25, 15f, isDeflectShield: true, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_clamp2"
@@ -1538,18 +1523,12 @@ public float CannonCD;
 
 		
 		if (sprite.name.Contains("spring_grab")) {
-		if (VileMode == 1) {
+		
 			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileAirRaidStart, player,
+				new VileStomp(), centerPoint, ProjIds.GizmoGrab, player,
 				0, 0, 15f, isDeflectShield: true
 			, addToLevel: true);
-		}
-			else {
-			return new GenericMeleeProj(
-				new VileStomp(), centerPoint, ProjIds.VileMK2Grab, player,
-				0, 0, 15f, isDeflectShield: true
-			, addToLevel : true);
-			}
+		
 		}
 
 

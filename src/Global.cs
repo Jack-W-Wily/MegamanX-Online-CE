@@ -17,9 +17,9 @@ namespace MMXOnline;
 
 public partial class Global {
 	public static decimal version = 19.12m;
-	public static string versionName = "0.0";
+	public static string versionName = "0.8";
 	public static string subVersionName = "WILY CUT 98 BETA";
-	public static string subVersionShortName = "WC98 0.7";
+	public static string subVersionShortName = "WC98 0.8";
 
 	// THIS VALUE MUST ALWAYS MANUALLY BE SET AFTER UPDATING ASSETS BEFORE BUILDING A RELEASE BUILD.
 	// Obtain it by pressing F1 in main menu.
@@ -31,7 +31,7 @@ public partial class Global {
 	public const string checksumPrefix = "[Wily Cut 98]";
 	// Use this to make sure the checksum varies.
 	// Better to use together with "checksumPrefix" and be diferent from it.
-	public const string checksumPrefix2 = "WC98 V0.7";
+	public const string checksumPrefix2 = "WC98 V0.8";
 	// Final checksum key.
 	public const string checksumKey = checksumPrefix + " " + checksumPrefix2;
 	// For displaying the name of the mod in the version string.

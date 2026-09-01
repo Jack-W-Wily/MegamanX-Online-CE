@@ -53,6 +53,13 @@ public class MissileElecBlack : Maverick {
 			}  	else {
 			killer.awardCurrency();
 			}
+
+			if (Global.level.gameMode is Arena) {
+				killer.addKill();
+			}
+
+
+			
 		}
 	}
 	

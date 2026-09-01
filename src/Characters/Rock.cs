@@ -27,6 +27,8 @@ public class Rock : Character {
 	}
 
 	public override string getSprite(string spriteName) {
+		
+
 		return "rock_" + spriteName;
 	}
 }

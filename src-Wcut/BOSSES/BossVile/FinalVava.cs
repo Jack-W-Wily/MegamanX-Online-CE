@@ -896,7 +896,7 @@ public class FinalVava : Vile {
 				if (player.input.isHeld(Control.Down, player)) {
 				changeState(new NecroBurstAttack(grounded), true);
 			} else if (player.input.isHeld(Control.Up, player)) {
-				changeState(new RisingSpecterState(grounded), true);
+				changeState(new NervousGhostState(grounded), true);
 			} else if (player.input.isLeftOrRightHeld(player)) {
 				changeState(new StraightNightmareAttack(grounded), true);
 			}
@@ -1115,7 +1115,7 @@ public class FinalVava : Vile {
 			vel = new Point(1, 0.5f);
 		}
 
-		if (charState is RisingSpecterState) {
+		if (charState is NervousGhostState) {
 			vel = new Point(1, -0.75f);
 		}
 

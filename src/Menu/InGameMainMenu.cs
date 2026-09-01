@@ -89,7 +89,7 @@ public class InGameMainMenu : IMainMenu {
 				}
 			} else if (selectY == 2) {
 				if (isSelCharDisabled()) return;
-				Menu.change(new SelectCharacterMenu(this, Global.level.is1v1(), Global.serverClient == null, true, false, Global.level.gameMode.isTeamMode, Global.isHost, () => { Menu.exit(); }));
+				Menu.change(new SelectCharacterMenu(this, Global.level.isRace(), Global.serverClient == null, true, false, Global.level.gameMode.isTeamMode, Global.isHost, () => { Menu.exit(); }));
 			} else if (selectY == 3) {
 				if (isMatchOptionsDisabled()) return;
 				Menu.change(new MatchOptionsMenu(this));

@@ -20,6 +20,8 @@ public class ZeroState : CharState {
 	}
 }
 
+
+
 public class HyperZeroStart : ZeroState {
 	public float radius = 200;
 	public float time;
@@ -327,6 +329,90 @@ public class AwakenedTaunt : ZeroState {
 		//zero.tauntCooldown = 180;
 	}
 }
+
+
+
+
+public class ItourioudanGenmuzeroStart : ZeroState {
+
+	public float superRegen;
+	public ItourioudanGenmuzeroStart() : base("genmu_air") {
+	}
+
+	public override void update() {
+		base.update();
+		if (character.vel.y > 2) {
+			character.changeState(new GenmureiState2(), true);
+		}
+		
+	}
+
+	public override void onEnter(CharState oldState) {
+		zero = character as Zero ?? throw new NullReferenceException();
+		if (character.grounded) {
+			character.vel.y = -character.getJumpPower();
+		}
+
+		
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+
+
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		//zero.tauntCooldown = 180;
+	}
+}
+
+
+
+
+public class GenmureiState2 : ZeroState {
+	bool fired;
+	public GenmureiState2() : base("attack_air_3") { }
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex >= 2 && !fired) {
+			fired = true;
+			character.playSound("genmureix5", sendRpc: true);
+			new GenmuProj(
+				character.pos.addxy(30 * character.xDir, 45), character.xDir, 2, 
+				isAZ: zero.isAwakened ? true : false,
+				zero, player, player.getNextActorNetId(), rpc: true
+			);
+			
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+
+	public RekkohaEffect? effect;
+
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity= true;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+}
+
+
 
 public class ZeroTaunt : CharState {
 	public ZeroTaunt() : base("taunt") {

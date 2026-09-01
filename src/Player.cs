@@ -122,7 +122,7 @@ public partial class Player {
 	public const int AxlHyperCost = 10;
 	public const int reviveVileCost = 1;
 	public const int reviveSigmaCost = 10;
-	public const int reviveXCost = 10;
+	public const int reviveXCost = 5;
 	public const int goldenArmorCost = 5;
 	public const int ultimateArmorCost = 6;
 	public bool lastDeathCanRevive;
@@ -1033,7 +1033,7 @@ public partial class Player {
 			) {
 				reviveSigma(loadout.sigmaLoadout.sigmaForm , spawnPoint);
 			}
-		} else if (character is MegamanX) {
+		} else if (character is XAnother) {
 			if (canReviveX() && (input.isPressed(Control.Special2, this) || Global.shouldAiAutoRevive)) {
 				reviveX();
 			}
@@ -1091,11 +1091,20 @@ public partial class Player {
 			}
 		}
 
+
+
+		if (Global.level.gameMode is Elimination) {
+			if (isAI) {
+				alliance = GameMode.redAlliance;
+			} else {
+				alliance = GameMode.blueAlliance;
+			}
+		}
 		updateWeapons();
 	}
 
 	public bool eliminated() {
-		if (Global.level.gameMode is Elimination || Global.level.gameMode is TeamElimination) {
+		if (Global.level.gameMode is Elimination or TeamElimination or Arena) {
 			if (!isSpectator && (deaths >= Global.level.gameMode.playingTo || (Global.level.isNon1v1Elimination() && serverPlayer?.joinedLate == true))) {
 				return true;
 			}
@@ -1263,22 +1272,20 @@ public partial class Player {
 		} else if (isAI &&
 		
 		(
-		Global.level.levelData.name == "st_cybermaze_test" 
-		
+		Global.level.levelData.name == "st_cybermaze_test" ||
+		Global.level.levelData.name == "st_x_x1_highway" 
 		)
 
 		&& charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Vile;
-			newChar = new EnemySpawnerChar(
+			newChar = new NothingChar(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
 		
 		} else if (isAI &&
 
-		(Global.level.levelData.name == "highway_1v1" ||
-		Global.level.levelData.name == "st_x_x1_highway"
-		)
+		(Global.level.levelData.name == "highway_1v1")
 
 		&& charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Vile;
@@ -1343,10 +1350,23 @@ public partial class Player {
 				false, charNetId, ownedByLocalPlayer
 			);
 
+		} else if (isAI && Global.level.gameMode is Arena
+		 &&
+		
+		 charNum >= 0) {
+			charNum = (int)CharIds.Sigma;
+			newChar = new EnemySpawnerChar(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer
+			);
+		
 		}
 
 
-		  // Players
+		
+
+
+		  // Playable Characters
 		  else if (charNum == (int)CharIds.X) {
 			XLoadout xLoadout = new() {
 				weapon1 = extraData[0],
@@ -1609,7 +1629,70 @@ public partial class Player {
 				isWarpIn: isWarpIn, heartTanks: htCount
 			);
 			
-		}
+		} else if (charNum == (int)CharIds.GBDRacer) {
+
+			newChar = new GBDRacer(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.XRacer) {
+
+			newChar = new XRacer(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.VileRacerMK1) {
+
+			newChar = new VileRacerMK1(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.VileRacerMk2) {
+
+			newChar = new VileRacerMK2(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.VileRacerMKV) {
+
+			newChar = new VileRacerMKV(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.SigmaRacerX1) {
+
+			newChar = new SigmaRacerX1(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.SigmaRacerX2) {
+
+			newChar = new SigmaRacerX2(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.DopplerRacer) {
+
+			newChar = new DopplerRacer(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} else if (charNum == (int)CharIds.ZeroIrisRacer) {
+
+			newChar = new ZeroIrisRacer(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn
+			);
+		} 
 			// Error out if invalid id.
 			else {
 			
@@ -2892,9 +2975,10 @@ public partial class Player {
 			fillSubtank(Global.level.server.customMatchSettings.subtankGain);
 		} else {
 			if (character is Zero or PunchyZero or BusterZero) fillSubtank(2);
-			if (character is Vile) fillSubtank(2);
-            if (character is Axl) fillSubtank(3);
-            if (character is MegamanX or BaseSigma) fillSubtank(4);
+			else if (character is Vile) fillSubtank(2);
+            else if (character is Axl) fillSubtank(3);
+            else if (character is MegamanX or BaseSigma) fillSubtank(4);
+			else {fillSubtank(3);}
 		}
 		if (character is Zero zero && zero.isViral) {
 			zero.freeBusterShots++;
@@ -2970,7 +3054,7 @@ public partial class Player {
 
 
 	public bool canReviveVile() {
-		if (Global.level.isElimination() ||
+		if (
 			!lastDeathCanRevive ||
 			!isVile ||
 			currency < reviveVileCost
@@ -3076,12 +3160,8 @@ public partial class Player {
 
 	public bool canReviveX() {
 		return (
-			character is MegamanX mmx &&
-			!mmx.isATrans &&
-			!mmx.hasAnyArmor &&
-			mmx.charState is Die &&
-			lastDeathCanRevive &&
-			newCharNum == 0 &&
+			character is XAnother mmx &&
+			character.charState is Die &&
 			currency >= reviveXCost
 		);
 	}
@@ -3213,6 +3293,7 @@ public partial class Player {
 		}
 		currency -= reviveXCost;
 		respawnTime = 0;
+		/*
 		// Save old char to variable and nuke him.
 		Character oldChar = character;
 		destroyCharacter(oldChar, true);
@@ -3223,9 +3304,11 @@ public partial class Player {
 			getNextATransNetId(), sendRpc: true,
 			forceSpawn: true
 		) ?? throw new Exception("Error spawning RCX.");
+		*/
 		// Set the inital state.
 		character.health = 0;
 		character.changeState(new XRevive(), true);
+		character.alive = true;
 	}
 
 	public void explodeDieStart() {

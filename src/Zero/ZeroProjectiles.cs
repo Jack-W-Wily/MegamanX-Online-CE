@@ -236,14 +236,16 @@ public class GenmuProj : Projectile {
 		weapon = Genmu.netWeapon;
 		damager.damage = 20;
 		damager.hitCooldown = 30;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.superFlinch;
 		vel = new Point(300 * xDir, 0);
 		this.type = type;
 		initY = pos.y;
 		maxTime = 0.5f;
 		destroyOnHit = false;
+		
 		xScale = 0.75f;
 		yScale = 0.75f;
+		
 		projId = (int)ProjIds.Gemnu;
 		if (isAZ) {
 			genericShader = player.zeroAzPaletteShader;
@@ -265,7 +267,8 @@ public class GenmuProj : Projectile {
 
 		float y = 0;
 		if (type == 0) y = initY + MathF.Sin(time * 8) * 50;
-		else y = initY + MathF.Sin(-time * 8) * 50;
+		else if (type == 1) y = initY + MathF.Sin(-time * 8) * 50;
+		else y = initY + MathF.Sin(-time * 8) * 0;
 		changePos(new Point(pos.x, y));
 	}
 }

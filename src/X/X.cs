@@ -390,6 +390,8 @@ public class MegamanX : Character {
 			Global.playSound("ching");
 			
 		}
+
+
 	}
 
 	public bool altGrabAnimLight;
@@ -582,15 +584,15 @@ public class MegamanX : Character {
 
 		bool inputCheckHC =  player.input.checkHadoken(player, xDir, Control.Shoot);
 
-		if (hasHadoukenEquipped()) {
+		
 			inputCheckH = player.input.checkHadoken(player, xDir, Control.Shoot);
-		}
-		if (hasShoryukenEquipped()) {
+		
+		
 			inputCheckS = player.input.checkShoryuken(player, xDir, Control.Shoot);
-		}
+		
 
 		
-		if (inputCheckH && canUseFgMove() && player.superAmmo >= player.superMaxAmmo
+		if (inputCheckHC && fullArmor == ArmorId.Light &&  player.superAmmo >= player.superMaxAmmo
 		//	player.hadoukenAmmo >= player.fgMoveMaxAmmo &&
 		//	hadoukenCooldownTime == 0
 		) {
@@ -608,7 +610,7 @@ public class MegamanX : Character {
 			stockedMaxBusterLv = 2;
 			player.superAmmo -= 8;
 		}
-		if (inputCheckS && canUseFgMove() && player.superAmmo >= 32
+		if (inputCheckS && fullArmor == ArmorId.Giga && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
 		//	shoryukenCooldownTime == 0
 		) {

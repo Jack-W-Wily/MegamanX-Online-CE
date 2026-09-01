@@ -419,15 +419,25 @@ public class WarpIn : CharState {
 	public override void update() {
 		if (!character.ownedByLocalPlayer) return;
 		if (!Global.level.mainPlayer.readyTextOver) return;
+		
 
 		if (warpAnim == null && !warpAnimOnce) {
 			warpAnimOnce = true;
+			if (Global.level.gameMode is not Race){
 			warpAnim = new Anim(
 				character.pos.addxy(0, -yOffset),
 				character.getSprite("warp_beam"),
 				character.xDir, player.getNextActorNetId(), false,
 				sendRpc: true
 			);
+			} else {
+			warpAnim = new Anim(
+				character.pos.addxy(0, -yOffset),
+				character.getSprite("idle"),
+				character.xDir, player.getNextActorNetId(), false,
+				sendRpc: true
+			);
+			}
 			warpAnim.splashable = false;
 		}
 
@@ -1005,13 +1015,13 @@ public class Jump : CharState {
 			
 
 
-
+		if (character is not EnemySpawnerChar ){
 		dashSpark = new Anim(
 			character.pos,
 			"jump_sparks", character.xDir, player.getNextActorNetId(),
 			true, sendRpc: true
 		);
-		
+		}
 	}
 }
 

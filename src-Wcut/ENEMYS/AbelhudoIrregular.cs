@@ -20,7 +20,7 @@ public class AbelhudoIrregular : Maverick {
 		awardWeaponId = WeaponIds.Buster;
 		weakWeaponId = WeaponIds.ShotgunIce;
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
-		dismantleTypeDeath = true;
+		dismantleTypeDeath = false;
 		shouldDealColisionDmg = true;
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
@@ -53,6 +53,10 @@ public class AbelhudoIrregular : Maverick {
 			}  	else {
 			killer.awardCurrency();
 			}
+
+			if (Global.level.gameMode is Arena) {
+				killer.addKill();
+			}
 		}
 	}
 
@@ -61,6 +65,8 @@ public class AbelhudoIrregular : Maverick {
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref WheelerCooldown);
+
+		
 		if (WheelerCooldown == 0) {
 			WheelerCooldown = 12;
 			playSound("viralSigmaShoot", sendRpc: true);
@@ -100,7 +106,7 @@ public class AbelhudoIrregular : Maverick {
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-				new TorpedoProjMech(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
+				new TorpedoProjMech2(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
 				
 		}, "torpedo");
 		if (isAI) {

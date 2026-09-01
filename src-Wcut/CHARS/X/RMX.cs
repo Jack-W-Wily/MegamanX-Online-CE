@@ -134,7 +134,7 @@ public class RockmanX : MegamanX {
 
 		if (canUseSupers) {
 
-			if (player.input.isL2Held(player) && downPressedTimes >= 2) {
+			if (player.input.isL2Held(player) && downPressedTimes >= 2 && player.input.isHeld(Control.Down,player)) {
 				enterParry();
 				if (!OverDrive) {
 				player.superAmmo -= 16;
@@ -143,9 +143,8 @@ public class RockmanX : MegamanX {
 				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 				playSound("ching", sendRpc: true);
 				}
-			} else if (charState is Dash or AirDash && upPressedTimes >= 2) {
-				charState.isGrabbing = true;
-				changeSpriteFromName("unpo_grab_dash", true);
+			} else if (charState is Dash or AirDash && downPressedTimes >= 2 && player.input.isHeld(Control.Down,player)) {
+				changeState(new UPGrabX(), true);
 				if (!OverDrive) {
 				player.superAmmo -= 16;
 				new GigaCrushBackwall(this.pos, this);
@@ -153,7 +152,7 @@ public class RockmanX : MegamanX {
 				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 				playSound("ching", sendRpc: true);
 				}
-			} else if (downPressedTimes >= 2 && player.input.isR2Pressed(player)) {
+			} else if (downPressedTimes >= 2 && player.input.isR2Pressed(player) && player.input.isHeld(Control.Down,player)) {
 				changeState(new XUPPunchState(grounded), true);
 				if (!OverDrive) {
 				player.superAmmo -= 16;
@@ -387,8 +386,8 @@ public class RockmanX : MegamanX {
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
-			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when !OverDrive => MeleeIds.Punch,
-			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when OverDrive => MeleeIds.UltraPunch,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when OverDrive => MeleeIds.Punch,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when !OverDrive => MeleeIds.UltraPunch,
 			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
 
 
@@ -408,7 +407,7 @@ public class RockmanX : MegamanX {
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
 				 isZSaberEffect: false,
-				addToLevel: addToLevel, hitspark : "empty"
+				addToLevel: addToLevel, hitspark : "empty", isShield: true
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,
@@ -419,7 +418,7 @@ public class RockmanX : MegamanX {
 				3, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
 			(int)MeleeIds.UltraPunch => new GenericMeleeProj(
-				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
+				RCXPunch.netWeapon, projPos, ProjIds.DropSlide, player,
 				6, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
 
@@ -456,47 +455,47 @@ public class RockmanX : MegamanX {
 			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.halfFlinch, 30, addToLevel: addToLevel
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.DoubleKick => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_1"
+				2, 0, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_1", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.DoubleKick2 => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Punch1 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.VJab1, player,
-				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 2, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				2, 0, 2, addToLevel: addToLevel, hitSound : "htsnd_punch_3", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
+				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				1, Global.halfFlinch, 5, addToLevel: addToLevel, isZSaberEffect: true
+				1, Global.halfFlinch, 5, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
+				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel
+				4, Global.defFlinch, 30, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			
 			(int)MeleeIds.NovaStrikeForce => new GenericMeleeProj(

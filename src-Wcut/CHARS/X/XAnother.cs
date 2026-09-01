@@ -65,6 +65,8 @@ public class XAnother : MegamanX {
 
 		
 		
+		
+		
 
 	// AttackCtrl: is for you to add moves to your character that he can only perform
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
@@ -117,34 +119,58 @@ public class XAnother : MegamanX {
 		}
 
 
+
+		
 	
 
-		if (player.input.isR2Pressed(player) && player.input.isHeld(Control.Up, player) && canSummonZero) {
+		if (player.input.isPressed(Control.Taunt, player) && player.input.isHeld(Control.Down, player) 
+		&& canSummonZero) {
 			if (helperZero == null) {
 				helperZero = new FakeZero(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 				player.superAmmo -= 32;
 			}
 		}
+
+		
 		bool canUseSupers = player.superAmmo >= 16 || OverDrive;
 
-		if (player.input.isR2Pressed(player) && !player.input.isHeld(Control.Up, player) && canUseSupers) {
+		if (canUseSupers) {
 
-			if (player.input.isHeld(Control.Down, player)) {
+			if (player.input.isL2Held(player) && downPressedTimes >= 2 && player.input.isHeld(Control.Down,player)) {
 				enterParry();
-			} else if (charState is Dash or AirDash) {
-				charState.isGrabbing = true;
-				changeSpriteFromName("unpo_grab_dash", true);
-			} else {
-				changeState(new XUPPunchState(grounded), true);
-			}
-			if (!OverDrive) {
+				if (!OverDrive) {
 				player.superAmmo -= 16;
+				new GigaCrushBackwall(this.pos, this);
+				new HitStop(pos, player, player.getNextActorNetId(), 
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				playSound("ching", sendRpc: true);
+				}
+			} else if (charState is Dash or AirDash && downPressedTimes >= 2 && player.input.isHeld(Control.Down,player)) {
+				changeState(new UPGrabX(), true);
+				if (!OverDrive) {
+				player.superAmmo -= 16;
+				new GigaCrushBackwall(this.pos, this);
+				new HitStop(pos, player, player.getNextActorNetId(), 
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				playSound("ching", sendRpc: true);
+				}
+			} else if (downPressedTimes >= 2 && player.input.isR2Pressed(player) && player.input.isHeld(Control.Down,player)) {
+				changeState(new XUPPunchState(grounded), true);
+				if (!OverDrive) {
+				player.superAmmo -= 16;
+				new GigaCrushBackwall(this.pos, this);
+				new HitStop(pos, player, player.getNextActorNetId(), 
+				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+				playSound("ching", sendRpc: true);
+				}
 			}
+			
 		}
 
 
 		return base.attackCtrl();
 	}
+
 
 
 	
@@ -268,7 +294,6 @@ public class XAnother : MegamanX {
 		return "rmx_" + spriteName;
 	}
 
-
 	// for the melee hitbox to work
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public enum MeleeIds {
@@ -297,13 +322,19 @@ public class XAnother : MegamanX {
 		ParryBlock,
 		Punch,
 
-		RisingFires,
+		UltraPunch,
 	
 		GrabKickLV1,
+
+		RisingFires,
 		GrabKickLV2,
 
 		LightBootKick,
+
 		DropDown,
+
+		NovaStrikeForce,
+
 	}
 
 
@@ -311,11 +342,13 @@ public class XAnother : MegamanX {
 	// IDs are located
 	public override int getHitboxMeleeId(Collider hitbox) {
 		if (sprite.name.Contains("cross_")) {
-			return (int)MeleeIds.GrabKickLV2;
+			return (int)MeleeIds.GrabKickLV1;
 		}
 		return (int)(sprite.name switch {
 			"rmx_block"   => MeleeIds.Blocking, 
 			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
+			"rmx_risingfire_charged" or "rmx_dropkick" => MeleeIds.RisingFires,
+			
 			"rmx_shoryuken" => MeleeIds.Shoryuken,
 			"rmx_punch_1" => MeleeIds.Punch1,
 			"rmx_grab_start" => MeleeIds.Grab,
@@ -326,25 +359,26 @@ public class XAnother : MegamanX {
 			"rmx_double_kick" when frameIndex > 5 => MeleeIds.DoubleKick2,
 			"rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
 			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_nova_force" => MeleeIds.NovaStrikeForce,
 			// Light  Helmet.
 			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
-			when hasUltimateArmor && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 
 
-			"rmx_fall" or "rmx_fall_shoot" or "rmx_wall_slide"  when hasUltimateArmor && stingActiveTime == 0  
+			"rmx_fall" or "rmx_fall_shoot" or "rmx_wall_slide"  when legArmor == ArmorId.Light && stingActiveTime == 0  
 			&& player.input.isPressed(Control.Jump,player) => MeleeIds.LightBootKick,
 			// Light Helmet when it up-dashes.
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
-			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when OverDrive => MeleeIds.Punch,
+			"rmx_unpo_punch" or "rmx_unpo_air_punch"  when !OverDrive => MeleeIds.UltraPunch,
 			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
-			"rmx_risingfire_charged" or "rmx_dropkick" => MeleeIds.RisingFires,
-			
+
 
 			"rmx_grab_foward"   => MeleeIds.GrabKickLV1, 
 			"rmx_light_kick"  => MeleeIds.GrabKickLV2, 
-			"rmx_grab_up" => MeleeIds.DropDown,	
+			"rmx_grab_up" => MeleeIds.DropDown,
 			_ => MeleeIds.None
 		});
 
@@ -352,13 +386,13 @@ public class XAnother : MegamanX {
 	}
 
 	// this is where you effectively make the melee hitboxes trigger
-public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
 					(int)MeleeIds.Blocking => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BlockingProjID, player,
 				 0, 0, isDeflectShield: true,
 				 isZSaberEffect: false,
-				addToLevel: addToLevel, hitspark : "empty"
+				addToLevel: addToLevel, hitspark : "empty", isShield: true
 			),
 			(int)MeleeIds.ParryBlock => new GenericMeleeProj(
 				RCXParry.netWeapon, projPos, ProjIds.UPParryBlock, player,
@@ -368,7 +402,10 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 				RCXPunch.netWeapon, projPos, ProjIds.MechFrogStompShockwave, player,
 				3, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
 			),
-			
+			(int)MeleeIds.UltraPunch => new GenericMeleeProj(
+				RCXPunch.netWeapon, projPos, ProjIds.DropSlide, player,
+				6, 0, 30, addToLevel: addToLevel, hitSound : "dbzclang"
+			),
 
 			(int)MeleeIds.DropDown => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.MechFrogGroundPound, player,
@@ -403,50 +440,53 @@ public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLe
 			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.halfFlinch, 30, addToLevel: addToLevel
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.DoubleKick => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_1"
+				2, 0, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_1", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.DoubleKick2 => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Punch1 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.UPPunch, player,
-				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Punch2 => new GenericMeleeProj(
 				RCXPunch.netWeapon, projPos, ProjIds.VJab1, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+				2, Global.halfFlinch, 30, addToLevel: addToLevel, hitSound : "htsnd_punch_2", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.LightHeadbuttEX => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
-				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				2, Global.defFlinch, 50, addToLevel: addToLevel, hitSound : "htsnd_punch_3", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.Shoryuken => new GenericMeleeProj(
 				ShoryukenWeapon.netWeapon, projPos, ProjIds.ForceGrabState, player,
-				2, 0, 2, addToLevel: addToLevel, hitSound : "htsnd_punch_3"
+				2, 0, 2, addToLevel: addToLevel, hitSound : "htsnd_punch_3", clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.MaxZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.XSaber, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
+				4, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.ZSaber => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				1, Global.halfFlinch, 5, addToLevel: addToLevel, isZSaberEffect: true
+				1, Global.halfFlinch, 5, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.ZSaberAir => new GenericMeleeProj(
 				ZXSaber.netWeapon, projPos, ProjIds.X6Saber, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true
+				2, Global.defFlinch, 30, addToLevel: addToLevel, isZSaberEffect: true, clashTier: ClashTier.Weak
 			),
 			(int)MeleeIds.NovaStrike => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.NovaStrike, player,
-				4, Global.defFlinch, 30, addToLevel: addToLevel
+				4, Global.defFlinch, 30, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			
-			
+			(int)MeleeIds.NovaStrikeForce => new GenericMeleeProj(
+				HyperNovaStrike.netWeapon, projPos, ProjIds.BurensenEND, player,
+				12, Global.defFlinch, 30, addToLevel: addToLevel
+			),
 
 			(int)MeleeIds.GrabKickLV1 => new GenericMeleeProj(
 				HyperNovaStrike.netWeapon, projPos, ProjIds.HeavyPush, player,

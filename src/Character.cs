@@ -430,6 +430,7 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["crouch*"] = getCrouchingCollider();
 		spriteToCollider["ra_*"] = getRaCollider();
 		spriteToCollider["rc_*"] = getRcCollider();
+		spriteToCollider["racer*"] = getRcCollider();
 		spriteToCollider["warp_beam"] = null;
 		spriteToCollider["warp_out"] = null;
 		spriteToCollider["warp_in"] = null;
@@ -995,7 +996,7 @@ public partial class Character : Actor, IDamagable {
 			if (killZone.kName == "enterCyberMazeClaudio") {
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.delayedActions.Add(new DelayedAction(() => {
-					enterBossClaudio();
+					Global.level.enterBossClaudio();
 				}, 0));
                 
             }
@@ -1004,10 +1005,23 @@ public partial class Character : Actor, IDamagable {
 			if (killZone.kName == "enterHunterBase2") {
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.delayedActions.Add(new DelayedAction(() => {
-					 enterHunterBase();
+					 Global.level.enterHunterBase();
 				}, 1));
             } else 
-			if (killZone.kName.Contains("Door")) {
+
+
+			if (killZone.kName.Contains("_")) {
+				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
+				Global.level.levelTrigger = killZone.kName;
+				Global.level.delayedActions.Add(new DelayedAction(() => {
+					 Global.level.enterLevel();
+				}, 1));
+            } else 
+
+
+
+
+			if (killZone.kName.Contains("Door") && charState is not PassDoor) {
                changeState(new PassDoor(), true);
             } else 
 			
@@ -1411,6 +1425,10 @@ public partial class Character : Actor, IDamagable {
 		if (isInDamageSprite()) {
 			DamageScaling += Global.spf;
 			DamageScalingCD = 0.5f;
+		}
+
+		if (DamageScalingCD == 0) {
+			DamageScaling = 0;
 		}
 		
 		
@@ -2656,7 +2674,7 @@ public partial class Character : Actor, IDamagable {
 
 	public virtual void landingCode(bool useSound = true) {
 		dashedInAir = 0;
-
+		if (this is not EnemySpawnerChar ){
 		dashSpark = new Anim(
 			pos.addxy(0, 5),
 			"jump_sparks", xDir, player.getNextActorNetId(),
@@ -2668,8 +2686,11 @@ public partial class Character : Actor, IDamagable {
 			true, sendRpc: true
 		);
 		
+		
 		dashSpark.yScale = 0.5f;
 		dashSpark2.yScale = 0.5f;
+		}
+
 
 		if (useSound) {
 			playAltSound("land", sendRpc: true, altParams: "larmor");
@@ -4710,166 +4731,6 @@ public partial class Character : Actor, IDamagable {
 		
 	}
 
-
-
-
-
-	// Wily Cut Level Get Vile
-
-
-
-		public void enterTestState() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
-		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.RockmanX;
-		if (Options.main.preferredCharacter == 1) {
-		spawnAsX = (int)CharIds.ZeroMID;
-		}
-		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.AxlWC;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.Sigma;
-		}
-		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
-		int botCount = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
-		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
-		var localServer = new Server(
-			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
-			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
-			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
-			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-			Global.quickStartDisableHtSt, disableVehicles,
-			2
-		);
-		localServer.players = new List<ServerPlayer>() { me };
-		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
-		Global.level.teamNum = localServer.teamNum;
-		Global.level.startLevel(localServer, false);
-	}
-
-
-
-	
-		public void enterVavaHunterBase() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_hunterbase1").Value;
-		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.RockmanX;
-		if (Options.main.preferredCharacter == 1) {
-		spawnAsX = (int)CharIds.ZeroMID;
-		}
-		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.AxlWC;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.Sigma;
-		}
-		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "st_vava_hunterbase1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
-		int botCount = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
-		bool disableVehicles = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
-		var localServer = new Server(
-			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
-			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
-			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
-			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-			Global.quickStartDisableHtSt, disableVehicles,
-			2
-		);
-		localServer.players = new List<ServerPlayer>() { me };
-		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
-		Global.level.teamNum = localServer.teamNum;
-		Global.level.startLevel(localServer, false);
-	}
-
-
-
-	
-	
-		public void enterHunterBase() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "hunterbase2").Value;
-		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.RockmanX;
-		if (Options.main.preferredCharacter == 1) {
-		spawnAsX = (int)CharIds.ZeroMID;
-		}
-		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.AxlWC;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.Sigma;
-		}
-		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartTrainingGameMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "hunterbase2" ? Global.quickStartTrainingGameMode : Global.quickStartGameMode;
-		int botCount = 0;// selectedLevel.name == "hunterbase2" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
-		bool disableVehicles = selectedLevel.name == "hunterbase2" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
-		var localServer = new Server(
-			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, 9999, botCount, selectedLevel.maxPlayers, 0, false, false,
-			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
-			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
-			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-			Global.quickStartDisableHtSt, disableVehicles,
-			2
-		);
-		localServer.players = new List<ServerPlayer>() { me };
-		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
-		Global.level.teamNum = localServer.teamNum;
-		Global.level.startLevel(localServer, false);
-	}
-
-
-	
-		public void enterBossClaudio() {
-		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "cybermaze_1v1").Value;
-		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
-		int spawnAsX = (int)CharIds.RockmanX;
-		if (Options.main.preferredCharacter == 1) {
-		spawnAsX = (int)CharIds.ZeroMID;
-		}
-		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.AxlWC;
-		}
-		if (Options.main.preferredCharacter == 3) {
-		spawnAsX = (int)CharIds.Sigma;
-		}
-		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
-		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
-		string gameMode = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
-		int botCount = 1;// selectedLevel.name == "cybermaze_1v1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
-		bool disableVehicles = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
-		var localServer = new Server(
-			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
-			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
-			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
-			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
-			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
-			Global.quickStartDisableHtSt, disableVehicles,
-			2
-		);
-		localServer.players = new List<ServerPlayer>() { me };
-		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
-		Global.level.teamNum = localServer.teamNum;
-		Global.level.startLevel(localServer, false);
-	}
 
 
 

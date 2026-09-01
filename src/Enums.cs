@@ -890,6 +890,10 @@ public enum ProjIds {
 
 	BlockableWeakLaunch,
 
+	BlockableMediumLaunch,
+
+	DropSlide,
+
 		RollingShieldCharged2,
 
 
@@ -997,9 +1001,16 @@ public enum ProjIds {
 	EnemyWheeler,
 	MissileElecSpark,
 
+	DragoonGrabConfirm,
+
 	// X1 Zero
 
 	RedBuster,
+
+	InfernoBeam,
+
+	ZInfernoBeam,
+	ZinfernoBeam2,
 
 
 	// Special damage types.

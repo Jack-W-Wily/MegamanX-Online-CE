@@ -19,8 +19,6 @@ public class DragoonSpark : Projectile {
 		destroyOnHit = false;
 		shouldShieldBlock = false;
 		setIndestructableProperties();
-		isLiftProjectile = true;;
-		isLiftProjectile = true;
 		isShield = true;
 		isReflectShield = true;
 		maxTime = 0.1f;
@@ -69,6 +67,10 @@ public class DragoonPunchState : CharState {
 	{
 	
 		base.update();
+
+		if (spcCancel) {
+			attackCtrl = true;
+		}
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -79,6 +81,9 @@ public class DragoonPunchState : CharState {
 			}
 			character.useGravity = true;
 		}
+
+
+		
 
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
@@ -93,16 +98,18 @@ public class DragoonPunchState : CharState {
 		if (!character.grounded) {
 			character.stopMoving();
 			pushBackSpeed = 100;
-		}		
+		}	
+
+		if (!character.grounded) {
+			sprite = "air_punch1";
+			character.changeSpriteFromName("air_punch1", true);
+		}	
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		if (!character.grounded) {
-			sprite = "air_punch1";
-			character.changeSpriteFromName("air_punch1", true);
-		}
+		
     }
 }
 
@@ -216,7 +223,11 @@ public class DragoonPunchState2 : CharState {
 		if (!character.grounded) {
 			character.stopMoving();
 			pushBackSpeed = 100;
-		}		
+		}
+		if (!character.grounded) {
+			sprite = "air_dunk";
+			character.changeSpriteFromName("air_dunk", true);
+		}
 	}
 
 	public override void onExit(CharState? newState) {
@@ -348,7 +359,6 @@ public class DragoonHadouken : CharState {
 
 	public DragoonHadouken() : base("hadouken_idle", "", "", "") {
 	superArmor = true;
-		spcCancel = true;
 	}
 
 	public override void update() {
@@ -361,8 +371,12 @@ public class DragoonHadouken : CharState {
 			Weapon weapon = new HadoukenWeapon(player);
 	
 			new SpeedBurnerProj(character.pos.addxy(20,-35), character.xDir,character, player, player.getNextActorNetId(), true);
-			if (character.frameIndex >= 6)new SpeedBurnerProj( character.pos.addxy(20,-35), character.xDir,character, player, player.getNextActorNetId(), true);
 			
+			if (invincible || character.iframesTime > 0) {
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+				new SpeedBurnerProj(character.pos.addxy(20,-35),  character.xDir,character, player, player.getNextActorNetId(), true);
+				}, 0.1f));
+			}
 			character.playSound("speedBurner", sendRpc: true);
 		}
 
@@ -402,7 +416,11 @@ public class DragoonHadoukenCrouch : CharState {
 			Weapon weapon = new HadoukenWeapon(player);
 
 			new SpeedBurnerProj(character.pos.addxy(20,-15),  character.xDir,character, player, player.getNextActorNetId(), true);
-			
+			if (invincible || character.iframesTime > 0) {
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+				new SpeedBurnerProj(character.pos.addxy(20,-15),  character.xDir,character, player, player.getNextActorNetId(), true);
+				}, 0.1f));
+			}
 			character.playSound("speedBurner", sendRpc: true);
 		}
 
@@ -681,7 +699,7 @@ public class DragoonShoryuken : CharState {
 			character.vel.y = -character.getJumpPower() * 1.55f;
 			character.playSound("ryuenjin", sendRpc: true);
 		}
-		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Length > 0) {
+		if (character.sprite.frameIndex >= 2 && character.currentFrame.POIs.Length > 0) {
 			character.move(new Point(character.xDir * 265, 0));
 			Point poi = character.currentFrame.POIs[0];
 			Point firePos = character.pos.addxy(poi.x * character.xDir, poi.y);
@@ -690,11 +708,98 @@ public class DragoonShoryuken : CharState {
 			} else {
 				anim.changePos(firePos);
 			}
-		} else if (character.sprite.frameIndex > 2) {
+		} 
+		else if (character.sprite.frameIndex > 7 && !character.sprite.name.Contains("finisher")) {
 			if (anim != null) {
 				anim.destroySelf();
 				anim = null;
 			}
+			character.changeSpriteFromName("shoryuken_finisher", true);
+		}
+
+		if (!isUnderwater) {
+			projTime += Global.spf;
+			if (projTime > 0.06f) {
+				projTime = 0;
+				var anim = new Anim(character.getCenterPos(), "shoryuken_fade", character.xDir, player.getNextActorNetId(), true, sendRpc: true);
+				anim.vel = new Point(-character.xDir * 50, 25);
+			}
+		}
+
+		var wallAbove = Global.level.checkTerrainCollisionOnce(character, 0, -10);
+		if (wallAbove != null && wallAbove.gameObject is Wall) {
+			timeInWall += Global.spf;
+			if (timeInWall > 0.1f) {
+				character.changeSpriteFromName("shoryuken_finisher", true);
+				return;
+			}
+		}
+
+		if (character.isAnimOver()) {
+			character.changeState(new Fall());
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState? newState) {
+		if (anim != null) {
+			anim.destroySelf();
+			anim = null;
+		}
+		base.onExit(newState);
+	}
+}
+
+
+
+
+
+public class DragoonShoryukenWeak : CharState {
+	bool jumpedYet;
+	float timeInWall;
+	bool isUnderwater;
+	Anim? anim;
+	float projTime;
+
+
+	public DragoonShoryukenWeak(bool isUnderwater) : base("shoryuken", "", "") {
+		this.isUnderwater = isUnderwater;
+		superArmor = true;
+		enterSound = "Rooster - FireCharge2";
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.isUnderwater() && anim != null) {
+			anim.visible = false;
+		}
+
+		if (character.sprite.frameIndex >= 2 && !jumpedYet) {
+			jumpedYet = true;
+			character.dashedInAir++;
+			character.vel.y = -character.getJumpPower() * 1.2f;
+			character.playSound("ryuenjin", sendRpc: true);
+		}
+		if (character.sprite.frameIndex >= 2 && character.currentFrame.POIs.Length > 0) {
+			character.move(new Point(character.xDir * 265, 0));
+			Point poi = character.currentFrame.POIs[0];
+			Point firePos = character.pos.addxy(poi.x * character.xDir, poi.y);
+			if (anim == null) {
+				anim = new Anim(firePos, "magmadragoon_shoryuken_flame", character.xDir, player.getNextActorNetId(), false, sendRpc: true);
+			} else {
+				anim.changePos(firePos);
+			}
+		} 
+		else if (character.sprite.frameIndex > 7 && !character.sprite.name.Contains("finisher")) {
+			if (anim != null) {
+				anim.destroySelf();
+				anim = null;
+			}
+			
 		}
 
 		if (!isUnderwater) {
@@ -797,7 +902,7 @@ public class DragoonUppercut : CharState {
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
-		if (player.input.isR2Pressed(player) && !shotOnce) {
+		if (player.input.isBPressed(player) && !shotOnce && character.frameIndex >= 1) {
 			   character.playSound("speedBurner", sendRpc: true);
             	new RisingFireProj(new RisingFire(), character.pos.addxy(30 * character.xDir,-43), character.xDir, player, player.getNextActorNetId(), true);
 			shotOnce = true;
@@ -951,3 +1056,108 @@ public class DragoonDiveKick : CharState {
 		character.stopMoving();
 	}
 }
+
+
+
+
+
+
+public class DragoonGrabbed : CharState {
+	public int hurtDir;
+	public float hurtSpeed;
+	public float flinchTime;
+
+
+	 Character? grabber;
+	Anim? anim;
+	public DragoonGrabbed(Character Grabber, int dir) : base("hurt") {
+		hurtDir = dir;
+		hurtSpeed = dir * 300;
+		flinchTime = 0.5f;
+		grabber = Grabber;
+	//	superArmor = true;
+	}
+
+	public override bool canEnter(Character character) {
+		if (character.isStatusImmune()) return false;
+		if (character.charState.superArmor || character.charState.invincible) return false;
+		if (character.isInvulnerable()) return false;
+		if (character.vaccineTime > 0) return false;
+		return base.canEnter(character);
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -300;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (anim == null) {
+				anim = new Anim(character.getCenterPos(), "magmadragoon_ball_proj", character.xDir, player.getNextActorNetId(), false, sendRpc: true);
+			} else {
+				anim.changePos(character.getCenterPos());
+			}
+
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
+			character.move(new Point(hurtSpeed, 0));
+		}
+
+		
+
+		if (stateTime >= 2 || character.grounded) {
+			if (grabber != null){
+			character.playSound("flamemOilBurn", sendRpc: true);
+			new InfernoBeam(new FireWave(),
+						character.pos, character.xDir,
+						grabber.player, grabber.player.getNextActorNetId(),
+						sendRpc: true
+					);
+			}
+			character.changeState(new KnockedDown(character.xDir), true);
+		}
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		anim?.destroySelf();
+	}
+}
+
+
+
+
+
+
+public class InfernoBeam : Projectile {
+	Player player;
+	public InfernoBeam(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
+		base(weapon, pos, 1, 0, 2, player, "zerox1_firebeam_up", Global.superFlinch, 2f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.InfernoBeam;
+		shouldShieldBlock = false;
+		shouldVortexSuck = false;
+		destroyOnHit = false;
+		damager.damage = 2;
+		maxTime = 1f;
+		hitSound = "kofhtsnd_lightning1";
+		this.player = player;
+
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+	}
+
+	public override bool shouldDealDamage(IDamagable damagable) {
+	
+		return true;
+	}
+
+	
+}
+

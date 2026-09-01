@@ -144,7 +144,7 @@ public class EnemySpawnerChar : BaseSigma {
 			 new MissileElecBlue(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
 			 fireballCooldown = 10;
 		}
-		if (player.input.isR2Pressed(player) && StageMaverick == null) {
+		if (player.input.isR2Pressed(player) && StageMaverick != null) {
 			if (Global.level.levelData.name == "airport") {
 			StageMaverick  = new StormEagle(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);	
 			}
@@ -154,16 +154,16 @@ public class EnemySpawnerChar : BaseSigma {
 			else if (Global.level.levelData.name == "powerplant") {
 			StageMaverick  = new SparkMandrill(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);	
 			}
-			else if (Global.level.levelData.name == "factory") {
+			else if (Global.level.levelData.name.Contains("factory")) {
 			StageMaverick  = new FlameMammoth(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);	
 			}
-			else if (Global.level.levelData.name == "forest") {
+			else if (Global.level.levelData.name.Contains("forest")) {
 			StageMaverick  = new StingChameleon(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);	
 			}
-			else if (Global.level.levelData.name == "tower") {
+			else if (Global.level.levelData.name.Contains("tower")) {
 			StageMaverick  = new BoomerangKuwanger(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);	
 			}
-			else if (Global.level.levelData.name == "gallery") {
+			else if (Global.level.levelData.name.Contains("gallery")) {
 			StageMaverick  = new ArmoredArmadillo(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);	
 			}
 			else if (Global.level.levelData.name == "ocean") {

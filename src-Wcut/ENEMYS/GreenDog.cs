@@ -53,6 +53,11 @@ public class GreenDog : Maverick {
 			}  	else {
 			killer.awardCurrency();
 			}
+
+
+			if (Global.level.gameMode is Arena) {
+				killer.addKill();
+			}
 		}
 	}
 

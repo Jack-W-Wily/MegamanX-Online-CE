@@ -950,9 +950,11 @@ public class ZainKokuSlash : CharState {
 		
 		 if (base.player.input.isHeld("up", base.player)) {
 			character.changeSpriteFromName("rising", true);
+			if (character.grounded){
 			character.dashedInAir++;
 			float ySpeedMod = 1.5f;
 			character.vel.y = (0f - character.getJumpPower()) * ySpeedMod;
+			}
 		}
 
 		 if (player.input.isHeld(Control.Down, player)
@@ -962,7 +964,7 @@ public class ZainKokuSlash : CharState {
 
 		if (base.player.input.isHeld(Control.Down, base.player)
 		&& !character.grounded){
-		    character.changeSpriteFromName("projswing", true);	
+		    character.changeSpriteFromName("dropstab", true);	
 			character.vel.y += 300;	
 		}
 	}
@@ -983,10 +985,17 @@ public class ZainKokuSlash : CharState {
 			}
 		}
 
+
+		if (character.grounded && character.sprite.name.Contains("drop")) {
+			character.changeState(new ZainGroundStab(), true);
+			}
+
+
 		if (character.isAnimOver()) {
 			if (character.grounded) character.changeState(new Idle(), true);
 			else character.changeState(new Fall(), true);
 		} else {
+			
 			if ((character.grounded || character.canAirJump()) &&
 				player.input.isPressed(Control.Jump, player)
 			) {
@@ -1250,6 +1259,7 @@ public class ZainAirDunk : CharState {
 	airMove = true;
 	superArmor = true;
 	spcCancel = true;
+	bonusAttackCtrl = true;
 }
 
 	public override void update()

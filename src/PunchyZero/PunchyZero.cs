@@ -223,7 +223,15 @@ public class PunchyZero : Character {
 		&& player.input.isR2Pressed(player) && player.superAmmo > 15) {
 			player.superAmmo -= 16;
 			changeState(new ZX1AkaBuster(), true);
-		}
+		} 
+
+		if (player.input.isHeld(Control.Down, player)
+		&& player.input.isR2Pressed(player) && player.superAmmo > 30) {
+			player.superAmmo -= 32;
+			changeState(new ZInferno(new RekkohaWeapon()), true);
+		} 
+
+
 		return !isInDamageSprite();
 	}
 
@@ -481,6 +489,9 @@ public class PunchyZero : Character {
 	}
 
 	public bool groundAttacks() {
+
+
+		
 		if (parryPressTime > 0 && parryCooldown == 0) {
 			changeState(new PZeroParry(), true);
 			return true;
@@ -689,7 +700,7 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel, clashTier: ClashTier.Weak, hitSound : "kofhtsnd_punch2", isLiftProjectile: true
 			),
 			(int)MeleeIds.Spin => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.halfFlinch,
+				meleeWeapon, projPos, ProjIds.PZeroSenpuukyaku, player, 2, Global.defFlinch,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.AirKick => new GenericMeleeProj(
@@ -705,7 +716,7 @@ public class PunchyZero : Character {
 				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1"
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				DropKickWeapon.staticWeapon, projPos, ProjIds.PZeroEnkoukyaku, player, 4, Global.halfFlinch,
+				DropKickWeapon.staticWeapon, projPos, ProjIds.ForceGrabState, player, 4, 0,
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1"
 			),
 			(int)MeleeIds.DropKickBounce => new GenericMeleeProj(

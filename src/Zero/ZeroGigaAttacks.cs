@@ -687,6 +687,8 @@ public class MessenkouState : ZeroGigaAttack {
 	}
 }
 
+
+
 public class RekkohaState : CharState {
 	public int shootInterval = 12;
 	public int distance = 36;

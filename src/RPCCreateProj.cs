@@ -781,6 +781,15 @@ public partial class RPCCreateProj : RPC {
 			case (int)ProjIds.DynamoBeam:
 				proj = new DynamoBeam(new ElectricSpark(), pos, xDir, player, netProjByte);
 				break;
+			case (int)ProjIds.ZinfernoBeam2:
+				proj = new ZInfernoBeam2(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.ZInfernoBeam:
+				proj = new ZInfernoBeam(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
+			case (int)ProjIds.InfernoBeam:
+				proj = new InfernoBeam(new ElectricSpark(), pos, xDir, player, netProjByte);
+				break;
 			case (int)ProjIds.ZainPillar:
 				proj = new ZainPillar(new ElectricSpark(), pos, xDir, player, netProjByte);
 				break;

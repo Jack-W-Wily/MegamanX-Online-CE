@@ -954,7 +954,7 @@ public class HostMenu : IMainMenu {
 			if (inGame && !Global.level.is1v1()) {
 				completeAction();
 			} else {
-				Menu.change(new SelectCharacterMenu(this, is1v1, isOffline, inGame, inGame, GameMode.isStringTeamMode(selectedGameMode), true, completeAction));
+				Menu.change(new SelectCharacterMenu(this, isRace, isOffline, inGame, inGame, GameMode.isStringTeamMode(selectedGameMode), true, completeAction));
 			}
 
 			return;

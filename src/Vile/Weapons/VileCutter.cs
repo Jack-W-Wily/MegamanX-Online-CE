@@ -223,6 +223,9 @@ public class VileMaroonedTomahawk : Projectile {
 		damager.damage = 1;
 		damager.hitCooldown = 20;
 		vel = new Point(250 * xDir, -125);
+		if (owner is VAVA2 && owner != null) {
+		changeSprite("cutter_mt_mk2", true);
+		}
 		maxTime = 3f;
 		projId = (int)ProjIds.MaroonedTomahawk;
 		destroyOnHit = false;
@@ -270,6 +273,9 @@ public class TwoHeadedSlash : Projectile {
 		damager.damage = 4;
 		damager.flinch = 20;
 		damager.hitCooldown = 30;
+		if (owner is VAVA2 && owner != null) {
+		changeSprite("cutter_mt_mk2", true);
+		}
 		if (Helpers.randomRange(0, 1) == 0) {
 			vel = new Point(250 * xDir, -250);
 		} else {

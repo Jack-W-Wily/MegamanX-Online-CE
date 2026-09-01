@@ -256,6 +256,11 @@ public class LevelData {
 			supportedGameModesSet.Add(GameMode.Race);
 		}
 
+		if (isMedium()) {
+			supportedGameModesSet.Add(GameMode.Arena);
+			
+		}
+
 		if (!is1v1()) {
 			supportedGameModesSet.Add(GameMode.Elimination);
 			supportedGameModesSet.Add(GameMode.TeamElimination);

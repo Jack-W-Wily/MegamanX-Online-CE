@@ -60,7 +60,7 @@ public class Hadouken : CharState {
 			float y = character.pos.y;
 			new HadoukenProj(new Point(x + (20 * character.xDir), y - 20), 
 			character.xDir, mmx, player, player.getNextActorNetId(), rpc: true);
-			character.playSound("hadouken", sendRpc: true);
+			character.playSound("Manowar - StrongLightning", sendRpc: true);
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();

@@ -15,6 +15,7 @@ public class DynamoWhippAttack : CharState {
 		airSprite = "whipattack_air";
 		useDashJumpSpeed = true;
 		airMove = true;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -73,6 +74,7 @@ public class DynamoCross : CharState {
 		: base("throw_cross", "", "", transitionSprite)
 	{
 	airMove = true;
+	canSpecialCancel = true;
 	
 	}
 
@@ -143,6 +145,9 @@ public class DynamoCrossProj : Projectile {
 		projId = (int)ProjIds.DynamoCross;
 		destroyOnHit = false;
 		destroyOnDMG = true;
+		damager.damage = 1;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 5;
 		maxTime = 1.5f;
 		this.vel.y = 0;
 		angle2 = 0;
@@ -306,8 +311,8 @@ public class DynamoAxeProj : Projectile {
 		pos, xDir, owner, "dynamo_axe_proj", netId, altPlayer
 	) {
 		weapon = SonicSlicer.netWeapon;
-		damager.damage = 3;
-		damager.flinch = Global.defFlinch;
+		damager.damage = 1;
+		damager.flinch = Global.defFlinch + 5;
 		damager.hitCooldown = 8;
 		vel = new Point(200 * xDir, -350);
 
@@ -352,6 +357,7 @@ public class DynamoBladeSlashAir : CharState {
 		useDashJumpSpeed = true;
 		airMove = true;
 		exitOnLanding = true;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -398,6 +404,7 @@ public class DynamoBladeSlash : CharState {
 		airSprite = "blade_attack";
 		useDashJumpSpeed = true;
 		airMove = true;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -442,6 +449,7 @@ public class DynamoUpperCut : CharState {
 	public DynamoUpperCut() : base("uppercut_slash") {
 		superArmor = true;
 		useDashJumpSpeed = true;
+		canSpecialCancel = true;
 	}
 
 	public override void update() {
@@ -520,7 +528,7 @@ public class DynamoBoomerang : CharState {
 		base.onEnter(oldState);
 		if (!character.grounded) {
 			character.stopMoving();
-			pushBackSpeed = 100;
+		//	pushBackSpeed = 100;
 		}
 	}
 
@@ -567,8 +575,8 @@ public class DynamoBoomerangProj : Projectile {
 		hitSound = "htsnd_slash1";
 		shouldShieldBlock = false;
 		if (player.character != null) setzIndex(player.character.zIndex - 100);
-		minTime = 0.4f;
-		maxReverseTime = 0.6f;
+		minTime = 0.2f;
+		maxReverseTime = 0.3f;
 		type = 0;
 		
 		if (rpc) {
@@ -1040,6 +1048,155 @@ public class DynamoGPStateLV3 : CharState {
 	}
 }
 
+
+
+
+
+
+public class DynamoGroundMax : CharState {
+	public int shootInterval = 12;
+	public int distance = 36;
+	public int shotMax = 4;
+	public int rumbleMax = 7;
+	public int rumbleNum;
+	public int shotNum;
+	public float shootTimer;
+	public bool shotModeActive;
+	public RekkohaEffect? effect;
+	public Weapon weapon;
+	public int attackMaxTime = 118;
+	public bool exiting;
+
+	public DynamoGroundMax(Weapon weapon) : base("groundpunch_charge") {
+		this.weapon = weapon;
+		invincible = true;
+		stunImmune = true;
+		pushImmune = true;
+	}
+
+	public override void update() {
+		weapon.shootCooldown = weapon.fireRate;
+		base.update();
+		if (exiting) {
+			if (character.isAnimOver()) {
+				character.changeToIdleOrFall();
+			}
+			return;
+		}
+
+		if (stateTime > 0.5 && character.sprite.name.Contains("groundpunch_charge")) {
+			character.changeSpriteFromName("groundpunch", true);
+			sprite = "groundpunch";
+		}
+		if (shotModeActive) {
+			if (shootTimer >= shootInterval) {
+				if (shotNum < shotMax) {
+					shotNum++;
+					float topScreenY = Global.level.getTopScreenY(character.pos.y);
+					float distXL = character.pos.x + distance * shotNum * -1;
+					float distXR = character.pos.x + distance * shotNum * 1;
+
+
+					if (Helpers.randomRange(0,1) == 0){
+					new DynamoBeam(new ElectricSpark(),
+						new Point(distXL, character.pos.y), character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					} else {
+					new DynamoBeam(new ElectricSpark(),
+						new Point(distXL, character.pos.y), -character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					}
+					if (Helpers.randomRange(0,1) == 0){
+					new DynamoBeam(new ElectricSpark(),
+						new Point(distXR, character.pos.y), character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					} else {
+					new DynamoBeam(new ElectricSpark(),
+						new Point(distXR, character.pos.y), -character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					}
+				}
+				if (rumbleNum < rumbleMax) {
+					character.shakeCamera(sendRpc: true);
+					rumbleNum++;
+				}
+				shootTimer = 0;
+			} else {
+				shootTimer += character.speedMul;
+			}
+		}
+		if (character.frameIndex >= 1 && !shotModeActive && !character.sprite.name.Contains("charge")) {
+			shotModeActive = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("rekkoha", sendRpc: true);
+			character.playSound("crashX2", sendRpc: true);
+			float topScreenY = Global.level.getTopScreenY(character.pos.y);
+		}
+		if (stateFrames >= attackMaxTime) {
+			exiting = true;
+			character.changeSpriteFromName("giga_end", true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.clenaseAllDebuffs();
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+}
+
+
+
+public class DynamoMegaSlash : CharState {
+	public bool hasShot;
+
+	public DynamoMegaSlash() : base("megaswing") {
+		useDashJumpSpeed = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+			if (character.frameIndex >= 1 && !hasShot) {
+				character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+				character.playSound("dynamoSlash", forcePlay: false, sendRpc: true);
+				hasShot = true;
+				character.vel.y = -200;
+			}
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character.vel.y < 0) {
+			character.vel.y = 0;
+		}
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+	}
+}
+
+
+
+
 public class DynamoAirShotState : CharState {
 	public bool hasShot;
 
@@ -1076,6 +1233,8 @@ public class DynamoAirShotState : CharState {
 
 
 
+
+
 public class DynamoAirBuster : Projectile {
 	int type;
 	bool split;
@@ -1083,8 +1242,8 @@ public class DynamoAirBuster : Projectile {
 		Weapon weapon, Point pos, int xDir, Player player,
 		int type, ushort netProjId, Point? vel = null, bool rpc = false
 	) : base(
-		weapon, pos, xDir, 75, 3, player, "dynamo_air_buster_proj",
-		Global.miniFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
+		weapon, pos, xDir, 75, 2, player, "dynamo_air_buster_proj",
+		Global.defFlinch, 0.5f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.DynamoAirBuster;
 		maxTime = 1f;

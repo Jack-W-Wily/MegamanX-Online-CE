@@ -262,3 +262,174 @@ public class ZeroFinalEnd : CharState {
 }
 
 
+
+
+
+
+
+
+public class ZInferno : CharState {
+	public int shootInterval = 12;
+	public int distance = 36;
+	public int shotMax = 4;
+	public int rumbleMax = 7;
+	public int rumbleNum;
+	public int shotNum;
+	public float shootTimer;
+	public bool shotModeActive;
+	public RekkohaEffect? effect;
+	public Weapon weapon;
+	public int attackMaxTime = 118;
+	public bool exiting;
+
+	public ZInferno(Weapon weapon) : base("rekkoha") {
+		this.weapon = weapon;
+		invincible = true;
+		stunImmune = true;
+		pushImmune = true;
+	}
+
+	public override void update() {
+		weapon.shootCooldown = weapon.fireRate;
+		base.update();
+		if (exiting) {
+			if (character.isAnimOver()) {
+				character.changeToIdleOrFall();
+			}
+			return;
+		}
+		if (shotModeActive) {
+			if (shootTimer >= shootInterval) {
+				if (shotNum < shotMax) {
+					shotNum++;
+					float topScreenY = Global.level.getTopScreenY(character.pos.y);
+					float distXL = character.pos.x + distance * shotNum * -1;
+					float distXR = character.pos.x + distance * shotNum * 1;
+
+
+					if (Helpers.randomRange(0,1) == 0){
+					new ZInfernoBeam(new FireWave(),
+						new Point(distXL, character.pos.y), character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					} else {
+					new ZInfernoBeam2(new FireWave(),
+						new Point(distXL, character.pos.y), -character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					}
+					if (Helpers.randomRange(0,1) == 0){
+					new ZInfernoBeam2(new FireWave(),
+						new Point(distXR, character.pos.y), character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					} else {
+					new ZInfernoBeam2(new FireWave(),
+						new Point(distXR, character.pos.y), -character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+					}
+				}
+				if (rumbleNum < rumbleMax) {
+					character.shakeCamera(sendRpc: true);
+					rumbleNum++;
+				}
+				shootTimer = 0;
+			} else {
+				shootTimer += character.speedMul;
+			}
+		}
+		if (character.frameIndex >= 6 && !shotModeActive) {
+			shotModeActive = true;
+			character.shakeCamera(sendRpc: true);
+			character.playSound("rekkoha", sendRpc: true);
+			character.playSound("crashX2", sendRpc: true);
+			float topScreenY = Global.level.getTopScreenY(character.pos.y);
+			new ZInfernoBeam(new FireWave(),
+						new Point(character.pos.x, character.pos.y), character.xDir,
+						player, player.getNextActorNetId(),
+						sendRpc: true
+					);
+		}
+		if (stateFrames >= attackMaxTime) {
+			exiting = true;
+			character.changeSpriteFromName("giga_end", true);
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.clenaseAllDebuffs();
+		if (player.isMainPlayer) {
+			effect = new RekkohaEffect();
+		}
+	}
+}
+
+
+
+public class ZInfernoBeam2 : Projectile {
+	Player player;
+	public ZInfernoBeam2(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
+		base(weapon, pos, 1, 0, 2, player, "zerox1_firebeam_down", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.ZinfernoBeam2;
+		shouldShieldBlock = false;
+		shouldVortexSuck = false;
+		destroyOnHit = false;
+		damager.damage = 6;
+		maxTime = 1f;
+		hitSound = "kofhtsnd_lightning1";
+		this.player = player;
+
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+	}
+
+	public override bool shouldDealDamage(IDamagable damagable) {
+	
+		return true;
+	}
+}
+	
+
+
+
+public class ZInfernoBeam : Projectile {
+	Player player;
+	public ZInfernoBeam(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool sendRpc = false) :
+		base(weapon, pos, 1, 0, 2, player, "zerox1_firebeam_up", Global.superFlinch, 2f, netProjId, player.ownedByLocalPlayer) {
+		projId = (int)ProjIds.ZInfernoBeam;
+		shouldShieldBlock = false;
+		shouldVortexSuck = false;
+		destroyOnHit = false;
+		damager.damage = 6;
+		maxTime = 1f;
+		hitSound = "kofhtsnd_lightning1";
+		this.player = player;
+
+		if (sendRpc) {
+			rpcCreate(pos, player, netProjId, xDir);
+		}
+	}
+
+	public override void update() {
+		base.update();
+	}
+
+	public override bool shouldDealDamage(IDamagable damagable) {
+	
+		return true;
+	}
+
+	
+}
+

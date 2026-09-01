@@ -72,6 +72,19 @@ public enum CharIds {
 	SoulBodyClone,
 
 
+	XRacer,
+	ZeroRacer,
+	VileRacerMK1,
+	VileRacerMk2,
+	VileRacerMKV,
+	AxlRacer,
+	SigmaRacerX1,
+	SigmaRacerX2,
+	DopplerRacer,
+	GBDRacer,
+	ZeroIrisRacer,
+
+
 }
 
 public class CharSelection {
@@ -125,6 +138,19 @@ public class CharSelection {
 		
 	];
 
+
+
+	
+	public static CharSelection[] selectionsRace => [
+		new CharSelection("X", (int)CharIds.XRacer, 1, 0, "xracer", 0){offset = new Point(0, 20)},
+		new CharSelection("Green Biker Dude", (int)CharIds.GBDRacer, 1, 0, "gbdracer", 0){offset = new Point(0, 20)},
+		new CharSelection("Zero and Iris", (int)CharIds.ZeroIrisRacer, 1, 0, "zeroirisracer", 0){offset = new Point(0, 20)},
+		new CharSelection("Vava", (int)CharIds.VileRacerMK1, 1, 0, "vilemk1racer", 0){offset = new Point(0, 20)},
+		new CharSelection("Vava MK II", (int)CharIds.VileRacerMk2, 1, 0, "vilemk2racer", 0){offset = new Point(0, 20)},
+		new CharSelection("Vava MK V", (int)CharIds.VileRacerMKV, 1, 0, "vilemk5racer", 0){offset = new Point(0, 20)},
+		new CharSelection("Sigma", (int)CharIds.SigmaRacerX1, 1, 0, "sigma1racer", 0){offset = new Point(0, 20)},
+		new CharSelection("Sigma and Claudio (FakeZ)", (int)CharIds.SigmaRacerX2, 1, 0, "sigma2racer", 0){offset = new Point(0, 20)},
+	];
 
 	public static CharSelection[] selectionsVavaUnlocked => [
 		new CharSelection("X", (int)CharIds.RockmanX, 1, 0, "smenu_x", 0){offset = new Point(0, 20)},
@@ -262,7 +288,7 @@ public class SelectCharacterMenu : IMainMenu {
 		this.isTeamMode = isTeamMode;
 		this.isHost = isHost;
 
-		charSelections = is1v1 ? CharSelection.selections : CharSelection.selections;
+		charSelections = is1v1 ? CharSelection.selectionsRace : CharSelection.selections;
 
 		if (Options.main.C7E1FBE2E00 == 888) {
 		charSelections = is1v1 ? CharSelection.selectionsVavaUnlocked : CharSelection.selectionsVavaUnlocked;

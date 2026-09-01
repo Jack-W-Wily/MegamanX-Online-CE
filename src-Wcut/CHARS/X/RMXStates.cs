@@ -10,6 +10,41 @@ namespace MMXOnline;
 
 
 
+public class UPGrabX : CharState {
+
+
+	public UPGrabX() : base("unpo_grab_dash") {
+		immuneToWind = true;
+		enterSound = "GDash";
+	}
+
+	public override void update() {
+		base.update();
+		character.move(new Point(character.xDir * 250, 0));
+
+	
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+	}
+
+    public override void onEnter(CharState oldState) {
+        base.onEnter(oldState);
+        character.useGravity = false;
+	}
+
+    public override void onExit(CharState? newState) {
+        base.onExit(newState);
+        character.useGravity = true;
+        character.slideVel = character.xDir * character.getDashSpeed() * 0.9f;
+	}
+}
+
+
+
 public class WarpDodge : CharState {
 	const float warpHeight = 150;
 	float origYPos;

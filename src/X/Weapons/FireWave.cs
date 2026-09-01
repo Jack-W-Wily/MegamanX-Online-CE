@@ -157,7 +157,7 @@ public class FireWaveProjCharged : Projectile {
 		weapon = FireWave.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 12;
-		damager.flinch = Global.defFlinch;
+		damager.flinch = Global.miniFlinch;
 		vel = new Point(0 * xDir, 0);
 		projId = (int)ProjIds.FireWaveCharged;
 		spriteMid = new Sprite("fire_wave_charge");

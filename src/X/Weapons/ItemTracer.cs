@@ -25,7 +25,7 @@ public class ItemTracer : Weapon {
 		MegamanX mmx = character as MegamanX ?? throw new NullReferenceException();
 
 		Character? target = null;
-		character.playSound("itemTracer", sendRpc: true);
+		character.playSound("itemTracer_", sendRpc: true);
 		CollideData? hit = Global.level.raycast(
 			character.pos, character.pos.addxy(150 * character.xDir, 0), new List<Type>() { typeof(Actor) }
 		);

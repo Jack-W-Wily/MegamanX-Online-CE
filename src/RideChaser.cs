@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace MMXOnline;
 
@@ -133,6 +134,9 @@ public class RideChaser : Actor, IDamagable {
 		}
 
 		if (character != null) {
+			if (Global.level.isRace()) {
+				visible = false;
+			}
 			driveCode(out bool shouldDrawIncline, out bool shouldDrawShoot, out bool shouldDrawIdle, out int inclineFrameIndex);
 
 			if (shouldDrawIncline && shouldDrawShoot) {
@@ -378,7 +382,11 @@ public class RideChaser : Actor, IDamagable {
 		if (!isJumping) {
 			if (player.input.isPressed(Control.Jump, player) && sprite.name != "ridechaser_turn" && grounded) {
 				isJumping = true;
+				if (player.input.isHeld(Control.Up, player)){
+				vel.y = -255;
+				} else {
 				vel.y = -225;
+				}
 			}
 		} else {
 			if (jumpTime < 0.15f && player.input.isHeld(Control.Jump, player)) {
@@ -693,7 +701,7 @@ public class InRideChaser : CharState {
 
 	public override void update() {
 		base.update();
-
+		
 		if (!character.ownedByLocalPlayer) return;
 
 		if (Global.level.isRace()) {

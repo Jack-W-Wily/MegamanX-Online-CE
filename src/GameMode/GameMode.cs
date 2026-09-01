@@ -18,9 +18,11 @@ public class GameMode {
 	public const string Race = "Race";
 	public const string TeamElimAlt = "Elimination Alt";
 
+	public const string Arena = "Arena Mode";
+
 	public static List<string> allGameModes = new List<string>() {
 		Deathmatch, TeamDeathmatch, CTF, KingOfTheHill,
-		ControlPoint, Elimination, TeamElimination, TeamElimAlt
+		ControlPoint, Elimination, TeamElimination, TeamElimAlt, Arena
 	};
 
 	public const int blueAlliance = 0;
@@ -160,6 +162,7 @@ public class GameMode {
 			selectedGameMode == TeamElimination ||
 			selectedGameMode == TeamElimAlt ||
 			selectedGameMode == KingOfTheHill ||
+			selectedGameMode == Arena ||
 			selectedGameMode.StartsWith("tm_")
 		) {
 			return true;
@@ -176,6 +179,7 @@ public class GameMode {
 		else if (mode == KingOfTheHill) return "koth";
 		else if (mode == Race) return "race";
 		else if (mode == TeamElimAlt) return "elim.alt";
+		else if (mode == Arena) return "arena";
 		else return "dm";
 	}
 
@@ -453,10 +457,10 @@ public class GameMode {
 						if (nextMatchHostMenu != null) Menu.change(nextMatchHostMenu);
 					}
 				} else {
-					if (!Menu.inMenu && level.is1v1()) {
+					if (!Menu.inMenu && level.isRace()) {
 						Menu.change(
 							new SelectCharacterMenu(
-								null, level.is1v1(), false, true, true,
+								null, level.isRace(), false, true, true,
 								level.gameMode.isTeamMode, Global.isHost, () => { })
 							);
 					}

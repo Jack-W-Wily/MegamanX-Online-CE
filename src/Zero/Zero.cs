@@ -104,7 +104,15 @@ public class Zero : Character {
 			_ => new RakuhouhaWeapon(),
 		};
 		if (this is ZeroMID) {
-			hyperMode = 2;//loadout.hyperMode;
+			
+			if (!OverDrive){
+			hyperMode = 2;
+			} else {
+			hyperMode = 1;
+			}
+			
+			
+			//loadout.hyperMode;
 		} else if (this is ZeroEND) {
 			hyperMode = 0;
         } else {

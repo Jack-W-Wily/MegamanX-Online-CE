@@ -997,7 +997,7 @@ public class HighwayVAVA : Vile {
 			vel = new Point(1, 0.5f);
 		}
 
-		if (charState is RisingSpecterState) {
+		if (charState is NervousGhostState) {
 			vel = new Point(1, -0.75f);
 		}
 		

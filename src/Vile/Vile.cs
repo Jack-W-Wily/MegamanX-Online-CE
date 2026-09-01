@@ -711,7 +711,7 @@ public class Vile : Character {
 			vel = new Point(1, 0.5f);
 		}
 
-		if (charState is RisingSpecterState) {
+		if (charState is NervousGhostState) {
 			vel = new Point(1, -0.75f);
 		}
 
@@ -1095,6 +1095,8 @@ public class Vile : Character {
 	public bool ShouldDrawAura;
 	
 	//public float aiAttackCooldown;
+
+	/*
 	public override void aiAttack(Actor? target) {
 		int vattack = Helpers.randomRange(1, 7);
 		bool isFacingTarget = (pos.x * xDir < target?.pos.x * xDir);
@@ -1122,6 +1124,7 @@ public class Vile : Character {
 			}
 		}
 	}
+	*/
 
 	public override void aiUpdate(Actor? target) {
 		base.aiUpdate(target);

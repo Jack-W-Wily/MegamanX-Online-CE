@@ -344,7 +344,9 @@ public partial class Level {
 			gameMode = new Race(this);
 		} else if (server.gameMode == GameMode.TeamElimAlt) {
 			gameMode = new TeamElimAlt(this, server.playTo, server.timeLimit);
-		} 
+		} else if (server.gameMode == GameMode.Arena) {
+			gameMode = new Arena(this, server.playTo, server.timeLimit);
+		}
 
 		// Radar dimensions
 		float maxDim = 50f;
@@ -2686,12 +2688,18 @@ public partial class Level {
 		return unoccupied.GetRandomItem();
 	}
 
+
+
+
+
+	
+
 	public SpawnPoint getFirstSpawnPoint(Player player) {
 		if (Global.overrideSpawnPoint != null) {
 			var sp = spawnPoints.FirstOrDefault(s => s.name == Global.overrideSpawnPoint);
 			if (sp != null) return sp;
 		}
-		if (isRace() || isFullMap()  ) {
+		if (isRace() || isFullMap() && !player.isAI ) {
 			return raceStartSpawnPoints[player.getSpawnIndex(raceStartSpawnPoints.Count)];
 		}
 		if (is1v1()) {
@@ -2897,6 +2905,216 @@ public partial class Level {
 			}
 		}
 	}
+
+
+
+
+
+
+	
+
+	// Wily Cut Level Get
+
+		public int getCharSpawn() {
+		
+		if (Options.main.preferredCharacter == 1) {
+		return (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		return (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		return (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		return (int)CharIds.Sigma;
+		}
+		return  (int)CharIds.RockmanX;
+		}
+
+
+		public string levelTrigger ;
+
+
+		public string getLevelName() {
+			if (levelTrigger == null) {
+			return "training";
+			}
+		return levelTrigger;
+		}
+
+		
+		public void enterLevel() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == getLevelName()).Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = getCharSpawn();
+		
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		//me.alliance = Global.quickStartTeam;
+		string gameMode =  Global.quickStartStoryMode;
+		int botCount = 1;//selectedLevel.name == "st_cybermaze_test" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
+		public void enterTestState() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_cybermaze_test").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = getCharSpawn();
+		
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_cybermaze_test" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_cybermaze_test" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
+	
+		public void enterVavaHunterBase() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "st_vava_hunterbase1").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "st_vava_hunterbase1" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "st_vava_hunterbase1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
+	
+	
+		public void enterHunterBase() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "hunterbase2").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartTrainingGameMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "hunterbase2" ? Global.quickStartTrainingGameMode : Global.quickStartGameMode;
+		int botCount = 0;// selectedLevel.name == "hunterbase2" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "hunterbase2" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 9999, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+	
+		public void enterBossClaudio() {
+		var selectedLevel = Global.levelDatas.FirstOrDefault(ld => ld.Key == "cybermaze_1v1").Value;
+		var scm = new SelectCharacterMenu(Global.quickStartCharNum);
+		int spawnAsX = (int)CharIds.RockmanX;
+		if (Options.main.preferredCharacter == 1) {
+		spawnAsX = (int)CharIds.ZeroMID;
+		}
+		if (Options.main.preferredCharacter == 2) {
+		spawnAsX = (int)CharIds.VAVA1;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.AxlWC;
+		}
+		if (Options.main.preferredCharacter == 3) {
+		spawnAsX = (int)CharIds.Sigma;
+		}
+		var me = new ServerPlayer(Options.main.playerName, 0, true, spawnAsX, Global.quickStartTeam, Global.deviceId, null, 0);
+		if (selectedLevel.name == "hunterbase2" && GameMode.isStringTeamMode(Global.quickStartStoryMode)) me.alliance = Global.quickStartTeam;
+		string gameMode = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartStoryMode : Global.quickStartGameMode;
+		int botCount = 1;// selectedLevel.name == "cybermaze_1v1" ? Global.quickStartTrainingBotCount : Global.quickStartBotCount;
+		bool disableVehicles = selectedLevel.name == "cybermaze_1v1" ? Global.quickStartDisableVehiclesTraining : Global.quickStartDisableVehicles;
+		var localServer = new Server(
+			Global.version, null, null, selectedLevel.name, selectedLevel.shortName,
+			gameMode, 1, botCount, selectedLevel.maxPlayers, 0, false, false,
+			NetcodeModel.FavorAttacker, 200, true, Global.quickStartMirrored,
+			Global.quickStartTrainingLoadout, Global.checksum, selectedLevel.checksum,
+			selectedLevel.customMapUrl, SavedMatchSettings.mainOffline.extraCpuCharData, null,
+			Global.quickStartDisableHtSt, disableVehicles,
+			2
+		);
+		localServer.players = new List<ServerPlayer>() { me };
+		Global.level = new Level(localServer.getLevelData(), SelectCharacterMenu.playerData, localServer.extraCpuCharData, false);
+		Global.level.teamNum = localServer.teamNum;
+		Global.level.startLevel(localServer, false);
+	}
+
+
+
 }
 
 public class DelayedAction {

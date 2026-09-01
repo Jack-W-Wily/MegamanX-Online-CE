@@ -462,6 +462,8 @@ public class LaunchedState : GenericGrabbedState {
 	public Character grabbedChar;
 	//private bool once;
 	public bool launched;
+
+	Anim? anim;
 	float launchTime;
 	bool once;
 	public LaunchedState(Character grabber) : base(grabber, 1, "") {
@@ -475,7 +477,7 @@ public class LaunchedState : GenericGrabbedState {
 
 		if (launched) {
 			launchTime += Global.spf;
-			if (launchTime > 0.33f) {
+			if (launchTime > 0.5f) {
 				character.changeToIdleOrFall();
 				return;
 			}
@@ -489,6 +491,16 @@ public class LaunchedState : GenericGrabbedState {
 						character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
 						character.playSound("crash", sendRpc: true);
 						character.shakeCamera(sendRpc: true);
+								character.changeState(
+							new KnockedDown(
+								-character.xDir
+							), true
+						);
+			character.angle = 0;
+			
+			character.shakeCamera(sendRpc: true);
+			anim = new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
+			anim.angle = 90;
 					}
 				}
 			}
@@ -515,7 +527,7 @@ public class LaunchedStateWeak : GenericGrabbedState {
 	bool once;
 	public LaunchedStateWeak(Character grabber) : base(grabber, 1, "") {
 		customUpdate = true;
-		superArmor = true;
+		
 	}
 
 
@@ -535,6 +547,42 @@ public class LaunchedStateWeak : GenericGrabbedState {
 			launched = true;
 			character.unstickFromGround();
 			character.vel.y = -100;
+		}
+	}
+}
+
+
+
+
+
+public class LaunchedStateMedium : GenericGrabbedState {
+	public Character grabbedChar;
+	//private bool once;
+	public bool launched;
+	float launchTime;
+	bool once;
+	public LaunchedStateMedium(Character grabber) : base(grabber, 1, "") {
+		customUpdate = true;
+		
+	}
+
+
+	public override void update() {
+		base.update();
+
+		if (launched) {
+			launchTime += Global.spf;
+			if (launchTime > 0.3f) {
+				character.changeToIdleOrFall();
+				return;
+			}
+
+		}
+
+		if (!launched) {
+			launched = true;
+			character.unstickFromGround();
+			character.vel.y = -200;
 		}
 	}
 }
@@ -648,7 +696,7 @@ public class WcutGenericDodgeF : CharState {
 public class PassDoor : CharState {
 
 	
-	public PassDoor() : base("warp_door", "", "", "") {
+	public PassDoor() : base("", "", "", "") {
 	
 	}
 
@@ -656,8 +704,13 @@ public class PassDoor : CharState {
 		base.update();
 	
 
-		if (stateTime >0.5f) {
-		character.move(new Point(character.xDir * 50, 0));
+		if (stateTime >0.5f ) {
+			if (!once){
+			once = true;
+				character.playSound("x4Door2");
+			}
+			
+			character.changePos(Point.lerp(character.pos, character.pos.addxy(3 * character.xDir, 0), 0.25f));
 
 		}
 
@@ -675,12 +728,14 @@ public class PassDoor : CharState {
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
 		character.useGravity = false;
+		character.stopMoving();
+		character.playSound("x4Door1");
 	}
 
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-
+		character.playSound("x4Door1");
 	}
 }
 

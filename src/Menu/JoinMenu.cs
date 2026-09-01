@@ -148,7 +148,7 @@ public class JoinMenu : IMainMenu {
 			Helpers.menuUpDown(ref selServerIndex, 0, publicServers.Count - 1);
 			if (Global.input.isPressedMenu(Control.MenuConfirm) || Global.quickStartOnline) {
 				var server = publicServers[selServerIndex];
-				Menu.change(new SelectCharacterMenu(this, server.level.EndsWith("1v1"), false, false, false, GameMode.isStringTeamMode(server.gameMode), false, () => joinServer(server)));
+				Menu.change(new SelectCharacterMenu(this, server.gameMode is Race, false, false, false, GameMode.isStringTeamMode(server.gameMode), false, () => joinServer(server)));
 			}
 		}
 

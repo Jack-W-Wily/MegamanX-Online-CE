@@ -210,14 +210,14 @@ public class Zain : Character {
 
 		if ((charState.attackCtrl || charState.bonusAttackCtrl)
 		 && player.input.isPressed(Control.WeaponLeft, player)
-		 && player.input.isHeld(Control.Up, player)) {
+		 && player.input.isHeld(Control.Up, player) && grounded) {
 			changeState(new ZainParryStartState(), true);
 		}
 
 		if (player.input.isPressed(Control.WeaponLeft, player)
 		   && (charState.attackCtrl || charState.bonusAttackCtrl)
 		   && !player.input.isHeld(Control.Up, player)
-		   ) {
+		   && grounded) {
 			if (unpoAbsorbedProj != null) {
 				changeState(new ZainUPParryProjState(unpoAbsorbedProj, true, false), true);
 				unpoAbsorbedProj = null;
@@ -404,19 +404,25 @@ public class Zain : Character {
 
 		if (sprite.name.Contains("air_dunk")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 2f, 20, 15f, clashTier: ClashTier.Strong, hitSound : "kofhtsnd_clamp2"
+			 ProjIds.MechFrogGroundPound, player, 2f, 30, 15f, clashTier: ClashTier.Strong, hitSound : "kofhtsnd_clamp2"
 			 , addToLevel: true);
 		}
 
 
 		if (sprite.name.Contains("projswing") && !sprite.name.Contains("air")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint,
-			 ProjIds.MechFrogGroundPound, player, 5f, 20, 15f, clashTier: ClashTier.Strong, hitSound : "clang3GG"
+			 ProjIds.MechFrogGroundPound, player, 5f, 30, 15f, clashTier: ClashTier.Strong, hitSound : "clang3GG"
 			 , addToLevel: true);
 		}
 		if (sprite.name.Contains("parry")) {
 			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.MechFrogStompShockwave, 
 			player, 1f, 0, 15f, hitSound : "kofhtsnd_grab2"
+			, addToLevel: true);
+		}
+
+		if (sprite.name.Contains("dropstab")) {
+			return new GenericMeleeProj(new SonicSlicer(), centerPoint, ProjIds.ForceGrabState, 
+			player, 3f, 0, 15f, hitSound : "kofhtsnd_grab2"
 			, addToLevel: true);
 		}
 		if (sprite.name.Contains("thrust")) {

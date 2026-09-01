@@ -109,6 +109,8 @@ public class RisingFireProj : Projectile {
 		shouldShieldBlock = false;
 		shouldVortexSuck = false;
 		fadeSprite = "explosion";
+		damager.damage = 2;
+		damager.flinch = Global.superFlinch;
 		destroyOnHit = true;
 		vel.y = -275;
 		

@@ -666,6 +666,74 @@ public class GizmoDashHoming : CharState {
 
 
 
+
+public class RisingSpecterStart : CharState {
+	
+	bool isDone;
+	Character otherChar;
+	float moveAmount;
+	float maxMoveAmount;
+	public RisingSpecterStart() : 
+	base("rising_specter_start"
+	) {
+	
+	}
+
+
+	public override void update() {
+		base.update();
+
+
+		foreach (var otherPlayer in Global.level.players) {
+					if (otherPlayer.character == null) continue;
+					if (otherPlayer == player) continue;
+					if (otherPlayer == character.parasiteDamager?.owner) continue;
+					if (otherPlayer.character.isInvulnerable()) continue;
+					if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+					if (otherPlayer.character.getCenterPos().distanceTo(character.getCenterPos()) > ParasiticBomb.carryRange) continue;
+					otherChar = otherPlayer.character;
+					
+					break;
+		}
+		
+		if (character.frameIndex > 0) {
+			if (otherChar != null){
+		character.changePos(Point.lerp(character.pos, otherChar.pos, 0.25f));
+		}
+		}
+	
+			if (character.isAnimOver()) {
+				character.changeState(new RisingSpecterState(true));
+			}
+		
+	}
+
+
+	
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.grounded = false;
+		character.vel.y = 0;
+
+		character.playSound("chargeUpLaserx4", sendRpc: true);
+			character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
+
+
 public class VavaGizmoGrabState : CharState {
 
     public Vile vile = null!;

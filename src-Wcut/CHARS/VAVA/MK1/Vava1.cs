@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using SFML.Graphics;
+using System.Transactions;
 
 namespace MMXOnline;
 
@@ -238,39 +239,22 @@ public class VAVA1 : Vile {
 
 
 	public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32){
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32
+		
+		){
 			changeState(new VavaBurensen1(), true);	
 			player.superAmmo = 0;
 			playSound("chingX4");
 		}
-/*
-		if (OverDrive && 
-		downPressedTimes >= 2 &&
-		upPressedTimes >= 2 &&
-		leftPressedTimes >= 2 &&
-		rightPressedTimes >= 2 &&
-		player.input.isR2Held(player) &&
-		player.superAmmo >= 32){
-			changeState(new VavaVOverdriveStart(), true);	
+
+		if (player.input.checkShoryuken(player, xDir, Control.R2) && player.superAmmo >= 32) {
+			changeState(new RisingSpecterStart());
 			player.superAmmo = 0;
-			downPressedTimes = 0;
-			upPressedTimes= 0;
-			leftPressedTimes= 0;
-			rightPressedTimes = 0;
-			playSound("chingX4");
-		}*/
+		}
+		
 
 
-
-		return !sprite.name.Contains("hurt") ||
-		!sprite.name.Contains("frozen") ||
-		!sprite.name.Contains("grabbed") || 
-		!sprite.name.Contains("knocked") || 
-		!sprite.name.Contains("launched") || 
-		!sprite.name.Contains("thrown") || 
-		!sprite.name.Contains("die") || 
-		!sprite.name.Contains("lose") ||
-		!sprite.name.Contains("stunned");
+		return !isInDamageSprite();
 	}
 
 
@@ -631,7 +615,7 @@ public class VAVA1 : Vile {
 	
 	public override void update() {
 		base.update();
-
+		Supers();
 
 
 		// blow up ride
@@ -848,13 +832,13 @@ public class VAVA1 : Vile {
 		}
 
 
-		if (charState is InRideChaser) {
+		if (charState is not WarpIn and not WarpIdle and not Die) {
 			return;
 		}
 		RideArmorAttacks();
 		RideLinkMK5();
 
-		Supers();
+		
 		if (!charState.attackCtrl || charState is VileMK2GrabState) {
 			return;
 		}
@@ -975,7 +959,7 @@ public class VAVA1 : Vile {
 			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
 			"vava_knee" => MeleeIds.VavaKneeAttack,
 			"vava_jab_1" => MeleeIds.Jab,
-			"vava_jab_2" or "vava_punch_1" or "vava_kick" or "vava_kick_2" or "vava_kick_3" => MeleeIds.Jab2,
+			"vava_jab_2" or "vava_punch_1" or "vava_kick" or "vava_kick_2" => MeleeIds.Jab2,
 			"vava_punch_2" => MeleeIds.UpperCut,
 			"vava_gizmo_dash_grab" => MeleeIds.GizmoGrab,
 			"vava_kamae_unblockable" or "vava_kamae_unblockable_land"  or "vava_air_bomb_attack"=> MeleeIds.KamaeUnB,
@@ -1056,8 +1040,8 @@ public class VAVA1 : Vile {
 				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1", isJuggleProjectile : true
 			),
 			(int)MeleeIds.DropKick => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.MechFrogGroundPound, player,
-				 2, 40, 42, isReflectShield: false,
+				new KRMelee(), projPos, ProjIds.DropSlide, player,
+				 2, 0, 42, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel, isJuggleProjectile : false, hitSound : "kofhtsnd_punch1"
 			),
@@ -1314,7 +1298,7 @@ public class VAVA1 : Vile {
 				if (player.input.isHeld(Control.Down, player)) {
 				changeState(new NecroBurstAttack(grounded), true);
 			} else if (player.input.isHeld(Control.Up, player)) {
-				changeState(new RisingSpecterState(grounded), true);
+				changeState(new NervousGhostState(grounded), true);
 			} else if (player.input.isLeftOrRightHeld(player)) {
 				changeState(new StraightNightmareAttack(grounded), true);
 			}
@@ -1530,7 +1514,7 @@ public class VAVA1 : Vile {
 			vel = new Point(1, 0.5f);
 		}
 
-		if (charState is RisingSpecterState) {
+		if (charState is NervousGhostState) {
 			vel = new Point(1, -0.75f);
 		}
 

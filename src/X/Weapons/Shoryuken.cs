@@ -41,7 +41,7 @@ public class Shoryuken : CharState {
 			jumpedYet = true;
 			character.dashedInAir++;
 			character.vel.y = -character.getJumpPower() * 1.55f;
-			character.playSound("shoryukenV", sendRpc: true);
+			character.playSound("Rooster - Knee", sendRpc: true);
 		}
 		if (character.sprite.frameIndex == 2 && character.currentFrame.POIs.Length > 0) {
 			character.move(new Point(character.xDir * 165, 0));

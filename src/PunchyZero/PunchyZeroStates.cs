@@ -125,6 +125,9 @@ public class PZeroLaunchPunch : PZeroGenericMeleeState {
 		if (zero.specialPressTime > 0) {
 			return zero.groundSpcAttacks();
 		}
+		if (player.input.isPressed(Control.Shoot, player)) {
+			character.changeState(new PZeroYoudantotsuQuick(), true);
+		}
 		
 		return false;
 	}
@@ -149,6 +152,23 @@ public class PZeroYoudantotsu : PZeroGenericMeleeState {
 		projId = (int)ProjIds.PZeroYoudantotsu;
 		soundFrame = 7;
 	}
+}
+
+
+
+public class PZeroYoudantotsuQuick : PZeroGenericMeleeState {
+	public PZeroYoudantotsuQuick() : base("megapunch") {
+		sound = "megapunch";
+		projId = (int)ProjIds.PZeroYoudantotsu;
+		soundFrame = 7;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.frameIndex = 5;
+	}
+
+
 }
 
 public class PZeroSpinKick : PZeroGenericMeleeState {
@@ -219,6 +239,12 @@ public class PZeroDiveKickState : PZeroState {
 		}
 		if (character.vel.y < 100) {
 			character.changeToLandingOrFall();
+			
+				character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
 			return;
 		}
 		CollideData? hit = Global.level.checkTerrainCollisionOnce(
@@ -226,6 +252,12 @@ public class PZeroDiveKickState : PZeroState {
 		);
 		if (hit?.isSideWallHit() == true) {
 			character.changeState(character.getFallState(), true);
+			
+				character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
 			return;
 		} else if (hit != null) {
 			stuckTime += Global.speedMul;
@@ -236,6 +268,14 @@ public class PZeroDiveKickState : PZeroState {
 		}
 		if (character.grounded || diveTime >= 6 && character.deltaPos.y == 0) {
 			character.changeToLandingOrFall();
+			
+			
+				character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+			
 			return;
 		}
 		diveTime += Global.spf;

@@ -563,11 +563,13 @@ public class ZeroMID : Zero {
 				changeState(new GenmureiState(), true);
 			} else if (isBlack) {
 				playSound("dynamoting", forcePlay: false, sendRpc: true);
-			changeState(new Idle());
+			changeState(new ZeroFinalStart());
 			playSound("dynamoUltraCross1", forcePlay: false, sendRpc: true);
 			}
-			else {
+			else if (isViral){
 				changeState(new DarkHoldShootState(new DarkHoldWeapon()), true);
+			} else {
+				changeState(new ItourioudanGenmuzeroStart(), true);
 			}
 			downPressedTimes = 0;
 			gigaAttack.ammo -= 32;
@@ -1048,7 +1050,7 @@ public class ZeroMID : Zero {
 				addToLevel: addToLevel, isJuggleProjectile : true, isLiftProjectile : true
 			),
 			(int)MeleeIds.RisingFang => new GenericMeleeProj(
-				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, 0, 30,
+				RisingFangWeapon.staticWeapon, projPos, ProjIds.RisingFang, player, 2, Global.defFlinch, 30,
 				isZSaberEffect: true,
 				addToLevel: addToLevel, isJuggleProjectile : true, isLiftProjectile : true
 			),

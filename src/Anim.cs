@@ -38,7 +38,7 @@ public class Anim : Actor {
 		if (isMaverickDeathAnim(spriteName)) {
 			maverickFade = true;
 			setzIndex(ZIndex.Character - 1);
-			playSound("maverickDie", sendRpc: true);
+		//	playSound("maverickDie", sendRpc: true);
 		}
 		// TODO: Remove all the harcoded sprites shenanigans.
 		if (spriteName.StartsWith("cannon_muzzle")) {
