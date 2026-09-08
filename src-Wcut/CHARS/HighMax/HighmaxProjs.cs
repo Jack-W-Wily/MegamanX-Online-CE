@@ -193,12 +193,14 @@ public class HighmaxStunShot : Projectile, IDamagable {
 
 public class DesmumeProj1 : Projectile {
 	public DesmumeProj1(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, Point? vel = null, bool rpc = false) :
-		base(weapon, pos, xDir, 150, 1, player, "highmax_punch_proj", 20, 0.2f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 150, 2, player, "highmax_punch_proj", Global.defFlinch, 0.2f, netProjId, player.ownedByLocalPlayer) {
 		projId = (int)ProjIds.DesmumeProj1;
 		this.vel = new Point(speed * xDir, -200);
 		useGravity = true;
 		collider.wallOnly = true;
 		fadeSound = "explosion";
+		damager.damage = 2;
+		damager.flinch = Global.defFlinch;
 		fadeSprite = "explosion";
 		hitSound = "kofhtsnd_lightning1";
 		destroyOnHit = false;
@@ -230,7 +232,7 @@ public class DesmumeProj1 : Projectile {
 public class DesmumeProj2 : Projectile {
 	float flameCreateTime = 1;
 	public DesmumeProj2(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 100, 1f, player, "highmax_punch_proj", 10, 1f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 100, 1f, player, "highmax_punch_proj", Global.halfFlinch, 1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 2;
 		projId = (int)ProjIds.DesmumeProj2;
 		useGravity = false;
@@ -277,7 +279,7 @@ public class DesmumeProj2 : Projectile {
 
 public class DesmumeProj3 : Projectile {
 	public DesmumeProj3(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
-		base(weapon, pos, xDir, 0, 2, player, "highmax_punch_proj", 10, 0.5f, netProjId, player.ownedByLocalPlayer) {
+		base(weapon, pos, xDir, 0, 2, player, "highmax_punch_proj", Global.superFlinch, 0.5f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 1f;
 		projId = (int)ProjIds.DesmumeProj3;
 		vel = new Point(0, -200);

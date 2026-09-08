@@ -676,7 +676,8 @@ public class RisingSpecterStart : CharState {
 	public RisingSpecterStart() : 
 	base("rising_specter_start"
 	) {
-	
+	invincible = true;
+	canGainMeter = false;
 	}
 
 

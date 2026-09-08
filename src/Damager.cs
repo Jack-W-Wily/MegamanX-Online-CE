@@ -86,6 +86,7 @@ public class Damager {
 		IDamagable victim, bool weakness, Weapon weapon, Actor actor,
 		int projId, float? overrideDamage = null, int? overrideFlinch = null, bool sendRpc = true
 	) {
+		
 		if (weapon == null) return false;
 		if (weapon is ItemTracer) return false;
 		if (projId == (int)ProjIds.GravityWellCharged) return false;
@@ -134,6 +135,7 @@ public class Damager {
 		if (owner == null) {
 			throw new Exception("Null damage player source. Use stage or self if not from another player.");
 		}
+		var attacker = owner.character;
 		if (victim is Character chr && chr.invulnTime > 0) {
 			return false;
 		}
@@ -215,9 +217,9 @@ public class Damager {
 			};
 			RPC.applyDamage.sendRpc(byteParams.ToArray());
 		}
-
-		if (owner.character != null && owner.character.isATrans) {
-			owner.character.disguiseCoverBlown = true;
+		
+		if (attacker != null && attacker.isATrans) {
+			attacker.disguiseCoverBlown = true;
 		}
 		if (damagingActor is Projectile tempProj &&
 			tempProj.ownerActor is Character atChar &&
@@ -888,7 +890,7 @@ public class Damager {
 
 			// For Grabs to work (WCUT)
 
-			var attacker = owner.character;
+			if (attacker != null && character != null){
 
 			if (attacker != null && character is RockmanX or XAnother) {
 				attacker.wasFigthing = (int)CharIds.RockmanX;
@@ -898,7 +900,7 @@ public class Damager {
 			flinch = Global.defFlinch;
 			}
 			if (projId == (int)ProjIds.ForceGrabState) {
-				if (attacker != null){
+				
 					if (attacker.charState is ZainGrabStab) {
 						
 						attacker.changeState(new ZainGrabStabEnd());
@@ -926,7 +928,7 @@ public class Damager {
 					if (attacker.charState is ZeroGrabStart) {
 						attacker.changeState(new ZeroGrabEX());
 					}	
-				}
+				
 				character?.changeState(new ForceGrabbed(attacker));
 
 			}
@@ -941,7 +943,6 @@ public class Damager {
 				}
 
 				if (projId == (int)ProjIds.newUpGrab ) {
-					if (owner != null && owner.character != null && character != null){
 					if (owner.character is not Vile){
 					owner.character.changeState(new XUPGrabState(character));
 					character.changeState(new UPGrabbed(owner.character));
@@ -951,26 +952,23 @@ public class Damager {
 						character.changeState(new GrabDrag(owner.character));
 						}
 					}
-					}
+					
 				}
 
 				if (projId == (int)ProjIds.DropSlide ) {
-					if (owner != null && owner.character != null && character != null){
-					
-						if (character.charState is not GrabDrag){
-						
-						character.changeState(new GrabDrag(owner.character));
+				
+						if (character.charState is not DraggedDown){			
+						character.changeState(new DraggedDown());
 						}
-					}
+					
 				}
 				
 
 				if (owner?.character is PunchyZero zx1 && zx1 != null) {
 				if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
-					if (owner != null && owner.character != null && character != null){
 					owner.character.changeState(new ZeroGrabEX());
-					character.changeState(new ForceGrabbed(zx1));
-					}
+					character?.changeState(new ForceGrabbed(zx1));
+					
 				}
 				}
 
@@ -993,13 +991,13 @@ public class Damager {
 
 
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
-				if (owner?.character is RockmanX rx && rx != null) {
-					character?.changeState(new ForceGrabbed(rx));
+				if (owner.character is RockmanX rx && rx != null) {
+					character.changeState(new ForceGrabbed(rx));
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
 				if (owner?.character is XAnother rxa && rxa != null) {
-					character?.changeState(new ForceGrabbed(rxa));
+					character.changeState(new ForceGrabbed(rxa));
 					owner.character.changeState(new RMXGrabState(character));
 				}
 
@@ -1008,16 +1006,16 @@ public class Damager {
 					attacker.changeState(new Vava1GrabState(character));
 				}
 				if (owner?.character is Kurumitos) {
-					character?.changeState(new ForceGrabbed(owner.character));
+					character.changeState(new ForceGrabbed(owner.character));
 					owner.character?.changeState(new KurumaGrabState(character));
 				}
 			}
 
 			if (projId == (int)ProjIds.GizmoGrab) {
-				//if (owner?.character is VAVA1 or FinalVava) {
-					character?.changeState(new ForceGrabbed(owner.character));
-					owner.character?.changeState(new VavaGizmoGrabState(character));
-				//}
+				
+					character.changeState(new ForceGrabbed(attacker));
+					attacker.changeState(new VavaGizmoGrabState(character));
+				
 			}
 
 			// Boss Instakill Inmmunities
@@ -1037,7 +1035,7 @@ public class Damager {
 			
 			
 			
-			) && character.isWCUTBoss
+			) && character?.isWCUTBoss == true
 			) {
 					damage = 0;
 					flinch = 0;
@@ -1046,7 +1044,7 @@ public class Damager {
 			}
 
 
-			if ((projId == (int)VAVA2ProjIds.NoiseCrushVCharged || projId == (int)ProjIds.HeavyPush) && owner.character != null) {
+			if ((projId == (int)VAVA2ProjIds.NoiseCrushVCharged || projId == (int)ProjIds.HeavyPush)) {
 				character.changeState(new PushedOver2(owner.character.xDir), true);
 			}
 
@@ -1241,7 +1239,7 @@ public class Damager {
 
 				character.changeState(new LaunchedStateMedium(attacker));
 			}
-
+			}
 
 			
 			if (character != null && character.sprite.name.Contains("mk2") && damage > 0 && !isArmorPiercing(projId)) {
@@ -1359,7 +1357,7 @@ public class Damager {
 				}
 			}
 
-			var attacker = owner.character;
+			
 			if (projId == (int)ProjIds.ForceGrabState) {
 				if (attacker != null){
 					if (attacker.charState is ZainGrabStab) {

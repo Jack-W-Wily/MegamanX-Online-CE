@@ -421,7 +421,7 @@ public class WarpIn : CharState {
 		if (!Global.level.mainPlayer.readyTextOver) return;
 		
 
-		if (warpAnim == null && !warpAnimOnce) {
+		if (warpAnim == null && !warpAnimOnce ) {
 			warpAnimOnce = true;
 			if (Global.level.gameMode is not Race){
 			warpAnim = new Anim(

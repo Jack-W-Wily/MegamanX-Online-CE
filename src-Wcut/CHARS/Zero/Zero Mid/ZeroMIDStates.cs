@@ -84,12 +84,12 @@ public class ZeroGrabEX : CharState {
 			character.useGravity = true;
 		}
 
-		if (character.frameIndex == 0 && soundCooldown == 0) {
+		if (character.frameIndex == 0 && soundCooldown == 0 && character.sprite.name.Contains("zarzo")) {
 			soundCooldown = 0.1f;
 			character.playSound("buster2", sendRpc: true);
 		}
 
-		if (stateTime > 0.5f && !character.sprite.name.Contains("end")) {
+		if (stateTime > 0.5f && !character.sprite.name.Contains("end") ) {
 			character.changeSpriteFromName("grab_ex_end", true);
 		}
 
@@ -97,7 +97,7 @@ public class ZeroGrabEX : CharState {
 
 		base.update();
 		Helpers.decrementTime(ref specialPressTime);
-		if (character.isAnimOver()) {
+		if (character.isAnimOver() || stateTime > 1.5f) {
 			character.changeToIdleOrFall();
 		}
 	}

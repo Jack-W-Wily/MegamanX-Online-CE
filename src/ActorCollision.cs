@@ -221,7 +221,7 @@ public partial class Actor {
 				}
 			}
 		}
-
+		
 		overrideGlobalCollider = null;
 		return false;
 	}

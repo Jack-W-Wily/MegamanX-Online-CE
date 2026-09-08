@@ -159,7 +159,7 @@ public class HighMax : Character {
 			return true;
 		}
 		if (cmdPressed && player.superAmmo == player.superMaxAmmo && !player.input.isHeld(Control.Up, player) && !player.input.isHeld(Control.Down, player)) {
-			changeState(new HighMaxSuperPunchState(), true);
+			changeState(new HighMaxHyperChargePunch(), true);
 			player.superAmmo = 0;
 			return true;
 		}
@@ -401,27 +401,40 @@ public class HighMax : Character {
 		}
 		if (sprite.name.Contains("slam_grab")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, 
-			ProjIds.MechFrogGroundPound, player, 3f, 30, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
+			ProjIds.DropSlide, player, 3f, 0, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
 			);
 		}
-		if (sprite.name.EndsWith("dash_punch")) {
+		if (sprite.name.EndsWith("dash_punch") && charState is HighMaxHyperSuperPunchState) {
 			return new GenericMeleeProj(new RCXPunch(), centerPoint,
-			 ProjIds.HeavyPush, player, 2f, 0, 4f, null, isShield: true, 
+			 ProjIds.BurensenEND, player, 2f, 0, 4f, null, isShield: true, 
 			 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
 			 );
 		}
+		if (sprite.name.EndsWith("dash_punch") && charState is not HighMaxHyperSuperPunchState) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint,
+			 ProjIds.HeavyPush, player, 2f, 0, 8f, null, isShield: true, 
+			 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
+			 );
+		}
+
+		if (sprite.name.EndsWith("foward_punch")) {
+			return new GenericMeleeProj(new RCXPunch(), centerPoint,
+			 ProjIds.HeavyPush, player, 4f, 0, 8f, null, isShield: true, 
+			 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
+			 );
+		}
+
+		
+
+
+
 		if (sprite.name.EndsWith("dash_punch_charge")) {
 			return new GenericMeleeProj(new RCXPunch(), 
 			centerPoint, ProjIds.ForceGrabState, player, 0f, 0, 20f, null, isShield: true,
-			 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_grab2"
+			 isDeflectShield: true, addToLevel: true, hitSound : "kofhtsnd_grab2"
 			 );
 		}
-		if (sprite.name.EndsWith("foward_punch") && charState is not HighMaxSuperPunchState) {
-			return new GenericMeleeProj(new RCXPunch(), 
-			centerPoint, ProjIds.HeavyPush, player, 3f, 0, 20f, 
-			null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1",  hitspark: "highmax_punch_spark"
-			);
-		}
+		
 
 		if (sprite.name.EndsWith("desmume")) {
 			return new GenericMeleeProj(new RCXPunch(), 

@@ -352,6 +352,8 @@ public partial class Player {
 	// Note: these are not automatically applied,
 	// you need to add code in Global.level.joinedLateSyncPlayers
 	// and update PlayerSync class at top of this file
+
+	
 	public int kills;
 	public int assists;
 	public int deaths;
@@ -514,11 +516,13 @@ public partial class Player {
 
 
 	// Character specific data populated on RPC request
-	//public ushort? charNetId;
-	//public ushort? charRollingShieldNetId;
-	//public float charXPos;
-	//public float charYPos;
-	//public int charXDir;
+	public ushort? charNetId;
+	public ushort? charRollingShieldNetId;
+	public float charXPos;
+	public float charYPos;
+	public int charXDir;
+
+
 	public Dictionary<int, int> charNumToKills = new Dictionary<int, int>() {
 	};
 
@@ -1241,7 +1245,7 @@ public partial class Player {
 		Character newChar;
 		// Bosses
 
-		int htCount = getStartHeartTanksForChar();
+		int htCount = heartTanks;
 
 
 		if (isAI && Global.level.levelData.name == "redandblue_vs_purple_1v1" && charNum >= 0 && isAI) {
@@ -1398,7 +1402,7 @@ public partial class Player {
 		  else if (spawnCharNum == (int)CharIds.Vile) {
 			bool mk2VileOverride = Global.level.isHyperMatch();
 
-			newChar = new Vile(
+			newChar = new VAVA1(
 				this, pos.x, pos.y, xDir, false, charNetId,
 				ownedByLocalPlayer, mk2VileOverride: mk2VileOverride,
 				isWarpIn: isWarpIn, heartTanks: htCount
@@ -1773,6 +1777,21 @@ public partial class Player {
 	}
 
 
+
+
+
+// Cleanup any buffered destroyed actors on player leave to prevent bugs.
+public void cleanupDeletedActors() {
+    ushort[] actorKeys = Global.level.destroyedActorsById.Keys.ToArray();
+    foreach (ushort key in actorKeys) {
+        if (Global.level.getPlayerById(key) == this) {
+            Global.level.destroyedActorsById.Remove(key);
+        }
+    }
+}
+
+
+
 //XKai Stuff
 
 	public bool XKaiUnlockSaber;
@@ -1826,10 +1845,11 @@ public partial class Player {
 	public bool XKaiIXGrowthBuff;
 
 
-
+	public int XKaiDeathCount = 0;
 
 	public void resetAllXKaibuffs() {
 		XKaiAbsorbNum = 0;
+		XKaiDeathCount = 0;
 		XKaiUnlockSaber = false;
 		XKaiUnlockLifesteal = false;
 		XKaiUnlockBarrier = false;
@@ -1853,6 +1873,35 @@ public partial class Player {
 		MaxChestKai = false;
 		XKaiUAXBuffs = false;
 		XKaiIXGrowthBuff = false;
+	}
+
+
+	
+	public void getAllXKAIBuffs() {
+		XKaiAbsorbNum = 999;
+		XKaiUnlockSaber = true;
+		XKaiUnlockLifesteal = true;
+		XKaiUnlockBarrier = true;
+		XKaiUnlockVirus = true;
+		XKaiRideArmor = true;
+		XKaiTimeStop = true;
+		XKaiParry = true;
+		XKaiSpeedBonus = true;
+		XKaiShotoBonus = true;
+		LightBootsKai = true;
+		LightArmKai = true;
+		LightHeadsKai = true;
+		LightChestKai = true;
+		GigaBootsKai = true;
+		GigaArmKai = true;
+		GigaHeadsKai = true;
+		GigaChestKai = true;
+		MaxBootsKai = true;
+		MaxArmKai = true;
+		MaxHeadsKai = true;
+		MaxChestKai = true;
+		XKaiUAXBuffs = true;
+		XKaiIXGrowthBuff = true;
 	}
 
 	
@@ -2344,7 +2393,7 @@ public partial class Player {
 				heartTanks: oldChar.heartTanks, isATrans: true
 			);
 		} else if (spawnCharNum == (int)CharIds.Vile) {
-			retChar = new Vile(
+			retChar = new VAVA1(
 				this, oldChar.pos.x, oldChar.pos.y, oldChar.xDir,
 				true, dnaNetId, ownedByLocalPlayer, isWarpIn: false,
 				mk2VileOverride: isVileMK2, mk5VileOverride: isVileMK5,
@@ -2868,6 +2917,7 @@ public partial class Player {
 	public void destroy() {
 		character?.destroySelf();
 		character = null;
+		cleanupDeletedActors();
 		removeOwnedActors();
 	}
 

@@ -155,13 +155,11 @@ public class StrikeChainHooked : CharState {
 			if (!flinch || stunTime >0.15f
 			) {
 				isDone = true;
-				if (character.charState is not GrabDrag){
 				character.changeState(
-							new HurtByEnemy(
-								character.xDir
+							new ForceGrabbed(
+								scpChar
 							), true
 						);
-				}
 				return;
 			}
 		} else if (scpChar != null) {
@@ -236,7 +234,7 @@ public class StrikeChainProj : Projectile {
 
 		canBeLocal = false;
 
-		if (rpc) {
+		if (rpc && owner != null) {
 			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
 		}
 	}
@@ -250,7 +248,7 @@ public class StrikeChainProj : Projectile {
 	public override void update() {
 		base.update();
 		if (!ownedByLocalPlayer) return;
-
+		if (mmx == null) return;
 		//We destroy the chain if X faces to the opposite xDir
 		if (mmx.xDir != startDir && mmx.charState is not WallSlide) {
 			destroySelf();
@@ -323,6 +321,7 @@ public class StrikeChainProj : Projectile {
 	public override void postUpdate() {
 		base.postUpdate();
 		//Syncs with current buster position.
+		if (mmx == null) return;
 		Point shootPos = mmx.getShootPos();
 		changePos(
 			new Point(
@@ -348,12 +347,15 @@ public class StrikeChainProj : Projectile {
 	public override void onDestroy() {
 		base.onDestroy();
 		if (hookedActor != null) hookedActor.useGravity = true;
+		if (mmx != null) {
 		mmx.strikeChainProj = null;
+		}
 	}
 
 	public override void onHitWall(CollideData other) {
 		base.onHitWall(other);
 		if (reversed) return;
+		if (mmx == null) return;
 
 		var wall = other.gameObject as Wall;
 
@@ -409,11 +411,12 @@ public class StrikeChainProj : Projectile {
 		int chainFrame = Helpers.clamp((int)(5 * length / maxDist), 0, 5);
 		float xOff = (length) * Helpers.cosb(byteAngle);
 		float yOff = (length) * Helpers.cosb(byteAngle);
-
+		if (owner != null && mmx != null){
 		DrawWrappers.DrawLine(
 			pos.x, pos.y, mmx.getShootPos().x, mmx.getShootPos().y,
 			new Color(206, 123, 239, 255), 4, ZIndex.Character - 2
 		);
+		}
 		
 		for (int i = 0; i < maxI; i++) {
 			xOff = (length - (pieceSize * i)) * Helpers.cosb(byteAngle);

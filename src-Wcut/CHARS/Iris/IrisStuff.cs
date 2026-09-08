@@ -28,6 +28,82 @@ public class IrisCrystalBashState : CharState {
 	public override void update()
 	{
 		
+			if ( player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			character.changeState(new IrisCrystalRisingBash(), true);
+			}
+		
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		base.update();
+		Helpers.decrementTime(ref specialPressTime);
+		if (stateTime > 0.5f) {
+			character.changeToIdleOrFall();
+		}
+	
+		if (character.isAnimOver()) {
+			return;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+
+	//	new Anim(character.pos,"iris_crystal_bash", character.xDir, player.getNextActorNetId(),true, sendRpc: true	);
+
+
+		character.playSound("punch2", sendRpc: true);
+		if (!character.grounded) {
+			character.stopMoving();
+			pushBackSpeed = 100;
+		}
+		//character.playSound("rocketPunch", forcePlay: false, sendRpc: true);
+		}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+    }
+}
+
+
+
+public class IrisCrystalStabState : CharState {
+
+
+	private float specialPressTime;
+	
+	public float pushBackSpeed;
+
+	public IrisCrystalStabState(string transitionSprite = "")
+		: base("attack_stab", "", "", transitionSprite)
+	{
+	airMove = true;
+	}
+
+	public override void update()
+	{
+		if (player.input.isHeld(Control.Down, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			character.changeState(new IrisCrystalBashState(), true);
+			}
+			if ( player.input.isHeld(Control.Up, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			character.changeState(new IrisCrystalRisingBash(), true);
+			}
+		
 		if (!character.grounded && pushBackSpeed > 0) {
 			character.useGravity = false;
 			character.move(new Point(-60 * character.xDir, -pushBackSpeed * 2f));
@@ -1139,12 +1215,15 @@ public class IrisCannon : Projectile {
 
 	private float ShootCD = 0;
 
+	private float ShootTime = 0;
 
+	private float ShootStartCooldown = 0;
 	private int raySplasherMod;
 	
 
 	public override void update() {
 		base.update();
+		if (owner == null) return;
 				Helpers.decrementTime(ref LaserCD);
 				Helpers.decrementTime(ref ShootCD);
 
@@ -1160,7 +1239,7 @@ public class IrisCannon : Projectile {
 			if (owner?.character != null) {
 				Character character = owner.character;
 				float targetPosX = (30 * -character.xDir + character.pos.x);
-				float targetPosY = (-40 + character.pos.y);
+				float targetPosY = (-30 + character.pos.y);
 				float moveSpeed = 1.5f * 60;
 
 				// X axis follow.
@@ -1181,7 +1260,7 @@ public class IrisCannon : Projectile {
 				}
 			}
 
-
+if (owner == null) return;
 
 		if (LaserCD == 0 && owner.character != null && owner.superAmmo > 15 &&
 
@@ -1196,16 +1275,30 @@ public class IrisCannon : Projectile {
 		}
 
 
-			
+			if (owner == null) return;
 		
 		
 				raySplasherMod++;
-			if (owner.input.isPressed(Control.WeaponRight,owner) && ShootCD == 0 && owner.superAmmo > 0 
-			&& owner.character != null && !owner.character.isInDamageSprite()){
-				ShootCD = 0.1f;
-			if (!owner.character.OverDrive) {
-				owner.superAmmo -= 1;
+			
+			if (owner != null &&  owner?.character != null && ShootStartCooldown == 0 &&
+			owner.input.isPressed(Control.WeaponRight, owner) &&( owner?.superAmmo > 4 
+			|| owner?.character != null && owner.character.OverDrive) ) {
+				
+				if (owner?.superAmmo > 0) {
+					ShootTime = 0.5f;
+				}
+				if (owner?.character != null && !owner.character.OverDrive ) {
+				owner.superAmmo -= 5;
+				}
+				ShootStartCooldown = 0.5f;
 			}
+
+			Helpers.decrementTime(ref ShootTime);
+			Helpers.decrementTime(ref ShootStartCooldown);
+			if (ShootTime > 0 && ShootCD == 0
+			&& owner.character != null && !owner.character.isInDamageSprite()){
+				ShootCD = 0.05f;
+				
 				playSound("shootX3lv", sendRpc: true);
 					new IrisFireBallProj(new IrisCrystal(), pos, xDir , shootNum,
 					 true, owner, owner.getNextActorNetId(), sendRpc: true);
@@ -1230,9 +1323,11 @@ public class IrisFireBallProj : Projectile {
 		1, 0.01f, netProjId, player.ownedByLocalPlayer
 	) {
 		projId = (int)ProjIds.IrisFireBallProj;
-		maxTime = 0.875f;
+		maxTime = 0.9f;
 		this.shootNum = shootNum;
 		this.isHanging = isHanging;
+		damager.flinch = Global.defFlinch;
+		hitSound = "htsnd_common_x4";
 
 		if (sendRpc) {
 			rpcCreate(pos, player, netProjId, xDir);
@@ -1263,16 +1358,6 @@ public class IrisFireBallProj : Projectile {
 	}
 
 
-	public override void onHitDamagable(IDamagable damagable) {
-		base.onHitDamagable(damagable);
-		if (damagable is Character chr) {
-			float modifier = 1;
-			if (chr.isUnderwater()) modifier = 2;
-			if (chr.isPushImmune()) return;
-			float xMoveVel = MathF.Sign(pos.x - chr.pos.x);
-			chr.move(new Point(xMoveVel * 50 * modifier, -800));
-		}
-	}
 	
 
 }

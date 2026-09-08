@@ -67,7 +67,50 @@ public class VAVAJab2 : CharState {
 				character.slideVel = character.xDir * character.getDashSpeed();
 				character.changeState(new VavaKneeAttack(), true);
 			}
+
+			if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
+						if (player.vileAmmo >= 10) {
+							character.changeState(new InfinityGigAttack(), true);
+							player.vileAmmo -= 10;
+						}			
+					}
+					 else if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
+						if (character.upPressedTimes >= 2) {
+							if (player.vileAmmo >= 20) {
+								character.changeState(new EgotisticalPillAttack(), true);
+								character.upPressedTimes = 0;
+							}
+						} else {
+							if (player.vileAmmo >= 14) {
+								character.changeState(new SpoiledBratPunch(), true);
+							}
+						}
+					}
+					
+				 	else if (player.input.isLeftOrRightHeld(player)) {
+						if (!player.input.isHeld(Control.Down, player)) {
+							if (player.vileAmmo >= 8) {
+								character.changeState(new GoGetterRightAttack(), true);
+							}
+						}
+					} else {
+						if (!player.input.isHeld(Control.Down, player)) {
+							if (character.charState is not InfinityGigAttack or SpoiledBratPunch) {
+								character.changeState(new VAVAJab1(), true);
+							}
+						} else {
+							if (character.downPressedTimes >= 2 && player.vileAmmo >= 26) {
+								character.changeState(new VAVAGoldenRight(), true);
+								player.vileAmmo -= 26;
+								character.downPressedTimes = 0;
+							} else {
+								character.changeState(new VAVAUpperCutPunch(), true);
+							}
+						}
+					}
 		}
+
+
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
@@ -309,6 +352,67 @@ public class VKamaeHotIcecle : CharState {
 			character.stopMoving();
 			pushBackSpeed = 100;
 		}		
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		specialId = SpecialStateIds.None;
+	}
+
+}
+
+
+
+
+
+public class VGenocideCutter : CharState {
+
+
+	public VGenocideCutter() : base("genocide_cutter") {
+		wiffCancel = true;
+		enterSound = "genocideCutter1";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+	}
+
+	
+	public float pushBackSpeed;
+
+
+	public override void update()
+	{
+	
+		base.update();
+
+		if (!once) {
+			if (!character.grounded && character.frameIndex > 5) {
+			character.stopMoving();
+			character.vel.y = -character.getJumpPower() * 0.75f;
+			once = true;
+			character.playSound("genocideCutter2", sendRpc: true);
+			}		
+		}
+		if (!character.grounded && pushBackSpeed > 0) {
+			character.useGravity = false;
+			character.move(new Point(60 * character.xDir, -pushBackSpeed * 2f));
+			pushBackSpeed -= 7.5f;
+		} else {
+			if (!character.grounded) {
+				character.move(new Point(-30 * character.xDir, 0));
+			}
+			character.useGravity = true;
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -character.getJumpPower() * 0.75f;
 	}
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
@@ -647,12 +751,14 @@ public class VileDashStateEnd : CharState {
 
 	public override void update() {
 		base.update();
+		character.vel.y = 0;
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		
 		if (!character.sprite.name.Contains("hyperdash_end")) {
 			character.changeSpriteFromName("land", true);
 		}

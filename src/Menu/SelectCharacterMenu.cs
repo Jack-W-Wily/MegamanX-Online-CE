@@ -135,7 +135,8 @@ public class CharSelection {
 		new CharSelection("Sigma", (int)CharIds.Sigma, 1, 0, "smenu_sigma", 0){offset = new Point(0, 20)},
 		new CharSelection("Dragoon", (int)CharIds.Dragoon, 1, 0, "smenu_dragoon", 0){offset = new Point(0, 20)},
 		new CharSelection("High Max", (int)CharIds.HighMax, 1, 0, "smenu_highmax", 0){offset = new Point(0, 20)},
-		
+		new CharSelection("Green Biker Dude", (int)CharIds.GBD, 1, 0, "smenu_gbd", 0){offset = new Point(0, 20)},
+		new CharSelection("XKai", (int)CharIds.XKai, 1, 0, "smenu_xkai", 0){offset = new Point(0, 20)},
 	];
 
 

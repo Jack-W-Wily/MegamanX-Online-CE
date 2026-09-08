@@ -192,16 +192,7 @@ public static CharSelection[] selections => [
 		
 		}
 		
-		// This is Where hypermode actiavtion happens
-		if (player.input.isPressed(Control.Special2, player)
-		&& player.currency > 4
-		) {
-			player.currency -= 5;
-			changeState(new OverDriveStart(), true);
-			/* 
-			changeState() you'll be using this for every custom action your character does
-			*/
-		}
+		
 
 		return base.normalCtrl();
 	}

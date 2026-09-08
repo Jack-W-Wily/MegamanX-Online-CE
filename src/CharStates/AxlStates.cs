@@ -145,7 +145,7 @@ public class DodgeRoll : AxlState {
 	public float dashTime = 0;
 	public int initialDashDir;
 	public DodgeRoll() : base("roll") {
-		normalCtrl = true;
+		//normalCtrl = true;
 		specialId = SpecialStateIds.AxlRoll;
 	}
 

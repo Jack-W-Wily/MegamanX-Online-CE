@@ -184,24 +184,12 @@ public class MegamanX : Character {
 		Helpers.decrementFrames(ref barrierActiveTime);
 
 
-		if (this is XKai && charState is WarpIn) {
-			weapons.RemoveAll(w => w is not XBuster and not GigaCrush and not HyperCharge);
-			if (player.MaxArmKai){
-				player.addHyperCharge();
-			} else {
-				player.removeHyperCharge();
-			}
-			if (player.GigaChestKai){
-				player.addGigaCrush();
-			} else {
-				player.removeGigaCrush();
-			}
-			if (player.XKaiUAXBuffs){
-				weapons.Add(new HyperNovaStrike());
-			} else {
-				player.removeNovaStrike();
-			}
+		if (this is XKai && charState is WarpIn ) {
+			weapons.RemoveAll(w => w is not XBuster and not GigaCrush and not HyperCharge and not HyperNovaStrike);
+			
 		}
+
+		
 		// Max armor barrier sprite.
 		if (barrierActiveTime > 0) {
 			if (!barrierAnim.isAnimOver()) {
@@ -479,7 +467,7 @@ public class MegamanX : Character {
 				canJump() && flag == null
 			) {
 			
-				changeState(new XHover(), true);
+				changeState(new XHoverUAX(), true);
 				return true;
 			}
 		}
@@ -592,7 +580,7 @@ public class MegamanX : Character {
 		
 
 		
-		if (inputCheckHC && fullArmor == ArmorId.Light &&  player.superAmmo >= player.superMaxAmmo
+		if (inputCheckHC && (fullArmor == ArmorId.Light || hasUltimateArmor || this is XKai && player.XKaiShotoBonus) &&  player.superAmmo >= player.superMaxAmmo
 		//	player.hadoukenAmmo >= player.fgMoveMaxAmmo &&
 		//	hadoukenCooldownTime == 0
 		) {
@@ -610,7 +598,7 @@ public class MegamanX : Character {
 			stockedMaxBusterLv = 2;
 			player.superAmmo -= 8;
 		}
-		if (inputCheckS && fullArmor == ArmorId.Giga && player.superAmmo >= 32
+		if (inputCheckS && (fullArmor == ArmorId.Giga || hasUltimateArmor || this is XKai && player.XKaiShotoBonus) && player.superAmmo >= 32
 		//	player.shoryukenAmmo >= player.fgMoveMaxAmmo &&
 		//	shoryukenCooldownTime == 0
 		) {
@@ -630,7 +618,9 @@ public class MegamanX : Character {
 			return true;
 		}
 
-		if (player.input.checkShoryuken(player, xDir, Control.Dash) && chestArmor == ArmorId.Force && player.superAmmo >= 16
+		if (player.input.checkShoryuken(player, xDir, Control.Dash) &&
+		
+		(chestArmor == ArmorId.Force || hasUltimateArmor) && player.superAmmo >= 16
 		
 		) {
 		
@@ -639,6 +629,8 @@ public class MegamanX : Character {
 			return true;
 		}
 
+
+		
 
 		
 		return false;
@@ -926,7 +918,7 @@ public class MegamanX : Character {
 	}
 
 	public override void increaseCharge() {
-		if (armArmor == ArmorId.Light) {
+		if (armArmor == ArmorId.Light || this is XKai && player.LightArmKai) {
 			chargeTime += speedMul * 1.5f;
 			return;
 		}

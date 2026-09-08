@@ -143,7 +143,7 @@ public class RockmanX : MegamanX {
 				player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
 				playSound("ching", sendRpc: true);
 				}
-			} else if (charState is Dash or AirDash && downPressedTimes >= 2 && player.input.isHeld(Control.Down,player)) {
+			} else if (charState is Dash or AirDash or LightDash or GigaAirDash && downPressedTimes >= 2 && player.input.isHeld(Control.Down,player)) {
 				changeState(new UPGrabX(), true);
 				if (!OverDrive) {
 				player.superAmmo -= 16;
@@ -451,7 +451,7 @@ public class RockmanX : MegamanX {
 			),
 			(int)MeleeIds.LightBootKick => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.GBDKick, player,
-				1, Global.halfFlinch, 30, addToLevel: addToLevel
+				1, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,

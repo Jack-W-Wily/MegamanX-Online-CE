@@ -1109,12 +1109,15 @@ public class DragoonGrabbed : CharState {
 
 		if (stateTime >= 2 || character.grounded) {
 			if (grabber != null){
-			character.playSound("flamemOilBurn", sendRpc: true);
-			new InfernoBeam(new FireWave(),
+				if (!once){
+					once = true;
+						character.playSound("flamemOilBurn", sendRpc: true);
+						new InfernoBeam(new FireWave(),
 						character.pos, character.xDir,
 						grabber.player, grabber.player.getNextActorNetId(),
 						sendRpc: true
 					);
+				}
 			}
 			character.changeState(new KnockedDown(character.xDir), true);
 		}

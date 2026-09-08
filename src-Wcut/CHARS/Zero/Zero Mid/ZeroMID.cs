@@ -495,15 +495,6 @@ public class ZeroMID : Zero {
 			cost = 4;
 		}
 
-			if (player.input.isPressed(Control.WeaponLeft, player)
-			&& player.currency > 4
-			) {
-				player.currency -= 5;
-				changeState(new OverDriveStart(), true);
-				/* 
-				changeState() you'll be using this for every custom action your character does
-				*/
-			}
 		if (player.currency >= cost &&
 			player.input.isHeld(Control.Special2, player) &&
 			charState is not HyperZeroStart and not WarpIn && (

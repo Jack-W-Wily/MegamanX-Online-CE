@@ -124,7 +124,7 @@ public float angleDist = 0;
 		if (owner.input.isAPressed(owner)){
 			playSound("dynamoslash", sendRpc: true);
 		}
-		if (sprite.name != "iris_crystal_bash_up" && sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash_up", true);
+		if (sprite.name != "iris_crystal_bash_up") changeSprite("iris_crystal_bash_up", true);
 			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);
 			}
@@ -135,13 +135,28 @@ public float angleDist = 0;
 			if (sprite.name != "iris_crystal_bb_behavior")changeSprite("iris_crystal_bb_behavior", false);
 		}
 
+
+		
+
 		if (owner.character.charState is IrisCrystalBashState  || 
 		owner.character.charState is IrisCrystalCharge &&
-		!owner.input.isHeld(Control.Up, owner) && owner.input.isAPressed(owner)){
+		owner.input.isHeld(Control.Down, owner) && owner.input.isAPressed(owner)){
 			state = 2;		
 		}
 		if (state == 2){
-			if (sprite.name != "iris_crystal_bash" && sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
+			if (sprite.name != "iris_crystal_bash") changeSprite("iris_crystal_bash", true);
+			if (	owner.character.charState is not IrisCrystalCharge ){
+			changePos(owner.character.pos);
+			}
+		}
+
+		if (owner.character.charState is IrisCrystalStabState  || 
+		owner.character.charState is IrisCrystalCharge &&
+		!owner.input.isHeld(Control.Down, owner) &&  !owner.input.isHeld(Control.Up, owner) &&owner.input.isAPressed(owner)){
+			state = 18;		
+		}
+		if (state == 18){
+			if (sprite.name != "iris_crystal_stab") changeSprite("iris_crystal_stab", true);
 			if (	owner.character.charState is not IrisCrystalCharge ){
 			changePos(owner.character.pos);
 			}
@@ -191,6 +206,7 @@ public float angleDist = 0;
 
 		if (owner.character.charState is not IrisCrystalBashState
 		&& owner.character.charState is not IrisCrystalRisingBash
+		&& owner.character.charState is not IrisCrystalStabState
 		&& owner.character.charState is not IrisSpawnBeam
 		&& owner.character.charState is not IrisSpawnIce
 		&& owner.character.charState is not IrisGrabEX

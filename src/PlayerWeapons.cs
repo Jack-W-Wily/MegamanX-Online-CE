@@ -308,6 +308,13 @@ label:
 		}
 	}
 
+
+	public void addNovaStrike() {
+		if (!weapons.Any(w => w is HyperNovaStrike)) {
+			weapons.Add(new HyperNovaStrike());
+		}
+	}
+
 	public void addHyperCharge() {
 		if (!weapons.Any(w => w is HyperCharge)) {
 			weapons.Insert(getLastWeaponIndex(), new HyperCharge());

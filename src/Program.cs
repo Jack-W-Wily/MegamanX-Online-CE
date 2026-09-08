@@ -1034,6 +1034,7 @@ class Program {
 			Sprite.xSaberBitmap[0] = Global.textures["MaxSaber"];
 			Sprite.xSaberBitmap[1] = Global.textures["MaxSaberFront"];
 		*/
+		Sprite.xSaberBitmap[0] = Global.textures["RMX_Basics_Kai"];
 	
 		Sprite.axlArmBitmap = Global.textures["axlArm"];
 

@@ -427,3 +427,51 @@ public class TriadThunderChargedState : CharState {
 		if (character.vel.y < 0) character.vel.y = 0;
 	}
 }
+
+
+
+public class TriadThunderChargedStateKai : CharState {
+	bool fired = false;
+	bool groundedOnce;
+	public MegamanX mmx = null!;
+	public TriadThunderChargedStateKai(bool grounded) : base(!grounded ? "fall" : "punch_ground") {
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (!character.ownedByLocalPlayer) return;
+		if (!groundedOnce) {
+			if (!character.grounded) {
+				stateTime = 0;
+				return;
+			} else {
+				groundedOnce = true;
+				sprite = "punch_ground";
+				character.changeSprite("rmx_punch_ground", true);
+			}
+		}
+		if (character.frameIndex >= 6 && !fired) {
+			fired = true;
+			float x = character.pos.x;
+			float y = character.pos.y;
+			character.shakeCamera(sendRpc: true);
+			new TriadThunderProjCharged(new Point(x, y), -1, 1, mmx, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderProjCharged(new Point(x, y), 1, 1, mmx, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderQuake(new Point(x, y), 1, mmx, player, player.getNextActorNetId(), rpc: true);
+			character.playSound("sparkmSparkX1", forcePlay: false, sendRpc: true);
+		}
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		else if (stateTime > 120f/120f) {
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		mmx = character as MegamanX ?? throw new NullReferenceException();
+		if (character.vel.y < 0) character.vel.y = 0;
+	}
+}

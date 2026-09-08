@@ -213,7 +213,7 @@ public class Sprite {
 					(int)mmx.helmetArmor,
 					(int)mmx.armArmor
 				];
-				drawXSaber = !mmx.hasAnyArmor && mmx.specialButtonMode == 1 || mmx.hasFullHyperMaxArmor;
+				drawXSaber = !mmx.hasAnyArmor && mmx.OverDrive;
 			}
 			if (character.flattenedTime > 0) {
 				scaleY = 0.5f;
@@ -337,6 +337,11 @@ public class Sprite {
 			
 		}
 
+		if (actor is XKai &&  animData.RXSprite ) {
+			bitmap = Global.textures["RMX_Basics_Kai"];
+			
+		}
+
 		if (actor is Projectile fstagproj  && fstagproj.owner.character is BossStag bossTag && bossTag.bonusHealth <= 0
 		&& animData.isFStagSPrite ) {
 			bitmap = Global.textures["FlameStagB"];
@@ -396,7 +401,7 @@ public class Sprite {
 				isCompositeSprite = true;
 			}
 		}
-
+	
 
 		if (armors != null && animData.RXSprite && !Options.main.fastShaders && !Options.main.disableShaders) {
 			bool isShootSprite = needsX3BusterCorrection();
@@ -441,6 +446,7 @@ public class Sprite {
 				}
 			}
 
+			
 			compositeBitmaps.Add(bitmap);
 			if (armors[2] > 0) {
 
@@ -563,7 +569,12 @@ public class Sprite {
 
 		
 
-			if (name is "boomerk_dash" or "boomerk_bald_dash" or "sigma1alt_roll" or "vulcan_dn_proj" && (animTime > 0 || frameIndex > 0)) {
+			if (name is "boomerk_dash" or "boomerk_bald_dash" or "sigma1alt_roll" or "vulcan_dn_proj"
+			or "vilemk2_roll" or "vilemk5_roll" or "vava_roll"
+			
+			
+			
+			 && (animTime > 0 || frameIndex > 0)) {
 				if (Global.isOnFrameCycle(4)) {
 					var trail = lastTwoBkTrailDraws.ElementAtOrDefault(5);
 					if (trail != null) {

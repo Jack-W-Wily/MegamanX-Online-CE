@@ -963,18 +963,19 @@ public class RPCJoinLateRequest : RPC {
 		var serverPlayer = Helpers.deserialize<ServerPlayer>(arguments);
 
 		Global.level.addPlayer(serverPlayer, true);
-		/*
+		
 		foreach (var player in Global.level.players) {
+
 			player.charNetId = null;
 			if (player.character != null) {
-				//player.charNetId = player.character.netId;
+				player.charNetId = player.character.netId;
 				player.charXPos = player.character.pos.x;
 				player.charYPos = player.character.pos.y;
 				player.charXDir = player.character.xDir;
-				//player.charRollingShieldNetId = player.character.chargedRollingShieldProj?.netId;
+				player.charRollingShieldNetId = player.character.chargedRollingShieldProj?.netId;
 			}
 		}
-		*/
+		
 
 		var controlPoints = new List<ControlPointResponseModel>();
 		foreach (var cp in Global.level.controlPoints) {
@@ -1596,6 +1597,18 @@ public class RPCHeal : RPC {
 public enum CommandGrabScenario {
 	StrikeChain,
 	MK2Grab,
+
+	ForceGrab,
+
+	LaunchedState,
+
+	LaunchedStateWeak,
+
+	LaunchedStateMedium,
+
+	HeavyPush,
+
+	
 	UPGrab,
 	WhirlpoolGrab,
 	DeadLiftGrab,

@@ -22,7 +22,7 @@ public class HadoukenProj : Projectile {
 		pos, xDir, owner, "hadouken", netId, player	
 	) {
 		weapon = HadoukenWeapon.netWeapon;
-		damager.damage = Damager.ohkoDamage;
+		damager.damage = 20;// Damager.ohkoDamage;
 		damager.hitCooldown = 9;
 		damager.flinch = Global.defFlinch;
 		vel = new Point(250 * xDir, 0);
@@ -50,6 +50,7 @@ public class Hadouken : CharState {
 
 	public Hadouken() : base("hadouken") {
 		superArmor = true;
+		canGainMeter = false;
 	}
 
 	public override void update() {

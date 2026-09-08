@@ -532,6 +532,10 @@ public class DesmumeSpam2 : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
+				character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
     }
 }
 
@@ -927,13 +931,13 @@ public class HighMaxChargePunch : CharState {
 		}
 
 		hoverTime += Global.spf;
-		if ((hoverTime > 5) || hoverTime > 0.5f &&
+		if (hoverTime > 0.2f &&
 				!character.player.input.isHeld(Control.Dash, character.player)
 			) {
 			if (player.input.isHeld(Control.Up, player)) {
 				character.changeState(new HighMaxSlamDownState(), true);
 			} else {
-				character.changeState(new HighMaxSuperPunchState(), true);
+				character.changeState(new HighMaxSuperPunchState(hoverTime), true);
 			}
 		}
 	}
@@ -957,11 +961,14 @@ public class HighMaxChargePunch : CharState {
 
 public class HighMaxSuperPunchState : CharState {
 	Anim? proj;
+
+	float dashTime;
 	bool once;
-	public HighMaxSuperPunchState() : base("dash_punch", "", "", "") {
+	public HighMaxSuperPunchState(float chargeTime) : base("dash_punch", "", "", "") {
 		superArmor = true;
 		immuneToWind = true;
 		invincible = true;
+		dashTime = chargeTime;
 	}
 
 	public override void update() {
@@ -971,7 +978,7 @@ public class HighMaxSuperPunchState : CharState {
 			proj.destroySelf();
 			proj = null;
 		}
-		if (stateTime < 0.7f){
+		if (stateTime < dashTime){
 		character.move(new Point(character.xDir * 350, 0));
 		}
 			CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
@@ -985,12 +992,162 @@ public class HighMaxSuperPunchState : CharState {
 
 			}
 			character.shakeCamera(sendRpc: true);
-			if (stateTime > 1f) {
+		} 
+		if (character.isAnimOver()) {
 			character.changeState(new Idle(), true);
 			return;
+		}
+
+		if (proj != null) {
+			proj.changePos(character.pos.addxy(0, -15));
+			proj.xDir = character.xDir;
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel.y = 0;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+		if (proj != null && !proj.destroyed) proj.destroySelf();
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+public class HighMaxHyperChargePunch : CharState {
+	float hoverTime;
+
+	bool once;
+
+	public HighMaxHyperChargePunch() : base("dash_punch_charge", "dash_punch_charge", "dash_punch_charge", "dash_punch_charge") {
+		exitOnLanding = false;
+		airMove = false;
+		attackCtrl = false;
+		normalCtrl = true;
+		superArmor = true;
+	}
+
+	public override void update() {
+		base.update();
+		character.turnToInput(player.input, player);
+		accuracy = 0;
+		Point prevPos = character.pos;
+
+		if (character.pos.x != prevPos.x) {
+			accuracy = 5;
+		}
+
+		if (character.vel.y < 0 && !player.input.isHeld(Control.Up, player)
+		&& !player.input.isHeld(Control.Down, player)) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+		if (player.input.isHeld(Control.Up, player)) {
+			character.vel.y = -character.getJumpPower() * 0.2f;
+		}
+		if (player.input.isHeld(Control.Down, player)) {
+			character.vel.y = +character.getJumpPower() * 0.2f;
+		}
+
+		if (character.gravityWellModifier > 1) {
+			character.vel.y = 53;
+		}
+
+		hoverTime += Global.spf;
+		if (hoverTime > 0.2f &&
+				!character.player.input.isHeld(Control.Special2, character.player)
+			) {
+			
+				character.changeState(new HighMaxHyperSuperPunchState(hoverTime * 1.5f), true);
+			
+		}
+	}
+
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.useGravity = false;
+		character.vel = new Point();
+
+				character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+
+}
+
+
+public class HighMaxHyperSuperPunchState : CharState {
+	Anim? proj;
+
+	float dashTime;
+
+	float projtime;
+	bool once;
+	public HighMaxHyperSuperPunchState(float chargeTime) : base("dash_punch", "", "", "") {
+		
+		immuneToWind = true;
+		dashTime = chargeTime;
+	}
+
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref projtime);
+
+		if (projtime <= 0 ) {
+			var poi = character.getFirstPOI();
+				new DesmumeProj1(new XBuster(), poi.Value, -character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+			projtime = 0.1f;
+		}
+		if (character.isUnderwater() && proj != null) {
+			proj.destroySelf();
+			proj = null;
+		}
+		if (stateTime < dashTime){
+		character.move(new Point(character.xDir * 350, 0));
+		}
+
+
+		
+			CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			if (!once) {
+				character.playSound("crash", forcePlay: false, sendRpc: true);
+				once = true;
+				var poi = character.getFirstPOI();
+				character.playSound("buster4");
+				new DynamoBeam(new ElectricSpark(), character.pos.addxy(20 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+				character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+				new DynamoBeam(new ElectricSpark(), character.pos.addxy(40 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+				new DynamoBeam(new ElectricSpark(), character.pos.addxy(60 * character.xDir,0), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+		
 			}
+			character.shakeCamera(sendRpc: true);
 		} 
-		if (stateTime > 1f) {
+		if (character.isAnimOver()) {
 			character.changeState(new Idle(), true);
 			return;
 		}

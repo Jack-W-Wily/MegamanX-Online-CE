@@ -130,6 +130,12 @@ public class Iris : Character {
 			changeState(new IrisDiveKick(), true);
 			}
 			if (!player.input.isHeld(Control.Up, player) &&
+			!player.input.isHeld(Control.Down, player) &&
+			player.input.isPressed(Control.Shoot, player))
+			{	
+			changeState(new IrisCrystalStabState(), true);
+			}
+			if (player.input.isHeld(Control.Down, player) &&
 			player.input.isPressed(Control.Shoot, player))
 			{	
 			changeState(new IrisCrystalBashState(), true);
@@ -345,7 +351,14 @@ public class Iris : Character {
 				, hitspark : "empty"
 			);
 		}
-		 if (  sprite.name.Contains("attack") && !sprite.name.Contains("rising"))
+		 if (  sprite.name.Contains("attack") && !sprite.name.Contains("rising") && !sprite.name.Contains("stab"))
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.VirusSlash,
+			player, 2f, 20, 20, ShouldClang : true ,addToLevel: true, hitSound : "kofhtsnd_lightning1"
+			);
+		}
+
+		 if (  sprite.name.Contains("attack") && sprite.name.Contains("stab"))
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.VirusSlash,
 			player, 2f, 20, 20, ShouldClang : true ,addToLevel: true, hitSound : "kofhtsnd_lightning1"
@@ -401,7 +414,7 @@ public class Iris : Character {
 		 if (  sprite.name.Contains("dive_kick"))
 		{
 			return new GenericMeleeProj(new IrisCrystal(), centerPoint,
-			ProjIds.GBDKick, player, 2f, 20, 20, 
+			ProjIds.GBDKick, player, 2f, 35, 20, 
 			ShouldClang : true ,addToLevel: true, hitSound : "kofhtsnd_punch3"
 			);
 		}

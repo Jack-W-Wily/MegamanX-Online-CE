@@ -487,6 +487,10 @@ public class XUPGrabState : CharState {
 			character.changeToIdleOrFall();
 			player.XKaiAbsorbNum ++;
 			player.superAmmo += 8;
+
+			if (player.XKaiAbsorbNum >= 2) {
+				character.addDamageText("Now I got your Power!", (int)FontType.Red);
+			}
 			character.playSound("upParryAbsorb", sendRpc: true);
 			if (victim != null) {
 				if ((victim.sprite.name.Contains("zarzo") || victim.sprite.name.Contains("zero_") )&& !player.XKaiUnlockSaber){
@@ -506,7 +510,7 @@ public class XUPGrabState : CharState {
 					character.addDamageText("Unlocked Ride Move!", (int)FontType.Red);
 				} if ((victim.sprite.name.Contains("highmax")) && !player.XKaiUnlockBarrier){
 					player.XKaiUnlockBarrier = true;
-					character.addDamageText("Unlocked Barrier Bonus!", (int)FontType.Red);
+					character.addDamageText("Unlocked Health Bonus!", (int)FontType.Red);
 				} if ((victim.sprite.name.Contains("gbd")) && !player.XKaiSpeedBonus){
 					player.XKaiSpeedBonus = true;
 					character.addDamageText("Unlocked Speed Bonus!", (int)FontType.Red);
@@ -712,6 +716,92 @@ public class GrabDrag : CharState {
 			if (grabber != null){
 			grabber.changeToIdleOrFall();
 			}
+			character.playSound("mugenhtsnd_hit3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
+		} 
+
+	}	
+}
+
+
+
+
+
+
+public class DraggedDown : CharState {
+	public const float maxGrabTime = 4;
+	
+	public long savedZIndex;
+	public DraggedDown() : base("knocked_down") {
+		
+	}
+
+	public override bool canEnter(Character character) {
+		if (!base.canEnter(character)) return false;
+		return !character.isInvulnerable() && !character.charState.invincible;
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMovingS();
+		character.stopCharge();
+		savedZIndex = character.zIndex;
+		
+	}
+
+	
+	public bool hitonce;
+
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		
+		character.setzIndex(savedZIndex);
+	}
+
+	float smokeTime;
+
+	bool firstHit;
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref smokeTime);
+
+		if (smokeTime == 0 && character.grounded){
+			if (!firstHit) {
+				firstHit = true;
+				character.playSound("ggsweep_5");
+				character.shakeCamera(sendRpc: true);
+				character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+			}
+		new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true);
+		smokeTime = 0.1f;
+		}
+
+
+	//	grabTime -= player.mashValue();
+		if (grabTime <= 0) {
+			character.changeToIdleOrFall();
+		}
+
+		character.move(new Point(character.xDir * -150, 0));
+		if (stateTime > 2f && character.grounded) {
+			character.changeState(new KnockedDown(-character.xDir), true);
+		}
+
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, -character.xDir, 0);
+		if (!hitonce &&collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			hitonce = true;
+			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+					character.changeState(
+							new KnockedDown(
+								-character.xDir
+							), true
+						);
 			character.playSound("mugenhtsnd_hit3", sendRpc: true);
 			character.shakeCamera(sendRpc: true);
 			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);

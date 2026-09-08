@@ -131,6 +131,117 @@ public class XHover : CharState {
 }
 
 
+
+
+public class XHoverUAX : CharState {
+	public SoundWrapper? sound;
+	float hoverTime;
+	int startXDir;
+
+	Anim? hoverExhaust;
+
+
+	public XHoverUAX() : base("hover", "hover_shoot") {
+		airMove = true;
+		attackCtrl = true;
+		normalCtrl = true;
+		useGravity = false;
+	}
+
+
+	
+
+	public override void update() {
+		base.update();
+		character.vel.y = 10;
+		character.xDir = startXDir;
+		Point inputDir = player.input.getInputDir(player);
+			Point prevPos = character.pos;
+
+
+		if (hoverExhaust != null) {
+			hoverExhaust.changePos(exhaustPos());
+			hoverExhaust.xDir = character.xDir;
+		}
+
+
+		startXDir = character.xDir;
+
+		if (inputDir.x == character.xDir) {
+			if (!sprite.StartsWith("hover_forward")) {
+				sprite = "hover_forward";
+				shootSprite = sprite + "_shoot";
+				character.changeSpriteFromName(sprite, true);
+			}
+		} else if (inputDir.x == -character.xDir) {
+			
+				//character.xDir = -character.xDir;
+				//startXDir = character.xDir;
+				if (!sprite.StartsWith("hover_backward")) {
+					sprite = "hover_backward";
+					shootSprite = sprite + "_shoot";
+					character.getShootXDir();
+					character.changeSpriteFromName(sprite, true);
+				}
+			
+		} else {
+			if (sprite != "hover") {
+				sprite = "hover";
+				shootSprite = sprite + "_shoot";
+				character.changeSpriteFromName(sprite, true);
+			}
+		}
+
+		if (character.vel.y < 0) {
+			character.vel.y += Global.speedMul * character.getGravity();
+			if (character.vel.y > 0) character.vel.y = 0;
+		}
+
+		if (character.gravityWellModifier > 1) {
+			character.vel.y = 53;
+		}
+
+		hoverTime += Global.spf;
+		if (hoverTime > 2 || player.input.checkDoubleTap(Control.Dash) ||
+			stateFrames > 12 && player.input.isPressed(Control.Jump, player)
+		) {
+			character.changeState(character.getFallState(), true);
+		}
+	}
+
+	
+	public Point exhaustPos() {
+		if (character.currentFrame.POIs.Length == 0) return character.pos;
+		Point exhaustPOI = character.currentFrame.POIs.Last();
+		return character.pos.addxy(exhaustPOI.x * character.xDir, exhaustPOI.y);
+	}
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		startXDir = character.xDir;
+		if (stateTime <= 0.1f) {
+			sound = character.playSound("uahover", forcePlay: false, sendRpc: true);
+		}
+		hoverExhaust = new Anim(
+			exhaustPos(), "hover_exhaust", character.xDir, player.getNextActorNetId(), false, sendRpc: true
+		);
+		hoverExhaust.setzIndex(ZIndex.Character - 1);
+		
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		if (sound != null && !sound.deleted) {
+			sound.sound?.Stop();
+		}
+		hoverExhaust?.destroySelf();
+		RPC.stopSound.sendRpc("uahover", character.netId);
+	}
+}
+
+
 public class LightDash : CharState {
 	public float dashTime;
 	public float dustTime;

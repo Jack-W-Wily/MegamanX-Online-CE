@@ -71,6 +71,7 @@ public class AxlMeleeBullet : Projectile {
 		this.byteAngle = byteAngle;
 		damager.damage = 1;
 		damager.hitCooldown = 30;
+		damager.flinch = 0;
 		setIndestructableProperties();
 		reflectable = false;
 		destroyOnHit = false;

@@ -709,7 +709,7 @@ public bool Supers() {
 						}
 					} else {
 						if (player.vileAmmo >= 25) {
-							changeState(new BumptyBoomGranadeLaunch(), true);
+							changeState(new AirFireNadeLaunch(), true);
 							player.vileAmmo -= 25;
 						}
 						}
@@ -1343,6 +1343,11 @@ public float CannonCD;
 		}
 
 		if (sprite.name.Contains("execution")) {
+			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.BlockableLaunch, player, 4, 0, 0
+			, addToLevel : true);
+		}
+
+		if (sprite.name.Contains("golden_right")) {
 			proj = new GenericMeleeProj(new VileStomp(), centerPoint, ProjIds.BlockableLaunch, player, 4, 0, 0
 			, addToLevel : true);
 		}

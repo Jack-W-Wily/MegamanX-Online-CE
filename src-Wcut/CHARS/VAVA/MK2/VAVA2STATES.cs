@@ -462,13 +462,27 @@ public class VAVA2GrabState : CharState {
 					}
 				}
 
-				
+				if (character.sprite.name.Contains("grab_rise") && character.frameIndex > 2) {
+					if (character.grounded) {
+					character.changeSpriteFromName("violentcrusher_grab", true);
+					sprite = "violentcrusher_grab";
+					character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+					if (victim != null && !violentcrusherspawn){
+					new DynamoBeam(new ElectricSpark(), victim.pos.addxy(0 * victim.xDir,50), character.xDir,player, player.getNextActorNetId(), sendRpc: true);
+					character.playSound("crash", true, true);
+					violentcrusherspawn = true;
+					}
+				}
+				}
 				if (player.input.isPressed(Control.Jump,player)
 				|| player.isAI && AIExecution == 2 && character.grounded){
 					character.vel.y = -character.getJumpPower();
+					character.changeSpriteFromName("grab_rise", true);
+					sprite = "grab_rise";
+					character.playSound("fstagUppercut",  sendRpc: true);
 				}
 				
-				if (player.input.isHeld(Control.Jump, player) || player.isAI && AIExecution == 2) {
+				if (player.input.isHeld(Control.Jump, player) && character.sprite.name.Contains("5") || player.isAI && AIExecution == 2) {
 				
 				Point moveAmount2 = new Point(character.xDir * 50, -50);
 				Point moveAmount = new Point(character.xDir * 50, 100);

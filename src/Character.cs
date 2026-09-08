@@ -25,6 +25,8 @@ public partial class Character : Actor, IDamagable {
 	public float spawnHealthAddTime;
 	public bool alive = true;
 	public int heartTanks;
+
+	public bool disableWarpInSprite;
 	public bool ShouldExplode;
 
 	public float aiAttackCooldown;
@@ -317,6 +319,8 @@ public partial class Character : Actor, IDamagable {
 	public TriadThunderProj? linkedTriadThunder;
 	public BeeSwarm? chargedParasiticBomb;
 	public List<MagnetMineProj> magnetMines = new();
+
+	public List<GBDMarker> GBDMarker = new();
 	public List<RaySplasherTurret> rayTurrets = new();
 	public RaySplasher? shootingRaySplasher = new();
 
@@ -433,6 +437,7 @@ public partial class Character : Actor, IDamagable {
 		spriteToCollider["racer*"] = getRcCollider();
 		spriteToCollider["warp_beam"] = null;
 		spriteToCollider["warp_out"] = null;
+		spriteToCollider["hyperdash_attack_*"] = null;
 		spriteToCollider["warp_in"] = null;
 		spriteToCollider["warp_door"] = null;
 		spriteToCollider["revive"] = null;
@@ -459,7 +464,7 @@ public partial class Character : Actor, IDamagable {
 		chargeEffect = new ChargeEffect();
 		lastGravityWellDamager = player;
 		this.heartTanks = heartTanks ?? player.getHeartTanks((int)charId);
-		maxHealth = getMaxHealth();
+		maxHealth = getMaxHealth() + this.heartTanks;
 
 
 
@@ -888,12 +893,14 @@ public partial class Character : Actor, IDamagable {
 
 	// For terrain collision.
 	public override Collider? getTerrainCollider() {
+		
 		if (spriteToColliderMatch(sprite.name, out Collider? overrideGlobalCollider)) {
 			return overrideGlobalCollider;
 		}
 		if (physicsCollider == null) {
 			return null;
 		}
+		
 		(float xSize, float ySize) = getTerrainColliderSize();
 		return new Collider(
 			new Rect(0f, 0f, xSize, ySize).getPoints(),
@@ -1290,10 +1297,14 @@ public partial class Character : Actor, IDamagable {
 			if (this is Vile){
 				if (this is VAVAV){
 				changeState(new VavaVOverdriveStart(), true);
+				} else {
+					changeState(new OverDriveStart(), true);
 				}
 			playSound("ching_vile");
 			} else {
-			playSound("ching");
+
+				changeState(new OverDriveStart(), true);
+		
 			}
 			addDamageText("O V E R D R I V E", 0);
 			invulnTime = 1f;
@@ -2307,7 +2318,7 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual bool isToughGuyHyperMode() {
-		return DamageScaling > 4;
+		return false;//DamageScaling > 4;
 	}
 
 	public virtual void clenaseDmgDebuffs() {
@@ -3800,7 +3811,7 @@ public partial class Character : Actor, IDamagable {
 				}
 				killPlayer(attacker, null, weaponIndex, projId);
 			} else {
-				if (mmx != null && mmx.chestArmor == ArmorId.Max && damage > 0) {
+				if (mmx != null && (mmx.chestArmor == ArmorId.Max  || mmx is XKai && player.MaxChestKai) && damage > 0) {
 					mmx.activateMaxBarrier(
 						charState is Hurt or GenericGrabbedState or VileMK2Grabbed or GenericStun
 					);
@@ -3829,6 +3840,16 @@ public partial class Character : Actor, IDamagable {
 
 			if (killer != null && killer != player && killer != Player.stagePlayer) {
 				killer.addKill();
+				if (killer.character != null && killer.character is Vile vavakiller) {
+					if (vavakiller is VAVA1) {
+						vavakiller.playSound("killConfirmMK1");
+					} else if (vavakiller is VAVAV) {
+						vavakiller.playSound("killConfirmMKV");
+					} else {
+						vavakiller.playSound("killConfirmMK2");
+					}
+				}
+
 				if (killer.possessedTime > 0) {
 					killer.possesser.addKill();
 				}
@@ -3838,6 +3859,12 @@ public partial class Character : Actor, IDamagable {
 							Global.level.gameMode.teamPoints[killer.alliance]++;
 							Global.level.gameMode.syncTeamScores();
 						}
+					}
+				}
+				if (this is XKai) {
+					player.XKaiDeathCount++;
+					if (player.XKaiDeathCount > 5) {
+						player.resetAllXKaibuffs();
 					}
 				}
 				killer.awardCurrency();

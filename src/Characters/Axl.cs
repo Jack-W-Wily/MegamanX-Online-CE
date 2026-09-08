@@ -491,9 +491,9 @@ public class Axl : Character {
 				&& player.input.isPressed(Control.Jump, player)) {
 				changeState(new AxlFlashKick(), true);
 			}
-			//	if (player.input.isPressed(Control.Special1, player) && mainWeapon.ammo > 2) {
-			//		changeState(new EvasionBarrage(), true);
-			//	}
+				if (player.input.isPressed(Control.Special1, player)) {
+					changeState(new EvasionBarrage(), true);
+			}
 		}
 		// Weapon update.
 
@@ -1435,7 +1435,7 @@ public class Axl : Character {
 			),
 			MeleeIds.EnemyStep => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.GBDKick, player,
-			 2, Global.halfFlinch, addToLevel: addToLevel, clashTier: ClashTier.Weak
+			 2, Global.defFlinch, addToLevel: addToLevel, clashTier: ClashTier.Weak
 			),
 			MeleeIds.RainStorm => new GenericMeleeProj(
 				new RCXPunch(), pos, ProjIds.ForceGrabState, player,

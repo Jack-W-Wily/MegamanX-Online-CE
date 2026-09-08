@@ -103,6 +103,9 @@ public class PlayerPB {
 
 	[ProtoMember(19)] public ServerPlayer serverPlayer;
 
+	
+
+
 	public PlayerPB() { }
 
 	public PlayerPB(Player player) {
@@ -126,6 +129,8 @@ public class PlayerPB {
 		loadoutData = player.loadout;
 		disguise = player.disguise;
 		atransLoadout = player.atransLoadout;
+		
+
 
 		if (player.character?.netId != null) {
 			currentCharNum = (int)player.character.charId;

@@ -310,10 +310,13 @@ public class JoinMenu : IMainMenu {
 			return;
 		}
 
-		var players = joinServerResponse.server.players;
-		var server = joinServerResponse.server;
-
+		var players = joinServerResponse?.server.players;
+		var server = joinServerResponse?.server;
+		if ( server == null) return;
 		if (Global.serverClient.serverPlayer.joinedLate) {
+			Menu.change(new WaitMenu(new MainMenu(), server, false));
+/*
+
 			Global.level = new Level(server.getLevelData(), SelectCharacterMenu.playerData, server.extraCpuCharData, true);
 			Global.level.teamNum = joinServerResponse.server.teamNum;
 

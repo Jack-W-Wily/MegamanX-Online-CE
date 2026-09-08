@@ -5,7 +5,7 @@ namespace MMXOnline;
 
 public class HyperNovaStrike : Weapon {
 	public static HyperNovaStrike netWeapon = new();
-	public const float ammoUsage = 14;
+	public const float ammoUsage = 3;
 
 	public HyperNovaStrike() : base() {
 		//damager = new Damager(player, 4, Global.defFlinch, 0.5f);
@@ -312,6 +312,10 @@ public class NovaStrikeStateDownEX : CharState {
 		var hitWall = Global.level.raycast(character.pos,character.pos.addxy(0, 10),new List<Type>() { typeof(Wall) });
 		if (hitWall != null) {
 			character.changeToIdleOrFall();
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
 		}
 		if (stateTime > 36f / 60f) {
 			character.changeToIdleOrFall();

@@ -183,7 +183,7 @@ public class XBuster : Weapon {
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
 				new Buster4GigaProj(pos, xDir, mmx, player, player.getNextActorNetId(), true);
-			} else if (mmx.armArmor == ArmorId.Light) {
+			} else if (mmx.armArmor == ArmorId.Light || mmx is XKai && player.LightArmKai) {
 				shootLightBuster4(mmx, pos, xDir);
 			} else {
 				new Buster4MaxProj(

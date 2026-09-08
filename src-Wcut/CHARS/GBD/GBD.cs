@@ -14,8 +14,9 @@ public class GBD : Character {
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans
 	) {
 		charId = CharIds.GBD;
-	}
 
+		
+	}
 
 
 	public GBDSniperAim? GBDAim;
@@ -59,11 +60,18 @@ public class GBD : Character {
 		}
 		if (!isBike){
 		if (player.input.isAPressed(player)) {
-			if (player.input.isHeld(Control.Down, player)) {
-			changeState(new VAVAUpperCutPunch(), true);	
-			}else {
-			changeState(new VAVAJab1(), true);	
+			if (player.input.isL2Held(player)){
+					changeState(new ZeroGrabStart(), true);	
+			} else {
+				if (grounded){
+					
+						changeState(new VAVAJab1(), true);		
+					
+				} else {
+						changeState(new IrisDiveKick(), true);
+				}
 			}
+			
 		}
 
 		if (player.input.isR2Pressed(player)) {
@@ -71,10 +79,19 @@ public class GBD : Character {
 		}
 
 		if (player.input.isBPressed(player)) {
+			if (!player.input.isHeld(Control.Down, player)) {
 			changeState(new GBDSniperState(), true);
 			if (GBDAim == null){
 				GBDAim = new GBDSniperAim(new IrisCrystal(), pos, getShootXDir(), player, 0,
 							player.getNextActorNetId(true), true);	
+			}
+			} else {	
+				var marker = new GBDMarker(pos, xDir, this, player, player.getNextActorNetId(), true);
+				GBDMarker.Add(marker);
+				if (GBDMarker.Count > 4) {
+					GBDMarker[0].destroySelf();
+					GBDMarker.RemoveAt(0);
+			    }
 			}
 		}
 
@@ -158,7 +175,7 @@ public class GBD : Character {
 		if (isBike){
 			
 			if (trailTime <= 0) {
-			if (OverDrive){
+			if (OverDrive || charState is GBDHomingState){
 			trailTime = 0.05f;
 			new FStagTrailProj(
 			 	pos, xDir,
@@ -188,6 +205,20 @@ public class GBD : Character {
 		Helpers.decrementTime(ref IdlePunchCooldown);
 		Helpers.decrementTime(ref CrouchPunchCooldown);
 		Helpers.decrementTime(ref DodgeCooldown);
+
+		if (player.superAmmo >= player.superMaxAmmo) {
+			weaponHealAmount = 0;
+		}
+		if (weaponHealAmount > 0 && player.health > 0) {
+			weaponHealTime += Global.spf;
+			if (weaponHealTime > 0.05) {
+				weaponHealTime = 0;
+				weaponHealAmount--;
+				player.superAmmo = Helpers.clampMax(player.superAmmo + 1, player.superMaxAmmo);
+				playSound("healX3", forcePlay: true, true);
+
+			}
+		}
 	}
 
 
@@ -236,6 +267,16 @@ public class GBD : Character {
 			
 		}
 
+		if (specialPressed && player.input.isHeld(Control.Down, player)) {
+			var marker = new GBDMarker(pos, xDir, this, player, player.getNextActorNetId(), true);
+			GBDMarker.Add(marker);
+			if (GBDMarker.Count > 4) {
+				GBDMarker[0].destroySelf();
+				GBDMarker.RemoveAt(0);
+			}
+			
+		}
+
 		if (shootPressed && player.input.isL2Held(player)) {
 			changeSpriteFromName("grab_start", true);
 			
@@ -247,7 +288,7 @@ public class GBD : Character {
 		}
 
 
-		if (specialPressed && CrouchPunchCooldown == 0 && !player.input.isHeld(Control.Down, player)) {
+		if (specialPressed && CrouchPunchCooldown == 0 && !player.input.isHeld(Control.Down, player) && !player.input.isHeld(Control.Up, player)) {
 			changeSpriteFromName("gun", true);
 			CrouchPunchCooldown = 0.5f;
 			playSound("mk2stunshot", sendRpc: true);
@@ -259,6 +300,27 @@ public class GBD : Character {
 
 		}
 		}
+
+
+		if (canDash() &&
+			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
+			changeState(new VileDashChargeState());
+			
+			
+		}
+
+
+
+		if (player.input.isR2Pressed(player) 
+			){
+				foreach (var GBDMarker in GBDMarker) {
+					if (GBDMarker.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange * 10) continue;
+					GBDMarker target = GBDMarker;
+					changeState(new GBDHomingState(target));
+					break;
+				}
+			}
+			
 	}
 
 
@@ -352,7 +414,7 @@ public class GBD : Character {
 
 
 	public override string getSprite(string spriteName) {
-		if (isBike){
+		if (isBike && charState is not LadderClimb and not LadderEnd){
 		return "gbd_b_" + spriteName;
 		}
 		return "gbd_" + spriteName;
@@ -367,7 +429,7 @@ public class GBD : Character {
 			);
 		}
 		if (sprite.name.Contains("pipe_slash_3")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.UPPunch, player, 3f, 30, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "clangGG");
 		}
 
 		if (sprite.name.Contains("uppercut")) {
@@ -375,53 +437,87 @@ public class GBD : Character {
 		}
 
 		if (sprite.name.Contains("jab")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 1f, 14,5, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 1f, 30,5, clashTier: ClashTier.Weak, addToLevel: true);
 		}
 
 		if (sprite.name.Contains("tonfa_f")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ZSaber, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "htsnd_slash_deep1");
 		}
 		if (sprite.name.Contains("tonfa_charged_f")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BurensenEND, player, 4f, 0, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BurensenEND, player, 4f, 0, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "htsnd_slash_deep3");
 		}
 
 		if (sprite.name.Contains("tonfa_u")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.TriggerOldFLinch, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.TriggerOldFLinch, player, 2f, 30,8, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "htsnd_slash_deep1");
 		}
 		if (sprite.name.Contains("tonfa_charged_u")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BlockableLaunch, player, 4f, 0, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.BlockableLaunch, player, 4f, 0, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "htsnd_slash_deep3");
 		}
 		if (sprite.name.Contains("tonfa_overhead")) {
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "htsnd_slash_deep2");
 		}
 
 
 		if (sprite.name.Contains("land")) {
 			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.Rakukojin, player, 2f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true);
 		}
-		if (sprite.name.Contains("kick")) {
+		if (sprite.name.Contains("kick") && isBike) {
 			if (isDashing) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 4f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.DropSlide, player, 6f, 0, 5f, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_knock1");
 			}
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 2f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogGroundPound, player, 3f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp2");
 			
 		}
-		if (sprite.name.Contains("grab")) {
-			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.ForceGrabState, player, 2f, 0, 5f, ShouldClang: false, addToLevel: true);
+
+		if (sprite.name.Contains("kick") && !isBike) {
+			
+			return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.GBDKick, player, 2f, 20, 5f, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "kofhtsnd_clamp2");
+			
+		}
+		 if (  sprite.name.Contains("grab") && !sprite.name.Contains("ex") )
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.ForceGrabState,
+			player, 0f, 0, 20, ShouldClang : true ,addToLevel: true, hitSound : "kofhtsnd_grab1"
+			);
+		}
+
+		 if (  sprite.name.Contains("grab") && sprite.name.Contains("ex") )
+		{
+			return new GenericMeleeProj(new IrisCrystal(), centerPoint, ProjIds.BurensenEND,
+			player, 3f, 0, 20, ShouldClang : false ,addToLevel: true, hitSound : "kofhtsnd_knock1"
+			);
 		}
 		if (sprite.name.Contains("pipe_slash_2")) {
 			if (isDashing) {
 				return new GenericMeleeProj(new RakukojinWeapon(), centerPoint, ProjIds.MechFrogStompShockwave, player, 3f, 0, clashTier: ClashTier.Weak, addToLevel: true);
 			}
-				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true);
+				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true,
+				 isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "clangGG"
+				 );
 		
 		}
 		if (sprite.name.EndsWith("pipe_slash")) {
 			if (isDashing) {
-				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true);
+				return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.HeavyPush, player, 3f, 0, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "clang3GG");
 			}
-			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true);
+			return new GenericMeleeProj(new RCXPunch(), centerPoint, ProjIds.ForceGrabState, player, 2f, 20, 4f, null, isShield: true, isDeflectShield: true, clashTier: ClashTier.Weak, addToLevel: true, hitSound : "clangGG");
 		}
+
+
+		if (sprite.name.Contains("hyperdash_attack")) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.HeavyPush, player,
+				2, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
+			, addToLevel : true, hitSound : "kofhtsnd_clamp2");
+		}
+
+		if (sprite.name.Contains("warp_beam")) {
+			return new GenericMeleeProj(
+				new VileStomp(), centerPoint, ProjIds.HeavyPush, player,
+				2, 0, 10f, isDeflectShield: true, clashTier: ClashTier.Weak
+			, addToLevel : true);
+		}
+
 		return proj;
 	}
 
@@ -431,7 +527,19 @@ public class GBD : Character {
 		return base.getCamCenterPos();
 	}
 
-	
+		// Ammo section
+	public override void addAmmo(float amount) {
+		weaponHealAmount += amount;
+	}
+
+	public override void addPercentAmmo(float amount) {
+		weaponHealAmount += amount * 0.32f;
+	}
+
+	public override bool canAddAmmo() {
+		return player.superAmmo < player.superMaxAmmo;
+	}
+
 	// For Shaders stuff
 	public override List<ShaderWrapper> getShaders() {
 		List<ShaderWrapper> baseShaders = base.getShaders();

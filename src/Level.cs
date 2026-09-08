@@ -1053,6 +1053,9 @@ public partial class Level {
 			player.disguise = hostPlayer.disguise;
 			player.atransLoadout = hostPlayer.atransLoadout;
 
+
+		
+
 			if (hostPlayer.currentCharNum != -1 &&
 				hostPlayer.charNetId != ushort.MaxValue &&
 				player.character == null
@@ -1117,15 +1120,15 @@ public partial class Level {
 	}
 
 	public Actor? getActorByNetId(ushort netId, bool getDestroyed = false) {
-		/*
+		
 		foreach (var go in gameObjects) {
 			var actor = go as Actor;
 			if (actor?.netId == netId) {
 				return actor;
 			}
 		}
-		return null;
-		*/
+		//return null;
+		
 		if (Global.level.actorsById.ContainsKey(netId)) {
 			return Global.level.actorsById[netId];
 		}
@@ -1973,10 +1976,10 @@ public partial class Level {
 	public void render() {
 		if (Global.level.mainPlayer == null) return;
 
-		if (Global.level.joinedLate && !Global.level.mainPlayer.warpedIn && Global.level.mainPlayer.character == null && blackJoinTime < 3) {
-			blackJoinTime += Global.spf;
-			return;
-		}
+	//	if (Global.level.joinedLate && !Global.level.mainPlayer.warpedIn && Global.level.mainPlayer.character == null && blackJoinTime < 3) {
+	//		blackJoinTime += Global.spf;
+	//		return;
+	//	}
 
 		if (!camSetFirstTime) {
 			camNotSetFrames++;
@@ -2005,7 +2008,9 @@ public partial class Level {
 			if (go.iDestroyed) {
 				continue;
 			}
+			if (go != null){
 			go.render(0, 0);
+			}
 		}
 		foreach (var ms in mapSprites) {
 			ms.render(0, 0);

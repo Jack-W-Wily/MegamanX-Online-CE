@@ -73,7 +73,7 @@ public class XKai : MegamanX {
 	
 	public override int baselineMaxHealth() {
 		if ( player.XKaiUnlockBarrier ) {
-			return 34;
+			return 44;
 		}
 		return 28;
 	}
@@ -122,7 +122,7 @@ public class XKai : MegamanX {
 		!player.input.isLeftOrRightHeld(player) &&
 		!player.input.checkShoryuken(player, xDir, Control.R2)
 		&& charState is not RMXDoubleKick) {
-			if (charState is Dash or AirDash) {
+			if (charState is Dash or AirDash or LightDash or GigaAirDash) {
 				charState.isGrabbing = true;
 				changeSpriteFromName("unpo_grab_dash", true);
 			} else{
@@ -142,25 +142,60 @@ public class XKai : MegamanX {
 		}
 
 	
+		
 
-	
+		if (player.input.isR2Pressed(player) && (player.superAmmo > 10 || OverDrive)) {
 
-	
-		bool canUseSupers = player.superAmmo >= 16 || OverDrive;
-
-		if (player.input.isR2Pressed(player) && !player.input.isHeld(Control.Up, player) && canUseSupers) {
-
-			if (player.input.isHeld(Control.Down, player)) {
+			if (player.input.isHeld(Control.L2, player) && player.XKaiParry) {
 				enterParry();
-			} else {
-				changeState(new XUPPunchState(grounded), true);
+			} else if (player.input.isHeld(Control.Up,player) && player.XKaiAbsorbNum > 2){
+				changeState(new RisingFireChargedState(), true);
+			} else if (player.input.isHeld(Control.Down,player) && player.XKaiAbsorbNum > 2){
+				if (!grounded){
+				changeState(new DragoonDiveKick(), true);
+				} else {
+					if (player.XKaiUnlockSaber){
+					changeState(new MessenkouState(new Messenkou()), true);
+					}
+				}
 			}
-			if (!OverDrive) {
-				player.superAmmo -= 16;
-			}
+			 	if (!OverDrive){
+				player.superAmmo -= 10;
+				}
 		}
 
-
+		if (player.XKaiAbsorbNum > 5) {
+			if (player.input.isPressed(Control.WeaponRight,player)) {
+				if (!grounded){
+				shoot(0, new StrikeChain(), false);
+				} else {
+					if (player.input.isHeld(Control. Up, player)) {
+						if (player.input.isHeld(Control.Dash, player)) {
+							if (BurnerCD == 0){
+							changeState(new SpeedBurnerCharState(), true);
+							BurnerCD = 1.2f;
+							}
+						}	else {
+								changeState(new VelGShootFireStateKai(), true);
+						}
+					} else if (player.input.isHeld(Control. Down, player)) {
+						if (downPressedTimes > 2 && bigSparkCD == 0){
+						changeState(new TriadThunderChargedStateKai(grounded), true);
+						bigSparkCD = 2;
+						} else {
+							if (SparkCD == 0){
+							shoot(0, new ElectricSpark(), false);	
+							SparkCD = 0.2f;
+							}
+						}
+					} else {
+						changeState(new VelGShootIceStateKai(), true);
+					}
+				
+				}
+				return true;
+			}
+		}
 		return base.attackCtrl();
 	}
 
@@ -187,10 +222,50 @@ public class XKai : MegamanX {
 	public bool helperzeroOnce = false;
 
 		public bool becomeragingcharge = false;
+
+	public float SparkCD;
+	public float BurnerCD;
+	public float bigSparkCD;
 	public override void update() {
 		base.update();
+		Helpers.decrementTime(ref SparkCD);
+		
+		Helpers.decrementTime(ref BurnerCD);
+
+		Helpers.decrementTime(ref bigSparkCD);
+
+		if (player.LightHeadsKai) {
+			if (charState is Jump && player.input.isHeld(Control.Down, player) && player.superAmmo >= 2) {
+				changeSpriteFromName("headbutt", false);
+				if (grounded)vel.y = -getJumpPower() * 2f;
+				  
+				
+				  if (!charState.once){
+				  player.superAmmo -= 2;
+				  charState.once = true;
+				  }
+			}
+		}
 
 
+		if (!isInDamageSprite()){
+			if (player.GigaChestKai && player.superAmmo >= 32 && downPressedTimes >= 3 && player.input.isPressed(Control.Special2, player)) {
+				changeState(new GigaCrushCharState(), true);
+				player.superAmmo -= 32;
+			}
+			if (player.XKaiUAXBuffs) {
+				if (player.input.isPressed(Control.Dash, player) && !grounded && player.superAmmo > 5) {
+					if (player.input.isHeld(Control.Up, player)) {
+						changeState(new NovaStrikeStateUpEX(), true);
+					} else if (player.input.isHeld(Control.Down, player)) {
+						changeState(new NovaStrikeStateDownEX(), true);
+					} else {
+						changeState(new NovaStrikeStateEX(), true);
+					}
+					player.superAmmo -= 5;
+				}
+			}
+		}
 		Helpers.decrementTime(ref CannonSlashCD);
 		Helpers.decrementTime(ref CannonStabCD);
 		Helpers.decrementTime(ref IrisGeneralizedCrystalCD);
@@ -198,10 +273,8 @@ public class XKai : MegamanX {
 		if (player.input.isAPressed(player) && player.input.isHeld(Control.Down ,player) && player.XKaiUnlockSaber && charState is RMXPunch or RMXPunch2 or RMXDoubleKick or RMXDoubleKickShoot) {
 			changeState(new X6SaberState(grounded), true);
 		}
-		if (!helperzeroOnce && helperZero == null && Global.level.levelData.name == "redandblue_vs_purple_1v1") {
-			helperZero = new FakeZero(player, pos, xDir, player.getNextActorNetId(), true, sendRpc: true);
-			helperzeroOnce = true;
-		}
+		
+
 
 		if (charState is Die) {
             helperZero?.destroySelf();
@@ -217,16 +290,19 @@ public class XKai : MegamanX {
 		Helpers.decrementTime(ref DodgeCD);
 
 
-		if (Global.level.levelData.name == "zero_vs_x_1v1") {
-			hasUltimateArmor = true;
-			if (bonusHealth == 0) {
-				overDriveTimer = 999;
-			}
 
+
+		if (player.currency >= 20 && downPressedTimes >= 3 && player.input.isPressed(Control.Taunt, player)) {
+			player.getAllXKAIBuffs();
+			shakeCamera(true);
+			player.currency -= 20;
+				playSound("distortion_a", true);
+			new GigaCrushProj(
+							pos, xDir, 
+							this, player, player.getNextActorNetId(), rpc: true
+							);
+			playSound("crash", true);
 		}
-
-
-
 		if (player.XKaiRideArmor){
 			// Perifericos
 		if (!isInDamageSprite()) {
@@ -279,18 +355,6 @@ public class XKai : MegamanX {
 		}
 
 
-		if (helmetArmor == ArmorId.Light) {
-			if (charState is Jump && player.input.isHeld(Control.Down, player) && player.superAmmo >= 5) {
-				changeSpriteFromName("headbutt", false);
-
-				  vel.y = -getJumpPower() * 2f;
-				
-				  if (!charState.once){
-				  player.superAmmo -= 5;
-				  charState.once = true;
-				  }
-			}
-		}
 
 		if (sprite.name == "rmx_grab_foward" && legArmor == ArmorId.Light) {
             sprite.name = "rmx_light_kick";
@@ -388,24 +452,25 @@ public class XKai : MegamanX {
 			"rmx_speedburner" => MeleeIds.SpeedBurnerCharged,
 			"rmx_shoryuken" => MeleeIds.Shoryuken,
 			"rmx_punch_1" => MeleeIds.Punch1,
-			"rmx_grab_start" => MeleeIds.Grab,
+			"rmx_grab_start" => MeleeIds.DashGrab,
 			"rmx_punch_2" => MeleeIds.Punch2,
 			"rmx_beam_saber" or "rmx_beam_saber_air" => MeleeIds.MaxZSaber,
 			"rmx_beam_saber2" => MeleeIds.ZSaber,
 			"rmx_double_kick" when frameIndex < 5 => MeleeIds.DoubleKick,
 			"rmx_double_kick" when frameIndex > 5 => MeleeIds.DoubleKick2,
 			"rmx_beam_saber_air2" => MeleeIds.ZSaberAir,
-			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
+			"rmx_nova_strike" or "rmx_nova_strike_down" or "rmx_risingfire_charged" or "rmx_nova_strike_up" => MeleeIds.NovaStrike,
 			// Light  Helmet.
-			"rmx_jump" or "rmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
-			when helmetArmor == ArmorId.Light && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
+			"rmx_jump" or "mmx_jump_shoot" or "rmx_wall_kick" or "rmx_wall_kick_shoot"
+		when player.LightHeadsKai && stingActiveTime == 0 => MeleeIds.LightHeadbutt,
 			// Light Helmet when it up-dashes.
 			"rmx_headbutt"  => MeleeIds.LightHeadbuttEX,
 			// Nothing.
 			"rmx_unpo_grab_dash" => MeleeIds.DashGrab,
 			"rmx_unpo_punch" or "rmx_unpo_air_punch" => MeleeIds.Punch,
 			"rmx_unpo_parry_start" => MeleeIds.ParryBlock,
-			"rmx_risingfire_charged" or "rmx_dropkick" => MeleeIds.RisingFires,
+			
+			"rmx_dropkick" => MeleeIds.RisingFires,
 			
 
 			"rmx_grab_foward"   => MeleeIds.GrabKickLV1, 
@@ -451,8 +516,8 @@ public class XKai : MegamanX {
 				4, Global.defFlinch, 30, addToLevel: addToLevel
 			),
 			(int)MeleeIds.RisingFires => new GenericMeleeProj(
-				SpeedBurner.netWeapon, projPos, ProjIds.SpeedBurnerCharged, player,
-				2, Global.defFlinch, 30, addToLevel: addToLevel, isJuggleProjectile : true
+				SpeedBurner.netWeapon, projPos, ProjIds.Hyouretsuzan2, player,
+				2, 0, 30, addToLevel: addToLevel, isJuggleProjectile : true
 			),
 			(int)MeleeIds.LightHeadbutt => new GenericMeleeProj(
 				LhHeadbutt.netWeapon, projPos, ProjIds.Headbutt, player,
@@ -558,6 +623,9 @@ public class XKai : MegamanX {
 
 	public override float getRunSpeed() {
 		float runSpeed = 90;
+		if (player.XKaiSpeedBonus) {
+			runSpeed *= 1.5f;
+		}
 	
 		return runSpeed * getRunDebuffs();
 	}

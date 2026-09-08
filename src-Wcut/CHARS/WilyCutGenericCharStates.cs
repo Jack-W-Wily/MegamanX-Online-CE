@@ -758,17 +758,24 @@ public class OverDriveStart : CharState {
 		if (character.frameIndex >= 3 && !fired) {
 			fired = true;
 			character.playSound("ching", sendRpc: true);
-			character.overDriveTimer = 12; // this will grant 12 seconds of hypermode
 		}
 		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
+
+		character.vel.y = 0;
 	}
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+		character.useGravity = false;
+		if (!character.sprite.name.Contains("activate_od")) {
+			character.changeSpriteFromName("win", true);
+			sprite = "win";
+		}
 	}
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
+		character.useGravity = true;
 	}
 
 }

@@ -185,6 +185,7 @@ public class FlamethrowerWildHorseKick : Projectile {
 		this.groundedVariant = groundedVariant;
 		angle = vel.angle;
 		fadeOnAutoDestroy = true;
+		isJuggleProjectile = true;
 		fadeSprite = "flamethrower_whk_fade";
 		projId = (int)ProjIds.WildHorseKick;
 		if (!groundedVariant) {
@@ -227,6 +228,7 @@ public class FlamethrowerDragonsWrath : Projectile {
 		damager.flinch = Global.defFlinch;
 		destroyOnHit = true;
 		destroyOnHitWall = true;
+		isJuggleProjectile = true;
 		this.groundedVariant = groundedVariant;
 		angle = vel.angle;
 		fadeOnAutoDestroy = true;
@@ -271,6 +273,7 @@ public class FlamethrowerSeaDragonRage : Projectile {
 		weapon = SeaDragonRage.netWeapon;
 		damager.damage = 1;
 		damager.hitCooldown = 6;
+		isJuggleProjectile = true;
 		maxTime = 0.25f;
 		damager.flinch = Global.defFlinch;
 		destroyOnHit = true;

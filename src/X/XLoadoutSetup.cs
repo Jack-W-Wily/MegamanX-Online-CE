@@ -16,24 +16,24 @@ public class XLoadoutSetup {
 
 		bool enableX1Weapons = player.loadout.xLoadout.weapon1 < 9 &&
 		 player.loadout.xLoadout.weapon2 < 9 &&  player.loadout.xLoadout.weapon3 < 9
-		;
+		&& !Options.main.novaStrikeFloor;
 		bool enableX2Weapons = player.loadout.xLoadout.weapon1 >= 9 &&
 		 player.loadout.xLoadout.weapon2 >= 9 &&  player.loadout.xLoadout.weapon3 >= 9
 		 && player.loadout.xLoadout.weapon1 <= 16 &&
 		 player.loadout.xLoadout.weapon2  <= 16&&  player.loadout.xLoadout.weapon3  <= 16
-		;
+		&& !Options.main.novaStrikeFloor;
 		bool enableX3Weapons = player.loadout.xLoadout.weapon1 >= 17 &&
 		 player.loadout.xLoadout.weapon2 >= 17 &&  player.loadout.xLoadout.weapon3 >= 17
 		 && player.loadout.xLoadout.weapon1 <= 24 &&
 		 player.loadout.xLoadout.weapon2  <= 24 &&  player.loadout.xLoadout.weapon3  <= 24
-		;
+		&& !Options.main.novaStrikeFloor;
 		bool enableX4Weapons =player.loadout.xLoadout.weapon1 > 24 &&
 		 player.loadout.xLoadout.weapon2 > 24  &&  player.loadout.xLoadout.weapon3 > 24 
-		;
+		&& !Options.main.novaStrikeFloor;
 		
 		weapons.Add(new XBuster());
 
-		if (enableX1Weapons && Options.main.novaStrikeFloor) {
+		if (enableX1Weapons ) {
 			weapons.Add(new HomingTorpedo());
 			weapons.Add(new ChameleonSting());
 			weapons.Add(new RollingShield());
@@ -43,7 +43,7 @@ public class XLoadoutSetup {
 			weapons.Add(new BoomerangCutter());
 			weapons.Add(new ShotgunIce());
 		}
-		if (enableX2Weapons && Options.main.novaStrikeFloor) {
+		if (enableX2Weapons ) {
 			weapons.Add(new CrystalHunter());
 			weapons.Add(new BubbleSplash());
 			weapons.Add(new SilkShot());
@@ -53,7 +53,7 @@ public class XLoadoutSetup {
 			weapons.Add(new MagnetMine());
 			weapons.Add(new SpeedBurner());
 		}
-		if (enableX3Weapons && Options.main.novaStrikeFloor) {
+		if (enableX3Weapons ) {
 			weapons.Add(new AcidBurst());
 			weapons.Add(new ParasiticBomb());
 			weapons.Add(new TriadThunder());
@@ -64,7 +64,7 @@ public class XLoadoutSetup {
 			weapons.Add(new TornadoFang());
 		}
 
-			if (enableX4Weapons && Options.main.novaStrikeFloor) {
+			if (enableX4Weapons) {
 			weapons.Add(new DoubleCyclone());
 			weapons.Add(new SoulBody());
 			weapons.Add(new FrostTower());
@@ -83,7 +83,7 @@ public class XLoadoutSetup {
 		if (player.hasBodyArmor(2) || player.xArmor1v1 == 3) weapons.Add(new GigaCrush());
 
 		// Regular Loadout.
-		if (!enableX1Weapons && !enableX2Weapons && !enableX3Weapons && !enableX4Weapons) {
+		if (!enableX1Weapons && !enableX2Weapons && !enableX3Weapons && !enableX4Weapons ) {
 			
 			weapons = xLoadout.getWeaponsFromLoadout(player);
 		}

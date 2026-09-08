@@ -535,7 +535,7 @@ public class AxlString5 : CharState {
 	}
 }
 
-public class EvasionBarrage : CharState {
+public class EvasionBarrageWC : CharState {
 	public AxlWC axl = null!;
 	public float pushBackSpeed;
 	float projTime = 99;
@@ -543,7 +543,7 @@ public class EvasionBarrage : CharState {
 	public bool exitCond;
 	public int lastFrameFired;
 
-	public EvasionBarrage() : base("evasionshot") { }
+	public EvasionBarrageWC() : base("evasionshot") { }
 
 	public override void update() {
 		base.update();
@@ -611,6 +611,87 @@ public class EvasionBarrage : CharState {
 		character.useGravity = true;
 	}
 }
+
+
+
+public class EvasionBarrage : CharState {
+	public Axl axl = null!;
+	public float pushBackSpeed;
+	float projTime = 99;
+	public int bulletsFired;
+	public bool exitCond;
+	public int lastFrameFired;
+
+	public EvasionBarrage() : base("evasionshot") { }
+
+	public override void update() {
+		base.update();
+			if (character.frameIndex <= 0) {
+			character.iframesTime = 10;
+		}
+		if (pushBackSpeed > 0) {
+			character.vel.y = 0;
+			character.useGravity = false;
+			if (!character.grounded || character.frameIndex >= 2) {
+				character.move(new Point(-80 * character.xDir, -pushBackSpeed));
+			}
+			pushBackSpeed -= Physics.Gravity / 2f;
+		} else {
+			character.useGravity = true;
+		}
+		Point? gunpos = character.getFirstPOI();
+
+		if (character.sprite.frameIndex >= 2) {
+			character.move(new Point(character.xDir * -150, 0));
+			if (gunpos != null && lastFrameFired != character.frameIndex) {
+				lastFrameFired = character.frameIndex;
+				BlueBulletProj.newWithDir(
+					axl, gunpos.Value, character.xDir,
+					player.getNextActorNetId(), sendRpc: true
+				);
+				new Anim(
+					gunpos.Value.addxy(-2 * character.xDir, 0),
+					"x8_axl_bullet_flash", character.xDir,
+					player.getNextActorNetId(), true, sendRpc: true,
+					host: character
+				);
+				character.playSound("axlBullet", sendRpc: true);
+				axl.player.weapon?.addAmmo(-0.75f, player);
+				bulletsFired++;
+			}
+		}
+		if ((bulletsFired >= 4 || axl.player.weapon?.ammo <= 0) &&
+			(character.frameIndex == 5 || character.frameIndex == 3)
+		) {
+			exitCond = true;
+		}
+		if (exitCond && character.frameIndex != 5 && character.frameIndex != 3) {
+			axl.armAngle = 0;
+			character.xPushVel = -100 * character.xDir;
+			if (pushBackSpeed > 0) {
+				character.vel.y = -pushBackSpeed;
+			}
+			else if (character.vel.y > 0) {
+				character.vel.y *= 0.5f;
+			}
+			character.changeToIdleOrFall();
+		}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.stopMoving();
+		pushBackSpeed = 180;
+		axl = character as Axl ?? throw new NullReferenceException();
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity = true;
+	}
+}
+
+
 
 public class RisingBarrage : CharState {
 	public AxlWC axl = null!;

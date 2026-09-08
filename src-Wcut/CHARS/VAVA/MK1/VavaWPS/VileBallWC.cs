@@ -469,8 +469,9 @@ public class AirFireNadeLaunch : CharState {
 
 	Vile vile = null!;
 
-	public AirFireNadeLaunch(string transitionSprite = "") : base("air_bomb_attack", "", "", transitionSprite) {
+	public AirFireNadeLaunch(string transitionSprite = "") : base("firenade", "", "", transitionSprite) {
 		useDashJumpSpeed = true;
+		airMove = true;
 	}
 
 	public override void update() {
@@ -497,8 +498,9 @@ public class AirFireNadeLaunch : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.useGravity = false;
-		character.vel = new Point();
+		//character.useGravity = false;
+		character.vel.y = -character.getJumpPower();
+		//character.vel = new Point();
 		vile = character as Vile ?? throw new NullReferenceException();
 	}
 

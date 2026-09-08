@@ -255,6 +255,80 @@ public class VelGShootFireState : VelguarderMState {
 	}
 }
 
+
+public class VelGShootFireStateKai : CharState {
+	float shootTime;
+	public VelGShootFireStateKai() : base("shoot") {
+
+	}
+
+	public override void update() {
+		base.update();
+		var maverick = character;
+		var velguarder = character;
+		
+
+		if (maverick.frameIndex == 1) {
+			var poi = maverick.getFirstPOIOrDefault();
+			shootTime += Global.spf;
+			if (shootTime > 0.05f) {
+				shootTime = 0;
+				maverick.playSound("fireWave", sendRpc: true);
+				new VelGFireProj(
+					poi, maverick.xDir, character,
+					player, player.getNextActorNetId(), rpc: true
+				);
+			}
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
+public class VelGShootIceStateKai : CharState {
+	bool shot;
+	int index = 0;
+	public VelGShootIceStateKai() : base("shoot") {
+	}
+	public override void update() {
+		base.update();
+		var maverick = character;
+
+		maverick.turnToInput(player.input, player);
+
+		if (maverick.frameIndex % 2 == 1) {
+			if (!shot) {
+				shot = true;
+				index++;
+				if (player.input.isHeld(Control.Up, player))
+					Proj(0);
+				else if (player.input.isHeld(Control.Right, player) || player.input.isHeld(Control.Left, player)) 
+					Proj(2);
+				else
+				 	Proj(1);
+			}
+		} else {
+			shot = false;
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+	public void Proj(int type) {
+		var poi = character.getFirstPOIOrDefault();
+		new VelGIceProj(
+			poi, character.xDir, type, character, 
+			player, player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+
+
 public class VelGShootIceState : VelguarderMState {
 	bool shot;
 	int index = 0;
