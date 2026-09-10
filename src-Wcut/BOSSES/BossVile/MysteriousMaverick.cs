@@ -90,7 +90,7 @@ public class MysteriousMaverick : Vile {
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
 		if (player.isAI) {
-			isWCUTBoss = true;
+//			isWCUTBoss = true;
 		}
 	}
 
@@ -1293,7 +1293,7 @@ public class MysteriousMaverick : Vile {
 							changeState(new SpoiledBratPunch());
 							break;
 						case 3 when isFacingTarget:
-							changeState(new InfinityGigAttack());
+							changeState(new BossJumpVile2());
 							break;
 						case 4 when isFacingTarget:
 							changeState(new VileDashChargeState());
@@ -1302,10 +1302,10 @@ public class MysteriousMaverick : Vile {
 							changeState(new VKamaeHotIcecle());
 							break;
 						case 6 when isFacingTarget:
-							changeState(new VileDashState(0.5f));
+							changeState(new VGenocideCutter());
 							break;
 						case 7 when isFacingTarget && linkedRideArmor != null:
-							changeState(new VileDashState(0.5f));
+							changeState(new Taunt());
 							linkedRideArmor.explode(true);
 							linkedRideArmor.playSound("necroburst", sendRpc: true);
 							new GigaCrushProj(
@@ -1314,91 +1314,9 @@ public class MysteriousMaverick : Vile {
 							);
 							break;
 					}
-				}	else	if (!grounded) {
-					switch (Vattack) {
-						case 1 when isFacingTarget:
-							
-								changeState(new ExplosiveRoundStateBoss());
-							
-							break;
-						case 2 when isFacingTarget:
-							changeState(new SpoiledBratPunch());
-							break;
-						case 3 when isFacingTarget:
-						
-								changeState(new VileDashState(0.5f));
-							
-							break;
-						case 4 when isFacingTarget:
-						
-								changeState(new SpreadShotKnee());
-							
-							break;
-						case 5 when isFacingTarget:
-							changeState(new PeaceOutRollerAttack());
-							break;
-						case 6 when isFacingTarget:
-							changeState(new InfinityGigAttack());
-							break;
-						case 7 when isFacingTarget && linkedRideArmor != null:
-							changeState(new VileDashState(0.5f));
-							linkedRideArmor.explode(true);
-							new NecroBurstProj(
-							linkedRideArmor.pos, xDir, this, player,
-							player.getNextActorNetId(), rpc: true
-								);
-							linkedRideArmor.playSound("necroburst", sendRpc: true);
-							new GigaCrushProj(
-							linkedRideArmor.pos, xDir, 
-							this, player, player.getNextActorNetId(), rpc: true
-							);
-							break;
-					}
-				}
+				}	
 
-			else	if (!isTargetClose && grounded && isWishinRangedMoves) {
-					switch (Vattack) {
-						case 1 when isFacingTarget:
-
-							changeState(new SpreadShotKnee());
-							vel.y = -getJumpPower();
-							break;
-						case 2 when isFacingTarget:
-							changeState(new SpoiledBratPunch());
-							break;
-						case 3 when isFacingTarget:
-						
-							changeState(new InfinityGigAttack());
-							
-							break;
-						case 4 when isFacingTarget:
-							changeState(new ExplosiveRoundStateBoss());
-							vel.y = -getJumpPower();
-							break;
-						case 5 when isFacingTarget:
-							changeState(new VileDashState(0.5f));
-							break;
-						case 6 when isFacingTarget:
-							changeState(new VileDashChargeState());
-							break;
-							//to make it so AI vile can Explode his own Ride
-						case 7 when isFacingTarget && linkedRideArmor != null:
-							changeState(new VileDashState(0.5f));
-							linkedRideArmor.explode(true);
-							new NecroBurstProj(
-							linkedRideArmor.pos, xDir, this, player,
-							player.getNextActorNetId(), rpc: true
-								);
-							linkedRideArmor.playSound("necroburst", sendRpc: true);
-							new GigaCrushProj(
-							linkedRideArmor.pos, xDir, 
-							this, player, player.getNextActorNetId(), rpc: true
-							);
-							break;
-					}
-				}
-
-				aiAttackCooldown = Helpers.randomRange(0, 30);
+				aiAttackCooldown = Helpers.randomRange(30, 60);
 			}
 
 			if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {

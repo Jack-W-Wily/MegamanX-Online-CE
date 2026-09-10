@@ -212,7 +212,7 @@ public static CharSelection[] selections => [
 				} else if (player.input.isHeld(Control.Up, player)){
 					changeState(new KurumitoStandingKick(), true);
 				} else {
-						changeState(new VAVAJab1(), true);
+						changeState(new Jab1(), true);
 							
 				}
 			}

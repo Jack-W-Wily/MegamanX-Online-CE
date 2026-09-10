@@ -159,7 +159,7 @@ public class Vava2Goliath : Vile {
 		hasFrozenCastle = player.frozenCastle;
 		hasSpeedDevil = player.speedDevil;
 		if (player.isAI) {
-			isWCUTBoss = true;
+		//	isWCUTBoss = true;
 		}
 	}
 
@@ -534,7 +534,9 @@ public class Vava2Goliath : Vile {
 		chargeLogic(shoot);
 
 
-
+		if (charState is InRideArmor) {
+			charState.invincible = true;
+		}
 
 	}
 
@@ -1294,7 +1296,7 @@ public class Vava2Goliath : Vile {
 							
 							break;
 						case 3 when isFacingTarget:
-							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
+							linkedRideArmor.changeState(new GoliathDash(), true);
 							break;
 						case 4 when isFacingTarget:
 							linkedRideArmor.changeState(new RAJump());
@@ -1311,8 +1313,7 @@ public class Vava2Goliath : Vile {
 								new LockDownMissileStart(new VileMK2Grab(), pos, -xDir, player, player.getNextActorNetId(), true);
 
 							} else {
-								linkedRideArmor.changeState(new RADash());
-								linkedRideArmor.changeSprite(attackSprite, false);
+								linkedRideArmor.changeState(new GoliathDash());
 							}
 							break;
 						case 6 when isFacingTarget:
@@ -1363,26 +1364,26 @@ public class Vava2Goliath : Vile {
 				} else if (isTargetClose && grounded) {
 					switch (Vattack) {
 						case 1 when isFacingTarget && player.superAmmo >= player.superMaxAmmo:
-							changeState(new VileDashChargeState());
+							changeState(new RisingSpecterStart());
 							player.superAmmo -= 32;
 							break;
 						case 2 when isFacingTarget:
 							changeState(new SpoiledBratPunch());
 							break;
 						case 3 when isFacingTarget:
-							changeState(new InfinityGigAttack());
+							changeState(new VGenocideCutter());
 							break;
 						case 4 when isFacingTarget:
-							changeState(new VileDashChargeState());
+							changeState(new VavaBurensen1());
 							break;
 						case 5 when isFacingTarget:
 							changeState(new VKamaeHotIcecle());
 							break;
 						case 6 when isFacingTarget:
-							changeState(new VileDashState(2f));
+							changeState(new VileDashChargeState());
 							break;
 						case 7 when isFacingTarget && linkedRideArmor != null:
-							changeState(new VileDashState(2f));
+							changeState(new VileDashChargeState());
 							linkedRideArmor.explode(true);
 							linkedRideArmor.playSound("necroburst", sendRpc: true);
 							new GigaCrushProj(
@@ -1481,8 +1482,7 @@ public class Vava2Goliath : Vile {
 							
 							break;
 						case 4 when isFacingTarget:
-							changeState(new ExplosiveRoundStateBoss());
-							vel.y = -getJumpPower();
+							changeState(new BossJumpVile2());
 							break;
 						case 5 when isFacingTarget:
 							changeState(new VileDashState(2f));
@@ -1517,9 +1517,9 @@ public class Vava2Goliath : Vile {
 				}
 
 				if (bonusHealth > 0) {
-				aiAttackCooldown = Helpers.randomRange(60, 120);
+				aiAttackCooldown = Helpers.randomRange(30, 60);
 				} else {
-					aiAttackCooldown = Helpers.randomRange(30, 60);
+					aiAttackCooldown = Helpers.randomRange(10, 40);
 				}
 			}
 

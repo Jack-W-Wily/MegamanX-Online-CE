@@ -1951,6 +1951,82 @@ public class RADash : RideArmorState {
 	}
 }
 
+
+
+
+
+public class GoliathDash : RideArmorState {
+	public float dashTime = 0;
+	float dashAttackTime = 0;
+	public Character? draggedChar;
+
+	public GoliathDash() : base("ridearmor_dash", "ridearmor_attack_dash", "ridearmor_carry_dash") {
+		enterSound = "ridedash";
+	}
+
+	public override void onEnter(RideArmorState? oldState) {
+		if (enterSound == "ridedash" && rideArmor.raNum >= 1 && rideArmor.raNum <= 4) {
+			enterSound = "ridedashx3";
+		}
+		base.onEnter(oldState);
+		rideArmor.isDashing = true;
+		new Anim(rideArmor.pos.addxy(rideArmor.xDir * -15, 0), "dash_sparks", rideArmor.xDir, null, true);
+	}
+
+	public override void onExit(RideArmorState? newState) {
+		base.onExit(newState);
+	}
+
+	public override void update() {
+		base.update();
+		groundCode();
+		var move = getDashVel();
+		rideArmor.move(move);
+		if (player != null) {
+			bool isHeldDashAttack = true;
+			if (isHeldDashAttack) {
+				dashTime = 0;
+				dashAttackTime += Global.spf;
+				if (dashAttackTime > 2) {
+					rideArmor.changeState(new RAIdle());
+					return;
+				}
+				if (rideArmor.sprite.name.Contains("attack") && rideArmor.frameIndex == 2) {
+					rideArmor.frameTime = 0;
+				}
+				var hitWall = Global.level.checkTerrainCollisionOnce(rideArmor, move.x * Global.spf * 2, 0, null);
+				if (hitWall?.isSideWallHit() == true) {
+					rideArmor.playSound("crashX3", forcePlay: false, sendRpc: true);
+					rideArmor.shakeCamera(sendRpc: true);
+					rideArmor.changeState(new RAIdle());
+					if (draggedChar != null) {
+						var mgpw = new MechGoliathPunchWeapon();
+						mgpw.applyDamage(draggedChar, false, rideArmor, (int)ProjIds.MechPunch);
+					}
+					return;
+				}
+			} else if (!player.input.isHeld(Control.Dash, player)) {
+				rideArmor.changeState(new RAIdle());
+				return;
+			}
+		}
+
+		dashTime += Global.spf;
+		if (dashTime > 0.6) {
+			rideArmor.changeState(new RAIdle());
+			return;
+		}
+		if (stateTime > 0.1) {
+			stateTime = 0;
+			new Anim(rideArmor.pos.addxy(rideArmor.xDir * -15, -4), "dust", rideArmor.xDir, null, true);
+		}
+	}
+
+	public Point getDashVel() {
+		return new Point(rideArmor.getRunSpeed() * rideArmor.getDashSpeed() * rideArmor.xDir, 0);
+	}
+}
+
 public class RACalldown : RideArmorState {
 	const float warpHeight = 150;
 	float origYPos;

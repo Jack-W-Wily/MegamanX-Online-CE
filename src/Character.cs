@@ -998,6 +998,15 @@ public partial class Character : Actor, IDamagable {
 			return;
 		}
 
+
+		if (other.gameObject is CrackedWall cw && cw.kName.Contains("door")) {
+			if (charState is not PassDoor) {
+				cw.changeSprite("ms_door_open", true);
+				changeState(new PassDoor(), true);
+			}
+		}
+		
+
 		if (other.gameObject is KillZone killZone && !isInvulnerable(true)) {
 			
 			if (killZone.kName == "enterCyberMazeClaudio") {
@@ -1024,15 +1033,6 @@ public partial class Character : Actor, IDamagable {
 					 Global.level.enterLevel();
 				}, 1));
             } else 
-
-
-
-
-			if (killZone.kName.Contains("Door") && charState is not PassDoor) {
-               changeState(new PassDoor(), true);
-            } else 
-			
-			
 			
 			{
 			killZone.applyDamage(this);

@@ -1095,6 +1095,10 @@ public class MHurt : MaverickState {
 
 	public override void update() {
 		base.update();
+		if (maverick.noHurtKnockback) {
+			maverick.useGravity = false;
+			maverick.stopMoving();
+		}
 		if (hurtSpeed != 0) {
 			hurtSpeed = Helpers.toZero(hurtSpeed, 1.6f / flinchTime * Global.speedMul, hurtDir);
 			maverick.move(new Point(hurtSpeed * 60f, 0));
@@ -1123,6 +1127,7 @@ public class MHurt : MaverickState {
 				maverick.useGravity = false;
 			}
 		}
+		
 		if (shouldKnockUp()) {
 			if (isCombo) {
 				maverick.vel.y = (-0.125f * (flinchTime - 1)) * 60f;

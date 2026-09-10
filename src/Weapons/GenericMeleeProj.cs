@@ -2,10 +2,15 @@
 
 namespace MMXOnline;
 
+using System.Collections.Generic;
 
 
 	
 public class GenericMeleeProj : Projectile {
+
+	Wall wall;
+
+	
 	public GenericMeleeProj(
 		Weapon weapon, Point pos, ProjIds projId, Player player,
 		float? damage = null, int? flinch = null, float? hitCooldown = null,
@@ -50,6 +55,24 @@ public class GenericMeleeProj : Projectile {
 		this.clashTier = clashTier;
 		this.hitspark = hitspark;
 		isMelee = true;
+
+
+		if (this.projId == (int)ProjIds.EnemySubBossColision) {
+			collider.isClimbable = false;
+		collider.wallOnly = false;
+		isStatic = true;
+		
+		var rect = collider.shape.getRect().getPoints();
+		wall = new Wall("Collision Shape", new List<Point>()
+		{
+				rect[0].add(new Point(0, 0)),
+				rect[1].add(new Point(0, 0)),
+				rect[2].add(new Point(0, 0)),
+				rect[3].add(new Point(0, 0)),
+			});
+
+		Global.level.addGameObject(wall);
+		}
 	}
 
 	public override void update() {

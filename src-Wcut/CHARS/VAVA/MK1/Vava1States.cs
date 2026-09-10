@@ -713,6 +713,7 @@ public class VileDashState : CharState {
 
 	public override void update() {
 		base.update();
+		character.isDashing = true;
 		if (player == null) return;
 		character.move(new Point(character.xDir * 400, 0));
 

@@ -173,7 +173,7 @@ public class NoneCannon : VileCannon {
 public class TridentLine : VileCannon {
 	public static TridentLine netWeapon = new();
 	public TridentLine() : base() {
-		type = (int)VileCannonType.TridentLine;
+		type = 2;//(int)VileCannonType.TridentLine;
 		index = (int)WeaponIds.TridentLine;
 		fireRate = 0; // TODO: definir
 		vileAmmoUsage = 0; // TODO: definir
@@ -187,25 +187,15 @@ public class TridentLine : VileCannon {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
 		if (!vile.missileWeapon.isCooldownPercentDone(0.8f)) return;
-		if (vile.charState is Crouch) {
-			shoot(vile, []);
-			return;
-		}
-		vile.changeState(new CannonAttack(this), true);
+		
+		vile.changeState(new Vava1TridentLine(vile.grounded), true);
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;
 		Point shootVel = vava.getVileShootVel(true);
 		Point shootPos = vava.setCannonAim(new Point(shootVel.x, shootVel.y));
-		if (vava.getShootXDir() == -1)
-			shootVel = new Point(shootVel.x * vava.getShootXDir(), shootVel.y);
-		new TridentLineProj(
-			shootPos, character.xDir, MathF.Round(shootVel.byteAngle),
-			character, character.player,
-			character.player.getNextActorNetId(), rpc: true
-		);
+			vava.changeState(new Vava1TridentLine(vava.grounded), true);
 		vava.setVileShootTime(this);
-		vava.playSound("tridentline", sendRpc: true);
 		vava.tryUseVileAmmo(vileAmmoUsage);
 	}
 }
@@ -638,7 +628,7 @@ public class TridentLineProj : Projectile {
 		Point pos, int xDir, float byteAngle,
 		Actor owner, Player player, ushort? netId, bool rpc = false
 	) : base(
-		pos, xDir, owner, "vile_mk2_tl_proj", netId, player
+		pos, xDir, owner, "vava_proj_trident_line", netId, player
 	) {
 		weapon = TridentLine.netWeapon;
 		xScale = xDir;

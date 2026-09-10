@@ -810,10 +810,16 @@ public class InfinityGigSecond : Projectile, IDamagable {
 		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex, actor: this);
 	}
 
+	bool onlyOne;
+
 	public override void onDestroy() {
 		base.onDestroy();
-		new InfinityGigThird(pos.addxy(70, 2), -xDir, owner.character, owner, owner.getNextActorNetId(true), 30, true);
-					
+		if (owner.character != null){
+			if (!onlyOne){
+				onlyOne = true;
+			new InfinityGigThird(pos.addxy(70, 2), -xDir, owner.character, owner, owner.getNextActorNetId(true), 30, true);
+			}		
+		}
 	}
 
 	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {

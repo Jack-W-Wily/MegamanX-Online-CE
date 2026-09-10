@@ -45,10 +45,12 @@ public class Vile : Character {
 	public VileCannon cannonWeapon;
 	public VileLoadout loadout;
 	public VileVulcan vulcanWeapon;
+
+	public VileBall vileBall;
 	public VileMissile missileWeapon;
 	public RocketPunch rocketPunchWeapon;
 	public VileNapalm napalmWeapon;
-	public VileBall grenadeWeapon;
+	public VileNapalm grenadeWeapon;
 	public VileCutter cutterWeapon;
 	public VileFlamethrower flamethrowerWeapon;
 	public VileLaser laserWeapon;
@@ -213,9 +215,108 @@ public class Vile : Character {
 		}
 	}
 
+	public int vileStyle = 0;
+
+
+	VileGrab grabWeapon;
+	public virtual void VileWeaponUpdate() {
+		if (vileStyle > 3) {
+			vileStyle = 0;
+		}
+		if (player.input.isPressed(Control.WeaponLeft, player)) {
+			vileStyle ++;
+		}
+
+		if (Options.main.vileLoadout.cannon == 0) {
+			cannonWeapon = new FrontRunner();
+		}
+		if (Options.main.vileLoadout.vulcan == 0) {
+			vulcanWeapon = new CherryBlast();
+		}
+		if (Options.main.vileLoadout.rocketPunch == 0) {
+			grabWeapon = new ViolentCrusher();
+		}
+		if (Options.main.vileLoadout.flamethrower == 0) {
+			flamethrowerWeapon = new WildHorseKick();
+		}
+		if (Options.main.vileLoadout.ball == 0) {
+			airSpWeapon = new ExplosiveRound();
+		}
+		if (Options.main.vileLoadout.napalm == 0) {
+			grenadeWeapon = new BumptyBoom();
+		}
+		if (Options.main.vileLoadout.missile == 0) {
+			missileWeapon = new HumerusCrush();
+		}
+		if (Options.main.vileLoadout.cutter == 0) {
+			cutterWeapon = new QuickHomesick();
+		}
+
+
+
+
+		if (Options.main.vileLoadout.cannon == 1) {
+			cannonWeapon = new FatBoy();
+		}
+		if (Options.main.vileLoadout.vulcan == 1) {
+			vulcanWeapon = new DistanceNeedler();
+		}
+		if (Options.main.vileLoadout.rocketPunch == 1) {
+			grabWeapon = new SpringSnatcher();
+		}
+		if (Options.main.vileLoadout.flamethrower == 1) {
+			flamethrowerWeapon = new SeaDragonRage();
+		}
+		if (Options.main.vileLoadout.ball == 1) {
+			airSpWeapon = new SpreadShot();
+		}
+		if (Options.main.vileLoadout.napalm == 1) {
+			grenadeWeapon = new RumblingBang();
+		}
+		if (Options.main.vileLoadout.missile == 1) {
+			missileWeapon = new HumerusCrush();
+		}
+		if (Options.main.vileLoadout.cutter == 1) {
+			cutterWeapon = new MaroonedTomahawk();
+		}
+
+
+
+
+
+		if (Options.main.vileLoadout.cannon == 2) {
+			cannonWeapon = new TridentLine();
+		}
+		if (Options.main.vileLoadout.vulcan == 2) {
+			vulcanWeapon = new BuckshotDance();
+		}
+		if (Options.main.vileLoadout.rocketPunch == 2) {
+			grabWeapon = new SpeedyViper();
+		}
+		if (Options.main.vileLoadout.flamethrower == 2) {
+			flamethrowerWeapon = new DragonsWrath();
+		}
+		if (Options.main.vileLoadout.ball == 2) {
+			airSpWeapon = new PeaceOutRoller();
+		}
+		if (Options.main.vileLoadout.napalm == 2) {
+			grenadeWeapon = new RumblingBang();
+		}
+		if (Options.main.vileLoadout.missile == 2) {
+			missileWeapon = new PopcornDemon();
+		}
+		if (Options.main.vileLoadout.cutter == 2) {
+			cutterWeapon = new ParasiteSword();
+		}
+		
+	}
+
 	public override void update() {
 		base.update();
+		VileWeaponUpdate();
+		Supers();
 
+		player.vileAmmo = energy.ammo;
 
 		if (overDriveTimer > 0){
 			ShouldDrawAura = true;
@@ -246,6 +347,43 @@ public class Vile : Character {
 		}
 	}
 
+
+
+	
+
+	public float HyperDashCooldown;
+
+	public virtual void Supers() {
+		Helpers.decrementTime(ref HyperDashCooldown);
+
+		if (!isInDamageSprite() && downPressedTimes > 1 && hasSpeedDevil && 
+
+			player.input.isHeld(Control.Down, player) &&
+		player.input.isPressed(Control.Dash, player) && HyperDashCooldown == 0) {
+			changeState(new VileDashChargeState(), true);
+			playSound("vilehyperdashstart", true);
+			HyperDashCooldown = 2f;
+		}
+
+
+		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32
+		
+		){
+			changeState(new VavaBurensen1(), true);	
+			player.superAmmo = 0;
+			playSound("chingX4");
+		}
+
+		if (player.input.checkShoryuken(player, xDir, Control.R2) && player.superAmmo >= 32) {
+			changeState(new RisingSpecterStart());
+			player.superAmmo = 0;
+		}
+		
+
+
+		
+	}
+
 	public override bool attackCtrl() {
 
 		if (	this is not VAVA1
@@ -269,15 +407,99 @@ public class Vile : Character {
 			);
 
 			if (specialPressed) {
-				if (dashGrabSpecial() ||
-					normalAttacks()
-				) {
-					return true;
+				if (player.input.isHeld(Control.Down, player)) {
+					grenadeWeapon?.vileShoot(this);
+				} else if (player.input.isHeld(Control.Up, player)) {
+					flamethrowerWeapon?.vileShoot(this);
+				} else {
+					airSpWeapon?.vileShoot(this);
 				}
 			}
-			if (shootHeld && cannonWeapon.type > -1) {
-				if (cannonWeapon.shootCooldown < cannonWeapon.fireRate * 0.75f)
-					cannonWeapon?.vileShoot(this);
+
+			if (player.input.isPressed(Control.WeaponLeft,player)) {
+				if (player.input.isHeld(Control.Down, player)) {
+					cutterWeapon?.vileShoot(this);
+				}// else if (player.input.isLeftOrRightHeld(player)) {
+					
+				//}
+				 else {
+					grabWeapon?.vileShoot(this);
+				}
+			}
+
+		
+			if (player.input.isAPressed(player) && player.input.isL2Held(player)) {
+				changeState(new VileChainGrabState());
+			}
+			if (player.input.isPressed(Control.R2,player) && player.input.isL2Held(player)) {
+				changeState(new Vava1GizmoDash());
+			}
+			if (player.input.isPressed(Control.Dash,player) && player.input.isL2Held(player)) {
+				changeState(new CrimsonPhantomState(grounded));
+			}
+
+
+			if (player.input.isAPressed(player) && !player.input.isL2Held(player)) {
+				if (grounded) {
+					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
+						if (player.vileAmmo >= 10) {
+							changeState(new InfinityGigAttack(), true);
+							player.vileAmmo -= 10;
+						}			
+					}
+					 else if (player.input.isHeld(Control.Up, player) && !player.input.isLeftOrRightHeld(player)) {
+						if (upPressedTimes >= 2) {
+							if (player.vileAmmo >= 20) {
+								changeState(new EgotisticalPillAttack(), true);
+								upPressedTimes = 0;
+							}
+						} else {
+							if (player.vileAmmo >= 14) {
+								changeState(new SpoiledBratPunch(), true);
+							}
+						}
+					}
+					
+				 	else if (player.input.isLeftOrRightHeld(player)) {
+						if (!player.input.isHeld(Control.Down, player)) {
+							if (player.vileAmmo >= 8) {
+								changeState(new GoGetterRightAttack(), true);
+							}
+						}
+					} else {
+						if (!player.input.isHeld(Control.Down, player)) {
+							if (charState is not InfinityGigAttack or SpoiledBratPunch) {
+								changeState(new VAVAJab1(), true);
+							}
+						} else {
+							if (downPressedTimes >= 2 && player.vileAmmo >= 26) {
+								changeState(new VAVAGoldenRight(), true);
+								player.vileAmmo -= 26;
+								downPressedTimes = 0;
+							} else {
+								changeState(new VAVAUpperCutPunch(), true);
+							}
+						}
+					}
+				} else {
+					if (player.input.isHeld(Control.Up, player) && player.input.isLeftOrRightHeld(player)) {
+							if (player.vileAmmo >= 6) {
+							changeState(new InfinityGigAttack(), true);
+							player.vileAmmo -= 6;
+						}			
+					} else {
+						if (player.vileAmmo >= 4) {
+							changeState(new SpoiledBratPunch(), true);
+
+						}
+					}
+				}
+			}
+
+
+			if (player.input.isR2Pressed(player) //&& cannonWeapon.type > -1
+			) {
+				cannonWeapon?.vileShoot(this);	
 			}
 			if (WeaponRightHeld && vulcanWeapon.type > -3) {
 				vulcanWeapon?.vileShoot(this);
@@ -361,6 +583,13 @@ public class Vile : Character {
 	public int airDashReset = 1;
 	public override bool normalCtrl() {
 
+
+		if (player.input.isL2Held(player)) {
+			changeState(new BlockWCUT(), true);
+
+		}
+
+
 		if (player.dashPressed(out string dashControl) && flag == null &&
 		!grounded && airDashReset == 0) {
 			changeState(new AirDash(dashControl));
@@ -393,8 +622,8 @@ public class Vile : Character {
 	}
 
 	public override bool chargeButtonHeld() {
-		if (currentWeapon is AssassinBulletChar) return player.input.isHeld(Control.Up, player);
-		return player.input.isBHeld(player);
+	//	if (currentWeapon is AssassinBulletChar) return player.input.isHeld(Control.Up, player);
+		return player.input.isR2Held(player);
 	}
 
 	public override bool canCharge() {
@@ -676,7 +905,11 @@ public class Vile : Character {
 		if (isRideArmor) {
 			if (isHeldUp) vel = new Point(1, -0.5f);
 			else vel = new Point(1, 0.5f);
-		} else if (!isCrouchState) {
+		} else if (charState is ShoulderCannon or Vava1TridentLine) {
+			if (frameIndex == 12) vel = new Point(1, 0.5f);
+			if (frameIndex == 15) vel = new Point(1, -0.5f);
+		}
+		else if (!isCrouchState) {
 			if (!canVileAim60Degrees()) return vel;
 			if (isHeldUp) {
 				if (isLeftOrRightHeld) vel = new Point(1, -0.75f);
@@ -688,7 +921,7 @@ public class Vile : Character {
 		} else if (isCrouchState) {
 			if (isHeldUp) vel = new Point(1, -0.5f);
 			if (isLeftOrRightHeld) vel = new Point(1, 0.5f);
-		}
+		} 
 
 		/*
 		if (rideArmor != null) {
@@ -747,32 +980,270 @@ public class Vile : Character {
 		}
 	}
 
-	// Melee IDs for attacks.
+
+	
 	public enum MeleeIds {
 		None = -1,
+		Blocking,
+		KamaeBlock,
+		Jab,
+		Jab2,
+		
+		VavaKneeAttack,
+		UpperCut,
 		Grab,
+		Grabmk2dash,
+		KamaeUnB,
+		HotIcecle,
+		BurensenStart,
+		BurensenStomp,
+		BurensenEND,
+		GreenEyedLamp,
+		BurensenENDCPU,
+		RagingDemon,
+		Kote,
+
+		GizmoGrab,
+		DropKick,
+		CannonExecution,
+		DeadLiftEX,
+		GoldenRight,
+		StompStart,
+		GrabNonFlinchAT,
+
+		SpeedDemon,
+
+		AirRaid,
+
+
 	}
 
-	// This can run on both owners and non-owners. So data used must be in sync.
+
+	// VAva melee stuff
 	public override int getHitboxMeleeId(Collider hitbox) {
-		if (sprite.name.Contains("dash_grab")) {
-			return (int)MeleeIds.Grab;
-		}
-		;
-		return (int)MeleeIds.None;
+		return (int)(sprite.name switch {
+			"vava_crouch_start"  => MeleeIds.StompStart,
+			"vava_block"  => MeleeIds.Blocking,
+			"vava_grab_attack" or "vava_grab_down"  => MeleeIds.GrabNonFlinchAT,
+			"vava_deadlift" => MeleeIds.DeadLiftEX,
+			"vava_golden_right" => MeleeIds.GoldenRight,
+			"vava_kamae" or "vava_kamae_dash" or "vava_kamae_backdash" => MeleeIds.KamaeBlock,
+			"vava_knee" => MeleeIds.VavaKneeAttack,
+			"vava_jab_1" => MeleeIds.Jab,
+			"vava_jab_2" or "vava_punch_1" or "vava_kick" or "vava_kick_2" => MeleeIds.Jab2,
+			"vava_punch_2" => MeleeIds.UpperCut,
+			"vava_gizmo_dash_grab" => MeleeIds.GizmoGrab,
+			"vava_kamae_unblockable" or "vava_kamae_unblockable_land"  or "vava_air_bomb_attack"=> MeleeIds.KamaeUnB,
+			"vava_kamae_kote" => MeleeIds.Kote,
+			"vava_spring_grab" => MeleeIds.Grab,
+			"vava_dash_grab" => MeleeIds.Grabmk2dash,
+			"vava_hoticecle" => MeleeIds.HotIcecle,
+			"vava_drop_kick"=> MeleeIds.DropKick,
+			"vava_cannon_execution" => MeleeIds.CannonExecution,
+			"vava_green_eyed_lamp" => MeleeIds.GreenEyedLamp,
+			"vava_burensen_1" => MeleeIds.BurensenStart,
+			"vava_burensen_2" or "vava_stomp" => MeleeIds.BurensenStomp,
+			"vava_ragingdemon_dash" => MeleeIds.RagingDemon,
+			"vava_burensen_finish" when !player.isAI => MeleeIds.BurensenEND,
+			"vava_burensen_finish" or "vava_hyperdash_attack" when player.isAI => MeleeIds.BurensenENDCPU,
+			"vava_hyperdash_attack" or "vava_missile_stance" =>  MeleeIds.SpeedDemon,
+
+			"vava_superkick"  => MeleeIds.BurensenENDCPU,
+			"vava_superkick_up"  => MeleeIds.AirRaid,
+			_ => MeleeIds.None
+		});
 	}
 
-	// This can be called from a RPC, so make sure there is no character conditionals here.
-	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
-		return (MeleeIds)id switch {
-			MeleeIds.Grab => new GenericMeleeProj(
-				new VileMK2Grab(), pos, ProjIds.VileMK2GrabStart, player,
-				0, 0, 3f,
-				addToLevel: true
+	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
+		Projectile? proj = id switch {
+			(int)MeleeIds.Blocking => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockingProjID, player, damage: 0.0f,
+				flinch: 0, hitCooldown: 0, isShield: false, isReflectShield: false,
+				isDeflectShield: true, ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitspark : "empty"
+
+
+				),
+
+			
+			(int)MeleeIds.StompStart => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.VileStomp, player,
+				 0, 0, 0, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
 			),
+
+			(int)MeleeIds.Grab => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.GenericWCUTGrabProjID, player,
+				 0, 0, 0, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound: "kofhtsnd_grab1"
+			),
+
+			(int)MeleeIds.GizmoGrab => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.GizmoGrab, player,
+				 0, 0, 0, isReflectShield: false,
+				clashTier: ClashTier.Weak, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound: "kofhtsnd_grab1"
+			),
+			(int)MeleeIds.Grabmk2dash => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.VileMK2Grab, player,
+				 0, 0, 0, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound: "kofhtsnd_grab1"
+			),
+			(int)MeleeIds.UpperCut => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
+				 2, 40, 32, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "htsnd_punch_3", isJuggleProjectile : true
+			),
+			(int)MeleeIds.VavaKneeAttack => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
+				 2, 20, 12, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true
+			),
+			(int)MeleeIds.GrabNonFlinchAT => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.SpinningBlade, player,
+				 1, 0, 10, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_punch1", isJuggleProjectile : true
+			),
+			(int)MeleeIds.DropKick => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.DropSlide, player,
+				 2, 0, 42, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, isJuggleProjectile : false, hitSound : "kofhtsnd_punch1"
+			),
+			(int)MeleeIds.CannonExecution => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
+				 2, 0, 42, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound: "kofhtsnd_knock1"
+			),
+			(int)MeleeIds.KamaeBlock => new GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.VJab1, player,
+			 0.25f, 5, 8, isReflectShield: true,
+			clashTier: ClashTier.Weak, isZSaberEffect: true,
+			addToLevel: addToLevel, hitSound : "htsnd_slash1"
+			),
+			(int)MeleeIds.Jab => new GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.VJab1, player,
+			 1, 12, 15, isReflectShield: true,
+			clashTier: ClashTier.Weak, isZSaberEffect: true,
+			addToLevel: addToLevel, hitSound : "htsnd_punch_1"
+			),
+			(int)MeleeIds.Jab2 => new GenericMeleeProj(
+			new KRMelee(), projPos, ProjIds.VJab2, player,
+			 1, 26, 8, isReflectShield: true,
+			clashTier: ClashTier.Weak, isZSaberEffect: true,
+			addToLevel: addToLevel, hitSound : "htsnd_punch_2", isJuggleProjectile : true
+			),
+
+
+			(int)MeleeIds.KamaeUnB => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.MechFrogStompShockwave, player,
+				2, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.DeadLiftEX => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
+				2, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, isJuggleProjectile : true
+			),
+
+
+			(int)MeleeIds.GoldenRight => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
+				3, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, hitSound : "dbzclang", isJuggleProjectile : true
+			),
+
+
+
+
+			(int)MeleeIds.Kote => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.KRStandingKick, player,
+				2, 40, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.BurensenStart => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenStart, player,
+				2, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp1", isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.BurensenStomp => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenStomp, player,
+				1, 0, 5, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : false
+			),
+
+
+			(int)MeleeIds.SpeedDemon => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.HeavyPush, player,
+				2, 0, 30, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_clamp2", isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.BurensenEND => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenEND, player,
+				2, 0, 30, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.BurensenENDCPU => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenEND, player,
+				2, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, hitSound : "kofhtsnd_megapunch1", isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.RagingDemon => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.RagingDemon, player,
+				5, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel, isJuggleProjectile : true
+			),
+
+			(int)MeleeIds.HotIcecle => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.Hyouretsuzan2, player,
+				2, 30, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, hitSound : "htsnd_glass", isJuggleProjectile : true, isLiftProjectile : true
+			),
+
+			(int)MeleeIds.GreenEyedLamp => new GenericMeleeProj(
+				new RyuenjinWeapon(), projPos, ProjIds.Ryuenjin, player,
+				2, 30, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, isJuggleProjectile : true,  hitSound : "htsnd_punch_3"
+			),
+
+			(int)MeleeIds.AirRaid => new GenericMeleeProj(
+				new RyuenjinWeapon(), projPos, ProjIds.VileAirRaidPlusKnock, player,
+				1, 0, 20, isReflectShield: true,
+				ShouldClang: false, isZSaberEffect: true,
+				addToLevel: addToLevel, isJuggleProjectile : true, hitSound: "htsnd_lighting"
+			),
+
 			_ => null
 		};
+		return proj;
 	}
+
+
 
 	public override bool isSoftLocked() {
 		if (isShootingGizmo) {
@@ -807,13 +1278,13 @@ public class Vile : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		if (isVileMK5) {
-			return "vilemk5_" + spriteName;
-		}
-		if (isVileMK2) {
-			return "vilemk2_" + spriteName;
-		}
-		return "vile_" + spriteName;
+	//	if (isVileMK5) {
+	//		return "vilemk5_" + spriteName;
+	//	}
+	//	if (isVileMK2) {
+	//		return "vilemk2_" + spriteName;
+	//	}
+		return "vava_" + spriteName;
 	}
 
 	public override void changeToIdleOrFall(string transitionSprite = "", string transShootSprite = "") {
@@ -931,15 +1402,35 @@ public class Vile : Character {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
+	
 	public override List<ShaderWrapper> getShaders() {
-		List<ShaderWrapper> shaders = base.getShaders();
+		List<ShaderWrapper> baseShaders = base.getShaders();
+		List<ShaderWrapper> shaders = new();
+		ShaderWrapper? palette = null;
 
-		if (hasFrozenCastle && player.frozenCastleShader != null) {
-			shaders.Add(player.frozenCastleShader);
+
+		if (this is not VAVA2 and not VAVAV and not FinalVava and not VAVA1){
+			if (player.skinSlot == 0) {
+				palette = player.vilePal0;
+			}
+			if (player.skinSlot == 1) {
+				palette = player.nightmareZeroShader;
+			}
+			if (player.skinSlot == 2) {
+				palette = player.nightmareZeroShader2;
+			}
 		}
 
+		if (palette != null) {
+			shaders.Add(palette);
+		}
+		if (shaders.Count == 0) {
+			return baseShaders;
+		}
+		shaders.AddRange(baseShaders);
 		return shaders;
 	}
+
 
 /*
 	public override float getRunSpeed() {
@@ -1008,7 +1499,7 @@ public class Vile : Character {
 			2 => new SplashHit(),
 			_ => null
 		};
-		Weapon? grenadeWeapon = loadout.ball switch {
+		Weapon? grenadeWeapon = loadout.napalm switch {
 			0 => new ExplosiveRound(),
 			1 => new SpreadShot(),
 			2 => new PeaceOutRoller(),

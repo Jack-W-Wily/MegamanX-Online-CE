@@ -8,7 +8,13 @@ public enum VileBallType {
 	ExplosiveRound,
 	SpreadShot,
 	PeaceOutRoller,
+	SwordBouquet,
 }
+
+
+
+
+
 public class VileBall : Weapon {
 	public float vileAmmoUsage;
 	public VileBall() : base() {
@@ -109,6 +115,50 @@ public class PeaceOutRoller : VileBall {
 		);
 	}
 }
+
+
+
+
+
+public class SwordBouquet : VileBall {
+	public static SwordBouquet netWeapon = new();
+	public SwordBouquet() : base() {
+		type = (int)VileBallType.SwordBouquet;
+		displayName = "Sword Bouquet";
+		vileAmmoUsage = 16;
+		fireRate = 75;
+		killFeedIndex = 80;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "3";
+		hitcooldown = "0.5";
+		flinch = "6";
+		effect = "Splits on ground.";
+	}
+	public override void vileShoot(Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new BallAttacks(this), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		if (character is not Vile vava) return;
+		vava.setVileShootTime(this);
+		vava.tryUseVileAmmo(vileAmmoUsage);
+		new PeaceOutRollerProj(
+			character.pos, character.xDir, 0, character, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+
+
+
+
+
+
+
+
+
 public class NoneBall : VileBall {
 	public static NoneBall netWeapon = new();
 	public NoneBall() : base() {

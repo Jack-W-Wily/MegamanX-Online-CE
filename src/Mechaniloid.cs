@@ -128,8 +128,8 @@ public class BirdMechaniloidProj : Projectile, IDamagable {
 public class Mechaniloid : Actor, IDamagable {
 	int state = 0;
 	Actor target;
-	float health = 8;
-	float maxHealth = 8;
+	float health = 4;
+	float maxHealth = 4;
 	const float sightRange = 250;
 	float attackRange;
 	string baseSprite;
@@ -392,6 +392,14 @@ public class Mechaniloid : Actor, IDamagable {
 			proj = new GenericMeleeProj(
 				weapon, centerPoint, ProjIds.Sigma2HopperDrill,
 				netOwner, 1, Global.defFlinch, 9,
+				addToLevel: true
+			);
+			proj.netcodeOverride = NetcodeModel.FavorDefender;
+		}
+		if (sprite.name == "enemy_walkball_idle") {
+			proj = new GenericMeleeProj(
+				weapon, centerPoint, ProjIds.Sigma2HopperDrill,
+				netOwner, 1, Global.defFlinch, 30,
 				addToLevel: true
 			);
 			proj.netcodeOverride = NetcodeModel.FavorDefender;

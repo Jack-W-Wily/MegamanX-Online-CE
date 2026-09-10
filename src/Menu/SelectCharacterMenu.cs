@@ -46,6 +46,8 @@ public enum CharIds {
 	Kurumitos,   // Always add the new characters bellow the Vanilla characters
 				 // Because otherwise the code gets really messy with the IDs
 	VAVA1,
+	VAVAV,
+	VAVA2,
 	RockmanX,
 	ZeroEarly,
 	ZeroMID,
@@ -126,9 +128,8 @@ public class CharSelection {
 		new CharSelection("Zero (Early)", (int)CharIds.PunchyZero, 1, 0, "smenu_zero", 0){offset = new Point(0, 20)},
 		new CharSelection("Zero (MID)", (int)CharIds.ZeroMID, 1, 0, "smenu_zero_2", 0){offset = new Point(0, 20)},
 		//new CharSelection("Zero (END)", (int)CharIds.ZeroEND, 1, 0, "smenu_zero_3", 0){offset = new Point(0, 20)},
-		new CharSelection("Axl", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},
-		
-		new CharSelection("Vava", (int)CharIds.VAVA1, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
+		new CharSelection("Axl", (int)CharIds.Axl, 1, 0, "smenu_axl", 0){offset = new Point(0, 20)},	
+		new CharSelection("Vava", (int)CharIds.Vile, 1, 0, "smenu_vile", 0){offset = new Point(0, 20)},
 		new CharSelection("Zain", (int)CharIds.Zain, 1, 0, "smenu_zain", 0){offset = new Point(0, 20)},
 		new CharSelection("Iris", (int)CharIds.Iris, 1, 0, "smenu_iris", 0){offset = new Point(0, 20)},
 		new CharSelection("Dynamo", (int)CharIds.Dynamo, 1, 0, "smenu_dynamo", 0){offset = new Point(0, 20)},
@@ -137,6 +138,8 @@ public class CharSelection {
 		new CharSelection("High Max", (int)CharIds.HighMax, 1, 0, "smenu_highmax", 0){offset = new Point(0, 20)},
 		new CharSelection("Green Biker Dude", (int)CharIds.GBD, 1, 0, "smenu_gbd", 0){offset = new Point(0, 20)},
 		new CharSelection("XKai", (int)CharIds.XKai, 1, 0, "smenu_xkai", 0){offset = new Point(0, 20)},
+		
+	
 	];
 
 

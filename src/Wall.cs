@@ -235,11 +235,14 @@ public class CrackedWall : Actor, IDamagable {
 	public int flag;
 	public string gibSprite;
 
+	public string kName;
+
 	public CrackedWall(Point pos, string crackedWallSprite, string gibSprite, int xDir, int yDir, int flag, int health, string destroyInstanceName, bool ownedByLocalPlayer) :
 		base(crackedWallSprite, pos, null, ownedByLocalPlayer, false) {
 		this.health = health;
 		maxHealth = health;
 		isStatic = true;
+		kName = gibSprite;
 		this.flag = flag;
 		this.gibSprite = gibSprite;
 		this.xDir = xDir;
@@ -301,6 +304,7 @@ public class CrackedWall : Actor, IDamagable {
 	// Only if 0 is returned, it can't damage it. Even if null, it still can
 	public static float? canDamageCrackedWall(int projId, CrackedWall? cw) {
 		if (cw?.flag == 3) return null;
+		if (cw?.gibSprite == "ms_door") return null;
 
 		if (projId == (int)ProjIds.GigaCrush) return 12;
 		if (projId == (int)ProjIds.Rakuhouha) return 12;

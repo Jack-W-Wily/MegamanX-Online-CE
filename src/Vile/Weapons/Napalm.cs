@@ -5,14 +5,12 @@ namespace MMXOnline;
 #region Weapons
 public enum NapalmType {
 	None = -1,
+	BumpityBoom,
 	RumblingBang,
-	FireGrenade,
-	SplashHit,
-	
-	BumpityBoom,	
+	SplashHit,	
 	TerritorialPow,
 	BangAwayBomb,
-	FlameRound,
+	FireGrenade,
 	
 }
 public class VileNapalm : Weapon {
@@ -107,6 +105,72 @@ public class SplashHit : VileNapalm {
 		);
 	}
 }
+
+
+
+
+
+public class BumptyBoomBall : VileBall {
+	public static SplashHit netWeapon = new();
+	public BumptyBoomBall() : base() {
+		type = (int)NapalmType.BumpityBoom;
+		displayName = "Bumpty Boom";
+		vileAmmoUsage = 16;
+		fireRate = 60 * 3;
+		killFeedIndex = 79;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "2/1";
+		hitcooldown = "0.5";
+		effect = "Pushes towards it.";
+	}
+	public override void vileShoot(Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new BumptyBoomGranadeLaunch(), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		new BumptyBoomProj(new BumptyBoom(),
+			character.pos.add(poi), character.xDir, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+
+
+
+public class BumptyBoom : VileNapalm {
+	public static BumptyBoom netWeapon = new();
+	public BumptyBoom() : base() {
+		type = (int)NapalmType.BumpityBoom;
+		displayName = "Bumpty Boom";
+		vileAmmoUsage = 16;
+		fireRate = 60 * 3;
+		killFeedIndex = 79;
+		vileWeight = 3;
+		ammousage = vileAmmoUsage;
+		damage = "2/1";
+		hitcooldown = "0.5";
+		effect = "Pushes towards it.";
+	}
+	public override void vileShoot(Vile vile) {
+		if (shootCooldown > 0) return;
+		if (vile.energy.ammo < vileAmmoUsage) return;
+		vile.changeState(new BumptyBoomGranadeLaunch(), true);
+	}
+	public override void shoot(Character character, int[] args) {
+		var poi = character.sprite.getCurrentFrame().POIs[0];
+		poi.x *= character.xDir;
+		new BumptyBoomProj(new BumptyBoom(),
+			character.pos.add(poi), character.xDir, character.player,
+			character.player.getNextActorNetId(), rpc: true
+		);
+	}
+}
+
+
 public class NoneNapalm : VileNapalm {
 	public static NoneNapalm netWeapon = new();
 	public NoneNapalm() : base() {

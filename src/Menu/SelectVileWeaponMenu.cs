@@ -5,6 +5,9 @@ using SFML.Graphics;
 
 namespace MMXOnline;
 
+
+
+
 public class SelectVileWeaponMenu : IMainMenu {
 	public List<WeaponCursor> cursors;
 	public int selCursorIndex;
@@ -15,30 +18,30 @@ public class SelectVileWeaponMenu : IMainMenu {
 			("Cannon", [
 				FrontRunner.netWeapon,
 				FatBoy.netWeapon,
-				LongShotGizmo.netWeapon
+				TridentLine.netWeapon
 			]),
 			("Vulcan", [
 				CherryBlast.netWeapon,
 				DistanceNeedler.netWeapon,
 				BuckshotDance.netWeapon,
 			]),
-			("Missile", [
+			("B", [
 				NoneMissile.netWeapon,
 				HumerusCrush.netWeapon,
 				PopcornDemon.netWeapon,
 				ElectricShock.netWeapon,
 			]),
-			("R.Punch", [
-				GoGetterRight.netWeapon,
-				SpoiledBrat.netWeapon,
-				InfinityGig.netWeapon,
+			("Stance", [
+				ViolentCrusher.netWeapon,
+				SpringSnatcher.netWeapon,
+				SpeedyViper.netWeapon,
 			]),
 			("Napalm", [
+				BumptyBoom.netWeapon,
 				RumblingBang.netWeapon,
-				FireGrenade.netWeapon,
-				SplashHit.netWeapon
+				SplashHit.netWeapon,
 			]),
-			("Grenade", [
+			("Ball", [
 				ExplosiveRound.netWeapon,
 				SpreadShot.netWeapon,
 				PeaceOutRoller.netWeapon
@@ -53,10 +56,11 @@ public class SelectVileWeaponMenu : IMainMenu {
 				SeaDragonRage.netWeapon,
 				DragonsWrath.netWeapon,
 			]),
-			("Laser", [
-				NecroBurst.netWeapon,
-				StraightNightmare.netWeapon,
-				RisingSpecter.netWeapon,
+			("VARIATION", [
+				VileClassic.netWeapon,
+				VileMk1.netWeapon,
+				VileMk2.netWeapon,		
+				VileMkV.netWeapon,
 			]),
 		};
 
@@ -127,9 +131,9 @@ public class SelectVileWeaponMenu : IMainMenu {
 				Options.main.saveToFile();
 				if (inGame) {
 					if (Options.main.killOnLoadoutChange) {
-						Global.level.mainPlayer.forceKill();
+				//		Global.level.mainPlayer.forceKill();
 					} else if (!Global.level.mainPlayer.isDead) {
-						Global.level.gameMode.setHUDErrorMessage(Global.level.mainPlayer, "Change will apply on next death", playSound: false);
+					//	Global.level.gameMode.setHUDErrorMessage(Global.level.mainPlayer, "Change will apply on next death", playSound: false);
 					}
 				}
 			}

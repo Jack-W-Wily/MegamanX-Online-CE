@@ -81,7 +81,8 @@ public class VAVAV : Vile {
 	public VAVAV(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true,
+		int? heartTanks = null, bool isATrans = false
 		) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
 
@@ -460,13 +461,7 @@ public class VAVAV : Vile {
 		}
 
 
-		if (charState is not VileStationaryHover &&
-			player.input.isHeld(Control.Down, player) &&
-		player.input.isPressed(Control.Dash, player) && HyperDashCooldown == 0) {
-			changeState(new VileDashChargeState(), true);
-			playSound("vilehyperdashstart", true);
-			HyperDashCooldown = 2f;
-		}
+		
 
 		if (charState is InRideChaser) {
 			return;
@@ -528,25 +523,6 @@ public class VAVAV : Vile {
 	}
 
 
-public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32
-		
-		){
-			changeState(new VavaBurensen1(), true);	
-			player.superAmmo = 0;
-			playSound("chingX4");
-		}
-
-		if (player.input.checkShoryuken(player, xDir, Control.R2) && player.superAmmo >= 32) {
-			changeState(new RisingSpecterStart());
-			player.superAmmo = 0;
-		}
-		
-
-
-		return !isInDamageSprite();
-	}
-
 
 	public bool SpecialMoves() {
 		
@@ -605,14 +581,6 @@ public bool Supers() {
 		){
 			changeState(new Vava1GizmoDash(), true);	
 			downPressedTimes = 0;
-			return true;
-		}
-
-
-		if (player.vileAmmo >= 15 && canDash() && player.speedDevil &&
-			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
-			changeState(new VileDashChargeState());
-			player.vileAmmo -= 15;
 			return true;
 		}
 
@@ -1647,16 +1615,7 @@ public float CannonCD;
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
-	public override List<ShaderWrapper> getShaders() {
-		List<ShaderWrapper> shaders = base.getShaders();
-
-		if (hasFrozenCastle && player.frozenCastleShader != null) {
-			shaders.Add(player.frozenCastleShader);
-		}
-
-		return shaders;
-	}
-
+	
 	public override float getRunSpeed() {
 		if (hasSpeedDevil) {
 			return base.getRunSpeed() * 1.1f;
@@ -1696,7 +1655,7 @@ public float CannonCD;
 		|| charState is VavaVSlashRun;
 	}
 
-	public virtual bool isStatusImmune() {
+	public override bool isStatusImmune() {
 		return charState is HexaInvoluteState;
 	}
 

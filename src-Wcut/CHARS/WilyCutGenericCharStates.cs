@@ -8,6 +8,72 @@ namespace MMXOnline;
 
 
 
+
+public class Jab1 : CharState {
+
+
+	public Jab1() : base("jab_1") {
+		wiffCancel = true;
+		canSpecialCancel = true;
+		enterSound = "punch2";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+
+		if (character.frameIndex > 1) {
+			if (player.input.isAPressed(player)) {
+				character.changeState(new Jab2(), true);
+		}
+		}
+
+		
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+public class Jab2 : CharState {
+
+
+	public Jab2() : base("jab_2") {
+		wiffCancel = true;
+		canSpecialCancel = true;
+		enterSound = "punch2";
+	}
+
+	public override void update() {
+		base.update();
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+		
+
+
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+
+	}
+
+}
+
+
+
+
 public class HitStop : Actor {
 	public float time;
 	public Player owner;

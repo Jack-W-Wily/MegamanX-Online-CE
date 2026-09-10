@@ -46,6 +46,8 @@ public class SavedMaverickData {
 public class Maverick : Actor, IDamagable {
 	// HP stuff.
 	public float health;
+
+	public SubBossPathBlocker pathBlocker;
 	public float maxHealth;
 	public bool alive = true;
 	private float healAmount = 0;
@@ -83,6 +85,8 @@ public class Maverick : Actor, IDamagable {
 	public float flyBar = 16;
 
 	public bool dismantleTypeDeath;
+
+	public bool noHurtKnockback;
 	public (int icon, int units) flyBarIndexes = (0, 0);
 
 	// Defense.
@@ -327,6 +331,8 @@ public class Maverick : Actor, IDamagable {
 		acidHurtCooldown = 0;
 	}
 
+
+	
 	public void debuffCooldowns() {
 		if (Global.level.mainPlayer.readyTextOver) {
 			Helpers.decrementTime(ref invulnTime);

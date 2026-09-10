@@ -894,7 +894,7 @@ public enum ProjIds {
 
 	DropSlide,
 
-		RollingShieldCharged2,
+	RollingShieldCharged2,
 
 
 	NormalPush,
@@ -1001,7 +1001,10 @@ public enum ProjIds {
 	EnemyWheeler,
 	MissileElecSpark,
 
+	EnemySubBossColision,
+
 	DragoonGrabConfirm,
+
 
 	// X1 Zero
 

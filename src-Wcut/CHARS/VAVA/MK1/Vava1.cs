@@ -187,21 +187,6 @@ public class VAVA1 : Vile {
 
 
 
-	public override bool normalCtrl() {
-		if (player.input.isL2Held(player)) {
-			changeState(new BlockWCUT(), true);
-
-		}
-	//	if (player.input.isPressed(Control.Special2, player)
-	//	&& player.currency > 4
-	//	) {
-	//		player.currency -= 5;
-	//	}
-
-		return base.normalCtrl();
-	}
-
-
 	
 
 	public override bool spcCancel() {
@@ -238,24 +223,7 @@ public class VAVA1 : Vile {
 
 
 
-	public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32
-		
-		){
-			changeState(new VavaBurensen1(), true);	
-			player.superAmmo = 0;
-			playSound("chingX4");
-		}
 
-		if (player.input.checkShoryuken(player, xDir, Control.R2) && player.superAmmo >= 32) {
-			changeState(new RisingSpecterStart());
-			player.superAmmo = 0;
-		}
-		
-
-
-		return !isInDamageSprite();
-	}
 
 
 	public bool SpecialMoves() {

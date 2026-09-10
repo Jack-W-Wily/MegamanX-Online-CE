@@ -65,7 +65,7 @@ public class GBD : Character {
 			} else {
 				if (grounded){
 					
-						changeState(new VAVAJab1(), true);		
+						changeState(new Jab1(), true);		
 					
 				} else {
 						changeState(new IrisDiveKick(), true);

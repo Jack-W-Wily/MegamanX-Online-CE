@@ -85,7 +85,8 @@ public class VAVA2 : Vile {
 	public VAVA2(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		bool isWarpIn = true,
+		int? heartTanks = null, bool isATrans = false
 		) : base(
 		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
 
@@ -502,13 +503,6 @@ public class VAVA2 : Vile {
 		}
 
 
-		if (charState is not VileStationaryHover &&
-			player.input.isHeld(Control.Down, player) &&
-		player.input.isPressed(Control.Dash, player) && HyperDashCooldown == 0) {
-			changeState(new VileDashChargeState(), true);
-			playSound("vilehyperdashstart", true);
-			HyperDashCooldown = 2f;
-		}
 
 		if (charState is InRideChaser) {
 			return;
@@ -526,26 +520,6 @@ public float CrimsonphantomCD;
 
 	
 	
-
-	
-	public bool Supers() {
-		if (player.input.checkShoryuken2(player, xDir, Control.Special1) && player.superAmmo >= 32
-		
-		){
-			changeState(new VavaBurensen1(), true);	
-			player.superAmmo = 0;
-			playSound("chingX4");
-		}
-
-		if (player.input.checkShoryuken(player, xDir, Control.R2) && player.superAmmo >= 32) {
-			changeState(new RisingSpecterStart());
-			player.superAmmo = 0;
-		}
-		
-
-
-		return !isInDamageSprite();
-	}
 
 
 	public bool SpecialMoves() {
@@ -577,12 +551,6 @@ public float CrimsonphantomCD;
 			return true;
 		}
 
-		if (player.vileAmmo >= 15 && canDash() && player.speedDevil &&
-			downPressedTimes >= 2 && player.input.isHeld(Control.Down, player) && player.input.isHeld(Control.Dash, player)) {
-			changeState(new VileDashChargeState());
-			player.vileAmmo -= 15;
-			return true;
-		}
 
 		return false ;
 	}
@@ -889,40 +857,6 @@ public float CannonCD;
 	}
 
 
-
-
-	public override bool normalCtrl() {
-		if (sprite.name.EndsWith("cannon_air") && isAnimOver()) {
-			changeSpriteFromName("fall", true);
-		}
-
-		if (player.input.isL2Held(player) &&
-			!isAttacking() && 
-			charState is not BlockWCUT and not CrimsonPhantomState and not Vava1GrabStartState and not Vava1GizmoDash
-		) {
-			
-			changeState(new BlockWCUT(), true);
-			return true;
-		}
-
-		
-		if (player.input.isL2Held(player)) {
-			if (player.input.isAPressed(player)) {
-				changeState(new Vava1GrabStartState(), true);
-			}
-			
-		}
-
-		if (!grounded &&
-			canVileHover() &&
-			player.input.isPressed(Control.Jump, player) &&
-			charState is not VileHover
-		) {
-			changeState(new VileHover(), true);
-			return true;
-		}
-		return base.normalCtrl();
-	}
 	
 	// Shoots stuff. VAVA(WCUT)
 	public override void shoot(int chargeLevel) {
@@ -1612,16 +1546,6 @@ public float CannonCD;
 	public override Collider getRaCollider() {
 		var rect = new Rect(0, 0, 18, 22);
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
-	}
-
-	public override List<ShaderWrapper> getShaders() {
-		List<ShaderWrapper> shaders = base.getShaders();
-
-		if (hasFrozenCastle && player.frozenCastleShader != null) {
-			shaders.Add(player.frozenCastleShader);
-		}
-
-		return shaders;
 	}
 
 	public override float getRunSpeed() {

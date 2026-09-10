@@ -18,12 +18,14 @@ public class VileLaser : Weapon {
 		index = (int)WeaponIds.VileLaser;
 	}
 }
+
+
 public class RisingSpecter : VileLaser {
 	public static RisingSpecter netWeapon = new();
 	public RisingSpecter() : base() {
 		index = (int)WeaponIds.RisingSpecter;
 		type = (int)VileLaserType.RisingSpecter;
-		displayName = "Rising Specter";
+		displayName = "Nervous Ghost";
 		vileAmmoUsage = 24;
 		killFeedIndex = 120;
 		vileWeight = 3;

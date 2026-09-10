@@ -618,6 +618,44 @@ public class Vava1GizmoDash : CharState {
 
 
 
+
+public class Vile2DashGrab : CharState {
+
+
+	public Vile2DashGrab() : base("dash_grab") {
+		immuneToWind = true;
+		enterSound = "GDash";
+	}
+
+	public override void update() {
+		base.update();
+		character.move(new Point(character.xDir * 250, 0));
+
+	
+		if (stateTime > 0.2f) {
+			character.changeToIdleOrFall();
+			return;
+		}
+
+
+	}
+
+    public override void onEnter(CharState oldState) {
+        base.onEnter(oldState);
+        character.useGravity = false;
+	}
+
+    public override void onExit(CharState? newState) {
+        base.onExit(newState);
+        character.useGravity = true;
+        character.slideVel = character.xDir * character.getDashSpeed() * 0.9f;
+	}
+}
+
+
+
+
+
 public class GizmoDashHoming : CharState {
 	
 	bool isDone;

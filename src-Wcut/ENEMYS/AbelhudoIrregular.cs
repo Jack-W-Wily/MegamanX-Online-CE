@@ -22,6 +22,7 @@ public class AbelhudoIrregular : Maverick {
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
 		dismantleTypeDeath = false;
 		shouldDealColisionDmg = true;
+		noHurtKnockback = true;
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
 		netActorCreateId = NetActorCreateId.AbelhudoIrregular;
@@ -62,16 +63,31 @@ public class AbelhudoIrregular : Maverick {
 
 	public float WheelerCooldown;
 
+
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (pathBlocker != null) {
+			pathBlocker.destroySelf();
+		}
+	}
+
+
+
 	public override void update() {
 		base.update();
 		Helpers.decrementTime(ref WheelerCooldown);
 
-		
+		if (pathBlocker == null){
+		pathBlocker = new SubBossPathBlocker(weapon, pos.addxy(100 * xDir, 0), 
+		xDir, player, player.getNextActorNetId(), rpc: true);
+		}
+
 		if (WheelerCooldown == 0) {
 			WheelerCooldown = 12;
 			playSound("viralSigmaShoot", sendRpc: true);
 
-			if (Helpers.randomRange(0, 2) == 0) {
+			if (Helpers.randomRange(0, 3) == 0) {
 				new ViralSigmaShootProj(new MechaniloidWeapon(player, MechaniloidType.Bird), pos, xDir, player, player.getNextActorNetId(), rpc: true);
 			} else if (Helpers.randomRange(0, 2) == 1) {
 					new ViralSigmaShootProj(new MechaniloidWeapon(player, MechaniloidType.Tank), pos, xDir, player, player.getNextActorNetId(), rpc: true);
@@ -115,6 +131,20 @@ public class AbelhudoIrregular : Maverick {
 		return mshoot;
 	}
 
+	
+	public MaverickState getShootState2(bool isAI) {
+		var mshoot = new MShoot((Point pos, int xDir) => {
+				new TorpedoProjMech2(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
+				
+		}, "torpedo");
+		if (isAI) {
+			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.001f);
+		}
+		return mshoot;
+	}
+
+
+
 
 
 
@@ -125,8 +155,9 @@ public class AbelhudoIrregular : Maverick {
 		}
 	
 		return [
-			getShootState(true),
 			getShootState(false),
+			getShootState2(false),
+			getShootState2(true),
 		];
 	}
 
@@ -138,15 +169,18 @@ public class AbelhudoIrregular : Maverick {
 
 
 
+	
+
+
+
 	// This can be called from a RPC, so make sure there is no character conditionals here.
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
-		return (MeleeIds)id switch {
-			MeleeIds.Pounce => new GenericMeleeProj(
-				meleeWeapon, pos, ProjIds.VelGMelee, player,
-				3, Global.defFlinch, addToLevel: addToLevel
-			),
-			_ => null
-		};
+		return  new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.EnemySubBossColision, player,
+				3, Global.superFlinch, addToLevel: true);
+			
+			
+		
 	}
 
 }
@@ -392,6 +426,61 @@ public class EnemyWheeler : Projectile, IDamagable {
 				//playSound("spinWheelLoop");
 			}
 		}
+	}
+}
+
+
+
+
+
+
+
+public class SubBossPathBlocker : Projectile {
+
+	Wall wall;
+	public SubBossPathBlocker(
+		Weapon weapon, Point pos, int xDir, 
+		Player player, ushort netProjId, bool rpc = false
+	) : base(
+		weapon, pos, xDir, 0, 0, player, "subboss_path_blocker", 
+		Global.halfFlinch, 1f, netProjId, player.ownedByLocalPlayer
+	) {
+		maxTime = 9999f;
+		projId = (int)ProjIds.EnemySubBossColision;
+		setIndestructableProperties();
+		fadeSprite = "explosion";
+		fadeOnAutoDestroy = true;
+		//isShield = true;
+		//isReflectShield = true;
+		collider.isClimbable = false;
+		collider.wallOnly = false;
+		isStatic = true;
+		
+		var rect = collider.shape.getRect().getPoints();
+		wall = new Wall("Collision Shape", new List<Point>()
+		{
+				rect[0].add(new Point(0, 0)),
+				rect[1].add(new Point(0, 0)),
+				rect[2].add(new Point(0, 0)),
+				rect[3].add(new Point(0, 0)),
+			});
+
+		Global.level.addGameObject(wall);
+		
+		if (player.character != null) zIndex = player.character.zIndex - 10;
+		
+		if (rpc) rpcCreate(pos, player, netProjId, xDir);
+	}
+
+	public static Projectile rpcInvoke(ProjParameters arg) {
+		return new HighmaxWallProj(
+			LightningWeb.netWeapon, arg.pos, arg.xDir, arg.player, arg.netId
+		);
+	}
+
+	public override void onDestroy() {
+		base.onDestroy();
+		if (wall != null) Global.level.removeGameObject(wall);
 	}
 }
 

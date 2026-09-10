@@ -226,11 +226,11 @@ public class BumptyBoomGranadeLaunch : CharState {
 			var poi = character.getFirstPOI();
 			if (!once && poi != null) {
 				once = true;
-				var proj = 	new PeaceOutRollerProj(
-						character.getCenterPos().addxy(20*character.xDir,0), character.xDir, 1, vile, player, 
-						character.player.getNextActorNetId(), rpc: true
-					);
-				//new BumptyBoomProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
+				var proj =// 	new PeaceOutRollerProj(
+						//character.getCenterPos().addxy(20*character.xDir,0), character.xDir, 1, vile, player, 
+						//character.player.getNextActorNetId(), rpc: true
+					//);
+				new BumptyBoomProj(vile.napalmWeapon, poi.Value, character.xDir, character.player, character.player.getNextActorNetId(), rpc: true);
 				proj.vel = new Point(character.xDir * 200, -200);
 			}
 
@@ -293,9 +293,8 @@ public class BumptyBoomProj : Projectile {
 		if (exploded) return;
 		exploded = true;
 		if (ownedByLocalPlayer) {
-			new GrenadeExplosionProj(
-				weapon, pos, xDir, owner, 1, target, Math.Sign(vel.x), owner.getNextActorNetId()
-			);
+			 new DragoonSpark(new SpeedBurner(), pos, xDir, owner,  
+				 owner.getNextActorNetId(), rpc : true);
 		}
 		destroySelf();
 	}
@@ -460,6 +459,67 @@ public class TerriotiralPowState : CharState {
 	}
 }
 
+
+
+
+
+
+
+
+public class BossJumpVile2 : CharState {
+
+	bool dropDown;
+	public BossJumpVile2() : base("jump") {
+		enterSound = "land";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+		normalCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!character.grounded && stateTime > 0.05f) {
+			exitOnLanding = true;
+		}
+
+		var poi = character.getFirstPOI();
+		if (!once && poi != null) {
+			once = true;
+
+			if (character is Vava2Goliath) {
+			var proj2 = new MK2NapalmGrenadeProj(
+					poi.Value, -character.xDir, character, character.player,
+					character.player.getNextActorNetId(), rpc: true
+				);
+			}
+			var proj = new MK2NapalmGrenadeProj(
+					poi.Value, character.xDir, character, character.player,
+					character.player.getNextActorNetId(), rpc: true
+				);
+			proj.vel = new Point(character.xDir * 100, 0);
+			character.playSound("FireNappalmMK2", forcePlay: false, sendRpc: true);
+
+		}
+
+
+		if (!character.grounded) {
+		
+			character.move(new Point(character.xDir * 200, 0));
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -character.getJumpPower() * 1.2f;
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		specialId = SpecialStateIds.None;
+	}
+}
 
 
 

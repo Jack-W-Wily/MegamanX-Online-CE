@@ -8,8 +8,8 @@ namespace MMXOnline;
 public enum VileCutterType {
 	None = -1,
 	QuickHomesick,
+	MaroonedTomahawk,
 	ParasiteSword,
-	MaroonedTomahawk
 }
 
 public class VileCutter : Weapon {
@@ -103,7 +103,17 @@ public class MaroonedTomahawk : VileCutter {
 	public override void vileShoot(Vile vile) {
 		if (shootCooldown > 0) return;
 		if (vile.energy.ammo < vileAmmoUsage) return;
-		vile.changeState(new CutterAttacks(this), true);
+		vile.changeState(new VavaTomahawk(), true);
+		vile.invulnTime = 0.2f;
+					var tomahawk1 = new VileMaroonedTomahawk(
+					vile.getShootPos(), vile.xDir, vile, vile.player,
+					vile.player.getNextActorNetId(), rpc: true
+						);
+					var tomahawk2 = new VileMaroonedTomahawk(
+				vile.getShootPos(), vile.xDir, vile, vile.player,
+				vile.player.getNextActorNetId(), rpc: true
+					);
+					tomahawk2.vel.y = -30;
 	}
 	public override void shoot(Character character, int[] args) {
 		if (character is not Vile vava) return;

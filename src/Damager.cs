@@ -978,17 +978,19 @@ public class Damager {
 					drgn.changeState(new DragoonGrab());
 					character?.changeState(new ForceGrabbed(drgn));
 				}
-				if (projId == (int)ProjIds.DragoonSpark) {
-					if (character != null){
-						character.changeState(new PushedOver2(drgn.xDir), true);
-					}
-				}
+				
 
 				if (drgn.charState is DragoonRising) {
 					drgn.charState.attackCtrl = true;
 				}
 			}
 
+
+			if (projId == (int)ProjIds.DragoonSpark) {
+					if (character != null){
+						character.changeState(new PushedOver2(character.xDir), true);
+					}
+				}
 
 			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
 				if (owner.character is RockmanX rx && rx != null) {
