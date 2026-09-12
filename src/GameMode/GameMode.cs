@@ -114,7 +114,7 @@ public class GameMode {
 	public Player? hudBotLeftPlayer;
 	public Player? hudBotRightPlayer;
 
-	bool hudPositionsAssigned;
+	public bool hudPositionsAssigned;
 	int currentLineH;
 
 	public enum HUDHealthPosition {
@@ -1576,7 +1576,7 @@ public class GameMode {
 	}
 
 	public void renderHealthAndWeapons() {
-		bool is1v1OrTraining = level.is1v1() || level.levelData.isTraining();
+		bool is1v1OrTraining = level.is1v1() || level.levelData.isTraining() || level.levelData.isStoryMode()  ;
 		if (!is1v1OrTraining) {
 			renderHealthAndWeapon(level.mainPlayer, HUDHealthPosition.Left);
 		} else {

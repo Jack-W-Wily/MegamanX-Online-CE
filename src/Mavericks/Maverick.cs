@@ -1053,7 +1053,7 @@ public class Maverick : Actor, IDamagable {
 		}
 
 
-			if (globalCollider != null && shouldDealColisionDmg
+			if (globalCollider != null && shouldDealColisionDmg && health > 1
 		&& !sprite.name.Contains("frozen") && !sprite.name.Contains("knocked") 
 		&& !sprite.name.Contains("grabbed") && !sprite.name.Contains("_hurt") 
 		&& !sprite.name.Contains("_hurt")  && !sprite.name.Contains("_die")) {

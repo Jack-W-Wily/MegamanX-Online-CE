@@ -13,6 +13,9 @@ public class VictoryPoint : Actor {
 
 	public override void update() {
 		base.update();
+		if (!Global.level.isRace()) {
+			visible = false;
+		}
 	}
 
 	public override void onStart() {
@@ -26,6 +29,7 @@ public class VictoryPoint : Actor {
 	public override void onCollision(CollideData other) {
 		base.onCollision(other);
 		if (!Global.isHost) return;
+		if (!Global.level.isRace()) return;
 		if (Global.level.gameMode.isOver) return;
 		if (other.otherCollider?.flag == (int)HitboxFlag.Hitbox) return;
 

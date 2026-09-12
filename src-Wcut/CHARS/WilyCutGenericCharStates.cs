@@ -216,15 +216,80 @@ public class BossWait : CharState {
 
 
 
-
+	Character? otherChar;
 	public BossWait() : base("lose") {
-		attackCtrl = true;
+		invincible = true;
 	}
 
 	public override void update() {
 		base.update();
-	
+
+		foreach (var otherPlayer in Global.level.players) {
+					if (otherPlayer.character == null) continue;
+					if (otherPlayer == player) continue;
+					if (otherPlayer == character.parasiteDamager?.owner) continue;
+					if (otherPlayer.character.isInvulnerable()) continue;
+					if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+					if (otherPlayer.character.getCenterPos().distanceTo(character.getCenterPos()) > ParasiticBomb.carryRange) continue;
+					otherChar = otherPlayer.character;
+					character.changeState(new BossWaitOver());
+					
+					break;
+		}
 	}
+
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.health = 0;
+		character.bonusHealth = 0;
+		
+		}
+
+
+		public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		Global.level.gameMode.assignPlayerHUDPositions();
+		Global.level.gameMode.hudPositionsAssigned = true;
+		}
+
+
+}
+
+
+
+public class BossWaitOver : CharState {
+
+
+
+
+	public BossWaitOver() : base("win") {
+		attackCtrl = true;
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+		if (character.health == character.maxHealth) {
+			
+			character.changeToIdleOrFall();
+			
+		}
+	}
+
+
+		public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.addHealth(character.maxHealth);
+		}
+
+
+		public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.bonusHealth = 60;
+		}
+
+
 }
 
 
@@ -326,7 +391,7 @@ public class GlobalParryState : CharState {
 			character.playSound("distortion_d");
 			character.playSound("GDash");
 		}
-
+		
 
 		
 		}

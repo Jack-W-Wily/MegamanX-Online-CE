@@ -582,10 +582,10 @@ public partial class Player {
 
 	public int getStartHeartTanks() {
 		if (Global.level.isNon1v1Elimination() && Global.level.gameMode.playingTo < 3) {
-			return 8;
+			return 0;
 		}
 		if (Global.level.is1v1()) {
-			return 8;
+			return 0;
 		}
 		if (Global.level?.server?.customMatchSettings != null) {
 			return Global.level.server.customMatchSettings.startHeartTanks;
@@ -1195,6 +1195,8 @@ public partial class Player {
 		return [];
 	}
 
+
+
 	public Character? spawnCharAtPoint(
 		int spawnCharNum, byte[] extraData,
 		Point pos, int xDir, ushort charNetId, bool sendRpc,
@@ -1278,15 +1280,16 @@ public partial class Player {
 		} else if (isAI &&
 		
 		(
-		Global.level.levelData.name == "st_cybermaze_test" ||
-		Global.level.levelData.name == "st_x_x1_highway" 
+		Global.level.goal != null && Global.level.goal.name == "BossClaudio"
 		)
 
 		&& charNum >= 0 && isAI) {
-			charNum = (int)CharIds.Vile;
-			newChar = new NothingChar(
-				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+			charNum = (int)CharIds.Sigma;
+			newChar = new BossClaudio(
+				this, Global.level.goal.pos.x, Global.level.goal.pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount,
+				isATrans: isNonMain
 			);
 		
 		} else if (isAI &&

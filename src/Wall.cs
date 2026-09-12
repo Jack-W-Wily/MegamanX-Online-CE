@@ -249,14 +249,15 @@ public class CrackedWall : Actor, IDamagable {
 		this.yDir = yDir;
 
 		id = Global.level.crackedWallAutoIncId;
-		if (Global.level.crackedWallAutoIncId == 255) {
-			throw new Exception("Cannot have more than 255 cracked walls!");
-		}
+		//if (Global.level.crackedWallAutoIncId == 255) {
+		//	throw new Exception("Cannot have more than 255 cracked walls!");
+		//}
 		Global.level.crackedWallAutoIncId++;
 
 		useGravity = false;
 		useActorGrid = true;
 
+		
 		collider.flag = (int)HitboxFlag.Hurtbox;
 		var rect = collider.shape.getRect().getPoints();
 		wall = new Wall("crackedwall", new List<Point>()
@@ -269,7 +270,7 @@ public class CrackedWall : Actor, IDamagable {
 
 		wall.isCracked = true;
 		Global.level.addGameObject(wall);
-
+		
 		this.destroyInstanceName = destroyInstanceName;
 	}
 
@@ -278,8 +279,15 @@ public class CrackedWall : Actor, IDamagable {
 		updateProjectileCooldown();
 	}
 
+	public float SpawnEntityCD;
+
 	public override void update() {
 		base.update();
+		Helpers.decrementTime(ref SpawnEntityCD);
+
+		if (sprite.name.Contains("enemy_spawner")) {
+			visible = false;
+		}
 	}
 
 	public void move(Point deltaPos) {
@@ -298,6 +306,7 @@ public class CrackedWall : Actor, IDamagable {
 			rect[2].addxy(-1, -1),
 			rect[3].addxy(1, -1),
 		};
+		
 		Global.level.addToGrid(wall);
 	}
 
@@ -412,7 +421,8 @@ public class KillZone : Geometry {
 	public float damage;
 	public bool flinch;
 	public float hitCooldown;
-
+	
+	public float SpawnEntityCD;
 	public string kName;
 	public KillZone(string name, List<Point> points, bool killInvuln, float? damage, bool flinch, float hitCooldown) : base(name, points) {
 		this.killInvuln = killInvuln;
@@ -421,6 +431,13 @@ public class KillZone : Geometry {
 		this.hitCooldown = hitCooldown;
 		this.kName = name;
 		collider.isTrigger = true;
+	}
+
+
+	
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref SpawnEntityCD);
 	}
 
 	public void applyDamage(IDamagable damagable) {

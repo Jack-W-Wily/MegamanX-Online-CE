@@ -633,7 +633,7 @@ public class WarpIdle : CharState {
 		}
 
 		if (Global.level.levelData.name == "st_cybermaze_test" && player.isAI) {
-			getTestStageEnemies();
+			//getTestStageEnemies();
 
 		}
 
@@ -670,16 +670,15 @@ public class WarpIdle : CharState {
 
 	
 	public void getTestStageEnemies() {
-		new GreenDog(player, new Point(612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
-		new MetClassic(player, new Point(112, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
-		new GreenDog(player, new Point(1612, 160),  1, player.getNextActorNetId(), true, sendRpc: true);
-		new HogumerEasy(player, new Point(1612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new GreenDog(player, new Point(612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new GreenDog(player, new Point(1612, 160),  1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new HogumerEasy(player, new Point(1612, 160), 1, player.getNextActorNetId(), true, sendRpc: true);
 
-		new MetClassic(player, new Point(412, 160),  1, player.getNextActorNetId(), true, sendRpc: true);
-		new MetClassic(player, new Point(1080, 124), 1, player.getNextActorNetId(), true, sendRpc: true);
-		new GreenDog(player, new Point(2612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
-		new HogumerEasy(player, new Point(2612, 166), 1, player.getNextActorNetId(), true, sendRpc: true);
-		new AbelhudoIrregular(player, new Point(3612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new MetClassic(player, new Point(412, 160),  1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new MetClassic(player, new Point(1080, 124), 1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new GreenDog(player, new Point(2612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new HogumerEasy(player, new Point(2612, 166), 1, player.getNextActorNetId(), true, sendRpc: true);
+	//	new AbelhudoIrregular(player, new Point(3612, 166),  1, player.getNextActorNetId(), true, sendRpc: true);
 
 	}
 

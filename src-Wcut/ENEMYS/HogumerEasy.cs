@@ -91,14 +91,18 @@ public class HogumerEasy : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		Pounce,
+
+		Block
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"ms_hogumer_idle" => MeleeIds.Pounce,
+			"ms_hogumer_idle" when frameIndex >= 2 => MeleeIds.Pounce,
+			"ms_hogumer_idle" when frameIndex < 2 => MeleeIds.Block,
 			_ => MeleeIds.None
 		});
+		
 	}
 
 

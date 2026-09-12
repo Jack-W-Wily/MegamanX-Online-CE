@@ -33,7 +33,7 @@ public partial class Character : Actor, IDamagable {
 
 	public decimal bonusHealth = 0;
 
-	public decimal bossArmor = 0;
+	public float bossArmor = 0;
 
 	// Player linked data.
 	public Player player;
@@ -957,6 +957,13 @@ public partial class Character : Actor, IDamagable {
 		return new Collider(rect.getPoints(), false, this, false, false, HitboxFlag.Hurtbox, new Point(0, 0));
 	}
 
+
+
+	public NavMeshNode? destNode;
+
+	public	Point enemySpawnPoint;
+
+
 	public override void preUpdate() {
 		base.preUpdate();
 		updateProjectileCooldown();
@@ -1018,20 +1025,68 @@ public partial class Character : Actor, IDamagable {
             }
 
 
-			if (killZone.kName == "enterHunterBase2") {
-				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
-				Global.level.delayedActions.Add(new DelayedAction(() => {
-					 Global.level.enterHunterBase();
-				}, 1));
+			if (killZone.kName.Contains("spawn")) {
+				destNode = Global.level.getClosestNodeInSight(pos);
+				var otherPlayer = Global.level.nonSpecPlayers().Find(p => p.id != player.id 
+				&& p.alliance != player.alliance && p.isAI);
+				
+
+			
+			
+					enemySpawnPoint = destNode.pos;
+				
+			
+
+
+				if (killZone.kName.Contains("Met")) {
+					
+				
+				if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
+					killZone.SpawnEntityCD = 20;
+					new MetClassic(otherPlayer, enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+					}
+				}
+				if (killZone.kName.Contains("MissileElec")) {
+						
+					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
+					killZone.SpawnEntityCD = 20;
+					new MissileElecBlue(otherPlayer, enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+					}
+				}
+				if (killZone.kName.Contains("GreenDog")) {
+					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
+					killZone.SpawnEntityCD = 20;
+					new GreenDog(otherPlayer, enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+					}
+				}
+				if (killZone.kName.Contains("HogumerEasy")) {
+					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
+					killZone.SpawnEntityCD = 20;
+					new HogumerEasy(otherPlayer,  enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+					}
+				}
+				if (killZone.kName.Contains("Abelhudo")) {
+					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
+					killZone.SpawnEntityCD = 9999;
+					new AbelhudoIrregular(otherPlayer,  enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+					}
+				}
+				
             } else 
 
 
+			
+
+
 			if (killZone.kName.Contains("_")) {
+				if (!EnteredLevel){
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.levelTrigger = killZone.kName;
 				Global.level.delayedActions.Add(new DelayedAction(() => {
 					 Global.level.enterLevel();
 				}, 1));
+				EnteredLevel = true;
+				}
             } else 
 			
 			{
@@ -1072,8 +1127,10 @@ public partial class Character : Actor, IDamagable {
 			}
 		}
 	}
-	
 
+
+	
+	public bool EnteredLevel;
 	public Anim? f1;
 	public Anim? f2;
 	public Anim? f3;
@@ -1409,7 +1466,7 @@ public partial class Character : Actor, IDamagable {
 		}
 		if (isWCUTBoss && !isInDamageSprite() && BurstCooldown == 0) {
 			if (bossArmorRegen == 0 && bossArmor < 3) {
-				bossArmor += 1;
+				bossArmor += Global.spf;
 				bossArmorRegen = 1;
 			}
 		}
@@ -2461,6 +2518,10 @@ public partial class Character : Actor, IDamagable {
 		return getCenterPos();
 	}
 
+
+	public Maverick subBoss;
+
+
 	public virtual Actor getFollowActor() {
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform;
@@ -2468,6 +2529,10 @@ public partial class Character : Actor, IDamagable {
 		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
 			return currentMaverick;
 		}
+		if (subBoss != null) {
+			return subBoss;
+		}
+
 		if (rideArmor != null) {
 			return rideArmor;
 		}

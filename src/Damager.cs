@@ -1359,6 +1359,24 @@ public class Damager {
 				}
 			}
 
+
+			if (owner.character is ZeroMID zarzo && zarzo.health > 0) {
+				if (zarzo.OverDrive) {
+					if (zarzo.charState is not ZeroDoubleBuster and not
+					ZeroSlash1State and not ZeroSlash2State
+					)
+						zarzo.charState.attackCtrl = true;
+						zarzo.dashedInAir = 0;
+				}
+				if (zarzo.charState.canSpecialCancel) {
+					zarzo.charState.spcCancel = true;
+				}
+			
+				if (owner.superAmmo != owner.superMaxAmmo) {
+					zarzo.addAmmo(1);
+				}
+			}
+
 			
 			if (projId == (int)ProjIds.ForceGrabState) {
 				if (attacker != null){

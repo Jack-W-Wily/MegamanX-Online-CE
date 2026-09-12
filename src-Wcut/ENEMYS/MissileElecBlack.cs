@@ -108,7 +108,7 @@ public class MissileElecBlack : Maverick {
 
 
 	public override MaverickState[] aiAttackStates() {
-		float enemyDist = 300;
+		float enemyDist = 199;
 		if (target != null) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}

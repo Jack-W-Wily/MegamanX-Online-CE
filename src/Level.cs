@@ -759,15 +759,15 @@ public partial class Level {
 					japeMemorial.zIndex = ZIndex.Background + 100;
 				}
 			} else if (objectName.StartsWith("Goal")) {
-				if (isRace()) {
-					if (goal != null) {
-						throw new Exception("Multiple goals not allowed in race mode.");
-					}
+				//if (isRace()) {
+			//		if (goal != null) {
+			//			throw new Exception("Multiple goals not allowed in race mode.");
+			//		}
 					var actor = new VictoryPoint(pos);
 					actor.name = instanceName;
 					goal = actor;
 					addGameObject(actor);
-				}
+				//}
 			} else if (objectName.StartsWith("Moving Platform")) {
 				string spriteName = instance.properties.spriteName ?? "";
 				string idleSpriteName = instance.properties.idleSpriteName ?? "";
@@ -2425,7 +2425,7 @@ public partial class Level {
 	}
 
 	public bool ignoreNoScrolls() {
-		return mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
+		return false;//mainPlayer.character?.charState is PassDoor;// mainPlayer.weapon is WolfSigmaHandWeapon || (mainPlayer.character as Axl)?.isAnyZoom() == true;
 	}
 
 	public void updateCamPos(float deltaX, float deltaY, float playerX, float playerY) {
@@ -2628,6 +2628,11 @@ public partial class Level {
 
 	public NavMeshNode getRandomNode() {
 		return navMeshNodes.GetRandomItem();
+	}
+
+
+	public NavMeshNode getClosestNode(Point pos) {
+		return navMeshNodes.OrderBy(s => s.pos.distanceTo(pos)).FirstOrDefault();
 	}
 
 	public SpawnPoint getClosestSpawnPoint(Point pos) {

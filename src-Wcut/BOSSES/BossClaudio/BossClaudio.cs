@@ -29,11 +29,11 @@ public class BossClaudio : Character {
 
 
 	public BossClaudio(
-		Player player, float x, float y, int xDir,
-		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+		Player player, float x, float y, int xDir, bool isVisible,
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false,
+		bool isRevive = true, int? heartTanks = null, bool isATrans = false
 		) : base( // Make sure it looks exactly like this
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans) {
 
 
 		charId = CharIds.BossClaudio;
@@ -74,6 +74,12 @@ public class BossClaudio : Character {
 		
 
 		return base.attackCtrl();
+	}
+
+
+	public override int getMaxHealth() {
+		
+		return MathInt.Ceiling(Player.getModifiedHealth(60) * Player.getHpMod());
 	}
 
 	public override CharState getJumpState() => new BossJumpStart();
