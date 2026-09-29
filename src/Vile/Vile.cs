@@ -316,14 +316,90 @@ public class Vile : Character {
 		VileWeaponUpdate();
 		Supers();
 
-		player.vileAmmo = energy.ammo;
 
-		if (overDriveTimer > 0){
-			ShouldDrawAura = true;
-		} else {
-			ShouldDrawAura = false;
+
+
+
+
+
+
+
+
+
+
+
+
+
+		//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+
+		if (charState is SpoiledBratPunch or InfinityGigAttack or GoGetterRightAttack) {
+			if (player.input.isR2Pressed(player) 
+			){
+				foreach (var otherPlayer in Global.level.players) {
+					if (otherPlayer.character == null) continue;
+					if (otherPlayer == player) continue;
+					if (otherPlayer == parasiteDamager?.owner) continue;
+					if (otherPlayer.character.isInvulnerable()) continue;
+					if (Global.level.gameMode.isTeamMode && otherPlayer.alliance != player.alliance) continue;
+					if (otherPlayer.character.getCenterPos().distanceTo(getCenterPos()) > ParasiticBomb.carryRange) continue;
+					Character target = otherPlayer.character;
+					changeState(new GizmoDashHoming(target));
+					break;
+				}
+			}
+		}
+		// DisrespectFactor
+
+		
+		if (player.input.isPressed(Control.Special2, player) && linkedRideArmor != null) {
+				changeState(new CallDownMech(linkedRideArmor, true), true);
+
+		}
+		
+		if (charState is not VileStationaryHover &&
+			GenericDodgeCD == 0 && player.canControl) {
+			if (!isInDamageSprite() &&
+			   player.input.isPressed(Control.Dash, player)
+			 && player.input.checkDoubleTap(Control.Dash)) {
+				changeState(new VileDodge(), true);
+				rideArmorPlatform = null;
+				GenericDodgeCD = 1;
+			}
 		}
 
+			// vileteleport
+		if (charState is VileDodge &&
+		linkedRideArmor != null &&
+		player.input.isPressed(Control.Up, player)) {
+			changeState(new VileTeleport(linkedRideArmor.pos), true);
+		}
+
+
+
+		bool PressA = player.input.isPressed(Control.Shoot, player);
+		
+		if (PressA && charState is VileStompState && frameIndex > 2) {
+			changeState(new VileSuperKickState(), true);
+		}
+		if (PressA && charState is VileChainGrabState && frameIndex > 2) {
+			changeState(new VilePunch1(), true);
+		}
+
+		
+		if (this is not VAVA1 and not VAVA2 and not VAVAV){
+			if (charState.normalCtrl){
+			player.vileAmmo = energy.ammo;
+			} else if (charState is VMissiLeStance) {
+			energy.ammo = player.vileAmmo;	
+			}
+			if (overDriveTimer > 0){
+				ShouldDrawAura = true;
+			} else {
+				ShouldDrawAura = false;
+			}
+		}
 		if (!ownedByLocalPlayer) return;
 
 		// Update the weapon system.

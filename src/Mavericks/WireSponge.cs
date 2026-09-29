@@ -221,6 +221,10 @@ public class WSpongeSideChainWeapon : Weapon {
 		weaponSlotIndex = 75;
 	}
 }
+
+
+
+
 public class WSpongeSideChainProj : Projectile {
 	public int state = 0;
 	public Player player;

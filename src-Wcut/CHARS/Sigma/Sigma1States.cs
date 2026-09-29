@@ -9,7 +9,7 @@ namespace MMXOnline;
 
 
 public class CmdSigmaStateWC : CharState {
-	public Sigma1 sigma = null!;
+	public Character sigma = null!;
 
 	public CmdSigmaStateWC(
 		string sprite, string shootSprite = "", string attackSprite = "",
@@ -19,7 +19,7 @@ public class CmdSigmaStateWC : CharState {
 	}
 
 	public override void onEnter(CharState oldState) {
-		sigma = player.character as Sigma1 ?? throw new NullReferenceException();
+		sigma = player.character;
 		base.onEnter(oldState);
 	}
 }
@@ -259,12 +259,12 @@ public class SigmaBallShootWC : CmdSigmaStateWC {
 			shoot = false;
 		}
 	
-		if (sigma.ballWeapon.ammo <= 0 || character.isAnimOver()) {
+		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 
 		// By disabling the code bellow, you can sort of make it MMX1 Accurate
-		if (character.sprite.loopCount > 0 && player.input.isPressed(Control.Special1, player)) {
+		if ( !player.isAI && character.sprite.loopCount > 0 && player.input.isPressed(Control.Special1, player)) {
 			character.changeToIdleOrFall();
 		}
 	}
@@ -283,8 +283,7 @@ public class SigmaBallShootWC : CmdSigmaStateWC {
 	}
 
 	public void ammoReduction() {
-		sigma.ballWeapon.addAmmo(-4, player);
-		sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
+		sigma.player.weapon?.addAmmo(-4, player);
 	}
 
 	public void angleShoot() {
@@ -335,7 +334,7 @@ public class SigmaBallShootWCEnhanced : CmdSigmaStateWC {
 			shoot = false;
 		}
 	
-		if (sigma.ballWeapon.ammo <= 0 || character.isAnimOver()) {
+		if (character.isAnimOver()) {
 			character.changeToIdleOrFall();
 		}
 
@@ -358,8 +357,7 @@ public class SigmaBallShootWCEnhanced : CmdSigmaStateWC {
 	}
 
 	public void ammoReduction() {
-		sigma.ballWeapon.addAmmo(-4, player);
-		sigma.sigmaAmmoRechargeCooldown = sigma.sigmaHeadBeamTimeBeforeRecharge;
+	
 	}
 
 	public void angleShoot() {
@@ -417,7 +415,6 @@ public class SigmaWallDashStateWC : CmdSigmaStateWC {
 
 	public override void onExit(CharState? newState) {
 		character.useGravity = true;
-		sigma.leapSlashCooldown = Sigma1.maxLeapSlashCooldown;
 		base.onExit(newState);
 	}
 
@@ -445,14 +442,14 @@ public class SigmaWallDashStateWC : CmdSigmaStateWC {
 			character.changeState(character.getFallState(), true);
 		}
 		if (player.input.isPressed(Control.Shoot, player) &&
-			!fired && sigma.saberCooldown == 0  && character.OverDrive && character.invulnTime == 0
+			!fired && character.OverDrive && character.invulnTime == 0
 		) {
 			if (yDir == 0) {
 				character.changeState(new SigmaSlashStateDash());
 				return;
 			}
 			fired = true;
-			sigma.saberCooldown = sigma.sigmaSaberMaxCooldown;
+			
 			character.playSound("sigmaSaber", sendRpc: true);
 			character.changeSpriteFromName("wall_dash_attack", true);
 			Point off = new Point(30, -20);

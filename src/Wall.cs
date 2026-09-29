@@ -237,12 +237,13 @@ public class CrackedWall : Actor, IDamagable {
 
 	public string kName;
 
-	public CrackedWall(Point pos, string crackedWallSprite, string gibSprite, int xDir, int yDir, int flag, int health, string destroyInstanceName, bool ownedByLocalPlayer) :
+	public CrackedWall(string name, Point pos, string crackedWallSprite, string gibSprite, int xDir, int yDir, int flag, int health, string destroyInstanceName, bool ownedByLocalPlayer) :
 		base(crackedWallSprite, pos, null, ownedByLocalPlayer, false) {
 		this.health = health;
 		maxHealth = health;
 		isStatic = true;
-		kName = gibSprite;
+		this.kName = name;
+		
 		this.flag = flag;
 		this.gibSprite = gibSprite;
 		this.xDir = xDir;
@@ -285,8 +286,10 @@ public class CrackedWall : Actor, IDamagable {
 		base.update();
 		Helpers.decrementTime(ref SpawnEntityCD);
 
-		if (sprite.name.Contains("enemy_spawner")) {
+		if (sprite.name.Contains("enemy_spawner") || sprite.name.Contains("boss_camera")) {
 			visible = false;
+			collider.flag = (int)HitboxFlag.Hitbox; 
+			Global.level.removeGameObject(wall);
 		}
 	}
 

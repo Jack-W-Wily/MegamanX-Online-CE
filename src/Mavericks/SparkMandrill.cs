@@ -220,6 +220,15 @@ public class SparkMPunchState : MaverickState {
 			maverick.changeState(new MIdle());
 		}
 	}
+
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		if (!maverick.sprite.name.Contains("punch")) {
+			maverick.changeSpriteFromName("attack", true);
+		}
+		}
+
 }
 
 
@@ -228,6 +237,16 @@ public class SparkMDashPunchState : MaverickState {
 	public float dustTime;
 	public SparkMDashPunchState() : base("dash_punch") {
 	}
+
+
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		if (!maverick.sprite.name.Contains("punch")) {
+			maverick.changeSpriteFromName("attack_dash", true);
+		}
+		}
+
 
 	public override void update() {
 		base.update();

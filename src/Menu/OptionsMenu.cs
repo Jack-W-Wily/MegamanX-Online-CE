@@ -432,6 +432,45 @@ public class OptionsMenu : IMainMenu {
 					},
 					"Character Alt Costume."
 				),
+
+
+			
+				// Difficulty
+				new MenuOption(
+					30, startY,
+					() => {
+						if (inGame) return;
+						Helpers.menuLeftRightInc(ref Options.main.Difficulty, 0, 2);
+					},
+					(Point pos, int index) => {
+						// ToDo: Implement "Buster" option for hypercharge like HDM.
+						Fonts.drawText(
+							optionFontText, "Difficulty:",
+ 							pos.x, pos.y, selected: selectedArrowPosY == index
+						);
+						
+						if (Options.main.Difficulty == 0){
+							Fonts.drawText(
+								optionFontValue, "L A R P E R" ,
+								pos.x + 166, pos.y, selected: selectedArrowPosY == index
+							);
+						}
+						if (Options.main.Difficulty == 1){
+							Fonts.drawText(
+								optionFontValue, "Hunter" ,
+								pos.x + 166, pos.y, selected: selectedArrowPosY == index
+							);
+						}
+						if (Options.main.Difficulty == 2){
+							Fonts.drawText(
+								optionFontValue, "X T R E M E" ,
+								pos.x + 166, pos.y, selected: selectedArrowPosY == index
+							);
+						}
+					},
+					"Difficulty."
+				),
+
 				
 				// Disable double-tap dash
 				new MenuOption(

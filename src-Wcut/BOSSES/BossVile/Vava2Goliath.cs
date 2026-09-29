@@ -163,7 +163,15 @@ public class Vava2Goliath : Vile {
 		}
 	}
 
-
+	public override int getMaxHealth() {
+		if (Options.main.Difficulty == 2) {
+		return MathInt.Ceiling(Player.getModifiedHealth(52) * Player.getHpMod());
+		} 
+		if (Options.main.Difficulty == 1) {
+		return MathInt.Ceiling(Player.getModifiedHealth(42) * Player.getHpMod());
+		} 
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
+	}
 
 	public override bool normalCtrl() {
 		if (player.input.isL2Held(player)) {
@@ -1285,6 +1293,7 @@ public class Vava2Goliath : Vile {
 				
 					if (charState is InRideArmor && linkedRideArmor != null) {
 						string? attackSprite = linkedRideArmor.rideArmorState?.attackSprite;
+					if (bonusHealth > 0){
 					switch (Vattack) {
 						case 1 when isFacingTarget && isTargetClose:
 							linkedRideArmor.changeState(new RAAIDashAttack(Control.Dash, false), true);
@@ -1315,6 +1324,7 @@ public class Vava2Goliath : Vile {
 							} else {
 								linkedRideArmor.changeState(new GoliathDash());
 							}
+							
 							break;
 						case 6 when isFacingTarget:
 
@@ -1360,6 +1370,9 @@ public class Vava2Goliath : Vile {
 							);
 
 							break;
+					}
+				} else {
+						changeState(new BossBackJump(), true);
 					}
 				} else if (isTargetClose && grounded) {
 					switch (Vattack) {

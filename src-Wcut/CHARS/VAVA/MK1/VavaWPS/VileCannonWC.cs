@@ -461,7 +461,7 @@ public class VileCannonProj : Projectile {
 			damager.flinch = Global.defFlinch;
 			projId = (int)ProjIds.FatBoy;
 			hitSound = "Ridearmor - Shot";
-			maxTime = 0.35f;
+			maxTime = 1f;
 		} else if (type == (int)VileCannonType.LongshotGizmo) {
 			weapon = TridentLine.netWeapon;	
 			sprite = "vile_mk2_lg_proj";

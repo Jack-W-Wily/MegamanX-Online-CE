@@ -21,7 +21,6 @@ public class GreenDog : Maverick {
 		weakWeaponId = WeaponIds.ShotgunIce;
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
 		dismantleTypeDeath = true;
-		shouldDealColisionDmg = true;
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
 		netActorCreateId = NetActorCreateId.GreenDog;
@@ -114,17 +113,34 @@ public class GreenDog : Maverick {
 		];
 	}
 
+
+	public MaverickState getBonusState() {
+		var mshoot = state;
+		   
+		if (Options.main.Difficulty > 1) {
+			mshoot = new VelGShootFireState();	
+		} else {
+			mshoot = new MTaunt();
+		}
+		return mshoot;
+	}
+
 	public override MaverickState[] aiAttackStates() {
 		float enemyDist = 199;
-		if (target != null) {
+		if (target != null && attackgeneralCooldown == 0) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
 		}
-		//if (enemyDist > 50) {
-		//	return [new VelGPounceStartState()];
-		//}
+		if (attackgeneralCooldown == 0){
+			if (Options.main.Difficulty == 0) {
+				attackgeneralCooldown = 2;
+			}
+			if (Options.main.Difficulty == 1) {
+				attackgeneralCooldown = 0.6f;
+			}
+		}
 		return [
-			getShootState2(),
-			getShootState(),
+			new GenericWCUTRunStateM(),
+			getBonusState(),
 			new VelGPounceStartState()
 		];
 	}

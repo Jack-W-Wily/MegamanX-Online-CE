@@ -43,7 +43,7 @@ public class JunkShield : Weapon {
 
 public class JunkShieldMagnet : Anim {
 
-	Vile vile = null!;
+	Character vile = null!;
 	float timer;
 	float startAng;
 	float ang;
@@ -51,7 +51,7 @@ public class JunkShieldMagnet : Anim {
 	bool once;
 
 	public JunkShieldMagnet(
-		Point pos, int xDir, Vile character, ushort? netId, float ang
+		Point pos, int xDir, Character character, ushort? netId, float ang
 	) : base(
 		pos, "junk_shield_magnet", xDir, netId, false, true
 	) {
@@ -99,7 +99,7 @@ public class JunkShieldMagnet : Anim {
 
 public class JunkShieldPiece : Anim {
 
-	Vile vile = null!;
+	Character vile = null!;
 	Anim magnet;
 	float startAng;
 	float ang;
@@ -111,7 +111,7 @@ public class JunkShieldPiece : Anim {
 	) {
 		frameSpeed = 0;
 		frameIndex = Helpers.randomRange(0, 3);
-		this.vile = character as Vile ?? throw new NullReferenceException();
+		this.vile = character as Character;
 		vile.junkShieldProjs.Add(this);
 		this.magnet = magnet;
 		startAng = ang;
@@ -176,7 +176,7 @@ public class JunkShieldProj : Projectile {
 	public bool smallestSon;
 	bool threw;
 	Player? player;
-	Vile? vile;
+	Character? vile;
 	float ang;
 	float radius = 40;
 	bool sound;
@@ -192,7 +192,7 @@ public class JunkShieldProj : Projectile {
 		projId = (int)VAVA2ProjIds.JunkShield;
 
 		if (ownedByLocalPlayer) {
-			vile = owner as Vile;
+			vile = owner as Character;
 			if (vile != null) {
 				vile.junkShieldProjs.Add(this);
 				changePos(vile.getCenterPos().add(Point.createFromByteAngle(ang).times(radius)));
@@ -340,8 +340,8 @@ public class JunkShieldProj2 : Projectile {
 		projId = (int)VAVA2ProjIds.JunkShield2;
 		maxTime = 0.75f;
 
-		frameIndex = fi;
-		frameSpeed = 0;
+	//	frameIndex = fi;
+	//	frameSpeed = 0;
 		damager.damage = 2;
 		damager.hitCooldown = 60;
 

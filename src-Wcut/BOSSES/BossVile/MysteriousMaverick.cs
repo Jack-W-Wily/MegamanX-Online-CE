@@ -1234,8 +1234,8 @@ public class MysteriousMaverick : Vile {
 								vel.y = -getJumpPower();
 								changeState(getJumpState(), true);
 							} else {
-								linkedRideArmor.changeState(new RADash());
-								linkedRideArmor.changeSprite(attackSprite, false);
+								linkedRideArmor.changeState(new GoliathDash());
+								
 							}
 							break;
 						case 6 when isFacingTarget:
@@ -1283,7 +1283,7 @@ public class MysteriousMaverick : Vile {
 
 							break;
 					}
-				} else if (isTargetClose && grounded) {
+				} else if (isTargetClose) {
 					switch (Vattack) {
 						case 1 when isFacingTarget && player.superAmmo >= player.superMaxAmmo:
 							changeState(new VileDashChargeState());
@@ -1305,6 +1305,8 @@ public class MysteriousMaverick : Vile {
 							changeState(new VGenocideCutter());
 							break;
 						case 7 when isFacingTarget && linkedRideArmor != null:
+
+						if (bonusHealth <= 0){
 							changeState(new Taunt());
 							linkedRideArmor.explode(true);
 							linkedRideArmor.playSound("necroburst", sendRpc: true);
@@ -1312,11 +1314,14 @@ public class MysteriousMaverick : Vile {
 							linkedRideArmor.pos, xDir, 
 							this, player, player.getNextActorNetId(), rpc: true
 							);
+						} else {
+								changeState(new CallDownMech(linkedRideArmor, true), true);
+							}
 							break;
 					}
 				}	
 
-				aiAttackCooldown = Helpers.randomRange(30, 60);
+				aiAttackCooldown = Helpers.randomRange(0, 60);
 			}
 
 			if (charState is VAVAKamae or VKamaeBDash or VKamaeDash && charState.stateTime > 0.2f) {

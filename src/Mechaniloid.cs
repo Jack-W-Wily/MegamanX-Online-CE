@@ -163,9 +163,11 @@ public class Mechaniloid : Actor, IDamagable {
 		}
 		
 		if (type == MechaniloidType.BallWalker) {
-			speed = 100;
+			speed = 50;
 			attackRange = 125;
 			useGravity = true;
+			health = 2;
+			maxHealth = 2;
 			netActorCreateId = NetActorCreateId.BallWalker;
 		}
 		if (type == MechaniloidType.Fish) {
@@ -396,10 +398,10 @@ public class Mechaniloid : Actor, IDamagable {
 			);
 			proj.netcodeOverride = NetcodeModel.FavorDefender;
 		}
-		if (sprite.name == "enemy_walkball_idle") {
+		if (sprite.name == "enemy_walkball") {
 			proj = new GenericMeleeProj(
 				weapon, centerPoint, ProjIds.Sigma2HopperDrill,
-				netOwner, 1, Global.defFlinch, 30,
+				netOwner, 2, Global.defFlinch, 60,
 				addToLevel: true
 			);
 			proj.netcodeOverride = NetcodeModel.FavorDefender;

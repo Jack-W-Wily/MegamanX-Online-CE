@@ -50,6 +50,25 @@ public partial class Character : Actor, IDamagable {
 		}
 	}
 
+
+
+	
+	// For Classic Weapon Compatibility
+	public List<Actor> junkShieldProjs = new();
+	public LoopingSound? junkShieldSound;
+	public Projectile? sWheel;
+	public HardKnuckleVProj? HardKnuckleVProj;
+	public bool armless;
+	public ChargeEffect NoiseCrushVEffect;
+	public bool hasChargedNoiseCrushV = false;
+	public float NoiseCrushVAnimTime;
+	public LoopingSound? chargedNoiseCrushVSound;
+	public bool usedDoubleJump;
+	public bool boughtSuperAdaptorOnce;
+	public float timeSinceLastShoot;
+	public bool isSlideColliding;
+
+	
 	// Armor variables.
 	public ArmorId chestArmor;
 	public ArmorId armArmor;
@@ -963,6 +982,10 @@ public partial class Character : Actor, IDamagable {
 
 	public	Point enemySpawnPoint;
 
+	
+
+
+
 
 	public override void preUpdate() {
 		base.preUpdate();
@@ -1006,79 +1029,208 @@ public partial class Character : Actor, IDamagable {
 		}
 
 
-		if (other.gameObject is CrackedWall cw && cw.kName.Contains("door")) {
-			if (charState is not PassDoor) {
-				cw.changeSprite("ms_door_open", true);
-				changeState(new PassDoor(), true);
+		if (other.gameObject is CrackedWall cw) {
+
+
+
+			if (cw.sprite.name.Contains("door")){
+				if (charState is not PassDoor) {
+					cw.changeSprite("ms_door_open", true);
+					changeState(new PassDoor(), true);
+				}
+			} 
+
+
+			if (cw.sprite.name.Contains("boss_camera")){
+				if (charState is not PassDoor) {
+					bossCamera = cw;
+				}
+			} 
+
+			if (cw.sprite.name.Contains("enemy_spawner")) {
+					var otherPlayer = Global.level.nonSpecPlayers().Find(p => p.id != player.id 
+				&& p.alliance != player.alliance && p.isAI);
+				
+
+				if (cw.kName.Contains("met")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new MetClassic(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("abelhudo")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new AbelhudoIrregular(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 999;
+					}
+				}
+				if (cw.kName.Contains("kast")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new Kast(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("missileelec")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new MissileElecBlue(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("turtlebobmer")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new TurtleBomber(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("greendog")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new GreenDog(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("charger")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						var soldier = new SoldierX1(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+						soldier.isCharger = true;
+						cw.SpawnEntityCD = 40;
+					}
+				}
+
+				if (cw.kName.Contains("x1rasoldier")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						var soldier = new SoldierX1(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+						soldier.isRideArmor = true;
+						cw.SpawnEntityCD = 40;
+					}
+				}
+
+				if (cw.kName.Contains("x1driver")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						var soldier = new SoldierX1(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+						soldier.isDriver = true;
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x1soldier")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						new SoldierX1(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+				
+						cw.SpawnEntityCD = 40;
+					}
+				}
+
+				if (cw.kName.Contains("x1biker")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						var biker = new SoldierX1(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+						biker.isBiker = true;
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x1biker")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						
+						var biker = new SoldierX1(otherPlayer, cw.pos,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
+						biker.isBiker = true;
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				
+				if (cw.kName.Contains("x1wheeler")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						new EnemyWheeler(new XBuster(), pos.addxy(200 * xDir, -50), -xDir, otherPlayer, otherPlayer.getNextActorNetId(), true);
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x2bird")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+
+						var bird = new ViralSigmaShootProj(new MechaniloidWeapon(otherPlayer, MechaniloidType.Bird), pos.addxy(200 * xDir, 0), -xDir, otherPlayer, otherPlayer.getNextActorNetId(), rpc: true);
+						Global.level.delayedActions.Add(new DelayedAction(() => {
+					bird.destroySelf();
+					}, 0.2f));
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x2dinotank")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						new ViralSigmaShootProj(new MechaniloidWeapon(otherPlayer, MechaniloidType.Tank), cw.pos, xDir, otherPlayer, otherPlayer.getNextActorNetId(), rpc: true);
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x2hopper")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						new ViralSigmaShootProj(new MechaniloidWeapon(otherPlayer, MechaniloidType.Hopper), cw.pos, xDir, otherPlayer, otherPlayer.getNextActorNetId(), rpc: true);
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x2fish")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						new ViralSigmaShootProj(new MechaniloidWeapon(otherPlayer, MechaniloidType.Fish), cw.pos, xDir, otherPlayer, otherPlayer.getNextActorNetId(), rpc: true);
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				if (cw.kName.Contains("x1walker")) {
+					if (otherPlayer != null && cw.SpawnEntityCD == 0) {
+						new ViralSigmaShootProj(new MechaniloidWeapon(otherPlayer, MechaniloidType.BallWalker), cw.pos, xDir, otherPlayer, otherPlayer.getNextActorNetId(), rpc: true);
+						cw.SpawnEntityCD = 40;
+					}
+				}
+				
+			} else {
 			}
-		}
+
+
+			}
+		
+
+
+
 		
 
 		if (other.gameObject is KillZone killZone && !isInvulnerable(true)) {
 			
+
+			if (killZone.kName.Contains("vileChaseTrigger") ) {
+				
+                	var otherPlayer = Global.level.nonSpecPlayers().Find(p => p.id != player.id 
+				&& p.alliance != player.alliance && p.isAI);
+				
+				if (killZone.SpawnEntityCD == 0){
+					killZone.SpawnEntityCD = 10;
+				otherPlayer?.character?.changeState(new VileTeleport(pos), true);
+				if (otherPlayer?.character != null) {
+					if (otherPlayer.character.linkedRideArmor != null) {
+						otherPlayer.character.linkedRideArmor.changeState(new RACalldown(pos.addxy(100,0), true));
+					}
+				}
+				}
+            }
+
+
 			if (killZone.kName == "enterCyberMazeClaudio") {
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.delayedActions.Add(new DelayedAction(() => {
 					Global.level.enterBossClaudio();
 				}, 0));
                 
-            }
-
-
-			if (killZone.kName.Contains("spawn")) {
-				destNode = Global.level.getClosestNodeInSight(pos);
-				var otherPlayer = Global.level.nonSpecPlayers().Find(p => p.id != player.id 
-				&& p.alliance != player.alliance && p.isAI);
-				
-
-			
-			
-					enemySpawnPoint = destNode.pos;
-				
-			
-
-
-				if (killZone.kName.Contains("Met")) {
-					
-				
-				if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
-					killZone.SpawnEntityCD = 20;
-					new MetClassic(otherPlayer, enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
-					}
-				}
-				if (killZone.kName.Contains("MissileElec")) {
-						
-					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
-					killZone.SpawnEntityCD = 20;
-					new MissileElecBlue(otherPlayer, enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
-					}
-				}
-				if (killZone.kName.Contains("GreenDog")) {
-					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
-					killZone.SpawnEntityCD = 20;
-					new GreenDog(otherPlayer, enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
-					}
-				}
-				if (killZone.kName.Contains("HogumerEasy")) {
-					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
-					killZone.SpawnEntityCD = 20;
-					new HogumerEasy(otherPlayer,  enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
-					}
-				}
-				if (killZone.kName.Contains("Abelhudo")) {
-					if (otherPlayer != null && killZone.SpawnEntityCD == 0) {
-					killZone.SpawnEntityCD = 9999;
-					new AbelhudoIrregular(otherPlayer,  enemySpawnPoint,  1, otherPlayer.getNextActorNetId(), true, sendRpc: true);
-					}
-				}
-				
-            } else 
-
-
-			
-
-
-			if (killZone.kName.Contains("_")) {
+            } else 	if (killZone.kName.Contains("_")) {
 				if (!EnteredLevel){
 				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
 				Global.level.levelTrigger = killZone.kName;
@@ -1319,6 +1471,8 @@ public partial class Character : Actor, IDamagable {
 	public float GenericParryCD;
 
 	public float SkinSlot = 0; 
+
+	public float Difficulty = 0;
 
 	// For  overdrives
 
@@ -2522,6 +2676,9 @@ public partial class Character : Actor, IDamagable {
 	public Maverick subBoss;
 
 
+	public CrackedWall bossCamera;
+
+
 	public virtual Actor getFollowActor() {
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform;
@@ -2529,6 +2686,7 @@ public partial class Character : Actor, IDamagable {
 		if (currentMaverick != null && currentMaverick.controlMode == MaverickModeId.TagTeam) {
 			return currentMaverick;
 		}
+
 		if (subBoss != null) {
 			return subBoss;
 		}
@@ -2540,6 +2698,9 @@ public partial class Character : Actor, IDamagable {
 	}
 
 	public virtual Point getCamCenterPos(bool ignoreZoom = false) {
+		if (bossCamera != null) {
+				return bossCamera.pos.round().addxy(camOffsetX, -30);
+		}
 		if (rideArmorPlatform != null) {
 			return rideArmorPlatform.pos.round().addxy(0, -70);
 		}

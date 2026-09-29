@@ -1278,14 +1278,23 @@ public partial class Player {
 			);
 
 		} else if (isAI &&
-		
-		(
-		Global.level.goal != null && Global.level.goal.name == "BossClaudio"
-		)
-
-		&& charNum >= 0 && isAI) {
+		Global.level.goal != null 
+		&& Global.level.goal.name == "BossClaudio"
+		&& charNum >= 0) {
 			charNum = (int)CharIds.Sigma;
 			newChar = new BossClaudio(
+				this, Global.level.goal.pos.x, Global.level.goal.pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount,
+				isATrans: isNonMain
+			);
+		
+		}else if (isAI &&
+		Global.level.goal != null 
+		&& Global.level.goal.name == "EXClaudio"
+		&& charNum >= 0) {
+			charNum = (int)CharIds.Sigma;
+			newChar = new BossClaudioEX(
 				this, Global.level.goal.pos.x, Global.level.goal.pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer,
 				isWarpIn: isWarpIn, heartTanks: htCount,
@@ -1325,13 +1334,41 @@ public partial class Player {
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
-		} else if (isAI &&(Global.level.levelData.name == "cybermaze_1v1" || Global.level.levelData.name == "centralcomputer_1v1" )
-		
+		} else if (isAI && Global.level.levelData.name == "centralcomputer_1v1" 
 		&& charNum >= 0 && isAI) {
 			charNum = (int)CharIds.BossClaudio;
 			newChar = new BossClaudio(
 				this, pos.x, pos.y, xDir,
-				false, charNetId, ownedByLocalPlayer
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount,
+				isATrans: isNonMain
+			);
+		} else if (isAI &&Global.level.levelData.name == "forest_1v1"
+		&& charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossClaudio;
+			newChar = new BossRockman(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount,
+				isATrans: isNonMain
+			);
+		}else if (isAI &&Global.level.levelData.name == "hunterbase_1v1"
+		&& charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossClaudio;
+			newChar = new Daymon(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount,
+				isATrans: isNonMain
+			);
+		} else if (isAI &&Global.level.levelData.name == "cybermaze_1v1"
+		&& charNum >= 0 && isAI) {
+			charNum = (int)CharIds.BossClaudio;
+			newChar = new BossClaudioEX(
+				this, pos.x, pos.y, xDir,
+				false, charNetId, ownedByLocalPlayer,
+				isWarpIn: isWarpIn, heartTanks: htCount,
+				isATrans: isNonMain
 			);
 		} else if (isAI && Global.level.levelData.name == "stag_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.BossClaudio;
@@ -1354,7 +1391,7 @@ public partial class Player {
 
 		} else if (isAI && Global.level.levelData.name == "sigma4_1v1" && charNum >= 0 && isAI) {
 			charNum = (int)CharIds.Sigma;
-			newChar = new Sigma1(
+			newChar = new BossSigmaX1(
 				this, pos.x, pos.y, xDir,
 				false, charNetId, ownedByLocalPlayer
 			);
@@ -1370,6 +1407,8 @@ public partial class Player {
 			);
 		
 		}
+
+
 
 
 		
@@ -1407,7 +1446,14 @@ public partial class Player {
 		  else if (spawnCharNum == (int)CharIds.Vile) {
 			bool mk2VileOverride = Global.level.isHyperMatch();
 
-
+			if (Options.main.Difficulty < 2) {
+			
+			Global.level.gameMode.setHUDErrorMessage(
+						this, "Difficulty set to XTREME "
+					);
+			Options.main.Difficulty = 2;
+			}
+			
 			if (loadout.vileLoadout.laser == 1){
 				newChar = new VAVA1(
 				this, pos.x, pos.y, xDir,

@@ -101,6 +101,7 @@ public class SigmaElectricBallWeapon : Weapon {
 }
 
 public class SigmaElectricBallProj : Projectile {
+
 	public SigmaElectricBallProj(
 		Point pos, int xDir, float byteAngle, Actor owner, 
 		Player player, ushort? netId, bool rpc = false
@@ -113,6 +114,7 @@ public class SigmaElectricBallProj : Projectile {
 		damager.hitCooldown = 12;
 		projId = (int)ProjIds.Sigma2Ball;
 		destroyOnHit = false;
+	
 		maxTime = 0.5f;
 		byteAngle = byteAngle % 256;
 		vel.x = 200 * Helpers.cosb(byteAngle);
@@ -124,6 +126,45 @@ public class SigmaElectricBallProj : Projectile {
 	}
 	public static Projectile rpcInvoke(ProjParameters args) {
 		return new SigmaElectricBallProj(
+			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
+		);
+	}
+}
+
+
+
+
+public class SigmaViralHeadProj : Projectile {
+
+	public SigmaViralHeadProj(
+		Point pos, int xDir, float byteAngle, Actor owner, 
+		Player player, ushort? netId, bool rpc = false
+	) : base(
+		pos, xDir, owner, "sigma_dark_inferno_proj", netId, player
+	) {
+		weapon = SigmaElectricBallWeapon.netWeapon;
+		damager.damage = 3;
+		damager.flinch = Global.defFlinch;
+		damager.hitCooldown = 12;
+		projId = (int)ProjIds.Sigma2Ball;
+		destroyOnHit = false;
+
+		maxTime = 2f;
+		byteAngle = byteAngle % 256;
+		vel.x = 0;
+		vel.y = 0;
+		this.byteAngle = byteAngle;
+		if (rpc) {
+			rpcCreateByteAngle(pos, owner, ownerPlayer, netId, byteAngle);
+		}
+	}
+
+	public override void update() {
+		base.update();
+		vel.x += 3 * xDir;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new SigmaViralHeadProj(
 			args.pos, args.xDir, args.byteAngle, args.owner, args.player, args.netId
 		);
 	}
@@ -161,6 +202,62 @@ public class SigmaElectricBallState : CharState {
 		neoSigma = character;
 	}
 }
+
+
+
+
+
+public class SigmaDarkInferno : CharState {
+	bool fired;
+
+	bool fired2;
+	public Character neoSigma = null!;
+	public SigmaDarkInferno() : base("dark_inferno") {
+		enterSound = "sigma2shoot";
+		invincible = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.frameIndex > 9 && !fired) {
+			fired = true;
+			character.playSound("sigma2ball", sendRpc: true);
+			Point pos = character.pos.addxy(0, -20);
+			
+				new SigmaViralHeadProj(
+					pos.addxy(-20 * character.xDir , -5), character.xDir, 0, neoSigma, player, 
+					player.getNextActorNetId(), rpc: true
+				);
+				
+			
+		}
+
+		if (character.frameIndex > 12 && !fired2) {
+			fired2 = true;
+			character.playSound("sigma2ball", sendRpc: true);
+			Point pos = character.pos.addxy(0, -20);
+			
+			
+				new SigmaViralHeadProj(
+					pos.addxy(-20 * character.xDir , -30), character.xDir, 0, neoSigma, player, 
+					player.getNextActorNetId(), rpc: true
+				);
+			
+		}
+
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.clenaseDmgDebuffs();
+		neoSigma = character;
+	}
+}
+
 
 public class NeoSigmaGigaAttackWeapon : Weapon {
 	public static NeoSigmaGigaAttackWeapon netWeapon = new();

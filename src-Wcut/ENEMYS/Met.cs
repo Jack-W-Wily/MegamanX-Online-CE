@@ -106,13 +106,21 @@ public class MetClassic : Maverick {
 
 	public override MaverickState[] aiAttackStates() {
 		float enemyDist = 199;
-		if (target != null) {
+		if (target != null && attackgeneralCooldown == 0) {
 			enemyDist = MathF.Abs(target.pos.x - pos.x);
+		}
+		if (attackgeneralCooldown == 0){
+			if (Options.main.Difficulty == 0) {
+				attackgeneralCooldown = 2;
+			}
+			if (Options.main.Difficulty == 1) {
+				attackgeneralCooldown = 0.6f;
+			}
 		}
 	
 		return [
 			getShootState(true),
-			new VelGPounceStartState()
+			new GenericDashStateMaverick()
 		];
 	}
 

@@ -37,14 +37,14 @@ public class KurumitoGrabStartState : CharState {
 
 
 public class KurumaGrabState : CharState {
-	public Character? victim;
+	public Actor? victim;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 
 	public bool UsedGrabFinisherOnce;
 	float timeWaiting;
 
-	public KurumaGrabState(Character? victim) : base("grab") {
+	public KurumaGrabState(Actor? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = 1;
 		specialId = SpecialStateIds.AxlRoll;
@@ -98,9 +98,6 @@ public class KurumaGrabState : CharState {
 		if (character.sprite.name.Contains("attack") && character.frameIndex == 2) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 1, 0, 2);
-
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.SelfDmg);
 			}
 		}
 		
@@ -112,20 +109,16 @@ public class KurumaGrabState : CharState {
 				character.playSound("explosionX3", sendRpc: true);
 				character.shakeCamera(sendRpc: true);
 				victim.shakeCamera(sendRpc: true);
-				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.Ryuenjin);
 			}
 		}
 
 		if (character.sprite.name.Contains("down") && character.frameIndex == 1) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 0, 2);
-				damager.applyDamage(victim, false, new FireWave(), character,
-				(int)ProjIds.MechFrogStompShockwave);
+		
 				new MechFrogStompShockwave(new FireWave(),
 				character.pos.addxy(6 * victim.xDir, 0f), victim.xDir, player,
 				player.getNextActorNetId(), rpc: true);
-				victim.changeState(new KnockedDown(victim.pos.x < character?.pos.x ? -1 : 1), true);
 				victim.playSound("crash", true);
 			}
 		}
@@ -133,8 +126,6 @@ public class KurumaGrabState : CharState {
 		if (character.sprite.name.Contains("foward") && character.frameIndex == 1) {
 			if (leechTime > 0.3f) {
 				leechTime = 0;
-				var damager = new Damager(player, 3, 20, 2);
-				damager.applyDamage(victim, false, new FireWave(), character, (int)ProjIds.UPPunch);
 			}
 		}
 
@@ -176,9 +167,7 @@ public class KurumaGrabState : CharState {
 		!character.sprite.name.Contains("up") &&
 		 !character.sprite.name.Contains("down") &&
 		 !character.sprite.name.Contains("foward")) {
-			victim.grabInvulnTime = 2;
-			victim.stunInvulnTime = 1;
-			victim?.releaseGrab(character, true);
+	
 		}
 		specialId = SpecialStateIds.None;
 	}

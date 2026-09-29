@@ -1005,6 +1005,7 @@ public enum ProjIds {
 
 	DragoonGrabConfirm,
 
+	FishFangProj,
 
 	// X1 Zero
 

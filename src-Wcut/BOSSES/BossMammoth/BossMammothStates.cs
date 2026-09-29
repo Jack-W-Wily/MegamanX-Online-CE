@@ -22,7 +22,7 @@ public class BFMammothMState : CharState {
 }
 
 
-public class BFlameMInfernoCharge : BFMammothMState {
+public class BFlameMInfernoCharge : CharState {
 	public BFlameMInfernoCharge() : base("inferno_charge") {
 		invincible = true;
 	}
@@ -38,8 +38,7 @@ public class BFlameMInfernoCharge : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (burningNoumander == null) return;
-
+	
 		if (stateTime > 1 && !once) {
 			once = true;
 			character.changeSpriteFromName("inferno_maxed", true);
@@ -53,7 +52,7 @@ public class BFlameMInfernoCharge : BFMammothMState {
 
 
 
-public class BFlameMInfernoRelease : BFMammothMState {
+public class BFlameMInfernoRelease : CharState {
 	public BFlameMInfernoRelease() : base("inferno_release") {
 	}
 
@@ -73,7 +72,7 @@ public class BFlameMInfernoRelease : BFMammothMState {
 
 	public override void update() {
 		base.update();
-		if (burningNoumander == null) return;
+		var burningNoumander = character;
 
 		if (character.frameIndex == 6 && !once) {
 			once = true;

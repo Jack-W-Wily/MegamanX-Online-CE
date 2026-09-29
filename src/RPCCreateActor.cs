@@ -65,9 +65,17 @@ public enum NetActorCreateId {
 
 	BallWalker,
 
+	Kast,
+
+	TurtleBomber,
+
+	SoldierX1,
+
+	Charger,
 
 	// For Classic Era WPS stuff
 	DWrapBigBubble,
+	
 
 	
 }
@@ -252,6 +260,18 @@ public class RPCCreateActor : RPC {
 				break;
 			case (int)NetActorCreateId.AbelhudoIrregular:
 				new AbelhudoIrregular(player, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.Kast:
+				new MissileElecBlack(player, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.TurtleBomber:
+				new TurtleBomber(player, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.Charger:
+				new Charger(player, pos, xDir, netProjByte, false);
+				break;
+			case (int)NetActorCreateId.SoldierX1:
+				new SoldierX1(player, pos, xDir, netProjByte, false);
 				break;
 		}
 	}

@@ -22,6 +22,11 @@ public class VAVA1 : Vile {
 	float mechBusterCooldown;
 	public bool usedAmmoLastFrame;
 	public int buckshotDanceNum;
+
+	public int VileMode = 0;
+	public float ModeCD;
+
+
 	public float vileAmmoRechargeCooldown;
 	public bool isShootingLongshotGizmo;
 	public int longshotGizmoCount;
@@ -269,8 +274,14 @@ public class VAVA1 : Vile {
 		bool WeaponRightHeld = player.input.isHeld(Control.WeaponRight, player);
 
 		SpecialMoves();
+		if (VileMode == 0){
 		if (WeaponRightHeld && player.vileAmmo > 0) {
 		getVulcanMoves();
+		}
+		} else {
+		if (player.input.isPressed(Control.WeaponRight, player) && player.vileAmmo > 0) {
+		getVulcanMoves();
+		}
 		}
 		if (!player.input.checkHadoken(player, xDir, Control.Shoot)
 		&& !player.input.checkShoryuken(player, xDir, Control.Shoot)
@@ -441,6 +452,9 @@ public class VAVA1 : Vile {
 	}
 	
 	public void getVulcanMoves() {
+
+
+			if (VileMode == 0){
 			if (player.input.isHeld(Control.Up, player)) {
 				if (player.vileAmmo >= 15) {
 					changeState(new VavaDistantNeedler(), true);
@@ -448,8 +462,27 @@ public class VAVA1 : Vile {
 				}
 			} else if (charState is Crouch) {
 				changeState(new VavaZipZapper(), true);
+			} else {	
+					if (charState is not BlockWCUT) {
+						vulcanWeapon = new CherryBlast();
+					vulcanWeapon?.vileShoot(this);
+					
+					}	
+			}
 			} else {
-				if (getChargeLevel() == 1 && player.vileAmmo >= 15 && OverDrive) {
+
+			if (getChargeLevel() == 0 && player.vileAmmo >= 5 ) {
+                	new FakeZeroBuster2Proj(
+					getShootPos(),  xDir, this, player.getNextActorNetId(), sendRpc: true
+					);playSound("buster2", sendRpc: true);
+					changeSpriteFromName("buster_1", true);
+					if (grounded) {
+					changeState(new VavaBusterSTate() ,true);
+					}
+					stopCharge();
+					player.vileAmmo -= 5;
+            	} 
+			else if (getChargeLevel() == 1 && player.vileAmmo >= 15 ) {
                 	int input = player.input.getYDir(player);
 					new FreezeCrackerVProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, input);
 					playSound("buster2", sendRpc: true);
@@ -459,7 +492,7 @@ public class VAVA1 : Vile {
 					}
 					stopCharge();
 					player.vileAmmo -= 15;
-            	} else if (getChargeLevel() == 1 && player.vileAmmo >= 15 && OverDrive) {
+            	} else if (getChargeLevel() == 1 && player.vileAmmo >= 15 ) {
               	  new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 					playSound("thunder_bolt", sendRpc: true);
 					player.vileAmmo -= 15;
@@ -468,7 +501,7 @@ public class VAVA1 : Vile {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-          		} else if (getChargeLevel() == 2 && player.vileAmmo >= 15 && OverDrive) {
+          		} else if (getChargeLevel() == 2 && player.vileAmmo >= 15 ) {
              	if (player.input.isLeftOrRightHeld(player)) {
 					playSound("noise_crush_charged");
 					new NoiseCrushVChargedProj(this, getShootPos(), xDir, 0, player.getNextActorNetId(), true);
@@ -481,7 +514,7 @@ public class VAVA1 : Vile {
 					changeState(new VavaBusterSTate() ,true);
 					}
 					stopCharge();
-				} else if (player.vileAmmo >= 15 && OverDrive){
+				} else if (player.vileAmmo >= 15 ){
 					new ThunderBoltProj(this, getShootPos(), xDir, player.getNextActorNetId(), 0, true);
 				playSound("thunder_bolt", sendRpc: true);
 				player.vileAmmo -= 15;
@@ -499,11 +532,7 @@ public class VAVA1 : Vile {
 					);
 					stopCharge();
 					}
-          		} else if (getChargeLevel() == 0) {
-					if (charState is not BlockWCUT) {
-					vulcanWeapon?.vileShoot(this);
-					}	
-				}
+          		}
 			}
 
 	}
@@ -586,6 +615,35 @@ public class VAVA1 : Vile {
 		Supers();
 
 
+
+
+
+		
+		Helpers.decrementTime(ref ModeCD);
+		if (player.input.isPressed(Control.WeaponLeft, player)
+		&& ModeCD == 0
+		&& VileMode == 0) {
+			VileMode = 1;
+			ModeCD = 0.01f;
+			addDamageText("Beatdown", 0);
+
+
+
+			playSound("vileModule", sendRpc: false);
+		}
+		if (player.input.isPressed(Control.WeaponLeft, player)
+		&& ModeCD == 0
+	 && VileMode == 1) {
+			VileMode = 0;
+			ModeCD = 0.01f;
+			addDamageText("Trash Metal", 3);
+
+			playSound("vileModule", sendRpc: false);
+		}
+
+
+
+
 		// blow up ride
 
 		if ( charState is not InRideArmor && linkedRideArmor != null && player.input.isHeld(Control.Down, player)
@@ -665,18 +723,18 @@ public class VAVA1 : Vile {
 
 	
 	
-		if (inCombatCooldown > 0) {
-            if (!isInDamageSprite() && charState is not Taunt) {
-			
-                if (player.input.isPressed(Control.Taunt, player)) {
-                    if (Helpers.randomRange(0, 1 ) == 0) {
+		
+		if (player.input.isHeld(Control.Up, player) && !isInDamageSprite() &&
+				  player.input.isPressed(Control.WeaponLeft,player) && GenericParryCD == 0
+			) {
+				genericParryCooldown = 0.2f;
+                   if (Helpers.randomRange(0, 1 ) == 0) {
                         changeState(new ZainParryShinStartState(), true);
                     } else {
                         changeState(new GlobalParryState(), true);
                     }
-                }
-            }
-        }
+          }
+        
 
 
 		if (overDriveTimer > 0) {

@@ -1525,6 +1525,8 @@ public class MWallKick : MaverickState {
 	}
 }
 
+
+
 // A generic shoot projectile state that any Maverick can use
 public class MShoot : MaverickState {
 	bool shotOnce;

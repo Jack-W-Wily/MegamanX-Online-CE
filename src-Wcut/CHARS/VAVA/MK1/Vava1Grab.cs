@@ -38,7 +38,7 @@ public class Vava1GrabStartState : CharState {
 
 
 public class Vava1GrabState : CharState {
-	public Character? victim;
+	public Actor? victim;
 	float leechTime = 1;
 
 	float regenTime = 1;
@@ -49,7 +49,7 @@ public class Vava1GrabState : CharState {
 
 	public bool hitONCE = false;
 
-	public Vava1GrabState(Character? victim) : base("grab") {
+	public Vava1GrabState(Actor? victim) : base("grab") {
 		this.victim = victim;
 		grabTime = Vava1Grabbed.maxGrabTime;
 	}
@@ -65,9 +65,7 @@ public override void update() {
 			//	return;
 		}
 
-		if (victim == null || victim.health <= 0) {
-			character.changeToIdleOrFall();
-		}
+		
 
 		if (victim.sprite.name.EndsWith("_grabbed") || victim.sprite.name.EndsWith("_die")) {
 			victimWasGrabbedSpriteOnce = true;
@@ -167,9 +165,7 @@ public override void update() {
 		!character.sprite.name.Contains("up") &&
 		 !character.sprite.name.Contains("down")&&
 		 !character.sprite.name.Contains("foward")	) {
-			victim.grabInvulnTime = 2;
-			victim.stunInvulnTime = 1;
-			victim?.releaseGrab(character, true);
+			
 		}
 	}
 }
@@ -227,6 +223,61 @@ public class VileStomped : CharState {
 		base.update();
 
 		
+
+
+
+			if ((grabber.sprite.name.Contains("idle") ||
+			grabber.sprite.name.Contains("crouch") ||
+			grabber.sprite.name.Contains("run") ||
+			grabber.sprite.name.Contains("fall") ||
+			grabber.sprite.name.Contains("jump") ||
+			grabber.sprite.name.Contains("hurt") ||
+			grabber.sprite.name.Contains("grabbed")) &&
+			character.player.input.isPressed(Control.Jump, player)
+			) {
+				character.changeToIdleOrFall();
+			}
+		
+	}
+}
+
+
+
+
+
+public class MVileStomped : MaverickState {
+	public const float maxGrabTime = 10;
+	public Actor? grabber;
+	public long savedZIndex;
+	public MVileStomped(Actor? grabber) : base("knocked_down") {
+		this.grabber = grabber;
+	}
+
+	public override bool canEnter(Maverick character) {
+		if (!base.canEnter(character)) return false;
+		return !character.isInvulnerable() && !character.state.invincible;
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		character.stopMoving();
+		
+		savedZIndex = character.zIndex;
+		character.setzIndex(grabber.zIndex - 100);
+	}
+
+	public override void onExit(MaverickState? newState) {
+		base.onExit(newState);
+		var character = maverick;
+		
+		character.setzIndex(savedZIndex);
+	}
+
+	public override void update() {
+		base.update();
+
+		var character = maverick;
 
 
 

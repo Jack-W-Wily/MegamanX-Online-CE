@@ -51,7 +51,15 @@ public class BossMammoth : Character {
 		isWCUTBoss = true;
 	}
 
-
+	public override int getMaxHealth() {
+		if (Options.main.Difficulty == 2) {
+		return MathInt.Ceiling(Player.getModifiedHealth(52) * Player.getHpMod());
+		} 
+		if (Options.main.Difficulty == 1) {
+		return MathInt.Ceiling(Player.getModifiedHealth(42) * Player.getHpMod());
+		} 
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
+	}
 
 	// NormalCTRL: is for you to add moves that your new Character that he can do while
 	// He isn't Softlocked in a motion be it an attack or a Damage State

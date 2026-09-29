@@ -1120,7 +1120,22 @@ public class Damager {
 
 					if ( projId == (int)ProjIds.VileAirRaidPlusKnock) {
 							
-							character.changeState(new LaunchedStateWeak(owner.character), true);
+							character.changeState(new LaunchedStateWeak(), true);
+							
+                    }
+				}
+
+
+				if (
+				(
+					projId == (int)ProjIds.VileAirRaidStart
+				|| projId == (int)ProjIds.VileAirRaidPlusKnock
+				)) {
+					owner.character.changeState(new VileAirRaid(character), true);
+
+					if ( projId == (int)ProjIds.VileAirRaidPlusKnock) {
+							
+							character.changeState(new LaunchedStateWeak(), true);
 							
                     }
 				}
@@ -1223,7 +1238,7 @@ public class Damager {
 			|| projId == (int)ProjIds.RisingSpecter
 			) && !character.isBlocking()) {
 
-				character.changeState(new LaunchedState(owner.character));
+				character.changeState(new LaunchedState());
 			}
 
 			if (projId == (int)ProjIds.TriggerOldFLinch) {
@@ -1234,12 +1249,12 @@ public class Damager {
 
 			if (character != null && attacker != null &&  projId == (int)ProjIds.BlockableWeakLaunch && !character.isBlocking()) {
 
-				character.changeState(new LaunchedStateWeak(attacker));
+				character.changeState(new LaunchedStateWeak());
 			}
 
 			if (character != null && attacker != null &&  projId == (int)ProjIds.BlockableMediumLaunch && !character.isBlocking()) {
 
-				character.changeState(new LaunchedStateMedium(attacker));
+				character.changeState(new LaunchedStateMedium());
 			}
 			}
 
@@ -1346,11 +1361,96 @@ public class Damager {
 		// Maverick section
 		else if (victim is Maverick maverick) {
 
-
+			if ((projId == (int)ProjIds.Shippuuga || projId == (int)ProjIds.MechFrogStompShockwave)) {
+				maverick.changeState(new MKnockedDown(attacker.xDir), true);
+			}
 			if (damage > 1 || flinch > 0) {
 				victim.playSound(hitSound);
 			} 
 			// Enable WCUT Grab Compatibility on Mavericks
+			
+
+			if (projId == (int)ProjIds.GBDKick || projId == (int)ProjIds.SiceSlide) {
+
+					owner.character.isDashing = true;
+					
+					owner.character.changeState(new JumpKick(), true);
+				}
+
+			if ((maverick.sprite.name.Contains("knocked_down") || maverick.state is MKnockedDown)
+				 && projId == (int)ProjIds.VileStomp
+				 && !maverick.isStatusImmune()) {
+					owner.character.changeState(new VileStompState(maverick), true);
+					maverick.changeState(new MVileStomped(owner.character), true);
+				}
+				if (projId == (int)ProjIds.VileStomp2
+				&& !maverick.isStatusImmune()) {
+					maverick.changeState(new MVileStomped(owner.character), true);
+				}
+
+
+
+			if (projId == (int)ProjIds.BurensenEND && !maverick.sprite.name.Contains("guard")) {
+				maverick.shakeCamera(sendRpc: true);
+				if (attacker != null) {
+					maverick.xDir = -attacker.xDir;
+				}
+				maverick.changeState(new MLaunchedFowardState(), true);
+				
+			}
+			
+
+			if (projId == (int)ProjIds.GenericWCUTGrabProjID) {
+				if (owner.character is RockmanX rx && rx != null) {
+					maverick.changeState(new MForceGrabbed(rx));
+					owner.character.changeState(new RMXGrabState(maverick));
+				}
+
+				if (owner?.character is XAnother rxa && rxa != null) {
+						maverick.changeState(new MForceGrabbed(rxa));
+					owner.character.changeState(new RMXGrabState(maverick));
+				}
+
+				if (attacker is Vile vavagrabber && maverick != null) {
+						maverick.changeState(new MForceGrabbed(vavagrabber));
+					attacker.changeState(new Vava1GrabState(maverick));
+				}
+				if (owner?.character is Kurumitos KR) {
+						maverick.changeState(new MForceGrabbed(KR));
+					owner.character?.changeState(new KurumaGrabState(maverick));
+				}
+			}
+
+
+
+			if (projId == (int)ProjIds.newUpGrab ) {
+					if (owner.character is not Vile){
+					owner.character.changeState(new XUPGrabState(maverick));
+					maverick.changeState(new MForceGrabbed(owner.character));
+					} else {
+						if (maverick.state is not MDraggedDown){
+						owner.character.changeState(new XUPGrabState(maverick));
+						maverick.changeState(new MDraggedDown());
+						}
+					}
+					
+				}
+
+				if (projId == (int)ProjIds.DropSlide ) {
+				
+						if (maverick.state is not MDraggedDown){			
+						maverick.changeState(new MDraggedDown());
+						}
+					
+				}
+
+
+			if ((projId == (int)VAVA2ProjIds.NoiseCrushVCharged || projId == (int)ProjIds.HeavyPush)) {
+				maverick.changeState(new MPushedOver2(attacker.xDir), true);
+			}
+
+			
+
 
 			if (projId == (int)ProjIds.GizmoGrab) {
 				if (owner?.character is VAVA1 or FinalVava) {
@@ -1413,6 +1513,21 @@ public class Damager {
 			}
 			// Enable Wcut Combos on Mavericks
 
+
+
+			if (Options.main.Difficulty == 0 && maverick != null && maverick.dismantleTypeDeath) {
+				
+				if (projId == (int)ProjIds.RollingShieldCharged || projId == (int)ProjIds.FrostShieldCharged  )
+				{
+					damage = damage *6;
+				} else {
+				damage = damage *3;
+				}
+			}
+			if (Options.main.Difficulty == 1 && maverick != null && maverick.dismantleTypeDeath
+			&& owner.weapon is not XBuster) {
+				damage = damage *2;
+			}
 			if(owner.character?.charState is GreenEyedLampState) {
 				owner.character.charState.normalCtrl = true;
 				owner.character.charState.attackCtrl = true;

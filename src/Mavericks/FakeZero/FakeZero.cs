@@ -297,6 +297,8 @@ public class FakeZero : Maverick {
 		DashSlash, 
 		TrippleBusterSlash,
 
+
+		AirRaid
 		
 	}
 
@@ -310,7 +312,7 @@ public class FakeZero : Maverick {
 			"claudio_trippleslash" => MeleeIds.TrippleSlash,
 			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
 			"claudio_dash" => MeleeIds.Rising,
-			"claudio_jump"  or  "claudio_rising" => MeleeIds.Rising,
+			"claudio_rising" => MeleeIds.Rising,
 			
 
 			_ => MeleeIds.None

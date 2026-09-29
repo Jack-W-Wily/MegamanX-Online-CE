@@ -47,6 +47,8 @@ public class Maverick : Actor, IDamagable {
 	// HP stuff.
 	public float health;
 
+	public float attackgeneralCooldown;
+
 	public SubBossPathBlocker pathBlocker;
 	public float maxHealth;
 	public bool alive = true;
@@ -388,6 +390,7 @@ public class Maverick : Actor, IDamagable {
 		Helpers.decrementFrames(ref weaknessCooldown);
 		Helpers.decrementFrames(ref virusTime);
 		Helpers.decrementFrames(ref oilTime);
+		Helpers.decrementTime(ref attackgeneralCooldown);
 	}
 	
 

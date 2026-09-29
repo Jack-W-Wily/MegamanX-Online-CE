@@ -165,22 +165,20 @@ public class VMissiLeStance : CharState {
 			vile.pos.addxy(8 * vile.xDir,-21), character.xDir, player, 
 			player.getNextActorNetId(), true);
 			}
-
-			if (character.xDir == 1) {
+			}
+		
 				if (player.input.isPressed(Control.Left, player) && player.input.checkDoubleTap(Control.Left)) {
 					character.changeState(new VMissileDash(), true);
+					character.xDir = 1;
 				}
-			
 
-			}
-			if (character.xDir == -1) {
-			
+
 				if (player.input.isPressed(Control.Right, player) && player.input.checkDoubleTap(Control.Right)) {
 				character.changeState(new VMissileDash(), true);
+				character.xDir = -1;
 					}
-				
-				}
-			}
+
+			
 		}
 	}
 

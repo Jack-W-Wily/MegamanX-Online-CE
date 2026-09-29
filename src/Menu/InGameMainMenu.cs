@@ -126,7 +126,7 @@ public class InGameMainMenu : IMainMenu {
 	}
 
 	public bool isSelArmorDisabled() {
-		if (Global.level.is1v1()) return true;
+		//if (Global.level.is1v1()) return true;
 		if (mainPlayer.isVile) return false;
 		if (mainPlayer.isZMID) return false;
 		if (mainPlayer.isX) return false;

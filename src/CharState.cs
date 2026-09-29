@@ -191,7 +191,7 @@ public class CharState {
 
 	public virtual bool canEnter(Character character) {
 		if (character.charState is InRideArmor &&
-			!(this is Die || this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
+			!(this is Die || this is BossBackJump || this is Idle || this is Jump || this is Fall || this is StrikeChainHooked || this is ParasiteCarry || this is VileMK2Grabbed || this is DarkHoldState ||
 			  this is UPGrabbed || this is GenericGrabbedState || this is DeadLiftGrabbed || Helpers.isOfClass(this, typeof(GenericGrabbedState)))
 		) {
 			//if (character.currentWeapon is NecroBurst && character.charState is LaserAttack) return false;
@@ -1764,7 +1764,7 @@ public class Die : CharState {
 				var randomPos = character.getCenterPos().addxy(randX, randY);
 				if (character is Vile vile1 && vile1.isVileMK2 ||
 				character is Doppma or KaiserSigma or BossClaudio or Zain
-				or BossStag or Kurumitos
+				or BossStag or Kurumitos || character.ShouldExplode
 				
 				
 				 ) {

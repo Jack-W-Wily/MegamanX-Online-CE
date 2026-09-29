@@ -13,9 +13,11 @@ using SFML.Graphics;
 // To make sure most things work without you having errors when you want to use Math for example
 
 namespace MMXOnline;
+//olá -RMS
+//Saudações - Jakkus
+//Minhas saudações - Kazen
 
-
-public class BossStag : Character {
+public class BossClaudioEX : Character {
 
 	
 
@@ -25,17 +27,13 @@ public class BossStag : Character {
 
 	public bool canSpecialCancel = false;
 
-	
-	public Weapon uppercutWeapon;
-	public Sprite antler;
-	public Sprite antlerDown;
-	public Sprite antlerSide;
-	public BossStag(
-		Player player, float x, float y, int xDir,
-		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
-		bool isWarpIn = true
+
+	public BossClaudioEX(
+		Player player, float x, float y, int xDir, bool isVisible,
+		ushort? netId, bool ownedByLocalPlayer, bool isWarpIn = false,
+		bool isRevive = true, int? heartTanks = null, bool isATrans = false
 		) : base( // Make sure it looks exactly like this
-		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn) {
+		player, x, y, xDir, isVisible, netId, ownedByLocalPlayer, isWarpIn, heartTanks, isATrans) {
 
 
 		charId = CharIds.BossClaudio;
@@ -43,24 +41,22 @@ public class BossStag : Character {
 
 
 		if (charState is WarpIn) player.superAmmo = 0;
-		uppercutWeapon = new Weapon(WeaponIds.FStagGeneric, 144, new Damager(player, 0, 0, 0));
-		antler = new Sprite("fstag_antler");
-		antlerDown = new Sprite("fstag_antler_down");
-		antlerSide = new Sprite("fstag_antler_side");
-		spriteFrameToSounds["fstag_run/2"] = "run";
-		spriteFrameToSounds["fstag_run/6"] = "run";
+
+		spriteFrameToSounds["claudio_jump_start/2"] = "zerosaberx3";
+
+		spriteFrameToSounds["claudio_trippleslash/1"] = "saber1";
+		spriteFrameToSounds["claudio_trippleslash/8"] = "saber2";
+		spriteFrameToSounds["claudio_trippleslash/17"] = "saber3";
+
+		spriteFrameToSounds["claudio_air_raid/1"] = "saber1";
+		spriteFrameToSounds["claudio_air_raid/8"] = "saber2";
+		spriteFrameToSounds["claudio_air_raid/17"] = "saber3";
+		spriteFrameToSounds["claudio_air_raid/27"] = "saber2";
+		spriteFrameToSounds["claudio_air_raid/33"] = "saber3";
+		spriteFrameToSounds["claudio_air_raid/36"] = "saber2";
 		isWCUTBoss = true;
 	}
 
-	public override int getMaxHealth() {
-		if (Options.main.Difficulty == 2) {
-		return MathInt.Ceiling(Player.getModifiedHealth(52) * Player.getHpMod());
-		} 
-		if (Options.main.Difficulty == 1) {
-		return MathInt.Ceiling(Player.getModifiedHealth(42) * Player.getHpMod());
-		} 
-		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
-	}
 
 
 	// NormalCTRL: is for you to add moves that your new Character that he can do while
@@ -76,8 +72,7 @@ public class BossStag : Character {
 		return base.normalCtrl();
 	}
 
-	public override CharState getJumpState() => new BossJumpStart();
-	
+
 	// AttackCtrl: is for you to add moves to your character that he can only perform
 	// While the attackCtrl flag is active in a charstate and is conventionally where you add attacks
 	public override bool attackCtrl() {
@@ -89,45 +84,27 @@ public class BossStag : Character {
 	}
 
 
+	public override int getMaxHealth() {
+		if (Options.main.Difficulty == 2) {
+		return MathInt.Ceiling(Player.getModifiedHealth(52) * Player.getHpMod());
+		} 
+		if (Options.main.Difficulty == 1) {
+		return MathInt.Ceiling(Player.getModifiedHealth(42) * Player.getHpMod());
+		} 
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
+	}
 
-
-	
-	public bool phase1Theme;
-
-	public bool phase2Theme;
-	public bool phase3Theme;
-
-
-
+	public override CharState getJumpState() => new BossJumpStart();
 	public override void update() {
 		base.update();
-
-
-		if (health > 10 && !phase1Theme && bonusHealth < 1){
-					phase1Theme = true;
-				Global.level.StartBossMusicX8();
-				//addMusicSource("Xvs8Generals_BossX1", getCenterPos(), true);
-		} 
-
-
-		if (isUnderwater()) {
-			antler.visible = false;
-			antlerDown.visible = false;
-			antlerSide.visible = false;
-		} else {
-			antler.visible = true;
-			antlerDown.visible = true;
-			antlerSide.visible = true;
+		if (charState is Dash or AirDash && player.health < 10) {
+			charState.specialId = SpecialStateIds.AxlRoll;
 		}
 
-		antler.update();
-		antlerDown.update();
-		antlerSide.update();
 
-	
-		Helpers.decrementTime(ref overDriveTimer);
-		Helpers.decrementTime(ref ShikiYamiBaraiCD);
-		
+		if (charState is ClaudioGroundPunchState) {
+			changeState(new ClaudioTriadThungerState(), true);
+		}
 
 		// Charge and release charge logic.
 		chargeLogic(shoot);
@@ -168,7 +145,7 @@ public class BossStag : Character {
 	
 
 	public override bool canDash() {
-		return false;
+		return true;
 	}
 
 	public override bool canWallClimb() {
@@ -176,8 +153,10 @@ public class BossStag : Character {
 	}
 
 	public override string getSprite(string spriteName) {
-		return "fstag_" + spriteName;
-
+		return "claudio_" + spriteName;
+		// NOTE: your character needs at bare minimum
+		// _idle.json, _warp_in.json and _warp_beam.json in order to
+		// work or else the game will crash when he Spawns
 	}
 
 
@@ -194,10 +173,12 @@ public class BossStag : Character {
 		Rising,
 		FireWave,
 
+		Launcher,
+
 		DashSlash, 
-		
 		TrippleBusterSlash,
 
+		airRaid,
 		
 	}
 
@@ -207,13 +188,14 @@ public class BossStag : Character {
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
 			"kr_block"  /*referenced sprite*/ => MeleeIds.Blocking, /*melee ID related to said sprite*/
-			"fstag_orochinagi_end"  => MeleeIds.DashSlash,
-			"fstag_punch" => MeleeIds.TrippleSlash,
+			"claudio_chargeslash"  => MeleeIds.DashSlash,
+			"claudio_trippleslash" => MeleeIds.TrippleSlash,
 			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
+			"claudio_air_raid" => MeleeIds.TrippleBusterSlash,
 			"claudio_dash" => MeleeIds.Rising,
-			"fstag_dash_grab" => MeleeIds.Grab,
-			"fstag_orochinagi_start"  or  "fstag_wall_dash" => MeleeIds.Rising,
-			
+			"claudio_rising" => MeleeIds.Rising,
+			 "claudio_jump"  => MeleeIds.airRaid,
+			"claudio_ground_punch" or "claudio_dash_end"  => MeleeIds.Launcher,
 
 			_ => MeleeIds.None
 		});
@@ -243,15 +225,22 @@ public class BossStag : Character {
 				ShouldClang: false,// this propety makes it so your move clangs in contact shield type hitboxes
 				isZSaberEffect: false,// adds the Zsaber slashing effect
 				addToLevel: addToLevel // make sure this is always active like this or your projectile won't work
-				, hitspark : "empty"
 			),
 
-			(int)MeleeIds.Grab => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.ForceGrabState, player,
+			(int)MeleeIds.Launcher => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				 3,0,10, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
+
+			(int)MeleeIds.airRaid => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.VileAirRaidStart, player,
+				 0,0,10, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
 			(int)MeleeIds.TrippleSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
 				 3,30,10, isReflectShield: false,
@@ -259,11 +248,11 @@ public class BossStag : Character {
 				addToLevel: addToLevel
 			),
 			(int)MeleeIds.Rising => new GenericMeleeProj(
-				new KRMelee(), projPos, ProjIds.X6Saber, player,
+				new KRMelee(), projPos, ProjIds.BlockableLaunch, player,
 				 2,30,10, isReflectShield: false,
 				clashTier: ClashTier.Weak, isZSaberEffect: false,
 				isJuggleProjectile:  true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitspark : "empty"
 			),
 			(int)MeleeIds.TrippleBusterSlash => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.X6Saber, player,
@@ -282,7 +271,6 @@ public class BossStag : Character {
 		};
 		return proj;
 	}
-
 
 
 	// Ammo section
@@ -347,6 +335,7 @@ public class BossStag : Character {
 	public void shoot(int chargeLevel) {
 
 
+		
 		if (chargeLevel >= 1) {
 			stopCharge();
 		}
@@ -395,11 +384,6 @@ public class BossStag : Character {
 	}
 
 
-		public override float getJumpPower() {
-		float jumpModifier = 3;
-	
-		return jumpModifier + base.getJumpPower();
-	}
 
 
 
@@ -425,7 +409,27 @@ public class BossStag : Character {
 	public override void render(float x, float y) {
 		addRenderEffect(RenderEffectType.SpeedDevilTrail);
 		// For drawing the growing aura that LastStand and Eigengrau Zero uses.
-		
+		if (visible && bonusHealth == 0) {
+			// Position to draw the sprite to.
+			float auraSize = 1 + omegaAura.twitch + omegaAura.grow;
+			float drawX = pos.x + x + (float)xDir * currentFrame.offset.x * auraSize;
+			float drawY = pos.y + y + (float)yDir * currentFrame.offset.y * auraSize + 1;
+
+			float auraAlpha = 0.75f;
+			
+			// Draw aura.
+			Global.sprites[sprite.name].draw(
+				sprite.frameIndex,
+				drawX, drawY,
+				xDir, yDir,
+				null, auraAlpha,
+				auraSize,
+				auraSize,
+				zIndex - 1,
+				player.omegaAuraShader
+			);
+			updateOmegaAura();
+		}
 
 
 	
@@ -442,8 +446,8 @@ public class BossStag : Character {
 		int Vattack = Helpers.randomRange(1, 7);
 		Helpers.decrementFrames(ref AIHellBarrageCD);
 		bool isTargetInAir = pos.y > target?.pos.y - 20;
-		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
-		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 220;
+		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 70;
+		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 200;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (Global.level.is1v1()) {
 			isBoss = true;
@@ -451,82 +455,93 @@ public class BossStag : Character {
 		if (isBoss) {
 			player.superAmmo = player.superMaxAmmo;
 		}
-		if (charState is Dash) {
-			changeState(new BFStagDashChargeState());
-		}
-		if (charState is AirDash ) {
-			changeState(new BFStagWallDashState());
-		}
 
-		if (charState is WallKick) {
-			changeState(new BFStagWallDashState2());
-		}
 		
 
 			if (!charState.isGrabbedState && !player.isDead && !isInvulnerableAttack()
-					&& aiAttackCooldown <= 0 && charState.attackCtrl) {
+						&& aiAttackCooldown <= 0 && charState.attackCtrl) {
 
-			if (isTargetClose) {
-				switch (Vattack) {
-					case 1 when isFacingTarget:
-						changeState(new BFStagDashChargeState());
-						break;
-					case 2 when isFacingTarget:
-						changeState(new BFStagGrabState(false));
-						break;
-					case 3 when isFacingTarget:
-						changeState(new BFStagGrabState(true));
-						break;
-					case 4 when isFacingTarget:
-						changeState(new BFStagDashState(0.1f));
-						break;
-					case 5 when isFacingTarget:
-						changeState(new BFStagOrochinagi());
-						break;
-					case 6 when isFacingTarget:
-						changeState(new BFStagShoot(false));
-						break;
-					case 7 when isFacingTarget && bonusHealth == 0:
-						changeState(new BFStagOrochinagiCharge());
-						addHealth(5);
-						break;
+				if (isTargetClose && grounded) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+						changeState(new ClaudioTrppleSlash());					
+							break;
+						case 2 when isFacingTarget:
+							changeState(new ClaudioTrppleSlash());	
+							break;
+						case 3 when isFacingTarget:
+							changeState(new ClaudioChargedSlash());	
+							break;
+						case 4 when isFacingTarget:
+							changeState(new ClaudioRising());	
+							break;
+						case 5 when isFacingTarget:
+							changeState(new ClaudioTriadThungerState());	
+							break;
+						case 6 when isFacingTarget:
+							changeState(new ClaudioDashPrepare());	
+							break;
+						case 7 when isFacingTarget:
+							changeState(new WSpongeLightningStateClaudio());	
+							break;
+					}
+				}
+
+				
+
+				if (!isTargetClose && grounded && isWishinRangedMoves) {
+					switch (Vattack) {
+						case 1 when isFacingTarget:
+						changeState(new ClaudioShingetsurin());					
+							break;
+						case 2 when isFacingTarget:
+							changeState(new ClaudioTrippleBuster());	
+							break;
+						case 3 when isFacingTarget:
+							if (bonusHealth > 0){
+							changeState(new ClaudioFWave());
+							} else {
+							if (Options.main.Difficulty > 1){
+								if (Helpers.randomRange(0,1) == 1){
+								changeState(new BFlameMInfernoCharge());
+								}else {changeState(new WSpongeLightningStateClaudioXtreme());}
+							} else {
+								if (Helpers.randomRange(0,1) == 1){
+								changeState(new ClaudioFWave());
+								}else {changeState(new WSpongeLightningStateClaudio());}
+							}
+
+							}
+							break;
+						case 4 when isFacingTarget:
+							changeState(new ClaudioRising());	
+							break;
+						case 5 when isFacingTarget:
+							changeState(new FishFang());
+							break;
+						case 6 when isFacingTarget:
+							changeState(new ClaudioDashPrepare());	
+							break;
+						case 7 when isFacingTarget:
+							changeState(new ClaudioTrippleBuster());	
+							break;
+					}
+				}
+
+				if (Options.main.Difficulty > 0){
+					if (bonusHealth > 0){
+					aiAttackCooldown = Helpers.randomRange(30, 60);
+					} else {
+					aiAttackCooldown = Helpers.randomRange(0, 30);
+					}
+				} else {
+				if (bonusHealth > 0){
+					aiAttackCooldown = Helpers.randomRange(60, 120);
+					} else {
+					aiAttackCooldown = 50;
+					}
 				}
 			}
-
-
-
-			if (!isTargetClose && isWishinRangedMoves) {
-				switch (Vattack) {
-					case 1 when isFacingTarget:
-						changeState(new BFStagGrabState(true));
-						break;
-					case 2 when isFacingTarget:
-						changeState(new BFStagDashChargeState());
-						break;
-					case 3 when isFacingTarget:
-						changeState(new BFStagDashChargeState());
-						break;
-					case 4 when isFacingTarget:
-						changeState(new BFStagShoot(false));
-						break;
-					case 5 when isFacingTarget:
-						changeState(new Taunt());
-						addHealth(5);
-						break;
-					case 6 when isFacingTarget:
-						changeState(new BFStagShoot(true));
-						break;
-					case 7 when isFacingTarget:
-						changeState(new BFStagDashChargeState());
-						break;
-				}
-			}
-			if (bonusHealth > 0) {
-				aiAttackCooldown = Helpers.randomRange(60, 120);
-			} else {
-				aiAttackCooldown = Helpers.randomRange(30, 60);
-			}
-		}
 
 			
 	
@@ -550,7 +565,7 @@ public class BossStag : Character {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
 							changeState(new BossGuard());	
-								aiDodgeCD = Helpers.randomRange(100, 220);
+								aiDodgeCD = 300;
 							
 						}
 					} 

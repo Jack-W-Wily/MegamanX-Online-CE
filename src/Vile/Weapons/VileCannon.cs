@@ -547,6 +547,7 @@ public class FrontRunnerProj : Projectile {
 		fadeSprite = "vile_mk2_proj_fade";
 		fadeOnAutoDestroy = true;
 		damager.damage = 2;
+		damager.flinch = Global.halfFlinch;
 		byteAngle = Helpers.to256(byteAngle);
 		this.byteAngle = byteAngle;
 		vel = 5 * 60 * Point.createFromByteAngle(byteAngle);

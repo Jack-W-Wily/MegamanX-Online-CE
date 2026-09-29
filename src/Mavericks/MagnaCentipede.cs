@@ -927,7 +927,7 @@ public class MagnaCDrainState : MaverickState {
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);
 		if (victim is Character vtc){
-		vtc?.changeState(new LaunchedStateWeak(player.character));
+		vtc?.changeState(new LaunchedStateWeak());
 		}
 	}
 }

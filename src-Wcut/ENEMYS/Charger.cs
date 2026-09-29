@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class MissileElecGreen : Maverick {
-	public VelGMeleeWeapon meleeWeapon = new();
+public class Charger : Maverick {
+	public SigmaMenuWeapon meleeWeapon = new();
 
-	public MissileElecGreen(
+	public Charger(
 		Player player, Point pos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
@@ -21,10 +21,9 @@ public class MissileElecGreen : Maverick {
 		weakWeaponId = WeaponIds.ShotgunIce;
 		weakMaverickWeaponId = WeaponIds.ChillPenguin;
 		dismantleTypeDeath = true;
-		shouldDealColisionDmg = true;
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
-		netActorCreateId = NetActorCreateId.MissileElecGreen;
+		netActorCreateId = NetActorCreateId.Charger;
 		netOwner = player;
 		if (sendRpc) {
 			createActorRpc(player.id);
@@ -34,10 +33,10 @@ public class MissileElecGreen : Maverick {
 		height = 24;
 	}
 
-	public bool healthvalueOnce = false;
 
 
 	
+
 	public override void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			if (Helpers.randomRange(0,5) == 0) {
@@ -61,48 +60,58 @@ public class MissileElecGreen : Maverick {
 		}
 	}
 
+	
+	public bool healthvalueOnce = false;
+
+
 	public override void update() {
 		base.update();
 
 
 		if (!healthvalueOnce) {
 			healthvalueOnce = true;
-			health = 2;
-		}
-
-
-		if (state is MIdle) {
-			state.invincible = true;
+			health = 10;
 		}
 		if (aiBehavior == MaverickAIBehavior.Control) {
-
+			if (state is MIdle or MRun or MLand or MGuard) {
+				if (shootPressed()) {
+					changeState(getShootState());
+				} else if (specialPressed()) {
+					changeState(getShootState2());
+				} else if (input.isPressed(Control.Dash, player)) {
+					changeState(new VelGPounceStartState());
+				}
+			} else if (state is MJump || state is MFall) {
+				if (input.isPressed(Control.Dash, player)) {
+					changeState(new VelGPounceStartState());
+				}
+			}
 		}
 	}
 
 	public override string getMaverickPrefix() {
-		return "met";
+		return "enemy_charger_soldier";
 	}
 
 	public override float getRunSpeed() {
-		return 135f * getRunDebuffs();
+		return 65f * getRunDebuffs();
 	}
 
-	public MaverickState getShootState(bool isAI) {
-		var mshoot = new MShoot((Point pos, int xDir) => {
-			new FakeZeroBusterProj(
-				pos, xDir, this, player.getNextActorNetId(), sendRpc: true
-			);
-		}, "busterX2");
-		if (isAI) {
-			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.001f);
-		}
-		return mshoot;
+	public MaverickState getShootState() {
+		return new MTaunt();
 	}
 
 	public MaverickState getShootState2() {
 		return new MTaunt();
 	}
 
+	public override MaverickState[] strikerStates() {
+		return [
+			new VelGShootFireState(),
+			new VelGShootIceState(),
+			new VelGPounceStartState(),
+		];
+	}
 
 	public override MaverickState[] aiAttackStates() {
 		float enemyDist = 199;
@@ -117,10 +126,10 @@ public class MissileElecGreen : Maverick {
 				attackgeneralCooldown = 0.6f;
 			}
 		}
-	
 		return [
-			getShootState(true),
-			new VelGPounceStartState()
+			new SparkMPunchState(),
+			new SparkMDashPunchState(),
+			new SparkMPunchState()
 		];
 	}
 
@@ -128,16 +137,28 @@ public class MissileElecGreen : Maverick {
 	public enum MeleeIds {
 		None = -1,
 		Pounce,
+		DashPunch,
 	}
 
-
+	// This can run on both owners and non-owners. So data used must be in sync.
+	public override int getHitboxMeleeId(Collider hitbox) {
+		return (int)(sprite.name switch {
+			"enemy_charger_soldier_punch" => MeleeIds.Pounce,
+			"enemy_charger_soldier_dash_punch" => MeleeIds.DashPunch,
+			_ => MeleeIds.None
+		});
+	}
 
 	// This can be called from a RPC, so make sure there is no character conditionals here.
 	public override Projectile? getMeleeProjById(int id, Point pos, bool addToLevel = true) {
 		return (MeleeIds)id switch {
 			MeleeIds.Pounce => new GenericMeleeProj(
 				meleeWeapon, pos, ProjIds.VelGMelee, player,
-				3, Global.defFlinch, addToLevel: addToLevel
+				3, Global.defFlinch, addToLevel: addToLevel, hitSound : "htsnd_punch_2"
+			),
+			MeleeIds.DashPunch => new GenericMeleeProj(
+				meleeWeapon, pos, ProjIds.HeavyPush, player,
+				3, 0, addToLevel: addToLevel , hitSound : "kofhtsnd_knock1"
 			),
 			_ => null
 		};

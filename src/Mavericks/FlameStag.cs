@@ -59,7 +59,7 @@ public class FlameStag : Maverick {
 			antlerDown.visible = true;
 			antlerSide.visible = true;
 		}
-
+		
 		antler.update();
 		antlerDown.update();
 		antlerSide.update();

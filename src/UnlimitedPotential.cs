@@ -352,11 +352,11 @@ public class XUPPunchState : CharState {
 }
 
 public class XUPGrabState : CharState {
-	public Character? victim;
+	public Actor? victim;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public XUPGrabState(Character? victim) : base("unpo_grab") {
+	public XUPGrabState(Actor? victim) : base("unpo_grab") {
 		this.victim = victim;
 		grabTime = UPGrabbed.maxGrabTime;
 	}
@@ -586,11 +586,18 @@ public class XUPGrabState : CharState {
 		base.onExit(newState);
 		character.useGravity = true;
 		//character.grabCooldown = 1;
-		if (victim != null){
-		victim.grabInvulnTime = 2;
+		if (victim != null && victim is Character victmC){
+		//victim.grabInvulnTime = 2;
 
 			var damager = new Damager(player, 2, 40, 0);
-			damager.applyDamage(victim, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
+			damager.applyDamage(victmC, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
+		}
+
+		if (victim != null && victim is Maverick victmM){
+		//victim.grabInvulnTime = 2;
+
+			var damager = new Damager(player, 2, 40, 0);
+			damager.applyDamage(victmM, false, new RCXGrab(), character, (int)ProjIds.UPGrab);
 		}
 		 
 	}

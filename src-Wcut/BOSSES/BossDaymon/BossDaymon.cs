@@ -4,43 +4,10 @@ using System.Runtime.InteropServices;
 
 namespace MMXOnline;
 
-public class BusterZero : Character {
-	// Hypermode stuff.
-	public bool isBlackZero;
-	public bool isAwakened;
-	public bool isViral;
-	public bool isHyperMode => (isBlackZero || isAwakened || isViral);
+public class Daymon : BusterZero {
 	
-	public float zSaberCooldown;
-	public float lemonCooldown;
-	public int stockedBusterLv;
-	public bool stockedSaber;
-	public float stockedTime;
-	public List<Projectile> zeroLemonsOnField = new();
-	public ZBusterSaber meleeWeapon = new();
-	public int lastShootPressed;
-	public float aiAttackCooldown;
-	public float jumpTimeAI;
 
-	public AwakenedAura awakenedAuraWeapon = new();
-
-
-	public int hyperMode;
-
-	// Hypermode effects stuff.
-	public int awakenedAuraFrame;
-	public float awakenedAuraAnimTime;
-
-	// Hypermode attacks.
-	public Weapon? gigaAttack;
-	public int gigaAttackSelected;
-
-	public float donutTimer;
-	public int donutsPending;
-
-	public BZeroLoadout loadout;
-
-	public BusterZero(
+	public Daymon(
 		Player player, float x, float y, int xDir,
 		bool isVisible, ushort? netId, bool ownedByLocalPlayer,
 		bool isWarpIn = true, BZeroLoadout? loadout = null,
@@ -48,7 +15,7 @@ public class BusterZero : Character {
 	) : base(
 		player, x, y, xDir, isVisible,
 		netId, ownedByLocalPlayer,
-		isWarpIn, heartTanks, isATrans
+		isWarpIn, loadout, heartTanks, isATrans
 	) {
 		charId = CharIds.BusterZero;
 		// Loadout stuff.
@@ -63,19 +30,8 @@ public class BusterZero : Character {
 		}
 	}
 
-	public override CharState getTauntState() => new BZeroTaunt();
+	public override CharState getTauntState() => new Taunt();
 
-	public override void addAmmo(float amount) {
-		gigaAttack?.addAmmo(amount, player);
-	}
-
-	public override void addPercentAmmo(float amount) {
-		gigaAttack?.addAmmoPercentHeal(amount);
-	}
-
-	public override bool canAddAmmo() {
-		return (gigaAttack != null && gigaAttack.ammo < gigaAttack.maxAmmo);
-	}
 	
 	public override void preUpdate() {
 		base.preUpdate();
@@ -137,16 +93,6 @@ public class BusterZero : Character {
 		chargeLogic(shoot);
 	}
 
-	public void updateAwakenedAura() {
-		awakenedAuraAnimTime += Global.speedMul;
-		if (awakenedAuraAnimTime > 4) {
-			awakenedAuraAnimTime = 0;
-			awakenedAuraFrame++;
-			if (awakenedAuraFrame > 3) {
-				awakenedAuraFrame = 0;
-			}
-		}
-	}
 
 	public override void chargeGfx() {
 		if (ownedByLocalPlayer) {
@@ -277,30 +223,8 @@ public class BusterZero : Character {
 		return base.attackCtrl();
 	}
 
-	public void setShootAnim() {
-		string shootSprite = getSprite(charState.shootSpriteEx);
-		if (!Global.sprites.ContainsKey(shootSprite)) {
-			if (grounded) { shootSprite = "zero_shoot"; }
-			else { shootSprite = "zero_fall_shoot"; }
-		}
-		if (shootAnimTime == 0) {
-			changeSprite(shootSprite, false);
-		} else if (charState is Idle && !charState.inTransition()) {
-			frameIndex = 0;
-			frameTime = 0;
-		}
-		if (charState is LadderClimb) {
-			if (player.input.isHeld(Control.Left, player)) {
-				this.xDir = -1;
-			} else if (player.input.isHeld(Control.Right, player)) {
-				this.xDir = 1;
-			}
-		}
-		shootAnimTime = DefaultShootAnimTime;
-	}
-
 	// Shoots stuff.
-	public virtual void shoot(int chargeLevel) {
+	public override void shoot(int chargeLevel) {
 		if (chargeLevel == 0) {
 			for (int i = zeroLemonsOnField.Count - 1; i >= 0; i--) {
 				if (zeroLemonsOnField[i].destroyed || zeroLemonsOnField[i].reflectCount > 0) {
@@ -330,39 +254,38 @@ public class BusterZero : Character {
 
 		shootSub(chargeLevel);
 	}
-	
-	public virtual void shootSub(int chargeLevel, bool sfx = true, bool cd = true) {
-		if (isAwakened) {
-			shootAwakened(chargeLevel, sfx, cd);
-		} else {
-			shootNormal(chargeLevel, sfx, cd);
-		}
-	}
 
-	public virtual void shootNormal(int chargeLevel, bool sfx = true, bool cd = true) {
+
+
+
+	public int shootNum;
+
+	
+
+	public override void shootNormal(int chargeLevel, bool sfx = true, bool cd = true) {
 		Point shootPos = getShootPos();
 		int xDir = getShootXDir();
 		string targetSound = "";
 		int? targetCooldown = null;
 
 		if (chargeLevel == 0) {
-			targetSound = "busterX3";
-			var lemon = new DZBusterProj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
-			);
+			targetSound = "shootX3lv";
+			var lemon = new IrisFireBallProj(new IrisCrystal(), shootPos, xDir , shootNum,
+					 true, player, player.getNextActorNetId(), sendRpc: true);
+					shootNum++;
 			zeroLemonsOnField.Add(lemon);
 			targetCooldown = 9;
 		} else if (chargeLevel == 1) {
 			targetSound = "buster2X3";
-			new DZBuster2Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
+			new FakeZeroBuster2Proj(
+				pos, xDir, this, player.getNextActorNetId(), sendRpc: true
 			);
 			targetCooldown = 22;
 		} else if (chargeLevel == 2) {
-			targetSound = "buster3X3";
-			new DZBuster3Proj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
-			);
+			targetSound = "irislaser2";
+			new IrisLaserProjFoward(getShootPos(), xDir, this, player,
+						player.getNextActorNetId(), rpc: true
+				);
 			targetCooldown = 22;
 		} else if (chargeLevel == 3) {
 			if (charState is WallSlide) {
@@ -395,73 +318,10 @@ public class BusterZero : Character {
 		}
 	}
 
-	public void shootAwakened(int chargeLevel, bool sfx = true, bool cd = true) {
-		Point shootPos = getShootPos();
-		int xDir = getShootXDir();
-		string targetSound = "";
-		int? targetCooldown = null;
+	
 
-		if (chargeLevel < 1) {
-			targetSound = "busterX3";
-			var lemon = new DZShinLemonProj(
-				shootPos, xDir, this, player, player.getNextActorNetId(), rpc: true
-			);
-			zeroLemonsOnField.Add(lemon);
-			targetCooldown = 9;
-		} else if (chargeLevel == 1) {
-			targetSound = "buster3X3";
-			new DZShinBusterProj(
-				shootPos, xDir, this, player.getNextActorNetId(), sendRpc: true
-			);
-			targetCooldown = 22;
-		} else if (chargeLevel == 2) {
-			targetSound = "shingetsurinX5";
-			new DZShinGetsurinProj(
-				shootPos, xDir, 0, this, player.getNextActorNetId(), sendRpc: true
-			);
-			targetCooldown = 22;
-		} else if (chargeLevel == 3) {
-			if (charState is WallSlide) {
-				shoot(2);
-				stockedBusterLv = 1;
-				targetCooldown = 22;
-			} else {
-				shootAnimTime = 0;
-				changeState(new BusterZeroDoubleBuster(false, 3), true);
-			}
-		} else if (chargeLevel >= 4) {
-			if (charState is WallSlide) {
-				shoot(2);
-				stockedBusterLv = 2;
-				stockedSaber = true;
-				targetCooldown = 22;
-			} else {
-				shootAnimTime = 0;
-				changeState(new BusterZeroDoubleBuster(false, 4), true);
-			}
-		}
-		if (targetSound != "") {
-			playSound(targetSound, sendRpc: true);
-		}
-		if (targetCooldown != null && cd) {
-			lemonCooldown = targetCooldown.Value;
-		}
-		if (chargeLevel >= 1) {
-			stopCharge();
-		}
-	}
-
-	public virtual void shootHadangeki() {
-		Point shootPos = pos.addxy(46 * xDir, -20);
-		
-		if (isAwakened) {
-			new DZShinHadangekiProj(shootPos, xDir, this, player.getNextActorNetId());
-		} else {
-			int type = 0;
-			if (isViral) { type = 1; }
-			if (isBlackZero) { type = 2; }
-			new DZHadangekiProj(shootPos, xDir, type, this, player.getNextActorNetId());
-		}
+	public override void shootHadangeki() {
+		changeState(new DaymonBladeThrow(), true);
 	}
 
 	public override int getMaxChargeLevel() {
@@ -471,11 +331,12 @@ public class BusterZero : Character {
 	// This can run on both owners and non-owners. So data used must be in sync.
 	public override int getHitboxMeleeId(Collider hitbox) {
 		return (int)(sprite.name switch {
-			"zarzo_projswing" or "zarzo_projswing_air" or "zero_wall_slide_attack" or "zarzo_nuclear" => MeleeIds.SaberSwing,
-			"zarzo_grab_start" => MeleeIds.Grab,
-			"zarzo_grab_ex" => MeleeIds.GrabEX,
-			"zarzo_grab_ex_end" => MeleeIds.GrabEnd,
-			"zarzo_block" => MeleeIds.Block,
+			"daymon_blade_spin" or "daymon_projswing" or "daymon_projswing_air" or "zero_wall_slide_attack" or "zarzo_nuclear" => MeleeIds.SaberSwing,
+			"daymon_grab_start" => MeleeIds.Grab,
+			"daymon_grab_ex" => MeleeIds.GrabEX,
+			"daymon_grab_ex_end" => MeleeIds.GrabEnd,
+			"daymon_dropkick" => MeleeIds.Slide,
+			"daymon_block" => MeleeIds.Block,
 			
 			_ => MeleeIds.None
 		});
@@ -484,10 +345,10 @@ public class BusterZero : Character {
 	public override Projectile? getMeleeProjById(int id, Point projPos, bool addToLevel = true) {
 		Projectile? proj = id switch {
 			(int)MeleeIds.SaberSwing => new GenericMeleeProj(
-				meleeWeapon, projPos, ProjIds.DZMelee, player,
-				isBlackZero ? 4 : 3, Global.defFlinch, isReflectShield: true,
+				meleeWeapon, projPos, ProjIds.HeavyPush, player,
+				isBlackZero ? 4 : 3, 0, isReflectShield: true,
 				clashTier: ClashTier.Weak, isZSaberEffect: true,
-				addToLevel: addToLevel
+				addToLevel: addToLevel, hitSound: "htsnd_slash_deep3"
 			),
 			(int)MeleeIds.Grab => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.ForceGrabState, player, 0, 0, 40, isReflectShield: true,
@@ -501,6 +362,11 @@ public class BusterZero : Character {
 			),
 			(int)MeleeIds.GrabEnd => new GenericMeleeProj(
 				meleeWeapon, projPos, ProjIds.HeavyPush, player, 5, 30, 15, isReflectShield: true,
+				isZSaberEffect2: false, ShouldClang: false,
+				addToLevel: addToLevel
+			),
+			(int)MeleeIds.Slide => new GenericMeleeProj(
+				meleeWeapon, projPos, ProjIds.DropSlide, player, 5, 0, 15, isReflectShield: true,
 				isZSaberEffect2: false, ShouldClang: false,
 				addToLevel: addToLevel
 			),
@@ -518,6 +384,7 @@ public class BusterZero : Character {
 	public enum MeleeIds {
 		None = -1,
 		Block,
+		Slide,
 		SaberSwing,
 		GrabEnd,
 		GrabEX,
@@ -528,19 +395,20 @@ public class BusterZero : Character {
 
 	
 	public override int getMaxHealth() {
-		if (isATrans) {
-			return base.getMaxHealth();
-		}
-		return MathInt.Ceiling(Player.getModifiedHealth(40) * Player.getHpMod());
+		if (Options.main.Difficulty == 2) {
+		return MathInt.Ceiling(Player.getModifiedHealth(52) * Player.getHpMod());
+		} 
+		if (Options.main.Difficulty == 1) {
+		return MathInt.Ceiling(Player.getModifiedHealth(42) * Player.getHpMod());
+		} 
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
 	}
 
 
 
 	public override string getSprite(string spriteName) {
-		if (Global.sprites.ContainsKey("bzero_" + spriteName)) {
-			return "bzero_" + spriteName;
-		}
-		return "zarzo_" + spriteName;
+		
+		return "daymon_" + spriteName;
 	}
 
 	public override bool chargeButtonHeld() {
@@ -695,20 +563,9 @@ public class BusterZero : Character {
 		if (charState.normalCtrl) {
 			player.press(Control.Shoot);
 		}
-
-		if (this is not Daymon){
 		// Go hypermode 
-		if (player.currency >= Player.zBusterZeroHyperCost && !isBlackZero && !isInvulnerable()
-			&& charState is not HyperBusterZeroStart and not WarpIn
-		) {
-			if (hyperMode == 0) {
-				changeState(new HyperBusterZeroStart(), true);
-			} else {
-				changeState(new HyperBusterZeroStart2(), true);
-			}
-		}
-
-
+		stockedBusterLv = 0;
+		stockedSaber = false;
 		float enemyDist = 300;
 		float enemyDistY = 30;
 		if (target != null) {
@@ -719,35 +576,88 @@ public class BusterZero : Character {
 		bool isTargetInAir = enemyDistY >= 20;
 		bool canHitMaxCharge = (!isTargetInAir && getChargeLevel() >= 4);
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
-		int ZBattack = Helpers.randomRange(0, 2);
+		int ZBattack = Helpers.randomRange(0, 7);
 		if (isTargetInAir) {
 			doJumpAI();
 		}
-		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && target != null) {
+		if (!isInvulnerable() && charState is not LadderClimb && aiAttackCooldown <= 0 && target != null && charState.attackCtrl) {
 			switch (ZBattack) {
 				// Release full charge if we have it.
 				case >= 0 when canHitMaxCharge && isFacingTarget:
 					turnToPos(target.getCenterPos());
 					player.release(Control.Shoot);
+					changeState(new DaymonDoubleBuster(false, 0));
 					break;
 				// Saber swing when target is close.
 				case 0 when isTargetClose:
-					turnToPos(target.getCenterPos());
-					player.press(Control.Special1);
+					changeState(new DaymonBladeSpin());
 					break;
 				// Another action if the enemy is on Do Jump and do SaberSwing.
 				case 1 when isTargetClose:
 					turnToPos(target.getCenterPos());
-					if (isTargetInAir) doJumpAI();	
-					player.press(Control.Special1);
+					if (isTargetInAir){
+						 changeState(new ZainBossJumpStart());
+					} else {
+						changeState(new DaymonSlash());
+					}
 					break;
+				case 2 when isTargetClose:
+					playSound("zeroLeapSNDx4", true);
+					changeState(new BossBackJump());
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					shoot(1);
+					changeSpriteFromName("fall_shoot", true);
+					}, 0.2f));
+
+				break;
+				case 3 when !isTargetClose:
+					playSound("zeroLeapSNDx4", true);
+					changeState(new BossJumpStart());
+				break;
+				case 3 when isTargetClose :
+					changeState(new BossGuard());
+				break;
+				case 4 when isTargetClose :
+					changeState(new DaymonSlide());
+				break;
+				case 5 when isTargetClose:
+					shoot(1);
+					aiAttackCooldown = 40;
+				break;
+				case 6 when isTargetClose:
+					changeState(new DaymonSlide());
+
+					playSound("zeroLeapSNDx4", true);
+					vel.y = -getJumpPower() * 1.2f;
+				break;
+				case 7 when isTargetClose && grounded:
+					changeState(new DaymonBladeSpin());
+
+					
+				break;
 				// Press Shoot to lemon.
-				default:
-					player.press(Control.Shoot);
+			default:
+					if (charState.attackCtrl && isTargetClose &&
+					( !isCharging() || bonusHealth <= 0)){
+					shoot(0);
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					shoot(0);
+					}, 0.2f));
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					shoot(0);
+					}, 0.3f));
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+					shoot(0);
+					}, 0.4f));
+					
+					}
 					break;
 			}
-			aiAttackCooldown = 10;
-		}
+			if (bonusHealth > 0){
+			aiAttackCooldown = 65;
+			} else {
+				aiAttackCooldown = 25;
+			}
 		}
 		base.aiAttack(target);
 	}
@@ -771,7 +681,7 @@ public class BusterZero : Character {
 				) {
 					if (target != null)
 					turnToPos(target.getCenterPos());
-					changeState(new BusterZeroMelee(), true);
+					changeState(new BossBackJump(), true);
 				}
 			}
 		}

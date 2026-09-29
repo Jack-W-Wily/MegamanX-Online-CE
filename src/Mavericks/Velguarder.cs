@@ -33,8 +33,15 @@ public class Velguarder : Maverick {
 		height = 24;
 	}
 
+
+	public bool addedHealth;
 	public override void update() {
 		base.update();
+
+		if (player.character is BossSigmaX1 && !addedHealth) {
+			addedHealth = true;
+			health = 50;
+		}
 		if (aiBehavior == MaverickAIBehavior.Control) {
 			if (state is MIdle or MRun or MLand or MGuard) {
 				if (shootPressed()) {
@@ -226,7 +233,7 @@ public class VelguarderMState : MaverickState {
 		velguader = maverick as Velguarder ?? throw new NullReferenceException();
 	}
 }
-public class VelGShootFireState : VelguarderMState {
+public class VelGShootFireState : MaverickState {
 	float shootTime;
 	public VelGShootFireState() : base("shoot2") {
 
@@ -234,7 +241,7 @@ public class VelGShootFireState : VelguarderMState {
 
 	public override void update() {
 		base.update();
-		if (velguader == null) return;
+		//if (velguader == null) return;
 
 		if (maverick.frameIndex == 1) {
 			var poi = maverick.getFirstPOIOrDefault();
@@ -243,7 +250,7 @@ public class VelGShootFireState : VelguarderMState {
 				shootTime = 0;
 				maverick.playSound("fireWave", sendRpc: true);
 				new VelGFireProj(
-					poi, maverick.xDir, velguader,
+					poi, maverick.xDir, maverick,
 					player, player.getNextActorNetId(), rpc: true
 				);
 			}
@@ -390,6 +397,8 @@ public class VelGPounceStartState : MaverickState {
 	}
 }
 
+
+
 public class VelGPounceState : MaverickState {
 	public VelGPounceState() : base("pounce") {
 	}
@@ -413,7 +422,10 @@ public class VelGPounceState : MaverickState {
 
 	public override void onEnter(MaverickState oldState) {
 		base.onEnter(oldState);
-	}
+		if (!maverick.sprite.name.Contains("pounce")) {
+			maverick.changeSpriteFromName("attack_air", true);
+		}
+		}
 
 	public override void onExit(MaverickState newState) {
 		base.onExit(newState);

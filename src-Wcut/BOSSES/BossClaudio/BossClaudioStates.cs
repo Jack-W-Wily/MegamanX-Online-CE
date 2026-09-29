@@ -142,6 +142,7 @@ public class BossJump : CharState {
 		specialId = SpecialStateIds.AxlRoll;
 		canSpecialCancel = true;
 		normalCtrl = true;
+		attackCtrl = true;
 	}
 
 	public override void update() {
@@ -159,6 +160,261 @@ public class BossJump : CharState {
 
 	public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		specialId = SpecialStateIds.None;
+	}
+}
+
+
+
+
+public class BossBackJump : CharState {
+
+	bool dropDown;
+	public BossBackJump() : base("fall") {
+		enterSound = "land";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+		normalCtrl = true;
+		attackCtrl = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (!character.grounded && stateTime > 0.05f) {
+			exitOnLanding = true;
+		}
+		if (!character.grounded) {
+		
+			character.move(new Point(character.xDir * -200, 0));
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.vel.y = -character.getJumpPower();
+		
+	}
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		specialId = SpecialStateIds.None;
+	}
+}
+
+
+
+
+
+
+public class WSpongeLightningStateClaudio : CharState {
+	int state;
+	Point poi;
+	public WSpongeLightningStateClaudio() : base("angry_thunder_start") {
+		superArmor = true;
+	
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+		var maverick = character;
+		if (state == 0 && maverick.getFirstPOI() != null) {
+			state++;
+			poi = maverick.getFirstPOIOrDefault();
+			new WolfSigmaBeam(new TriadThunder(), poi.addxy(0, -130), maverick.xDir, 1, 1, player, player.getNextActorNetId(), rpc: true);
+		}
+
+		if (state == 1 && maverick.frameIndex == 5) {
+			state++;
+			var spawnPos = poi.addxy(50 * maverick.xDir, -120);
+			var closestTarget = Global.level.getClosestTarget(poi, player.alliance, true, aMaxDist: 150);
+			if (closestTarget != null) spawnPos.x = closestTarget.pos.x;
+			new WolfSigmaBeam(new TriadThunder(), spawnPos, maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+		}
+
+		if (state == 2 && maverick.frameIndex == 8) {
+			state++;
+			var spawnPos = poi.addxy(-50 * maverick.xDir, -120);
+			var closestTarget = Global.level.getClosestTarget(poi, player.alliance, true, aMaxDist: 150);
+			if (closestTarget != null) spawnPos.x = closestTarget.pos.x;
+			new WolfSigmaBeam(new TriadThunder(), spawnPos, maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+		}
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
+
+public class WSpongeLightningStateClaudioXtreme : CharState {
+	int state;
+	Point poi;
+	public WSpongeLightningStateClaudioXtreme() : base("angry_thunder_start") {
+		superArmor = true;
+	
+	}
+
+
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		character.playSound("ching", sendRpc: true);
+		new GigaCrushBackwall(character.pos, character);
+		new HitStop(character.pos, player, player.getNextActorNetId(), 
+		player.ownedByLocalPlayer, overrideTime: 0.3f, sendRpc: true);
+	}
+
+	public override void update() {
+		base.update();
+		if (player == null) return;
+		var maverick = character;
+		if (state == 0 && maverick.getFirstPOI() != null) {
+			state++;
+			poi = maverick.getFirstPOIOrDefault();
+			new WolfSigmaBeam(new TriadThunder(), poi.addxy(0, -130), maverick.xDir, 1, 1, player, player.getNextActorNetId(), rpc: true);
+		}
+
+		if (state == 1 && maverick.frameIndex == 5) {
+			state++;
+			var spawnPos = poi.addxy(50 * maverick.xDir, -120);
+			var closestTarget = Global.level.getClosestTarget(poi, player.alliance, true, aMaxDist: 150);
+			if (closestTarget != null) spawnPos.x = closestTarget.pos.x;
+			new WolfSigmaBeam(new TriadThunder(), spawnPos, maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+		}
+
+		if (state == 2 && maverick.frameIndex == 8) {
+			state++;
+			var spawnPos = poi.addxy(-50 * maverick.xDir, -120);
+			var closestTarget = Global.level.getClosestTarget(poi, player.alliance, true, aMaxDist: 150);
+			if (closestTarget != null) spawnPos.x = closestTarget.pos.x;
+			new WolfSigmaBeam(new TriadThunder(), spawnPos, maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(-100 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.5f));
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(100 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.5f));
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(200 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.8f));
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(-200 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.8f));
+		}
+
+		
+
+		if (maverick.isAnimOver()) {
+			maverick.changeToIdleOrFall();
+		}
+	}
+}
+
+
+
+public class FishFang : CharState {
+	public bool hasShot;
+
+	public FishFang() : base("shoot_air2") {
+		useDashJumpSpeed = true;
+		airMove = true;
+	}
+
+	public override void update() {
+		base.update();
+			if (character.frameIndex >= 1 && !hasShot) {
+				character.playSound("dynamopillar", forcePlay: false, sendRpc: true);
+				new FishFangProj(character.pos.addxy(20 * character.xDir, -20), character.xDir, character, player, player.getNextActorNetId(true), 30, true);
+				new FishFangProj(character.pos.addxy(10 * character.xDir, 0), character.xDir, character, player, player.getNextActorNetId(true), 30, true);
+				hasShot = true;
+				character.vel.y = -200;
+			}
+			if (stateTime > 0.25f) {
+				character.changeToIdleOrFall();
+			}
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+		if (character.grounded) {
+			character.vel.y = -character.getJumpPower();
+		}
+		if (character.vel.y < 0) {
+			character.vel.y = 0;
+		}
+	}
+}
+
+
+
+
+public class ClaudioRising : CharState {
+
+	bool dropDown;
+	public ClaudioRising() : base("rising") {
+		enterSound = "land";
+		specialId = SpecialStateIds.AxlRoll;
+		canSpecialCancel = true;
+	}
+
+	public override void update() {
+		base.update();
+
+		if (character.grounded  && stateTime > 0.05f) {
+				character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+
+			if (character.bonusHealth == 0) {
+					new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(0, -120), character.xDir, 1, 1, player, player.getNextActorNetId(), rpc: true);
+			var maverick = character;
+				if (Options.main.Difficulty > 1) {
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(-100 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.5f));
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(100 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.5f));
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(200 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.8f));
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				new WolfSigmaBeam(new TriadThunder(), character.pos.addxy(-200 * maverick.xDir, -120), maverick.xDir, 1, 2, player, player.getNextActorNetId(), rpc: true);
+			
+				}, 0.8f));
+				}
+			}
+			character.changeToCrouchOrFall();
+		}
+		
+		if (!character.grounded) {
+		
+			character.move(new Point(character.xDir * 200, 0));
+		}
+
+	}
+
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+			character.vel.y = -character.getJumpPower() * 1.5f;
 	}
 
 	public override void onExit(CharState? newState) {
@@ -670,11 +926,84 @@ public class ClaudioGroundPunchState : CharState {
 			float y = character.pos.y;
 			if (character.bonusHealth == 0) {
 				if (character is BossClaudio){
-				new TriadThunderProjCharged(new Point(x, y), -1, 0, character, player, player.getNextActorNetId(), rpc: true);
-				new TriadThunderProjCharged(new Point(x, y), 1, 0, character, player, player.getNextActorNetId(), rpc: true);
-				}
+				character.shakeCamera(sendRpc: true);
+				character.playSound("crash", forcePlay: false, sendRpc: true);
+				new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);	}
 				new TriadThunderQuake(new Point(x, y), 1, character, player, player.getNextActorNetId(), rpc: true);
 			}
+
+
+			if (character.OverDrive) {
+				
+				character.shakeCamera(sendRpc: true);
+			character.playSound("crash", forcePlay: false, sendRpc: true);
+			new MechFrogStompShockwave(new XBuster(),
+				character.pos.addxy(6 * character.xDir, 0f), character.xDir, player,
+				player.getNextActorNetId(), rpc: true);
+			}
+			character.shakeCamera(sendRpc: true);
+			once = true;
+			RockProjectile(15);
+			RockProjectile(-15);
+
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				RockProjectile(35);
+				RockProjectile(-35);
+			}, 0.075f));
+
+			Global.level.delayedActions.Add(new DelayedAction(() => {
+				RockProjectile(-55);
+				RockProjectile(55);
+			}, 0.15f));
+		}
+
+		if (character.isAnimOver()) {
+			character.changeToIdleOrFall();
+		}
+	}
+	public void RockProjectile(int dist) {
+		new FakeZeroRockProj(
+			character.pos.addxy(dist, 0), character.xDir, character,
+			player.getNextActorNetId(), sendRpc: true
+		);
+
+	}
+}
+
+
+
+
+
+
+public class ClaudioTriadThungerState : CharState {
+	
+	public ClaudioTriadThungerState() : base("groundpunch") {
+	}
+	public override void onEnter(CharState oldState) {
+		base.onEnter(oldState);
+	}
+
+	public override void update() {
+		base.update();
+		
+		if (character.frameIndex == 3 && !once) {
+			character.playSound("crashX2", forcePlay: false, sendRpc: true);
+
+
+			float x = character.pos.x;
+			float y = character.pos.y;
+			
+				if (character.bonusHealth <= 0) {
+					new WolfSigmaBeam(new TriadThunder(), character.pos, character.xDir, 1, 1, player, player.getNextActorNetId(), rpc: true);
+		
+				}
+				new TriadThunderProjCharged(new Point(x, y), -1, 0, character, player, player.getNextActorNetId(), rpc: true);
+				new TriadThunderProjCharged(new Point(x, y), 1, 0, character, player, player.getNextActorNetId(), rpc: true);
+				
+				new TriadThunderQuake(new Point(x, y), 1, character, player, player.getNextActorNetId(), rpc: true);
+			
 
 
 			if (character.OverDrive) {

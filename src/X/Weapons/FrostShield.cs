@@ -271,10 +271,10 @@ public class FrostShieldProjCharged : Projectile {
 		if (!ownedByLocalPlayer) return;
 
 		if (isAnimOver()) {
-			if (character?.charState is Dash || character?.charState is AirDash) {
-				if (damager.damage != 3) updateDamager(3);
-			} else {
+			if (character?.charState is Idle or Crouch) {
 				if (damager.damage != 0) updateDamager(0);
+			} else {
+				if (damager.damage != 3) updateDamager(3);
 			}
 		}
 

@@ -670,6 +670,8 @@ public class RideArmor : Actor, IDamagable {
 		FStomp2,
 		Groundpound,
 		Deactive,
+
+		GDashAttack
 	}
 
 	// This can run on both owners and non-owners. So data used must be in sync.
@@ -679,7 +681,10 @@ public class RideArmor : Actor, IDamagable {
 			|| sprite.name.Contains("blackbear2") 
 			|| sprite.name.Contains("raiden")) return (int)MeleeIds.Punch;
 			if (raNum == 1) return (int)MeleeIds.KPunch;
-			if (raNum == 4) return (int)MeleeIds.GPunch;
+			if (raNum == 4) {
+			if (sprite.name.Contains("dash") )return (int)MeleeIds.GDashAttack;
+			return (int)MeleeIds.GPunch;
+			}
 			if (raNum == 5) return (int)MeleeIds.DPunch;
 		}
 		if (sprite.name.Contains("deactive")) {
@@ -721,6 +726,10 @@ public class RideArmor : Actor, IDamagable {
 			MeleeIds.GPunch =>new GenericMeleeProj(
 				new MechGoliathPunchWeapon(), pos, ProjIds.MechGoliathPunch, player,
 				damage: 4, flinch: Global.defFlinch, 30, addToLevel: addToLevel
+			),
+			MeleeIds.GDashAttack =>new GenericMeleeProj(
+				new MechGoliathPunchWeapon(), pos, ProjIds.ForceGrabState, player,
+				damage: 4, 0, 30, addToLevel: addToLevel
 			),
 			MeleeIds.DPunch =>new GenericMeleeProj(
 				new MechDevilBearPunchWeapon(), pos, ProjIds.MechDevilBearPunch, player,
@@ -1960,7 +1969,7 @@ public class GoliathDash : RideArmorState {
 	float dashAttackTime = 0;
 	public Character? draggedChar;
 
-	public GoliathDash() : base("ridearmor_dash", "ridearmor_attack_dash", "ridearmor_carry_dash") {
+	public GoliathDash() : base("ridearmor_attack_dash", "ridearmor_attack_dash", "ridearmor_attack_dash") {
 		enterSound = "ridedash";
 	}
 

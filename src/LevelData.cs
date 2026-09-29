@@ -669,10 +669,28 @@ public class LevelData {
 		if (isCustomMap) {
 			return name;
 		}
-		if (stageSongs.ContainsKey(name)) {
+		else if (name == "st_cybermaze_test" && Options.main.preferredCharacter == 0) {
+			return "introStageBreisX4_JX";
+		}
+		else if (name == "st_cybermaze_test" && Options.main.preferredCharacter == 1) {
+			return "introStageZeroX5_megasfc";
+		}
+		else if (name == "st_cybermaze_test" && Options.main.preferredCharacter == 2) {
+			return "vileStage_repliroiddofuturo";
+		}
+		if (name == "cybermaze_1v1" && Options.main.preferredCharacter == 0) {
+			return "zero_X2";
+		}
+		else  if (name == "cybermaze_1v1" && Options.main.preferredCharacter == 1) {
+			return "CannonBall_megasfc";
+		}
+		else if (name == "cybermaze_1v1" && Options.main.preferredCharacter == 2) {
+			return "xvszero_beta";
+		}
+		else if (stageSongs.ContainsKey(name)) {
 			return stageSongs[name];
 		}
-		if (stageSongs.ContainsKey(Helpers.removeMapSuffix(name))) {
+		else if (stageSongs.ContainsKey(Helpers.removeMapSuffix(name))) {
 			return stageSongs[Helpers.removeMapSuffix(name)];
 		}
 		return Helpers.removeMapSuffix(name);

@@ -730,7 +730,7 @@ public partial class Level {
 								pos.x + (j * xDir * (repeatXPadding + spriteWidth)),
 								pos.y + (i * yDir * (repeatYPadding + spriteHeight))
 							);
-							var crackedWall = new CrackedWall(mapSpritePos, spriteName, gibSpriteName, xDir, yDir, destructableFlag, health, destroyInstanceName, true);
+							var crackedWall = new CrackedWall(instanceName,mapSpritePos, spriteName, gibSpriteName, xDir, yDir, destructableFlag, health, destroyInstanceName, true);
 							crackedWall.setzIndex(zIndex);
 						}
 					}
@@ -2626,6 +2626,11 @@ public partial class Level {
 		return minNode;
 	}
 
+
+
+
+	
+
 	public NavMeshNode getRandomNode() {
 		return navMeshNodes.GetRandomItem();
 	}
@@ -2931,7 +2936,7 @@ public partial class Level {
 		return (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		return (int)CharIds.VAVA1;
+		return (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		return (int)CharIds.AxlWC;
@@ -3017,7 +3022,7 @@ public partial class Level {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;
@@ -3057,7 +3062,7 @@ public partial class Level {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;
@@ -3095,7 +3100,7 @@ public partial class Level {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;

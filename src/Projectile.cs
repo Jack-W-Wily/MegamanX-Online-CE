@@ -104,6 +104,8 @@ public class Projectile : Actor {
 	) {
 		this.weapon = weapon;
 		this.speed = speed;
+
+		
 		vel = new Point(speed * xDir, 0);
 		useGravity = false;
 		damager = new Damager(player, damage, flinch, hitCooldown);
@@ -179,6 +181,11 @@ public class Projectile : Actor {
 	public override void update() {
 		base.update();
 
+
+		if (ownerActor is BossRockman && this is not JunkShieldProj2) {
+			changeSpriteIfDifferent("rockman_rock_proj", false);
+			
+		}
 
 		
 		time += Global.spf;

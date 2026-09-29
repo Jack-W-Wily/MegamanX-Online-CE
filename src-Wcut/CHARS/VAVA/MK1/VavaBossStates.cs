@@ -727,70 +727,19 @@ public class VavaBurensen4 : CharState {
 			
 		}
 		character.isDashing = true;
-		if (character.frameIndex == 8 && character.sprite.name.Contains("cannon_execution") && !fired) {
-				fired = true;
-				character.playSound("irislaser2", forcePlay: false, sendRpc: true);
-				 
-				new GigaCrushPilar(character.pos, ZIndex.Character + 10);
-			character.shakeCamera(true);
-			}
-
-		if (victim.sprite.name.EndsWith("knocked_down") || victim.sprite.name.EndsWith("_die")) {
-			// Consider a max timer of 0.5-1 second here before the move just shorts out. Same with other command grabs
-			victimWasGrabbedSpriteOnce = true;
-		}
-		if (!victimWasGrabbedSpriteOnce) {
-			timeWaiting += Global.spf;
-			if (timeWaiting > 1) {
-				victimWasGrabbedSpriteOnce = true;
-			}
-		}
 		
-		if (character.sprite.name.Contains("burensen_2")) {
-			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
-			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
-
-			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
-
-			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
-			if (leechTime > 0.10f && character.frameIndex == 7 || character.frameIndex == 3) {
-				leechTime = 0;
-				character.addHealth(0.13f);
-				character.shakeCamera(sendRpc: true);
-				var damager = new Damager(player, 2f, 0, 3);
-				damager.applyDamage(victim, false, new VileMK2Grab(), character, (int)ProjIds.BurensenStomp);
-			}
-
-		}
-
-		if (character.sprite.name.Contains("hyperdash_attack") && !character.isAnimOver()) {
-			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
-			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
-
-			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
-
-			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
-			}
-			if (character.sprite.name.Contains("drop_kick") && !character.isAnimOver()) {
-			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
-			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
-
-			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
-
-			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
-			}
-			if (character.sprite.name.Contains("golden_right") && !character.isAnimOver()) {
+			if (character.sprite.name.Contains("golden_right") && character.frameIndex < 3) {
 			Point enemyHeadPos = victim.getCenterPos();
 			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
 
 			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, 0);
 
 			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
-			}
-
-		if (character.sprite.name.Contains("cannon_execution") && character.isAnimOver()) {
-			character.changeToIdleOrFall();
+			} else {
+			character.useGravity = true;
 		}
+
+	
 	}
 
 	public override void onEnter(CharState oldState) {

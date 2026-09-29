@@ -155,11 +155,15 @@ public class StrikeChainHooked : CharState {
 			if (!flinch || stunTime >0.15f
 			) {
 				isDone = true;
+				if (scp.ownerActor is not Maverick){
 				character.changeState(
 							new ForceGrabbed(
 								scpChar
 							), true
 						);
+				} else {
+					character.changeToIdleOrFall();
+				}
 				return;
 			}
 		} else if (scpChar != null) {

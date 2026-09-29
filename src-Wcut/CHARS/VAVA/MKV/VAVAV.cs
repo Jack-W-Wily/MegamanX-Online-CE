@@ -420,6 +420,7 @@ public class VAVAV : Vile {
 		Helpers.decrementTime(ref gizmoCooldown);
 	
 
+		
 		if (player.input.isPressed(Control.WeaponLeft, player)
 		&& ModeCD == 0
 		&& VileMode == 0) {

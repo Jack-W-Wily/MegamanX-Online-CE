@@ -72,8 +72,10 @@ public class StingProj : Projectile {
 		projId = (int)ProjIds.Sting;
 		maxTime = 0.6f;
 		if (type == 1) {
+			if (ownerActor is not BossRockman){
 			var sprite = "sting_flat";
 			changeSprite(sprite, false);
+			}
 			reflectable = true;
 		} else if (type == 2 || type == 3) {
 			var sprite = "sting_up";
@@ -109,6 +111,7 @@ public class StingProj : Projectile {
 
 	public override void update() {
 		base.update();
+
 		if (type == 0 && time > 0.05) {
 			vel.x = 0;
 		}

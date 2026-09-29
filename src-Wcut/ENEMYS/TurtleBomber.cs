@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace MMXOnline;
 
-public class MissileElecGreen : Maverick {
+public class TurtleBomber : Maverick {
 	public VelGMeleeWeapon meleeWeapon = new();
 
-	public MissileElecGreen(
+	public TurtleBomber(
 		Player player, Point pos, int xDir,
 		ushort? netId, bool ownedByLocalPlayer, bool sendRpc = false
 	) : base(
@@ -24,7 +24,7 @@ public class MissileElecGreen : Maverick {
 		shouldDealColisionDmg = true;
 		weapon = new Weapon(WeaponIds.VelGGeneric, 101);
 
-		netActorCreateId = NetActorCreateId.MissileElecGreen;
+		netActorCreateId = NetActorCreateId.TurtleBomber;
 		netOwner = player;
 		if (sendRpc) {
 			createActorRpc(player.id);
@@ -37,7 +37,6 @@ public class MissileElecGreen : Maverick {
 	public bool healthvalueOnce = false;
 
 
-	
 	public override void creditMaverickKill(Player killer, Player assister, int? weaponIndex) {
 		if (killer != null && killer != player) {
 			if (Helpers.randomRange(0,5) == 0) {
@@ -67,40 +66,45 @@ public class MissileElecGreen : Maverick {
 
 		if (!healthvalueOnce) {
 			healthvalueOnce = true;
-			health = 2;
+			health = 15;
 		}
 
 
-		if (state is MIdle) {
-			state.invincible = true;
-		}
+		
 		if (aiBehavior == MaverickAIBehavior.Control) {
 
 		}
 	}
 
 	public override string getMaverickPrefix() {
-		return "met";
+		return "enemy_turtle";
 	}
 
 	public override float getRunSpeed() {
-		return 135f * getRunDebuffs();
+		return 0f * getRunDebuffs();
 	}
 
 	public MaverickState getShootState(bool isAI) {
 		var mshoot = new MShoot((Point pos, int xDir) => {
-			new FakeZeroBusterProj(
-				pos, xDir, this, player.getNextActorNetId(), sendRpc: true
-			);
-		}, "busterX2");
+			new TriadThunderProjCharged(pos, xDir, 3, this, player, player.getNextActorNetId(), rpc: true);
+			new TriadThunderProjCharged(pos, -xDir, 3, this, player, player.getNextActorNetId(), rpc: true);
+		}, "sparkmSparkX1");
 		if (isAI) {
 			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.001f);
 		}
 		return mshoot;
 	}
 
-	public MaverickState getShootState2() {
-		return new MTaunt();
+	
+	public MaverickState getShootState2(bool isAI) {
+		var mshoot = new MShoot((Point pos, int xDir) => {
+				new TorpedoProjMech(pos, xDir, this, player, player.getNextActorNetId(), rpc: true);
+				
+		}, "torpedo");
+		if (isAI) {
+			mshoot.consecutiveData = new MaverickStateConsecutiveData(0, 4, 0.001f);
+		}
+		return mshoot;
 	}
 
 
@@ -119,8 +123,8 @@ public class MissileElecGreen : Maverick {
 		}
 	
 		return [
-			getShootState(true),
-			new VelGPounceStartState()
+			getShootState2(false),
+			getShootState2(true),
 		];
 	}
 

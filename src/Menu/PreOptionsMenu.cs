@@ -341,7 +341,7 @@ public class PreCPUMenu : IMainMenu {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;
@@ -539,7 +539,7 @@ public class PreCPUMenu2 : IMainMenu {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;
@@ -577,7 +577,7 @@ public class PreCPUMenu2 : IMainMenu {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;
@@ -619,7 +619,7 @@ public class PreCPUMenu2 : IMainMenu {
 		spawnAsX = (int)CharIds.ZeroMID;
 		}
 		if (Options.main.preferredCharacter == 2) {
-		spawnAsX = (int)CharIds.VAVA1;
+		spawnAsX = (int)CharIds.Vile;
 		}
 		if (Options.main.preferredCharacter == 3) {
 		spawnAsX = (int)CharIds.AxlWC;

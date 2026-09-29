@@ -47,6 +47,14 @@ public class BossClaudio : Character {
 		spriteFrameToSounds["claudio_trippleslash/1"] = "saber1";
 		spriteFrameToSounds["claudio_trippleslash/8"] = "saber2";
 		spriteFrameToSounds["claudio_trippleslash/17"] = "saber3";
+
+
+		spriteFrameToSounds["claudio_air_raid/1"] = "saber1";
+		spriteFrameToSounds["claudio_air_raid/8"] = "saber2";
+		spriteFrameToSounds["claudio_air_raid/17"] = "saber3";
+		spriteFrameToSounds["claudio_air_raid/27"] = "saber2";
+		spriteFrameToSounds["claudio_air_raid/33"] = "saber3";
+		spriteFrameToSounds["claudio_air_raid/36"] = "saber2";
 		isWCUTBoss = true;
 	}
 
@@ -78,8 +86,13 @@ public class BossClaudio : Character {
 
 
 	public override int getMaxHealth() {
-		
-		return MathInt.Ceiling(Player.getModifiedHealth(60) * Player.getHpMod());
+		if (Options.main.Difficulty == 2) {
+		return MathInt.Ceiling(Player.getModifiedHealth(52) * Player.getHpMod());
+		} 
+		if (Options.main.Difficulty == 1) {
+		return MathInt.Ceiling(Player.getModifiedHealth(42) * Player.getHpMod());
+		} 
+		return MathInt.Ceiling(Player.getModifiedHealth(32) * Player.getHpMod());
 	}
 
 	public override CharState getJumpState() => new BossJumpStart();
@@ -162,6 +175,7 @@ public class BossClaudio : Character {
 		DashSlash, 
 		TrippleBusterSlash,
 
+		airRaid
 		
 	}
 
@@ -174,8 +188,10 @@ public class BossClaudio : Character {
 			"claudio_chargeslash"  => MeleeIds.DashSlash,
 			"claudio_trippleslash" => MeleeIds.TrippleSlash,
 			"claudio_shoot2" => MeleeIds.TrippleBusterSlash,
+			"claudio_air_raid" => MeleeIds.TrippleBusterSlash,
 			"claudio_dash" => MeleeIds.Rising,
-			"claudio_jump"  or  "claudio_rising" => MeleeIds.Rising,
+			"claudio_rising" => MeleeIds.Rising,
+			 "claudio_jump" when bonusHealth <= 0  => MeleeIds.airRaid,
 			"claudio_ground_punch" or "claudio_dash_end"  => MeleeIds.Launcher,
 
 			_ => MeleeIds.None
@@ -211,6 +227,13 @@ public class BossClaudio : Character {
 			(int)MeleeIds.Launcher => new GenericMeleeProj(
 				new KRMelee(), projPos, ProjIds.BurensenEND, player,
 				 3,0,10, isReflectShield: false,
+				ShouldClang: false, isZSaberEffect: false,
+				addToLevel: addToLevel
+			),
+
+			(int)MeleeIds.airRaid => new GenericMeleeProj(
+				new KRMelee(), projPos, ProjIds.VileAirRaidStart, player,
+				 0,0,10, isReflectShield: false,
 				ShouldClang: false, isZSaberEffect: false,
 				addToLevel: addToLevel
 			),
@@ -437,7 +460,7 @@ public class BossClaudio : Character {
 		Helpers.decrementFrames(ref AIHellBarrageCD);
 		bool isTargetInAir = pos.y > target?.pos.y - 20;
 		bool isTargetClose = target?.getCenterPos().distanceTo(getCenterPos()) < 50;
-		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 120;
+		bool isWishinRangedMoves = target?.getCenterPos().distanceTo(getCenterPos()) < 220;
 		bool isFacingTarget = (pos.x < target?.pos.x && xDir == 1) || (pos.x >= target?.pos.x && xDir == -1);
 		if (Global.level.is1v1()) {
 			isBoss = true;
@@ -460,7 +483,11 @@ public class BossClaudio : Character {
 							changeState(new ClaudioTrppleSlash());	
 							break;
 						case 3 when isFacingTarget:
+						if (bonusHealth <= 0){
 							changeState(new ClaudioChargedSlash());	
+						} else {
+							changeState(new ClaudioGroundPunchState());	
+						}
 							break;
 						case 4 when isFacingTarget:
 							changeState(new ClaudioTrppleSlash());	
@@ -482,13 +509,17 @@ public class BossClaudio : Character {
 				if (!isTargetClose && grounded && isWishinRangedMoves) {
 					switch (Vattack) {
 						case 1 when isFacingTarget:
-						changeState(new ClaudioShingetsurin());					
+						if (bonusHealth <= 0){
+						changeState(new ClaudioShingetsurin());	
+						} else {
+							changeState(new ClaudioTrippleBuster());
+						}				
 							break;
 						case 2 when isFacingTarget:
 							changeState(new ClaudioTrippleBuster());	
 							break;
 						case 3 when isFacingTarget:
-							changeState(new ClaudioFWave());
+							changeState(new ClaudioGuardState());
 							break;
 						case 4 when isFacingTarget:
 							changeState(new ClaudioTrippleBuster());	
@@ -533,7 +564,7 @@ public class BossClaudio : Character {
 				) {
 					if (grounded) {
 						if (aiDodgeCD == 0 && !isDashing) {
-							changeState(new ClaudioGuardState());	
+							changeState(new BossGuard());	
 								aiDodgeCD = 300;
 							
 						}
@@ -545,4 +576,140 @@ public class BossClaudio : Character {
 		base.aiDodge(target);
 	}
 	
+}
+
+
+
+
+
+
+
+
+
+public class FishFangProj : Projectile, IDamagable {
+	public Actor? target;
+	public float smokeTime = 0;
+	public float maxSpeed = 150;
+	public FishFangProj(
+		Point pos, int xDir, Actor owner, Player player, ushort? netId, float? angle = null, bool rpc = false
+	) : base(
+		pos, xDir, owner, "zarzo_fishfangproj", netId, player
+	) {
+		weapon = HomingTorpedo.netWeapon;
+		netcodeOverride = NetcodeModel.FavorDefender;
+		damager.damage = 2;
+		damager.flinch = Global.superFlinch;
+		vel = new Point(150 * xDir, 0);
+		fadeSprite = "explosion";
+		fadeSound = "explosion";
+		maxTime = 2f;
+		projId = (int)ProjIds.FishFangProj;
+		fadeOnAutoDestroy = true;
+		reflectableFBurner = true;
+		customAngleRendering = true;
+		this.angle = this.xDir == -1 ? 180 : 0;
+		if (angle != null) {
+			this.angle = angle.Value + (this.xDir == -1 ? 180 : 0);
+		}
+		if (rpc) {
+			rpcCreate(pos, owner, ownerPlayer, netId, xDir);
+		}
+		canBeLocal = false;
+	}
+	public static Projectile rpcInvoke(ProjParameters args) {
+		return new FishFangProj(
+			args.pos, args.xDir, args.owner, args.player, args.netId
+		);
+	}
+	bool homing = true;
+	public void reflect(float reflectAngle) {
+		angle = reflectAngle;
+		target = null;
+	}
+	public override void preUpdate() {
+		base.preUpdate();
+		updateProjectileCooldown();
+	}
+	public override void update() {
+		base.update();
+		if (ownedByLocalPlayer && homing) {
+			if (target != null) {
+				if (!Global.level.gameObjects.Contains(target)) {
+					target = null;
+				}
+			}
+			if (target != null) {
+				if (time < 3f) {
+					var dTo = pos.directionTo(target.getCenterPos()).normalize();
+					var destAngle = MathF.Atan2(dTo.y, dTo.x) * 180 / MathF.PI;
+					destAngle = Helpers.to360(destAngle);
+					angle = Helpers.lerpAngle(angle, destAngle, Global.spf * 3);
+				}
+			}
+			if (time >= 0.15) {
+				target = Global.level.getClosestTarget(pos, damager.owner.alliance, true, aMaxDist: Global.screenW * 0.75f);
+			} else if (time < 0.15) {
+				//this.vel.x += this.xDir * Global.spf * 300;
+			}
+			vel.x = Helpers.cosd(angle) * maxSpeed;
+			vel.y = Helpers.sind(angle) * maxSpeed;
+		}
+		smokeTime += Global.spf;
+		if (smokeTime > 0.2) {
+			smokeTime = 0;
+			if (homing) new Anim(pos, "torpedo_smoke", 1, null, true);
+		}
+	}
+	public override void renderFromAngle(float x, float y) {
+		var angle = this.angle;
+		var xDir = 1;
+		var yDir = 1;
+		var frameIndex = 0;
+		float normAngle = 0;
+		if (angle < 90) {
+			xDir = 1;
+			//yDir = -1;
+			normAngle = angle;
+		}
+		if (angle >= 90 && angle < 180) {
+			xDir = -1;
+			//yDir = -1;
+			normAngle = 180 - angle;
+		} else if (angle >= 180 && angle < 270) {
+			xDir = -1;
+			yDir = 1;
+			normAngle = angle - 180;
+		} else if (angle >= 270 && angle < 360) {
+			xDir = 1;
+			yDir = 1;
+			normAngle = 360 - angle;
+		}
+
+		if (normAngle < 18) frameIndex = 0;
+		else if (normAngle >= 18 && normAngle < 36) frameIndex = 1;
+		else if (normAngle >= 36 && normAngle < 54) frameIndex = 2;
+		else if (normAngle >= 54 && normAngle < 72) frameIndex = 3;
+		else if (normAngle >= 72 && normAngle < 90) frameIndex = 4;
+
+		sprite.draw(frameIndex, pos.x + x, pos.y + y, xDir, yDir, getRenderEffectSet(), 1, 1, 1, zIndex, actor: this);
+	}
+	public void applyDamage(float damage, Player? owner, Actor? actor, int? weaponIndex, int? projId) {
+		if (damage > 0) {
+			destroySelf();
+		}
+	}
+	public bool canBeDamaged(int damagerAlliance, int? damagerPlayerId, int? projId) {
+		return damager.owner.alliance != damagerAlliance;
+	}
+	public bool isInvincible(Player attacker, int? projId) {
+		return false;
+	}
+	public bool canBeHealed(int healerAlliance) {
+		return false;
+	}
+	public void heal(Player healer, float healAmount, bool allowStacking = true, bool drawHealText = false) {
+	}
+	public bool isPlayableDamagable() {
+		return false;
+	}
 }

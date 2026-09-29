@@ -627,12 +627,12 @@ public class VileAirRaid : CharState {
 			}
 		}
 
-			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, -10);
+			Point enemyHeadPos = victim.getHeadPos() ?? victim.getCenterPos().addxy(0, 0);
 			Point poi = character.getFirstPOIOffsetOnly() ?? new Point();
 			Point snapPos = enemyHeadPos.addxy(-poi.x * character.xDir, -poi.y);
 			character.changePos(Point.lerp(character.pos, snapPos, 0.25f));
 
-		
+	if (!character.sprite.name.Contains("claudio")){
 	if (!player.input.isHeld(Control.Down, player) 
 			&& player.input.isPressed(Control.Shoot, player)) {
 
@@ -674,18 +674,23 @@ public class VileAirRaid : CharState {
 
 		
 
-	
+
 
 		if (player.input.isPressed(Control.Jump, player)) {
 			character.changeToIdleOrFall();
 			character.vel.y = -character.getJumpPower();
 			return;
 		}
-
-		if (grabTime <= 0) {
-			character.changeToIdleOrFall();
-			return;
+		
+	} else {
+			if (character.isAnimOver()) {
+				character.changeState(new ClaudioRising(), true);
+			
+			}
 		}
+
+	
+		
 	}
 
 	public override void onEnter(CharState oldState) {
@@ -736,7 +741,7 @@ public class VileTeleport : CharState {
 		base.onEnter(oldState);
 		character.vel = Point.zero;
 		character.useGravity = false;
-		origYPos = character.linkedRideArmor.pos.y;
+		origYPos = summonPos.y;
 
 		if (isNew) {
 			character.changePos(summonPos.addxy(0, -warpHeight));
@@ -761,11 +766,11 @@ public class VileStomp : Weapon {
 
 
 public class VileStompState : CharState {
-	public Character? victim;
+	public Actor? victim;
 	float leechTime = 1;
 	public bool victimWasGrabbedSpriteOnce;
 	float timeWaiting;
-	public VileStompState(Character? victim) : base("stomp", "", "", "") {
+	public VileStompState(Actor? victim) : base("stomp", "", "", "") {
 		this.victim = victim;
 		grabTime = 3;
 	}
@@ -831,7 +836,6 @@ public class VileStompState : CharState {
 	public override void onExit(CharState? newState) {
 		base.onExit(newState);
 		character.useGravity = true;
-		victim.grabInvulnTime = 0.5f;
 		 
 	}
 }

@@ -110,6 +110,7 @@ public class MechFrogStompShockwave : Projectile {
 	public MechFrogStompShockwave(Weapon weapon, Point pos, int xDir, Player player, ushort netProjId, bool rpc = false) :
 		base(weapon, pos, xDir, 0, 0, player, "groundpound_explosion", 0, 1f, netProjId, player.ownedByLocalPlayer) {
 		maxTime = 0.75f;
+		damager.damage = 1;
 		projId = (int)ProjIds.MechFrogStompShockwave;
 		yScale = 0.5f;
 		destroyOnHit = false;
@@ -327,7 +328,7 @@ public class TorpedoProjMech : Projectile, IDamagable {
 	) {
 		weapon = RideArmor.netWeapon;
 		damager.damage = 2;
-		vel = new Point(1 * xDir, 0);
+		vel = new Point(100 * xDir, -200);
 		fadeSprite = "explosion";
 		fadeSound = "explosion";
 		maxTime = 2f;

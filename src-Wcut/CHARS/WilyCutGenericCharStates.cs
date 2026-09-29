@@ -286,7 +286,7 @@ public class BossWaitOver : CharState {
 
 		public override void onExit(CharState? newState) {
 		base.onExit(newState);
-		character.bonusHealth = 60;
+		character.bonusHealth = character.maxHealth;
 		}
 
 
@@ -589,26 +589,32 @@ public class PushedOver2 : CharState {
 
 
 
-public class LaunchedState : GenericGrabbedState {
-	public Character grabbedChar;
+public class LaunchedState : CharState {
+	
 	//private bool once;
 	public bool launched;
 
 	Anim? anim;
 	float launchTime;
 	bool once;
-	public LaunchedState(Character grabber) : base(grabber, 1, "") {
-		customUpdate = true;
+	public LaunchedState() : base("hurt") {
+	
 		superArmor = true;
 	}
 
+
+
+	public override void onExit(CharState? newState) {
+		base.onExit(newState);
+		character.useGravity= true;
+	}
 
 	public override void update() {
 		base.update();
 
 		if (launched) {
 			launchTime += Global.spf;
-			if (launchTime > 0.5f) {
+			if (launchTime > 0.8f) {
 				character.changeToIdleOrFall();
 				return;
 			}
@@ -650,14 +656,13 @@ public class LaunchedState : GenericGrabbedState {
 
 
 
-public class LaunchedStateWeak : GenericGrabbedState {
-	public Character grabbedChar;
+public class LaunchedStateWeak : CharState {
+	
 	//private bool once;
 	public bool launched;
 	float launchTime;
-	bool once;
-	public LaunchedStateWeak(Character grabber) : base(grabber, 1, "") {
-		customUpdate = true;
+	
+	public LaunchedStateWeak( ) : base("hurt") {
 		
 	}
 
@@ -686,14 +691,14 @@ public class LaunchedStateWeak : GenericGrabbedState {
 
 
 
-public class LaunchedStateMedium : GenericGrabbedState {
-	public Character grabbedChar;
+public class LaunchedStateMedium : CharState {
+	
 	//private bool once;
 	public bool launched;
 	float launchTime;
-	bool once;
-	public LaunchedStateMedium(Character grabber) : base(grabber, 1, "") {
-		customUpdate = true;
+	
+	public LaunchedStateMedium() : base("hurt") {
+		
 		
 	}
 
@@ -777,6 +782,290 @@ public class LaunchedFowardState : CharState {
 
 	}
 }
+
+
+
+
+
+
+
+
+
+
+public class MPushedOver2 : MaverickState {
+	public int hurtDir;
+	public float hurtSpeed;
+	public float flinchTime;
+	public MPushedOver2(int dir) : base("hurt") {
+		hurtDir = dir;
+		hurtSpeed = dir * 300;
+		flinchTime = 0.5f;
+	//	superArmor = true;
+	}
+
+	public override bool canEnter(Maverick character) {
+		if (character.isStatusImmune()) return false;
+		if (character.state.superArmor || character.state.invincible) return false;
+		if (character.isInvulnerable()) return false;
+		return base.canEnter(character);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		character.vel.y = -300;
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
+			character.move(new Point(hurtSpeed, 0));
+		}
+
+		
+
+		if (stateTime >= flinchTime) {
+			character.changeState(new MIdle(), true);
+		}
+	}
+}
+
+
+
+
+public class MKnockedDown : MaverickState {
+	public int hurtDir;
+	public float hurtSpeed;
+	public float flinchTime;
+	public MKnockedDown(int dir) : base("knocked_down") {
+		hurtDir = dir;
+		hurtSpeed = dir * 100;
+		flinchTime = 0.5f;
+	}
+
+	public override bool canEnter(Maverick character) {
+		if (character.isStatusImmune()) return false;
+		if (character.isFlinchImmune()) return false;
+		if (character.isInvulnerable()) return false;
+		return base.canEnter(character);
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		if (character.grounded){
+		character.vel.y = -100;
+		}
+		
+	}
+
+	bool landOnce;
+
+
+	public Anim? dashSpark;
+	public Anim? dashSpark2;
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+
+		if (!character.sprite.name.Contains("knocked_down") && stateTime > 0.1f && !once) {
+			character.changeSpriteFromName("hurt", true);
+			sprite = "hurt";
+		}
+		if (character.grounded && !landOnce && stateTime > 0.1f) {
+			landOnce = true;
+			dashSpark = new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		dashSpark2 = new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", -character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true
+		);
+		
+		dashSpark.yScale = 0.5f;
+		dashSpark2.yScale = 0.5f;
+			character.playSound("crashX3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+		}
+		if (hurtSpeed != 0) {
+			hurtSpeed = Helpers.toZero(hurtSpeed, 400 * Global.spf, hurtDir);
+			character.move(new Point(hurtSpeed, 0));
+		}
+
+		if (stateTime >= flinchTime) {
+			
+			if (player.input.isHeld(Control.Jump, player) || 
+			player.isAI && Options.main.CPUAlwaysTechOnTraining && Global.level.isTraining() ||
+			player.isAI && !Global.level.isTraining() ) {
+                character.vel.y = -character.getJumpPower() * 0.5f;
+				character.invulnTime = 0.35f;
+				character.changeToIdleOrFall();
+            }
+		}
+	}
+}
+
+
+
+
+
+
+
+public class MDraggedDown : MaverickState {
+	public const float maxGrabTime = 4;
+	
+	public long savedZIndex;
+	public MDraggedDown() : base("knocked_down") {
+		
+	}
+
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character =maverick;
+		character.stopMovingS();
+
+		if (!character.sprite.name.Contains("knocked_down")) {
+			character.changeSpriteFromName("hurt", true);
+			sprite = "hurt";
+		}
+		
+		savedZIndex = character.zIndex;
+		
+	}
+
+	
+	public bool hitonce;
+
+
+	public override void onExit(MaverickState? newState) {
+		var character =maverick;
+		base.onExit(newState);
+		
+		character.setzIndex(savedZIndex);
+	}
+
+	float smokeTime;
+
+	bool firstHit;
+	public override void update() {
+		base.update();
+		Helpers.decrementTime(ref smokeTime);
+		var character =maverick;
+		if (smokeTime == 0 && character.grounded){
+			if (!firstHit) {
+				firstHit = true;
+				character.playSound("ggsweep_5");
+				character.shakeCamera(sendRpc: true);
+				character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+			}
+		new Anim(
+			character.pos.addxy(0, 5),
+			"jump_sparks", character.xDir, player.getNextActorNetId(),
+			true, sendRpc: true);
+		smokeTime = 0.1f;
+		}
+
+
+	//	grabTime -= player.mashValue();
+		if (grabTime <= 0) {
+			character.changeToIdleOrFall();
+		}
+
+		character.move(new Point(character.xDir * -150, 0));
+		if (stateTime > 2f && character.grounded) {
+			character.changeState(new MKnockedDown(-character.xDir), true);
+		}
+
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, -character.xDir, 0);
+		if (!hitonce &&collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			hitonce = true;
+			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+					character.changeState(
+							new MKnockedDown(
+								-character.xDir
+							), true
+						);
+			character.playSound("mugenhtsnd_hit3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
+		} 
+
+	}	
+}
+
+
+
+public class MLaunchedFowardState : MaverickState {
+
+
+	public bool hitonce;
+
+	public MLaunchedFowardState() : base("hurt") {
+		superArmor = false;
+		
+	}
+
+	public override void update() {
+		base.update();
+		var character = maverick;
+		
+		character.angle += 10;
+		character.move(new Point(character.xDir * 350, 0));
+		if (stateTime > 2f || stateTime > 0.2f && character.grounded) {
+			character.changeState(new MKnockedDown(-character.xDir), true);
+			character.angle = 0;
+		}
+
+
+		CollideData? collideData = Global.level.checkTerrainCollisionOnce(character, character.xDir, 0);
+		if (!hitonce &&collideData != null && collideData.isSideWallHit() && character.ownedByLocalPlayer) {
+			hitonce = true;
+			character.applyDamage(2, player, character, (int)WeaponIds.SpeedBurner, (int)ProjIds.SpeedBurnerRecoil);
+					character.changeState(
+							new MKnockedDown(
+								-character.xDir
+							), true
+						);
+			character.angle = 0;
+			character.playSound("mugenhtsnd_hit3", sendRpc: true);
+			character.shakeCamera(sendRpc: true);
+			new Anim(character.pos, "hitwave_wall", -character.xDir, null, true);
+		} 
+		
+
+	}
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		character.useGravity = true;
+		character.vel.y = -character.getJumpPower() * 0.6f;
+	
+            character.xDir = -character.xDir;
+        
+	}
+
+	public override void onExit(MaverickState? newState) {
+		base.onExit(newState);
+		var character = maverick;
+		character.angle = 0;
+
+	}
+}
+
+
+
+
+
+
 
 
 
@@ -1113,9 +1402,22 @@ public class MForceGrabbed : MGrabbed {
 	}
 
 
+
+	public override void onEnter(MaverickState oldState) {
+		base.onEnter(oldState);
+		var character = maverick;
+		if (!character.sprite.name.Contains("grabbed")) {
+			character.changeSpriteFromName("hurt", true);
+			sprite = "hurt";
+		}
+	}
+
+
 	public override void update() {
 		techTimer += Global.spf;
 		var character = maverick;
+
+		
 		if (!Teched && techTimer > 0.2f && techTimer < 0.4f && player.input.isPressed(Control.Jump, player)) {
             character.changeToIdleOrFall();
 			Teched = true;
