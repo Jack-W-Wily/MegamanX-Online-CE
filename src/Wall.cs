@@ -284,6 +284,10 @@ public class CrackedWall : Actor, IDamagable {
 
 	public override void update() {
 		base.update();
+
+		if (sprite.name == "ms_door_open" && isAnimOver()) {
+			changeSprite("ms_door_idle", true);
+		}
 		Helpers.decrementTime(ref SpawnEntityCD);
 
 		if (sprite.name.Contains("enemy_spawner") || sprite.name.Contains("boss_camera")) {

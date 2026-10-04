@@ -1035,6 +1035,7 @@ public partial class Character : Actor, IDamagable {
 
 			if (cw.sprite.name.Contains("door")){
 				if (charState is not PassDoor) {
+					
 					cw.changeSprite("ms_door_open", true);
 					changeState(new PassDoor(), true);
 				}
@@ -1231,13 +1232,17 @@ public partial class Character : Actor, IDamagable {
 				}, 0));
                 
             } else 	if (killZone.kName.Contains("_")) {
-				if (!EnteredLevel){
-				DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
-				Global.level.levelTrigger = killZone.kName;
-				Global.level.delayedActions.Add(new DelayedAction(() => {
-					 Global.level.enterLevel();
-				}, 1));
-				EnteredLevel = true;
+				if (Global.isOffline){
+					if (!EnteredLevel){
+					DrawWrappers.DrawTextureHUD(Global.textures["menubackground"], 0, 0, 384, 216, 0, 0, 2);
+					Global.level.levelTrigger = killZone.kName;
+					Global.level.delayedActions.Add(new DelayedAction(() => {
+						Global.level.enterLevel();}, 1));
+					EnteredLevel = true;
+					}
+				} else
+				{
+					EnteredLevel = true;
 				}
             } else 
 			

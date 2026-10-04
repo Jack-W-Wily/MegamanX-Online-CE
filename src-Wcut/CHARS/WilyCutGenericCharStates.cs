@@ -218,7 +218,7 @@ public class BossWait : CharState {
 
 	Character? otherChar;
 	public BossWait() : base("lose") {
-		invincible = true;
+		invincible = false;
 	}
 
 	public override void update() {
@@ -241,8 +241,6 @@ public class BossWait : CharState {
 
 		public override void onEnter(CharState oldState) {
 		base.onEnter(oldState);
-		character.health = 0;
-		character.bonusHealth = 0;
 		
 		}
 

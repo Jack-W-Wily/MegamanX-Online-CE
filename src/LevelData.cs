@@ -561,7 +561,7 @@ public class LevelData {
 		if (customSize != -1) {
 			return customSize == 5;
 		}
-		if (name is "giantdam" or "gallery" or "powercenterfull") {
+		if (name is "giantdam" or "gallery" or "powercenterfull" or "st_cybermaze_test") {
 			return true;
 		}
 		return name.EndsWith("_collosal") || name.EndsWith("_xl");
